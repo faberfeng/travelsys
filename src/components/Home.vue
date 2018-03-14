@@ -1,0 +1,591 @@
+<template>
+    <div class="wrapper">
+        <el-row>
+            <el-col :span="24" class="header">
+                <div class="headerImg">
+                    <img src='http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'/>
+                </div>
+                <div class="headerText">
+                    {{title}}
+                </div>
+                <div class="headerInfo">
+                    <div class="headerInfoImg">
+                        <img src='http://q.qjbim.com:80/common/css/default/images/photo.jpg'/>
+                    </div>
+                    <div class="headerInfoText">
+                        {{userName}}
+                    </div>
+                    <div class="logout">
+                        <a href=""><img src="http://q.qjbim.com:80//common/css/default/images/top-system.png"/></a>
+                    </div>
+                </div>
+            </el-col>
+        </el-row>
+        <div class="contentBody">
+            <div class="sideBar">
+                <a href="#">
+                    <i class="el-icon-d-arrow-right iconI"></i>
+                </a>
+            </div>
+            <div  class="main">
+                <div class="content">
+                    <el-row class="navigation">
+                        <el-col :span="24" >
+                            <el-tabs v-model="navigationPath" @tab-click="handleClick">
+                                <el-tab-pane label="工程首页" name="projectPage" >
+                                    <div class="projectInfo">
+                                        <div class="img">
+                                            <el-carousel :interval="3000" arrow="always">
+                                                <el-carousel-item v-for="item in 4" :key="item">
+                                                    <h3>{{item}}</h3>
+                                                    </el-carousel-item>
+                                            </el-carousel>
+                                        </div>
+                                        <div class="tal">
+                                            <p class="talTitle">概况</p>
+                                            <ul class="talUl">
+                                                <li><label>使用单位</label>上海市城市建设开发投资总公司</li>
+                                                <li><label>工程名称</label>企业自用办公楼企业自用办公楼</li>
+                                                <li><label>设计单位</label>同济大学建筑设计研究院</li>
+                                                <li><label>施工单位</label>上海建工</li>
+                                                <li><label>监理单位</label>上海建科监理咨询有限公司</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="projectTab">
+                                        <el-tabs type="border-card">
+                                            <el-tab-pane>
+                                                <span slot="label"><i class="el-icon-date"></i> 动态</span>
+                                                <ul class="projectList">
+                                                    <li>
+                                                        <div class="projectListInfo">
+                                                            <div class="projectListImg">
+                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                                                            </div> 
+                                                            <div class="projectListText">
+                                                                <p class="title"><strong>tyty</strong><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="projectListInfo">
+                                                            <div class="projectListImg">
+                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                                                            </div> 
+                                                            <div class="projectListText">
+                                                                <p class="title"><strong>tyty</strong><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="projectListInfo">
+                                                            <div class="projectListImg">
+                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                                                            </div> 
+                                                            <div class="projectListText">
+                                                                <p class="title"><strong>tyty</strong><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="projectListInfo">
+                                                            <div class="projectListImg">
+                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                                                            </div> 
+                                                            <div class="projectListText">
+                                                                <p class="title"><strong>tyty</strong><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </el-tab-pane>
+                                            <el-tab-pane label="通知">
+                                                <ul class="projectList">
+                                                    <li>
+                                                        <div class="projectListInfo">
+                                                            <div class="projectListImg">
+                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                                                            </div> 
+                                                            <div class="projectListText">
+                                                                <p class="title"><strong>tyty</strong> <span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                                                                <p class="projectBottom">2018-01-31 15:42:07</p>
+                                                            </div>
+                                                        </div>
+                                                    </li> 
+                                                </ul>
+                                            </el-tab-pane>
+                                        </el-tabs>
+                                    </div>
+                                </el-tab-pane>
+                                <el-tab-pane label="进度计划" name="plan">进度计划</el-tab-pane>
+                                <el-tab-pane label="设计管理" name="designManager">
+                                    <el-menu :default-active="activeIndex"  mode="horizontal">
+                                        <el-menu-item index="1"><router-link :to="{path:'/home/design'}">设计协调</router-link></el-menu-item>
+                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">属性管理</router-link></el-menu-item>
+                                        <el-menu-item index="3"><router-link :to="{path:'/home/designversion'}">设计版本</router-link></el-menu-item>
+                                    </el-menu>
+                                    <router-view/>
+                                </el-tab-pane>
+                                <el-tab-pane label="成本管理" name="costManage">
+                                    <el-menu :default-active="activeIndex"  mode="horizontal">
+                                        <el-menu-item index="1"><router-link :to="{path:'/home/costover'}">成本预览</router-link></el-menu-item>
+                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">构建量清单</router-link></el-menu-item>
+                                        <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">工程量清单</router-link></el-menu-item>
+                                        <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">物料量清单</router-link></el-menu-item>
+                                    </el-menu>
+                                    <router-view/>
+                                </el-tab-pane>
+                                <el-tab-pane label="物资采购" name="materialPurchase">物资采购</el-tab-pane>
+                                <el-tab-pane label="施工现场" name="construction">施工现场</el-tab-pane>
+                                <el-tab-pane label="文档管理" name="documentManager">
+                                    <el-menu :default-active="activeIndex"  mode="horizontal">
+                                        <el-menu-item index="1"><router-link :to="{path:'/home/costover'}">最近文档</router-link></el-menu-item>
+                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">工程云盘</router-link></el-menu-item>
+                                        <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">已经分享</router-link></el-menu-item>
+                                        <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">个人中转</router-link></el-menu-item>
+                                    </el-menu>
+                                    <router-view/>
+                                </el-tab-pane>
+                                <el-tab-pane label="设施维保" name="facilities">设施维保</el-tab-pane>
+                                <el-tab-pane label="配置中心" name="settings">
+                                    <div class="settings">
+                                        <div  class="settingsLeft">
+                                            <h5>工程配置中心</h5>
+                                            <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
+                                                <el-submenu index="/home/initalsettings">
+                                                    <template slot="title">
+                                                        <span>工程场地与项目初始化</span>
+                                                    </template>
+                                                    <el-menu-item-group>
+                                                        <el-menu-item index="/home/initalsettings">工程初始化配置信息</el-menu-item>
+                                                        <el-menu-item index="/home/groundsettings">场地与单体初始化</el-menu-item>
+                                                        <el-menu-item index="/home/pageinital">分页与楼层初始化</el-menu-item>
+                                                    </el-menu-item-group>
+                                                </el-submenu>
+                                                <el-submenu index="/home/datatransform">
+                                                    <template slot="title">
+                                                        <span>建筑信息模型标准管理</span>
+                                                    </template>
+                                                    <el-menu-item-group>
+                                                        <el-menu-item index="/home/datatransform">数据传递标准预览</el-menu-item>
+                                                        <el-menu-item index="/home/professional">专业种类分类编码</el-menu-item>
+                                                        <el-menu-item index="/home/worktool">作业工具分类编码</el-menu-item>
+                                                        <el-menu-item index="/home/constructordesignmapped">结构设计分类映射</el-menu-item>
+                                                        <el-menu-item index="/home/constructordesigncode">结构设计分类编码</el-menu-item>
+                                                        <el-menu-item index="/home/projectsubmit">工程招标分类编码</el-menu-item>
+                                                        <el-menu-item index="/home/materialpurchase">物资采购分类编码</el-menu-item>
+                                                        <el-menu-item index="/home/buildingproperty">构建属性语意编码</el-menu-item>
+                                                    </el-menu-item-group>
+                                                </el-submenu>
+                                                <el-submenu index="/home/jobmanage">
+                                                    <template slot="title">
+                                                        <span>用户岗位群组管理</span>
+                                                    </template>
+                                                    <el-menu-item-group>
+                                                        <el-menu-item index="/home/jobmanage">岗位管理</el-menu-item>
+                                                        <el-menu-item index="/home/groupmanage">群组管理</el-menu-item>
+                                                        <el-menu-item index="/home/usermanage">用户管理</el-menu-item>
+                                                    </el-menu-item-group>
+                                                </el-submenu>
+                                                <el-submenu index="/home/projectstationmanage">
+                                                    <template slot="title">
+                                                        <span>工程动态日志</span>
+                                                    </template>
+                                                    <el-menu-item-group>
+                                                        <el-menu-item index="/home/projectstationmanage">工程动态管理</el-menu-item>
+                                                        <el-menu-item index="/home/projectloggermanage">工程日志管理</el-menu-item>
+                                                    </el-menu-item-group>
+                                                </el-submenu>
+                                            </el-menu>
+                                        </div>
+                                        <div class="settingsRight">
+                                            <router-view ></router-view>
+                                        </div>
+                                    </div>
+                                </el-tab-pane>
+                            </el-tabs>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+
+
+export default {
+    name:'Home',
+    data(){
+        return{
+            title:'企业自用办公楼',
+            userName:'李从文',
+            navigationPath:'projectPage',
+            activeIndex:'1',
+            settingActive:'/home/initalsettings'
+        }
+    },
+    created(){
+        this.navigationPath = sessionStorage.getItem('navigationPath');
+        this.settingActive = sessionStorage.getItem('settingActive');
+        if(!this.navigationPath){
+            this.navigationPath='projectPage';
+        }
+        if(!this.settingActive){
+            this.settingActive='/home/initalsettings';
+        }
+    },
+    computed:{
+        path(){
+            return this.$store.state.path;
+        }
+    },
+    methods:{
+        handleClick(tab,event){
+            // console.log(tab);
+            // console.log(tab.index)
+            if(tab.label === '工程首页'){
+                this.$router.push({
+                    path:'/home'
+                });
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath);
+            }else if(tab.label === '进度计划'){
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.label === '设计管理'){
+                this.$router.push({
+                    path:'/home/design'
+                });
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.label === '成本管理'){
+                this.$router.push({
+                    path:'/home/costover'
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.label === '物资采购'){
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+
+            }else if(tab.label === '施工现场'){
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+
+            }else if(tab.label === '文档管理'){
+                this.$router.push({
+                    path:'/home/costover'
+                });
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.label === '设施维保'){
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.label === '配置中心'){
+                this.$router.push({
+                    path:this.settingActive
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath);
+            }
+        },
+        selectIndex(index,indexPath){
+            this.settingActive = index;
+            sessionStorage.setItem('settingActive',this.settingActive);
+        }
+    }
+}
+</script>
+<style scoped>
+    a{
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+    .wrapper{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .header{
+        height: 70px;
+        background: #25282d;
+        overflow: hidden;
+        display: flex;
+    }
+    .headerImg{
+        width: 200px;
+        height: 50px;
+        margin:10px 5px;
+    }
+    .headerText{
+        font-size: 24px;
+        height: 70px;
+        text-align: left;
+        line-height: 70px;
+        color: white;
+        font-family: "方正小标宋简体";
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        flex: 1;
+    }
+    .headerInfo{
+        width: 200px;
+        height: 70px;
+    }
+    .headerInfoImg{
+        width: 25%;
+        height: 50px;
+        margin: 10px;
+        float: left;
+    }
+    .headerInfoImg img{
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+    }
+    .headerInfoText{
+        color: white;
+        height: 100%;
+        width: 25%;
+        float: left;
+        line-height:70px;;
+    }
+    .logout{
+        width: 20%;
+        float: left;
+        line-height: 50px;
+        margin:10px;
+    }
+    .logout img{
+        position: relative;
+        top: 7px;
+    }
+    /* 侧边栏 */
+    .contentBody{
+        display: flex;
+    }
+    .sideBar{
+        width: 20px;
+        min-width: 20px;
+        background: #f5f7fa;
+    }
+    /* 导航栏 */
+    .main{
+        flex: 1;
+        overflow:auto;
+    }
+    .content{
+        width: 100%;
+    }
+    .navigation{
+        height:40px;
+        width:100%;
+    }
+    /* 工程面板 */
+    .projectTab{
+        width: 100%;
+        float: left;
+        margin-right: 1%;
+        margin-top: 10px;
+        
+    }
+    /* 工程信息 */
+    .projectInfo{
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+    }
+    .projectInfo .img,.projectInfo .tal{
+        height: 300px;
+    }
+    .projectInfo .img{
+        width: 500px;
+    }
+    .projectInfo .tal{
+        flex: 1;
+        margin-left: 10px;
+        float: right;
+        background: #f5f7fa;
+        
+    }
+    .tal .talTitle{
+        color: red;
+        text-align: left;
+        height: 30px;
+        line-height: 30px;
+        padding-left: 20px;
+    }
+    .tal .talUl{
+        list-style:none;
+        padding-left: 20px;
+        font-size: 14px;
+    }
+    .talUl li{
+        text-align: left;
+        display: inline-block;
+        width: 100%;
+        height: 50px;
+    }
+    .talUl label{
+        color:#ccc;
+        display: inline-block;
+        margin-right: 20px;
+    }
+    .projectInfoTitle{
+        text-align: left;
+        height: 40px;
+        line-height: 40px;
+        background: #f1f1f1;
+    }
+    /* 工程列表 */
+    .projectList{
+        width: 100%;
+        list-style: none;
+        overflow: auto;
+        padding-left: 0;
+        margin-top: 0px;
+    }
+    .projectList li{
+        display: inline-block;
+        width: 100%;
+        background:#e0f0fd;
+        margin-top: 5px; 
+    }
+    .projectListInfo{
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+    }
+    .projectListImg{
+        width: 100px;
+        float: left;
+    }
+    .projectListText{
+        font-size: 12px;
+        flex: 1;
+        margin: 0 2px;
+        float: left;
+        text-align: left;
+    }
+    .projectListText .title{
+        width: 100%;
+    }
+    .projectListText .title a{
+        float: right;
+        width: 100px;
+        font-size: 14px;
+        cursor: pointer;
+        text-align: center;
+        color: #ccc;
+    }
+    .projectListText .title a:hover{
+        color: red;
+    }
+    .title span{
+        font-size: 14px;
+        display: inline-block;
+        margin-left: 20px;
+    }
+    .btn{
+        float: right;
+        margin-top: 10px;
+    }
+    .projectListBtn{
+        width: 20%;
+        float: left;
+    }
+    .title{
+        width: 100%;
+        text-align: left;
+        font-size: 16px;
+    }
+    .projectList img{
+        width: 50px;
+        height: 50px;
+        border-radius:50px; 
+        margin-top: 10px;
+    }
+    .projectBottom{
+        width: 100%;
+        font-size: 12px;
+        overflow: hidden;
+        color: #ccc;
+        margin-top: 15px;
+    }
+    .projectBottom label{
+        display: inline-block;
+        width: 30%;
+        margin-left: 20px;
+    }
+    /* 轮播图 */
+    .el-carousel__item h3 {
+        color: #475669;
+        font-size: 18px;
+        opacity: 0.75;
+        line-height: 300px;
+        margin: 0;
+    }
+    .el-carousel__item:nth-child(2n) {
+        background-color: #99a9bf;
+    }
+    
+    .el-carousel__item:nth-child(2n+1) {
+        background-color: #d3dce6;
+    }
+    /*设计管理*/
+    .el-menu-item{
+        padding: 0;
+        margin: 0 20px;
+    }
+    /*配置中心*/
+    .settings{
+        width: 100%;
+        overflow: auto;
+        display: flex;
+       
+    }
+    .settingsLeft{
+        width: 230px;
+        /* background: #fafafa; */
+    }
+    .settingsRight{
+         flex: 1;
+    }
+    .settings h5{
+        width:100%;
+        margin-top: 14px;
+        font-size: 18px;
+    }
+    .el-menu{
+        border: none;
+    }
+    .el-submenu__title{
+        background: #ccc;
+    }
+    
+    /* .el-menu-item.is-active{
+        color: red;
+    } */
+    .el-menu--horizontal>.el-menu-item{
+        height: 40px;
+        line-height: 40px;
+    }
+    .el-menu--horizontal>.el-menu-item.is-active{
+        border-bottom: 2px solid red;
+    }
+</style>
+
+
