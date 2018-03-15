@@ -393,7 +393,7 @@ export default {
     .main{
         flex: 1;
         overflow:auto;
-        margin-left: 18px;
+        /* margin-left: 18px; */
     }
     .content{
         width: 100%;
@@ -574,16 +574,24 @@ export default {
        
     }
     .settingsLeft{
-        width: 230px;
-        /* background: #fafafa; */
+        width: 192px;
+        background: #fafafa;
+        border-right:1px solid #ccc; 
+        
     }
     .settingsRight{
          flex: 1;
     }
     .settings h5{
         width:100%;
-        margin-top: 14px;
-        font-size: 18px;
+        height:52px; 
+        line-height: 52px;
+        font-family: 'MicrosoftYaHei';
+        font-weight: bold;
+        color: #333;
+        margin: 20px 0 14px 0;
+        font-size: 16px;
+        border-bottom: 1px solid #ccc;
     }
     .el-menu{
         border: none;

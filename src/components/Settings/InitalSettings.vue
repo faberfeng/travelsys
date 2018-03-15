@@ -2,7 +2,7 @@
     <div class="wrapper">
         <h4 class="title">工程初始配置</h4>
         <div class="account">
-            <h5 class="accountTitle">工程账号</h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-id.jpg"/>工程账号</h5>
             <ul class="accountList">
                 <li class="pre"><span>工程账号</span> <label>Q200117061402</label></li>
                 <li class="pre"><span>工程名称</span> <label>企业自用办公楼</label></li>
@@ -11,18 +11,26 @@
                 <li class="pre"><span>工程管理员电话</span> <label>13651762908</label></li>
                 <li class="pre"><span>授权用户数量</span> <label>无限制使用  14个已使用</label><span class="logo"><el-checkbox v-model="checked">使用默认logo</el-checkbox></span></li>
                 <li class="pre"><span>到期日期</span> <label>2018年12月31日</label></li>
-                <li class="pre"><span>工程logo</span> <label><img /></label></li>
+                <li class="pre " id="pre">
+                    <span>工程logo</span> 
+                    <label>
+                        <img src="../../image/project-logo.png" class="logo" />
+                        <p style="margin:0;"><el-checkbox style="margin:0;width:130px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left
+                        0;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></p>
+                    </label>
+                    
+                </li>
             </ul>
         </div>
         <div class="summary">
-            <h5 class="accountTitle">工程概况<span class="add" @click="add"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-state.jpg"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
             <ul class="accountList uniqueList" >
                 <li class="pre" v-for=" (item,index) in sumaryData" :key="index"><span>{{item.unity}}</span> <label>{{item.unityName}}</label><i @click="edit(index)" class="el-icon-document"></i><i @click="del(index)" class="el-icon-delete
 "></i></li>
             </ul>
         </div>
         <div class="img">
-            <h5 class="accountTitle">工程图片</h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-img.jpg">工程图片</h5>
             <ul class="imgUl">
                 <li class="imgLi">
                     <div class="imgD">
@@ -165,29 +173,40 @@ export default {
         width: 100%;
     }
     .title{
-        color: red;
-        width: 100%;
+        color: #fc343a;
+        font-size: 18px;
+        font-weight: bold;
+        width: 95%;
         border-bottom:1px solid #ccc; 
-        height: 30px;
-        line-height: 30px;
-        padding:10px 0px;
-        margin: 0;
+        height: 52px;
+        line-height: 52px;
+        padding:0px 15px;
+        margin: 20px 0 0 0 ;
         text-align: left;
     }
-    .account,.summary{
-        border-bottom:1px solid #e6e6e6; 
-        width: 100%;
+    .account,.summary,.img{
+        /* border-bottom:1px solid #e6e6e6;  */
+        width: 95%;
+        padding-left: 15px;
     }
     .accountTitle{
         width: 100%;
-        color: red;
+        color: #fc3439;
         text-align: left;
-        margin-bottom: 0;
+        font-size: 16px;
+        font-family: '微软雅黑';
+        font-weight: bold;
+        margin: 20px 0 10px 0;
+        border-bottom: 1px solid #ccc;
+        height: 45px;
+        line-height: 45px;
     }
     .add{
-        color: #ccc;
+        color: #336699;
         float: right;
         cursor: pointer;
+        font-size: 14px;
+        font-family: '微软雅黑'
     }
     .accountList{
         display: inline-block;
@@ -203,6 +222,7 @@ export default {
         line-height: 40px;
         cursor: pointer;
         display: flex;
+        margin: 20px 0;
         
     } 
     .pre span{
@@ -212,12 +232,15 @@ export default {
         text-align: right;
         font-size: 14px;
         cursor: pointer;
+        color: #999999;
+        font-size: '微软雅黑';
     }
     .pre label{
-        color: black;
+        color: #333333;
+        font-size: '微软雅黑';
         display: inline-block;
         flex: 1;
-        margin-left: 20px;
+        margin-left: 21px;
         font-size: 14px;
         cursor: pointer;
         width: 100%;
@@ -234,10 +257,16 @@ export default {
         width: 30px;
 
     }
-    .pre img{
+    #pre{
+        height: 100px;
+    }
+    #pre span{
+        line-height: 20px;
+    }
+    .logo{
         width: 200px;
-        height: 40px;
-        background: #ccc;
+        height: 50px;
+        /* background: #ccc; */
     }
     .el-col{
         border: 1px solid #ccc;
@@ -302,5 +331,10 @@ export default {
     .imgLi i{
         display: inline-block;
 
+    }
+    .imgicon {
+        position: relative;
+        top: 3px;
+        margin-right: 12px;
     }
 </style>
