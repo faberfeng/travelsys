@@ -54,4 +54,23 @@ export default {
   width: 111px;
   margin-left: 20px;
 }
+/**/
+.el-tabs__active-bar{
+  height: 3px;
+  width: 56px;
+}
+.el-tabs__item{
+  color: #333333;
+  font-size: 14px;
+  font-family: '微软雅黑'
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
+  /* border-top: 3px solid #fc3439; */
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item{
+  font-size: 16px;
+  width: 106px;
+  font-weight: bold;
+  color: #666666;
+}
 </style>

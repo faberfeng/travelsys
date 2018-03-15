@@ -532,7 +532,7 @@ export default {
     }
     .pagenation{
         width: 100%;
-        text-align: left;
+        text-align: right;
         height: 40px;
         margin-top: 20px;
     }
