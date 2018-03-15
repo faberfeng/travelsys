@@ -4,6 +4,9 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
+
+//工程首页 组件
+import ProJHome from '@/components/ProjectHome/home'
 /*成本管理 组件*/
 
 import Goujian from '@/components/ManageCost/Goujian'
@@ -36,6 +39,11 @@ export default new Router({
       name:'Home',
       component:Home,
       children:[
+        {
+          path:'/home/projHome',
+          name:'ProJHome',
+          component:ProJHome
+        },
         {
           path:'/home/costover',
           name:'Costover',

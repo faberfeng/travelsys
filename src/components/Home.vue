@@ -33,98 +33,7 @@
                         <el-col :span="24" >
                             <el-tabs v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" >
-                                    <div class="projectInfo">
-                                        <div class="img">
-                                            <el-carousel :interval="3000" arrow="always" height="240px" width="340px">
-                                                <el-carousel-item v-for="item in 4" :key="item">
-                                                    <h3>{{item}}</h3>
-                                                    </el-carousel-item>
-                                            </el-carousel>
-                                        </div>
-                                        <div class="tal">
-                                            <p class="talTitle">概况</p>
-                                            <ul class="talUl">
-                                                <li><label>使用单位</label>上海市城市建设开发投资总公司</li>
-                                                <li><label>工程名称</label>企业自用办公楼企业自用办公楼</li>
-                                                <li><label>设计单位</label>同济大学建筑设计研究院</li>
-                                                <li><label>施工单位</label>上海建工</li>
-                                                <li><label>监理单位</label>上海建科监理咨询有限公司</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="projectTab">
-                                        <el-tabs type="border-card">
-                                            <el-tab-pane>
-                                                <span slot="label"> 动态</span>
-                                                <ul class="projectList">
-                                                    <li>
-                                                        <div class="projectListInfo">
-                                                            <div class="projectListImg">
-                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                                                            </div> 
-                                                            <div class="projectListText">
-                                                                <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="projectListInfo">
-                                                            <div class="projectListImg">
-                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                                                            </div> 
-                                                            <div class="projectListText">
-                                                                <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="projectListInfo">
-                                                            <div class="projectListImg">
-                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                                                            </div> 
-                                                            <div class="projectListText">
-                                                                <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="projectListInfo">
-                                                            <div class="projectListImg">
-                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                                                            </div> 
-                                                            <div class="projectListText">
-                                                                <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                                                                <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </el-tab-pane>
-                                            <el-tab-pane label="通知">
-                                                <ul class="projectList">
-                                                    <li>
-                                                        <div class="projectListInfo">
-                                                            <div class="projectListImg">
-                                                                <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                                                            </div> 
-                                                            <div class="projectListText">
-                                                                <p class="title"><strong>tyty</strong> <span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                                                                <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                                                                <p class="projectBottom">2018-01-31 15:42:07</p>
-                                                            </div>
-                                                        </div>
-                                                    </li> 
-                                                </ul>
-                                            </el-tab-pane>
-                                        </el-tabs>
-                                    </div>
+                                       <router-view/>
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan">进度计划</el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager">
@@ -255,7 +164,7 @@ export default {
             // console.log(tab.index)
             if(tab.label === '工程首页'){
                 this.$router.push({
-                    path:'/home'
+                    path:'/home/projHome'
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
