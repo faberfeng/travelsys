@@ -30,7 +30,7 @@
                             <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
                             <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
                             <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
                         </div>
@@ -82,12 +82,12 @@
                             <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><strong>tyty</strong> <span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
                             <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                            <p class="projectBottom">2018-01-31 15:42:07</p>
                         </div>
                     </div>
-                </li>
+                </li> 
             </ul>
         </el-tab-pane>
     </el-tabs>
@@ -203,7 +203,7 @@ export default {
         width: 100%;
         float: left;
         margin-right: 1%;
-        margin-top: 42px;
+        margin-top: 10px;
         
     }
     /* 工程信息 */
@@ -216,12 +216,11 @@ export default {
         height: 240px;
     }
     .projectInfo .img{
-        width: 340px;
+        width: 500px;
     }
     .projectInfo .tal{
         flex: 1;
-        margin-left: 26px;
-        margin-right: 20px;
+        margin-left: 12px;
         float: right;
         background: #f5f7fa;
     }
@@ -294,11 +293,6 @@ export default {
     }
     .projectListText .title{
         width: 100%;
-        height: 35px;
-        line-height: 35px;
-        text-align: left;
-        font-size: 16px;
-        font-weight: bold;
     }
     .projectListText .title a{
         float: right;
@@ -315,7 +309,6 @@ export default {
         font-size: 14px;
         display: inline-block;
         margin-left: 20px;
-        color: #666;
     }
     .btn{
         float: right;
@@ -325,14 +318,16 @@ export default {
         width: 20%;
         float: left;
     }
-    .projectList img{
-        width: 48px;
-        height: 48px;
-        border-radius:48px; 
-        margin: 12px;
+    .title{
+        width: 100%;
+        text-align: left;
+        font-size: 16px;
     }
-    .el-tabs--border-card>.el-tabs__content{
-        padding: 0;
+    .projectList img{
+        width: 50px;
+        height: 50px;
+        border-radius:50px; 
+        margin-top: 10px;
     }
     .projectBottom{
         width: 100%;
@@ -341,7 +336,6 @@ export default {
         overflow: hidden;
         color: #ccc;
         margin-top: 20px;
-        margin-bottom: 6px;
     }
     .projectBottom label{
         display: inline-block;
@@ -366,12 +360,42 @@ export default {
     .el-carousel__arrow{
         width: 16px;
         height: 36px;
-        border-radius: 2px;
-        background: #df0010;
-        opacity: .5;
+        position: absolute;
+        display: block;
+        overflow: hidden;
+        background-image: url(./images/fanye_1.png);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        cursor: pointer;
+        opacity: 0.7;
+        filter: "alpha(opacity=70)";
+        -ms-filter: "alpha(opacity=70)";
+        border-radius: 0;
+        background-color:none;
     }
-
-
+    .el-carousel__arrow--right{
+        right: 0px;
+        transition: right .3s;
+        transform: rotateY(180deg);
+    }
+    .el-carousel__arrow--left{
+        left: 0px;
+        transition: left .3s;
+    }
+    #slider-news:hover .slider-left{
+        left: 0px;
+    }
+    #slider-news:hover .slider-right{
+        right: 0px;
+    }
+    .slider-left:hover{
+        background-image: url("./images/fanye_2.png");
+            transform: rotateY(180deg);
+    }
+    .slider-right:hover{
+        background-image: url("./images/fanye_2.png");
+            transform: rotateY(0deg)!important;
+    }
     /*设计管理*/
     .el-menu-item{
         padding: 0;
@@ -417,33 +441,6 @@ export default {
         font-size: 18px;
         font-family: '微软雅黑';
         font-weight: bold;
-    }
-    .el-tabs--border-card{
-        border:none;
-    }
-    .el-tabs--border-card>.el-tabs__header{
-        background: none;
-    }
-    .el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
-        border-top: 3px solid #fc3439; 
-        z-index: 1;
-        height: 48px;
-        color: #df0010;
-        font-family: 'MrcrosoftYaHei';
-        font-weight: bold;
-    }
-    .el-tabs--border-card > .el-tabs__header .el-tabs__item{
-        height: 51px;
-    }
-    .el-tabs--border-card > .el-tabs__header{
-        border-left: 1px solid #ccc;
-    }
-    .el-tabs--border-card{
-        box-shadow: none;
-        -webkit-box-shadow:none;
-    }
-    .el-tabs__nav{
-        width: 108px;
     }
 }
 </style>
