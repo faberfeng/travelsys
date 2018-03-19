@@ -33,7 +33,7 @@
                         <el-col :span="24" >
                             <el-tabs v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" >
-                                       <router-view/>
+                                       <router-view class="sss"/>
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan">进度计划</el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager">
