@@ -2,7 +2,7 @@
 <div id="home_project">
    <div class="projectInfo">
         <div class="lunbo-container">
-            <el-carousel :interval="3000" arrow="always" height="240px" width="340px">
+            <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
                 <el-carousel-item v-for="item in 4" :key="item">
                     <h3>{{item}}</h3>
                     </el-carousel-item>
@@ -20,170 +20,101 @@
         </div>
     </div>
 <div class="projectTab">
-    <el-tabs type="border-card">
-        <el-tab-pane>
-            <span slot="label"> 动态</span>
-            <ul class="projectList">
-                <li>
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </el-tab-pane>
-        <el-tab-pane label="通知">
-            <ul class="projectList">
-                <li>
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p >在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </el-tab-pane>
-    </el-tabs>
+    <div id="item-box" class="clearfix">
+        <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
+        <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
+    </div>
+    <ul class="projectList" v-show="tabShow == 1">
+        <li>
+            <div class="projectListInfo">
+                <div class="projectListImg">
+                    <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                </div> 
+                <div class="projectListText">
+                    <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                    <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                    <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <ul class="projectList" v-show="tabShow == 2">
+        <li>
+            <div class="projectListInfo">
+                <div class="projectListImg">
+                    <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                </div> 
+                <div class="projectListText">
+                    <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                    <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                    <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                </div>
+            </div>
+        </li>
+    </ul>
 </div>
 </div>
 
 </template>
 <script>
 export default {
-  
+    data(){
+        return{
+            tabShow:1,
+        }
+    },
+    methods:{
+        switchTab(key){
+            var vm = this
+            if(vm.tabShow != key){
+                vm.tabShow = key;
+            }
+        }
+    }
 }
 </script>
 
 <style lang="less">
     #home_project{
+        .font-color1{
+            color: #333;
+            font-size: 14px;
+        }
         a{
             text-decoration: none;
             display: inline-block;
             width: 100%;
             height: 100%;
         }
-        .wrapper{
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        // .clearfix{
+        //     overflow: hidden;
+        //     clear: both;
+        //     content: '';
+        // }
+        #item-box{
+            display: block;
+            border-bottom: 1px solid #ccc;
+            height: 37px;
         }
-        .header{
-            height: 67px;
-            background: #25282d;
-            overflow: hidden;
-            display: flex;
+        .label-item{
+            float: left;
+            height: 34px;
+            width:106px;
+            text-align: center;
+            font-size: 16px;
+            color: #666666;
+            line-height: 34px;
+            cursor: pointer;
+            border-top: 3px solid #ffffff;
         }
-        .headerImg{
-            width: 200px;
-            height: 50px;
-            margin:10px 5px;
-        }
-        .headerText{
-            font-size: 18px;
-            height: 67px;
-            text-align: left;
-            line-height: 67px;
-            color: white;
-            font-family: "微软雅黑";
+        .label-item-active{
+            color: #df0010;
             font-weight: bold;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            flex: 1;
-        }
-        .headerInfo{
-            width: 200px;
-            height: 67px;
-        }
-        .headerInfoImg{
-            width: 25%;
-            height: 50px;
-            margin: 10px;
-            float: left;
-        }
-        .headerInfoImg img{
-            width: 50px;
-            height: 50px;
-            border-radius: 50px;
-        }
-        .headerInfoText{
-            color: white;
-            height: 100%;
-            width: 25%;
-            float: left;
-            line-height:70px;;
-        }
-        .logout{
-            width: 20%;
-            float: left;
-            line-height: 50px;
-            margin:10px;
-        }
-        .logout img{
-            position: relative;
-            top: 7px;
-        }
-        /* 侧边栏 */
-        .contentBody{
-            display: flex;
-        }
-        .sideBar{
-            width: 25px;
-            min-width: 25px;
-            background: #f5f7fa;
-            border-right: 1px solid #cccccc;
-        }
-        .sideBar img{
-            position: relative;
-            top: 20px;
-
+            line-height: 34px;
+            border-top: 3px solid #df0010;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #fff;
         }
         /* 导航栏 */
         .main{
@@ -213,10 +144,10 @@ export default {
             display: flex;
         }
         .projectInfo .lunbo-container,.projectInfo .tal{
-            height: 240px;
+            height: 242px;
         }
         .projectInfo .lunbo-container{
-            width: 500px;
+            width: 340px;
         }
         .projectInfo .img{
             width: 340px;
@@ -237,7 +168,7 @@ export default {
             height: 20px;
             line-height: 20px;
             padding-left: 30px;
-            margin: 21px 0 10px 0;
+            margin: 21px 0 7px 0;
         }
         .tal .talUl{
             list-style:none;
@@ -249,8 +180,8 @@ export default {
             text-align: left;
             display: inline-block;
             width: 100%;
-            height: 35px;
-            line-height: 35px;
+            height: 37px;
+            line-height: 37px;
         }
         .talUl label{
             color:#999999;
@@ -309,10 +240,14 @@ export default {
             font-size: 14px;
             cursor: pointer;
             text-align: center;
-            color: #ccc;
+            color: #999;
+            line-height: 45px;
         }
         .projectListText .title a:hover{
-            color: red;
+            color: #fc3439;
+        }
+        .projectListText .title a .el-icon-arrow-right{
+            margin-left: 1px;
         }
         .title span{
             font-size: 14px;
@@ -332,7 +267,7 @@ export default {
             width: 48px;
             height: 48px;
             border-radius:48px; 
-            margin: 12px;
+            margin: 15px 12px 10px;
         }
         .el-tabs--border-card>.el-tabs__content{
             padding: 0;
@@ -356,7 +291,7 @@ export default {
             color: #475669;
             font-size: 18px;
             opacity: 0.75;
-            line-height: 240px;
+            line-height: 242px;
             margin: 0;
         }
         .el-carousel__item:nth-child(2n) {

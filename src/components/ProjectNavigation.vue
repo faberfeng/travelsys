@@ -11,7 +11,7 @@ export default {
     name:'ProjectNavigation',
     data(){
         return{
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany'
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/ListCompany'
         }
     },
     created(){
