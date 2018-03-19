@@ -40,6 +40,9 @@ export default {
   font-family: '微软雅黑';
   
 }
+.settingsLeft .el-menu-item:hover{
+  background-color: none;
+}
 .el-menu-item.is-active{
   color: #fc3439;
   font-weight: bold;
@@ -117,15 +120,5 @@ export default {
   height: 48px;
   line-height: 48px;
 }
-.el-tabs__item{
-  font-size: 14px;
-  font-family: 'MicrosoftYaHei';
-  color: #333333;
-}
-.el-tabs__item.is-active{
-  font-weight: bold;
-}
-.is-opened .el-submenu__title{
-  border-left: 4px solid #df0010;
-}
+
 </style>

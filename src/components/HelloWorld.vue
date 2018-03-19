@@ -3,7 +3,7 @@
 
     <h2>Essential Links</h2>
     <el-transfer v-model="value2" :data="data2"></el-transfer>
-    <router-link :to="{path:'/home'}">主页</router-link>
+    <router-link :to="{path:'/home/projHome'}">主页</router-link>
   </div>
 </template>
 
