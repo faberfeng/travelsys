@@ -32,9 +32,9 @@
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置</h5>
             <div class="groundSettingBody">
                 <div class="groundSettingBodyS">
-                    <p>
+                    <p class="firstP">
                         <label>效果等级</label>
-                        <el-select v-model="value">
+                        <el-select v-model="value" class="elSelect">
                             <el-option v-for="(item,index) in options" :key="index" :value="item.value" :label="item.label"></el-option>
                         </el-select>
                     </p>
@@ -64,9 +64,8 @@
                     <el-table-column prop="angle" label="轴网转角"></el-table-column>
                     <el-table-column prop="action" label="操作">
                         <template slot-scope="scope">
-                            
-                            <el-button class="editIcon" @click="listTableEdit(scope)" type="text" size="small"><img  class="iconImg editIcon"  src="../../assets/edit.png"/></el-button>
-                            <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, listData)" type="text" size="small"><img class="iconImg"  src="../../assets/delete.png"/></el-button>
+                            <div class="editIcon" @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
+                            <div class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, listData)"><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -518,6 +517,7 @@ export default {
         .groundSettingBody{
             color: #999999;
             width: 100%;
+            margin-top: 20px;
         }
         .groundSettingBodyS{
             display: flex;
@@ -525,30 +525,45 @@ export default {
         }
         .groundSettingBodyS p{
             flex: 1;
+            max-width:350px;
             text-align: left;
         }
+        .groundSettingBodyS .firstP{
+            margin-left: 65px;
+        }
         .groundSettingBodyS label{
-            width: 100px;
+            width: 60px;
             height: 30px;
+            color: #999;
+            font-size:'MicrosoftYaHei';
             display: inline-block;
         }
+       .groundSettingBodyS .elSelect{
+           width: 225px;
+       }
         .groundSettingBodyP{
             display:flex;
         }
         .groundSettingBodyP label{
             display: inline-block;
             width: 100px;
-            height: 70px;
-            line-height: 70px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 14px;
+            margin-left: 65px;
             text-align: left;
         }
         .groundSettingBodyP div{
             flex: 1;
-            height: 30px;
-            padding: 8px;
+            margin-left: -6px;
         }
         .groundSettingBodyC{
             text-align: left;
+            position: relative;
+            left: 80px;
+            font-size: 12px;
+            transform: scale(0.85);
+            color:#333;
         }
         .groundTable{
             width: 100%;

@@ -22,7 +22,7 @@ import DataTransform from '@/components/Settings/DataTransform'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -35,9 +35,20 @@ export default new Router({
       component:Login
     },
     {
+      path:'/showcompany',
+      name:'ProjectNavigation',
+      component:resolve=>require(['@/components/ProjectNavigation'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
       path:'/home',
       name:'Home',
       component:Home,
+      // meta:{
+      //   requireAuth:true
+      // },
       children:[
         {
           path:'/home/projHome',
@@ -158,3 +169,18 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to,from,next)=>{
+  const token = localStorage.getItem('token');
+  if(to.meta.requireAuth){
+    if(token){
+      next();
+    }else{
+      next({
+        path:'/login'
+      })
+    }
+  }else{
+    next()
+  }
+})
+export default router;

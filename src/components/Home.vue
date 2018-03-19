@@ -495,7 +495,7 @@ export default {
         font-family: 'MicrosoftYaHei';
         font-weight: bold;
         color: #333;
-        margin: 10px 0 14px 0;
+        margin: 10px 0;
         font-size: 16px;
         border-bottom: 1px solid #ccc;
     }
@@ -505,10 +505,6 @@ export default {
     .el-submenu__title{
         background: #ccc;
     }
-    
-    /* .el-menu-item.is-active{
-        color: red;
-    } */
     .el-menu--horizontal>.el-menu-item{
         height: 40px;
         line-height: 40px;
@@ -521,7 +517,27 @@ export default {
         font-family: '微软雅黑';
         font-weight: bold;
     }
-    
+    .settingsLeft .el-menu-item-group{
+        background: #ececec;
+    }
+    .settingsLeft .el-submenu span{
+        width: 124px;
+        display: inline-block;
+        margin-left: -10px;
+        text-align: left;
+    }
+    .el-tabs__item{
+        font-size: 14px;
+        font-family: 'MicrosoftYaHei';
+        color: #333333;
+    }
+    .el-tabs__item.is-active{
+        font-weight: bold;
+    }
+    .is-opened .el-submenu__title{
+        border-left: 4px solid #df0010;
+        background: #7a818a;
+    }
 </style>
 
 
