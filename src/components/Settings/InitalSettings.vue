@@ -2,35 +2,33 @@
     <div class="wrapper">
         <h4 class="title">工程初始配置</h4>
         <div class="account">
-            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-id.jpg"/>工程账号</h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号</h5>
             <ul class="accountList">
                 <li class="pre"><span>工程账号</span> <label>Q200117061402</label></li>
                 <li class="pre"><span>工程名称</span> <label>企业自用办公楼</label></li>
                 <li class="pre"><span>工程管理账号</span> <label>evan.qiang@qq.com</label></li>
                 <li class="pre"><span>工程管理员姓名</span> <label>王自强</label></li>
                 <li class="pre"><span>工程管理员电话</span> <label>13651762908</label></li>
-                <li class="pre"><span>授权用户数量</span> <label>无限制使用  14个已使用</label><span class="logo"><el-checkbox v-model="checked">使用默认logo</el-checkbox></span></li>
+                <li class="pre"><span>授权用户数量</span> <label>无限制使用  14个已使用</label></li>
                 <li class="pre"><span>到期日期</span> <label>2018年12月31日</label></li>
                 <li class="pre " id="pre">
                     <span>工程logo</span> 
-                    <label>
-                        <img src="../../image/project-logo.png" class="logo" />
-                        <p style="margin:0;"><el-checkbox style="margin:0;width:130px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left
-                        0;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></p>
-                    </label>
-                    
+                    <div class="preDiv">
+                        <div><img src="../../assets/project-logo.png" class="logo" /></div>
+                        <div style="margin:0;"><el-checkbox size="small" style="margin:0;width:130px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left
+                        0;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
+                    </div>
                 </li>
             </ul>
         </div>
         <div class="summary">
-            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-state.jpg"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-state.png"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
             <ul class="accountList uniqueList" >
-                <li class="pre" v-for=" (item,index) in sumaryData" :key="index"><span>{{item.unity}}</span> <label>{{item.unityName}}</label><i @click="edit(index)" class="el-icon-document"></i><i @click="del(index)" class="el-icon-delete
-"></i></li>
+                <li class="pre" v-for=" (item,index) in sumaryData" :key="index"><span>{{item.unity}}</span> <label>{{item.unityName}}</label><img class="imgedit" @click="edit(index)" src="../../assets/edit.png"/><img @click="del(index)" class="imgdelete" src="../../assets/delete.png"/></li>
             </ul>
         </div>
         <div class="img">
-            <h5 class="accountTitle"><img class="imgicon" src="../../image/project-img.jpg">工程图片</h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-img.jpg">工程图片</h5>
             <ul class="imgUl">
                 <li class="imgLi">
                     <div class="imgD">
@@ -51,38 +49,38 @@
         <el-dialog title="工程概况信息编辑" :visible.sync="addDialog">
             <el-form >
                 <el-form-item label="单位">
-                    <el-input  auto-complete="off" v-model="projectUnity"></el-input>
+                    <el-input class="inp"  v-model="projectUnity"></el-input>
                 </el-form-item>
                 <el-form-item label="名称">
-                    <el-input  auto-complete="off" v-model="projectName"></el-input>
+                    <el-input class="inp"  v-model="projectName"></el-input>
                 </el-form-item>
             </el-form>
             <p class="err" v-show="showErr">请输入完整信息</p>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="addDialog=false">取消</el-button>
                 <el-button type="primary" @click="addMakeSure">确定</el-button>
+                <el-button @click="addDialog=false">取消</el-button>
             </div>
         </el-dialog>
         <el-dialog title="工程概况信息编辑" :visible.sync="editDialog">
             <el-form >
                 <el-form-item label="单位">
-                    <el-input  auto-complete="off" v-model="projectUnity"></el-input>
+                    <el-input  class="inp" v-model="projectUnity"></el-input>
                 </el-form-item>
                 <el-form-item label="名称">
-                    <el-input  auto-complete="off" v-model="projectName"></el-input>
+                    <el-input  class="inp" v-model="projectName"></el-input>
                 </el-form-item>
             </el-form>
             <p class="err" v-show="showErr">请输入完整信息</p>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="editDialog=false">取消</el-button>
                 <el-button type="primary" @click="editMakeSure">确定</el-button>
+                <el-button @click="editDialog=false">取消</el-button>
             </div>
         </el-dialog>
         <el-dialog title="工程概况信息编辑" :visible.sync="deleteDialog">
             <h3>确认删除吗？</h3>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="deleteDialog=false">取消</el-button>
                 <el-button type="primary" @click="deleteMakeSure">确定</el-button>
+                <el-button @click="deleteDialog=false">取消</el-button>
             </div>
         </el-dialog>
     </div>
@@ -96,7 +94,7 @@ export default {
             editDialog:false,
             deleteDialog:false,
             showErr:false,
-            checked:true,
+            checked:false,
             projectUnity:'',
             projectName:'',
             sumaryData:[
@@ -178,14 +176,13 @@ export default {
         font-weight: bold;
         width: 95%;
         border-bottom:1px solid #ccc; 
-        height: 52px;
-        line-height: 52px;
+        height: 50px;
+        line-height: 50px;
         padding:0px 15px;
-        margin: 20px 0 0 0 ;
+        margin: 10px 0 0 0 ;
         text-align: left;
     }
     .account,.summary,.img{
-        /* border-bottom:1px solid #e6e6e6;  */
         width: 95%;
         padding-left: 15px;
     }
@@ -222,7 +219,7 @@ export default {
         line-height: 40px;
         cursor: pointer;
         display: flex;
-        margin: 20px 0;
+        margin: 15px 0;
         
     } 
     .pre span{
@@ -235,7 +232,7 @@ export default {
         color: #999999;
         font-size: '微软雅黑';
     }
-    .pre label{
+    .pre label,.preDiv{
         color: #333333;
         font-size: '微软雅黑';
         display: inline-block;
@@ -248,13 +245,13 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
-    .pre i{
-        color:royalblue;
+    .pre .imgedit,.pre .imgdelete{
         visibility:hidden;
-        line-height: 40px;
-        display: block;
-        height: 40px;
-        width: 30px;
+        position: relative;
+        top: 12px;
+        margin-right: 22px;
+        width: 16px ;
+        height: 16px;
 
     }
     #pre{
@@ -266,7 +263,8 @@ export default {
     .logo{
         width: 200px;
         height: 50px;
-        /* background: #ccc; */
+        display: inline-block;
+        background: #f0f1f4;
     }
     .el-col{
         border: 1px solid #ccc;
@@ -274,13 +272,13 @@ export default {
     .summary .pre:hover{
         background:#fff6f6;
     }
-    .pre:hover i{
+    .pre:hover .imgedit {
         visibility:visible;
     }
-    .logo{
-        text-align: left !important;
-        width: 150px !important;
+     .pre:hover .imgdelete{
+        visibility:visible;
     }
+
     
     /*工程概况*/
     .summary .pre{
@@ -336,5 +334,8 @@ export default {
         position: relative;
         top: 3px;
         margin-right: 12px;
+    }
+    .inp{
+        width: 80%;
     }
 </style>

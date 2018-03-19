@@ -9,29 +9,21 @@
                     {{title}}
                 </div>
                 <div class="headerInfo">
-                    <div class="headerInfoImg">
-                        <img src='http://q.qjbim.com:80/common/css/default/images/photo.jpg'/>
-                    </div>
-                    <div class="headerInfoText">
-                        {{userName}}
-                    </div>
-                    <div class="logout">
-                        <a href=""><img src="http://q.qjbim.com:80//common/css/default/images/top-system.png"/></a>
-                    </div>
+                    <img class="headerInfoImg" src='../assets/loginimg.png'/>
                 </div>
             </el-col>
         </el-row>
         <div class="contentBody">
             <div class="sideBar">
                 <a href="#">
-                    <img src="../image/arrow-left.png"/>
+                    <img src="../assets/arrow-left.png"/>
                 </a>
             </div>
             <div  class="main">
                 <div class="content">
                     <el-row class="navigation">
                         <el-col :span="24" >
-                            <el-tabs v-model="navigationPath" @tab-click="handleClick">
+                            <el-tabs  v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" >
                                        <router-view class="sss"/>
                                 </el-tab-pane>
@@ -140,7 +132,7 @@ export default {
             userName:'李从文',
             navigationPath:'projectPage',
             activeIndex:'1',
-            settingActive:'/home/initalsettings'
+            settingActive:'/home/initalsettings',
         }
     },
     created(){
@@ -228,7 +220,7 @@ export default {
         overflow: hidden;
     }
     .header{
-        height: 67px;
+        height: 68px;
         background: #25282d;
         overflow: hidden;
         display: flex;
@@ -237,6 +229,10 @@ export default {
         width: 200px;
         height: 50px;
         margin:10px 5px;
+    }
+    #pane-projectPage{
+        margin-top: 35px;
+        margin-left:20px;
     }
     .headerText{
         font-size: 18px;
@@ -252,20 +248,20 @@ export default {
         flex: 1;
     }
     .headerInfo{
-        width: 200px;
-        height: 67px;
+        width: 86px;
+        height: 68px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #433a43;
+        cursor: pointer;
     }
     .headerInfoImg{
-        width: 25%;
-        height: 50px;
-        margin: 10px;
-        float: left;
+        width: 48px;
+        height: 48px;
+        border-radius: 48px;
     }
-    .headerInfoImg img{
-        width: 50px;
-        height: 50px;
-        border-radius: 50px;
-    }
+
     .headerInfoText{
         color: white;
         height: 100%;
@@ -295,7 +291,7 @@ export default {
     }
     .sideBar img{
         position: relative;
-        top: 20px;
+        top: 22px;
 
     }
     /* 导航栏 */
@@ -308,7 +304,7 @@ export default {
         width: 100%;
     }
     .navigation{
-        height:40px;
+        height:48px;
         width:100%;
     }
     /* 工程面板 */
@@ -316,7 +312,8 @@ export default {
         width: 100%;
         float: left;
         margin-right: 1%;
-        margin-top: 10px;
+        margin-top: 43px;
+
         
     }
     /* 工程信息 */
@@ -493,12 +490,12 @@ export default {
     }
     .settings h5{
         width:100%;
-        height:52px; 
-        line-height: 52px;
+        height:50px; 
+        line-height: 50px;
         font-family: 'MicrosoftYaHei';
         font-weight: bold;
         color: #333;
-        margin: 20px 0 14px 0;
+        margin: 10px 0 14px 0;
         font-size: 16px;
         border-bottom: 1px solid #ccc;
     }
@@ -524,6 +521,7 @@ export default {
         font-family: '微软雅黑';
         font-weight: bold;
     }
+    
 </style>
 
 

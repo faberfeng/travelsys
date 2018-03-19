@@ -1,7 +1,7 @@
 <template>
 <div id="home_project">
    <div class="projectInfo">
-        <div class="lunbo-container">
+        <div class="img">
             <el-carousel :interval="3000" arrow="always" height="240px" width="340px">
                 <el-carousel-item v-for="item in 4" :key="item">
                     <h3>{{item}}</h3>
@@ -212,10 +212,10 @@ export default {
         overflow: hidden;
         display: flex;
     }
-    .projectInfo .lunbo-container,.projectInfo .tal{
+    .projectInfo .img,.projectInfo .tal{
         height: 240px;
     }
-    .projectInfo .lunbo-container{
+    .projectInfo .img{
         width: 500px;
     }
     .projectInfo .tal{
@@ -371,59 +371,30 @@ export default {
         filter: "alpha(opacity=70)";
         -ms-filter: "alpha(opacity=70)";
         border-radius: 0;
-        background-color:transparent;
-        transform: translateY(-50%);
+        background-color:none;
     }
-     .el-carousel__arrow i{
-         display: none;
-     }
     .el-carousel__arrow--right{
-        right: -80px;
+        right: 0px;
         transition: right .3s;
-        transform: rotateY(180deg) translateY(-50%);
+        transform: rotateY(180deg);
     }
     .el-carousel__arrow--left{
-        left: -80px;
+        left: 0px;
         transition: left .3s;
     }
-    .lunbo-container:hover .el-carousel__arrow--left{
+    #slider-news:hover .slider-left{
         left: 0px;
     }
-    .lunbo-container:hover .el-carousel__arrow--right{
+    #slider-news:hover .slider-right{
         right: 0px;
     }
-    .el-carousel__arrow--left:hover{
+    .slider-left:hover{
         background-image: url("./images/fanye_2.png");
-        transform:rotateY(180deg) translateY(-50%);
+            transform: rotateY(180deg);
     }
-    .el-carousel__arrow--right:hover{
+    .slider-right:hover{
         background-image: url("./images/fanye_2.png");
-        transform: translateY(-50%);
-    }
-    .el-carousel__indicator{
-        padding-bottom: 10px;
-        padding-left: 0;
-        padding-right: 0;
-    }
-    .el-carousel__button{
-        width: 6px;
-        height: 6px;
-        display: inline-block;
-        background-color: #999;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: all .3s ease-in-out;
-        -ms-transition: all .3s ease-in-out;
-        -moz-transition: all .3s ease-in-out;
-        -webkit-transition: all .3s ease-in-out;
-        -o-transition: all .3s ease-in-out;
-        margin: 0 4px;
-        vertical-align: top;
-    }
-    .is-active button{
-        background: #f33;
-        width: 26px;
-        height: 6px;
+            transform: rotateY(0deg)!important;
     }
     /*设计管理*/
     .el-menu-item{
