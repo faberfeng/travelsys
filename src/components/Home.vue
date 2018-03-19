@@ -538,6 +538,15 @@ export default {
         border-left: 4px solid #df0010;
         background: #7a818a;
     }
+    .settingsLeft .el-menu-item-group{
+        background: #ececec;
+    }
+    .settingsLeft .el-submenu span{
+        width: 124px;
+        display: inline-block;
+        margin-left: -10px;
+        text-align: left;
+    }
 </style>
 
 
