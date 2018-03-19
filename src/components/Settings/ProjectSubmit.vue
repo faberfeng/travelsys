@@ -20,14 +20,16 @@ export default {
         /* border-left: 1px solid #ccc; */
     }
     .title{
-        color: red;
-        width: 100%;
+        color: #fc343a;
+        font-size: 18px;
+        font-weight: bold;
+        width: 95%;
         border-bottom:1px solid #ccc; 
-        height: 30px;
-        line-height: 30px;
+        height: 50px;
+        line-height: 50px;
+        padding:0px 15px;
+        margin: 10px 0 0 0 ;
         text-align: left;
-        padding:10px 0px;
-        margin: 0;
     }
 
 </style>

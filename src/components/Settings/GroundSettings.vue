@@ -1,35 +1,35 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" id="groundSetting">
       <h4 class="title">场地与单体配置</h4>
       <div class="main">
         <div class="groundInfo groundTitle">
-            <h5 class="accountTitle"><i class="el-icon-document"></i>场地信息 <span @click="groundInfoEdit" class="groundIcon"><i class="el-icon-edit-outline"></i></span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<img class="groundEdit" @click="groundInfoEdit" src="../../assets/ground-editpng.png"/></h5>
                 <ul class="groundInfoInp">
-                    <li><label>城市坐标系名称:</label><el-input :disabled="canEdit" class="sInp"></el-input></li>
+                    <li><label>城市坐标系名称</label><el-input :disabled="canEdit" class="sInp"></el-input></li>
                     <li>
-                        <label>场地原点:</label>
+                        <label>场地原点</label>
                         <div>
-                            <el-input :disabled="canEdit" class="sInp"><template slot="prepend">X=</template></el-input> 
+                            <el-input :disabled="canEdit" class="sInp"></el-input> 
                         </div>
                         <div>
-                            <el-input :disabled="canEdit" class="sInp"><template slot="prepend">Y=</template></el-input>
+                            <el-input  :disabled="canEdit" class="sInp spe"></el-input>
                         </div>
-                        <label>场地高程:</label>
+                        <label>场地高程</label>
                         <div>
-                            <el-input :disabled="canEdit"><template slot="prepend">X=</template></el-input>    
+                            <el-input :disabled="canEdit"></el-input>    
                         </div>
                     </li>
                     <li>
-                        <label>工程规模:</label>
+                        <label>工程规模</label>
                         <div>
-                            <el-input :disabled="canEdit"><template slot="append">平方米</template></el-input>
+                            <el-input class="scale" :disabled="canEdit"></el-input>
                         </div>
                     </li>                
                 </ul>
                 <p><el-button @click="saveEdit" class="btn" type="primary">保存</el-button><el-button class="btn">取消</el-button></p>
         </div>
         <div class="groundSetting groundTitle">
-            <h5 class="accountTitle"><i class="el-icon-document"></i>场景设置 <span class="groundIcon"><i class="el-icon-edit-outline"></i></span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置</h5>
             <div class="groundSettingBody">
                 <div class="groundSettingBodyS">
                     <p>
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="singleList groundTitle">
-            <h5 class="accountTitle"><i class="el-icon-document"></i>单体列表<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/single-list.png"/>单体列表<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="listData" style="width:99%">
                     <el-table-column prop="index" label="序号"></el-table-column>
@@ -64,15 +64,16 @@
                     <el-table-column prop="angle" label="轴网转角"></el-table-column>
                     <el-table-column prop="action" label="操作">
                         <template slot-scope="scope">
-                            <el-button class="editIcon" @click="listTableEdit(scope)" type="text" size="small"><i class="el-icon-edit-outline"></i></el-button>
-                            <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, listData)" type="text" size="small"><i class="el-icon-delete"></i></el-button>
+                            
+                            <el-button class="editIcon" @click="listTableEdit(scope)" type="text" size="small"><img  class="iconImg editIcon"  src="../../assets/edit.png"/></el-button>
+                            <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, listData)" type="text" size="small"><img class="iconImg"  src="../../assets/delete.png"/></el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </div>
         </div>
         <div class="groundSource groundTitle">
-            <h5 class="accountTitle"><i class="el-icon-document"></i>场地资源包<span @click="groundSourceAdd"  class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
+           <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="groundSourceData" style="width:99%">
                     <el-table-column prop="groundIndex" label="序号"></el-table-column>
@@ -424,126 +425,186 @@ export default {
     }
 }
 </script>
-<style scoped>
-    .wrapper{
-        width: 100%;
-    }
-    .title{
-        color: red;
-        width: 100%;
-        border-bottom:1px solid #ccc; 
-        height: 30px;
-        line-height: 30px;
-        text-align: left;
-        padding:10px 0px;
-        margin: 0;
-    }
-    .groundTitle{
-        width: 100%;
-    }
-    .groundIcon{
-        float: right;
-        width: 60px;
-        height: 100%;
-        cursor: pointer;
-        text-align: center;
-        color: #336699;
-    }
-    .accountTitle{
-        color: red;
-        text-align: left;
-        width: 100%;
-        height: 30px;
-        line-height: 30px;
-        border-bottom:1px solid #e6e6e6
-    }
-    .groundInfoInp{
-        display: inline-block;
-        width: 100%;
-        list-style: none;
-        padding: 0;
-        color: #999999;
-        font-size: 14px;
-    }
-    .groundInfoInp li{
-        display: inline-block;
-        width: 100%;
-        display: flex;
-        margin: 15px 0;
-    }
-    .groundInfoInp label{
-        width: 110px;
-        height: 40px;
-        line-height: 40px;
-    }  
-    .groundInfoInp div{
-        flex: 1;
-    }  
-    .sInp{
-        float: left;
-    }
-    .btn{
-        width: 15%;
-        max-width: 150px;
-        min-width:70px;
-    }
+<style lang="less">
+    #groundSetting{
+        .wrapper{
+            width: 100%;
+        }
+        .title{
+            color: #fc343a;
+            font-size: 18px;
+            font-weight: bold;
+            width: 95%;
+            border-bottom:1px solid #ccc; 
+            height: 50px;
+            line-height: 50px;
+            padding:0px 15px;
+            margin: 10px 0 0 0 ;
+            text-align: left;
+        }
+        .groundTitle{
+            width: 95%;
+            padding-left: 20px;
+        }
+        .groundIcon{
+            float: right;
+            width: 60px;
+            height: 100%;
+            cursor: pointer;
+            text-align: center;
+            color: #336699;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .groundIcon:hover{
+            font-weight: bold;
+        }
+        .accountTitle{
+            width: 100%;
+            color: #fc3439;
+            text-align: left;
+            font-size: 16px;
+            font-family: '微软雅黑';
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #ccc;
+            height: 45px;
+            line-height: 45px;
+        }
+        .groundInfoInp{
+            display: inline-block;
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            color: #999999;
+            font-size: 14px;
+        }
+        .groundInfoInp li{
+            display: inline-block;
+            width: 100%;
+            display: flex;
+            margin: 15px 0;
+        }
+        .groundInfoInp label{
+            width: 110px;
+            height: 40px;
+            text-align: right;
+            margin-right: 10px;
+            line-height: 40px;
+            font-size: 14px;
+            font-family: 'MrcrosoftYaHei';
+        }  
+        .groundInfoInp div{
+            flex: 1;
+            height: 37px;
+        }  
+        .sInp{
+            float: left;
+            min-width: 225px;
+        }
+        .scale{
+            width: 225px;
+            float: left;
+        }
+        .spe{
+            margin-left: 10px;
+        }
+        .btn{
+            width: 15%;
+            max-width: 150px;
+            min-width:70px;
+        }
 
-    .groundSettingBody{
-        color: #999999;
-        width: 100%;
+        .groundSettingBody{
+            color: #999999;
+            width: 100%;
+        }
+        .groundSettingBodyS{
+            display: flex;
+            font-size: 14px;
+        }
+        .groundSettingBodyS p{
+            flex: 1;
+            text-align: left;
+        }
+        .groundSettingBodyS label{
+            width: 100px;
+            height: 30px;
+            display: inline-block;
+        }
+        .groundSettingBodyP{
+            display:flex;
+        }
+        .groundSettingBodyP label{
+            display: inline-block;
+            width: 100px;
+            height: 70px;
+            line-height: 70px;
+            text-align: left;
+        }
+        .groundSettingBodyP div{
+            flex: 1;
+            height: 30px;
+            padding: 8px;
+        }
+        .groundSettingBodyC{
+            text-align: left;
+        }
+        .groundTable{
+            width: 100%;
+            text-align: left;
+        }
+        .groundTable .table{
+            flex: 1;
+        }
+        .pagenation{
+            width: 100%;
+            text-align: right;
+            height: 40px;
+            margin-top: 20px;
+        }
+        .editIcon{
+            color: #fe731e;
+        }
+        .deleteIcon{
+            color: #4573a2;
+        }
+        .infoIcon{
+            color: #3ac737;
+        }
+        .imgicon {
+            position: relative;
+            top: 1px;
+            margin-right: 12px;
+        }
+        // .el-input__inner{
+            
+        // }
+        .el-input.is-disabled .el-input__inner{
+            height: 37px;
+            background: #fafafa;
+        }
+        .groundEdit{
+            float: right;
+            position: relative;
+            top: 15px;
+            cursor: pointer;
+        }
+        .el-input__inner{
+            height: 37px;
+        }
+        .iconImg{
+            width: 16px;
+            height: 16px;
+            position: relative;
+            top: 5px;
+            margin-right: 25px;
+        }
+        .editIcon{
+            margin-left: 10px;
+        }
+
     }
-    .groundSettingBodyS{
-        display: flex;
-        font-size: 14px;
-    }
-    .groundSettingBodyS p{
-        flex: 1;
-        text-align: left;
-    }
-    .groundSettingBodyS label{
-        width: 100px;
-        height: 30px;
-        display: inline-block;
-    }
-    .groundSettingBodyP{
-        display:flex;
-    }
-    .groundSettingBodyP label{
-        display: inline-block;
-        width: 100px;
-        height: 70px;
-        line-height: 70px;
-        text-align: left;
-    }
-    .groundSettingBodyP div{
-        flex: 1;
-        height: 30px;
-        padding: 8px;
-    }
-    .groundSettingBodyC{
-        text-align: left;
-    }
-    .groundTable{
-        width: 100%;
-        text-align: left;
-    }
-    .groundTable .table{
-        flex: 1;
-    }
-    .pagenation{
-        width: 100%;
-        text-align: right;
-        height: 40px;
-        margin-top: 20px;
-    }
-    .editIcon{
-        color: #fe731e;
-    }
-    .deleteIcon{
-        color: #4573a2;
-    }
-    .infoIcon{
-        color: #3ac737;
-    }
+    
 </style>
 
