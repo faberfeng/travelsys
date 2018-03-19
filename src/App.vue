@@ -120,5 +120,16 @@ export default {
   height: 48px;
   line-height: 48px;
 }
-
+.el-tabs__item{
+  font-size: 14px;
+  font-family: 'MicrosoftYaHei';
+  color: #333333;
+}
+.el-tabs__item.is-active{
+  font-weight: bold;
+}
+.is-opened .el-submenu__title{
+  border-left: 4px solid #df0010;
+  background: #7a818a;
+}
 </style>
