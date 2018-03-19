@@ -1,7 +1,7 @@
 <template>
     <div id="projectNavigation">
         <div>i am ok</div>
-        123
+        <el-button @click="back" type="primary">登陆</el-button>
     </div>
 </template>
 <script>
@@ -20,8 +20,22 @@ export default {
     },
     methods:{
         getProjectList(){
-            axios.get(this.url).then((response)=>{
+            // axios.get(this.url).then((response)=>{
+            //     console.log(response);
+            // })
+            axios({
+                method:'GET',
+                url:this.url,
+                headers:{
+                    'accept':'application/json;charset=UTF-8',
+                }
+            }).then((response)=>{
                 console.log(response);
+            })
+        },
+        back(){
+            this.$router.push({
+                path:'/login'
             })
         }
     }

@@ -56,16 +56,16 @@
         <div class="singleList groundTitle">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/single-list.png"/>单体列表<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
-                <el-table class="table" border :data="listData" style="width:99%">
+                <el-table class="table" border :data="listData" style="width:100%">
                     <el-table-column prop="index" label="序号"></el-table-column>
                     <el-table-column prop="name" label="单体名称"></el-table-column>
                     <el-table-column prop="coordinate" label="轴网基点坐标"></el-table-column>
                     <el-table-column prop="high" label="首层相对高度"></el-table-column>
                     <el-table-column prop="angle" label="轴网转角"></el-table-column>
-                    <el-table-column prop="action" label="操作">
-                        <template slot-scope="scope">
-                            <div class="editIcon" @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, listData)"><img class="iconImg"  src="../../assets/delete.png"/></div>
+                    <el-table-column prop="action" label="操作" width="150">
+                        <template slot-scope="scope" >
+                            <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
+                            <div class="iconDiv2 iconDiv"  @click="deleteRow(scope.$index, listData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -74,7 +74,7 @@
         <div class="groundSource groundTitle">
            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
-                <el-table class="table" border :data="groundSourceData" style="width:99%">
+                <el-table class="table" border :data="groundSourceData" style="width:100%">
                     <el-table-column prop="groundIndex" label="序号"></el-table-column>
                     <el-table-column prop="groundName" label="资源包名称"></el-table-column>
                     <el-table-column prop="groundCategroy" label="资源类型"></el-table-column>
@@ -83,11 +83,11 @@
                     <el-table-column prop="groundVersion" label="版本"></el-table-column>
                     <el-table-column prop="groundRemark" label="备注"></el-table-column>
                     <el-table-column prop="groundState" label="当时状态"></el-table-column>
-                    <el-table-column prop="groundAction" label="操作">
-                        <template slot-scope="scope">
-                            <el-button class="editIcon" @click="groundTableEdit(scope)" type="text" size="small"><i class="el-icon-edit-outline"></i></el-button>
-                            <el-button class="infoIcon" type="text" size="small"><i class="el-icon-info"></i></el-button>
-                            <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, groundSourceData)" type="text" size="small"><i class="el-icon-delete"></i></el-button>
+                    <el-table-column prop="groundAction" label="操作" width='120'>
+                        <template slot-scope="scope" >
+                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
+                            <div class="iconDiv " @click="deleteRow(scope.$index, groundSourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -568,6 +568,7 @@ export default {
         .groundTable{
             width: 100%;
             text-align: left;
+            margin-top: 20px;
         }
         .groundTable .table{
             flex: 1;
@@ -592,9 +593,19 @@ export default {
             top: 1px;
             margin-right: 12px;
         }
-        // .el-input__inner{
+        .iconDiv{
+            width: 30px;
+            height: 30px;
+            float: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center; 
             
-        // }
+        }
+        .iconDiv2{
+            margin-left: 20px;
+        }
         .el-input.is-disabled .el-input__inner{
             height: 37px;
             background: #fafafa;

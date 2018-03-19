@@ -1,6 +1,6 @@
 <template>
-  <div class="wrapper">
-      <h4 class="title">分区与楼层配置</h4>
+  <div class="wrapper" id="pageIntial">
+      <h4 class="titleAll">分区与楼层配置</h4>
       <div class="pageInital">
         <div class="pageSelect">
             <div class="pageOption">
@@ -31,24 +31,24 @@
             </div>
         </div>
         <div class="flor">
-            <h5 class="title"><i class="el-icon-document"></i> 竖向楼层<span @click="addFlor" class="add"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="title"><img class="imgicon"  src="../../assets/columFloor.png"/> 竖向楼层<span @click="addFlor" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="pageTable"> 
                 <el-table :data="florData" border style="width:95%">
                     <el-table-column label="序号" prop="index"></el-table-column>
                     <el-table-column label="名称" prop="name"></el-table-column>
                     <el-table-column label="标高值" prop="value"></el-table-column>
                     <el-table-column label="备注" prop="remarks" ></el-table-column>
-                    <el-table-column label="操作">
+                    <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
-                            <span class="iconEdit"><i class="el-icon-document"></i></span>
-                            <span class="iconDelete"><i class="el-icon-delete"></i></span>
+                            <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
+                            <div class="iconDiv2 iconDiv"  @click="deleteRow(scope.$index, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
             </div>
         </div>
         <div >
-            <h5 class="title"><i class="el-icon-document"></i> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="title"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
                 <el-table :data="sourceData" border align="left" style="width:95%">
                     <el-table-column label="序号" prop="index"></el-table-column>
@@ -60,11 +60,11 @@
                     <el-table-column label="版本" prop="version"></el-table-column>
                     <el-table-column label="备注" prop="remarks"></el-table-column>
                     <el-table-column label="当前状态" prop="state"></el-table-column>
-                    <el-table-column label="操作">
-                        <template slot-scope="scope">
-                            <span class="iconEdit"><i class="el-icon-document"></i></span>
-                            <span class="iconInfo"><i class="el-icon-info"></i></span>
-                            <span class="iconDelete"><i class="el-icon-delete"></i></span>
+                    <el-table-column label="操作" width="120">
+                        <template slot-scope="scope" >
+                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
+                            <div class="iconDiv " @click="deleteRow(scope.$index, sourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -130,82 +130,130 @@ export default {
         },
         addSource(){
             console.log(345)
+        },
+        groundTableEdit(){
+
+        },
+        deleteRow(){
+
+        },
+        listTableEdit(){
+
         }
+
     }
 }
 </script>
-<style scoped>
-    .wrapper{
-        width: 100%;
-    }
-    .title{
-        color: #fc343a;
-        font-size: 18px;
-        font-weight: bold;
-        width: 95%;
-        border-bottom:1px solid #ccc; 
-        height: 50px;
-        line-height: 50px;
-        padding:0px 15px;
-        margin: 10px 0 0 0 ;
-        text-align: left;
-    }
+<style lang='less'>
+    #pageIntial{
+        .wrapper{
+            width: 100%;
+        }
+        .titleAll{
+           color: #fc343a;
+            font-size: 18px;
+            font-weight: bold;
+            width: 95%;
+            border-bottom:1px solid #ccc; 
+            height: 50px;
+            line-height: 50px;
+            padding:0px 15px;
+            margin: 10px 0px 0 0px ;
+            text-align: left; 
+        }
+        .title{
+            color: #fc343a;
+            font-size: 18px;
+            font-weight: bold;
+            width: 95%;
+            border-bottom:1px solid #ccc; 
+            height: 50px;
+            line-height: 50px;
+            // padding:0px 15px;
+            margin: 10px 15px 0 20px ;
+            text-align: left;
+        }
 
-    .pageSelect{
-        display: flex;
-        margin-top: 20px;
-        font-size: 0.8rem;
-        color: #999999;
+        .pageSelect{
+            display: flex;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #999999;
+        }
+        .pageOption{
+            flex: 1;
+            text-align: left;
+            margin-left: 21px;
+            max-width: 280px;
+        }
+        .pageBtn{
+            width: 250px;
+        }
+        .btn{
+            width: 95px;
+        }
+        .add{
+            float: right;
+            color: #336699;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'MicroSoftYaHei';
+            font-weight: normal;
+        }
+        .add:hover{
+            font-weight: bold;
+        }
+        .flor{
+            width: 100%;
+        }
+        .iconEdit{
+            color: #fe731e;
+            width: 25%;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+        }
+        .iconDelete{
+            width: 25%;
+            color: #4573a2;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+        }
+        .iconInfo{
+            width: 25%;
+            color: #3ac737;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+        }
+        .pagination{
+            width: 100%;
+            text-align: right;
+            margin-top: 10px;
+        }
+        .iconDiv{
+            width: 30px;
+            height: 30px;
+            float: left;
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;  
+        }
+        .imgicon {
+            position: relative;
+            top: 1px;
+            margin-right: 12px;
+        }
+        .pageTable,.sourceTable{
+            margin-left: 20px;
+            margin-top: 30px;
+            width: 100%;
+            text-align: left;
+        }
     }
-    .pageOption{
-        flex: 1;
-    }
-    .pageBtn{
-        width: 200px;
-    }
-    .add{
-        float: right;
-        color: #336699;
-        cursor: pointer;
-    }
-    .flor{
-        width: 100%;
-    }
-    .pageTable{
-        width: 100%;
-        margin-top: 20px;
-        text-align: left;
-    }
-    .iconEdit{
-        color: #fe731e;
-        width: 25%;
-        display: inline-block;
-        cursor: pointer;
-        text-align: center;
-    }
-    .iconDelete{
-        width: 25%;
-        color: #4573a2;
-        display: inline-block;
-        cursor: pointer;
-        text-align: center;
-    }
-    .iconInfo{
-        width: 25%;
-        color: #3ac737;
-        display: inline-block;
-        cursor: pointer;
-        text-align: center;
-    }
-    .sourceTable{
-        width: 100%;
-        margin-top: 20px;
-    }
-    .pagination{
-        width: 100%;
-        text-align: right;
-        margin-top: 10px;
-    }
+    
 </style>
 
 

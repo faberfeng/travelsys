@@ -122,8 +122,16 @@
     </div>
 </template>
 <script>
-
-
+// var winHeight = 0;
+// if (window.innerHeight){
+//     winHeight = window.innerHeight;
+// }else if ((document.body) && (document.body.clientHeight)){
+//     winHeight = document.body.clientHeight;
+// }
+// var oSettingLeft = document.getElementsByClassName('settingsLeft')[0];
+//         console.log(oSettingLeft)
+// oSettingLeft.setAttribute('height',this.winHeight+'px')
+//         console.log(this.winHeight+'+++++++++')
 export default {
     name:'Home',
     data(){
@@ -133,6 +141,7 @@ export default {
             navigationPath:'projectPage',
             activeIndex:'1',
             settingActive:'/home/initalsettings',
+            winHeight:''
         }
     },
     created(){
@@ -143,7 +152,8 @@ export default {
         }
         if(!this.settingActive){
             this.settingActive='/home/initalsettings';
-        }
+        };
+        
     },
     computed:{
         path(){
@@ -495,7 +505,7 @@ export default {
         font-family: 'MicrosoftYaHei';
         font-weight: bold;
         color: #333;
-        margin: 10px 0;
+        margin: 10px 0 0 0;
         font-size: 16px;
         border-bottom: 1px solid #ccc;
     }
