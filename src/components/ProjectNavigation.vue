@@ -11,23 +11,23 @@ export default {
     name:'ProjectNavigation',
     data(){
         return{
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/ListCompany'
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',
+            token:''
         }
     },
     created(){
+        this.token = localStorage.getItem('token');
+        console.log(this.token);
         this.getProjectList();
         console.log(123);
     },
     methods:{
         getProjectList(){
-            // axios.get(this.url).then((response)=>{
-            //     console.log(response);
-            // })
             axios({
                 method:'GET',
                 url:this.url,
                 headers:{
-                    'accept':'application/json;charset=UTF-8',
+                    "token":this.token
                 }
             }).then((response)=>{
                 console.log(response);

@@ -1,11 +1,11 @@
 <template>
     <div class="main">
         <div>
-            <input v-model="login.Id" placeholder="id"/>
-            <input v-model="login.Password" placeholder="password" type="password"/>
+            <el-input class="inp" v-model="login.Id" placeholder="id"/>
+            <el-input class="inp" v-model="login.Password" placeholder="password" type="password"/>
         </div>
         <el-checkbox v-model="checked">记住我</el-checkbox>
-        <button @click="Login">login</button>
+        <el-button @click="Login">login</el-button>
     </div>
 </template>
 <script>
@@ -38,7 +38,6 @@ export default {
                   'account':this.login.Id,
                   'isRemember':this.checked,
                   'password':this.login.Password
-
               }
           }).then((response)=>{
               this.projectData = response.data;
@@ -61,6 +60,11 @@ export default {
     .p{
         user-select: none;
         color: aqua;
+    }
+    .inp{
+        width: 300px;
+        display:block;
+        margin:40px auto;
     }
 </style>
 
