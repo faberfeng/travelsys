@@ -32,7 +32,7 @@ export default {
               method:'Post',
               url:this.loginUrl,
               headers:{
-                  'content-type':'application/json;charset=UTF-8',
+                  'accept':'application/json;charset=UTF-8',
               },
               params:{
                   'account':this.login.Id,
