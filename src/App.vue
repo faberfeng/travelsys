@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- <img src="./assets/logo.png"> -->
+    
     <router-view/>
   </div>
 </template>
@@ -59,20 +59,84 @@ export default {
   left: 70px;
 }
 /*弹框信息*/
-.el-dialog__header{
-  height:50px;
-  line-height: 50px;
-  text-align: left;
+#inital .el-dialog__header{
+  padding:0;
+}
+#inital .el-dialog__headerbtn{
+  top:10px;
+  right: 10px;
+}
+#inital .el-dialog__footer{
+  padding: 28px 0 30px 0;
+}
+#inital .el-dialog__body{
+  padding:40px 0 0px 0;
+}
+#inital .el-dialog__footer .el-button{
+  height: 36px;
+  margin-left: 18px;
+}
+#inital .el-button--primary{
+  background: #fc3439;
+}
+#inital .el-button--primary:hover{
+  background: #ff5257;
+}
+#inital .el-button--default{
   border: 1px solid #ccc;
 }
-.el-dialog__title{
-  color: red;
+#inital .el-button--default:hover{
+  background: #e6e6e6;
 }
-.el-dialog__wrapper .el-input__inner{
-  height: 31px;
-  line-height: 31px;
-  background: #fafafa;
+#inital .el-button--default:hover >#inital .el-button--default span{
+  color: #666;
 }
+#inital .el-button--default span{
+  color: #999;
+  font-size: 14px;
+  font-family: 'MicrosoftYaHei';
+}
+
+#edit .el-dialog__header{
+  height: 68px;
+  padding:0;
+  border-bottom: 1px solid #e6e6e6;
+  text-align: left;
+}
+#edit  .el-dialog__title{
+  color:#fc3439;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: 'MicrosoftYaHei';
+  width: 150px;
+  height: 26px;
+  display: inline-block;
+  margin: 34px 0 15px 30px;
+}
+#edit .el-dialog__headerbtn{
+  top:10px;
+  right: 10px;
+}
+#edit .el-dialog__body{
+  padding: 40px 20px 30px 20px;
+  width: 70%;
+  margin: 0 auto;
+}
+#edit .el-form-item{
+  margin: 0 20px auto;
+  width: 70%;
+}
+#edit .el-form-item__label{
+  padding: 0;
+  
+}
+#edit .el-input__inner{
+  width: 388px;
+  height: 30px;
+}
+
+
+
 .el-form-item{
   margin-bottom: 19px;
 }

@@ -443,17 +443,18 @@ export default {
             color: #fc343a;
             font-size: 18px;
             font-weight: bold;
-            width: 95%;
+            width: 96%;
             border-bottom:1px solid #ccc; 
             height: 50px;
             line-height: 50px;
             padding:0px 15px;
-            margin: 10px 0 0 0 ;
+            margin: 10px 20px 0 0 ;
             text-align: left;
         }
         .groundTitle{
-            width: 95%;
+            width: 97%;
             padding-left: 20px;
+            // margin-right: 20px;
         }
         .groundIcon{
             float: right;

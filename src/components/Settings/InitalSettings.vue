@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" id="inital">
+    <div class="wrapper" id='in'>
         <h4 class="title">工程初始配置</h4>
         <div class="account">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
@@ -53,47 +53,53 @@
                     </div>
                 </li>
                 
-                
             </ul>
         </div>
         <!--弹出的对话框-->
-        <el-dialog title="工程概况信息编辑" :visible.sync="addDialog">
-            <el-form >
-                <el-form-item label="单位">
-                    <el-input class="inp"  v-model="projectUnity"></el-input>
-                </el-form-item>
-                <el-form-item label="名称">
-                    <el-input class="inp"  v-model="projectName"></el-input>
-                </el-form-item>
-            </el-form>
-            <p class="err" v-show="showErr">请输入完整信息</p>
-            <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="addMakeSure">确定</el-button>
-                <el-button @click="addDialog=false">取消</el-button>
-            </div>
-        </el-dialog>
-        <el-dialog title="工程概况信息编辑" :visible.sync="editDialog">
-            <el-form >
-                <el-form-item label="单位">
-                    <el-input  class="inp" v-model="projectUnity"></el-input>
-                </el-form-item>
-                <el-form-item label="名称">
-                    <el-input  class="inp" v-model="projectName"></el-input>
-                </el-form-item>
-            </el-form>
-            <p class="err" v-show="showErr">请输入完整信息</p>
-            <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="editMakeSure">确定</el-button>
-                <el-button @click="editDialog=false">取消</el-button>
-            </div>
-        </el-dialog>
-        <el-dialog title="工程概况信息编辑" :visible.sync="deleteDialog">
-            <h3>确认删除吗？</h3>
-            <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="deleteMakeSure">确定</el-button>
-                <el-button @click="deleteDialog=false">取消</el-button>
-            </div>
-        </el-dialog>
+        <div id="edit">
+            <el-dialog title="工程概况信息编辑" :visible.sync="addDialog">
+                <el-form >
+                    <el-form-item label="单位 :">
+                        <el-input class="inp"  v-model="projectUnity"></el-input>
+                    </el-form-item>
+                    <el-form-item label="名称 :">
+                        <el-input class="inp"  v-model="projectName"></el-input>
+                    </el-form-item>
+                </el-form>
+                <p class="err" v-show="showErr">请输入完整信息</p>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="addMakeSure">确定</el-button>
+                    <el-button @click="addDialog=false">取消</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog title="工程概况信息编辑" :visible.sync="editDialog">
+                <el-form >
+                    <el-form-item label="单位 :">
+                        <el-input  class="inp" v-model="projectUnity"></el-input>
+                    </el-form-item>
+                    <el-form-item label="名称 :">
+                        <el-input  class="inp" v-model="projectName"></el-input>
+                    </el-form-item>
+                </el-form>
+                <p class="err" v-show="showErr">请输入完整信息</p>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="editMakeSure">确定</el-button>
+                    <el-button @click="editDialog=false">取消</el-button>
+                </div>
+            </el-dialog>
+        </div>
+        
+        <div id="inital">
+            <el-dialog  :visible.sync="deleteDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">你确定删除分区【西南区】?</p>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="deleteMakeSure">删除</el-button>
+                    <el-button @click="deleteDialog=false">取消</el-button>
+                </div>
+            </el-dialog>
+        </div>
     </div>
 </template>
 <script>
@@ -106,6 +112,7 @@ export default {
             addDialog:false,
             editDialog:false,
             deleteDialog:false,
+            NotdeleteDialog:false,
             showErr:false,
             checked:false,
             projectUnity:'',
@@ -195,6 +202,7 @@ export default {
 }
 </script>
 <style scoped>
+
     .wrapper{
         width: 100%;
     }
@@ -211,8 +219,9 @@ export default {
         text-align: left;
     }
     .account,.summary,.img{
-        width: 95%;
-        padding-left: 15px;
+        width:97%;
+        margin-left: 15px;
+        margin-right: 20px;
     }
     .accountTitle{
         width: 100%;
@@ -485,6 +494,24 @@ export default {
     .groundEdit{
         display: inline-block;
         margin-right: 10px;
+    }
+    /*删除弹框*/
+    .deleteDialogImg{
+        height: 50px;
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 13px 0 0 0;
     }
     
 </style>

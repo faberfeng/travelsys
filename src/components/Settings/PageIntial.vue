@@ -4,7 +4,7 @@
       <div class="pageInital">
         <div class="pageSelect">
             <div class="pageOption">
-                <label>单位名称</label>
+                <label>单体名称</label>
                 <el-select v-model="value" placeholder="请选择">
                     <el-option
                     v-for="item in options"
@@ -14,7 +14,7 @@
                     </el-option>
                 </el-select>
             </div>
-            <div class="pageOption">
+            <div class="pageOption pageOption1">
                 <label>建筑分区</label>
                 <el-select v-model="value" placeholder="请选择">
                     <el-option
@@ -33,7 +33,7 @@
         <div class="flor">
             <h5 class="title"><img class="imgicon"  src="../../assets/columFloor.png"/> 竖向楼层<span @click="addFlor" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="pageTable"> 
-                <el-table :data="florData" border style="width:95%">
+                <el-table :data="florData" border style="width:97%">
                     <el-table-column label="序号" prop="index"></el-table-column>
                     <el-table-column label="名称" prop="name"></el-table-column>
                     <el-table-column label="标高值" prop="value"></el-table-column>
@@ -48,9 +48,9 @@
             </div>
         </div>
         <div >
-            <h5 class="title"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
-                <el-table :data="sourceData" border align="left" style="width:95%">
+                <el-table :data="sourceData" border align="left" style="width:97%">
                     <el-table-column label="序号" prop="index"></el-table-column>
                     <el-table-column label="资源包名称" prop="sourceBagName"></el-table-column>
                     <el-table-column label="资源类型" prop="sourceType"></el-table-column>
@@ -62,9 +62,9 @@
                     <el-table-column label="当前状态" prop="state"></el-table-column>
                     <el-table-column label="操作" width="120">
                         <template slot-scope="scope" >
-                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
-                            <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
-                            <div class="iconDiv " @click="deleteRow(scope.$index, sourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv iconDiv2" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv iconDiv2" style="width:17px;height:17px;"><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
+                            <div class="iconDiv iconDiv2" @click="deleteRow(scope.$index, sourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -153,30 +153,29 @@ export default {
            color: #fc343a;
             font-size: 18px;
             font-weight: bold;
-            width: 95%;
+            width: 96%;
             border-bottom:1px solid #ccc; 
             height: 50px;
             line-height: 50px;
             padding:0px 15px;
-            margin: 10px 0px 0 0px ;
+            margin: 10px 10px 0 0px ;
             text-align: left; 
         }
         .title{
             color: #fc343a;
             font-size: 18px;
             font-weight: bold;
-            width: 95%;
-            border-bottom:1px solid #ccc; 
-            height: 50px;
-            line-height: 50px;
-            // padding:0px 15px;
-            margin: 10px 15px 0 20px ;
+            width: 97%;
+            border-bottom:1px solid #e6e6e6; 
+            height: 40px;
+            line-height: 40px;
+            margin: 30px 20px 0 20px ;
             text-align: left;
         }
 
         .pageSelect{
             display: flex;
-            margin-top: 20px;
+            margin-top: 26px;
             font-size: 0.8rem;
             color: #999999;
         }
@@ -184,7 +183,18 @@ export default {
             flex: 1;
             text-align: left;
             margin-left: 21px;
-            max-width: 280px;
+            max-width: 290px;
+        }
+        .pageOption1{
+            margin-left: 60px;
+        }
+        .pageOption label{
+            color: #999;
+            font-weight: normal;
+            font-size: 14px;
+            font-family: 'MicrosoftYaHei';
+            display: inline-block;
+            margin-right: 10px;
         }
         .pageBtn{
             width: 250px;
@@ -228,30 +238,42 @@ export default {
             text-align: center;
         }
         .pagination{
-            width: 100%;
+            width: 98%;
             text-align: right;
             margin-top: 10px;
+            margin-right: 20px;
         }
         .iconDiv{
-            width: 30px;
-            height: 30px;
+            width: 16px;
+            height: 16px;
             float: left;
             cursor: pointer; 
             display: flex;
             align-items: center;
             justify-content: center;  
         }
+        .iconDiv2{
+            margin-left: 10px;
+        }
         .imgicon {
             position: relative;
             top: 1px;
             margin-right: 12px;
         }
+        #sourceB{
+            margin-top: 50px;
+        }
         .pageTable,.sourceTable{
             margin-left: 20px;
-            margin-top: 30px;
+            margin-top: 20px;
             width: 100%;
             text-align: left;
         }
+        .el-select__caret {
+            margin-right: 10px;
+            display: inline-block;
+        }
+       
     }
     
 </style>
