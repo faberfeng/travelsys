@@ -12,7 +12,7 @@ export default {
     data(){
         return{
             url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',
-            pathInit:''
+            pathInit:'',
         }
     },
     created(){

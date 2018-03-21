@@ -108,10 +108,10 @@ export default {
             border-top: 3px solid #ffffff;
         }
         .label-item-active{
-            color: #df0010;
+            color: #fc3439;
             font-weight: bold;
             line-height: 34px;
-            border-top: 3px solid #df0010;
+            border-top: 3px solid #fc3439;
             border-left: 1px solid #ccc;
             border-right: 1px solid #ccc;
             border-bottom: 1px solid #fff;
@@ -131,11 +131,9 @@ export default {
         }
         /* 工程面板 */
         .projectTab{
-            width: 100%;
+            width: 98%;
             float: left;
-            margin-right: 1%;
             margin-top: 42px;
-            
         }
         /* 工程信息 */
         .projectInfo{
@@ -203,6 +201,7 @@ export default {
             overflow: auto;
             padding-left: 0;
             margin-top: 0px;
+            
         }
         .projectList li{
             display: inline-block;

@@ -1,22 +1,24 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" id="inital">
         <h4 class="title">工程初始配置</h4>
         <div class="account">
-            <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号</h5>
-            <ul class="accountList">
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
+            <ul class="accountList" >
                 <li class="pre"><span>工程账号</span> <label>Q200117061402</label></li>
                 <li class="pre"><span>工程名称</span> <label>企业自用办公楼</label></li>
                 <li class="pre"><span>工程管理账号</span> <label>evan.qiang@qq.com</label></li>
                 <li class="pre"><span>工程管理员姓名</span> <label>王自强</label></li>
-                <li class="pre"><span>工程管理员电话</span> <label>13651762908</label></li>
-                <li class="pre"><span>授权用户数量</span> <label>无限制使用  14个已使用</label></li>
-                <li class="pre"><span>到期日期</span> <label>2018年12月31日</label></li>
-                <li class="pre " id="pre">
+                <li class="pre" v-show="isShow"><span>工程管理员电话</span> <label>13651762908</label></li>
+                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>无限制使用  14个已使用</label></li>
+                <li class="pre" v-show="isShow"><span>到期日期</span> <label>2018年12月31日</label></li>
+                <li class="pre " id="pre" v-show="isShow">
                     <span>工程logo</span> 
                     <div class="preDiv">
-                        <div><img src="../../assets/project-logo.png" class="logo" /></div>
-                        <div style="margin:0;"><el-checkbox size="small" style="margin:0;width:130px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left
-                        0;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
+                        <div class="imgDiv">
+                            <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
+                            <img src="../../assets/project-logo.png" class="logo" /></div>
+                        <div style="margin:0;"><el-checkbox size="small" style="margin:0;width:115px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left:
+                        -10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
                     </div>
                 </li>
             </ul>
@@ -31,18 +33,27 @@
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-img.jpg">工程图片</h5>
             <ul class="imgUl">
                 <li class="imgLi">
-                    <div class="imgD">
-                        <i class="el-icon-circle-plus-outline"></i>
-                        <p>上传封面图片</p>
+                    <div>
+                        <img src="../../assets/firstPageImage.png"/>
                     </div>
+                    <div class="imgBottom"><label><div class="setAsLogo"></div>封面</label><span> <div class="bottomDelete"></div>删除</span></div>
+                </li>
+                <li class="imgLi">
+                    <div>
+                        <img src="../../assets/firstPageImage.png"/>
+                    </div>
+                    <div class="imgBottom"><label><div class="setAsLogo"></div>设为封面</label><span> <div class="bottomDelete"></div>删除</span></div>
                 </li>
                 <li class="imgLi">
                     <div class="imgD">
-                        <i class="el-icon-circle-plus-outline"></i>
-                        <p>上传封面图片</p>
+                        <div class="imgDMask">
+                            <div class="imgMaskD"></div>
+                            <p class="imgDMaskp">上传图片</p>
+                        </div>
                     </div>
                 </li>
-                <li class="imgLi"></li>
+                
+                
             </ul>
         </div>
         <!--弹出的对话框-->
@@ -86,6 +97,8 @@
     </div>
 </template>
 <script>
+import shouqiImg from '../../assets/arrow-top.png';
+import zhankaiImg  from '../../assets/arrow-down.png'
 export default {
     name:'InitalSettings',
     data(){
@@ -97,6 +110,9 @@ export default {
             checked:false,
             projectUnity:'',
             projectName:'',
+            retractImg:shouqiImg,
+            retractText:'收起',
+            isShow:true,
             sumaryData:[
                 {
                     unity:'使用单位',
@@ -162,6 +178,18 @@ export default {
             }else{
                 this.showErr = true;
             }
+        },
+        retract(){
+            if(this.retractImg === shouqiImg){
+                this.retractImg = zhankaiImg;
+                this.retractText = '展开';
+                this.isShow = false;
+            }else{
+                this.retractImg = shouqiImg;
+                this.retractText = '收起';
+                this.isShow = true;
+            }
+
         }
     }
 }
@@ -193,8 +221,8 @@ export default {
         font-size: 16px;
         font-family: '微软雅黑';
         font-weight: bold;
-        margin: 20px 0 10px 0;
-        border-bottom: 1px solid #ccc;
+        margin: 20px 0 2px 0;
+        border-bottom: 1px solid #e6e6e6;
         height: 45px;
         line-height: 45px;
     }
@@ -215,6 +243,7 @@ export default {
         text-align: left;
         list-style:none;
         padding: 0;
+        margin:0;
     }
     .accountList .pre{
         color: #ccc;
@@ -223,7 +252,7 @@ export default {
         line-height: 40px;
         cursor: pointer;
         display: flex;
-        margin: 15px 0;
+        margin: 13px 0;
         
     } 
     .pre span{
@@ -264,11 +293,46 @@ export default {
     #pre span{
         line-height: 20px;
     }
-    .logo{
+    .img{
+        overflow-y: auto;
+        margin-bottom: 40px;
+    }
+    .preDiv .imgDiv{
         width: 200px;
         height: 50px;
         display: inline-block;
         background: #f0f1f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .imgDiv{
+        position: relative;
+    }
+    .imgDiv .imgMask{
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #999999;
+        opacity:0.5;
+        position: absolute;
+        visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hoverAdd{
+        width: 20px;
+        margin-right: 10px;
+    }
+    .preDiv .imgDiv:hover >.imgMask{
+        visibility:visible;
+    } 
+    .logo{
+        width: 139px;
+        height: 42px;
     }
     .el-col{
         border: 1px solid #ccc;
@@ -306,20 +370,43 @@ export default {
     /*工程图片*/
     .imgUl{
         width:100%;
-        list-style:none;   
+        height: 200px;
+        list-style:none; 
+        overflow: auto;
+        padding: 0; 
+        margin-top: 20px; 
     }
     .imgUl .imgLi{
-        width: 150px;
-        height: 150px;
-        background: #ccc;
+        width: 200px;
+        height: 145px;
+        background: #f0f1f4;
         float: left;
-        margin: 10px;
+        margin-right:20px;
         color: red;
         position: relative;
         text-align: center;
+        cursor: pointer;
     }
-    .imgLi p{
+    .imgLi img{
+        width: 200px;
+        height: 145px;
+    }
+    .imgMaskD{
+        width: 30px;
+        height: 30px;
+        margin: 0 auto;
+        background: url('../../assets/updataImg.png')
+    }
+    .imgDMaskp{
+        color: #ccc;
         margin: 5px; 
+        font-size: 12px;
+    }
+    .imgUl .imgLi:hover .imgDMaskp{
+        color: #df0010;
+    }
+    .imgUl .imgLi:hover .imgMaskD{
+        background: url('../../assets/updataImg-hover.png')
     }
     .imgLi .imgD{
         position: absolute;
@@ -329,11 +416,57 @@ export default {
         top: 0;
         bottom: 0;
         cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    .imgLi i{
+    .imgLi:hover .imgBottom{
+        visibility: visible;
+    }
+    .imgBottom{
+        color: #999999;
+        font-size: 12px;
+        font-weight: normal;
+        cursor: pointer;
+        text-align: left;
+        visibility: hidden;
+    }
+    .imgBottom label{
         display: inline-block;
-
+        width: 65px;
+        cursor: pointer;
+        margin-right: 15px;
     }
+    .imgBottom label:hover{
+        color: #fc3439;
+    }
+    .imgBottom label:hover .setAsLogo{
+        background: url('../../assets/setAsLogo-hover.png');
+    }
+    .imgBottom span:hover .bottomDelete{
+        background: url('../../assets/imgBottomDelete-hover.png');
+    }
+    .imgBottom span:hover{
+        color: #336699;
+    }
+    .setAsLogo{
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        margin-right: 4px;
+        background: url('../../assets/setAsLogo.png');
+    }
+    .bottomDelete{
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        margin-right: 4px;
+        background: url('../../assets/imgBottomDelete.png');
+        position: relative;
+        top: 1px;
+    }
+
+
     .imgicon {
         position: relative;
         top: 3px;
@@ -342,4 +475,16 @@ export default {
     .inp{
         width: 80%;
     }
+    .groundSpan{
+        color: #336699;
+        font-size: 14px;
+        font-weight: normal;
+        cursor: pointer;
+        float: right;
+    }
+    .groundEdit{
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
 </style>
