@@ -4,7 +4,8 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
-
+//工程列表页
+import projectlist from '@/components/ProjectList'
 //工程首页 组件
 import ProJHome from '@/components/ProjectHome/home'
 /*成本管理 组件*/
@@ -37,6 +38,14 @@ const router = new Router({
       path:'/showcompany',
       name:'ProjectNavigation',
       component:resolve=>require(['@/components/ProjectNavigation'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path:'/projectlist',
+      name:'projectlist',
+      component:projectlist,
       meta:{
         requireAuth:true
       }
