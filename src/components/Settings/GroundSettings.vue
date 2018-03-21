@@ -3,34 +3,38 @@
       <h4 class="title">场地与单体配置</h4>
       <div class="main">
         <div class="groundInfo groundTitle">
-            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<img class="groundEdit" @click="groundInfoEdit" src="../../assets/ground-editpng.png"/></h5>
-                <ul class="groundInfoInp">
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<span :class="[{'groundEdit-active':!canEdit},'groundEdit']" @click="groundInfoEdit"></span></h5>
+            <div :class="[{'groundInfoInp-active':!canEdit},'groundInfoInp']">
+                <ul>
                     <li><label>城市坐标系名称</label><el-input :disabled="canEdit" class="sInp"></el-input></li>
                     <li>
                         <label>场地原点</label>
                         <div>
-                            <el-input :disabled="canEdit" class="sInp"></el-input> 
+                            <el-input :disabled="canEdit" class="sInp icon-X" placeholder="0.0"></el-input> 
                         </div>
                         <div>
-                            <el-input  :disabled="canEdit" class="sInp spe"></el-input>
+                            <el-input  :disabled="canEdit" class="sInp spe icon-Y" placeholder="0.0"></el-input>
                         </div>
-                        <label>场地高程</label>
+                        <label style="width:95px;">场地高程</label>
                         <div>
-                            <el-input :disabled="canEdit"></el-input>    
+                            <el-input :disabled="canEdit" class="icon-Z" placeholder="0.0"></el-input>    
                         </div>
                     </li>
                     <li>
                         <label>工程规模</label>
                         <div>
-                            <el-input class="scale" :disabled="canEdit"></el-input>
+                            <el-input class="scale icon-size" :disabled="canEdit" ></el-input>
                         </div>
                     </li>                
                 </ul>
-                <p><el-button @click="saveEdit" class="btn" type="primary">保存</el-button><el-button class="btn">取消</el-button></p>
+                <p v-show="!canEdit"><el-button @click="saveEdit" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEdit">取消</el-button></p>
+            </div>
         </div>
         <div class="groundSetting groundTitle">
-            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置</h5>
-            <div class="groundSettingBody">
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置
+                 <span :class="[{'groundEdit-active':!canEditCj},'groundEdit']" @click="groundInfoEditCJ"></span>
+            </h5>
+            <div  :class="[{'groundInfoInp-active':!canEditCj},'groundSettingBody']">
                 <div class="groundSettingBodyS">
                     <p class="firstP">
                         <label>效果等级</label>
@@ -51,6 +55,7 @@
                 <div class="groundSettingBodyC">
                     <el-checkbox v-model="checked">显示天空</el-checkbox>
                 </div>
+                <p v-show="!canEditCj"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
             </div>
         </div>
         <div class="singleList groundTitle">
@@ -219,6 +224,7 @@ export default {
           value1:0,
           checked:false,
           canEdit:true,
+          canEditCj:true,
           addListShow:false,
           addgroundShow:false,
           editgroundShow:false,
@@ -283,12 +289,16 @@ export default {
     },
     methods:{
         groundInfoEdit(){
-            this.canEdit = false;
-            console.log(123);
+            this.canEdit = this.canEdit?false:true;
         },
         saveEdit(){
             this.canEdit = true;
-            console.log(123456);
+        },
+         groundInfoEditCJ(){
+            this.canEditCj = this.canEditCj?false:true;
+        },
+        saveEditCJ(){
+            this.canEditCj = true;
         },
         addList(){
             this.addListShow = true;
@@ -465,18 +475,29 @@ export default {
             font-size: 16px;
             font-family: '微软雅黑';
             font-weight: bold;
-            margin: 20px 0 10px 0;
+            margin: 5px 0 20px 0;
             border-bottom: 1px solid #ccc;
-            height: 45px;
+            height: 40px;
             line-height: 45px;
         }
         .groundInfoInp{
             display: inline-block;
             width: 100%;
+            height: 248px;
+            border: 1px solid #fff;
             list-style: none;
             padding: 0;
             color: #999999;
             font-size: 14px;
+        }
+        .groundInfoInp >ul{
+            margin: 20px 0 16px;
+            padding-left:8px; 
+            padding-right:20px; 
+        }
+        .groundInfoInp-active{
+            border: 1px solid #fc4349;
+            border-radius: 2px;
         }
         .groundInfoInp li{
             display: inline-block;
@@ -504,16 +525,28 @@ export default {
         .scale{
             width: 225px;
             float: left;
+            position: relative;
         }
         .spe{
             margin-left: 10px;
         }
         .btn{
-            width: 15%;
-            max-width: 150px;
-            min-width:70px;
+            width: 110px;
+            height: 34px;
+            line-height: 34px;
+            border: 1px solid #ffffff;
+            padding: 0;
+            text-align: center;
+            border-radius: 2px;
         }
-
+        .btn-save{
+            border: 1px solid #fc3439;
+            background: #fc3439;
+        }
+        .btn-cancle{
+            border: 1px solid #cccccc;
+            margin-left: 20px;
+        }
         .groundSettingBody{
             color: #999999;
             width: 100%;
@@ -612,12 +645,22 @@ export default {
         }
         .groundEdit{
             float: right;
+            width: 16px;
+            height: 16px;
             position: relative;
             top: 15px;
             cursor: pointer;
+            background: url(../../assets/ground-editpng.png) no-repeat 0 0;
+            &:hover{
+                background: url(../../assets/edit.png) no-repeat 0 0;
+            }
+        }
+        .groundEdit-active{
+             background: url(../../assets/edit.png) no-repeat 0 0;
         }
         .el-input__inner{
             height: 37px;
+            color: #999999;
         }
         .iconImg{
             width: 16px;
@@ -629,7 +672,49 @@ export default {
         .editIcon{
             margin-left: 10px;
         }
-
+        .icon-size::after{
+            display: block;
+            position: absolute;
+            right: 12px;
+            top: 13px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #333333;
+            content: '平方米';
+        }
+        .icon-X::after{
+            display: block;
+            position: absolute;
+            left: 12px;
+            top: 13px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #333333;
+            content: 'X=';
+        }
+        .icon-Y::after{
+            display: block;
+            position: absolute;
+            left: 12px;
+            top: 13px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #333333;
+            content: 'Y=';
+        }
+        .icon-Z::after{
+            display: block;
+            position: absolute;
+            left: 12px;
+            top: 13px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #333333;
+            content: 'Z=';
+        }
+        .icon-X input,.icon-Y input,.icon-Z input,{
+            padding-left: 32px;
+        }
     }
     
 </style>
