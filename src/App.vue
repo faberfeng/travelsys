@@ -18,6 +18,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  min-width: 1200px;
 }
 /*更改组件配色*/
 .settingsLeft .el-menu{
@@ -131,5 +132,15 @@ export default {
 .is-opened .el-submenu__title{
   border-left: 4px solid #df0010;
   background: #7a818a;
+  color: #ffffff;
+}
+.el-menu-item-group__title{
+  padding: 0;
+}
+.is-opened  .el-submenu__title i{
+  color: #fff;
+}
+.el-submenu__title i{
+  color: #666666;
 }
 </style>

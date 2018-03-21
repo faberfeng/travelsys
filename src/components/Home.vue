@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" ref="allHeight">
         <el-row>
             <el-col :span="24" class="header">
                 <div class="headerImg">
@@ -10,11 +10,16 @@
                 </div>
                 <div class="headerInfo">
                     <img class="headerInfoImg" src='../assets/loginimg.png'/>
+                    <div class="infoHover">
+                        <p class="p1">刘客强</p>
+                        <p class="p2" >退出</p>
+                    </div>
                 </div>
+                
             </el-col>
         </el-row>
         <div class="contentBody">
-            <div class="sideBar">
+            <div class="sideBar" ref="sideB">
                 <a href="#">
                     <img src="../assets/arrow-left.png"/>
                 </a>
@@ -59,7 +64,7 @@
                                 <el-tab-pane label="设施维保" name="facilities">设施维保</el-tab-pane>
                                 <el-tab-pane label="配置中心" name="settings">
                                     <div class="settings">
-                                        <div  class="settingsLeft">
+                                        <div  class="settingsLeft" ref="settingsL">
                                             <h5>工程配置中心</h5>
                                             <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
                                                 <el-submenu index="/home/initalsettings">
@@ -122,16 +127,7 @@
     </div>
 </template>
 <script>
-// var winHeight = 0;
-// if (window.innerHeight){
-//     winHeight = window.innerHeight;
-// }else if ((document.body) && (document.body.clientHeight)){
-//     winHeight = document.body.clientHeight;
-// }
-// var oSettingLeft = document.getElementsByClassName('settingsLeft')[0];
-//         console.log(oSettingLeft)
-// oSettingLeft.setAttribute('height',this.winHeight+'px')
-//         console.log(this.winHeight+'+++++++++')
+
 export default {
     name:'Home',
     data(){
@@ -141,7 +137,8 @@ export default {
             navigationPath:'projectPage',
             activeIndex:'1',
             settingActive:'/home/initalsettings',
-            winHeight:''
+            winHeight:'',
+            screenWidth: document.documentElement.clientHeight
         }
     },
     created(){
@@ -153,12 +150,28 @@ export default {
         if(!this.settingActive){
             this.settingActive='/home/initalsettings';
         };
+        console.log(this.screenWidth+'++++++');
         
+    },
+    mounted(){
+        var height = ''
+        if(document.documentElement.clientHeight){
+            height = document.documentElement.clientHeight;
+        }else{
+           height = document.body.clientHeight;
+        }
+        
+        this.$refs.sideB.style.height = height+'px';
+        //this.$refs.settingsL.style.height = height+'px';
+        console.log(height);
     },
     computed:{
         path(){
             return this.$store.state.path;
-        }
+        },
+        // screenWidth(val,val1){
+        //     console.log(val+'+++++'+val1);
+        // }
     },
     methods:{
         handleClick(tab,event){
@@ -263,8 +276,50 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        background: #433a43;
+        
         cursor: pointer;
+    }
+    .headerInfo:hover .infoHover{
+        visibility: visible;
+    }
+    .infoHover{
+        width: 180px;
+        height: 112px;
+        position: absolute;
+        top: 68px;
+        right: 5px;
+        background: #fff;
+        visibility: hidden;
+        box-shadow:-2px 2px 2px 2px #d9d9d9 ;
+        border-radius: 5px;
+        z-index: 10;
+    }
+    .infoHover .p1{
+        border-bottom: 1px solid #e6e6e6;
+        height: 60px;
+        line-height: 60px;
+        color: #333333;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: left;
+        padding-left: 28px;
+        margin: 0;
+    }
+    .infoHover .p2{
+        height: 50px;
+        line-height: 50px;
+        margin: 0;
+        color: #666666;
+        font-size:14px;
+        font-weight: normal;
+        text-align: left;
+        margin-left: 28px;
+    }
+    .infoHover .btn{
+        width: 100%;
+    }
+    .headerInfo:hover{
+        background: #343a43;
     }
     .headerInfoImg{
         width: 48px;
