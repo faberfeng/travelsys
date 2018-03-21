@@ -50,12 +50,12 @@
                     </p>
                 </div>
                 <div class="groundSettingBodyP">
-                    <label>整体亮度</label><div><el-slider v-model="value1"></el-slider></div>
+                    <label>整体亮度</label><div><el-slider class="slider_P" v-model="value1"></el-slider></div>
                 </div>
                 <div class="groundSettingBodyC">
                     <el-checkbox v-model="checked">显示天空</el-checkbox>
                 </div>
-                <p v-show="!canEditCj"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
+                <p v-show="!canEditCj" style="margin-bottom:-6px;"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
             </div>
         </div>
         <div class="singleList groundTitle">
@@ -496,14 +496,14 @@ export default {
             padding-right:20px; 
         }
         .groundInfoInp-active{
-            border: 1px solid #fc4349;
+            border: 1px solid #fc4349!important;
             border-radius: 2px;
         }
         .groundInfoInp li{
             display: inline-block;
             width: 100%;
             display: flex;
-            margin: 15px 0;
+            margin: 18px 0;
         }
         .groundInfoInp label{
             width: 110px;
@@ -550,7 +550,8 @@ export default {
         .groundSettingBody{
             color: #999999;
             width: 100%;
-            margin-top: 20px;
+            border: 1px solid #ffffff;
+            padding-bottom: 26px;
         }
         .groundSettingBodyS{
             display: flex;
@@ -558,8 +559,11 @@ export default {
         }
         .groundSettingBodyS p{
             flex: 1;
-            max-width:350px;
+            max-width:319px;
             text-align: left;
+        }
+        .el-input__icon{
+            width: 22px;
         }
         .groundSettingBodyS .firstP{
             margin-left: 65px;
@@ -579,7 +583,7 @@ export default {
         }
         .groundSettingBodyP label{
             display: inline-block;
-            width: 100px;
+            width: 88px;
             height: 40px;
             line-height: 40px;
             font-size: 14px;
@@ -590,13 +594,30 @@ export default {
             flex: 1;
             margin-left: -6px;
         }
+        /**********控制滚动bar的小圆点样式**********/
+        .el-slider__runway{
+            height: 12px;
+        }
+        .el-slider__bar{
+           height: 10px;
+            top: 1px;
+        }
+        .el-slider__button-wrapper{
+                top: -12px;
+        }
+        /**********控制滚动bar的小圆点样式**********/
         .groundSettingBodyC{
             text-align: left;
             position: relative;
-            left: 80px;
+            left: 59px;
             font-size: 12px;
             transform: scale(0.85);
             color:#333;
+        }
+        .groundSetting{
+            .accountTitle{
+                margin-bottom: 15px;
+            }
         }
         .groundTable{
             width: 100%;
@@ -637,7 +658,7 @@ export default {
             
         }
         .iconDiv2{
-            margin-left: 20px;
+            margin-left: 11px;
         }
         .el-input.is-disabled .el-input__inner{
             height: 37px;
@@ -716,6 +737,34 @@ export default {
             padding-left: 32px;
         }
     }
-    
+    .el-tooltip__popper{
+        padding: 1px 7.5px;
+        margin-top: 10px!important;//不起作用
+    }
+    .el-tooltip__popper .popper__arrow{
+        border-width: 3px!important;
+    }
+
+    .el-table--border th{
+         background: #f2f2f2;
+    }
+    .el-table--enable-row-hover .el-table__body tr:hover>td {
+        background-color: #fafafa;
+    }
+    .el-table th{
+            padding: 15px 0;
+    }
+    .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
+     border-right: 1px solid #e0e0e0;
+    }
+    .el-table td, .el-table th.is-leaf {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .el-table--border, .el-table--group {
+        border: 1px solid #d9d9d9;
+    }
+    .el-table::before,.el-table--border::after, .el-table--group::after{
+        display: none;
+    }
 </style>
 
