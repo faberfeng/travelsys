@@ -59,7 +59,7 @@ const router = new Router({
       // },
       children:[
         {
-          path:'/home/projHome',
+          path:'/home/projHome/:id',
           name:'ProJHome',
           component:ProJHome
         },

@@ -1,23 +1,7 @@
 <template>
     <div class="wrapper" ref="allHeight">
-        <el-row>
-            <el-col :span="24" class="header">
-                <div class="headerImg">
-                    <img src='http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'/>
-                </div>
-                <div class="headerText">
-                    {{title}}
-                </div>
-                <div class="headerInfo">
-                    <img class="headerInfoImg" src='../assets/loginimg.png'/>
-                    <div class="infoHover">
-                        <p class="p1">刘客强</p>
-                        <p class="p2" >退出</p>
-                    </div>
-                </div>
-                
-            </el-col>
-        </el-row>
+      <!--2018/3/21 付伟超修改-->
+        <headerCommon :username='userName' :userid='userId'></headerCommon>
         <div class="contentBody">
             <div class="sideBar" ref="sideB">
                 <a href="#">
@@ -127,18 +111,23 @@
     </div>
 </template>
 <script>
-
+import headerCommon from './header.vue'
+import axios from 'axios'
 export default {
     name:'Home',
+    components: {
+      headerCommon
+    },
     data(){
         return{
-            title:'企业自用办公楼',
-            userName:'李从文',
+            userName:'',
+            userId:'',
             navigationPath:'projectPage',
             activeIndex:'1',
             settingActive:'/home/initalsettings',
             winHeight:'',
-            screenWidth: document.documentElement.clientHeight
+            screenWidth: document.documentElement.clientHeight,
+            token:''
         }
     },
     created(){
@@ -155,6 +144,7 @@ export default {
     },
     mounted(){
         var height = ''
+        var vm = this
         if(document.documentElement.clientHeight){
             height = document.documentElement.clientHeight;
         }else{
@@ -164,6 +154,9 @@ export default {
         this.$refs.sideB.style.height = height+'px';
         //this.$refs.settingsL.style.height = height+'px';
         console.log(height);
+        //getUserInfo获取用户的姓名和项目权限
+        vm.token  = localStorage.getItem('token')
+        vm.getUserInfo()
     },
     computed:{
         path(){
@@ -174,6 +167,24 @@ export default {
         // }
     },
     methods:{
+        getUserInfo(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
+                headers:{
+                    'accept':'application/json;charset=UTF-8',
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                console.log('getUserInfo获取用户的姓名和项目权限')
+                console.log(response)
+                vm.userName = response.data.rt.onlineInfo.userName
+                vm.userId = response.data.rt.onlineInfo.userId
+            }).catch((err)=>{
+                    console.log(err)
+            })
+        },
         handleClick(tab,event){
             // console.log(tab);
             // console.log(tab.index)
