@@ -95,8 +95,8 @@
                 <p class="deleteDialogWarning">删除提醒</p>
                 <p class="deleteDialogText">你确定删除分区【西南区】?</p>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="deleteMakeSure">删除</el-button>
-                    <el-button @click="deleteDialog=false">取消</el-button>
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteDialog=false">取消</button>
                 </div>
             </el-dialog>
         </div>

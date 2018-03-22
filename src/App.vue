@@ -76,7 +76,33 @@ export default {
   height: 36px;
   margin-left: 18px;
 }
-#inital .el-button--primary{
+#inital .deleteBtn,#inital .cancelBtn{
+  width: 111px;
+  height: 36px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 2px;
+}
+#inital .deleteBtn{
+  color: #fff;
+  background: #fc3439;
+}
+#inital .deleteBtn:hover{
+  background: #ff5257;
+
+}
+#inital .cancelBtn{
+  margin-left: 20px;
+  color: #999;
+  font-size: 14px;
+  font-family: 'MicrosoftYaHei';
+  background: #fff;
+}
+#inital .cancelBtn:hover{
+  color: #666;
+  background: #e6e6e6;
+}
+/* #inital .el-button--primary{
   background: #fc3439;
 }
 #inital .el-button--primary:hover{
@@ -95,7 +121,7 @@ export default {
   color: #999;
   font-size: 14px;
   font-family: 'MicrosoftYaHei';
-}
+} */
 
 #edit .el-dialog__header{
   height: 68px;

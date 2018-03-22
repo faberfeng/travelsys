@@ -156,8 +156,6 @@ export default {
         
         this.$refs.sideB.style.height = height+'px';
         //this.$refs.settingsL.style.height = height+'px';
-        //console.log(height);
-        //getUserInfo获取用户的姓名和项目权限
     },
     computed:{
         path(){
@@ -379,114 +377,9 @@ export default {
         height:48px;
         width:100%;
     }
-    /* 工程面板 */
-    .projectTab{
-        width: 100%;
-        float: left;
-        margin-right: 1%;
-        margin-top: 43px;
-
-        
-    }
-    /* 工程信息 */
-    .projectInfo{
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-    }
-    .projectInfo .img,.projectInfo .tal{
-        height: 240px;
-    }
-    .projectInfo .img{
-        width: 500px;
-    }
-    .projectInfo .tal{
-        flex: 1;
-        margin-left: 12px;
-        float: right;
-        background: #f5f7fa;
-    }
-    .tal .talTitle{
-        color: #fc3439;
-        font-family: '微软雅黑';
-        font-weight: bold;
-        font-size: 18px;
-        text-align: left;
-        height: 20px;
-        line-height: 20px;
-        padding-left: 30px;
-        margin: 21px 0 10px 0;
-    }
-    .tal .talUl{
-        list-style:none;
-        margin-top:5px;
-        padding-left: 30px;
-        font-size: 14px;
-    }
-    .talUl li{
-        text-align: left;
-        display: inline-block;
-        width: 100%;
-        height: 35px;
-        line-height: 35px;
-    }
-    .talUl label{
-        color:#999999;
-        font-size: 14px;
-        font-family: '微软雅黑';
-        display: inline-block;
-        margin-right: 40px;
-    }
-    .projectInfoTitle{
-        text-align: left;
-        height: 40px;
-        line-height: 40px;
-        background: #f1f1f1;
-    }
+    
     /* 工程列表 */
-    .projectList{
-        width: 100%;
-        list-style: none;
-        overflow: auto;
-        padding-left: 0;
-        margin-top: 0px;
-    }
-    .projectList li{
-        display: inline-block;
-        width: 100%;
-        margin-top: 5px; 
-        border-bottom:1px solid #ebebeb;
-    }
-    .projectListInfo{
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-    }
-    .projectListImg{
-        width: 80px;
-        float: left;
-    }
-    .projectListText{
-        font-size: 12px;
-        flex: 1;
-        margin: 0 2px;
-        float: left;
-        text-align: left;
-    }
-    .projectListText .title{
-        width: 100%;
-    }
-    .projectListText .title a{
-        float: right;
-        width: 100px;
-        font-size: 14px;
-        cursor: pointer;
-        text-align: center;
-        color: #ccc;
-    }
-    .projectListText .title a:hover{
-        color: red;
-    }
+
     .title span{
         font-size: 14px;
         display: inline-block;
