@@ -76,11 +76,13 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
+                console.log(11111);
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
-                }else if(typeof(response.data.rt.companyList) != 'undefined'){//多个企业
-                    console.log(response.data.rt.companyList)
+                }else if(response.data.rt.companyList.length != 0){//多个企业
+                    console.log(response.data.rt.companyList);
+                    console.log(22222);
                     vm.companyList = response.data.rt.companyList
                 }
             }).catch(function(error){

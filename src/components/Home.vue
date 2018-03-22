@@ -150,8 +150,6 @@ export default {
         if(!this.settingActive){
             this.settingActive='/home/initalsettings';
         };
-        console.log(this.screenWidth+'++++++');
-        
     },
     mounted(){
         var height = ''
@@ -163,20 +161,14 @@ export default {
         
         this.$refs.sideB.style.height = height+'px';
         //this.$refs.settingsL.style.height = height+'px';
-        console.log(height);
     },
     computed:{
         path(){
             return this.$store.state.path;
         },
-        // screenWidth(val,val1){
-        //     console.log(val+'+++++'+val1);
-        // }
     },
     methods:{
         handleClick(tab,event){
-            // console.log(tab);
-            // console.log(tab.index)
             if(tab.label === '工程首页'){
                 this.$router.push({
                     path:'/home/projHome'

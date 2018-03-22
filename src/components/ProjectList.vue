@@ -29,6 +29,10 @@
       </el-col>
     </el-row>
     <!-- <router-link :to="{path:'/home/projHome'}">主页</router-link> -->
+    <div>daohang</div>
+    <ul>
+        <li v-for="(item,index) in listData" :key="index"><router-link :to="{path:'/home/projHome',query:{projId:item.projId}}">导航</router-link></li>
+    </ul>
   </div>
 </template>
 
@@ -39,7 +43,7 @@ export default {
    data(){
       return {
         token:'',
-        listData:{},
+        listData:[],
         title:'我们的公司'
       }
   },
@@ -108,8 +112,9 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
-                if(typeof(response.data.rt) != 'undefined'){
+                if(response.data.rt != 0){
                   vm.listData = response.data.rt;
+                  console.log(vm.listData)
                 }
             }).catch((err)=>{
                 console.log(err)

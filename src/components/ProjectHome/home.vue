@@ -1,67 +1,79 @@
 <template>
-<div id="home_project">
-   <div class="projectInfo">
-        <div class="lunbo-container">
-            <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
-                <el-carousel-item v-for="item in 4" :key="item">
-                    <h3>{{item}}</h3>
-                    </el-carousel-item>
-            </el-carousel>
+    <div id="home_project">
+        <div class="projectInfo">
+            <div class="lunbo-container">
+                <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
+                    <el-carousel-item v-for="item in 4" :key="item">
+                        <h3>{{item}}</h3>
+                        </el-carousel-item>
+                </el-carousel>
+            </div>
+            <div class="tal">
+                <p class="talTitle">概况</p>
+                <ul class="talUl">
+                    <li><label>使用单位</label>上海市城市建设开发投资总公司</li>
+                    <li><label>工程名称</label>企业自用办公楼企业自用办公楼</li>
+                    <li><label>设计单位</label>同济大学建筑设计研究院</li>
+                    <li><label>施工单位</label>上海建工</li>
+                    <li><label>监理单位</label>上海建科监理咨询有限公司</li>
+                </ul>
+            </div>
         </div>
-        <div class="tal">
-            <p class="talTitle">概况</p>
-            <ul class="talUl">
-                <li><label>使用单位</label>上海市城市建设开发投资总公司</li>
-                <li><label>工程名称</label>企业自用办公楼企业自用办公楼</li>
-                <li><label>设计单位</label>同济大学建筑设计研究院</li>
-                <li><label>施工单位</label>上海建工</li>
-                <li><label>监理单位</label>上海建科监理咨询有限公司</li>
+        <div class="projectTab">
+            <div id="item-box" class="clearfix">
+                <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
+                <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
+            </div>
+            <ul class="projectList" v-show="tabShow == 1">
+                <li>
+                    <div class="projectListInfo">
+                        <div class="projectListImg">
+                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                        </div> 
+                        <div class="projectListText">
+                            <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <ul class="projectList" v-show="tabShow == 2">
+                <li>
+                    <div class="projectListInfo">
+                        <div class="projectListImg">
+                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                        </div> 
+                        <div class="projectListText">
+                            <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
+                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>
-<div class="projectTab">
-    <div id="item-box" class="clearfix">
-        <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
-        <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
-    </div>
-    <ul class="projectList" v-show="tabShow == 1">
-        <li>
-            <div class="projectListInfo">
-                <div class="projectListImg">
-                    <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                </div> 
-                <div class="projectListText">
-                    <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                    <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                    <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                </div>
-            </div>
-        </li>
-    </ul>
-    <ul class="projectList" v-show="tabShow == 2">
-        <li>
-            <div class="projectListInfo">
-                <div class="projectListImg">
-                    <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
-                </div> 
-                <div class="projectListText">
-                    <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                    <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                    <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
-                </div>
-            </div>
-        </li>
-    </ul>
-</div>
-</div>
 
 </template>
 <script>
+import axios from 'axios';
+
 export default {
     data(){
         return{
             tabShow:1,
+            projId:'',
+            url:'//10.252.26.240:8080/h2-bim-project/project2/index?projId',
+            token:'',
         }
+    },
+    created(){
+        console.log(this.$route.query.projId);
+        this.token = localStorage.getItem('token');
+        this.projId = this.$route.query.projId;
+        this.url = this.url+'='+this.projId ;
+        this.getData()
     },
     methods:{
         switchTab(key){
@@ -69,6 +81,14 @@ export default {
             if(vm.tabShow != key){
                 vm.tabShow = key;
             }
+        },
+        getData(){
+            axios.get(this.url,{
+                token:this.token
+            }).then((response)=>{
+               // console.log(response);
+                console.log('++++++++++')
+            })
         }
     }
 }
@@ -86,11 +106,6 @@ export default {
             width: 100%;
             height: 100%;
         }
-        // .clearfix{
-        //     overflow: hidden;
-        //     clear: both;
-        //     content: '';
-        // }
         #item-box{
             display: block;
             border-bottom: 1px solid #ccc;

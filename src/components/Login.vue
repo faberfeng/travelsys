@@ -46,7 +46,7 @@ export default {
                    'token':vm.token
               },
           }).then((response)=>{
-              console.log(response)
+             // console.log(response)
               if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
                  vm.$router.push({
                      path:'/showcompany'
@@ -69,12 +69,15 @@ export default {
               }
           }).then((response)=>{
               this.projectData = response.data;
-              localStorage.setItem('token',this.projectData.rt.session.onlineInfo.tokenId);
               if(this.projectData.cd === '10004'){
-                  console.log(123)
+                  localStorage.setItem('token',this.projectData.rt.session.onlineInfo.tokenId);
                   this.$router.push({
                       path:'/showcompany'
                   })
+              }else if(this.projectData.cd === '10003'){
+                  alert(this.projectData.msg)//密码不正确
+              }else if(this.projectData.cd === '10000'){
+                  alert(this.projectData.msg)//账号不存在
               }
               console.log(this.projectData);
           })
