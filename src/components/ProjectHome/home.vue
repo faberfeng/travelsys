@@ -20,7 +20,7 @@
         </div>
     </div>
 <div class="projectTab">
-    <div id="item-box" class="clearfix">
+    <div id="item-box">
         <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
         <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
     </div>
