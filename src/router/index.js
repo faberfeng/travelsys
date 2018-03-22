@@ -3,23 +3,6 @@ import Router from 'vue-router'
 
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
-import Home from '@/components/Home'
-//工程列表页
-import projectlist from '@/components/ProjectList'
-//工程首页 组件
-import ProJHome from '@/components/ProjectHome/home'
-/*成本管理 组件*/
-
-import Goujian from '@/components/ManageCost/Goujian'
-import Gongcheng from '@/components/ManageCost/Gongcheng'
-import Wuliao from '@/components/ManageCost/Wuliao'
-/*设计管理 组件*/
-import Design from '@/components/ManageDesign/Design'
-import DesignVersion from '@/components/ManageDesign/DesignVersion'
-/*配置中心 组件 */
-
-import PageIntial from '@/components/Settings/PageIntial'
-import DataTransform from '@/components/Settings/DataTransform'
 
 Vue.use(Router)
 
@@ -45,7 +28,7 @@ const router = new Router({
     {
       path:'/projectlist',
       name:'projectlist',
-      component:projectlist,
+      component:resolve=>require(['@/components/ProjectList'],resolve),
       meta:{
         requireAuth:true
       }
@@ -53,7 +36,7 @@ const router = new Router({
     {
       path:'/home',
       name:'Home',
-      component:Home,
+      component:resolve=>require(['@/components/Home'],resolve),
       // meta:{
       //   requireAuth:true
       // },
@@ -61,7 +44,7 @@ const router = new Router({
         {
           path:'/home/projHome/:id',
           name:'ProJHome',
-          component:ProJHome
+          component:resolve=>require(['@/components/ProjectHome/home'],resolve)
         },
         {
           path:'/home/costover',
@@ -71,27 +54,27 @@ const router = new Router({
         {
           path:'/home/goujian',
           name:'Goujian',
-          component:Goujian
+          component:resolve=>require(['@/components/ManageCost/Goujian'],resolve),
         },
         {
           path:'/home/gongcheng',
           name:'Gongcheng',
-          component:Gongcheng
+          component:resolve=>require(['@/components/ManageCost/Gongcheng'],resolve)
         },
         {
           path:'/home/wuliao',
           name:'Wuliao',
-          component:Wuliao
+          component:resolve=>require(['@/components/ManageCost/Wuliao'],resolve)
         },
         {
           path:'/home/design',
           name:'Design',
-          component:Design
+          component:resolve=>require(['@/components/ManageDesign/Design'],resolve)
         },
         {
           path:'/home/designversion',
           name:'DesignVersion',
-          component:DesignVersion
+          component:resolve=>require(['@/components/ManageDesign/DesignVersion'],resolve)
         },
         {
           path:'/home/initalsettings',
@@ -106,12 +89,12 @@ const router = new Router({
         {
           path:'/home/pageinital',
           name:'PageIntial',
-          component:PageIntial
+          component:resolve=>require(['@/components/Settings/PageIntial'],resolve)
         },
         {
           path:'/home/datatransform',
           name:'DataTransform',
-          component:DataTransform
+          component:resolve=>require(['@/components/Settings/DataTransform'],resolve)
         },
         {
           path:'/home/projectstationmanage',
