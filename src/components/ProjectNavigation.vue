@@ -1,18 +1,6 @@
 <template>
     <div id="projectNavigation">
-         <el-row>
-            <el-col :span="24" class="header">
-                <div class="headerImg">
-                    <img src='http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'/>
-                </div>
-                <div class="headerText">
-                    {{title}}
-                </div>
-                <div class="headerInfo" @click="logout">
-                    <img class="headerInfoImg" src='../assets/loginimg.png'/>
-                </div>
-            </el-col>
-        </el-row>
+        <headerCommon></headerCommon>
         <h1>企业类型 工程类型</h1>
         <ul class="companyBox clearfix">
             <li class="company-item" v-for="(item,index) in companyList" :key="index" >
@@ -25,9 +13,13 @@
     </div>
 </template>
 <script>
-import axios from 'axios';
+import axios from 'axios'
+import headerCommon from './header.vue'
 export default {
     name:'ProjectNavigation',
+    components: {
+      headerCommon
+    },
     data(){
         return{
             url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',

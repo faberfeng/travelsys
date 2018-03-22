@@ -1,19 +1,6 @@
 <template>
 <div class="wrapper">
-    <el-row>
-        <el-col :span="24" class="header">
-            <div class="headerImg">
-                <img src='http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'/>
-            </div>
-            <div class="headerText">
-                {{title}}
-            </div>
-            <div class="headerInfo" @click="logout">
-                <img class="headerInfoImg" src='../assets/loginimg.png'/>
-            </div>
-        </el-col>
-    </el-row>
-    <h2>工程列表页</h2>
+    <headerCommon></headerCommon>
     <el-row>
       <el-col :span="8" style="width:300px;margin-left:30px;" v-for="(item, index) in listData" :key="index" :offset="index > 0 ? 2 : 0">
         <el-card :body-style="{ padding: '0px' }">
@@ -22,7 +9,7 @@
             <span v-text="item.projName"></span>
             <div class="bottom clearfix">
               <time class="time" v-text="item.projManager"></time>
-              <el-button type="text" class="button">操作按钮</el-button>
+              <el-button type="text" @click="selectProject(item.projId)" class="button">操作按钮</el-button>
             </div>
           </div>
         </el-card>
@@ -38,6 +25,7 @@
 
 <script>
 import axios from 'axios'
+import headerCommon from './header.vue'
 export default {
   name: 'ProjectList',
    data(){
@@ -46,6 +34,9 @@ export default {
         listData:[],
         title:'我们的公司'
       }
+  },
+  components: {
+    headerCommon
   },
   mounted(){
     var vm = this
@@ -120,6 +111,12 @@ export default {
                 console.log(err)
             })
         },
+        selectProject(id){
+            var vm = this
+            vm.$router.push({
+              path:`/home/projHome/${id}`,
+            })
+        }
   }
 }
 </script>
