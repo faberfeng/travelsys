@@ -26,7 +26,8 @@ export default {
             pathInit:'',
             companyList:{},
             title:'我们的公司',
-            token:''
+            token:'',
+            companyType:{},
         }
     },
     mounted(){
@@ -68,20 +69,23 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
-                console.log(11111);
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                 }else if(response.data.rt.companyList.length != 0){//多个企业
                     console.log(response.data.rt.companyList);
-                    console.log(22222);
                     vm.companyList = response.data.rt.companyList
+                }else if(typeof(response.data.rt.countQ1) != 'undefined'){
+                    vm.companyType = response.data.rt
                 }
             }).catch(function(error){
-                vm.$router.push({
-                  path:'/login'
-                })
+                // vm.$router.push({
+                //   path:'/login'
+                // })
             })
+        },
+        selectType(){
+
         },
         //企业唯一或不唯一
         initCompany(){
