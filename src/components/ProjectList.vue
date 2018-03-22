@@ -1,6 +1,6 @@
 <template>
 <div class="wrapper">
-    <headerCommon></headerCommon>
+    <headerCommon :username="userName"></headerCommon>
     <el-row>
       <el-col :span="8" style="width:300px;margin-left:30px;" v-for="(item, index) in listData" :key="index" :offset="index > 0 ? 2 : 0">
         <el-card :body-style="{ padding: '0px' }">
@@ -28,16 +28,19 @@ export default {
       return {
         token:'',
         listData:[],
-        title:'我们的公司'
+        title:'我们的公司',
+        userName:'',
+        userId:'',
       }
   },
   components: {
-    headerCommon
+      headerCommon
   },
   mounted(){
-    var vm = this
-    vm.token  = localStorage.getItem('token')
-    vm.viewFlag()
+      var vm = this
+      vm.token  = localStorage.getItem('token')
+      vm.viewFlag()
+      vm.getUserInfo()
   },
   methods:{
       logout(){
@@ -63,6 +66,24 @@ export default {
                 console.log('退出失败!')
                console.log(err)
             })
+      },
+      getUserInfo(){
+          var vm = this
+          axios({
+              method:'GET',
+              url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
+              headers:{
+                  'accept':'application/json;charset=UTF-8',
+                  'token':vm.token
+              },
+          }).then((response)=>{
+              // console.log('getUserInfo获取用户的姓名和项目权限')
+              console.log(response)
+              vm.userName = response.data.rt.onlineInfo.userName
+              vm.userId = response.data.rt.onlineInfo.userId
+          }).catch((err)=>{
+                  console.log(err)
+          })
       },
       viewFlag(){
             var vm = this
@@ -98,7 +119,6 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log(response);
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
                   console.log(vm.listData)
