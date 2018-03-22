@@ -194,7 +194,7 @@ export default {
             margin-left: 26px;
             margin-right: 20px;
             float: right;
-            background: #f5f7fa;
+            background: #fafafa;
         }
         .tal .talTitle{
             color: #fc3439;

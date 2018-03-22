@@ -451,7 +451,7 @@ export default {
         
     }
     .settingsRight{
-         flex: 1;
+        flex: 1;
     }
     .settings h5{
         width:100%;
