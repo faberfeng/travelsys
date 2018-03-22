@@ -16,10 +16,6 @@
       </el-col>
     </el-row>
     <!-- <router-link :to="{path:'/home/projHome'}">主页</router-link> -->
-    <div>daohang</div>
-    <ul>
-        <li v-for="(item,index) in listData" :key="index"><router-link :to="{path:'/home/projHome',query:{projId:item.projId}}">导航</router-link></li>
-    </ul>
   </div>
 </template>
 
@@ -112,7 +108,8 @@ export default {
             })
         },
         selectProject(id){
-            var vm = this
+            var vm = this;
+            localStorage.setItem('projId',id);
             vm.$router.push({
               path:`/home/projHome/${id}`,
             })

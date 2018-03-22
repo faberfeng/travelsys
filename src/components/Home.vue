@@ -127,10 +127,13 @@ export default {
             settingActive:'/home/initalsettings',
             winHeight:'',
             screenWidth: document.documentElement.clientHeight,
-            token:''
+            token:'',
+            projId:''
         }
     },
     created(){
+        this.projId = localStorage.getItem('projId');//获取工程编号
+
         this.navigationPath = sessionStorage.getItem('navigationPath');
         this.settingActive = sessionStorage.getItem('settingActive');
         if(!this.navigationPath){
@@ -139,6 +142,8 @@ export default {
         if(!this.settingActive){
             this.settingActive='/home/initalsettings';
         };
+        this.token  = localStorage.getItem('token')
+        this.getUserInfo()
     },
     mounted(){
         var height = ''
@@ -151,10 +156,8 @@ export default {
         
         this.$refs.sideB.style.height = height+'px';
         //this.$refs.settingsL.style.height = height+'px';
-        console.log(height);
+        //console.log(height);
         //getUserInfo获取用户的姓名和项目权限
-        vm.token  = localStorage.getItem('token')
-        vm.getUserInfo()
     },
     computed:{
         path(){
@@ -172,7 +175,7 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log('getUserInfo获取用户的姓名和项目权限')
+               // console.log('getUserInfo获取用户的姓名和项目权限')
                 console.log(response)
                 vm.userName = response.data.rt.onlineInfo.userName
                 vm.userId = response.data.rt.onlineInfo.userId
@@ -183,7 +186,7 @@ export default {
         handleClick(tab,event){
             if(tab.label === '工程首页'){
                 this.$router.push({
-                    path:'/home/projHome'
+                    path:'/home/projHome/'+this.projId
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
