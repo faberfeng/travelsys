@@ -13,10 +13,10 @@
                     <el-row class="navigation">
                         <el-col :span="24" >
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
-                                <el-tab-pane label="工程首页" name="projectPage" >
+                                <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                        <router-view class="sss"/>
                                 </el-tab-pane>
-                                <el-tab-pane label="进度计划" name="plan">进度计划</el-tab-pane>
+                                <el-tab-pane label="进度计划" name="plan" v-if="auth.progress">进度计划</el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
                                         <el-menu-item index="1"><router-link :to="{path:'/home/design'}">设计协调</router-link></el-menu-item>
@@ -25,7 +25,7 @@
                                     </el-menu>
                                     <router-view/>
                                 </el-tab-pane>
-                                <el-tab-pane label="成本管理" name="costManage">
+                                <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
                                         <el-menu-item index="1"><router-link :to="{path:'/home/costover'}">成本预览</router-link></el-menu-item>
                                         <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">构建量清单</router-link></el-menu-item>
@@ -34,9 +34,9 @@
                                     </el-menu>
                                     <router-view/>
                                 </el-tab-pane>
-                                <el-tab-pane label="物资采购" name="materialPurchase">物资采购</el-tab-pane>
-                                <el-tab-pane label="施工现场" name="construction">施工现场</el-tab-pane>
-                                <el-tab-pane label="文档管理" name="documentManager">
+                                <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
+                                <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
+                                <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
                                         <el-menu-item index="1"><router-link :to="{path:'/home/costover'}">最近文档</router-link></el-menu-item>
                                         <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">工程云盘</router-link></el-menu-item>
@@ -45,8 +45,7 @@
                                     </el-menu>
                                     <router-view/>
                                 </el-tab-pane>
-                                <el-tab-pane label="设施维保" name="facilities">设施维保</el-tab-pane>
-                                <el-tab-pane label="配置中心" name="settings">
+                                <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
                                     <div class="settings">
                                         <div  class="settingsLeft" ref="settingsL">
                                             <h5>工程配置中心</h5>
@@ -128,7 +127,27 @@ export default {
             winHeight:'',
             screenWidth: document.documentElement.clientHeight,
             token:'',
-            projId:''
+            projId:'',
+            /*********
+                 *要判断导航栏功能； 
+                 * 工程首页 （007）、进度计划（005）、设计管理（004）、
+                 * 成本管理（012）、物资采购（011）、安全管理（013）、
+                 * 施工现场（006）、文档管理（002）、空间管理（009）、
+                 * 资产管理（010）、配置中心（001）
+                 * *********/
+            auth:{
+                homePage:false,
+                progress:false,
+                design:false,
+                costManagement:false,
+                materialPurchasing:false,
+                safetyManagement:false,
+                constructionSite:false,
+                docManagement:false,
+                spaceManagement:false,
+                assetManagement:false,
+                configurationCenter:false
+            }
         }
     },
     created(){
@@ -174,9 +193,70 @@ export default {
                 },
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
-                console.log(response)
                 vm.userName = response.data.rt.onlineInfo.userName
                 vm.userId = response.data.rt.onlineInfo.userId
+                /*********
+                 *要判断导航栏功能； 
+                 * 工程首页 （007）、进度计划（005）、设计管理（004）、
+                 * 成本管理（012）、物资采购（011）、安全管理（013）、
+                 * 施工现场（006）、文档管理（002）、空间管理（009）、
+                 * 资产管理（010）、配置中心（001）
+                 *  auth:{
+                        homePage:false,
+                        progress:false,
+                        design:false,
+                        costManagement:false,
+                        materialPurchasing:false,
+                        safetyManagement:false,
+                        constructionSite:false,
+                        docManagement:false,
+                        spaceManagement:false,
+                        assetManagement:false,
+                        configurationCenter:false
+                    }
+                 * *********/
+                // console.log("check this out!!!")
+                // console.log(new Date());
+                for(var i=0;i<response.data.rt.onlineInfo.projAuth[1].length;i++){
+                    var arr = response.data.rt.onlineInfo.projAuth[1][i].substr(0,3)
+                    switch(arr){
+                        case "007":
+                            vm.auth.homePage = true
+                        break;
+                        case "005":
+                            vm.auth.progress = true
+                        break;
+                        case "004":
+                            vm.auth.design = true
+                        break;
+                        case "012":
+                            vm.auth.costManagement = true
+                        break;
+                        case "011":
+                            vm.auth.materialPurchasing = true
+                        break;
+                        case "013":
+                            vm.auth.safetyManagement = true
+                        break;
+                        case "006":
+                            vm.auth.constructionSite = true
+                        break;
+                        case "002":
+                            vm.auth.docManagement = true
+                        break;
+                        case "009":
+                            vm.auth.spaceManagement = true
+                        break;
+                        case "010":
+                            vm.auth.assetManagement = true
+                        break;
+                        case "001":
+                            vm.auth.configurationCenter = true
+                        break;
+                    }
+                }
+                // console.log("check this out!!!")
+                // console.log(new Date());
             }).catch((err)=>{
                     console.log(err)
             })
