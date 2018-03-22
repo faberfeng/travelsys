@@ -26,8 +26,8 @@
                 </el-select>
             </div>
             <div class="pageBtn">
-                <el-button class="btn" type="primary">+添加</el-button>
-                <el-button class="btn" type="primary">编辑</el-button>
+                <button class="addBtn">+添加</button>
+                <button class="editBtn">编辑</button>
             </div>
         </div>
         <div class="flor">
@@ -198,9 +198,21 @@ export default {
         }
         .pageBtn{
             width: 250px;
+            text-align: left;
         }
-        .btn{
+        .addBtn,.editBtn{
             width: 95px;
+            height: 38px;
+            border: 1px solid #ccc;
+            background: #fc3439;
+            color: #fff;
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 2px;
+        }
+        .pageSelect .el-input--suffix .el-input__inner{
+            height: 38px;
         }
         .add{
             float: right;
