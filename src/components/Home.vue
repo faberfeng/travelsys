@@ -356,7 +356,7 @@ export default {
         text-decoration: none;
         display: inline-block;
         width: 100%;
-        min-height: 100vh;
+        /* min-height: 100vh; */
     }
     .wrapper{
         width: 100%;
@@ -559,7 +559,7 @@ export default {
         width: 100%;
         overflow: auto;
         display: flex;
-        height: 100vh;
+        min-height: 100vh;
        
     }
     .settingsLeft{
