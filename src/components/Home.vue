@@ -222,9 +222,12 @@ export default {
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
+                params:{
+                    refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                },
                 headers:{
                     'accept':'application/json;charset=UTF-8',
-                    'token':vm.token
+                    'token':vm.token,
                 },
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
