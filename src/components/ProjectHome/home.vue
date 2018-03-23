@@ -67,8 +67,9 @@ export default {
     },
     created(){
         var vm = this
-        vm.token = localStorage.getItem('token'); 
-        vm.getPJDetial(vm.$route.params.id);
+        const token = localStorage.getItem('token') 
+        vm.token =token;
+        // vm.getPJDetial(vm.$route.params.id);
     },
     methods:{
         switchTab(key){
@@ -77,37 +78,6 @@ export default {
                 vm.tabShow = key;
             }
         },
-        getPJDetial(key){
-            var vm = this
-            if(vm.notbeenUse){
-               //console.log("look the proj_id")
-                /*******
-                 * 谨记：
-                 * 获取路由params的写法是this.$route 不是this.$router!!!
-                 * ********/
-               // console.log(vm.$route.params.id);
-                axios({
-                    method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/index?projId='+key,
-                    headers:{
-                        'accept':'application/json;charset=UTF-8',
-                        'token':vm.token
-                    },
-                }).then((response)=>{
-                    console.log(response);
-                    vm.notbeenUse =false
-                    if(response.data.msg == "您没有登录或登录超时，请重新登录"){
-                         vm.$router.push({
-                            path:'/login'
-                        })
-                    }
-                }).catch((err)=>{
-                    console.log(err)
-                }) 
-            }else{
-                return false
-            }
-        }
     }
 }
 </script>

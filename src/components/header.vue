@@ -2,9 +2,9 @@
     <el-row>
         <el-col :span="24" class="header">
             <div class="headerImg">
-                <img src='http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'/>
+                <img :src="proimg?proimg:'http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'"/>
             </div>
-            <div class="headerText" v-text="title"></div>
+            <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
                 <img class="headerInfoImg" src='../assets/loginimg.png'/>
                 <div class="infoHover">
@@ -22,10 +22,9 @@ import axios from 'axios'
 export default Vue.component('common-header', {
    data(){
         return{
-          title:'华建Q系列工程协同应用系统',
       }
      },
-    props: ['username','userid'],
+    props: ['username','userid','proname','proimg'],
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
@@ -73,6 +72,11 @@ export default Vue.component('common-header', {
         width: 200px;
         height: 50px;
         margin:10px 5px;
+    }
+    .headerImg img{
+        display: block;
+        width: 100%;
+        height: 100%;
     }
     #pane-projectPage{
         margin-top: 35px;

@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper" ref="allHeight">
       <!--2018/3/21 付伟超修改-->
-        <headerCommon :username='userName' :userid='userId'></headerCommon>
+        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
         <div class="contentBody">
             <div class="sideBar" ref="sideB">
                 <a href="#">
@@ -17,7 +17,7 @@
                                        <router-view class="sss"/>
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress">进度计划</el-tab-pane>
-                                <el-tab-pane label="设计管理" name="designManager">
+                                <el-tab-pane label="设计管理" name="designManager" v-if="auth.design">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
                                         <el-menu-item index="1"><router-link :to="{path:'/home/design'}">设计协调</router-link></el-menu-item>
                                         <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">属性管理</router-link></el-menu-item>
@@ -119,8 +119,12 @@ export default {
     },
     data(){
         return{
-            userName:'',
-            userId:'',
+            header:{
+                 userName:'',
+                 userId:'', 
+                 projectName:'华建Q系列工程协同应用系统',
+                 projectImg:'',
+            },          
             navigationPath:'projectPage',
             activeIndex:'1',
             settingActive:'/home/initalsettings',
@@ -152,18 +156,19 @@ export default {
         }
     },
     created(){
-        this.projId = localStorage.getItem('projId');//获取工程编号
+        var vm = this
+        vm.projId = localStorage.getItem('projId');//获取工程编号
 
-        this.navigationPath = sessionStorage.getItem('navigationPath');
-        this.settingActive = sessionStorage.getItem('settingActive');
-        if(!this.navigationPath){
-            this.navigationPath='projectPage';
+        vm.navigationPath = sessionStorage.getItem('navigationPath');
+        vm.settingActive = sessionStorage.getItem('settingActive');
+        if(!vm.navigationPath){
+            vm.navigationPath='projectPage';
         }
-        if(!this.settingActive){
-            this.settingActive='/home/initalsettings';
+        if(!vm.settingActive){
+            vm.settingActive='/home/initalsettings';
         };
-        this.token  = localStorage.getItem('token')
-        this.getUserInfo()
+        vm.token  = localStorage.getItem('token')
+        vm.getPJDetial(vm.projId);
     },
     mounted(){
         var height = ''
@@ -182,6 +187,36 @@ export default {
         },
     },
     methods:{
+        getPJDetial(key){
+            var vm = this
+            //console.log("look the proj_id")
+            /*******
+             * 谨记：
+             * 获取路由params的写法是this.$route 不是this.$router!!!
+             * ********/
+            // console.log(vm.$route.params.id);
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/index?projId='+key,
+                headers:{
+                    'accept':'application/json;charset=UTF-8',
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                //console.log(response);
+                if(response.data.msg == "您没有登录或登录超时，请重新登录"){
+                        vm.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
+                    vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
+                    vm.getUserInfo()
+                }
+            }).catch((err)=>{
+                console.log(err)
+            }) 
+        },
         getUserInfo(){
             var vm = this
             axios({
@@ -193,8 +228,8 @@ export default {
                 },
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
-                vm.userName = response.data.rt.onlineInfo.userName
-                vm.userId = response.data.rt.onlineInfo.userId
+                vm.header.userName = response.data.rt.onlineInfo.userName
+                vm.header.userId = response.data.rt.onlineInfo.userId
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
@@ -217,9 +252,7 @@ export default {
                  * *********/
                 // console.log("check this out!!!")
                 // console.log(new Date());
-                console.log(response.data.rt.onlineInfo);
                 var id = localStorage.getItem('projId');
-                console.log(id+'===========')
                 for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
                     var arr = response.data.rt.onlineInfo.projAuth[id][i].substr(0,3)
                     switch(arr){

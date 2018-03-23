@@ -4,12 +4,13 @@
     <el-row>
       <el-col :span="8" style="width:300px;margin-left:30px;" v-for="(item, index) in listData" :key="index" :offset="index > 0 ? 2 : 0">
         <el-card :body-style="{ padding: '0px' }">
-          <div :style="item.imgPath?'background-image:url('+item.imgPath+')':'background-image:url('+require('../assets/logo.png')+')'" class="image"></div>
+          <div :style="item.imgPath?'background-image:url('+item.imgPath+')':'background-image:url('+require('../assets/logo.png')+')'" class="image" v-if="!item.expired"></div>
+          <div v-else class="image">项目已过期</div>
           <div style="padding: 14px;">
             <span v-text="item.projName"></span>
             <div class="bottom clearfix">
               <time class="time" v-text="item.projManager"></time>
-              <el-button type="text" @click="selectProject(item.projId)" class="button">操作按钮</el-button>
+              <el-button type="text" @click="selectProject(item.projId,item.expired)" class="button">操作按钮</el-button>
             </div>
           </div>
         </el-card>
@@ -43,47 +44,10 @@ export default {
       vm.getUserInfo()
   },
   methods:{
-      logout(){
-         var vm = this
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/logout',
-                data:{
-                  'token':vm.token
-                },
-                 headers:{
-                    'accept':'application/json;charset=UTF-8',
-                    'token':vm.token
-                },
-             }).then((response)=>{
-                if(response.data.cd == "0"){
-                    localStorage.removeItem('token')
-                    vm.$router.push({
-                       path:'/login'
-                    }) 
-                }
-            }).catch((err)=>{
-                console.log('退出失败!')
-               console.log(err)
-            })
-      },
       getUserInfo(){
           var vm = this
-          axios({
-              method:'GET',
-              url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
-              headers:{
-                  'accept':'application/json;charset=UTF-8',
-                  'token':vm.token
-              },
-          }).then((response)=>{
-              // console.log('getUserInfo获取用户的姓名和项目权限')
-              console.log(response)
-              vm.userName = response.data.rt.onlineInfo.userName
-              vm.userId = response.data.rt.onlineInfo.userId
-          }).catch((err)=>{
-                  console.log(err)
-          })
+          vm.userName = localStorage.getItem('username')
+          vm.userId = localStorage.getItem('userid')
       },
       viewFlag(){
             var vm = this
@@ -121,18 +85,24 @@ export default {
             }).then((response)=>{
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
-                  console.log(vm.listData)
                 }
             }).catch((err)=>{
                 console.log(err)
             })
         },
-        selectProject(id){
+        selectProject(id,expired){
+          if(expired){
+               this.$message({
+                message: '项目已过期！',
+                type: 'warning'
+              });
+          }else{
             var vm = this;
             localStorage.setItem('projId',id);
             vm.$router.push({
               path:`/home/projHome/${id}`,
             })
+          }
         }
   }
 }
