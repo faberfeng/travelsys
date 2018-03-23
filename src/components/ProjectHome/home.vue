@@ -1,6 +1,6 @@
 <template>
     <div id="home_project">
-    <div class="projectInfo">
+        <div class="projectInfo">
             <div class="lunbo-container">
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
                     <el-carousel-item v-for="item in 4" :key="item">
@@ -86,7 +86,7 @@ export default {
                  * 谨记：
                  * 获取路由params的写法是this.$route 不是this.$router!!!
                  * ********/
-                console.log(vm.$route.params.id);
+                //console.log(vm.$route.params.id);
                 axios({
                     method:'GET',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/index?projId='+key,
@@ -95,7 +95,7 @@ export default {
                         'token':vm.token
                     },
                 }).then((response)=>{
-                    console.log(response);
+                   // console.log(response);
                     vm.notbeenUse =false
                     if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                          vm.$router.push({
@@ -115,6 +115,7 @@ export default {
 
 <style lang="less">
     #home_project{
+        margin-right: 20px;
         .font-color1{
             color: #333;
             font-size: 14px;
@@ -170,7 +171,7 @@ export default {
         }
         /* 工程面板 */
         .projectTab{
-            width: 98%;
+            width: 100%;
             float: left;
             margin-top: 42px;
         }
@@ -192,7 +193,6 @@ export default {
         .projectInfo .tal{
             flex: 1;
             margin-left: 26px;
-            margin-right: 20px;
             float: right;
             background: #fafafa;
         }
