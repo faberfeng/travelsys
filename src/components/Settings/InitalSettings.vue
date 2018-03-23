@@ -513,7 +513,7 @@ export default {
         font-size: 14px;
         font-family: 'MicrosoftYahei';
         font-weight: normal;
-        margin: 13px 0 0 0;
+        margin: 10px 0 0 0;
     }
     
 </style>

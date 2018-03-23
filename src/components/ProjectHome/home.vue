@@ -1,6 +1,6 @@
 <template>
     <div id="home_project">
-    <div class="projectInfo">
+        <div class="projectInfo">
             <div class="lunbo-container">
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
                     <el-carousel-item v-for="item in 4" :key="item">
@@ -84,6 +84,7 @@ export default {
 
 <style lang="less">
     #home_project{
+        margin-right: 20px;
         .font-color1{
             color: #333;
             font-size: 14px;
@@ -139,7 +140,7 @@ export default {
         }
         /* 工程面板 */
         .projectTab{
-            width: 98%;
+            width: 100%;
             float: left;
             margin-top: 42px;
         }
@@ -161,7 +162,6 @@ export default {
         .projectInfo .tal{
             flex: 1;
             margin-left: 26px;
-            margin-right: 20px;
             float: right;
             background: #fafafa;
         }
