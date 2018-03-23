@@ -4,7 +4,7 @@
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
         <div class="contentBody">
             <div class="sideBar" ref="sideB">
-                <a href="#">
+                <a href="#" >
                     <img src="../assets/arrow-left.png"/>
                 </a>
             </div>
@@ -355,8 +355,6 @@ export default {
     a{
         text-decoration: none;
         display: inline-block;
-        width: 100%;
-        /* min-height: 100vh; */
     }
     .wrapper{
         width: 100%;
@@ -473,6 +471,7 @@ export default {
     .sideBar{
         width: 25px;
         min-width: 25px;
+        min-height: 100vh;
         background: #f5f7fa;
         border-right: 1px solid #cccccc;
     }

@@ -77,9 +77,17 @@ export default {
                 },
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
-                console.log(response)
-                vm.userName = response.data.rt.onlineInfo.userName
-                vm.userId = response.data.rt.onlineInfo.userId
+                console.log(response);
+                console.log('++++++++++++');
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    vm.userName = response.data.rt.onlineInfo.userName;
+                    vm.userId = response.data.rt.onlineInfo.userId;
+                }
+                
             }).catch((err)=>{
                     console.log(err)
             })
@@ -174,6 +182,15 @@ export default {
                     this.$router.push({
                         path:'/projectlist'
                     })
+                }else if(response.data.cd === "1"){
+                    console.log(response.data.cd );
+                    alert(response.data.msg);
+                    setTimeout(()=>{
+                         vm.$router.push({
+                            path:'/login'
+                        })
+                    },1000)
+                   
                 }
             }).catch(function(error){
                 vm.$router.push({
