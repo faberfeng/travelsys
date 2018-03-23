@@ -217,8 +217,11 @@ export default {
                  * *********/
                 // console.log("check this out!!!")
                 // console.log(new Date());
-                for(var i=0;i<response.data.rt.onlineInfo.projAuth[1].length;i++){
-                    var arr = response.data.rt.onlineInfo.projAuth[1][i].substr(0,3)
+                console.log(response.data.rt.onlineInfo);
+                var id = localStorage.getItem('projId');
+                console.log(id+'++++++++++++++++++')
+                for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
+                    var arr = response.data.rt.onlineInfo.projAuth[id][i].substr(0,3)
                     switch(arr){
                         case "007":
                             vm.auth.homePage = true

@@ -86,7 +86,7 @@ export default {
                  * 谨记：
                  * 获取路由params的写法是this.$route 不是this.$router!!!
                  * ********/
-                console.log(vm.$route.params.id);
+               // console.log(vm.$route.params.id);
                 axios({
                     method:'GET',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/index?projId='+key,
@@ -95,7 +95,7 @@ export default {
                         'token':vm.token
                     },
                 }).then((response)=>{
-                    console.log(response);
+                    //console.log(response);
                     vm.notbeenUse =false
                     if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                          vm.$router.push({
