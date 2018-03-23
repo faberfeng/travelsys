@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper" id='in'>
-        <h4 class="title">工程初始配置</h4>
+        <h4 class="title"><span>工程初始配置</span></h4>
         <div class="account">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
             <ul class="accountList" >
@@ -210,16 +210,18 @@ export default {
         color: #fc343a;
         font-size: 18px;
         font-weight: bold;
-        width: 95%;
         border-bottom:1px solid #ccc; 
         height: 50px;
         line-height: 50px;
-        padding:0px 15px;
-        margin: 10px 0 0 0 ;
+        margin: 10px 20px 0 0px ;
         text-align: left;
     }
+    .title span{
+        width: 50%;
+        margin-left: 15px;
+    }
     .account,.summary,.img{
-        width:97%;
+        /* width:97%; */
         margin-left: 15px;
         margin-right: 20px;
     }

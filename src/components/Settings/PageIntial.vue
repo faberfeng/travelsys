@@ -1,7 +1,7 @@
 <template>
-  <div class="wrapper" id="pageIntial">
+  <div class="wrapper" id="pageIn">
       <h4 class="titleAll">分区与楼层配置</h4>
-      <div class="pageInital">
+      <div class="pageI">
         <div class="pageSelect">
             <div class="pageOption">
                 <label>单体名称</label>
@@ -33,7 +33,7 @@
         <div class="flor">
             <h5 class="title"><img class="imgicon"  src="../../assets/columFloor.png"/> 竖向楼层<span @click="addFlor" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="pageTable"> 
-                <el-table :data="florData" border style="width:97%">
+                <el-table :data="florData" border class="table" style="width:100%">
                     <el-table-column label="序号" prop="index"></el-table-column>
                     <el-table-column label="名称" prop="name"></el-table-column>
                     <el-table-column label="标高值" prop="value"></el-table-column>
@@ -47,10 +47,10 @@
                 </el-table>
             </div>
         </div>
-        <div >
+        <div class="flor">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
-                <el-table :data="sourceData" border align="left" style="width:97%">
+                <el-table :data="sourceData" border class="table"  style="width:100%">
                     <el-table-column label="序号" prop="index"></el-table-column>
                     <el-table-column label="资源包名称" prop="sourceBagName"></el-table-column>
                     <el-table-column label="资源类型" prop="sourceType"></el-table-column>
@@ -59,8 +59,8 @@
                     <el-table-column label="上传时间" prop="updateTime" ></el-table-column>
                     <el-table-column label="版本" prop="version"></el-table-column>
                     <el-table-column label="备注" prop="remarks"></el-table-column>
-                    <el-table-column label="当前状态" prop="state"></el-table-column>
-                    <el-table-column label="操作" width="120">
+                    <el-table-column label="当前状态" prop="state" width="120px"></el-table-column>
+                    <el-table-column label="操作" width="120px">
                         <template slot-scope="scope" >
                             <div class="iconDiv iconDiv2" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
                             <div class="iconDiv iconDiv2" style="width:17px;height:17px;"><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
@@ -78,7 +78,6 @@
                 </el-pagination>
             </div>
         </div>
-
       </div>
   </div>
 </template>
@@ -145,31 +144,31 @@ export default {
 }
 </script>
 <style lang='less'>
-    #pageIntial{
+    #pageIn{
         .wrapper{
             width: 100%;
+        }
+        .pageI{
+            margin: 0 20px 0 15px;
         }
         .titleAll{
            color: #fc343a;
             font-size: 18px;
             font-weight: bold;
-            width: 96%;
             border-bottom:1px solid #ccc; 
             height: 50px;
             line-height: 50px;
-            padding:0px 15px;
-            margin: 10px 10px 0 0px ;
+            margin: 10px 20px 0 15px ;
             text-align: left; 
         }
         .title{
             color: #fc343a;
             font-size: 18px;
             font-weight: bold;
-            width: 97%;
             border-bottom:1px solid #e6e6e6; 
             height: 40px;
             line-height: 40px;
-            margin: 30px 20px 0 20px ;
+            margin: 30px 0px 0 0px ;
             text-align: left;
         }
 
@@ -210,6 +209,7 @@ export default {
             cursor: pointer;
             padding: 0;
             border-radius: 2px;
+            border: none;
         }
         .pageSelect .el-input--suffix .el-input__inner{
             height: 38px;
@@ -227,6 +227,7 @@ export default {
         }
         .flor{
             width: 100%;
+            margin: 0 auto;
         }
         .iconEdit{
             color: #fe731e;
@@ -250,10 +251,14 @@ export default {
             text-align: center;
         }
         .pagination{
-            width: 98%;
+            width: 100%;
             text-align: right;
             margin-top: 10px;
             margin-right: 20px;
+        }
+        .el-pagination{
+            padding:0;
+            // margin-right: 20px;
         }
         .iconDiv{
             width: 16px;
@@ -276,14 +281,47 @@ export default {
             margin-top: 50px;
         }
         .pageTable,.sourceTable{
-            margin-left: 20px;
+
             margin-top: 20px;
             width: 100%;
             text-align: left;
+            display: flex;
+        }
+        .pageTable .table,.sourceTable .table{
+            flex: 1;
         }
         .el-select__caret {
             margin-right: 10px;
             display: inline-block;
+        }
+         .el-tooltip__popper{
+            padding: 1px 7.5px;
+            margin-top: 10px!important;//不起作用
+        }
+        .el-tooltip__popper .popper__arrow{
+            border-width: 3px!important;
+        }
+
+        .el-table--border th{
+            background: #f2f2f2;
+        }
+        .el-table--enable-row-hover .el-table__body tr:hover>td {
+            background-color: #fafafa;
+        }
+        .el-table th{
+                padding: 15px 0;
+        }
+        .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
+        border-right: 1px solid #e0e0e0;
+        }
+        .el-table td, .el-table th.is-leaf {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .el-table--border, .el-table--group {
+            border: 1px solid #d9d9d9;
+        }
+        .el-table::before,.el-table--border::after, .el-table--group::after{
+            display: none;
         }
        
     }

@@ -86,6 +86,7 @@ export default {
 #inital .deleteBtn{
   color: #fff;
   background: #fc3439;
+  border: none;
 }
 #inital .deleteBtn:hover{
   background: #ff5257;
@@ -102,26 +103,6 @@ export default {
   color: #666;
   background: #e6e6e6;
 }
-/* #inital .el-button--primary{
-  background: #fc3439;
-}
-#inital .el-button--primary:hover{
-  background: #ff5257;
-}
-#inital .el-button--default{
-  border: 1px solid #ccc;
-}
-#inital .el-button--default:hover{
-  background: #e6e6e6;
-}
-#inital .el-button--default:hover >#inital .el-button--default span{
-  color: #666;
-}
-#inital .el-button--default span{
-  color: #999;
-  font-size: 14px;
-  font-family: 'MicrosoftYaHei';
-} */
 
 #edit .el-dialog__header{
   height: 68px;
@@ -233,4 +214,13 @@ export default {
 .el-submenu__title i{
   color: #666666;
 }
+.el-menu-item:focus, .el-menu-item:hover{
+  background-color:inherit;
+}
+.el-submenu__title:focus{
+  background-color:#7a818a;
+}
+/* .el-submenu__title:hover{
+  background-color:inherit;
+}  */
 </style>
