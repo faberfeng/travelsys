@@ -27,7 +27,7 @@ export default {
       }
   },
   created(){
-      var vm = this
+      var vm = this;
       const token = localStorage.getItem('token') 
       if(token != 'undefined'){
           vm.token = token
@@ -55,6 +55,7 @@ export default {
           })
         },
       Login(){
+            
           this.login.Password = md5(this.login.Password);
           axios({
               method:'Post',

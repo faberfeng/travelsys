@@ -67,8 +67,7 @@ export default {
     },
     created(){
         var vm = this
-        const token = localStorage.getItem('token') 
-        vm.token =token;
+        vm.token = localStorage.getItem('token'); 
         vm.getPJDetial(vm.$route.params.id);
     },
     methods:{
@@ -95,7 +94,7 @@ export default {
                         'token':vm.token
                     },
                 }).then((response)=>{
-                    //console.log(response);
+                    console.log(response);
                     vm.notbeenUse =false
                     if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                          vm.$router.push({

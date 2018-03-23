@@ -46,8 +46,8 @@
                                     <router-view/>
                                 </el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
-                                    <div class="settings">
-                                        <div  class="settingsLeft" ref="settingsL">
+                                    <div class="settings" ref="settingsL">
+                                        <div  class="settingsLeft" >
                                             <h5>工程配置中心</h5>
                                             <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
                                                 <el-submenu index="/home/initalsettings">
@@ -128,6 +128,7 @@ export default {
             screenWidth: document.documentElement.clientHeight,
             token:'',
             projId:'',
+            cHeight:'',
             /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
@@ -136,17 +137,17 @@ export default {
                  * 资产管理（010）、配置中心（001）
                  * *********/
             auth:{
-                homePage:false,
-                progress:false,
-                design:false,
-                costManagement:false,
-                materialPurchasing:false,
-                safetyManagement:false,
-                constructionSite:false,
-                docManagement:false,
-                spaceManagement:false,
-                assetManagement:false,
-                configurationCenter:false
+                homePage:true,
+                progress:true,
+                design:true,
+                costManagement:true,
+                materialPurchasing:true,
+                safetyManagement:true,
+                constructionSite:true,
+                docManagement:true,
+                spaceManagement:true,
+                assetManagement:true,
+                configurationCenter:true
             }
         }
     },
@@ -166,15 +167,14 @@ export default {
     },
     mounted(){
         var height = ''
-        var vm = this
         if(document.documentElement.clientHeight){
-            height = document.documentElement.clientHeight;
+            this.cHeight = document.documentElement.clientHeight;
         }else{
-           height = document.body.clientHeight;
+           this.cHeight = document.body.clientHeight;
         }
+       // this.$refs.sideB.style.height = this.cHeight+'px';
         
-        this.$refs.sideB.style.height = height+'px';
-        //this.$refs.settingsL.style.height = height+'px';
+        // this.$refs.settingsL.style.height = this.cHeight+'px';
     },
     computed:{
         path(){
@@ -219,7 +219,7 @@ export default {
                 // console.log(new Date());
                 console.log(response.data.rt.onlineInfo);
                 var id = localStorage.getItem('projId');
-                console.log(id+'++++++++++++++++++')
+                console.log(id+'===========')
                 for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
                     var arr = response.data.rt.onlineInfo.projAuth[id][i].substr(0,3)
                     switch(arr){
@@ -323,7 +323,7 @@ export default {
         text-decoration: none;
         display: inline-block;
         width: 100%;
-        height: 100%;
+        min-height: 100vh;
     }
     .wrapper{
         width: 100%;
@@ -435,6 +435,7 @@ export default {
     /* 侧边栏 */
     .contentBody{
         display: flex;
+        height:100%;
     }
     .sideBar{
         width: 25px;
@@ -525,13 +526,13 @@ export default {
         width: 100%;
         overflow: auto;
         display: flex;
+        height: 100vh;
        
     }
     .settingsLeft{
         width: 192px;
         background: #fafafa;
         border-right:1px solid #ccc; 
-        
     }
     .settingsRight{
         flex: 1;
