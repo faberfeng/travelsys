@@ -36,15 +36,15 @@
                 </li>
             </ul>
             <ul class="projectList" v-show="tabShow == 2">
-                <li>
+                <li v-for="(item,index) in projectNoticeListInfo" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
                             <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
                         </div> 
                         <div class="projectListText">
                             <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                            <p class="font-color1">{{item.message}}</p>
+                            <p class="projectBottom">{{item.createDate | toLocalD}}<label>来自网页浏览器</label></p>
                         </div>
                     </div>
                 </li>
@@ -159,7 +159,7 @@ export default {
                     pageSize:10
                 }
             }).then((response)=>{
-               // console.log(response);
+               console.log(response.data.rt.rows);
                 if(response.data.cs === '1'){
                     this.$router.push({
                         path:'/login'
@@ -183,7 +183,7 @@ export default {
                     pageSize:10
                 }
             }).then((response)=>{
-                console.log(response.data.rt);
+                //console.log(response.data);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
