@@ -7,20 +7,22 @@
             <button class="registerBtn">注册</button>
         </div>
         <div class="loginBody">
-            <div class="loginDialog">
-                <p class="loginBodyText">系统账号登陆</p>
-                <div class="loginInput">
-                    <div id="firstInp"><input placeholder="账号" class="input" v-model="login.Id"/></div>
-                    <div id="secondInp" class="af"><input placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
+            <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
+                <div class="loginDialog">
+                    <p class="loginBodyText">系统账号登陆</p>
+                    <div class="loginInput">
+                        <div id="firstInp"><input placeholder="账号" class="input" v-model="login.Id"/></div>
+                        <div id="secondInp" class="af"><input placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
+                    </div>
+                    <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
+                    
+                    <button class="login" @click="Login">登陆</button>
+                    <div class="loginInfo">
+                        <a class="loginInfoLeft">立即注册</a>
+                        <a class="loginInfoRight">忘记密码</a>
+                    </div>
+                    <button class="loginWidthYun">云华建账号登陆</button>
                 </div>
-                <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
-                
-                <button class="login" @click="Login">登陆</button>
-                <div class="loginInfo">
-                    <a class="loginInfoLeft">立即注册</a>
-                    <a class="loginInfoRight">忘记密码</a>
-                </div>
-                <button class="loginWidthYun">云华建账号登陆</button>
             </div>
         </div>   
     </div>
