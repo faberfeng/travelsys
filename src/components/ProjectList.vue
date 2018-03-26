@@ -1,24 +1,157 @@
 <template>
 <div class="wrapper">
     <headerCommon :username="userName"></headerCommon>
-    <el-row>
-      <el-col :span="8" style="width:300px;margin-left:30px;" v-for="(item, index) in listData" :key="index" :offset="index > 0 ? 2 : 0">
-        <el-card :body-style="{ padding: '0px' }">
-          <div :style="item.imgPath?'background-image:url('+item.imgPath+')':'background-image:url('+require('../assets/logo.png')+')'" class="image" v-if="!item.expired"></div>
-          <div v-else class="image">项目已过期</div>
-          <div style="padding: 14px;">
-            <span v-text="item.projName"></span>
-            <div class="bottom clearfix">
-              <time class="time" v-text="item.projManager"></time>
-              <el-button type="text" @click="selectProject(item.projId,item.expired)" class="button">操作按钮</el-button>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-    <!-- <router-link :to="{path:'/home/projHome'}">主页</router-link> -->
+    <div class="header-bar">
+      <span class="bar-title">工程导航</span>
+      <span class="bar-button">条形风格</span>
+    </div>
+    <div v-for="(item, index) in listData" :key="index" class="item-proj" @click="selectProject(item.projId,item.expired)">
+        <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
+          <span class="item-title">工程名称</span>
+          <span  class="item-name" v-text="item.projName"></span>
+          <img class="img"  src="../assets/003.png" alt="">
+        </div>
+        <div class="item_body">
+          <p style="margin-bottom:20px" class="clearfix">
+            <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
+          </p>
+          <p style="margin-bottom:20px" class="clearfix">
+            <span class="body-left">使用单位</span><span class="body-right" v-text="item.overviewList?item.overviewList[0].viewVal:''"></span>
+          </p>
+          <p style="margin-bottom:20px" class="clearfix">
+            <span class="body-left">工程名称</span><span class="body-right" v-text="item.overviewList?item.overviewList[1].viewVal:''"></span>
+          </p>
+          <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'item-head','new_s','text-s']"></span>
+        </div>
+    </div>
   </div>
 </template>
+<style scoped>
+*{
+  margin: 0;
+  padding: 0;
+}
+.header-bar{
+  margin-top: 25px;
+  border-bottom: 1px solid #cccccc;
+  height: 43px;
+}
+.bar-title{
+  font-size: 18px;
+  font-weight: bold;
+  color: #fc3439;
+  float: left;
+  line-height: 18px;
+  margin-top: 11px;
+  margin-left: 20px;
+  position: relative;
+}
+.bar-title::after{
+  display: block;
+  position: absolute;
+  width: 72px;
+  height: 2px;
+  background: #fc3439;
+  content: '';
+  bottom: -15px;
+}
+.bar-button{
+  float: right;
+  width: 102px;
+  height: 26px;
+  border:1px solid #fc3439;
+  border-radius: 2px;
+  text-align: center;
+  line-height: 26px;
+  color: #fc3439;
+  margin-right: 20px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.bar-button:hover{
+  background: #fc3439;
+  color: #ffffff;
+}
+.item-proj{
+  width:280px;
+  height: 272px;
+  float: left;
+  box-shadow: 0px 0px 20px #f1f1f1;
+  margin-top: 20px;
+  margin-left: 20px;
+  position: relative;
+  cursor: pointer;
+}
+.item-head{
+  width: 100%;
+  height: 116px;
+  position: relative;
+}
+.new{
+  background: #ff9933;
+}
+.ongoing{
+  background: #fc3439;
+}
+.end{
+  background: #b3b3b3;
+}
+.new_s{
+  color: #ff9933;
+  font-size: 14px; 
+}
+.ongoing_s{
+  color: #fc3439;
+  font-size: 14px; 
+}
+.end_s{
+  color: #b3b3b3;
+  font-size: 14px; 
+}
+.text-s{
+  display: block;
+  line-height: 14px;
+  text-align: left;
+}
+.img{
+  display: block;
+  position: absolute;
+  bottom: 0px;
+}
+.item-title{
+  display: block;
+  font-size: 14px;
+  color: #ffffff;
+  padding: 23px 0 0 20px;
+  text-align: left; 
+  line-height: 14px;
+}
+.item-name{
+  font-size: 18px;
+  color: #ffffff;
+  text-align: left;
+  line-height: 18px;
+  display: block;
+  padding-left:20px;
+  padding-top: 23px;
+  font-weight: bold; 
+}
+.item_body{
+  margin:25px 20px 0
+}
+.item_body span{
+  line-height: 14px;
+  font-size: 14px;
+}
+.body-left{
+  float: left;
+  color: #999999;
+}
+.body-right{
+  float: right;
+  color: #666666;
+}
+</style>
 
 <script>
 import axios from 'axios'
@@ -85,6 +218,13 @@ export default {
             }).then((response)=>{
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
+                  for(var i=0;i<vm.listData.length;i++){
+                    if(typeof(vm.listData[i].overviewList != 'undefined')){
+                        // for(var j=0;j<vm.listData[i].overviewList.le){
+
+                        // }
+                    }
+                  }
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -110,7 +250,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
- a{
+    a{
         text-decoration: none;
         display: inline-block;
         width: 100%;
@@ -120,6 +260,7 @@ export default {
         width: 100%;
         height: 100%;
         overflow: hidden;
+        padding-bottom: 100px;
     }
     .header{
         height: 68px;
@@ -177,11 +318,7 @@ export default {
         line-height: 50px;
         margin:10px;
     }
-    .logout img{
-        position: relative;
-        top: 7px;
-    }
-.time {
+  .time {
     font-size: 13px;
     color: #999;
   }
@@ -197,20 +334,15 @@ export default {
   }
 
   .image {
-    height: 320px;
     width: 100%;
     display: block;
     background-size: 100% 100%;
     background-position: center center; 
   }
 
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-  
-  .clearfix:after {
-      clear: both
+  .clearfix{
+      clear: both;
+      overflow: hidden;
+      content:'';
   }
 </style>
