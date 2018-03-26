@@ -104,7 +104,9 @@
 </template>
 <script>
 import shouqiImg from '../../assets/arrow-top.png';
-import zhankaiImg  from '../../assets/arrow-down.png'
+import zhankaiImg  from '../../assets/arrow-down.png';
+import axios from 'axios';
+
 export default {
     name:'InitalSettings',
     data(){
@@ -120,6 +122,8 @@ export default {
             retractImg:shouqiImg,
             retractText:'收起',
             isShow:true,
+            token:'',
+            projId:'',
             sumaryData:[
                 {
                     unity:'使用单位',
@@ -144,6 +148,13 @@ export default {
             ],
             index:''
         }
+    },
+    created(){
+        this.token = localStorage.getItem('token');
+        this.projId = localStorage.getItem('projId');
+        console.log(this.projId);
+        console.log(this.token);
+        this.getData();
     },
     methods:{
         edit(index){
@@ -196,6 +207,19 @@ export default {
                 this.retractText = '收起';
                 this.isShow = true;
             }
+
+        },
+        getData(){
+            var url = 'http://10.252.26.240:8080/h2-bim-project/project2/'+this.projId+'/overview/list';
+            axios({
+                method:'GET',
+                url:url,
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                console.log(response);
+            })
 
         }
     }

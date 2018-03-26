@@ -78,7 +78,7 @@ export default {
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
                 console.log(response);
-                console.log('++++++++++++');
+                console.log('获取用户信息');
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -104,12 +104,14 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
+                console.log('获取企业列表');
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+response.data.rt.companyId
-                    vm.initCompany()
+                    vm.initCompany();
+                    console.log(123);
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
                     console.log(response.data.rt.companyList);
-                    vm.companyList = response.data.rt.companyList
+                    vm.companyList = response.data.rt.companyList;
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
                     if(response.data.rt.countQ1 !=0){
@@ -152,6 +154,7 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
+                console.log('获取企业个数')
                 if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                      vm.$router.push({
                         path:'/login'
@@ -176,6 +179,7 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
+                console.log('导航到企业');
                 if(response.data.cd == "10009"){//跳转项目首页
                     localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId)
                     vm.token = response.data.rt.session.onlineInfo.tokenId
@@ -183,7 +187,6 @@ export default {
                         path:'/projectlist'
                     })
                 }else if(response.data.cd === "1"){
-                    console.log(response.data.cd );
                     alert(response.data.msg);
                     setTimeout(()=>{
                          vm.$router.push({
@@ -199,7 +202,7 @@ export default {
             })
         },
         redirect(key){
-           var vm = this
+           var vm = this;
             vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+key
             vm.initCompany()
         }
