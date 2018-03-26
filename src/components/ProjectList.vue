@@ -3,26 +3,70 @@
     <headerCommon :username="userName"></headerCommon>
     <div class="header-bar">
       <span class="bar-title">工程导航</span>
-      <span class="bar-button">条形风格</span>
+      <span class="bar-button" @click="changeStyle">条形风格</span>
     </div>
-    <div v-for="(item, index) in listData" :key="index" class="item-proj" @click="selectProject(item.projId,item.expired)">
-        <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
-          <span class="item-title">工程名称</span>
-          <span  class="item-name" v-text="item.projName"></span>
-          <img class="img"  src="../assets/003.png" alt="">
-        </div>
-        <div class="item_body">
-          <p style="margin-bottom:20px" class="clearfix">
-            <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
-          </p>
-          <p style="margin-bottom:20px" class="clearfix">
-            <span class="body-left">使用单位</span><span class="body-right" v-text="item.overviewList?item.overviewList[0].viewVal:''"></span>
-          </p>
-          <p style="margin-bottom:20px" class="clearfix">
-            <span class="body-left">工程名称</span><span class="body-right" v-text="item.overviewList?item.overviewList[1].viewVal:''"></span>
-          </p>
-          <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'item-head','new_s','text-s']"></span>
-        </div>
+    <div class="clearfix item-proj-box0" v-if="show0">
+      <div v-for="(item, index) in listData" :key="index" class="item-proj" @click="selectProject(item.projId,item.expired)">
+          <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
+            <span class="item-title">工程名称</span>
+            <span  class="item-name" v-text="item.projName"></span>
+            <img class="img"  src="../assets/003.png" alt="">
+          </div>
+          <div class="item_body">
+            <div style="height:102px;overflow:hidden;">
+              <p style="margin-bottom:20px" class="clearfix">
+                <span class="body-left">工程账号</span><span class="body-right" v-text="item.projCode"></span>
+              </p>
+              <p style="margin-bottom:20px" class="clearfix">
+                <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
+              </p>
+              <p style="margin-bottom:20px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
+                <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-text="val.viewVal"></span>
+              </p>
+            </div>
+            <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'new_s','text-s']"></span>
+          </div>
+      </div>
+    </div>
+    <div class="item-proj-box" v-else>
+       <div  v-for="(item, index) in listData" :key="index+'line'" class="item-proj-line" @click="selectProject(item.projId,item.expired)">
+         <span class="proj-state-box">
+           <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
+           <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
+         </span>
+         <img :src="item.imgPath" class="line-img" alt="">
+         <div class="line-detial-box">
+            <h1 v-text="item.projName"></h1>
+            <div class="line-content-box">
+              <p  class="clearfix line-p">
+                <span class="body-left-line">工程账号</span><span class="body-left-line" v-text="item.projCode"></span>
+              </p>
+              <p class="clearfix line-p">
+                <span class="body-left-line">工程管理员账号</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
+              </p>
+              <p class="clearfix line-p">
+                <span class="body-left-line">工程管理员姓名</span><span class="body-left-line" v-text="item.projAdminName"></span>
+              </p>
+              <p class="clearfix line-p">
+                <span class="body-left-line">工程管理员电话</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
+              </p>
+              <p class="clearfix line-p">
+                <span class="body-left-line">授权用户数量</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
+              </p>
+              <p class="clearfix line-p" v-for="(val,key) in item.overviewList" :key="key">
+                <span class="body-left-line" v-text="val.viewKey"></span><span class="body-left-line" v-text="val.viewVal"></span>
+              </p>
+            </div>
+            <div class="line-content-box">
+             <p class="clearfix line-p">
+                <span class="body-left-line">到期日期</span><span class="body-left-line" v-text="item.projExpireTime"></span>
+              </p>
+              <p class="clearfix line-p" v-for="(val,key) in item.overviewList" :key="key">
+                <span class="body-left-line" v-text="val.viewKey"></span><span class="body-left-line" v-text="val.viewVal"></span>
+              </p>
+            </div>
+         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +125,93 @@
   margin-left: 20px;
   position: relative;
   cursor: pointer;
+}
+.item-proj:hover,.item-proj-line:hover{
+    box-shadow: 0px 0px 20px #ba8c5d;
+}
+.item-proj-box0{
+  padding-bottom:20px;
+}
+.item-proj-box{
+  width:100%;
+  padding: 0px 20px;
+  box-sizing: border-box;
+}
+.item-proj-line{
+  width:100%;
+  height: 272px;
+  box-shadow: 0px 0px 20px #f1f1f1;
+  position: relative;
+  cursor: pointer;
+  margin-top: 30px;
+  padding: 44px 55px 38px 55px;
+  box-sizing: border-box;
+}
+.proj-state-box{
+  display: block;
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  top: 40px;
+  left: 51px;
+}
+.proj-state-bg{
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/88989.png');
+}
+.ongoing_bg{
+  background-image: url('../assets/88990.png');
+}
+.end_bg{
+  background-image: url('../assets/88991.png');
+}
+.proj-state-title{
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  line-height: 14px;
+  position: absolute;
+  top: 21px;
+  left: 6px;
+  transform: rotate(-45deg);
+  letter-spacing: 2px;
+}
+.line-img{
+  float: left;
+  width: 250px;
+  height: 190px;
+}
+.line-detial-box{
+  float: left;
+  width: 780px;
+  overflow: hidden;
+  margin-left: 20px;
+}
+.line-detial-box>h1{
+  font-size: 22px;
+  color: #333333;
+  line-height: 22px;
+  text-align: left;
+  margin: 11px 0;
+}
+.line-p{
+  margin-top: 17px;
+}
+.line-content-box{
+  width:50%;height:145px;float:left;overflow:hidden;
+}
+.body-left-line{
+  font-size: 12px;
+  line-height: 12px;
+  text-align: left;
+  float: left;
+  margin-left: 20px;
+  color: #666666;
+}
+p>.body-left-line:first-of-type{
+  margin-left: 0;
 }
 .item-head{
   width: 100%;
@@ -160,6 +291,7 @@ export default {
   name: 'ProjectList',
    data(){
       return {
+        show0:true,
         token:'',
         listData:[],
         title:'我们的公司',
@@ -177,6 +309,10 @@ export default {
       vm.getUserInfo()
   },
   methods:{
+      changeStyle(){
+        var vm = this
+        vm.show0 = vm.show0?false:true
+      },
       getUserInfo(){
           var vm = this
           vm.userName = localStorage.getItem('username')
@@ -221,13 +357,6 @@ export default {
               console.log('++++++++++++++')
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
-                  for(var i=0;i<vm.listData.length;i++){
-                    if(typeof(vm.listData[i].overviewList != 'undefined')){
-                        // for(var j=0;j<vm.listData[i].overviewList.le){
-
-                        // }
-                    }
-                  }
                 }
             }).catch((err)=>{
                 console.log(err)
