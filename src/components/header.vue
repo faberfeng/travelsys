@@ -41,8 +41,11 @@ export default Vue.component('common-header', {
                 },
             }).then((response)=>{
                 if(response.data.cd == "0"){
-                    localStorage.removeItem('token')
-                        vm.$router.push({
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('projId');
+                    sessionStorage.removeItem('navigationPath');
+                    sessionStorage.removeItem('settingActive');
+                    vm.$router.push({
                         path:'/login'
                     }) 
                 }

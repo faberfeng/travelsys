@@ -1,10 +1,12 @@
 <template>
     <div class="main" id="login">
         <div class="loginHeader">
-            <div class="firstTitle">
-               <span class="firstTitleText">华建H系列 </span> 
-                <span class="sendTitle">工程协调应用系统</span></div>
-            <button class="registerBtn">注册</button>
+            <div style="width:1200px;position:relative;margin:0 auto;">
+                <div class="firstTitle">
+                    <span class="firstTitleText">华建H系列 </span> 
+                    <span class="sendTitle">工程协调应用系统</span></div>
+                <button class="registerBtn">注册</button>
+            </div>
         </div>
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
@@ -118,34 +120,30 @@ export default {
             height: 72px;
             background: #ffffff;
             text-align: left;
-            position: relative;
-        }
-        .firstTitle,.sendTitlem.Btn{
-            display: inline-block;
         }
         .firstTitle{
             display: inline-block;
             color: #fc3439;
             font-family: '微软雅黑';
             font-weight: bold;
-            font-size: 32px;
-            line-height: 32px;
             margin:27px 0 14px 0px; 
             position: absolute;
-            left: 7.833%;
+            left: 94px;
         }
-        // .firstTitleText{
-        //     font-size: 32px;
-        //     line-height: 32px;
-        // }
+        .firstTitleText{
+            font-size: 32px;
+            display: inline-block;
+            line-height: 32px;
+            width: 155px;
+         }
         .sendTitle{
             color: #333;
             font-size: 20px;
             line-height: 20px;
             display: inline-block;
-            width: 162px;
             font-weight: normal;
-            margin-left: 5px;
+            margin-left: 20px;
+            width: 160px;
         }
         .registerBtn{
             width: 56px;
@@ -175,8 +173,7 @@ export default {
             border-radius: 2px;
             position: absolute;
             top: 136px;
-            right: 13.5%;
-            // margin: 49px 161px 0 680px;
+            left: 679px;
             background: #fff;
             border:1px solid #ccc;
         }
