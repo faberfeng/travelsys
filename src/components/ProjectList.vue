@@ -6,7 +6,7 @@
       <span class="bar-button" @click="changeStyle">条形风格</span>
     </div>
     <div class="clearfix item-proj-box0" v-if="show0">
-      <div v-for="(item, index) in listData" :key="index" class="item-proj" @click="selectProject(item.projId,item.expired)">
+      <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired)">
           <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
             <span class="item-title">工程名称</span>
             <span  class="item-name" v-text="item.projName"></span>
@@ -29,7 +29,7 @@
       </div>
     </div>
     <div class="item-proj-box" v-else>
-       <div  v-for="(item, index) in listData" :key="index+'line'" class="item-proj-line" @click="selectProject(item.projId,item.expired)">
+       <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired)">
          <span class="proj-state-box">
            <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
            <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
@@ -120,14 +120,20 @@
   width:280px;
   height: 272px;
   float: left;
-  box-shadow: 0px 0px 20px #f1f1f1;
+  box-shadow: 0px 0px 13px #f1f1f1;
   margin-top: 20px;
   margin-left: 20px;
   position: relative;
   cursor: pointer;
 }
 .item-proj:hover,.item-proj-line:hover{
-    box-shadow: 0px 0px 20px #ba8c5d;
+    box-shadow: 0px 0px 13px #c06000;
+}
+.ongoing_color:hover,.ongoing_color_b:hover{
+  box-shadow: 0px 0px 9px #d40000;
+}
+.end_color:hover,.end_color_b:hover{
+  box-shadow: 0px 0px 9px #221815;
 }
 .item-proj-box0{
   padding-bottom:20px;
@@ -140,7 +146,7 @@
 .item-proj-line{
   width:100%;
   height: 272px;
-  box-shadow: 0px 0px 20px #f1f1f1;
+  box-shadow: 0px 0px 13px #f1f1f1;
   position: relative;
   cursor: pointer;
   margin-top: 30px;
@@ -279,7 +285,9 @@ p>.body-left-line:first-of-type{
   color: #999999;
 }
 .body-right{
+  width: 50%;
   float: right;
+  max-height: 28px;
   color: #666666;
 }
 </style>

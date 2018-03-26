@@ -1,22 +1,28 @@
 <template>
     <div id="projectNavigation">
         <headerCommon :username="userName"></headerCommon>
-        <h1 v-show="companyType.length>0">产品导航</h1>
-        <ul class="companyBox clearfix">
-            <li class="company-item" v-for="(item,index) in companyType" :key="index" :class="item.name" >
-                <span v-text="item.name" class="Q_title" @click="selectType(item.id)"></span>
+        <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
+        <ul class="clearfix" id="CTypeList">
+            <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
+                <span  class="Q_title_left"></span>
+                <span v-text="item.name" class="Q_title_name"></span>
             </li>
         </ul>
-         <h1  v-show="companyList.length>0">企业导航</h1>
-        <ul class="companyBox clearfix">
-            <li class="company-item" v-for="(item,index) in companyList" :key="index" >
-                <input type="hidden" name="companyId" :value="item.companyId">
-                <input type="hidden" name="type" :value="item.type">
-                <img :src="item.imgPath" alt="" class="companyImage">
-                <span v-text="item.companyName" class="Q_title"></span>
-                <button @click="redirect(item.companyId)" class="button-company">进入</button>
-            </li>
-        </ul>
+        <div class="conpanyContainer">
+            <h1  class="h1-companybox">企业导航</h1>
+            <ul class="companyBox">
+                <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId)" >
+                    <input type="hidden" name="companyId" :value="item.companyId">
+                    <input type="hidden" name="type" :value="item.type">
+                    <img :src="item.imgPath" alt="" class="companyImage">
+                    <div style="padding:15px 20px;">
+                       <span v-text="item.companyName" class="Q_title"></span>
+                        <span class="star"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+         
     </div>
 </template>
 <script>
@@ -35,6 +41,7 @@ export default {
             userName:'',
             userId:'',
             token:'',
+            active:'',
             companyType:{},
         }
     },
@@ -77,8 +84,6 @@ export default {
                 },
             }).then((response)=>{
                // console.log('getUserInfo获取用户的姓名和项目权限')
-                console.log(response);
-                console.log('获取用户信息');
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -104,35 +109,41 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
-                console.log('获取企业列表');
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+response.data.rt.companyId
-                    vm.initCompany();
-                    console.log(123);
+                    vm.initCompany()
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
                     console.log(response.data.rt.companyList);
-                    vm.companyList = response.data.rt.companyList;
+                    vm.companyList = response.data.rt.companyList
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
-                    if(response.data.rt.countQ1 !=0){
+                    var index = 0
+                    if(response.data.rt.countQ3 !=0){
                         obj.push({
-                            'name':'Q1',
-                            'id':1,
+                            'name':'Q3',
+                            'id':3,
                         })
+                        vm.active='Q3'
+                        index = 3
                     }
                     if(response.data.rt.countQ2 !=0){
                         obj.push({
                             'name':'Q2',
                             'id':2,
                         })
+                        vm.active='Q2'
+                        index = 2
                     }
-                    if(response.data.rt.countQ3 !=0){
+                    if(response.data.rt.countQ1 !=0){
                         obj.push({
-                            'name':'Q3',
-                            'id':3,
+                            'name':'Q1',
+                            'id':1,
                         })
+                        vm.active='Q1'
+                        index = 1
                     }
-                    vm.companyType = obj
+                    vm.companyType = obj.reverse()
+                    vm.selectType(index)
                 }
             }).catch(function(error){
                 // vm.$router.push({
@@ -142,6 +153,7 @@ export default {
         },
         selectType(index){
              var vm = this
+             vm.active = 'Q'+index
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/listCompany',
@@ -154,7 +166,6 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
-                console.log('获取企业个数')
                 if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                      vm.$router.push({
                         path:'/login'
@@ -179,7 +190,6 @@ export default {
                 },
             }).then((response)=>{
                 console.log(response);
-                console.log('导航到企业');
                 if(response.data.cd == "10009"){//跳转项目首页
                     localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId)
                     vm.token = response.data.rt.session.onlineInfo.tokenId
@@ -187,6 +197,7 @@ export default {
                         path:'/projectlist'
                     })
                 }else if(response.data.cd === "1"){
+                    console.log(response.data.cd );
                     alert(response.data.msg);
                     setTimeout(()=>{
                          vm.$router.push({
@@ -202,14 +213,18 @@ export default {
             })
         },
         redirect(key){
-           var vm = this;
+           var vm = this
             vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+key
             vm.initCompany()
         }
     }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
+    *{
+        margin: 0;
+        padding: 0;
+    }
     li{
         list-style: none;
     }
@@ -218,13 +233,88 @@ export default {
         overflow: hidden;
         content: '';
     }
+    #CTypeList{
+        position: fixed;
+        top: 68px;
+        left: 0;
+        bottom: 0;
+        width: 109px;
+        border-right: 1px solid #e6e6e6;
+    }
+    .company-item-left{
+        margin-top:55px; 
+    }
+    .Q_title_left{
+        display: block;
+        margin: 0 auto;
+        width: 72px;
+        height: 72px;
+        border: 1px solid #cccccc;
+        border-radius: 50%;
+        position: relative;
+        cursor: pointer;
+    }
+    .active-Q1 .Q_title_left,.active-Q2 .Q_title_left,.active-Q3 .Q_title_left{
+        background: #fc3439;
+    }
+    .Q_title_left::after{
+        display: block;
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 24px;
+        left: 24px;
+        background-size:100%; 
+        background-position:0 0;
+        content: '';
+    }
+    .company-item-leftQ1 .Q_title_left::after{
+        background-image:url('../assets/2.png');
+    }
+    .company-item-leftQ2 .Q_title_left::after{
+        background-image:url('../assets/1.png');
+    }
+    .company-item-leftQ3 .Q_title_left::after{
+        background-image:url('../assets/3.png');
+    }
+    .active-Q1 .Q_title_left::after{
+       background-image:url('../assets/2-1.png');
+    }
+    .active-Q2 .Q_title_left::after{
+       background-image:url('../assets/1-1.png');
+    }
+    .active-Q3 .Q_title_left::after{
+       background-image:url('../assets/3-1.png');
+    }
+    .Q_title_name{
+        display: block;
+        text-align: center;
+        font-size: 18px;
+        line-height: 18px;
+        color: #999999;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .conpanyContainer{
+        display: block;
+        margin-left: 110px;
+        padding: 0 30px 0 42px;
+    }
+    .h1-companybox{
+        font-size: 18px;
+        color: #333333;
+        line-height: 18px;
+        margin: 40px 0 30px;
+        text-align: left;
+    }
     .company-item{
         float: left;
-        width: 186px;
-        height: 226px;
-        background: cadetblue;
+        width: 232px;
+        height: 208px;
         margin-left: 30px;
         position: relative;
+        box-shadow: 0px 0px 24px rgba(34,24,21,.09);
+        cursor: pointer;
         .button-company{
             display: none;
             position: absolute;
@@ -233,8 +323,15 @@ export default {
           margin-left: -21px;
           cursor: pointer;
         }
-        &:hover .button-company{
+        .star{
+            background: url('../assets/star.png') no-repeat 0 0;
             display: block;
+            width: 74px;
+            height: 10px;
+            margin-top: 15px;
+        }
+        &:hover{
+            box-shadow: 0px 0px 24px rgba(34,24,21,.49);
         }
     }
 
@@ -331,11 +428,12 @@ export default {
   .Q_title{
       display: block;
       width: 100%;
-      text-align: center;
-    font-size: 36px;
-    color: #fff;
-    height: 170px;
-    line-height: 170px;
+      text-align: left;
+    font-size: 14px;
+    color: #333333;
+    height: 48px;
+    overflow: hidden;
+    line-height: 16px;
     cursor: pointer;
   }
     .Q1{
@@ -348,8 +446,10 @@ export default {
         background: #31b0bb;
     }
     .companyImage{
+        display: block;
         width: 100%;
-        height: 110px;
+        height: 100px;
+        background: #f77c75;
     }
 </style>
 
