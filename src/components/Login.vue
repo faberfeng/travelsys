@@ -10,6 +10,7 @@
         </div>
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
+                <div class="loginDialogSide"></div>
                 <div class="loginDialog">
                     <p class="loginBodyText">系统账号登陆</p>
                     <div class="loginInput">
@@ -18,7 +19,7 @@
                     </div>
                     <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
                     
-                    <button class="login" @click="Login">登陆</button>
+                    <button class="login" @click="Login">登录</button>
                     <div class="loginInfo">
                         <a class="loginInfoLeft">立即注册</a>
                         <a class="loginInfoRight">忘记密码</a>
@@ -159,6 +160,10 @@ export default {
             margin-right: 0px;
             margin-top: 28px;
             padding: 0;
+            box-sizing: content-box;
+            -webkit-box-sizing: content-box;
+            -moz-box-sizing: content-box;
+            -ms-box-sizing:content-box;
         }
         .loginBody{
             width: 100%;
@@ -166,6 +171,14 @@ export default {
             background: url('../assets/loginImg.jpg');
             background-position: center;
             position: relative;
+        }
+        .loginDialogSide{
+            width: 316px;
+            height: 193px;
+            background: url(../assets/loginImage.png);
+            position: absolute;
+            left: 159px;
+            top: 195px;
         }
         .loginDialog{
             width: 360px;
@@ -200,6 +213,19 @@ export default {
             padding: 0 35px;
             color: #333;
         }
+        .input-placeholder{
+            color:#ccc;
+        }
+        ::-webkit-input-placeholder {/*Chrome/Safari*/
+            color:#ccc;
+        }
+        ::-moz-placeholder {/*Firefox*/
+            color:#ccc;
+        }
+        ::-ms-input-placeholder {/*IE*/
+            color:#ccc;
+        }
+    
         #firstInp,#secondInp{
             height: 40px;
         }
@@ -240,11 +266,11 @@ export default {
         }
         .el-checkbox__input{
             position: relative;
-            top: -2px;
+            // top: -2px;
         }
         .el-checkbox__inner{
-            width: 10px;
-            height: 10px;
+            width: 14px;
+            height: 14px;
         }
         .autoLoginText {
             color: #ccc;
@@ -269,6 +295,10 @@ export default {
             color: #fff;
             cursor: pointer;
             padding: 0;
+            font-size: 18px;
+        }
+        .login:hover{
+            background: #ff5257;
         }
         .loginInfo{
             width: 280px;
@@ -290,6 +320,9 @@ export default {
         .loginInfoRight{
             float: right;
         }
+        .loginInfoLeft:hover,.loginInfoRight:hover{
+            font-weight: bold;
+        }
         .loginWidthYun{
             width: 131px;
             height: 29px;
@@ -301,6 +334,11 @@ export default {
             color:#ccc;
             font-size: 12px;
             padding: 0;
+        }
+        .loginWidthYun:hover,.registerBtn:hover{
+            background-color: #e6e6e6;
+            color: #666;
+
         }
     }
 </style>
