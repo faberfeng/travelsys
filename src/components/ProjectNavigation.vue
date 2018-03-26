@@ -37,7 +37,7 @@ export default {
         return{
             url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',
             pathInit:'',
-            companyList:{},
+            companyList:[],
             userName:'',
             userId:'',
             token:'',
@@ -191,8 +191,8 @@ export default {
             }).then((response)=>{
                 console.log(response);
                 if(response.data.cd == "10009"){//跳转项目首页
-                    localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId)
-                    vm.token = response.data.rt.session.onlineInfo.tokenId
+                    localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId);
+                    vm.token = response.data.rt.session.onlineInfo.tokenId;
                     this.$router.push({
                         path:'/projectlist'
                     })

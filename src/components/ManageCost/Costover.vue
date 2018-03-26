@@ -13,7 +13,10 @@
 </template>
 <script>
 export default {
-  name:'Costover'
+  name:'Costover',
+  created(){
+    //   console.log(88888888888888)
+  }
 }
 </script>
 <style scoped>

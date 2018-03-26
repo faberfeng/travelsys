@@ -3,19 +3,15 @@
         <div class="projectInfo">
             <div class="lunbo-container">
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
-                    <el-carousel-item v-for="item in 4" :key="item">
-                        <h3>{{item}}</h3>
+                    <el-carousel-item v-for="(item,index) in projectImageList" :key="index">
+                        <img style="width:340px;height:242px" :src="item.filePath"/>
                         </el-carousel-item>
                 </el-carousel>
             </div>
             <div class="tal">
                 <p class="talTitle">概况</p>
                 <ul class="talUl">
-                    <li><label>使用单位</label>上海市城市建设开发投资总公司</li>
-                    <li><label>工程名称</label>企业自用办公楼企业自用办公楼</li>
-                    <li><label>设计单位</label>同济大学建筑设计研究院</li>
-                    <li><label>施工单位</label>上海建工</li>
-                    <li><label>监理单位</label>上海建科监理咨询有限公司</li>
+                    <li v-for="(item,index) in overviewList" :key='index'><label>{{item.viewKey}}</label>{{item.viewVal}}</li>
                 </ul>
             </div>
         </div>
@@ -25,29 +21,30 @@
                 <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
             </div>
             <ul class="projectList" v-show="tabShow == 1">
-                <li>
+                <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
+                            <!-- <img :src="'http://10.252.26.240:8080'+item.userImg"> -->
                             <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">王自强</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="font-color1">{{item.title}}</p>
+                            <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
                         </div>
                     </div>
                 </li>
             </ul>
             <ul class="projectList" v-show="tabShow == 2">
-                <li>
+                <li v-for="(item,index) in projectNoticeListInfo" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
                             <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
                         </div> 
                         <div class="projectListText">
                             <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
-                            <p class="font-color1">在【工程文档】中【默认群组】内上传了文件【 WKPT_MEP_11F(2017.9.25定).gmd】</p>
-                            <p class="projectBottom">2018-01-31 15:42:07<label>来自网页浏览器</label></p>
+                            <p class="font-color1">{{item.message}}</p>
+                            <p class="projectBottom">{{item.createDate | toLocalD}}<label>来自网页浏览器</label></p>
                         </div>
                     </div>
                 </li>
@@ -56,20 +53,36 @@
     </div>
 </template>
 <script>
-import axios from 'axios'
+import axios from 'axios';
 export default {
     data(){
         return{
             tabShow:1,
             token:'',
-            notbeenUse:true
+            notbeenUse:true,
+            projId:'',
+            allData:{},//工程首页信息
+            overviewList:[],//工程概况信息
+            projectImageList:[],//工程图片列表
+            projectStationInfoList:[],//工程动态信息列表
+            projectNoticeListInfo:[],//工程通知列表
+        }
+    },
+    filters:{
+        toLocalD(val){
+            return new Date(val).toLocaleString();
         }
     },
     created(){
-        var vm = this
-        const token = localStorage.getItem('token') 
-        vm.token =token;
-        // vm.getPJDetial(vm.$route.params.id);
+
+        this.token = localStorage.getItem('token'); //获取token
+        this.projId = localStorage.getItem('projId');//获取工程id
+        this.getProjectInfo();//工程首页信息
+        this.getBasicSituation();//获取工程概况信息;
+        this.getProjectImageList()//获取工程图片列表
+        this.getProjectStationInfo()//获取用户动态信息列表
+        this.getProjectNoticeList();//获取通知列表
+
     },
     methods:{
         switchTab(key){
@@ -78,6 +91,108 @@ export default {
                 vm.tabShow = key;
             }
         },
+        getProjectInfo(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080//h2-bim-project/project2/index?projId='+this.projId,
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                //console.log(response.data);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.allData = response.data.rt;
+                }
+            })
+        },
+        //获取工程概况信息列表
+        getBasicSituation(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/'+this.projId+'/overview/list',
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                //console.log(response.data);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.overviewList = response.data.rt;
+                }
+            })
+        },
+        getProjectImageList(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/findProjectImage?projectId='+this.projId,
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                //console.log(response.data);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.projectImageList = response.data.rt;
+                }
+            })
+        },
+        getProjectStationInfo(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/list',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    pageNo:0,
+                    pageSize:10
+                }
+            }).then((response)=>{
+               console.log(response.data.rt.rows);
+                if(response.data.cs === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.projectStationInfoList = response.data.rt.rows;
+                }
+
+            })
+        },
+        getProjectNoticeList(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/noticeList',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projId:this.projId,
+                    pageNo:0,
+                    pageSize:10
+                }
+            }).then((response)=>{
+                //console.log(response.data);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.projectNoticeListInfo = response.data.rt.rows;
+                }
+            })
+        }
     }
 }
 </script>
