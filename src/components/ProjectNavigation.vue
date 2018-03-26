@@ -7,7 +7,7 @@
                 <span v-text="item.name" class="Q_title" @click="selectType(item.id)"></span>
             </li>
         </ul>
-         <h1  v-show="companyList.length>0">企业导航</h1>
+        <h1  v-show="companyList.length>0">企业导航</h1>
         <ul class="companyBox clearfix">
             <li class="company-item" v-for="(item,index) in companyList" :key="index" >
                 <input type="hidden" name="companyId" :value="item.companyId">
@@ -31,11 +31,11 @@ export default {
         return{
             url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',
             pathInit:'',
-            companyList:{},
+            companyList:[],
             userName:'',
             userId:'',
             token:'',
-            companyType:{},
+            companyType:[],
         }
     },
     mounted(){
@@ -141,7 +141,7 @@ export default {
             })
         },
         selectType(index){
-             var vm = this
+             var vm = this;
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/listCompany',
@@ -181,8 +181,8 @@ export default {
                 console.log(response);
                 console.log('导航到企业');
                 if(response.data.cd == "10009"){//跳转项目首页
-                    localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId)
-                    vm.token = response.data.rt.session.onlineInfo.tokenId
+                    localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId);
+                    vm.token = response.data.rt.session.onlineInfo.tokenId;
                     this.$router.push({
                         path:'/projectlist'
                     })
@@ -202,7 +202,7 @@ export default {
             })
         },
         redirect(key){
-           var vm = this;
+            var vm = this;
             vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+key
             vm.initCompany()
         }
