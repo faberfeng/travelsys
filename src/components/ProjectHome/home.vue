@@ -159,7 +159,7 @@ export default {
                     pageSize:10
                 }
             }).then((response)=>{
-               console.log(response.data.rt.rows);
+                //console.log(response.data.rt.rows);
                 if(response.data.cs === '1'){
                     this.$router.push({
                         path:'/login'
