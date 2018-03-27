@@ -4,19 +4,19 @@
         <div class="account">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
             <ul class="accountList" >
-                <li class="pre"><span>工程账号</span> <label>Q200117061402</label></li>
-                <li class="pre"><span>工程名称</span> <label>企业自用办公楼</label></li>
-                <li class="pre"><span>工程管理账号</span> <label>evan.qiang@qq.com</label></li>
-                <li class="pre"><span>工程管理员姓名</span> <label>王自强</label></li>
-                <li class="pre" v-show="isShow"><span>工程管理员电话</span> <label>13651762908</label></li>
-                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>无限制使用  14个已使用</label></li>
-                <li class="pre" v-show="isShow"><span>到期日期</span> <label>2018年12月31日</label></li>
+                <li class="pre"><span>工程账号</span> <label>{{projectConfig.projAdminAccount}}</label></li>
+                <li class="pre"><span>工程名称</span> <label>{{projectConfig.projName}}</label></li>
+                <li class="pre"><span>工程管理账号</span> <label>{{projectConfig.projAdminEmail}}</label></li>
+                <li class="pre"><span>工程管理员姓名</span> <label>{{projectConfig.projAdminName}}</label></li>
+                <li class="pre" v-show="isShow"><span>工程管理员电话</span> <label>{{projectConfig.projTelphone}}</label></li>
+                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>无限制使用  {{projectUseCount}}个已使用</label></li>
+                <li class="pre" v-show="isShow"><span>到期日期</span> <label>{{projectConfig.projExpireTime | toLocalD}}</label></li>
                 <li class="pre " id="pre" v-show="isShow">
                     <span>工程logo</span> 
                     <div class="preDiv">
-                        <div class="imgDiv">
+                        <div class="imgDiv" @click="updataNewImage">
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
-                            <img src="../../assets/project-logo.png" class="logo" /></div>
+                            <img :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/></div>
                         <div style="margin:0;"><el-checkbox size="small" style="margin:0;width:115px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left:
                         -10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
                     </div>
@@ -26,17 +26,18 @@
         <div class="summary">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-state.png"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
             <ul class="accountList uniqueList" >
-                <li class="pre" v-for=" (item,index) in sumaryData" :key="index"><span>{{item.unity}}</span> <label>{{item.unityName}}</label><img class="imgedit" @click="edit(index)" src="../../assets/edit.png"/><img @click="del(index)" class="imgdelete" src="../../assets/delete.png"/></li>
+                <li class="pre" v-for=" (item,index) in sumaryData" :key="index"><span>{{item.viewKey}}</span> <label>{{item.viewVal}}</label><img class="imgedit" @click="edit(index)" src="../../assets/edit.png"/><img @click="del(index)" class="imgdelete" src="../../assets/delete.png"/></li>
             </ul>
         </div>
         <div class="img">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-img.jpg">工程图片</h5>
             <ul class="imgUl">
-                <li class="imgLi">
+                <!--封面图片-->
+                <li class="imgLi" v-for="(item,index) in projectImageList" :key="index">
                     <div>
-                        <img src="../../assets/firstPageImage.png"/>
+                        <img :src="item.filePath"/>
                     </div>
-                    <div class="imgBottom"><label><div class="setAsLogo"></div>封面</label><span> <div class="bottomDelete"></div>删除</span></div>
+                    <div class="imgBottom"><label><div class="setAsLogo"></div>封面</label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
                 </li>
                 <li class="imgLi">
                     <div>
@@ -44,8 +45,9 @@
                     </div>
                     <div class="imgBottom"><label><div class="setAsLogo"></div>设为封面</label><span> <div class="bottomDelete"></div>删除</span></div>
                 </li>
-                <li class="imgLi">
-                    <div class="imgD">
+                <!--上传图片-->
+                <li class="imgLi" >
+                    <div class="imgD" >
                         <div class="imgDMask">
                             <div class="imgMaskD"></div>
                             <p class="imgDMaskp">上传图片</p>
@@ -57,7 +59,7 @@
         </div>
         <!--弹出的对话框-->
         <div id="edit">
-            <el-dialog title="工程概况信息编辑" :visible.sync="addDialog">
+            <el-dialog title="新增工程概况信息" :visible.sync="addDialog">
                 <el-form >
                     <el-form-item label="单位 :">
                         <el-input class="inp"  v-model="projectUnity"></el-input>
@@ -124,44 +126,36 @@ export default {
             isShow:true,
             token:'',
             projId:'',
-            sumaryData:[
-                {
-                    unity:'使用单位',
-                    unityName:'上海城市建设开发投资公司'
-                },
-                {
-                    unity:'设计单位',
-                    unityName:'同济大学建筑设计研究院'
-                },
-                {
-                    unity:'工程名称',
-                    unityName:'企业自用办公楼'
-                },
-                {
-                    unity:'施工单位',
-                    unityName:'上海建工'
-                },
-                {
-                    unity:'监理单位',
-                    unityName:'上海建科咨询有限公司'
-                }
-            ],
-            index:''
+            sumaryData:[],//工程概况信息列表
+            //unity=>viewKey viewVal=>viewVal
+            index:'',
+            projectConfig:{},
+            projectUseCount:'',
+            projectImage:{},
+            projectImageList:[],//获取工程图片列表
         }
     },
     created(){
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
-        console.log(this.projId);
-        console.log(this.token);
-        this.getData();
+        this.getBasicSituation();//获取工程概况
+        this.getProjectInitalConfig();//工程初始信息
+        this.getProjectImageList();//获取工程图片列表
+    },
+    filters:{
+        toLocalD(val){
+            return new Date(val).toLocaleString();
+        }
     },
     methods:{
         edit(index){
             this.editDialog = true;
             this.index = index;
+            this.projectUnity = this.sumaryData[index].viewKey;
+            this.projectName = this.sumaryData[index].viewVal;
         },
         del(index){
+            this.index = index;
             this.deleteDialog = true;
         },
         add(){
@@ -170,9 +164,27 @@ export default {
         addMakeSure(){
              if(this.projectUnity !==''&& this.projectName !==''){
                 this.sumaryData.push({
-                    unity:this.projectUnity,
-                    unityName:this.projectName
+                    viewKey:this.projectUnity,
+                    viewVal:this.projectName
                 })
+                axios({
+                    method:'post',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
+                    headers:{
+                        'token':this.token,
+                        "Content-Type": "application/json"
+                    },
+                    data:{
+                        id:0,
+                        projId:localStorage.getItem('projId'),
+                        viewKey:this.projectUnity,
+                        viewVal:this.projectName
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==='0'){
+                        alert('新增成功');
+                    }
+                });
                 this.projectUnity='';
                 this.projectName='';
                 this.addDialog = false;
@@ -184,11 +196,45 @@ export default {
         deleteMakeSure(){
             this.sumaryData.splice(this.index,1);
             this.deleteDialog = false;
+            axios({
+                method:'post',
+                url:"http://10.252.26.240:8080/h2-bim-project/project2/delProjectOverview",
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.sumaryData[this.index].id
+                }
+            }).then((response)=>{
+                console.log(response);
+                if(response.data.cd === '0'){
+                    alert('删除成功');
+                }
+            })
         },
         editMakeSure(){
             if(this.projectUnity !==''&& this.projectName !==''){
-                this.sumaryData[this.index].unity = this.projectUnity;
-                this.sumaryData[this.index].unityName = this.projectName;
+                this.sumaryData[this.index].viewKey = this.projectUnity;
+                this.sumaryData[this.index].viewVal = this.projectName;
+                axios({
+                    method:'post',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
+                    headers:{
+                        'token':this.token,
+                        "Content-Type": "application/json"
+                    },
+                    data:{
+                        id:this.sumaryData[this.index].id,
+                        projId:this.sumaryData[this.index].projId,
+                        viewKey:this.sumaryData[this.index].viewKey,
+                        viewVal:this.sumaryData[this.index].viewVal
+                    }
+                }).then((response)=>{
+                    //console.log(response);
+                    if(response.data.cd==='0'){
+                        alert('修改成功');
+                    }
+                });
                 this.projectUnity='';
                 this.projectName='';
                 this.editDialog = false;
@@ -196,6 +242,9 @@ export default {
             }else{
                 this.showErr = true;
             }
+        },
+        updataNewImage(){
+            console.log(123)
         },
         retract(){
             if(this.retractImg === shouqiImg){
@@ -209,7 +258,28 @@ export default {
             }
 
         },
-        getData(){
+        deleteImage(index){
+            console.log(index);
+            this.projectImageList.splice(index,1);
+            //this.projectImageList[index];
+            axios({
+                method:'post',
+                url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    imageId:this.projectImageList[index].id,
+                    fileId:this.projectImageList[index].fileId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==='0'){
+                    alert('删除成功');
+                }
+            })
+        },
+        getBasicSituation(){
             var url = 'http://10.252.26.240:8080/h2-bim-project/project2/'+this.projId+'/overview/list';
             axios({
                 method:'GET',
@@ -218,9 +288,60 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                console.log(response);
+                //console.log( response.data.rt);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.sumaryData = response.data.rt;
+                }
             })
 
+        },
+        getProjectInitalConfig(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/projectConfigIndex',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                console.log(response.data.rt);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.projectConfig = response.data.rt.project;
+                    this.projectUseCount = response.data.rt.projectUserCount;
+                    this.projectImage = response.data.rt.projectImage;
+                }
+            })
+        },
+        getProjectImageList(){
+            axios({
+                method:'get',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/findProjectImage',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                console.log(response.data.rt);
+                if(response.data.cd === '1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    this.projectImageList = response.data.rt;
+                }
+            })
         }
     }
 }
@@ -410,6 +531,7 @@ export default {
         overflow: auto;
         padding: 0; 
         margin-top: 20px; 
+        height: 400px;
     }
     .imgUl .imgLi{
         width: 200px;
@@ -421,6 +543,7 @@ export default {
         position: relative;
         text-align: center;
         cursor: pointer;
+        margin-top: 20px;
     }
     .imgLi img{
         width: 200px;

@@ -1,15 +1,16 @@
 <template>
     <div class="main" id="login">
         <div class="loginHeader">
-            <div style="width:1200px;position:relative;margin:0 auto;">
+            <div style="width:1200px;position:relative;margin:0 auto;height:72px;">
                 <div class="firstTitle">
                     <span class="firstTitleText">华建H系列 </span> 
-                    <span class="sendTitle">工程协调应用系统</span></div>
+                    <span class="sendTitle">工程协同应用系统</span></div>
                 <button class="registerBtn">注册</button>
             </div>
         </div>
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
+                <div class="loginDialogSide"></div>
                 <div class="loginDialog">
                     <p class="loginBodyText">系统账号登陆</p>
                     <div class="loginInput">
@@ -18,7 +19,7 @@
                     </div>
                     <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
                     
-                    <button class="login" @click="Login">登陆</button>
+                    <button class="login" @click="Login">登录</button>
                     <div class="loginInfo">
                         <a class="loginInfoLeft">立即注册</a>
                         <a class="loginInfoRight">忘记密码</a>
@@ -112,23 +113,30 @@ export default {
 }
 </script>
 <style lang='less'>
+    
     #login{
         width: 100%;
         height: 100vh;
+        *{
+            margin: 0;
+            padding: 0;
+        }
         .loginHeader{
             width: 100%;
             height: 72px;
             background: #ffffff;
             text-align: left;
+            border: none;
         }
         .firstTitle{
             display: inline-block;
             color: #fc3439;
             font-family: '微软雅黑';
             font-weight: bold;
-            margin:27px 0 14px 0px; 
+            margin:27px 0 0px 0px; 
             position: absolute;
             left: 94px;
+            border: none;
         }
         .firstTitleText{
             font-size: 32px;
@@ -142,7 +150,7 @@ export default {
             line-height: 20px;
             display: inline-block;
             font-weight: normal;
-            margin-left: 20px;
+            margin-left: 22px;
             width: 160px;
         }
         .registerBtn{
@@ -159,23 +167,35 @@ export default {
             margin-right: 0px;
             margin-top: 28px;
             padding: 0;
+            box-sizing: content-box;
+            -webkit-box-sizing: content-box;
+            -moz-box-sizing: content-box;
+            -ms-box-sizing:content-box;
         }
         .loginBody{
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 72px);
+            border:none;
             background: url('../assets/loginImg.jpg');
             background-position: center;
             position: relative;
+        }
+        .loginDialogSide{
+            width: 316px;
+            height: 193px;
+            background: url(../assets/loginImage.png);
+            position: absolute;
+            left: 195px;
+            top: 183px;
         }
         .loginDialog{
             width: 360px;
             height: 406px;
             border-radius: 2px;
             position: absolute;
-            top: 136px;
+            top: 135px;
             left: 679px;
             background: #fff;
-            border:1px solid #ccc;
         }
         .loginBodyText{
             color:#fc3439;
@@ -187,7 +207,7 @@ export default {
             width: 200px;
         }
         .loginInput{
-            margin: 44px 40px 0 40px;
+            margin: 43px 40px 0 40px;
             position: relative;
             height: 104px;
         }
@@ -200,8 +220,26 @@ export default {
             padding: 0 35px;
             color: #333;
         }
+        .input:-webkit-autofill { 
+            // background-color: #FAFFBD; 
+            background-image: none; 
+            // color: #000; 
+        }
+        .input-placeholder{
+            color:#ccc;
+        }
+        ::-webkit-input-placeholder {/*Chrome/Safari*/
+            color:#ccc;
+        }
+        ::-moz-placeholder {/*Firefox*/
+            color:#ccc;
+        }
+        ::-ms-input-placeholder {/*IE*/
+            color:#ccc;
+        }
+    
         #firstInp,#secondInp{
-            height: 40px;
+            height: 42px;
         }
         #firstInp:after{
             content: url('../assets/login-person.png');
@@ -240,11 +278,11 @@ export default {
         }
         .el-checkbox__input{
             position: relative;
-            top: -2px;
+            // top: -2px;
         }
         .el-checkbox__inner{
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
         }
         .autoLoginText {
             color: #ccc;
@@ -269,10 +307,15 @@ export default {
             color: #fff;
             cursor: pointer;
             padding: 0;
+            font-size: 18px;
+            border-radius: 2px;
+        }
+        .login:hover{
+            background: #ff5257;
         }
         .loginInfo{
             width: 280px;
-            margin: 16px auto 0;
+            margin: 15px auto 0;
             overflow: auto;
         }
         .loginInfo .loginInfoLeft,.loginInfo .loginInfoRight{
@@ -290,6 +333,9 @@ export default {
         .loginInfoRight{
             float: right;
         }
+        .loginInfoLeft:hover,.loginInfoRight:hover{
+            font-weight: bold;
+        }
         .loginWidthYun{
             width: 131px;
             height: 29px;
@@ -301,6 +347,15 @@ export default {
             color:#ccc;
             font-size: 12px;
             padding: 0;
+            box-sizing: content-box;
+            -webkit-box-sizing: content-box;
+            -moz-box-sizing: content-box;
+            -ms-box-sizing:content-box;
+            position: relative;
+            top: -2px;
+        }
+        .loginWidthYun:hover,.registerBtn:hover{
+            color: #fc3439;
         }
     }
 </style>
