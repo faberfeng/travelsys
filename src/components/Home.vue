@@ -141,17 +141,17 @@ export default {
                  * 资产管理（010）、配置中心（001）
                  * *********/
             auth:{
-                homePage:true,
-                progress:true,
-                design:true,
-                costManagement:true,
-                materialPurchasing:true,
-                safetyManagement:true,
-                constructionSite:true,
-                docManagement:true,
-                spaceManagement:true,
-                assetManagement:true,
-                configurationCenter:true
+                homePage:false,
+                progress:false,
+                design:false,
+                costManagement:false,
+                materialPurchasing:false,
+                safetyManagement:false,
+                constructionSite:false,
+                docManagement:false,
+                spaceManagement:false,
+                assetManagement:false,
+                configurationCenter:false
             }
         }
     },
@@ -292,6 +292,52 @@ export default {
                         case "001":
                             vm.auth.configurationCenter = true
                         break;
+                    }
+                }
+                //遍历判断
+                if(vm.$route.query.firstView == 'Y'){
+                    if(vm.auth.homePage){
+                        console.log('首页')
+                    }else if(vm.auth.progress){
+                        vm.$router.push({
+                            path:'/home/design'//进度计划；
+                        })
+                    }else if(vm.auth.design){
+                        vm.$router.push({
+                            path:'/home/costover'//设计管理
+                        })
+                    }else if(vm.auth.costManagement){
+                        vm.$router.push({
+                            path:'/home/costover'//成本管理
+                        })
+                    }else if(vm.auth.materialPurchasing){
+                        vm.$router.push({
+                            path:'/home/costover'//物资采购
+                        })
+                    }else if(vm.auth.safetyManagement){
+                        vm.$router.push({
+                            path:'/home/costover'//安全管理
+                        })
+                    }else if(vm.auth.constructionSite){
+                        vm.$router.push({
+                            path:'/home/costover'//施工现场
+                        })
+                    }else if(vm.auth.docManagement){
+                        vm.$router.push({
+                            path:'/home/costover'//文档管理
+                        })
+                    }else if(vm.auth.spaceManagement){
+                        vm.$router.push({
+                            path:'/home/costover'//空间管理
+                        })
+                    }else if(vm.auth.assetManagement){
+                        vm.$router.push({
+                            path:'/home/costover'//资产管理
+                        })
+                    }else if(vm.auth.configurationCenter){
+                        vm.$router.push({
+                            path:'/home/initalsettings'//配置中心
+                        })
                     }
                 }
                 // console.log("check this out!!!")

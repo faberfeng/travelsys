@@ -418,6 +418,7 @@ export default {
             localStorage.setItem('projId',id);
             vm.$router.push({
               path:`/home/projHome/${id}`,
+              query: { firstView: 'Y' }
             })
           }
         }
