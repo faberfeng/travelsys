@@ -2,10 +2,10 @@
     <div id="projectNavigation">
         <headerCommon :username="userName"></headerCommon>
         <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
-        <ul class="clearfix" id="CTypeList">
+        <ul id="CTypeList">
             <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
                 <span  class="Q_title_left"></span>
-                <span v-text="item.name" class="Q_title_name"></span>
+                <span v-text="item.name" :class="[item.name == active?'active-title':'','Q_title_name']"></span>
             </li>
         </ul>
         <div class="conpanyContainer">
@@ -14,7 +14,9 @@
                 <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId)" >
                     <input type="hidden" name="companyId" :value="item.companyId">
                     <input type="hidden" name="type" :value="item.type">
-                    <img :src="item.imgPath" alt="" class="companyImage">
+                    <span class="companyImage">
+                        <span class="companyImage-img" :style="'background-image:url('+item.imgPath+');'"></span>
+                    </span>
                     <div style="padding:15px 20px;">
                        <span v-text="item.companyName" class="Q_title"></span>
                         <span class="star"></span>
@@ -240,15 +242,19 @@ export default {
         bottom: 0;
         width: 109px;
         border-right: 1px solid #e6e6e6;
+        padding-top: 24px;
     }
     .company-item-left{
         margin-top:55px; 
     }
+    .active-title{
+        color: #fc3439!important;
+    }
     .Q_title_left{
         display: block;
         margin: 0 auto;
-        width: 72px;
-        height: 72px;
+        width: 60px;
+        height: 60px;
         border: 1px solid #cccccc;
         border-radius: 50%;
         position: relative;
@@ -256,14 +262,17 @@ export default {
     }
     .active-Q1 .Q_title_left,.active-Q2 .Q_title_left,.active-Q3 .Q_title_left{
         background: #fc3439;
+        border: none;
+        width: 72px;
+        height: 72px;
     }
     .Q_title_left::after{
         display: block;
         position: absolute;
         width: 24px;
         height: 24px;
-        top: 24px;
-        left: 24px;
+        top: 18px;
+        left: 18px;
         background-size:100%; 
         background-position:0 0;
         content: '';
@@ -279,12 +288,33 @@ export default {
     }
     .active-Q1 .Q_title_left::after{
        background-image:url('../assets/2-1.png');
+           top: 24px;
+        left: 24px;
     }
     .active-Q2 .Q_title_left::after{
        background-image:url('../assets/1-1.png');
+           top: 24px;
+        left: 24px;
     }
     .active-Q3 .Q_title_left::after{
        background-image:url('../assets/3-1.png');
+           top: 24px;
+        left: 24px;
+    }
+    .active-Q1,.active-Q2,.active-Q3{
+        position: relative;
+    }
+    .active-Q1::after,.active-Q2::after,.active-Q3::after{
+        display: block;
+        position: absolute;
+        width: 12px;
+        height: 32px;
+        top: 20px;
+        right: -1px;
+        background-image: url('../assets/sanjian84.png');
+        background-size:100%; 
+        background-position:0 0;
+        content: '';
     }
     .Q_title_name{
         display: block;
@@ -331,7 +361,7 @@ export default {
             margin-top: 15px;
         }
         &:hover{
-            box-shadow: 0px 0px 24px rgba(34,24,21,.49);
+            box-shadow: 0px 0px 40px rgba(34, 24, 21, 0.69);
         }
     }
 
@@ -449,7 +479,50 @@ export default {
         display: block;
         width: 100%;
         height: 100px;
-        background: #f77c75;
+        border: none;
+        position: relative;
+    }
+    .companyBox .company-item:nth-of-type(4n+1){
+        .companyImage{
+             background: #f77c75;
+        }
+         &:hover .companyImage{
+            background: #e55149;
+         }
+    }
+    .companyBox .company-item:nth-of-type(4n+2){
+         .companyImage{
+             background: #85cbc2;
+         }
+         &:hover .companyImage{
+            background: #54b5a8;
+         }
+    }
+    .companyBox .company-item:nth-of-type(4n+3){
+        .companyImage{
+         background: #d9c5b0;
+        }
+         &:hover .companyImage{
+            background: #c9a176;
+         }
+    }
+    .companyBox .company-item:nth-of-type(4n+4){
+         .companyImage{
+         background: #b2c7d0;
+         }
+          &:hover .companyImage{
+            background: #6fa8c1;
+         }
+    }
+    .companyImage-img{
+        display: block;
+        width: 200px;
+        height: 50px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin:-25px 0 0 -100px; 
+        background-size: 100% 100%; 
     }
 </style>
 
