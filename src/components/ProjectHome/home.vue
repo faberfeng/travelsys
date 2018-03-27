@@ -24,11 +24,10 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <!-- <img :src="'http://10.252.26.240:8080'+item.userImg"> -->
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                            <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span>计划发生拖延</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span>{{item.content}}</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
                             <p class="font-color1">{{item.title}}</p>
                             <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
                         </div>
@@ -183,7 +182,7 @@ export default {
                     pageSize:10
                 }
             }).then((response)=>{
-                //console.log(response.data);
+                console.log(response.data);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
