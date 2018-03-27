@@ -9,18 +9,20 @@
       <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired)">
           <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
             <span class="item-title">工程名称</span>
-            <span  class="item-name" v-text="item.projName"></span>
+            <div :class="[item.projName.length>13?'item-name-box-s':'','item-name-box']">
+              <span class="item-name" v-text="item.projName.length>25?item.projName.substr(0,25)+'...':item.projName" :title="item.projName"></span>
+            </div>
             <img class="img"  src="../assets/003.png" alt="">
           </div>
           <div class="item_body">
             <div style="height:102px;overflow:hidden;">
-              <p style="margin-bottom:20px" class="clearfix">
+              <p style="margin-bottom:18px" class="clearfix">
                 <span class="body-left">工程账号</span><span class="body-right" v-text="item.projCode"></span>
               </p>
-              <p style="margin-bottom:20px" class="clearfix">
+              <p style="margin-bottom:18px" class="clearfix">
                 <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
               </p>
-              <p style="margin-bottom:20px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
+              <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
                 <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-text="val.viewVal"></span>
               </p>
             </div>
@@ -39,31 +41,34 @@
             <h1 v-text="item.projName"></h1>
             <div class="line-content-box">
               <p  class="clearfix line-p">
-                <span class="body-left-line">工程账号</span><span class="body-left-line" v-text="item.projCode"></span>
+                <span class="body-left-line" style="width:84px;">工程账号</span><span class="body-left-line" v-text="item.projCode"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line">工程管理员账号</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
+                <span class="body-left-line" style="width:84px;">工程管理员账号</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line">工程管理员姓名</span><span class="body-left-line" v-text="item.projAdminName"></span>
+                <span class="body-left-line" style="width:84px;">工程管理员姓名</span><span class="body-left-line" v-text="item.projAdminName"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line">工程管理员电话</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
+                <span class="body-left-line" style="width:84px;">工程管理员电话</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line">授权用户数量</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
-              </p>
-              <p class="clearfix line-p" v-for="(val,key) in item.overviewList" :key="key">
-                <span class="body-left-line" v-text="val.viewKey"></span><span class="body-left-line" v-text="val.viewVal"></span>
+                <span class="body-left-line" style="width:84px;">授权用户数量</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
               </p>
             </div>
             <div class="line-content-box">
-             <p class="clearfix line-p">
-                <span class="body-left-line">到期日期</span><span class="body-left-line" v-text="item.projExpireTime"></span>
-              </p>
-              <p class="clearfix line-p" v-for="(val,key) in item.overviewList" :key="key">
-                <span class="body-left-line" v-text="val.viewKey"></span><span class="body-left-line" v-text="val.viewVal"></span>
-              </p>
+              <table>
+                <tbody>
+                  <tr class="line-table" >
+                    <td class="body-left-table">到期日期</td>
+                    <td class="body-right-table" v-text="item.projExpireTime"></td>
+                  </tr>
+                  <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
+                    <td class="body-left-table" v-text="val.viewKey"></td>
+                    <td  class="body-right-table" v-text="val.viewVal"></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
          </div>
       </div>
@@ -76,7 +81,7 @@
   padding: 0;
 }
 .header-bar{
-  margin-top: 25px;
+  margin-top: 24px;
   border-bottom: 1px solid #cccccc;
   height: 43px;
 }
@@ -213,7 +218,7 @@
   line-height: 12px;
   text-align: left;
   float: left;
-  margin-left: 20px;
+  margin-left: 10px;
   color: #666666;
 }
 p>.body-left-line:first-of-type{
@@ -258,20 +263,29 @@ p>.body-left-line:first-of-type{
 .item-title{
   display: block;
   font-size: 14px;
-  color: #ffffff;
+  color: rgba(255, 255, 255, .3);
   padding: 23px 0 0 20px;
   text-align: left; 
   line-height: 14px;
 }
+.item-name-box{
+  display: block;
+  height: 78px;
+  line-height: 54px;
+  text-align: left;
+  margin: 0 20px;
+  overflow: hidden;
+}
+.item-name-box-s{
+  line-height: 66px;
+}
 .item-name{
   font-size: 18px;
   color: #ffffff;
-  text-align: left;
-  line-height: 18px;
-  display: block;
-  padding-left:20px;
-  padding-top: 23px;
+  line-height: 26px;
+  display: inline-block;
   font-weight: bold; 
+  vertical-align: middle;
 }
 .item_body{
   margin:25px 20px 0
@@ -288,7 +302,30 @@ p>.body-left-line:first-of-type{
   width: 50%;
   float: right;
   max-height: 28px;
+  text-align: right;
   color: #666666;
+}
+.line-content-box table{
+  width: 100%;
+  height: 100%;
+  margin-top:8px; 
+}
+.line-table{
+  margin-top: 17px;
+  height: 12px;
+}
+.body-left-table{
+  font-size: 12px;
+  color: #666666;
+  line-height: 27px;
+  text-align: left;
+}
+.body-right-table{
+  font-size: 12px;
+  color: #666666;
+  line-height: 27px;
+  text-align: left;
+  padding-left: 10px; 
 }
 </style>
 
@@ -399,6 +436,7 @@ export default {
     .wrapper{
         width: 100%;
         height: 100%;
+        min-width: 1200px;
         overflow: hidden;
         padding-bottom: 100px;
     }
