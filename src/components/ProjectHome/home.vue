@@ -27,7 +27,7 @@
                             <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span>{{item.content}}</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span>{{item.content}}</span><a @click="gotoPath(index)">查看文档<i class="el-icon-arrow-right"></i></a></p>
                             <p class="font-color1">{{item.title}}</p>
                             <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
                         </div>
@@ -38,12 +38,12 @@
                 <li v-for="(item,index) in projectNoticeListInfo" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img src="http://q.qjbim.com/qjbim-file//upload/static/user_default_05.png"/>
+                            <img :src="baseUrl+'common/css/default/images/notice/'+item.imagePath+'.png'"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">tyty</label><span>计划发生拖延11</span><a>查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span>{{item.subTitle}}</span><a @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a></p>
                             <p class="font-color1">{{item.message}}</p>
-                            <p class="projectBottom">{{item.createDate | toLocalD}}<label>来自网页浏览器</label></p>
+                            <p class="projectBottom">{{item.createDate | toLocalD}}</p>
                         </div>
                     </div>
                 </li>
@@ -58,6 +58,7 @@ export default {
         return{
             tabShow:1,
             token:'',
+            baseUrl:'http://10.252.26.240:8080/qjbim-project/',
             notbeenUse:true,
             projId:'',
             allData:{},//工程首页信息
@@ -155,10 +156,10 @@ export default {
                 params:{
                     projId:this.projId,
                     pageNo:0,
-                    pageSize:10
+                    pageSize:24
                 }
             }).then((response)=>{
-                //console.log(response.data.rt.rows);
+                console.log(response.data.rt);
                 if(response.data.cs === '1'){
                     this.$router.push({
                         path:'/login'
@@ -182,15 +183,149 @@ export default {
                     pageSize:10
                 }
             }).then((response)=>{
-                console.log(response.data);
+                //console.log(response.data.rt.rows);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
                     })
                 }else{
                     this.projectNoticeListInfo = response.data.rt.rows;
+                    if(this.projectNoticeListInfo){
+                         this.projectNoticeListInfo.forEach((item,index,arr)=>{
+                            if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){
+                                arr[index].noticeName = '进度计划';
+                            }else if(item.type=='5'||item.type=='6'||item.type=='7'){
+                                arr[index].noticeName = '设计协调';
+                            }else if(item.type=='8'||item.type=='9'||item.type=='10'||item.type=='11'){
+                                arr[index].noticeName = '施工现场';
+                            }else if(item.type=='12'){
+                                arr[index].noticeName = '空间管理';
+                            }else if(item.type=='13'||item.type=='14'||item.type=='15'||item.type=='23'||item.type=='24'||item.type=='25'){
+                                arr[index].noticeName = '质量验收';
+                            }else if(item.type=='16'||item.type=='17'||item.type=='18'){
+                                arr[index].noticeName = '质量检查';
+                            }else if(item.type=='19'||item.type=='20'||item.type=='21'){
+                                arr[index].noticeName = '安全验收';
+                            }else if(item.type=='26'||item.type=='27'){
+                                arr[index].noticeName = '安全检查';
+                            };
+                            
+                            var ImagePath = this.updateNoticeImage(item.type);//判断图片地址
+                            var subTitle = this.updateNoticeTitle(item.type);//判断副标题
+                            arr[index].subTitle = subTitle;
+                            arr[index].imagePath = ImagePath;
+                        })
+                    }
+                   
                 }
             })
+        },
+        gotoPath(index){
+            console.log(index);
+            if(this.projectNoticeListInfo[index].type=='1'||this.projectNoticeListInfo[index].type=='2'||this.projectNoticeListInfo[index].type=='3'||this.projectNoticeListInfo[index].type=='4'){
+                this.$router.push({
+                    path:'/home/design'
+                });
+                //localStorage.setItem('navigationPath','designManager')
+            }else if(this.projectNoticeListInfo[index].type=='5'||this.projectNoticeListInfo[index].type=='6'||this.projectNoticeListInfo[index].type=='7'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='8'||this.projectNoticeListInfo[index].type=='9'||this.projectNoticeListInfo[index].type=='10'||this.projectNoticeListInfo[index].type=='11'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='12'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='13'||this.projectNoticeListInfo[index].type=='14'||this.projectNoticeListInfo[index].type=='15'||this.projectNoticeListInfo[index].type=='23'||this.projectNoticeListInfo[index].type=='24'||this.projectNoticeListInfo[index].type=='25'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='16'||this.projectNoticeListInfo[index].type=='17'||this.projectNoticeListInfo[index].type=='18'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='19'||this.projectNoticeListInfo[index].type=='20'||this.projectNoticeListInfo[index].type=='21'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            }else if(this.projectNoticeListInfo[index].type=='26'||this.projectNoticeListInfo[index].type=='27'){
+                this.$router.push({
+                    path:'/home/design'
+                })
+            };
+        },
+        updateNoticeImage(type){
+            var text = "";
+            switch (type) {
+                case 1: text="plan_new"; break;
+                case 2: text="plan_start"; break;
+                case 3: text="plan_end"; break;
+                case 4: text="plan_delay"; break;
+                case 5: text="design_new"; break;
+                case 6: text="design_reply"; break;
+                case 7: text="design_@"; break;
+                case 8: text="construction_new"; break;
+                case 9: text="construction_delay"; break;
+                case 10: text="construction_due"; break;
+                case 11: text="construction_pay"; break;
+                case 12: text="store_remindcontract"; break;
+                case 13: text="qualityaccept_new"; break;
+                case 14: text="qualityaccept_reply"; break;
+                case 15: text="qualityaccept_@"; break;
+                case 16: text="qualitycheck_new"; break;
+                case 17: text="qualitycheck_reply"; break;
+                case 18: text="qualitycheck_@"; break;
+                case 19: text="securityaccept_new"; break;
+                case 20: text="securityaccept_reply"; break;
+                case 21: text="securityaccept_@"; break;
+                case 22: text="plan_value"; break;
+                case 23: text="qualityaccept_reject"; break;
+                case 24: text="qualityaccept_supply"; break;
+                case 25: text="qualityaccept_adopt"; break;
+                case 26: text="safetystatus_timeout"; break;
+                case 27: text="safetycheck_remind"; break;
+                default:
+                    text = "";
+            }
+            return text;
+        },
+        updateNoticeTitle(type) {
+            var text = "";
+            switch (type) {
+                case 1: text="收到新的任务"; break;
+                case 2: text="您的任务即将开始"; break;
+                case 3: text="您的任务邻近结束"; break;
+                case 4: text="您的任务已经拖延"; break;
+                case 5: text="有新的讨论主题"; break;
+                case 6: text="收到新的回复"; break;
+                case 7: text="有用户提到您"; break;
+                case 8: text="收到新的联系单"; break;
+                case 9: text="计划发生拖延"; break;
+                case 10: text="临近整改期限"; break;
+                case 11: text="定货单付款提醒"; break;
+                case 12: text="商铺续约提醒"; break;
+                case 13: text="有新的验收申请"; break;
+                case 14: text="收到新的回复"; break;
+                case 15: text="有用户提到您"; break;
+                case 16: text="有新的整改发起"; break;
+                case 17: text="收到新的回复"; break;
+                case 18: text="有用户提到您"; break;
+                case 19: text="有新的验收申请"; break;
+                case 20: text="收到新的回复"; break;
+                case 21: text="有用户提到您"; break;
+                case 22: text="上月产值提醒"; break;
+                case 23: text="验收被驳回"; break;
+                case 24: text="验收需补充"; break;
+                case 25: text="验收已通过"; break;
+                case 26: text="安全状态超时"; break;
+                case 27: text="安全检查提醒"; break;
+                default:
+                    text = "";
+            }
+            return text;
         }
     }
 }
@@ -375,6 +510,12 @@ export default {
             display: inline-block;
             margin-left: 20px;
             color: #666;
+            // height: 35px;
+            // line-height: 35px;
+            // overflow: hidden;
+            // text-overflow: ellipsis;
+            // white-space: nowrap;
+            // width: 900px;
         }
         .btn{
             float: right;
@@ -535,6 +676,7 @@ export default {
             font-size: 18px;
             font-family: '微软雅黑';
             font-weight: bold;
+            display: inline-block;
         }
         .el-tabs--border-card{
             border:none;
