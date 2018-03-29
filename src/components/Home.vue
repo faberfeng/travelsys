@@ -23,7 +23,7 @@
                                         <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">属性管理</router-link></el-menu-item>
                                         <el-menu-item index="3"><router-link :to="{path:'/home/designversion'}">设计版本</router-link></el-menu-item>
                                     </el-menu>
-                                    <router-view/>
+                                    <!-- <router-view/> -->
                                 </el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
@@ -32,7 +32,7 @@
                                         <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">工程量清单</router-link></el-menu-item>
                                         <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">物料量清单</router-link></el-menu-item>
                                     </el-menu>
-                                    <router-view/>
+                                    <!-- <router-view/> -->
                                 </el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
@@ -43,7 +43,7 @@
                                         <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">已经分享</router-link></el-menu-item>
                                         <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">个人中转</router-link></el-menu-item>
                                     </el-menu>
-                                    <router-view/>
+                                    <!-- <router-view/> -->
                                 </el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
                                     <div class="settings" ref="settingsL">
