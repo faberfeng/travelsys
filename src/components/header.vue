@@ -63,12 +63,11 @@ export default Vue.component('common-header', {
     .container-header{
         width: 100%;
         height: 68px;
-        overflow: hidden;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        z-index: 1000;
+        z-index: 1001;
     }
     .header{
         height: 68px;
@@ -126,7 +125,6 @@ export default Vue.component('common-header', {
         box-shadow:-2px 2px 2px 2px #d9d9d9 ;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
-        z-index: 10;
         overflow: hidden;
     }
     .infoHover .p1{
