@@ -14,7 +14,6 @@
                         <el-col :span="24" >
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
-                                       <router-view class="sss"/>
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress">进度计划</el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design">
@@ -23,7 +22,10 @@
                                         <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">属性管理</router-link></el-menu-item>
                                         <el-menu-item index="3"><router-link :to="{path:'/home/designversion'}">设计版本</router-link></el-menu-item>
                                     </el-menu>
+<<<<<<< HEAD
                                     <!-- <router-view/> -->
+=======
+>>>>>>> cafe4534b9e1bc2a30c51841e3854549edc4ec4a
                                 </el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
@@ -32,7 +34,10 @@
                                         <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">工程量清单</router-link></el-menu-item>
                                         <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">物料量清单</router-link></el-menu-item>
                                     </el-menu>
+<<<<<<< HEAD
                                     <!-- <router-view/> -->
+=======
+>>>>>>> cafe4534b9e1bc2a30c51841e3854549edc4ec4a
                                 </el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
@@ -43,7 +48,10 @@
                                         <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">已经分享</router-link></el-menu-item>
                                         <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">个人中转</router-link></el-menu-item>
                                     </el-menu>
+<<<<<<< HEAD
                                     <!-- <router-view/> -->
+=======
+>>>>>>> cafe4534b9e1bc2a30c51841e3854549edc4ec4a
                                 </el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
                                     <div class="settings" ref="settingsL">
@@ -97,7 +105,7 @@
                                             </el-menu>
                                         </div>
                                         <div class="settingsRight">
-                                            <router-view ></router-view>
+                                             <router-view></router-view>
                                         </div>
                                     </div>
                                 </el-tab-pane>

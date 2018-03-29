@@ -3,20 +3,33 @@
       <h4 class="title">用户管理</h4>
       <div class="usermanage">
           <h5 class="subtitle">用户列表<span class="subSpan"><el-input suffix-icon="el-icon-search" class="inp" placeholder="输入姓名"></el-input><el-button @click="addUser" class="btn" type="primary">+添加</el-button></span></h5>
-          <el-table style="width:98%;" border :data="userList">
-              <el-table-column label="姓名" prop="name"></el-table-column>
-              <el-table-column label="账号" prop="account"></el-table-column>
-              <el-table-column label="工程管理员" prop="administrator"></el-table-column>
-              <el-table-column label="已被分配到的岗位" prop="department"></el-table-column>
-              <el-table-column label="添加时间" prop="addtime"></el-table-column>
-              <el-table-column label="添加人" prop="operator"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                    <el-button class="editIcon" @click="editUser"  type="text" size="small"><i class="el-icon-edit-outline"></i></el-button>
-                    <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, userList)" type="text" size="small"><i class="el-icon-delete"></i></el-button>
-                </template>
-              </el-table-column>
-          </el-table>
+          <table class="UserList" border="1" width='100%'>
+              <thead>
+                  <tr  class="userList-thead">
+                    <th width="15%">姓名</th>
+                    <th width="20%">账号</th>
+                    <th width="9%">工程管理员</th>
+                    <th width="15%;">已被分配到的岗位</th>
+                    <th width="16%;">添加时间</th>
+                    <th width="11%;">添加人</th>
+                    <th width="14%">操作
+                        <el-button class="editIcon" @click="editUser"  type="text" size="small"><i class="el-icon-edit-outline"></i></el-button>
+                        <el-button class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, userList)" type="text" size="small"><i class="el-icon-delete"></i></el-button>
+                    </th>
+                  </tr>
+              </thead>
+              <tbody>
+                   <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+              </tbody>
+          </table>
           <div class="pagination">
                 <el-pagination
                 :page-sizes="[10, 20, 30, 40]"
@@ -127,6 +140,51 @@
         </el-dialog> 
   </div>
 </template>
+<style scoped lang='less'>
+.UserList{
+    margin:0 20px;
+    border-collapse: collapse;
+    border: 1px solid #e6e6e6;
+    thead{
+        background: #f2f2f2;
+        th{
+            padding-left: 10px;
+            height: 52px;
+            text-align: left;
+            box-sizing: border-box;
+            border-right: 1px solid #e6e6e6;
+            font-size: 12px;
+            color: #333333;
+        }
+    }
+    tbody{
+        tr{
+            td{
+                padding-left: 10px;
+                height: 52px;
+                text-align: left;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #333333;
+            }
+             &:hover{
+                background: #fafafa;
+            }
+        }
+    }
+}
+ .pagination{
+    width: 100%;
+    text-align: right;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+.el-pagination{
+    padding:0;
+    // margin-right: 20px;
+}
+</style>
 <script>
 export default {
   name:'UserManage',
