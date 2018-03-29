@@ -86,7 +86,7 @@
                                   <div class="pagination-btn-separator"></div>
                             </td>
                             <td>
-                                 <a href="javascript:void(0)" class="btn-refresh btn-TAB"></a>
+                                 <a href="javascript:void(0)" @click="this.getInfo" class="btn-refresh btn-TAB"></a>
                             </td>
                         </tr>
                     </tbody>
@@ -408,6 +408,32 @@ export default {
       vm.getJobShuXingTu()
   },
   methods:{
+        changePage(val){//分页 0 -1 1 2
+            var vm = this 
+            if(vm.pageDetial.pagePerNum == 1 && (val == 0 || val == -1)){
+                vm.$message('这已经是第一页!')
+                return false
+            }else if(vm.pageDetial.pagePerNum == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                vm.$message('这已经是最后一页!')
+                return false
+            }else{
+                switch(val){
+                    case 0:
+                         vm.pageDetial.pagePerNum = 1
+                        break;
+                    case -1:
+                         vm.pageDetial.pagePerNum--
+                        break;
+                    case 1:
+                         vm.pageDetial.pagePerNum++
+                        break;
+                    case 2:
+                         vm.pageDetial.pagePerNum = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                        break;
+                }
+            }
+
+        },
         getJobShuXingTu(){
             var vm = this
             var setting = {
