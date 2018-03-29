@@ -156,7 +156,7 @@ export default {
                 params:{
                     projId:this.projId,
                     pageNo:0,
-                    pageSize:24
+                    pageSize:100
                 }
             }).then((response)=>{
                 console.log(response.data.rt);
@@ -180,17 +180,13 @@ export default {
                 params:{
                     projId:this.projId,
                     pageNo:0,
-                    pageSize:10
+                    pageSize:100
                 }
             }).then((response)=>{
                 //console.log(response.data.rt.rows);
-                if(response.data.cd === '1'){
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }else{
-                    this.projectNoticeListInfo = response.data.rt.rows;
-                    if(this.projectNoticeListInfo){
+                if(response.data.cd === '0'){
+                    if(response.data.rt.rows){
+                        this.projectNoticeListInfo = response.data.rt.rows;
                          this.projectNoticeListInfo.forEach((item,index,arr)=>{
                             if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){
                                 arr[index].noticeName = '进度计划';
@@ -216,7 +212,10 @@ export default {
                             arr[index].imagePath = ImagePath;
                         })
                     }
-                   
+                }else{
+                   this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
@@ -226,11 +225,10 @@ export default {
                 this.$router.push({
                     path:'/home/design'
                 });
-                //localStorage.setItem('navigationPath','designManager')
             }else if(this.projectNoticeListInfo[index].type=='5'||this.projectNoticeListInfo[index].type=='6'||this.projectNoticeListInfo[index].type=='7'){
                 this.$router.push({
                     path:'/home/design'
-                })
+                });
             }else if(this.projectNoticeListInfo[index].type=='8'||this.projectNoticeListInfo[index].type=='9'||this.projectNoticeListInfo[index].type=='10'||this.projectNoticeListInfo[index].type=='11'){
                 this.$router.push({
                     path:'/home/design'
@@ -677,7 +675,7 @@ export default {
             font-family: '微软雅黑';
             font-weight: bold;
             display: inline-block;
-            float: left;
+            // float: left;
         }
         .projectList-detial{
             white-space: nowrap;

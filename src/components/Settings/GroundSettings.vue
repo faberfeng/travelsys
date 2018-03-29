@@ -6,24 +6,24 @@
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<span :class="[{'groundEdit-active':!canEdit},'groundEdit']" @click="groundInfoEdit"></span></h5>
             <div :class="[{'groundInfoInp-active':!canEdit},'groundInfoInp']">
                 <ul>
-                    <li><label>城市坐标系名称</label><el-input :disabled="canEdit" class="sInp"></el-input></li>
+                    <li><label>城市坐标系名称</label><el-input v-model="groundInfo.siteId" :disabled="canEdit" class="sInp"></el-input></li>
                     <li>
                         <label>场地原点</label>
                         <div>
-                            <el-input :disabled="canEdit" class="sInp icon-X" placeholder="0.0"></el-input> 
+                            <el-input v-model="groundInfo.pointX" :disabled="canEdit" class="sInp icon-X" placeholder="0.0"></el-input> 
                         </div>
                         <div>
-                            <el-input  :disabled="canEdit" class="sInp spe icon-Y" placeholder="0.0"></el-input>
+                            <el-input v-model="groundInfo.pointY"  :disabled="canEdit" class="sInp spe icon-Y" placeholder="0.0"></el-input>
                         </div>
                         <label style="width:95px;">场地高程</label>
                         <div>
-                            <el-input :disabled="canEdit" class="icon-Z" placeholder="0.0"></el-input>    
+                            <el-input v-model="groundInfo.heightZ" :disabled="canEdit" class="icon-Z" placeholder="0.0"></el-input>    
                         </div>
                     </li>
                     <li>
                         <label>工程规模</label>
                         <div>
-                            <el-input class="scale icon-size" :disabled="canEdit" ></el-input>
+                            <el-input v-model="groundInfo.projectScale" class="scale icon-size" :disabled="canEdit" ></el-input>
                         </div>
                     </li>                
                 </ul>
@@ -38,39 +38,39 @@
                 <div class="groundSettingBodyS">
                     <p class="firstP">
                         <label>效果等级</label>
-                        <el-select v-model="value" class="elSelect">
-                            <el-option v-for="(item,index) in options" :key="index" :value="item.value" :label="item.label"></el-option>
+                        <el-select v-model="SceneEnvironmentList.EffectLevel" class="elSelect">
+                            <el-option v-for="(item,index) in effectLevel" :key="index" :value="item.value" :label="item.label"></el-option>
                         </el-select>
                     </p>
                     <p>
                         <label>场景事件</label>
-                        <el-select v-model="value">
-                            <el-option v-for="(item,index) in options" :key="index" :value="item.value" :label="item.label"></el-option>
+                        <el-select v-model="SceneEnvironmentList.SceneTime">
+                            <el-option v-for="(item,index) in groundThing" :key="index" :value="item.value" :label="item.label"></el-option>
                         </el-select>
                     </p>
                 </div>
                 <div class="groundSettingBodyP">
-                    <label>整体亮度</label><div><el-slider class="slider_P" v-model="value1"></el-slider></div>
+                    <label>整体亮度</label><div><el-slider class="slider_P" v-model="SceneEnvironmentList.Brightness"></el-slider></div>
                 </div>
                 <div class="groundSettingBodyC">
-                    <el-checkbox v-model="checked">显示天空</el-checkbox>
+                    <el-checkbox v-model="SceneEnvironmentList.showSky">显示天空</el-checkbox>
                 </div>
                 <p v-show="!canEditCj" style="margin-bottom:-6px;"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
             </div>
         </div>
         <div class="singleList groundTitle">
-            <h5 class="accountTitle"><img class="imgicon" src="../../assets/single-list.png"/>单体列表<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
+            <h5 class="accountTitle"><img class="imgicon" src="../../assets/single-list.png"/>单体列表<span @click="updateList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="listData" style="width:100%">
                     <el-table-column prop="index" label="序号"></el-table-column>
-                    <el-table-column prop="name" label="单体名称"></el-table-column>
-                    <el-table-column prop="coordinate" label="轴网基点坐标"></el-table-column>
-                    <el-table-column prop="high" label="首层相对高度"></el-table-column>
-                    <el-table-column prop="angle" label="轴网转角"></el-table-column>
+                    <el-table-column prop="Name" label="单体名称"></el-table-column>
+                    <el-table-column prop="Origin" label="轴网基点坐标"></el-table-column>
+                    <el-table-column prop="OriginHeight" label="首层相对高度"></el-table-column>
+                    <el-table-column prop="AxisAngle" label="轴网转角"></el-table-column>
                     <el-table-column prop="action" label="操作" width="150">
                         <template slot-scope="scope" >
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv"  @click="deleteRow(scope.$index, listData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv"  @click="deleteListRow(scope.$index, listData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -92,7 +92,7 @@
                         <template slot-scope="scope" >
                             <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
                             <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
-                            <div class="iconDiv " @click="deleteRow(scope.$index, groundSourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv " @click="deleteTableRow(scope.$index, groundSourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -106,9 +106,9 @@
       <!--dialog-->
       <el-dialog class="openDialog" title="新增单体列表" :visible.sync="addListShow" :before-close="listClose">
             <el-form label-width="150px" label-position="right">
-                <el-form-item label="序号">
+                <!-- <el-form-item label="序号">
                     <el-input v-model="addListindex"  placeholder="请输入"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="单体名称">
                     <el-input v-model="addListname" placeholder="请输入"></el-input>
                 </el-form-item>
@@ -129,9 +129,9 @@
         </el-dialog> 
         <el-dialog title="修改单体列表" :visible.sync="editListShow" @click="listClose">
             <el-form label-width="150px" label-position="right" >
-                <el-form-item label="序号">
+                <!-- <el-form-item label="序号">
                     <el-input v-model="addListindex"  placeholder="请输入"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="单体名称">
                     <el-input v-model="addListname" placeholder="请输入"></el-input>
                 </el-form-item>
@@ -214,9 +214,23 @@
                 <el-button @click="groundClose">取 消</el-button>
             </span>
         </el-dialog>
+        <!--删除提醒-->
+        <div id="inital">
+            <el-dialog  :visible.sync="deleteListDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">你确定删除?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteListDialog=false">取消</button>
+                </div>
+            </el-dialog>
+        </div>
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   name:'GroundSettings',
   data(){
@@ -244,27 +258,37 @@ export default {
           groundSourceSize:'',
           groundVersion:'',
           groundRemark:'',
+          deleteListDialog:false,
+          listRow:[],
           groundState:'',
-          options: [{
-            value: '选项1',
-            label: '黄金糕'
+          effectLevel:[{
+              value:'好',
+              label:'好'
+            },{
+                value:'很好',
+                label:'很好'
+            },{
+                value:'最好',
+                laebl:'最好'
+            }
+          ],
+          groundThing: [{
+                value: '早晨',
+                label: '早晨'
             }, {
-            value: '选项2',
-            label: '双皮奶'
+                value: '上午',
+                label: '上午'
+            },{
+                value: '中午',
+                label: '中午'
+            },{
+                value: '下午',
+                label: '下午'
+            },{
+                value: '傍晚',
+                label: '傍晚'
             }],
-            listData:[{
-                index: '01',
-                name: '企业自用办公室',
-                coordinate: '0.0',
-                high:'47',
-                angle:'0'
-            }, {
-                index: '02',
-                name: '企业自用办公室',
-                coordinate: '0.0',
-                high:'47',
-                angle:'0'
-            }],
+            listData:[],
             groundSourceData:[{
                 groundIndex: '01',
                 groundName: 'yanshichangdi',
@@ -284,66 +308,227 @@ export default {
                 groundVersion:'241',
                 groundRemark:'2017-10-23 17:40',
                 groundState:'加载'
-            }]
+            }],
+            baseUrl:'http://10.252.26.240:8080/',
+            token:'',
+            projId:'',
+            effectLevelVal:'很好',//效果等级值
+            groundThingVal:'早晨',//场景事件值
+            groundInfo:{},//场地信息
+            SceneEnvironmentList:{}//场景设置
+
         }
+
+    },
+    created(){
+        this.token = localStorage.getItem('token');
+        this.projId = localStorage.getItem('projId');
+        this.getGroundInformation();//场地信息
+        this.getSceneEnvironment();//场景设置
+        this.findSubProject();//获取单体列表 表格
+        this.getUnityBundle();//获取场地资源包 表格
     },
     methods:{
         groundInfoEdit(){
             this.canEdit = this.canEdit?false:true;
         },
+        //保存场地信息
         saveEdit(){
-            this.canEdit = true;
+            axios({
+                method:'post',
+                url:this.baseUrl+'/h2-bim-project/project2/Config/saveSite',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    heightZ:this.groundInfo.heightZ,
+                    pointName:this.groundInfo.pointName,
+                    pointX:this.groundInfo.pointX,
+                    pointY:this.groundInfo.pointY,
+                    projectScale:this.groundInfo.projectScale
+
+                }
+            }).then((response)=>{
+                //console.log(response)
+                if(response.data.cd === '0'){
+                    console.log('修改成功');
+                    this.canEdit = true;
+                }else{
+                    this.canEdit = false;
+                }
+            })
         },
          groundInfoEditCJ(){
             this.canEditCj = this.canEditCj?false:true;
         },
         saveEditCJ(){
-            this.canEditCj = true;
+            if(this.SceneEnvironmentList.EffectLevel==='好'){
+                this.SceneEnvironmentList.EffectLevel=0;
+            }else if(this.SceneEnvironmentList.EffectLevel=='很好'){
+                this.SceneEnvironmentList.EffectLevel=1;
+            }else if(this.SceneEnvironmentList.EffectLevel=='最好'){
+                this.SceneEnvironmentList.EffectLevel=2;
+            };
+            if(this.SceneEnvironmentList.SceneTime=='早晨'){
+                this.SceneEnvironmentList.SceneTime=0;
+            }else if(this.SceneEnvironmentList.SceneTime=='上午'){
+                this.SceneEnvironmentList.SceneTime=1;
+            }else if(this.SceneEnvironmentList.SceneTime=='中午'){
+                this.SceneEnvironmentList.SceneTime=2;
+            }else if(this.SceneEnvironmentList.SceneTime=='下午'){
+                this.SceneEnvironmentList.SceneTime=3;
+            }else if(this.SceneEnvironmentList.SceneTime=='傍晚'){
+                this.SceneEnvironmentList.SceneTime=4;
+            }
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/setSceneEnvironment',
+                headers:{
+                    'token':this.token
+                },
+                data:{
+                    Brightness:this.SceneEnvironmentList.Brightness,
+                    EffectLevel:this.SceneEnvironmentList.EffectLevel,
+                    IsshowSky:this.SceneEnvironmentList.IsshowSky,
+                    SceneTime:this.SceneEnvironmentList.SceneTime,
+                    SkyType:this.SceneEnvironmentList.SkyType,
+                    showSky:this.SceneEnvironmentList.showSky
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.canEditCj = true;
+                    if(this.SceneEnvironmentList.EffectLevel=='0'){
+                        this.SceneEnvironmentList.EffectLevel='好';
+                    }else if(this.SceneEnvironmentList.EffectLevel=='1'){
+                        this.SceneEnvironmentList.EffectLevel='很好';
+                    }else if(this.SceneEnvironmentList.EffectLevel=='2'){
+                        this.SceneEnvironmentList.EffectLevel='最好';
+                    };
+                    if(this.SceneEnvironmentList.SceneTime=='0'){
+                        this.SceneEnvironmentList.SceneTime='早晨';
+                    }else if(this.SceneEnvironmentList.SceneTime=='1'){
+                        this.SceneEnvironmentList.SceneTime='上午';
+                    }else if(this.SceneEnvironmentList.SceneTime=='2'){
+                        this.SceneEnvironmentList.SceneTime='中午';
+                    }else if(this.SceneEnvironmentList.SceneTime=='3'){
+                        this.SceneEnvironmentList.SceneTime='下午';
+                    }else if(this.SceneEnvironmentList.SceneTime=='4'){
+                        this.SceneEnvironmentList.SceneTime='傍晚';
+                    }
+                }else{
+                    this.canEditCj = false;
+                }
+            })
         },
         addList(){
             this.addListShow = true;
         },
+        //新增单体列表子项
+        updateList(){
+            this.addListShow = true;
+        },
+        //新增单体列表子项
         addListSure(){
-            this.listData.push({
-                index: this.addListindex,
-                name: this.addListname,
-                coordinate: this.addListcoordinate,
-                high:this.addListhigh,
-                angle:this.addListangle
-            });
-            this.addListindex = '';
-            this.addListname = '';
-            this.addListcoordinate='';
-            this.addListhigh='';
-            this.addListangle='';
-            setTimeout(()=>{
-                this.addListShow = false;
-            },0)
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    AxisAngle:this.addListangle,
+                    Name:this.addListname,
+                    Origin:this.addListcoordinate,
+                    OriginHeight:this.addListhigh,
+                    UseCS:0
+                }
+            }).then((response)=>{
+                console.log(response.data);
+                if(response.data.cd == '0'){
+                    this.listData.push({
+                        index: this.listData.length+1,
+                        Name: this.addListname,
+                        Origin: this.addListcoordinate,
+                        OriginHeight:this.addListhigh,
+                        AxisAngle:this.addListangle
+                    });
+                    //清空输入
+                    this.addListname = '';
+                    this.addListcoordinate='';
+                    this.addListhigh='';
+                    this.addListangle='';
+
+                    this.addListShow = false;
+                }else if(response.data.cd ='-1'){
+                    alert(response.data.msg);
+                }
+            })
             
         },
+        //修改单体列表子项
         editListSure(){
-            this.editListShow = false;
+            
             this.listData[this.listIndexNumber].index = this.addListindex ,
-            this.listData[this.listIndexNumber].name = this.addListname;
-            this.listData[this.listIndexNumber].coordinate = this.addListcoordinate,
-            this.listData[this.listIndexNumber].high = this.addListhigh;
-            this.listData[this.listIndexNumber].angle = this.addListangle;
-            //清空数据
-            this.addListindex = '';
-            this.addListname = '';
-            this.addListcoordinate='';
-            this.addListhigh='';
-            this.addListangle='';
+            this.listData[this.listIndexNumber].Name = this.addListname;
+            this.listData[this.listIndexNumber].Origin = this.addListcoordinate,
+            this.listData[this.listIndexNumber].OriginHeight = this.addListhigh;
+            this.listData[this.listIndexNumber].AxisAngle = this.addListangle;
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    AxisAngle:this.addListangle,
+                    ID:this.listData[this.listIndexNumber].ID,
+                    Name:this.addListname,
+                    Origin:this.addListcoordinate,
+                    OriginHeight:this.addListhigh,
+                    ParentID:this.listData[this.listIndexNumber].ParentID,
+                    Type:this.listData[this.listIndexNumber].Type,
+                    UseCS:this.listData[this.listIndexNumber].UseCS
+                }
+            }).then((response)=>{
+                console.log(response.data);
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.editListShow = false;
+                    //清空数据
+                    this.addListindex = '';
+                    this.addListname = '';
+                    this.addListcoordinate='';
+                    this.addListhigh='';
+                    this.addListangle='';
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }
+            })
+            
         },
+        //修改单体列表的信息
         listTableEdit(index){
             this.listIndexNumber = index.$index;
+            console.log(this.listIndexNumber);
             this.addListindex = this.listData[this.listIndexNumber].index,
-            this.addListname = this.listData[this.listIndexNumber].name;
-            this.addListcoordinate = this.listData[this.listIndexNumber].coordinate,
-            this.addListhigh = this.listData[this.listIndexNumber].high;
-            this.addListangle = this.listData[this.listIndexNumber].angle;
+            this.addListname = this.listData[this.listIndexNumber].Name;
+            this.addListcoordinate = this.listData[this.listIndexNumber].Origin,
+            this.addListhigh = this.listData[this.listIndexNumber].OriginHeight;
+            this.addListangle = this.listData[this.listIndexNumber].AxisAngle;
             this.editListShow = true;
-            console.log(index.$index)
+
         },
         listClose(){
             this.addListShow = false;
@@ -427,8 +612,139 @@ export default {
             this.groundRemark = '';
             this.groundState = '';
         },
-        deleteRow(index, rows) {
+        deleteListRow(index, rows) {
+            this.deleteListDialog = true;
+            this.listRow = rows;
+            this.listIndexNumber = index;
+
+        },
+        //确认删除单体列表子项
+        deleteMakeSure(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'h2-bim-project/project2/Config/deleteSubProject',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    buildId:this.listData[this.listIndexNumber].ID,
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                }
+            })
+            this.listRow.splice(this.listIndexNumber, 1);
+            this.deleteListDialog = false;
+        },
+        deleteTableRow(index, rows) {
             rows.splice(index, 1);
+        },
+        getGroundInformation(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'h2-bim-project/project2/Config/projectSiteDatumIndex',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                this.groundInfo = response.data.rt.site;
+                this.groundInfo.siteId = response.data.rt.siteId;
+            })
+        },
+        getSceneEnvironment(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/getSceneEnvironmentByProjId',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    jsonData:{
+                        projId:this.projId
+                    }
+                }
+
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    if(response.data.rt.EffectLevel=='0'){
+                        response.data.rt.EffectLevel='好';
+                    }else if(response.data.rt.EffectLevel=='1'){
+                        response.data.rt.EffectLevel='很好';
+                    }else if(response.data.rt.EffectLevel=='2'){
+                        response.data.rt.EffectLevel='最好';
+                    };
+                    if(response.data.rt.SceneTime=='0'){
+                        response.data.rt.SceneTime='早晨';
+                    }else if(response.data.rt.SceneTime=='1'){
+                        response.data.rt.SceneTime='上午';
+                    }else if(response.data.rt.SceneTime=='2'){
+                        response.data.rt.SceneTime='中午';
+                    }else if(response.data.rt.SceneTime=='3'){
+                        response.data.rt.SceneTime='下午';
+                    }else if(response.data.rt.SceneTime=='4'){
+                        response.data.rt.SceneTime='傍晚';
+                    }
+                    this.SceneEnvironmentList = response.data.rt;
+                    //console.log(response.data);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
+            })
+        },
+        findSubProject(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'h2-bim-project/project2/Config/findSubProject/'+this.projId,
+                headers:{
+                    token:this.token
+                }
+            }).then((response)=>{
+                
+                if(response.data.cd == '0'){
+                    this.listData = response.data.rt.rows;
+                    this.listData.forEach((item,index,arr)=>{
+                        arr[index].index = index;
+                    })
+                   //console.log(this.listData);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
+            })
+        },
+        //获取场地静态资源包
+        getUnityBundle(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/getUnityBundleByHolderId',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    holderId:this.groundInfo.siteId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    //console.log(response.data)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
         }
 
     }

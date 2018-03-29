@@ -5,9 +5,9 @@
         <div class="pageSelect">
             <div class="pageOption">
                 <label>单体名称</label>
-                <el-select v-model="value" placeholder="请选择">
+                <el-select v-model="subProjectsValue" placeholder="请选择" @change="changeSubProjects">
                     <el-option
-                    v-for="item in options"
+                    v-for="item in subProjectsName"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -16,9 +16,9 @@
             </div>
             <div class="pageOption pageOption1">
                 <label>建筑分区</label>
-                <el-select v-model="value" placeholder="请选择">
+                <el-select v-model="partitionListValue" placeholder="请选择" @change="changePartionList">
                     <el-option
-                    v-for="item in options"
+                    v-for="item in partitionListName"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -26,8 +26,9 @@
                 </el-select>
             </div>
             <div class="pageBtn">
-                <button class="addBtn">+添加</button>
-                <button class="editBtn">编辑</button>
+                <button class="addBtn" @click="addPartitionList">+添加</button>
+                <button class="editBtn" @click="editPartitionList">编辑</button>
+                <button class="editBtn" @click="deletePartitionList">删除</button>
             </div>
         </div>
         <div class="flor">
@@ -35,13 +36,13 @@
             <div class="pageTable"> 
                 <el-table :data="florData" border class="table" style="width:100%">
                     <el-table-column label="序号" prop="index"></el-table-column>
-                    <el-table-column label="名称" prop="name"></el-table-column>
-                    <el-table-column label="标高值" prop="value"></el-table-column>
-                    <el-table-column label="备注" prop="remarks" ></el-table-column>
+                    <el-table-column label="名称" prop="Name"></el-table-column>
+                    <el-table-column label="标高值" prop="BottomHeight"></el-table-column>
+                    <el-table-column label="备注" prop="Remark" ></el-table-column>
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv"  @click="deleteRow(scope.$index, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv"  @click="deleteFloorRow(scope.$index, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -78,38 +79,118 @@
                 </el-pagination>
             </div>
         </div>
+        <!--dialog-->
+        <el-dialog title="新增竖向楼层" :visible.sync="addFloorList" @click="cancleAddFloorList">
+            <el-form label-width="150px" label-position="right" >
+                <el-form-item label="楼层名称">
+                    <el-input v-model="FloorName" placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-form-item label="楼层标高">
+                    <el-input v-model="FloorValue"  placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-checkbox v-model="setAsAuto">设置为默认楼层</el-checkbox>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="makeAddFloorList">确 定</el-button>
+                <el-button @click="cancleAddFloorList">取 消</el-button>
+            </span>
+        </el-dialog>
+        <!--编辑竖向楼层-->
+        <el-dialog title="编辑竖向楼层" :visible.sync="editFloorList" @click="cancleEditFloorList">
+            <el-form label-width="150px" label-position="right" >
+                <el-form-item label="楼层名称">
+                    <el-input v-model="FloorName" placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-form-item label="楼层标高">
+                    <el-input v-model="FloorValue"  placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-checkbox v-model="setAsDefault">设置为默认楼层</el-checkbox>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="makeEditFloorList">确 定</el-button>
+                <el-button @click="cancleEditFloorList">取 消</el-button>
+            </span>
+        </el-dialog>
+        <!--删除-->
+        <div id="inital">
+            <el-dialog  :visible.sync="deleteFloorDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">你确定删除?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteFloorDialog=false">取消</button>
+                </div>
+            </el-dialog>
+        </div>
+        <!--编辑建筑分区-->
+        <el-dialog title="编辑分区" :visible.sync="editPartition" @click="cancleEditPartitionList">
+            <el-form label-width="150px" label-position="right" >
+                <el-form-item label="区域名称">
+                    <el-input v-model="partitionName" placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-form-item label="面积">
+                    <el-input v-model="Area"  placeholder="请输入"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="makeEditPartitionList">确 定</el-button>
+                <el-button @click="cancleEditPartitionList">取 消</el-button>
+            </span>
+        </el-dialog>
+        <!--新增建筑分区-->
+        <el-dialog title="新增分区" :visible.sync="addPartition" @click="cancleAddPartitionList">
+            <el-form label-width="150px" label-position="right" >
+                <el-form-item label="区域名称">
+                    <el-input v-model="partitionName" placeholder="请输入"></el-input>
+                </el-form-item>
+                <el-form-item label="面积">
+                    <el-input v-model="Area"  placeholder="请输入"></el-input>
+                </el-form-item>
+            </el-form>
+            <el-checkbox v-model="partitionIsDefault">作为默认分区</el-checkbox>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="makeAddPartitionList">确 定</el-button>
+                <el-button @click="cancleAddPartitionList">取 消</el-button>
+            </span>
+        </el-dialog>
+        <!--删除建筑分区-->
+        <div id="inital">
+            <el-dialog  :visible.sync="deletePartionDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">你确定删除【{{deletepartitionContent}}】?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deletePartitionMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deletePartionDialog=false">取消</button>
+                </div>
+            </el-dialog>
+        </div>
       </div>
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   name:'PageIntial',
   data() {
       return {
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
+        subProjects:[],//总单体名称信息
+        subProjectsName:[],//单体名称
+        subProjectsValue:'',//单体名称值
+        partitionList: [],//总建筑分区信息 
+        partitionListName:[],//建筑分区名称
+        partitionListValue:'',//建筑分区值
         value: '',
-        florData:[{
-            index:'01',
-            name:'极地楼层',
-            value:'最小值',
-            remarks:''
-
-        }],
+        florData:[],
+        addFloorList:false,
+        editFloorList:false,
+        deleteFloorDialog:false,
+        setAsAuto:false,
+        setAsDefault:false,
+        FloorName:'',
+        FloorValue:'',
         sourceData:[{
             index:'01',
             sourceBagName:'yanshichangdi',
@@ -120,12 +201,175 @@ export default {
             version:'239',
             remarks:'',
             state:'加载'
-        }]
+        }],
+        floorIndex:'',
+        baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+        token:'',
+        projId:'',
+        partitionName:'',
+        Area:'',
+        editPartition:false,
+        partitionIndex:0,
+        addPartition:false,
+        partitionIsDefault:false,
+        deletePartionDialog:false,
+        deletepartitionContent:''
+
       }
     },
+    created(){
+        this.token = localStorage.getItem('token');//获取token
+        this.projId = localStorage.getItem('projId');//获取项目projId
+        this.floorAndSceneInit();//分层与楼层初始化
+    },
     methods:{
+        //新增竖向楼层列表
         addFlor(){
-            console.log(123);
+            this.addFloorList = true;
+        },
+        //确认添加
+        makeAddFloorList(){
+            console.log(this.setAsAuto)
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/updateStorey',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    holderId:this.florData[0].ParentID,
+                    flag:0,
+                    projectId:this.projId
+                },
+                data:{
+                    "Type": this.florData[0].Type,
+                    "ParentID": this.florData[0].ParentID,
+                    "Name": this.FloorName,
+                    "BottomHeight": this.FloorValue,
+                    "Unit":this.florData[0].Unit,
+                    "IsDefault": this.setAsAuto
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.florData.forEach((item,index,arr)=>{
+                        arr[index].Remark = '';
+                        arr[index].IsDefault = false;
+                    })
+                    this.florData.push({
+                        "index":this.florData.length+1,
+                        "Name":this.FloorName,
+                        "BottomHeight":this.FloorValue,
+                        "IsDefault": this.setAsAuto,
+                    });
+                    //修改备注
+                    this.florData.forEach((item,index,arr)=>{
+                        if(item.IsDefault){
+                          arr[index].Remark = '默认楼层';  
+                        }
+                    })
+                    //清空输入框的值
+                    this.FloorName = '';
+                    this.FloorValue = '';
+                    //console.log(response.data);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }
+            })
+            this.addFloorList = false;
+        },
+        //取消添加
+        cancleAddFloorList(){
+            this.addFloorList = false;
+        },
+        //编辑竖向楼层
+        listTableEdit(scope){
+            this.floorIndex = scope.$index;
+
+            this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+            this.FloorName = this.florData[this.floorIndex].Name;
+            this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+            this.editFloorList = true;
+        },
+        makeEditFloorList(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/updateStorey',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    holderId:this.florData[this.floorIndex].ID,
+                    flag:1,
+                    projectId:this.projId
+                },
+                data:{
+                    ID: this.florData[this.floorIndex].ID,
+                    Type: this.florData[this.floorIndex].Type,
+                    ParentID: this.florData[this.floorIndex].ParentID,
+                    Name: this.FloorName,
+                    Group: "",
+                    UnderID: this.florData[this.floorIndex].UnderID,
+                    OverID: this.florData[this.floorIndex].OverID,
+                    BottomHeight: this.FloorValue,
+                    Unit:this.florData[this.floorIndex].Unit,
+                    IsDefault: this.setAsDefault
+                }
+            }).then(response=>{
+                console.log(response.data);
+                this.florData[this.floorIndex].Name = this.FloorName;
+                this.florData[this.floorIndex].BottomHeight = this.FloorValue;
+                //修改备注
+                this.florData.forEach((item,index,arr)=>{
+                    arr[index].Remark = '';
+                    arr[index].IsDefault = false;
+                    //console.log( arr[index].Remark)
+                })
+                this.florData[this.floorIndex].Remark = "默认楼层";
+                this.florData[this.floorIndex].IsDefault = true;
+               // console.log(this.florData[this.floorIndex].Remark)
+                 //清空输入框的内容
+                this.FloorName ='';
+                this.FloorValue = '';
+            })
+            this.editFloorList = false;
+        },
+        cancleEditFloorList(){
+            this.editFloorList = false;
+            this.FloorName ='';
+            this.FloorValue = '';
+        },
+        //删除竖向楼层
+        deleteFloorRow(index){
+            this.floorIndex = index;
+            if(this.florData[index].IsDefault){
+                alert('默认楼层不能删除');
+            }else{  
+                this.deleteFloorDialog = true;
+            }
+        },
+        deleteMakeSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/deleteStorey',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    storeyId:this.florData[this.floorIndex].ID
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.florData.splice(this.floorIndex,1);
+                    this.deleteFloorDialog = false; 
+                }else if(response.data.cd = '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
         },
         addSource(){
             console.log(345)
@@ -136,10 +380,225 @@ export default {
         deleteRow(){
 
         },
-        listTableEdit(){
+        
+        //分区与楼层初始化
+        floorAndSceneInit(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'project2/Config/floorAndSceneInit',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    this.subProjects= response.data.rt.subProjects;//单体信息
+                    this.partitionList = response.data.rt.partitionList;//建筑分区
+                    console.log(this.partitionList)
+                    this.partitionList.forEach((item,index)=>{
+                        this.partitionListName.push({
+                            label:item.name,
+                            value:index
+                        })
+                    })
+                    this.subProjects.forEach((item,index)=>{
+                        this.subProjectsName.push({
+                            label:item.name,
+                            value:index
+                        })
+                    })
+                    //初始化 单体名称 和 建筑分区的初始值
+                    this.partitionListValue = this.partitionListName[0].label;
+                    this.subProjectsValue = this.subProjectsName[0].label;
+                    
+                }
+            }).then(()=>{
+                this.findStore(this.partitionList,0)
+            })
+        },
+        //改变单体名称值 来改变建筑分区的值
+        changeSubProjects(val){
+            axios({
+                method:'get',
+                url:this.baseUrl+'project2/Config/getPartitionBySubProjId',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    subProjId:this.subProjects[val].id
+                } 
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    
+                    this.partitionListName = [];
+                    this.partitionList = response.data.rt;
+                    this.partitionList.forEach((item,index)=>{
+                        this.partitionListName.push({
+                            label:item.Name,
+                            value:index
+                        })
+                    })
+                    this.partitionListValue = this.partitionListName[0].label;
+                    this.partitionIndex = 0;
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }).then(()=>{
+                this.findStore(this.partitionList,0);
+            })
+        },
+        //改变建筑分区的值
+        changePartionList(val){
+            this.partitionIndex = val;
+            this.findStore(this.partitionList,val);
 
+        },
+        //获取楼层
+        findStore(val,index){
+            console.log(val);
+            console.log(index);
+            var nextUrl = '';
+            if(val[index].ID){
+                nextUrl = val[index].ID;
+            }else{
+                nextUrl = val[index].id;
+            }
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/findStorey/'+nextUrl,
+                headers:{
+                    'token':this.token
+                }
+            }).then(response=>{
+                //console.log(response.data);
+                if(response.data.cd == '0' && response.data.rt.rows){
+                    this.florData = response.data.rt.rows;
+                    this.florData.forEach((item,index,arr)=>{
+                        arr[index].index = index;
+                        arr[index].Remark = '';
+                        if(item.IsDefault){
+                            arr[index].Remark = '默认楼层';
+                        }
+                    });
+                    
+                } 
+            })
+        },
+        //编辑建筑分区
+        editPartitionList(){
+            this.editPartition = true;
+            this.partitionName = this.partitionList[this.partitionIndex].name || this.partitionList[this.partitionIndex].Name;
+            this.Area = this.partitionList[this.partitionIndex].areaValue || this.partitionList[this.partitionIndex].AreaValue;
+        },
+        cancleEditPartitionList(){
+            this.partitionName ='';
+            this.Area ='';
+            this.editPartition = false;
+        },
+        makeEditPartitionList(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/updatePartition',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    subProjId:this.partitionList[this.partitionIndex].ParentID,
+                    projId:this.projId
+                },
+                data:{
+                    AreaValue:this.Area,
+                    ID:this.partitionList[this.partitionIndex].ID,
+                    IsDefault:this.partitionList[this.partitionIndex].IsDefault,
+                    Name:this.partitionName,
+                    ParentID:this.partitionList[this.partitionIndex].ParentID,
+                    Type:this.partitionList[this.partitionIndex].Type,
+                    Unit:this.partitionList[this.partitionIndex].Unit
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.partitionListName[this.partitionIndex].label = this.partitionName;
+                    this.partitionList[this.partitionIndex].AreaValue = this.Area;
+                    this.partitionName ='';
+                    this.Area ='';
+                    this.editPartition = false;
+                }
+            })
+            
+        },
+        //新增建筑分区
+        addPartitionList(){
+            this.addPartition = true;
+        },
+        makeAddPartitionList(){
+            
+            axios({
+                method:'post',
+                url:this.baseUrl+'project2/Config/updatePartition',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    subProjId:this.partitionList[this.partitionIndex].ParentID
+                },
+                data:{
+                    AreaValue:this.Area,
+                    IsDefault:this.partitionIsDefault,
+                    Name:this.partitionName,
+                }
+            }).then(response=>{
+                console.log(response.data);
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.partitionListName.push({
+                        label:this.partitionName,
+                        value:this.partitionListName.length+1
+                    })
+                    this.partitionName ='';
+                    this.Area ='';
+                    this.addPartition = false;
+                }
+            })
+        },
+        cancleAddPartitionList(){
+            this.partitionName ='';
+            this.Area ='';
+            this.addPartition = false;
+        },
+        //删除建筑分区
+        deletePartitionList(){
+            this.deletepartitionContent = this.partitionListName[this.partitionIndex].label;
+            this.deletePartionDialog = true;
+        },
+        deletePartitionMakeSure(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'project2/Config/deletePartition',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    partitionId:this.partitionList[this.partitionIndex].ID || this.partitionList[this.partitionIndex].id
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.partitionListName.splice(this.partitionIndex,1);
+                    this.partitionListValue = this.partitionListName[0].label;
+                    this.deletePartionDialog = false;
+                } else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }
+            })
+            
         }
-
     }
 }
 </script>
@@ -196,7 +655,7 @@ export default {
             margin-right: 10px;
         }
         .pageBtn{
-            width: 250px;
+            // width: 250px;
             text-align: left;
         }
         .addBtn,.editBtn{
