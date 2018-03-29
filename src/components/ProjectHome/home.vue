@@ -508,12 +508,8 @@ export default {
             display: inline-block;
             margin-left: 20px;
             color: #666;
-            // height: 35px;
-            // line-height: 35px;
-            // overflow: hidden;
-            // text-overflow: ellipsis;
-            // white-space: nowrap;
-            // width: 900px;
+            position: relative;
+            top: 10px;
         }
         .btn{
             float: right;
@@ -640,10 +636,6 @@ export default {
             overflow: auto;
             display: flex;
         
-        }
-        .settingsLeft{
-            width: 230px;
-            /* background: #fafafa; */
         }
         .settingsRight{
             flex: 1;

@@ -47,7 +47,7 @@
                         </el-col>
                     </el-row>
                     <div  class="settingsLeft" v-if="!settingsCenter" ref="settingsL">
-                        <h5 style="margin:0;padding:22px 0;">工程配置中心</h5>
+                        <h5>工程配置中心</h5>
                         <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
                             <el-submenu index="/setting/initalsettings">
                                 <template slot="title">
@@ -629,29 +629,31 @@ export default {
         bottom: 0;
     }
     .settingsRight{
-      display: block;
-     margin-left: 219px;
-     margin-top: 116px;
+        display: block;
+        margin-left: 219px;
+        margin-top: 116px;
     }
     .settingsCenter{
       margin-left: 26px!important;
     }
-    .settings h5{
+    .settingsLeft h5{
         width:100%;
-        height:50px; 
-        line-height: 50px;
         font-family: 'MicrosoftYaHei';
         font-weight: bold;
         color: #333;
-        margin: 10px 0 0 0;
+        margin: 0px 0 0 0;
+        padding: 20px 0 14px 0;
         font-size: 16px;
-        border-bottom: 1px solid #ccc;
+        line-height: 16px;
+        border-bottom: 1px solid #e0e0e0;
     }
+
     .el-menu{
         border: none;
     }
     .el-submenu__title{
         background: #ccc;
+        height: 50px;
     }
     .el-menu--horizontal>.el-menu-item{
         height: 40px;
@@ -690,7 +692,9 @@ export default {
         background: #ececec;
     }
     .settingsLeft .el-submenu span{
-        width: 124px;
+        width: 140px;
+        height: 50px;
+        line-height: 50px;
         display: inline-block;
         margin-left: -10px;
         text-align: left;
