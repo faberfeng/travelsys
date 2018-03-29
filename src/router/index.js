@@ -76,84 +76,139 @@ const router = new Router({
           name:'DesignVersion',
           component:resolve=>require(['@/components/ManageDesign/DesignVersion'],resolve)
         },
+      ]
+    },
+    {
+      path:'/setting',
+      name:'Setting',
+      component:resolve=>require(['@/components/Home'],resolve),
+      children:[
         {
-          path:'/home/initalsettings',
+          path:'/setting/initalsettings',
           name:'InitalSettings',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/InitalSettings'],resolve)
         },
         {
-          path:'/home/groundsettings',
+          path:'/setting/groundsettings',
           name:'GroundSettings',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/GroundSettings'],resolve)
         },
         {
-          path:'/home/pageinital',
+          path:'/setting/pageinital',
           name:'PageIntial',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/PageIntial'],resolve)
         },
         {
-          path:'/home/datatransform',
+          path:'/setting/datatransform',
           name:'DataTransform',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/DataTransform'],resolve)
         },
         {
-          path:'/home/projectstationmanage',
+          path:'/setting/projectstationmanage',
           name:'ProjectStationManage',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/ProjectStationManage'],resolve)
         },
         {
-          path:'/home/projectloggermanage',
+          path:'/setting/projectloggermanage',
           name:'ProjectLoggerManage',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/ProjectLoggerManage'],resolve)
         },
         {
-          path:'/home/groupmanage',
+          path:'/setting/groupmanage',
           nama:'GroupManage',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/GroupManage'],resolve)
         },
         {
-          path:'/home/worktool',
+          path:'/setting/worktool',
           name:'WorkTool',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/WorkTool'],resolve)
         },
         {
-          path:'/home/jobmanage',
+          path:'/setting/jobmanage',
           name:'JobManage',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/JobManage'],resolve)
         },
         {
-          path:'/home/usermanage',
+          path:'/setting/usermanage',
           name:'UserManage',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/UserManage'],resolve)
         },
         {
-          path:'/home/professional',
+          path:'/setting/professional',
           name:'Professional',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/Professional'],resolve)
         },
         {
-          path:'/home/constructordesignmapped',
+          path:'/setting/constructordesignmapped',
           name:'ConstructorDesignMapped',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/ConstructorDesignMapped'],resolve)
         },
         {
-          path:'/home/constructordesigncode',
+          path:'/setting/constructordesigncode',
           name:'ConstructorDesignCode',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/ConstructorDesignCode'],resolve)
         },
         {
-          path:'/home/projectsubmit',
+          path:'/setting/projectsubmit',
           name:'ProjectSubmit',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/ProjectSubmit'],resolve)
         },
         {
-          path:'/home/materialpurchase',
+          path:'/setting/materialpurchase',
           name:'MaterialPurchase',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/MaterialPurchase'],resolve)
         },
         {
-          path:'/home/buildingproperty',
+          path:'/setting/buildingproperty',
           name:'BuildingProperty',
+          meta:{
+            settingsCenter:true
+          },
           component:resolve=>require(['@/components/Settings/BuildingProperty'],resolve)
         },
       ]

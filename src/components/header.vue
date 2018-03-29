@@ -1,5 +1,5 @@
 <template>
-    <el-row>
+    <el-row class="container-header">
         <el-col :span="24" class="header">
             <div class="headerImg">
                 <img :src="proimg?proimg:'http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'"/>
@@ -60,10 +60,15 @@ export default Vue.component('common-header', {
 </script>
 
 <style scoped>
-    .wrapper{
+    .container-header{
         width: 100%;
-        height: 100%;
+        height: 68px;
         overflow: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
     }
     .header{
         height: 68px;

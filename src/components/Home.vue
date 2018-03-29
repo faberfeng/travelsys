@@ -42,64 +42,62 @@
                                     </el-menu>
                                 </el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
-                                    <div class="settings" ref="settingsL">
-                                        <div  class="settingsLeft" >
-                                            <h5>工程配置中心</h5>
-                                            <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
-                                                <el-submenu index="/home/initalsettings">
-                                                    <template slot="title">
-                                                        <span>工程场地与项目初始化</span>
-                                                    </template>
-                                                    <el-menu-item-group>
-                                                        <el-menu-item index="/home/initalsettings">工程初始化配置信息</el-menu-item>
-                                                        <el-menu-item index="/home/groundsettings">场地与单体初始化</el-menu-item>
-                                                        <el-menu-item index="/home/pageinital">分页与楼层初始化</el-menu-item>
-                                                    </el-menu-item-group>
-                                                </el-submenu>
-                                                <el-submenu index="/home/datatransform">
-                                                    <template slot="title">
-                                                        <span>建筑信息模型标准管理</span>
-                                                    </template>
-                                                    <el-menu-item-group>
-                                                        <el-menu-item index="/home/datatransform">数据传递标准预览</el-menu-item>
-                                                        <el-menu-item index="/home/professional">专业种类分类编码</el-menu-item>
-                                                        <el-menu-item index="/home/worktool">作业工具分类编码</el-menu-item>
-                                                        <el-menu-item index="/home/constructordesignmapped">结构设计分类映射</el-menu-item>
-                                                        <el-menu-item index="/home/constructordesigncode">结构设计分类编码</el-menu-item>
-                                                        <el-menu-item index="/home/projectsubmit">工程招标分类编码</el-menu-item>
-                                                        <el-menu-item index="/home/materialpurchase">物资采购分类编码</el-menu-item>
-                                                        <el-menu-item index="/home/buildingproperty">构建属性语意编码</el-menu-item>
-                                                    </el-menu-item-group>
-                                                </el-submenu>
-                                                <el-submenu index="/home/jobmanage">
-                                                    <template slot="title">
-                                                        <span>用户岗位群组管理</span>
-                                                    </template>
-                                                    <el-menu-item-group>
-                                                        <el-menu-item index="/home/jobmanage">岗位管理</el-menu-item>
-                                                        <el-menu-item index="/home/groupmanage">群组管理</el-menu-item>
-                                                        <el-menu-item index="/home/usermanage">用户管理</el-menu-item>
-                                                    </el-menu-item-group>
-                                                </el-submenu>
-                                                <el-submenu index="/home/projectstationmanage">
-                                                    <template slot="title">
-                                                        <span>工程动态日志</span>
-                                                    </template>
-                                                    <el-menu-item-group>
-                                                        <el-menu-item index="/home/projectstationmanage">工程动态管理</el-menu-item>
-                                                        <el-menu-item index="/home/projectloggermanage">工程日志管理</el-menu-item>
-                                                    </el-menu-item-group>
-                                                </el-submenu>
-                                            </el-menu>
-                                        </div>
-                                        <div class="settingsRight">
-                                             <router-view></router-view>
-                                        </div>
-                                    </div>
                                 </el-tab-pane>
                             </el-tabs>
                         </el-col>
                     </el-row>
+                    <div  class="settingsLeft" v-if="!settingsCenter" ref="settingsL">
+                        <h5 style="margin:0;padding:22px 0;">工程配置中心</h5>
+                        <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
+                            <el-submenu index="/setting/initalsettings">
+                                <template slot="title">
+                                    <span>工程场地与项目初始化</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="/setting/initalsettings">工程初始化配置信息</el-menu-item>
+                                    <el-menu-item index="/setting/groundsettings">场地与单体初始化</el-menu-item>
+                                    <el-menu-item index="/setting/pageinital">分页与楼层初始化</el-menu-item>
+                                </el-menu-item-group>
+                            </el-submenu>
+                            <el-submenu index="/setting/datatransform">
+                                <template slot="title">
+                                    <span>建筑信息模型标准管理</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="/setting/datatransform">数据传递标准预览</el-menu-item>
+                                    <el-menu-item index="/setting/professional">专业种类分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/worktool">作业工具分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/constructordesignmapped">结构设计分类映射</el-menu-item>
+                                    <el-menu-item index="/setting/constructordesigncode">结构设计分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/projectsubmit">工程招标分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/materialpurchase">物资采购分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/buildingproperty">构建属性语意编码</el-menu-item>
+                                </el-menu-item-group>
+                            </el-submenu>
+                            <el-submenu index="/setting/jobmanage">
+                                <template slot="title">
+                                    <span>用户岗位群组管理</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="/setting/jobmanage">岗位管理</el-menu-item>
+                                    <el-menu-item index="/setting/groupmanage">群组管理</el-menu-item>
+                                    <el-menu-item index="/setting/usermanage">用户管理</el-menu-item>
+                                </el-menu-item-group>
+                            </el-submenu>
+                            <el-submenu index="/setting/projectstationmanage">
+                                <template slot="title">
+                                    <span>工程动态日志</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="/setting/projectstationmanage">工程动态管理</el-menu-item>
+                                    <el-menu-item index="/setting/projectloggermanage">工程日志管理</el-menu-item>
+                                </el-menu-item-group>
+                            </el-submenu>
+                        </el-menu>
+                    </div>
+                    <div :class="[{'settingsCenter':settingsCenter},'settingsRight']">
+                        <router-view></router-view>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,6 +113,7 @@ export default {
     },
     data(){
         return{
+            settingsCenter:true,//是否是两边铺满
             header:{
                  userName:'',
                  userId:'', 
@@ -123,7 +122,7 @@ export default {
             },          
             navigationPath:'projectPage',
             activeIndex:'1',
-            settingActive:'/home/initalsettings',
+            settingActive:'/setting/initalsettings',
             winHeight:'',
             screenWidth: document.documentElement.clientHeight,
             token:'',
@@ -161,8 +160,9 @@ export default {
             vm.navigationPath='projectPage';
         }
         if(!vm.settingActive){
-            vm.settingActive='/home/initalsettings';
+            vm.settingActive='/setting/initalsettings';
         };
+        vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
     },
@@ -332,7 +332,7 @@ export default {
                         })
                     }else if(vm.auth.configurationCenter){
                         vm.$router.push({
-                            path:'/home/initalsettings'//配置中心
+                            path:'/setting/initalsettings'//配置中心
                         })
                     }
                 }
@@ -343,6 +343,7 @@ export default {
             })
         },
         handleClick(tab,event){
+            this.settingsCenter = true;
             if(tab.label === '工程首页'){
                 this.$router.push({
                     path:'/home/projHome/'+this.projId
@@ -386,6 +387,7 @@ export default {
                     path:this.settingActive
                 })
                 this.navigationPath = tab.name;
+                this.settingsCenter = false;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
             }
         },
@@ -512,13 +514,17 @@ export default {
     .contentBody{
         display: flex;
         height:100%;
+        position: relative;
     }
     .sideBar{
         width: 25px;
         min-width: 25px;
-        min-height: 100vh;
         background: #f5f7fa;
         border-right: 1px solid #cccccc;
+        position: fixed;
+        top: 68px;
+        left: 0;
+        bottom: 0;
     }
     .sideBar img{
         position: relative;
@@ -533,10 +539,17 @@ export default {
     }
     .content{
         width: 100%;
+        position: relative;
     }
     .navigation{
         height:48px;
         width:100%;
+        position: fixed;
+        top: 68px;
+        left: 26px;
+        right: 0;
+        background: #fff;
+        z-index: 1000;
     }
     
     /* 工程列表 */
@@ -610,9 +623,18 @@ export default {
         width: 192px;
         background: #fafafa;
         border-right:1px solid #ccc; 
+        position: fixed;
+        top: 116px;
+        left: 26px;
+        bottom: 0;
     }
     .settingsRight{
-        flex: 1;
+      display: block;
+     margin-left: 219px;
+     margin-top: 116px;
+    }
+    .settingsCenter{
+      margin-left: 26px!important;
     }
     .settings h5{
         width:100%;
