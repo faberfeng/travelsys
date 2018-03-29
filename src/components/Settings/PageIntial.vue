@@ -585,7 +585,7 @@ export default {
                 },
                 params:{
                     projId:this.projId,
-                    partitionId:this.partitionList[this.partitionIndex].ID || this.partitionList[this.partitionIndex].id
+                    partitionId:this.partitionList[this.partitionIndex].ID
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
@@ -714,6 +714,7 @@ export default {
             text-align: right;
             margin-top: 10px;
             margin-right: 20px;
+            height: 50px;
         }
         .el-pagination{
             padding:0;
