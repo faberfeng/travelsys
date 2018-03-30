@@ -223,4 +223,16 @@ export default {
 /* .el-submenu__title:hover{
   background-color:inherit;
 }  */
+/*日期选择器*/
+.el-date-editor{
+    height: 36px;
+    width: 146px;
+  }
+  .el-input__inner{
+      height: 36px;
+  }
+  .el-input__prefix{
+      top: -2px;
+  }
+
 </style>

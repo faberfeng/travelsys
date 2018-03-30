@@ -1,46 +1,49 @@
 <template>
   <div class="wrapper" id="projectStation">
       <h4 class="sTitle"><span>工程动态管理</span></h4>
-      <div class="selectMode">
-          <label>筛选</label>
-          <div class="block">
-            <el-date-picker
-                v-model="loggerDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期" @change="dateChange">
-            </el-date-picker>
+      <div class="stationManage">
+          <div class="selectMode">
+            <label>筛选</label>
+            <div class="block">
+                    <el-date-picker v-model="startDay" type="date" placeholder="选择开始日期"  @change="dateChange1"></el-date-picker>
+                    <span class="yi"></span>
+                    <el-date-picker v-model="endDay" type="date" placeholder="选择结束日期"  @change="dateChange2"></el-date-picker>
+                <!-- <el-date-picker
+                    v-model="loggerDate"
+                    type="daterange"
+                    range-separator="-"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期" @change="dateChange">
+                </el-date-picker> -->
+            </div>
+            <button class="queryBtn" @click="queryProjectStation">查询</button>
         </div>
-        <div class="btn">
-            <el-button type="primary" @click="queryProjectStation">查询</el-button>
-        </div>
-      </div>
-      <div class="project">
-          <ul class="projectList">
-                <li v-for="(item,index) in projectStationList" :key="index">
-                    <div class="projectListInfo">
-                        <div class="projectListImg">
-                            <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
-                        </div> 
-                        <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>
-                            <p class="font-color1">{{item.title}}</p>
-                            <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
+        <div class="project">
+            <ul class="projectList">
+                    <li v-for="(item,index) in projectStationList" :key="index">
+                        <div class="projectListInfo">
+                            <div class="projectListImg">
+                                <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
+                            </div> 
+                            <div class="projectListText">
+                                <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>
+                                <p class="font-color1">{{item.title}}</p>
+                                <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
+                            </div>
                         </div>
-                    </div>
-                </li>
-            </ul>
-      </div>
-      <div class="pagenation">   
-        <div class="pagination">
-            <el-pagination
-                :page-sizes="[10,20,30,40,50]"
-                 layout="total, sizes, prev, pager, next, jumper"
-                :total="totalInfoNumber"
-                @size-change="pageSizeChange"
-                @current-change="currentPageChange">
-            </el-pagination>
+                    </li>
+                </ul>
+        </div>
+        <div class="pagenation">   
+            <div class="pagination">
+                <el-pagination
+                    :page-sizes="[10,20,30,40,50]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="totalInfoNumber"
+                    @size-change="pageSizeChange"
+                    @current-change="currentPageChange">
+                </el-pagination>
+            </div>
         </div>
       </div>
   </div>
@@ -141,59 +144,82 @@ export default {
     queryProjectStation(){
         this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
     },
-    //事件选择器改变时间的时候触发
-    dateChange(){
-        if(this.loggerDate){
-            this.startDay = new Date(this.loggerDate[0]).toLocaleString().split(' ')[0].split('/').join('-');
-            this.endDay = new Date(this.loggerDate[1]).toLocaleString().split(' ')[0].split('/').join('-');
+    //日期选择
+    dateChange1(){
+        if(this.startDay){
+            this.startDay = new Date(this.startDay).toLocaleString().split(' ')[0].split('/').join('-'); 
         }else{
             this.startDay = '';
+        }
+        console.log(this.startDay);
+      },
+      dateChange2(){
+        if(this.endDay){
+            this.endDay = new Date(this.endDay ).toLocaleString().split(' ')[0].split('/').join('-');
+        }else{
             this.endDay = '';
         }
-    },
+        console.log(this.endDay);
+      },
   }
 }
 </script>
 <style lang="less">
     #projectStation{
+        .stationManage{
+            margin: 0 20px 0 15px;
+            
+        }
         .sTitle{
-            color: #fc343a;
-            font-size: 18px;
-            font-weight: bold;
             border-bottom:1px solid #ccc; 
-            height: 50px;
-            line-height: 50px;
-            margin: 10px 20px 0 0px ;
+            margin: 0px 20px 0 0px ;
             text-align: left;
         }
+        
         .sTitle span{
-            width: 50%;
-            margin-left: 15px;
+            display: inline-block;
+            margin: 22px 0 12px 15px;
+            color: #fc343a;
+            font-size: 18px;
+            line-height: 18px;
+            font-weight: bold;
         }
         .selectMode{
             display: flex;
-            margin: 20px 20px 0 0;
-            height: 70px;
-            border-bottom: 1px solid #e6e6e6;
+            margin: 20px 0px 0 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 30px;
         }
         .selectMode label{
-            width: 100px;
-            height: 40px;
-            line-height: 40px;
-        }
-        .block{
-            flex: 1;
             text-align: left;
+            height: 36px;
+            margin-right: 20px;
+            line-height: 36px;
+            font-size: 14px;
+            font-weight: normal;
+            color: #666;
         }
-        .btn{
-            width: 100px;
-            height: 40px;
+        // .block{
+        //     flex: 1;
+        //     text-align: left;
+        // }
+        .queryBtn{
+            width: 111px;
+            height: 36px;
             display: inline-block;
-            margin-right: 10px;
+            background: #fc3439;
+            border: none;
+            border-radius: 2px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: normal;
+            padding: 0;
+            margin-left: 20px;
+            cursor: pointer;
         }
 
         .project{
-            margin: 20px 20px 0 15px;
+            margin: 20px 0px 0 0px;
         }
         .projectList{
                 width: 100%;
@@ -299,11 +325,25 @@ export default {
         }
         .pagenation{
             text-align: right;
-            margin: 5px 20px 0 15px;
+            margin: 20px 0px 0 0px;
             height: 50px;
         }
         .el-pagination{
             padding: 0;
+        }
+        /*日期选择器*/
+        .el-date-editor{
+            height: 36px;
+            width: 146px;
+        }
+        .yi{
+            width: 13px;
+            height: 0px;
+            margin: 0 10px;
+            display: inline-block;
+            border-bottom: 1px solid #333;
+            position: relative;
+            top: -3px;
         }
     }
     
