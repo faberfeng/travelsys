@@ -635,6 +635,7 @@ export default {
     }
     .settingsCenter{
       margin-left: 26px!important;
+    
     }
     .settingsLeft h5{
         width:100%;
