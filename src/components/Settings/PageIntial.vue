@@ -80,37 +80,66 @@
             </div>
         </div>
         <!--dialog-->
-        <el-dialog title="新增竖向楼层" :visible.sync="addFloorList" @click="cancleAddFloorList">
-            <el-form label-width="150px" label-position="right" >
-                <el-form-item label="楼层名称">
-                    <el-input v-model="FloorName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="楼层标高">
-                    <el-input v-model="FloorValue"  placeholder="请输入"></el-input>
-                </el-form-item>
+        <div id="edit">
+            <!--编辑分区-->
+            <el-dialog title="编辑分区" :visible.sync="editPartition" :before-close="cancleEditPartitionList">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">区域名称 :</label><input class="inp" placeholder="请输入" v-model="partitionName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">面积 :</label><input class="inp" placeholder="请输入" v-model="Area"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeEditPartitionList">确定</button>
+                    <button class="editBtnC" @click="cancleEditPartitionList">取消</button>
+                </div>
+            </el-dialog>
+            <!--新增建筑分区-->
+            <el-dialog title="新增分区" :visible.sync="addPartition" :before-close="cancleAddPartitionList">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">区域名称 :</label><input class="inp" placeholder="请输入" v-model="partitionName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">面积 :</label><input class="inp" placeholder="请输入" v-model="Area"/></div>
+                </div>
+                <el-checkbox v-model="partitionIsDefault">作为默认分区</el-checkbox>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeAddPartitionList">确定</button>
+                    <button class="editBtnC" @click="cancleAddPartitionList">取消</button>
+                </div>
+            </el-dialog>
+            <!--新增竖向楼层-->
+            <el-dialog title="新增竖向楼层" :visible.sync="addFloorList" :before-close="cancleAddFloorList">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入" v-model="FloorValue"/></div>
+                </div>
                 <el-checkbox v-model="setAsAuto">设置为默认楼层</el-checkbox>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="makeAddFloorList">确 定</el-button>
-                <el-button @click="cancleAddFloorList">取 消</el-button>
-            </span>
-        </el-dialog>
-        <!--编辑竖向楼层-->
-        <el-dialog title="编辑竖向楼层" :visible.sync="editFloorList" @click="cancleEditFloorList">
-            <el-form label-width="150px" label-position="right" >
-                <el-form-item label="楼层名称">
-                    <el-input v-model="FloorName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="楼层标高">
-                    <el-input v-model="FloorValue"  placeholder="请输入"></el-input>
-                </el-form-item>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeAddFloorList">确定</button>
+                    <button class="editBtnC" @click="cancleAddFloorList">取消</button>
+                </div>
+            </el-dialog>
+            <!--编辑竖向楼层-->
+            <el-dialog title="编辑竖向楼层" :visible.sync="editFloorList" :before-close="cancleEditFloorList">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入" v-model="FloorValue"/></div>
+                </div>
                 <el-checkbox v-model="setAsDefault">设置为默认楼层</el-checkbox>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="makeEditFloorList">确 定</el-button>
-                <el-button @click="cancleEditFloorList">取 消</el-button>
-            </span>
-        </el-dialog>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeEditFloorList">确定</button>
+                    <button class="editBtnC" @click="cancleEditFloorList">取消</button>
+                </div>
+            </el-dialog>
+            <!--新增资源包弹窗-->
+            <el-dialog title="上传文件" :visible.sync="addpartitionShow" :before-close="addPartitionCancel">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">概要文件 :</label><span class="">企业自用办公楼4.png</span><div style="margin-left:208px;margin-top:11px;"><button class="upImgBtn">选择文件</button></div></div>
+                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择文件</button><span class="upImgText">未选择任何文件</span></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addPartitionSure">上传</button>
+                    <button class="editBtnC" @click="addPartitionCancel">取消</button>
+                </div>
+            </el-dialog>
+        </div>
         <!--删除-->
         <div id="inital">
             <el-dialog  :visible.sync="deleteFloorDialog" width="398px">
@@ -123,37 +152,6 @@
                 </div>
             </el-dialog>
         </div>
-        <!--编辑建筑分区-->
-        <el-dialog title="编辑分区" :visible.sync="editPartition" @click="cancleEditPartitionList">
-            <el-form label-width="150px" label-position="right" >
-                <el-form-item label="区域名称">
-                    <el-input v-model="partitionName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="面积">
-                    <el-input v-model="Area"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="makeEditPartitionList">确 定</el-button>
-                <el-button @click="cancleEditPartitionList">取 消</el-button>
-            </span>
-        </el-dialog>
-        <!--新增建筑分区-->
-        <el-dialog title="新增分区" :visible.sync="addPartition" @click="cancleAddPartitionList">
-            <el-form label-width="150px" label-position="right" >
-                <el-form-item label="区域名称">
-                    <el-input v-model="partitionName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="面积">
-                    <el-input v-model="Area"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <el-checkbox v-model="partitionIsDefault">作为默认分区</el-checkbox>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="makeAddPartitionList">确 定</el-button>
-                <el-button @click="cancleAddPartitionList">取 消</el-button>
-            </span>
-        </el-dialog>
         <!--删除建筑分区-->
         <div id="inital">
             <el-dialog  :visible.sync="deletePartionDialog" width="398px">
@@ -189,6 +187,7 @@ export default {
         deleteFloorDialog:false,
         setAsAuto:false,
         setAsDefault:false,
+        addpartitionShow:false,
         FloorName:'',
         FloorValue:'',
         sourceData:[{
@@ -371,8 +370,15 @@ export default {
                 }
             })
         },
+        //新增分区资源包
         addSource(){
-            console.log(345)
+            this.addpartitionShow = true;
+        },
+        addPartitionSure(){
+            this.addpartitionShow = false;
+        },
+        addPartitionCancel(){
+            this.addpartitionShow = false;
         },
         groundTableEdit(){
 
@@ -527,6 +533,12 @@ export default {
                     this.partitionName ='';
                     this.Area ='';
                     this.editPartition = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
             
@@ -563,6 +575,12 @@ export default {
                     this.partitionName ='';
                     this.Area ='';
                     this.addPartition = false;
+                }else if(response.data.cd == "-1"){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
@@ -598,7 +616,8 @@ export default {
                 }
             })
             
-        }
+        },
+        
     }
 }
 </script>
@@ -739,6 +758,13 @@ export default {
         }
         #sourceB{
             margin-top: 50px;
+        }
+        .editBodyone,.editBodytwo{
+            text-align: left;
+        }
+        .editInpText{
+            display: inline-block;
+            margin-left: 89px;
         }
         .pageTable,.sourceTable{
 

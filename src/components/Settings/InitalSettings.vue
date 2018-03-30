@@ -37,16 +37,11 @@
                     <div>
                         <img :src="item.filePath"/>
                     </div>
-                    <div class="imgBottom"><label><div class="setAsLogo"></div>封面</label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
+                    <div class="imgBottom"><label @click="setAsCover(index)"><div class="setAsLogo"></div>{{item.text}}</label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
                 </li>
-                <li class="imgLi">
-                    <div>
-                        <img src="../../assets/firstPageImage.png"/>
-                    </div>
-                    <div class="imgBottom"><label><div class="setAsLogo"></div>设为封面</label><span> <div class="bottomDelete"></div>删除</span></div>
-                </li>
+                
                 <!--上传图片-->
-                <li class="imgLi" >
+                <li class="imgLi" @click='updataCoverImg'>
                     <div class="imgD" >
                         <div class="imgDMask">
                             <div class="imgMaskD"></div>
@@ -59,43 +54,45 @@
         </div>
         <!--弹出的对话框-->
         <div id="edit">
-            <el-dialog title="新增工程概况信息" :visible.sync="addDialog">
-                <el-form >
-                    <el-form-item label="单位 :">
-                        <el-input class="inp"  v-model="projectUnity"></el-input>
-                    </el-form-item>
-                    <el-form-item label="名称 :">
-                        <el-input class="inp"  v-model="projectName"></el-input>
-                    </el-form-item>
-                </el-form>
+            <el-dialog title="新增工程概况信息" :visible.sync="addDialog" @close="addCancle">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="projectUnity"/></div>
+                    <div class="editBodytwo"><label class="editInpText">取值 :</label><input class="inp" placeholder="请输入" v-model="projectName"/></div>
+                </div>
                 <p class="err" v-show="showErr">请输入完整信息</p>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="addMakeSure">确定</el-button>
-                    <el-button @click="addDialog=false">取消</el-button>
+                    <button class="editBtnS" @click="addMakeSure">确定</button>
+                    <button class="editBtnC" @click="addCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="工程概况信息编辑" :visible.sync="editDialog">
-                <el-form >
-                    <el-form-item label="单位 :">
-                        <el-input  class="inp" v-model="projectUnity"></el-input>
-                    </el-form-item>
-                    <el-form-item label="名称 :">
-                        <el-input  class="inp" v-model="projectName"></el-input>
-                    </el-form-item>
-                </el-form>
+            <el-dialog title="工程概况信息编辑" :visible.sync="editDialog" @close="editCancle">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="projectUnity"/></div>
+                    <div class="editBodytwo"><label class="editInpText">取值 :</label><input class="inp" placeholder="请输入" v-model="projectName"/></div>
+                </div>
                 <p class="err" v-show="showErr">请输入完整信息</p>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="editMakeSure">确定</el-button>
-                    <el-button @click="editDialog=false">取消</el-button>
+                    <button class="editBtnS" @click="editMakeSure">确定</button>
+                    <button class="editBtnC" @click="editCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="图片上传" :visible.sync="upImg" @close="upImgCancle">
+                <div class="editBody">
+                    <!-- <div class="editBodyone"><label class="editInpText">概要文件 :</label>上传工程图片</div> -->
+                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择图片</button><span class="upImgText">未选择任何图片</span></div>
+                </div>
+                <p class="err" v-show="showErr">请输入完整信息</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="upImgSure">上传</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
         </div>
-        
         <div id="inital">
             <el-dialog  :visible.sync="deleteDialog" width="398px">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">你确定删除分区【西南区】?</p>
+                <p class="deleteDialogText">你确定删除【】?</p>
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
@@ -118,9 +115,11 @@ export default {
             deleteDialog:false,
             NotdeleteDialog:false,
             showErr:false,
+            upImg:false,
             checked:false,
             projectUnity:'',
             projectName:'',
+            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
             retractImg:shouqiImg,
             retractText:'收起',
             isShow:true,
@@ -133,6 +132,7 @@ export default {
             projectUseCount:'',
             projectImage:{},
             projectImageList:[],//获取工程图片列表
+            firstCoverImg:[],//封面图片
         }
     },
     created(){
@@ -206,7 +206,7 @@ export default {
                     id:this.sumaryData[this.index].id
                 }
             }).then((response)=>{
-                console.log(response);
+                //console.log(response);
                 if(response.data.cd === '0'){
                     alert('删除成功');
                 }
@@ -259,9 +259,8 @@ export default {
 
         },
         deleteImage(index){
-            console.log(index);
+            //console.log(index);
             this.projectImageList.splice(index,1);
-            //this.projectImageList[index];
             axios({
                 method:'post',
                 url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
@@ -299,6 +298,7 @@ export default {
             })
 
         },
+        //获取工程初始信息
         getProjectInitalConfig(){
             axios({
                 method:'get',
@@ -310,7 +310,7 @@ export default {
                     projId:this.projId
                 }
             }).then((response)=>{
-                console.log(response.data.rt);
+                //console.log(response.data.rt);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -322,6 +322,7 @@ export default {
                 }
             })
         },
+        //获取工程图片
         getProjectImageList(){
             axios({
                 method:'get',
@@ -333,15 +334,73 @@ export default {
                     projectId:this.projId
                 }
             }).then((response)=>{
-                console.log(response.data.rt);
-                if(response.data.cd === '1'){
+                console.log(response.data);
+                if(response.data.cd == '0'){
+                    this.projectImageList = response.data.rt;
+                    this.projectImageList.forEach((item,index,arr)=>{
+                        if(item.imgType == '2'){
+                            arr[index].text = '设为封面';
+                        }else{
+                            arr[index].text = '封面'
+                        }
+                    })
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
                     this.$router.push({
                         path:'/login'
                     })
-                }else{
-                    this.projectImageList = response.data.rt;
                 }
             })
+        },
+        //设为封面
+        setAsCover(number){
+            axios({
+                method:'post',
+                url:this.baseUrl+'setProjectCover',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    fileId:this.projectImageList[number].id
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    alert('设置成功')
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }).then(()=>{
+                this.getProjectImageList();
+            })
+        },
+        //上传图片
+        updataCoverImg(){
+            console.log(123);
+            this.upImg = true;
+        },
+        upImgSure(){
+            this.upImg = false;
+        },
+        upImgCancle(){
+            this.upImg = false;
+        },
+        //弹窗关闭
+        addCancle(){
+            this.addDialog = false;
+            this.projectUnity = '';
+            this.projectName ='';
+        },
+        editCancle(){
+            this.editDialog = false;
+            this.projectUnity = '';
+            this.projectName ='';
         }
     }
 }
@@ -352,18 +411,18 @@ export default {
         width: 100%;
     }
     .title{
-        color: #fc343a;
-        font-size: 18px;
         font-weight: bold;
         border-bottom:1px solid #ccc; 
-        height: 50px;
-        line-height: 50px;
-        margin: 10px 20px 0 0px ;
+        margin: 0px 20px 0 0px ;
         text-align: left;
     }
     .title span{
-        width: 50%;
+        display: inline-block;
         margin-left: 15px;
+        color: #fc343a;
+        font-size: 18px;
+        line-height: 18px;
+        margin: 22px 0 11px 15px;
     }
     .account,.summary,.img{
         /* width:97%; */
@@ -662,5 +721,5 @@ export default {
         font-weight: normal;
         margin: 10px 0 0 0;
     }
-    
+   
 </style>

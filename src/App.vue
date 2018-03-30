@@ -54,10 +54,6 @@ export default {
 .el-submenu__icon-arrow .el-icon-arrow-down{
   color: black;
 }
-/*穿梭框样式*/
-.el-transfer-panel__item .el-checkbox__input{
-  left: 70px;
-}
 /*弹框信息*/
 #inital .el-dialog__header{
   padding:0;
@@ -103,20 +99,21 @@ export default {
   color: #666;
   background: #e6e6e6;
 }
-
+#edit .el-dialog{
+  width: 660px !important;
+}
 #edit .el-dialog__header{
   height: 68px;
   padding:0;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 2px solid #e6e6e6;
   text-align: left;
 }
 #edit  .el-dialog__title{
   color:#fc3439;
   font-size: 18px;
+  line-height:18px; 
   font-weight: bold;
   font-family: 'MicrosoftYaHei';
-  width: 150px;
-  height: 26px;
   display: inline-block;
   margin: 34px 0 15px 30px;
 }
@@ -125,9 +122,8 @@ export default {
   right: 10px;
 }
 #edit .el-dialog__body{
-  padding: 40px 20px 30px 20px;
-  width: 70%;
-  margin: 0 auto;
+  padding: 0;
+  margin-top:40px;
 }
 #edit .el-form-item{
   margin: 0 20px auto;
@@ -141,7 +137,10 @@ export default {
   width: 388px;
   height: 30px;
 }
-
+#edit .el-dialog__footer{
+  padding: 0;
+  margin: 30px 0 40px 0;
+}
 
 
 .el-form-item{
@@ -220,9 +219,6 @@ export default {
 .el-submenu__title:focus{
   background-color:#7a818a;
 }
-/* .el-submenu__title:hover{
-  background-color:inherit;
-}  */
 /*日期选择器*/
 .el-date-editor{
     height: 36px;
@@ -234,5 +230,86 @@ export default {
   .el-input__prefix{
       top: -2px;
   }
-
+  #in .el-checkbox__inner{
+      width: 12px;
+      height: 12px;
+      position: relative;
+      top: -1px;
+  }
+  #in .el-checkbox__label{
+      font-size: 12px;
+      font-weight: normal;
+  }
+   /*编辑弹框*/
+    #edit .editBody{
+        margin: 0 auto;
+    }
+    #edit .editBodytwo{
+        margin-top: 20px;
+    }
+    #edit .editInpText{
+        color: #666;
+        font-size: 14px;
+        line-height: 14px;
+        font-weight: normal;
+        display: inline-block;
+        margin-right: 20px;
+        width: 15%;
+        text-align: right;
+    }
+    #edit .inp{
+        width: 388px;
+        height: 30px;
+        border: 1px solid #d1d1d1;
+        border-radius: 2px;
+        background: #fafafa;
+        padding-left: 10px;
+    }
+    #edit .inp::-webkit-input-placeholder,#edit .inp::-ms-input-placeholder,#edit .inp::-moz-input-placeholder{
+        color: #b3b3b3;
+    }
+    #edit .editBtnS,#edit .editBtnC{
+        width: 111px;
+        height: 36px;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    #edit .editBtnS{
+        background: #fc3439;
+        margin-right: 20px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: normal;
+    }
+    #edit .editBtnS:hover{
+        background: #ff5257;
+    }
+    #edit .editBtnC{
+        color: #666;
+        background: #fff;
+        border: 1px solid #ccc;
+    }
+    #edit .editBtnC:hover{
+        background: #e6e6e6;
+        color: #666;
+    }
+    #edit .upImgBtn{
+        width: 98px;
+        height: 26px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        background: #f9f9f9;
+        font-size: 14px;
+        font-weight: normal;
+        color: #666;;
+    }
+    #edit .upImgText{
+        font-size:14px;
+        line-height: 14px;
+        display: inline-block;
+        margin-left: 10px;
+        font-weight: normal;
+        color: #999;
+    }
 </style>

@@ -3,7 +3,7 @@
       <h4 class="sTitle"><span>数据传递标准预览</span></h4>
       <div class="dataTransform">
           <div class="dataCollectAnalysis">
-              <!-- <h5 class="title"><i class="el-icon-document"></i>标准汇总分析<span class="imp"><i class="el-icon-document"></i>导入标准</span><span class="imp"><i class="el-icon-document"></i>导出标准</span></h5> -->
+              
              <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform1.png"/>标准汇总分析<span class="import"><span></span>导入标准</span><span class="export"><span></span>导出标准</span></h5>
               <div class="dataTransformTable">
                   <el-table border style="width:100%;" >
@@ -16,7 +16,6 @@
               </div>
           </div>
           <div class="dataTransAnalysis">
-              <!-- <h5 class="title"><i class="el-icon-document"></i>数据传递分析</h5> -->
               <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform2.png"/>工程概况</h5>
               <div class="dataTransAnalysisImg">
                 <div class="pro"><el-progress type="circle" :percentage="0"></el-progress><p>构建总量</p></div>
@@ -117,6 +116,8 @@ export default {
         color: #666;
         font-weight: normal;
         cursor: pointer;
+        font-size: 14px;
+        font-weight: normal;
     }
     .import:hover,.export:hover{
         color: #fc3439;

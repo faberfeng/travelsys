@@ -77,7 +77,7 @@
             </div>
         </div>
         <div class="groundSource groundTitle">
-           <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
+           <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addSource" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="groundSourceData" style="width:100%">
                     <el-table-column prop="groundIndex" label="序号"></el-table-column>
@@ -102,86 +102,45 @@
                 
             </div>
         </div>
-      </div>
-      <!--dialog-->
-      <el-dialog class="openDialog" title="新增单体列表" :visible.sync="addListShow" :before-close="listClose">
-            <el-form label-width="150px" label-position="right">
-                <!-- <el-form-item label="序号">
-                    <el-input v-model="addListindex"  placeholder="请输入"></el-input>
-                </el-form-item> -->
-                <el-form-item label="单体名称">
-                    <el-input v-model="addListname" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="轴网基点坐标">
-                    <el-input v-model="addListcoordinate"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="首层相对高度">
-                    <el-input v-model="addListhigh"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="轴网转角">
-                    <el-input v-model="addListangle"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="addListSure">确 定</el-button>
-                <el-button @click="listClose">取 消</el-button>
-            </span>
-        </el-dialog> 
-        <el-dialog title="修改单体列表" :visible.sync="editListShow" @click="listClose">
-            <el-form label-width="150px" label-position="right" >
-                <!-- <el-form-item label="序号">
-                    <el-input v-model="addListindex"  placeholder="请输入"></el-input>
-                </el-form-item> -->
-                <el-form-item label="单体名称">
-                    <el-input v-model="addListname" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="轴网基点坐标">
-                    <el-input v-model="addListcoordinate"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="首层相对高度">
-                    <el-input v-model="addListhigh"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="轴网转角">
-                    <el-input v-model="addListangle"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="editListSure">确 定</el-button>
-                <el-button @click="listClose">取 消</el-button>
-            </span>
-        </el-dialog>
-        <el-dialog title="新增场地资源包" :visible.sync="addgroundShow" :before-close="groundClose">
-            <el-form label-width="150px" label-position="right">
-                <el-form-item label="序号">
-                    <el-input v-model="groundIndex"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源包名称">
-                    <el-input v-model="groundName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源类型">
-                    <el-input v-model="groundCategroy"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源名称">
-                    <el-input v-model="groundSourceName"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源包大小">
-                    <el-input v-model="groundSourceSize"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="版本">
-                    <el-input v-model="groundVersion"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="groundRemark"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="当时状态">
-                    <el-input v-model="groundState"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="addGroundSure">确 定</el-button>
-                <el-button @click="groundClose">取 消</el-button>
-            </span>
-        </el-dialog>
+        </div>
+        <!--dialog-->
+        <div id="edit">
+            <el-dialog title="新增单体列表" :visible.sync="addListShow" :before-close="listClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入" v-model="addListcoordinate"/></div>
+                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入" v-model="addListhigh"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入" v-model="addListangle"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addListSure">确定</button>
+                    <button class="editBtnC" @click="listClose">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="修改单体列表" :visible.sync="editListShow" :before-close="listClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入" v-model="addListcoordinate"/></div>
+                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入" v-model="addListhigh"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入" v-model="addListangle"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editListSure">确定</button>
+                    <button class="editBtnC" @click="listClose">取消</button>
+                </div>
+            </el-dialog>
+            <!--新增资源包弹窗-->
+            <el-dialog title="上传文件" :visible.sync="addgroundShow" :before-close="groundClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">概要文件 :</label><span class="">企业自用办公楼4.png</span><div style="margin-left:208px;margin-top:11px;"><button class="upImgBtn">选择文件</button></div></div>
+                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择文件</button><span class="upImgText">未选择任何文件</span></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addGroundSure">上传</button>
+                    <button class="editBtnC" @click="groundClose">取消</button>
+                </div>
+            </el-dialog>
+        </div>
         <el-dialog title="修改场地资源包" :visible.sync="editgroundShow" :before-close="groundClose">
             <el-form label-width="150px" label-position="right">
                 <el-form-item label="序号">
@@ -745,6 +704,10 @@ export default {
                     })
                 }
             })
+        },
+        //新增资源包
+        addSource(){
+            this.addgroundShow = true;
         }
 
     }
@@ -1052,6 +1015,14 @@ export default {
         }
         .icon-X input,.icon-Y input,.icon-Z input,{
             padding-left: 32px;
+        }
+        .editBodyone,.editBodytwo{
+            text-align: left;
+        }
+        .editInpText{
+            display: inline-block;
+            margin-left: 89px;
+
         }
     }
     .el-tooltip__popper{
