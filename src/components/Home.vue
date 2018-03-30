@@ -631,10 +631,11 @@ export default {
     .settingsRight{
         display: block;
         margin-left: 219px;
-        margin-top: 149px;
+        margin-top: 116px;
     }
     .settingsCenter{
       margin-left: 26px!important;
+    
     }
     .settingsLeft h5{
         width:100%;
