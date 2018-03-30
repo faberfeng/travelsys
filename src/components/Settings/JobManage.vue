@@ -398,6 +398,9 @@ export default {
       },
        'pageDetial.pagePerNum':function(newVal,old){//多重属性用''阔起
           this.getInfo()
+      },
+       'pageDetial.currentPage':function(newVal,old){//多重属性用''阔起
+          this.getInfo()
       }
   },
   created(){
@@ -410,25 +413,26 @@ export default {
   methods:{
         changePage(val){//分页 0 -1 1 2
             var vm = this 
-            if(vm.pageDetial.pagePerNum == 1 && (val == 0 || val == -1)){
+            console.log(val)
+            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
                 vm.$message('这已经是第一页!')
                 return false
-            }else if(vm.pageDetial.pagePerNum == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+            }else if(vm.pageDetial.currentPage == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
                 vm.$message('这已经是最后一页!')
                 return false
             }else{
                 switch(val){
                     case 0:
-                         vm.pageDetial.pagePerNum = 1
+                         vm.pageDetial.currentPage = 1
                         break;
                     case -1:
-                         vm.pageDetial.pagePerNum--
+                         vm.pageDetial.currentPage--
                         break;
                     case 1:
-                         vm.pageDetial.pagePerNum++
+                         vm.pageDetial.currentPage++
                         break;
                     case 2:
-                         vm.pageDetial.pagePerNum = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                         vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
                         break;
                 }
             }
@@ -634,8 +638,7 @@ export default {
         color: #fc343a;
         font-size: 18px;
         font-weight: bold;
-        width: 95%;
-        border-bottom:1px solid #ccc; 
+        border-bottom:2px solid #ccc; 
         height: 50px;
         line-height: 50px;
         padding:0px 15px;
