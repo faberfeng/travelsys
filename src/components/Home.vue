@@ -631,7 +631,7 @@ export default {
     .settingsRight{
         display: block;
         margin-left: 219px;
-        margin-top: 116px;
+        margin-top: 149px;
     }
     .settingsCenter{
       margin-left: 26px!important;

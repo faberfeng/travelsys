@@ -332,6 +332,7 @@ export default {
 <style lang="less">
     #home_project{
         margin-right: 20px;
+        margin-left: 20px;
         .font-color1{
             color: #333;
             font-size: 14px;
