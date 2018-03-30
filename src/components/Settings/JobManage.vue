@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" id="jobPage">
       <h4 class="title">岗位11管理</h4>
       <div class="usermanage">
           <h5 class="subtitle">用户列表
@@ -14,140 +14,141 @@
                   <span @click="addUser" class="btn">添加</span>
              </span>
           </h5>
-          <table class="UserList" border="1" width='100%'>
-              <thead>
-                  <tr  class="userList-thead">
-                    <th width="18%">岗位名称</th>
-                    <th width="18%">岗位类型</th>
-                    <th width="50%">授权的功能模块</th>
-                    <th width="14%;">操作 </th>
-                  </tr>
-              </thead>
-              <tbody>
-                   <tr v-for="(val,index) in jobList" :key="index">
-                        <td v-text="val.posName"></td>
-                         <td v-text="val.posTypeName"></td>
-                         <td v-text="val.posAuthNameList"></td>
-                         <td>
-                             <!--
-                                 if(rowData.posType == 0 || (rowData.posName == '工程管理员' && rowData.posTypeName == '工程内岗位'))
-				return '-';
-			if(rowData.posName == '默认岗位' && rowData.posTypeName == '合作方岗位')
-				return '<a href="javascript:void(0)" onclick="editPosition('+ rowData.id +')">编辑</a>';
-
-			return '<a href="javascript:void(0)" onclick="editPosition('+ rowData.id +')">编辑</a>&nbsp; &nbsp;'
-			     +'<a href="javascript:void(0)" onclick="deleteRow('+ rowIndex +')">删除</a> ';
-                             -->
-                              <el-button v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))" class="editIcon" @click="editUser"  type="text" size="small"><i class="el-icon-edit-outline"></i></el-button>
-                              <el-button v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" class="deleteIcon" @click.native.prevent="deleteRow(scope.$index, userList)" type="text" size="small"><i class="el-icon-delete"></i></el-button>
-                         </td>
+          <div style="padding:0 20px;box-sizing: border-box;">
+            <table class="UserList" border="1" width='100%'>
+                <thead>
+                    <tr  class="userList-thead">
+                        <th width="18%">岗位名称</th>
+                        <th width="18%">岗位类型</th>
+                        <th width="50%">授权的功能模块</th>
+                        <th width="14%;">操作 </th>
                     </tr>
-              </tbody>
-          </table>
-          <div class="pagination">
-                <el-pagination
-                :page-sizes="[10, 20, 30, 40]"
-                :page-size="100"
-                 layout="total, sizes, prev, pager, next, jumper"
-                :total="199">
-                </el-pagination>
+                </thead>
+                <tbody>
+                    <tr v-for="(val,index) in jobList" :key="index">
+                            <td v-text="val.posName"></td>
+                            <td v-text="val.posTypeName"></td>
+                            <td v-text="val.posAuthNameList"></td>
+                            <td>
+                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))"
+                                 class="editIcon" @click="addUser(val.posType,val.posName,val.id)"></span>
+                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" 
+                                class="deleteIcon" @click="deleteJob(val.id)"></span>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+           </div>
+           <div class="datagrid-pager pagination">
+               <table cellspacing="0" cellpadding="0" border="0">
+                   <tbody>
+                       <tr>
+                           <td>
+                               <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
+                               <option value="10">10</option>
+                               <option value="20">20</option>
+                               <option value="30">30</option>
+                               <option value="40">40</option>
+                               <option value="50">50</option>
+                               </select>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-left:5px;">第</span>
+                            </td>
+                            <td>
+                                  <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-right:5px;">共2页</span>
+                            </td>
+                            <td>
+                                 <div class="pagination-btn-separator"></div>
+                            </td>
+                             <td>
+                                <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <a href="javascript:void(0)" @click="this.getInfo" class="btn-refresh btn-TAB"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
+                <div style="clear:both;"></div>
             </div>
       </div>
-        <el-dialog class="openDialog" title="添加用户" :visible.sync="adduser" :before-close="userClose">
-            <div>
-                <div>
-                    <span>岗位名称</span>
-                    <input type="text" v-model="jobDetial.posName" placeholder="请输入">
-                </div>
-                 <div>
-                    <span @click="this.jobDetial.posType = 1">工程内岗位 </span>
-                    <span @click="this.jobDetial.posType = 2">合作方岗位 </span>
-                </div>
-                <div>
-                    <span>岗位权限</span>
-                    <!--树形图-->
-                    <el-tree
-                    :data="jobTree"
-                    show-checkbox
-                    default-expand-all
-                    node-key="id"
-                    ref="tree"
-                    highlight-current
-                    :props="defaultProps">
-                    </el-tree>
-                </div>
+        <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
+            <div class="log-head clearfix">
+                <span class="log-head-title">岗位名称:</span>
+                 <el-radio v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
+                <el-radio v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
+            </div>
+            <div  class="JobName">
+                <input type="text" v-model="jobDetial.posName" placeholder="请输入">
+            </div>
+            <div  class="log-body clearfix">
+                <span class="log-head-title">岗位权限:</span>
+                <!--树形图-->
+                <el-tree
+                :data="jobTree"
+                show-checkbox
+                node-key="authCode"
+                :default-expanded-keys="jobTree_opend"
+                :default-checked-keys="jobTree_checked"
+                ref="tree_job"
+                highlight-current
+                :props="defaultProps">
+                </el-tree>
             </div>
             <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="addUserSure">保存</el-button>
+                <el-button type="primary" @click="PostaddUser">保存</el-button>
                 <el-button @click="userClose">取 消</el-button>
-            </span>
-        </el-dialog> 
-        <el-dialog class="openDialog" title="添加用户" :visible.sync="edituser" :before-close="editClose">
-            <div class="userMiddle">
-                <div class="userMiddleLeft">   
-                    用户信息
-                </div>
-                <div class="userMiddleRight">
-                    <img class="img" />
-                     <ul>
-                        <li><label>姓名:</label>王自强</li>
-                        <li><label>账号:</label>wzq01</li>
-                        <li><label>邮箱:</label>xxxxxx@qq.com</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="userBottom">
-                <div class="userBottomLeft">   
-                    指定岗位
-                </div>
-                <div class="userBottomRight">
-                    <p><el-checkbox v-model="checked" style="color:black">工程管理员</el-checkbox></p>
-                    <ul>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-                        <li><el-checkbox v-model="checked">工程管理员</el-checkbox></li>
-
-                    </ul>
-                </div>
-            </div>
-
-            <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="editUserSure">保存</el-button>
-                <el-button @click="editClose">取 消</el-button>
             </span>
         </el-dialog> 
   </div>
 </template>
 
-<style scoped lang='less'>
-.UserList{
-    margin:0 20px;
-    border-collapse: collapse;
-    border: 1px solid #e6e6e6;
-    thead{
-        background: #f2f2f2;
-        th{
-            padding-left: 10px;
-            height: 52px;
-            text-align: left;
-            box-sizing: border-box;
-            border-right: 1px solid #e6e6e6;
-            font-size: 12px;
-            color: #333333;
-        }
+<style  lang='less'>
+#jobPage{
+    .editIcon{
+        float: left;
+        width: 17px;
+        height: 16px;
+        background: url('../../assets/edit.png')no-repeat 0 0;
+        cursor: pointer;
+        margin-right: 20px;
     }
-    tbody{
-        tr{
-            td{
+    .deleteIcon{
+        float: left;
+        width: 16px;
+        height: 16px;
+        background: url('../../assets/delete.png')no-repeat 0 0;
+        cursor: pointer;
+    }
+    .UserList{
+        border-collapse: collapse;
+        border: 1px solid #e6e6e6;
+        thead{
+            background: #f2f2f2;
+            th{
                 padding-left: 10px;
                 height: 52px;
                 text-align: left;
@@ -156,21 +157,199 @@
                 font-size: 12px;
                 color: #333333;
             }
-             &:hover{
-                background: #fafafa;
+        }
+        tbody{
+            tr{
+                td{
+                    padding-left: 10px;
+                    height: 52px;
+                    text-align: left;
+                    box-sizing: border-box;
+                    border-right: 1px solid #e6e6e6;
+                    font-size: 12px;
+                    color: #333333;
+                }
+                &:hover{
+                    background: #fafafa;
+                }
             }
         }
     }
-}
- .pagination{
-    width: 100%;
-    text-align: right;
-    margin-top: 10px;
-    margin-right: 20px;
-}
-.el-pagination{
-    padding:0;
-    // margin-right: 20px;
+    .pagination{
+        width: 100%;
+        text-align: right;
+        margin-top: 10px;
+        margin-right: 20px;
+    }
+    .el-pagination{
+        padding:0;
+        // margin-right: 20px;
+    }
+    .el-dialog{
+        width: 586px;
+        .el-dialog__header{
+            padding: 34px 0 17px 30px;
+            text-align: left;
+            border-bottom: 1px solid #cccccc;
+            .el-dialog__title{
+                font-size: 20px;
+            color: #fc3439;
+            line-height: 20px;
+            font-weight: bold;
+            }
+            .el-dialog__headerbtn{
+                top: 10px;
+                right: 10px;
+            }
+        }
+        .el-dialog__body{
+            padding: 22px 45px 20px;
+            .log-head{
+                margin-bottom: 7px;
+                .log-head-title{
+                    width: 80px;
+                    font-size: 14px;
+                    color: #333333;
+                    line-height: 14px;
+                    font-weight: bold;
+                    float: left;
+                }
+                .el-radio{
+                    float: left;
+                    span{
+                        color: #666666;
+                    }
+                }
+            }
+            .JobName{
+                display: block;
+                padding-left: 80px;
+                box-sizing: border-box;
+                input{
+                    display: block;
+                    width: 100%;
+                    height: 32px;
+                    padding: 0 10px;
+                    box-sizing: border-box;
+                     border-radius: 2px;
+                    border:1px solid #e0e0e0;
+                    background: #fafafa; 
+                }
+            }
+            .log-body{
+                margin-top: 20px;
+                .log-head-title{
+                     width: 80px;
+                    font-size: 14px;
+                    color: #333333;
+                    line-height: 14px;
+                    font-weight: bold;
+                    float: left;
+                }
+                .el-tree{
+                    float: left;
+                    width: 414px;
+                    height: 278px;
+                    overflow: auto;
+                    padding: 5px;
+                    box-sizing: border-box;
+                    border:1px solid #e0e0e0;
+                }
+            }
+            .el-dialog__footer{
+                padding: 0 0 20px;
+            }
+        }
+
+    }
+    .clearfix{
+        clear: both;
+        overflow: hidden;
+        content: '';
+    }
+    /**********一下是分页器的样式***************/
+    .datagrid-pager {
+        display: block;
+        margin: 0 20px;
+        height: 31px;
+        width: auto;
+        border:1px solid #d4d4d4;
+        // padding: 3px 4px;
+        box-sizing: border-box;
+        background: #f5f5f5;
+    }
+    .pagination table {
+        float: left;
+        height: 30px;
+        th, td {
+            min-width: 5px;
+            padding: 0px;
+            margin: 0px;
+        }
+    }
+    .pagination-page-list {
+        margin: 0px 6px;
+        padding: 1px 2px;
+        width: 43px;
+        height: auto;
+        border-width: 1px;
+        border-style: solid;
+    }
+    .pagination .pagination-num {
+        border-color: #D4D4D4;
+        margin: 0 2px;
+        width: 30px;
+    }
+    .pagination-btn-separator {
+        float: left;
+        height: 24px;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #fff;
+        margin: 3px 1px;
+    }
+    .btn-TAB{
+        display: block;
+        width:26px;
+        height: 26px;
+        cursor: pointer;
+        position: relative;
+        &:hover{
+             box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+        &::after{
+            display: block;
+            position: absolute;
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-size: 100% 100%; 
+            top: 8px;
+            left: 8px;
+        }
+    }
+    .btn-left0::after{
+        background-image: url('../../assets/fenye2.png');
+    }
+    .btn-left1::after{
+        background-image: url('../../assets/fenye1.png');
+    }
+    .btn-right0::after{
+        background-image: url('../../assets/fenye4.png');
+    }
+    .btn-right1::after{
+        background-image: url('../../assets/fenye3.png');
+    }
+    .btn-refresh::after{
+        background-image: url('../../assets/fenye5.png');
+    }
+    .pagination-title{
+        font-size: 14px;
+        color: #333333;
+    }
+    .pagination-info{
+        margin-top: 5px;
+    }
 }
 </style>
 
@@ -183,10 +362,12 @@ export default {
   name:'',
   data(){
       return {
+          title:'增加岗位',
           jobList:[],//岗位列表
-          jobTotalNum:0,//最大岗位数
           posType:'',//岗位类型
           jobTree:[],
+          jobTree_checked:[],
+          jobTree_opend:[],
           defaultProps: {
             children: 'undefined',
             label: 'authName'
@@ -196,15 +377,17 @@ export default {
           radio: 'email',
           checked:false,
           projId:'',
+          jobID:0,
           jobDetial:{
             authCodes: [],
             posId: '',
             posName: "",
-            posType: 1
+            posType: '1'
           },
           pageDetial:{
-              pagePerNum:10,
-              currentPage:1,
+              pagePerNum:10,//一页几份数据
+              currentPage:1,//初始查询页数 第一页
+              total:'',//所有数据
           },
           token:''
       }
@@ -212,29 +395,48 @@ export default {
   watch:{
       posType:function(newVal,old){
           this.getInfo()
+      },
+       'pageDetial.pagePerNum':function(newVal,old){//多重属性用''阔起
+          this.getInfo()
       }
   },
   created(){
       var vm = this
-      vm.projId = localStorage.getItem('projId')
+      vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')
       vm.intoJobManager()
       vm.getJobShuXingTu()
   },
   methods:{
+        changePage(val){//分页 0 -1 1 2
+            var vm = this 
+            if(vm.pageDetial.pagePerNum == 1 && (val == 0 || val == -1)){
+                vm.$message('这已经是第一页!')
+                return false
+            }else if(vm.pageDetial.pagePerNum == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                vm.$message('这已经是最后一页!')
+                return false
+            }else{
+                switch(val){
+                    case 0:
+                         vm.pageDetial.pagePerNum = 1
+                        break;
+                    case -1:
+                         vm.pageDetial.pagePerNum--
+                        break;
+                    case 1:
+                         vm.pageDetial.pagePerNum++
+                        break;
+                    case 2:
+                         vm.pageDetial.pagePerNum = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                        break;
+                }
+            }
+
+        },
         getJobShuXingTu(){
             var vm = this
             var setting = {
-                view: {
-                    dblClickExpand: false,
-                    showLine: true,
-                    selectedMulti: false
-                },
-                check: {
-                    enable: true,
-                    chkStyle: "checkbox",
-                    chkboxType: { "Y": "ps", "N": "s" }
-                },
                 data: {
                     key:{
                         name: "authName"
@@ -254,12 +456,26 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    pId:vm.projId
+                    pId:vm.jobID
                 }
             }).then((response)=>{
-                // console.log(response)
-               vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
-                 console.log(vm.jobTree)
+                console.log(response)
+                if(response.data.rt){
+                    var jobTree_checked = [],jobTree_opend = []
+
+                    for(var i =0;i<response.data.rt.length;i++){
+                        if(response.data.rt[i].flag){
+                            jobTree_checked.push(response.data.rt[i].authCode)
+                        }
+                        if(response.data.rt[i].open){
+                             jobTree_opend.push(response.data.rt[i].authCode)
+                        }
+                    }
+                    vm.jobTree_checked = jobTree_checked,
+                    vm.jobTree_opend = jobTree_opend,
+                    vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
+                    console.log(vm.jobTree)
+                }
             }).catch((err)=>{
                 console.log(err)
             })
@@ -298,7 +514,7 @@ export default {
                 }
             }).then((response)=>{
                 vm.jobList = response.data.rt.gridDataJson.rows
-                vm.jobTotalNum = response.data.rt.gridDataJson.total
+                vm.pageDetial.total = response.data.rt.gridDataJson.total
             }).catch((err)=>{
                 console.log(err)
             })
@@ -306,24 +522,79 @@ export default {
         deleteRow(index, rows) {
             rows.splice(index, 1);
         },
-        addUser(){
+        addUser(type,name,val){
             var vm = this
             vm.adduser = true;
+            if(val){
+                vm.jobDetial.posName = name;
+                vm.jobDetial.posType = ''+type;
+                vm.jobID = parseInt(val)
+                vm.getJobShuXingTu()//获取某val的权限
+            }
         },
         userClose(){
-            this.adduser = false;
+            var vm = this
+            //清空数据
+            vm.jobDetial.posName = '';
+            vm.jobDetial.posType = '1';
+            vm.adduser = false;
+            vm.getJobShuXingTu()
         },
-        addUserSure(){
-            this.adduser = false;
+        PostaddUser(){
+             var vm = this
+            var checkCode = vm.$refs.tree_job.getCheckedKeys();
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    authCodes:checkCode,
+                    posId: vm.jobID,
+                    posName: vm.jobDetial.posName,
+                    posType: vm.jobDetial.posType,
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.adduser = false;
+                    vm.getInfo()
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
         },
-        editUser(){
-            this.edituser = true;
-        },
-        editUserSure(){
-            this.edituser = false;
-        },
-        editClose(){
-            this.edituser = false;
+        deleteJob(key){
+            var vm = this
+            vm.$confirm('您要删除当前所选记录吗？', '请确认', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delProjectPosition',
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:[key]
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                            vm.getInfo()
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+            }).catch(() => {
+            vm.$message({
+                type: 'info',
+                message: '已取消删除'
+            });          
+            });
         }
   }
 }
@@ -344,9 +615,8 @@ export default {
     :-ms-input-placeholder { /* Internet Explorer 10+ */
         color:    #999999;
     }
-    select {  
+    select.inp-search {  
     /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-    border: solid 1px #000;  
     /*很关键：将默认的select选择框样式清除*/  
     appearance:none;  
     -moz-appearance:none;  
