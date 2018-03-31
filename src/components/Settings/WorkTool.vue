@@ -1,10 +1,11 @@
 <template>
   <div class="wrapper">
-      <h4 class="title">作业工具分类编码</h4>
-      <div class="worktool">
-        <h5 class="worktooltitle">分类编码 <span class="worktoolicon"><el-button class="btn" type="primary"><i class="el-icon-plus"></i>添加</el-button></span></h5>
+      <h4 class="title"><span>作业工具分类编码</span></h4>
+      <div class="manageWorktool">
+        <span class="worktooltitle">分类编码</span>
+        <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-            <el-table border :data="tableData5" style="width:95%"> 
+            <el-table border :data="tableData5" style="width:100%"> 
                 <el-table-column  type="expand" >
                     <template slot-scope="props">
                         <el-table border  :data="tableData5" style="width:100%">
@@ -49,7 +50,7 @@
                 </el-table-column>
             </el-table>
         </div>
-      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -80,32 +81,52 @@ export default {
         width: 100%;
     }
     .title{
+        border-bottom:1px solid #ccc; 
+        margin: 0 ;
+        text-align: left;
+    }
+    .title span{
+        display: inline-block;
+        margin-left: 15px;
         color: #fc343a;
         font-size: 18px;
+        line-height: 18px;
         font-weight: bold;
-        width: 95%;
-        border-bottom:1px solid #ccc; 
-        height: 50px;
-        line-height: 50px;
-        padding:0px 15px;
-        margin: 10px 0 0 0 ;
+        margin: 22px 0 12px 15px;
+    }
+    .manageWorktool{
+        margin: 0 20px 0 15px;
         text-align: left;
     }
     .worktooltitle{
-        color: red;
-        width: 100%;
-        height: 50px;
-        line-height: 50px;
+        color:#fc3439;
+        display: inline-block;
+        width: 50%;
         text-align: left;
-        padding:10px 0px;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: bold;
         margin: 0;
+        text-align: left;
+        margin: 30px 0 20px;
     }   
-    .worktoolicon{
+    .btn{
+        width: 96px;
+        height: 32px;
+        border: none;
+        border-radius: 2px;
         float: right;
-        width: 20%;
+        margin: 22px 0 12px 0;
+        cursor: pointer;
+        background: #fc3439;
+        color: #fff;
+        font-size: 14px;
+        font-weight: normal;
     }
-    .worktable{
-        width: 100%;
-
+    .btn:hover{
+        background: #ff5257
+    }
+    .btn i{
+        margin-right: 10px;
     }
 </style>
