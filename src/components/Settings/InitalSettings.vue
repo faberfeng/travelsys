@@ -17,7 +17,7 @@
                         <div class="imgDiv" @click="updataNewImage">
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
                             <img :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/></div>
-                        <div style="margin:0;"><el-checkbox size="small" style="margin:0;width:115px;font-size:12px;" v-model="checked">使用默认logo</el-checkbox> <label style="margin-left:
+                        <div style="margin:0;"><el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> <label style="margin-left:
                         -10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
                     </div>
                 </li>
@@ -78,8 +78,13 @@
             </el-dialog>
             <el-dialog title="图片上传" :visible.sync="upImg" @close="upImgCancle">
                 <div class="editBody">
-                    <!-- <div class="editBodyone"><label class="editInpText">概要文件 :</label>上传工程图片</div> -->
-                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择图片</button><span class="upImgText">未选择任何图片</span></div>
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传图片 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectImg" class="upImgBtn">选择图片</button>
+                            <input class="upInput"  type="file" accept="image/*" @change="fileChanged" ref="file" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
                 </div>
                 <p class="err" v-show="showErr">请输入完整信息</p>
                 <div slot="footer" class="dialog-footer">
@@ -116,13 +121,16 @@ export default {
             NotdeleteDialog:false,
             showErr:false,
             upImg:false,
-            checked:false,
+            isAsdefault:false,
             projectUnity:'',
             projectName:'',
             baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
             retractImg:shouqiImg,
             retractText:'收起',
             isShow:true,
+            imageName:'未选择任何图片',
+            imageType:'',
+            filesList:{},
             token:'',
             projId:'',
             sumaryData:[],//工程概况信息列表
@@ -133,6 +141,12 @@ export default {
             projectImage:{},
             projectImageList:[],//获取工程图片列表
             firstCoverImg:[],//封面图片
+            header:{
+                 userName:'',
+                 userId:'', 
+                 projectName:'华建Q系列工程协同应用系统',
+                 projectImg:'',
+            }, 
         }
     },
     created(){
@@ -243,8 +257,10 @@ export default {
                 this.showErr = true;
             }
         },
+        //上传新logo
         updataNewImage(){
-            console.log(123)
+            this.imageType = 1;
+            this.upImg =true;
         },
         retract(){
             if(this.retractImg === shouqiImg){
@@ -259,8 +275,8 @@ export default {
 
         },
         deleteImage(index){
-            //console.log(index);
-            this.projectImageList.splice(index,1);
+            console.log(index);
+            console.log(this.projectImageList[index].id)
             axios({
                 method:'post',
                 url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
@@ -273,8 +289,15 @@ export default {
                     fileId:this.projectImageList[index].fileId,
                 }
             }).then((response)=>{
-                if(response.data.cd==='0'){
+                if(response.data.cd == '0'){
+                    this.projectImageList.splice(index,1);
                     alert('删除成功');
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.cd)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
@@ -310,7 +333,7 @@ export default {
                     projId:this.projId
                 }
             }).then((response)=>{
-                //console.log(response.data.rt);
+                console.log(response.data.rt);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -382,14 +405,92 @@ export default {
         },
         //上传图片
         updataCoverImg(){
-            console.log(123);
             this.upImg = true;
+            this.imageType = 2;
         },
         upImgSure(){
-            this.upImg = false;
+            const formData = new FormData();
+            formData.append('fileData',this.filesList[0]);
+            formData.append('projId',this.projId);
+            formData.append('imageType',this.imageType);
+            // axios.post(this.baseUrl+'/uploadImage',formData,{
+            //     headers:{
+            //         'token':this.token,
+            //         'Content-Type': 'multipart/form-data'
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd== '0'){
+            //         this.getProjectImageList();
+            //         console.log(response.data);
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg)
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // })
+            axios({
+                method:'post',
+                url:this.baseUrl+'/uploadImage',
+                headers:{
+                    'token':this.token,
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd== '0'){
+                    this.getProjectImageList();
+                    this.getProjectInitalConfig();
+                    this.upImg = false;
+                    console.log(response.data);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
         },
         upImgCancle(){
             this.upImg = false;
+        },
+        //选择图片
+        selectImg(){
+            this.$refs.file.click();
+        },
+        fileChanged(){
+            const list = this.$refs.file.files;
+            this.imageName = list[0].name;
+            this.filesList = list;
+            console.log(this.filesList)
+        },
+        //是否为默认图片
+        isAsDefault(){  
+            console.log(this.isAsdefault);
+            axios({
+                method:'post',
+                url:this.baseUrl+'useDefaultLogo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    confValue:this.isAsdefault
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+
         },
         //弹窗关闭
         addCancle(){
@@ -401,7 +502,7 @@ export default {
             this.editDialog = false;
             this.projectUnity = '';
             this.projectName ='';
-        }
+        },
     }
 }
 </script>
@@ -721,5 +822,29 @@ export default {
         font-weight: normal;
         margin: 10px 0 0 0;
     }
-   
+    /* 上传文件按钮 */
+    #edit .imageBody{
+       text-align: left;
+    }
+    .imageBody .imageBodyText{
+        color: #666;
+        font-size: 14px;
+        line-height: 14px;
+        font-weight: normal;
+        display: inline-block;
+        margin-right: 20px;
+        margin-left: 94px;
+        text-align: right;
+   }
+   .updataImageSpan{
+        overflow: hidden;
+        width: 98px;
+    }
+    .updataImageSpan input{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        /* -ms-filter: 'alpha(opacity=0)'; */
+    }
 </style>

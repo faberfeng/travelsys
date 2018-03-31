@@ -304,6 +304,11 @@ export default {
         font-weight: normal;
         color: #666;;
     }
+    /* #edit .upInput{
+        width: 98px;
+        height: 26px;
+        background: #f9f9f9;
+    } */
     #edit .upImgText{
         font-size:14px;
         line-height: 14px;

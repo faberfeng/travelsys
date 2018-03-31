@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper" id="pageIn">
-      <h4 class="titleAll">分区与楼层配置</h4>
+      <h4 class="titleAll"><span>分区与楼层配置</span></h4>
       <div class="pageI">
         <div class="pageSelect">
             <div class="pageOption">
@@ -636,8 +636,12 @@ export default {
             border-bottom:1px solid #ccc; 
             height: 50px;
             line-height: 50px;
-            margin: 10px 20px 0 15px ;
+            margin: 10px 20px 0 0px ;
             text-align: left; 
+        }
+        .titleAll span{
+            display: inline-block;
+            margin-left: 15px;
         }
         .title{
             color: #fc343a;
