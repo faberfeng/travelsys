@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper" id="jobPage">
-      <h4 class="title">岗位11管理</h4>
+      <h4 class="title">岗位管理</h4>
       <div class="usermanage">
-          <h5 class="subtitle">用户列表
+          <h5 class="subtitle">岗位列表
               <span class="subSpan">
                   <select v-model="posType" class="inp-search">
                         <option value="">全部岗位</option>
@@ -128,6 +128,12 @@
 
 <style  lang='less'>
 #jobPage{
+     .el-button{
+        width: 112px;
+        height: 36px;
+        line-height: 36px;
+        padding: 0;
+    }
         /***********设置滚动条************/
     /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
@@ -417,6 +423,7 @@ export default {
           this.getInfo()
       },
        'pageDetial.pagePerNum':function(newVal,old){//多重属性用''阔起
+         this.pageDetial.currentPage = 1
           this.getInfo()
       },
        'pageDetial.currentPage':function(newVal,old){//多重属性用''阔起
@@ -437,7 +444,7 @@ export default {
             if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
                 vm.$message('这已经是第一页!')
                 return false
-            }else if(vm.pageDetial.currentPage == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+            }else if(vm.pageDetial.currentPage == Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
                 vm.$message('这已经是最后一页!')
                 return false
             }else{
@@ -452,7 +459,7 @@ export default {
                          vm.pageDetial.currentPage++
                         break;
                     case 2:
-                         vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                         vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
                         break;
                 }
             }

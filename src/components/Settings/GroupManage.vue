@@ -9,7 +9,7 @@
               <p class="title-box">
                   <span class="title-left">群组名称:</span>
                   <span class="title-right">
-                     <input type="text" :value="ugInfo.ugName"  class="title-right-icon" :disabled="canEditname">
+                     <input type="text" v-model="ugEdit.name"  class="title-right-icon" :disabled="canEditname">
                      <span  class="title-right-edit-icon" @click="allowChangeName"></span>
                   </span>
               </p>
@@ -24,15 +24,15 @@
                <p class="title-box">
                   <span class="title-left">群组标签:</span>
                    <span class="title-right">
-                     <input type="text"  :value="ugInfo.ugTag"  placeholder="请输入" class="title-right-icon" :disabled="canEditlabel">
+                     <input type="text"  v-model="ugEdit.tag"  placeholder="请输入" class="title-right-icon" :disabled="canEditlabel">
                      <span  class="title-right-edit-icon" @click="allowChangeLabel"></span>
                   </span>
               </p>
                 <p class="title-box">
                   <span class="title-left">群组状态:</span>
                   <span class="info-title">
-                    <el-radio v-model="status" label="1">启用</el-radio>
-                    <el-radio v-model="status" label="2">禁用</el-radio>
+                    <el-radio v-model="ugEdit.status" label="1" >启用</el-radio>
+                    <el-radio v-model="ugEdit.status" label="0" >禁用</el-radio>
                   </span>
               </p>
                 <p class="title-box">
@@ -43,11 +43,11 @@
             <h1 class="icon-title icon-group">
               群组成员
               <span class="icon icon-addMenber" @click="centerDialogVisible = true"></span>
-            <span class="icon icon-deleteMenber"></span>
+              <span class="icon icon-deleteMenber" @click="deleteUser"></span>
             </h1>
           <ul>
               <li class="check-item" v-for="(item,index) in userQunzuList" :key="index">
-                <el-checkbox label="">
+                <el-checkbox class="hahaha"   @change="pushUserID(item.userId)">
                     <span class="check-name" v-text="item.userName"></span>
                     <span class="check-title" v-text="item.account"></span>
                 </el-checkbox>
@@ -66,10 +66,6 @@
                 <span class='title-qun' v-text="item.ugName"></span>
                 <span class="icon icon-delect-qun" @click="deleteQR(item.ugId)"></span>
             </li>
-             <!-- <li class="qun-item qun-item-active">
-                <span class='title-qun'>建设单位</span>
-                <span class="icon icon-delect-qun"></span>
-            </li> -->
         </ul>
       </div>
       <!--添加用户弹窗-->
@@ -81,11 +77,11 @@
         <div class="clearfix">
             <div class="diolog-main">
                  <span class="title-right">
-                     <input type="text" value="" v-model="userInfo"  placeholder="输入姓名" class="title-right-icon" >
-                     <span  class="el-icon-search"></span>
+                     <input type="text" value="" v-model="userInfo"  placeholder="输入姓名" @keyup.enter="getUserInfo" class="title-right-icon" >
+                     <span  class="el-icon-search" @click="getUserInfo"></span>
                   </span>
                   <ul style="max-height:320px;overflow-y: auto;">
-                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key">
+                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.userName,item.account,item.userPositions)">
                           <p>
                             <span class="check-name" v-text="item.userName+'-'"></span>
                             <span class="check-title" v-text="item.account"></span>
@@ -95,35 +91,25 @@
                           </p>
                           <span class="icon icon-selectUser"></span>
                       </li>
-                       <li class="userList-item">
-                          <p>
-                            <span class="check-name">王子晴</span>
-                            <span class="check-title">(工程管理员)</span>
-                          </p>
-                          <p>
-                            <span class="check-title">(工程管理员)</span>
-                          </p>
-                          <span class="icon icon-selectUser active"></span>
-                      </li>
                   </ul>
             </div>
             <div class="diolog-main">
                 <div style="margin:20px 15px 20px 20px;">
                     <span>已选择群组成员</span>
                     <ul>
-                      <li class="userList-item" v-for='(item,index) in userToAdd' :key="index">
+                      <li class="userList-item" v-for='(item,index) in userDetialAdd' :key="index">
                           <p>
-                            <span class="check-name">王子晴</span>
-                            <span class="check-title">(工程管理员)</span>
+                            <span class="check-name" v-text="item.name+'-'+item.count"></span>
+                            <span class="check-title" v-text="item.name"></span>
                           </p>
                           <p>
-                            <span class="check-title">(工程管理员)</span>
+                            <span class="check-title" v-for="(val,key) in item.userPositions" :key="key+'pos'" v-text="val.posName+' '"></span>
                           </p>
-                          <span class="icon icon-cancleUser"></span>
+                          <span class="icon icon-cancleUser" @click="removeUserAdd(item.id)"></span>
                       </li>
                   </ul>
                 </div>
-                <span class="saveBTN" @click="centerDialogVisible = false">保存</span>
+                <span class="saveBTN" @click="saveUserQR">保存</span>
             </div>
         </div>
         </el-dialog>
@@ -464,6 +450,9 @@
                     top: 14px;
                     right: 14px;
                     background-image:url('./images/a-1.png'); 
+                    &:hover{
+                         background-image:url('./images/a-2.png'); 
+                    }
                 }
                 .icon-cancleUser{
                     width: 14px;
@@ -514,19 +503,22 @@
 
 <script>
 import axios from 'axios'
-
+import index from '../../../node_modules/_vue@2.5.16@vue';
 export default {
   name:'',
   data(){
       return {
+          ugEdit:{
+              name:'',
+              tag:'',
+              status:''
+          },
           canEditname:true,
           canEditlabel:true,
           token:'',
           projId:'',//项目id
-          status:'1',
           userQunzuNum:'',
           userQunzuList:[],
-          userToAdd:[],//准备添加的用户
           userInfo:'',
           centerDialogVisible: false,
           outsideUserList:[],//可添加的外部用户
@@ -534,10 +526,17 @@ export default {
           activeugID:'',//正在查看的群组
           activeugIDkey:0,//正在查看的群组的index
           ugInfo:'',//群组详情
+          userListDEL:[],//打算删除的用户id数组
+          userListAdd:[],//打算添加的用户id数组
+          userDetialAdd:[],//打算添加的用户id详情的数组
       }
   },
   watch:{
-    
+      'ugEdit.status':function(newval,old){
+          if(old != '' && newval != ''){
+                this.EditStatus()
+          }
+      }
   },
   created(){
       var vm = this
@@ -546,6 +545,209 @@ export default {
       vm.intoQunzu()
   },
   methods:{
+        saveUserQR(){
+            var vm = this
+            if(vm.userListAdd.length>0){
+                for(var i=0;i<vm.userListAdd.length;i++){
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addUserGroupUser',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            userId:vm.userListAdd[i],
+                            ugId:vm.activeugID,//正在查看的群组ID
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.centerDialogVisible = false
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }
+                this.$message({
+                    type: 'success',
+                    message: '添加群组用户成功'
+                });
+                setTimeout(function(){
+                    vm.getQRuser(vm.activeugID)
+                },1000)
+            }else{
+                this.$message({
+                    type: 'warming',
+                    message: '请选择用户'
+                });
+            }
+        },
+        removeUserAdd(val){
+            var vm = this
+            if(vm.userListAdd.indexOf(val) != -1){
+                var index = vm.userListAdd.indexOf(val)
+                vm.userListAdd.splice(index,1)
+                vm.userDetialAdd.splice(index,1)
+            }
+            console.log(vm.userListAdd)
+            console.log(vm.userDetialAdd)
+        },
+        addUser(val,name,count,tag){
+            var vm = this
+             if(vm.userListAdd.indexOf(val) == -1){
+                vm.userListAdd.push(val)
+                vm.userDetialAdd.push({
+                    id:val,
+                    name:name,
+                    count:count,
+                    userPositions:tag
+                })
+            }
+             console.log(vm.userListAdd)
+            console.log(vm.userDetialAdd)
+        },
+        deleteUser(){//删除用户
+          var vm = this
+          if(vm.userListDEL.length == 0){
+              vm.$message({
+                  type:'warming',
+                message: '请选择用户!'
+              })
+          }else{
+            vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                for(var i=0;i<vm.userListDEL.length;i++){
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            userId:vm.userListDEL[i],
+                            ugId:vm.activeugID,//正在查看的群组ID
+                        }
+                    }).then((response)=>{
+                             vm.getQRuser(vm.activeugID)
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }
+                vm.userListDEL = []
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+          }
+        },
+        pushUserID(id){
+            var vm = this
+            var index = vm.userListDEL.indexOf(id)
+            if(index == -1){
+                vm.userListDEL.push(id)
+            }else{
+                vm.userListDEL.splice(index,1)
+            }
+            console.log(vm.userListDEL)
+        },
+        EditName(){
+              var vm = this
+               this.$prompt('修改群组名称', '修改群组', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                       axios({
+                            method:'POST',
+                            url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/renameGroupNameNode',
+                            headers:{
+                                'token':vm.token
+                            },
+                            data:{
+                                projId:vm.projId,
+                                ugId:vm.activeugID,//正在查看的群组ID
+                                ugName:value,
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == 0){
+                                this.$message({
+                                    type: 'success',
+                                    message: '修改群组名称成功'
+                                });
+                                vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消修改'
+                    });       
+                });
+        },
+        EditLabel(){
+               var vm = this
+               this.$prompt('修改群组标签', '修改群组', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                       axios({
+                            method:'POST',
+                            url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUgTag',
+                            headers:{
+                                'token':vm.token
+                            },
+                            data:{
+                                projId:vm.projId,
+                                ugId:vm.activeugID,//正在查看的群组ID
+                                ugTag:value,
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == 0){
+                                this.$message({
+                                    type: 'success',
+                                    message: '修改群组标签成功'
+                                });
+                                vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消修改'
+                    });       
+                });
+        },
+        EditStatus(){
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUserGroupStatus',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    projId:vm.projId,
+                    ugId:vm.activeugID,//正在查看的群组ID
+                    ugStatus:vm.ugEdit.status,
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    this.$message({
+                        type: 'success',
+                        message: '修改群组状态成功'
+                    });
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         addQR(){//添加群组
               var vm = this
                this.$prompt('群组名称', '新建群组', {
@@ -612,10 +814,12 @@ export default {
             })
         },
         allowChangeName(){
-            this.canEditname = !this.canEditname
+            var vm = this
+            vm.EditName()
         },
          allowChangeLabel(){
-            this.canEditlabel = !this.canEditlabel
+              var vm = this
+               vm.EditLabel()
         },
        intoQunzu(){
            var vm = this
@@ -713,6 +917,7 @@ export default {
        changeQR(val,index){//切换群组，根据群组ID获取群组信息
              var vm = this
              if(val){
+                vm.ugEdit.status = ''
                 axios({
                     method:'POST',
                     url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/findCompanyUserGroupByNodeId',
@@ -726,7 +931,11 @@ export default {
                     vm.activeugID = val
                     //  vm.activeugIDkey = index
                     vm.ugInfo = response.data.rt//工程群组
-                    vm.status =  response.data.rt.ugStatus+''
+                    //增添群组信息
+                    vm.ugEdit.name = vm.ugInfo.ugName 
+                    vm.ugEdit.tag = vm.ugInfo.ugTag
+                    vm.ugEdit.status = vm.ugInfo.ugStatus
+                    vm.ugEdit.status =  response.data.rt.ugStatus+''
                     vm.getQRuser(val)
                 }).catch((err)=>{
                     console.log(err)
