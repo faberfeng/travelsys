@@ -252,6 +252,7 @@ export default {
                 // console.log("check this out!!!")
                 // console.log(new Date());
                 var id = localStorage.getItem('projId');
+                localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
                 for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
                     var arr = response.data.rt.onlineInfo.projAuth[id][i].substr(0,3)
                     switch(arr){

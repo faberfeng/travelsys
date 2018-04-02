@@ -8,7 +8,7 @@
                      <input type="text" v-model="userSearchInfo" placeholder="输入姓名"  class="title-right-icon" @keyup.enter="getInfo">
                      <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
                   </span>
-                  <span  class="btn" @click="addUser">添加</span>
+                  <span  class="btn" @click="addUser()">添加</span>
              </span>
           </h5>
           <div style="padding:0 20px;box-sizing: border-box;">
@@ -35,10 +35,8 @@
                          <td v-text="val.addTimeStr"></td>
                         <td v-text="val.addUser"></td>
                         <td>
-                            <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))"
-                                class="editIcon" @click="addUser(val.userId)"></span>
-                            <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" 
-                            class="deleteIcon" @click="deleteUser(val.id)"></span>
+                            <span class="editIcon" @click="addUser(val.id)"></span>
+                            <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.id)"></span>
                         </td>
                     </tr>
                 </tbody>
@@ -100,32 +98,34 @@
                 <div style="clear:both;"></div>
             </div>
       </div>
-        <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
-            <div class="log-head clearfix" v-if="userDetial.show">
-                <span class="log-head-title">查找用户:</span>
-                 <el-radio v-model="userDetial.posType" label="1">邮箱</el-radio>
-                 <el-radio v-model="userDetial.posType" label="2">账号</el-radio>
-            </div>
-            <div  class="JobName clearfix">
-                <input type="text" v-model="userDetial.posName" placeholder="请输入">
-                <span class="btn">查询</span>
+        <el-dialog :class="[userDetial.show?'':'active','openDialog']" :title="title" :visible.sync="adduser" :before-close="userClose">
+            <div  v-if="userDetial.show">
+                <div class="log-head clearfix">
+                    <span class="log-head-title">查找用户:</span>
+                    <el-radio v-model="userDetial.posType" label="1">邮箱</el-radio>
+                    <el-radio v-model="userDetial.posType" label="2">账号</el-radio>
+                </div>
+                <div  class="JobName clearfix">
+                    <input type="text" v-model="userDetial.posName" placeholder="请输入" @keyup.enter="searchUser">
+                    <span class="btn" @click="searchUser">查询</span>
+                </div>
             </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url(http://10.252.26.240:8080/qjbim-file/'+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
-                            <span class="detial">日你妈</span>
+                            <span class="detial" v-text="userDetial.info.realName"></span>
                         </p>
                         <p>
                             <span class="name">账号:</span>
-                            <span class="detial">日你妈</span>
+                            <span class="detial" v-text="userDetial.info.account" style="color:#666;font-weight: normal;"></span>
                         </p>
                         <p>
                             <span class="name">邮箱:</span>
-                            <span class="detial">日你妈</span>
+                            <span class="detial" v-text="userDetial.info.email"  style="color:#666;font-weight: normal;"></span>
                         </p>
                     </span>
                 </div>
@@ -133,9 +133,9 @@
             <div  class="log-body clearfix">
                 <span class="log-head-title">指定岗位:</span>
                 <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
-                    <el-checkbox class="log-head-position" v-model="checkDefault">工程管理员</el-checkbox>
+                    <el-checkbox class="log-head-position" v-model="position_default.checkFlg">工程管理员</el-checkbox>
                     <div class="position-all">
-                        <el-checkbox  v-model="checkDefault" @change="handleCheckAllChange(item.id)" v-for="(item,index) in position_list" :key="index" >{{item.posName}}</el-checkbox>
+                        <el-checkbox  v-model="item.checkFlg"   v-for="(item,index) in position_list" :key="index" >{{item.posName}}</el-checkbox>
                     </div>
                 </div>
             </div>
@@ -375,7 +375,7 @@
                                 float: left;
                                 width: 80px;
                                 height: 80px;
-                                background: url('./images/people.png')no-repeat 0 0 ;
+                                background-size:100% 100%;
                             }
                             .info-user{
                                 float: left;
@@ -385,6 +385,7 @@
                                     height: 30px;
                                     line-height: 30px;
                                     font-size: 14px;
+                                    text-align: left;
                                     .name{
                                         color: #999999;
                                     }
@@ -409,7 +410,11 @@
                         padding: 0 0 20px;
                     }
                 }
-
+            }
+            .active{
+                .el-dialog__body{
+                    padding-top:0; 
+                }
             }
             .clearfix{
                 clear: both;
@@ -509,6 +514,9 @@ export default {
   name:'',
   data(){
       return {
+          projAuth:{
+              deleteUser:false
+          },
           title:'添加用户',
           userList:[],//用户列表
           userSearchInfo:'',//岗位类型
@@ -528,7 +536,8 @@ export default {
           userDetial:{
             posName: "",
             posType: '1',
-            show:true
+            show:true,
+            info:{},//具体信息
           },
           position_default:{},//工程管理员岗位
           position_list:[],//可选其他岗位
@@ -538,7 +547,7 @@ export default {
               total:'',//所有数据
               pageNum:0//页面数
           },
-          checkDefault:false,
+          projUserId:0,//编辑的用户ID
           token:''
       }
   },
@@ -556,6 +565,8 @@ export default {
   },
   created(){
       var vm = this
+      var projAuth = localStorage.getItem('projAuth')
+      vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')
       vm.intoUserManager()
@@ -589,8 +600,35 @@ export default {
             }
 
         },
-        handleCheckAllChange(){
-
+        searchUser(){
+            var vm = this
+            if(vm.userDetial.posType == 1){
+                var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+                if(!myreg.test(vm.userDetial.posName))
+                {
+                    vm.$message({
+                        type:'warning',
+                        message:'请输入有效的邮箱！'
+                    });
+                    return false;
+                }
+            }
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/findUserByKeyWord',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    params:vm.userDetial.posName
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.userDetial.info = response.data.rt
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
         },
         getJobShuXingTu(){
             var vm = this
@@ -686,6 +724,8 @@ export default {
             var vm = this
             vm.adduser = true;
             if(id){//编辑用户
+                vm.title = '编辑用户'
+                 vm.userDetial.show = false
                 axios({
                     method:'GET',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/editProjectUser',
@@ -698,10 +738,17 @@ export default {
                     }
                 }).then((response)=>{
                     console.log(response)
+                    vm.userDetial.info = response.data.rt.projectUser
+                    vm.userDetial.positions = response.data.rt.positions
+                    vm.position_default = response.data.rt.positions[0]//工程管理员岗位
+                    vm.position_list = response.data.rt.positions.slice(1)//可选其他岗位
+                    vm.projUserId = response.data.rt.projUserId
                 }).catch((err)=>{
                     console.log(err)
                 })
             }else{
+                  vm.title = '添加用户'
+                vm.userDetial.show = true
                  axios({//添加用户
                     method:'GET',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addProjectUser',
@@ -729,24 +776,43 @@ export default {
         },
         PostaddUser(){
              var vm = this
-            var checkCode = vm.$refs.tree_job.getCheckedKeys();
+             var posIds = []
+             var isAdmin = 1
+            if(vm.position_default.checkFlg){
+                posIds.push(vm.position_default.id+'')
+                isAdmin = 2
+            }
+            for(var i=0;i<vm.position_list.length;i++){
+                if(vm.position_list[i].checkFlg){
+                    posIds.push(vm.position_list[i].id+'')
+                }
+            }
+            console.log(posIds)
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/saveProjectUser',
                 headers:{
                     'token':vm.token
                 },
+                params:{
+                    projId:vm.projId,
+                },
                 data:{
-                    authCodes:checkCode,
-                    posId: vm.jobID,
-                    posName: vm.userDetial.posName,
-                    posType: vm.userDetial.posType,
+                    isAdmin: isAdmin,
+                    posIds: posIds,
+                    projUserId: vm.projUserId,
+                    userId: vm.userDetial.info.userId+''
                 }
             }).then((response)=>{
-                if(response.data.cd == 0){
+                 if(response.data.cd == 0){
                     vm.adduser = false;
                     vm.getInfo()
-                }
+                 }else{
+                     vm.$message({
+                         type:'warning',
+                         message:response.data.msg
+                     })
+                 }
             }).catch((err)=>{
                 console.log(err)
             })
