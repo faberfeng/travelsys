@@ -15,7 +15,7 @@
                     <input type="hidden" name="companyId" :value="item.companyId">
                     <input type="hidden" name="type" :value="item.type">
                     <span class="companyImage">
-                        <span class="companyImage-img" :style="'background-image:url('+item.imgPath+');'"></span>
+                        <span class="companyImage-img" :style="item.imgPath?'background-image:url('+item.imgPath+');':'background-image:url('+require('../assets/bg_logo.png')+');'"></span>
                     </span>
                     <div style="padding:15px 20px;">
                        <span v-text="item.companyName" class="Q_title"></span>

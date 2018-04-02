@@ -1,54 +1,32 @@
 <template>
-  <div class="wrapper">
-      <h4 class="title"><span>专业种类分类编码</span></h4>
+  <div class="wrapper" id="Professional">
+      <h4 class="title"><span>专业工种分类编码</span></h4>
       <div class="manageWorktool">
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-            <el-table border :data="tableData5" style="width:100%"> 
-                <el-table-column  type="expand" >
-                    <template slot-scope="props">
-                        <el-table border  :data="tableData5" style="width:100%">
-                            <el-table-column label="序号" prop="index" >
-
-                            </el-table-column>
-                            <el-table-column label="编码" prop="code" >
-
-                            </el-table-column>
-                            <el-table-column label="标题" prop="title" >
-
-                            </el-table-column>
-                            <el-table-column label="来源" prop="source">
-
-                            </el-table-column>
-                            <el-table-column label="状态" prop="state">
-
-                            </el-table-column>
-                            <el-table-column label="操作" prop="action">
-
-                            </el-table-column>
-                        </el-table>
-                    </template>
-                </el-table-column>
-                <el-table-column label="序号" prop="index" >
-
-                </el-table-column>
-                <el-table-column label="编码" prop="code" >
-
-                </el-table-column>
-                <el-table-column label="标题" prop="title" >
-
-                </el-table-column>
-                <el-table-column label="来源" prop="source">
-
-                </el-table-column>
-                <el-table-column label="状态" prop="state">
-
-                </el-table-column>
-                <el-table-column label="操作" prop="action">
-
-                </el-table-column>
-            </el-table>
+        <table class="UserList" border="1" width='100%'>
+            <thead>
+                <tr  class="userList-thead">
+                    <th width="5%">序号</th>
+                    <th width="28%">编码</th>
+                    <th width="20%">标题</th>
+                    <th width="22%">来源</th>
+                    <th width="12%">状态</th>
+                    <th width="13%;">操作 </th>
+                </tr>
+            </thead>
+        </table>
+          <el-tree :data="codingList"   node-key="id" :props="defaultProps" @node-click="handleNodeClick">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                    <div class="item-code item-code-index" v-text="node.key"></div>
+                    <div class="item-code " style="width:28%">编码</div>
+                    <div class="item-code " style="width:20%">标题</div>
+                    <div class="item-code " style="width:22%">来源</div>
+                    <div class="item-code " style="width:12%">状态</div>
+                    <div class="item-code " style="width:13%;">操作 </div>
+                </span>
+          </el-tree>
         </div>
     </div>
   </div>
@@ -59,23 +37,14 @@ export default {
     name:'Professional',
     data(){
         return {
-            tableData5:[{
-                index: '01',
-                code:'010000',
-                title: '信息工具',
-                source: '行业标准',
-                state: '正常使用',
-            },
-            {
-                index: '02',
-                code:'020000',
-                title: '信息工具',
-                source: '行业标准',
-                state: '正常使用',
-            }],
+            codingList:[],//编码列表
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/'
+            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            defaultProps:{
+              children: 'children',
+               label: 'number'
+            }
         }
     },
     created(){
@@ -84,8 +53,12 @@ export default {
         this.getWorkCode()
     },
     methods:{
+        handleNodeClick(data) {
+            console.log(data);
+        },
         //专业种类分类/作业工具分类编码信息
         getWorkCode(){
+            var vm = this
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/getWorkCode',
@@ -98,11 +71,14 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
+                    vm.codingList = response.data.rt
                 }else if(response.data.cd == '-1'){
-                    console.log(response.data.msg)
+                    vm.$message({
+                        type:'warning',
+                        message:response.data.msg
+                    })
                 }else{
-                    this.$router.push({
+                    vm.$router.push({
                         path:'/login'
                     })
                 }
@@ -112,9 +88,76 @@ export default {
 
 }
 </script>
-<style scoped>
-    .wrapper{
+<style  lang='less'>
+#Professional{
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .clearfix{
+        clear: both;
+        overflow: hidden;
+        content: '';
+    }
+    .UserList{
+        border-collapse: collapse;
+        border: 1px solid #e6e6e6;
+        thead{
+            background: #f2f2f2;
+            th{
+                padding-left: 10px;
+                height: 52px;
+                text-align: left;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #333333;
+            }
+        }
+        tbody{
+            tr{
+                td{
+                    padding-left: 10px;
+                    height: 52px;
+                    text-align: left;
+                    box-sizing: border-box;
+                    border-right: 1px solid #e6e6e6;
+                    font-size: 12px;
+                    color: #333333;
+                }
+                &:hover{
+                    background: #fafafa;
+                }
+            }
+        }
+    }
+    .el-tree-node__content{
+        height: auto;
+        padding-left:5%!important; 
+    }
+    // .el-tree-node__expand-icon{
+    //     display: none;
+    // }
+    .custom-tree-node{
         width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .item-code{
+        float: left;
+        height: 50px;
+        line-height: 50px;
+        font-size: 14px;
+        color: #333333;
+        border-bottom: 1px solid #e0e0e0;
+        border-right:  1px solid #e0e0e0;
+    }
+    .item-code-index{
+        position: absolute;
+        left: -5%;
+        top: 0;
+        width: 5%;
     }
     .title{
         border-bottom:1px solid #ccc; 
@@ -165,4 +208,5 @@ export default {
     .btn i{
         margin-right: 10px;
     }
+}
 </style>

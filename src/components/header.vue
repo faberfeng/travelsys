@@ -2,7 +2,7 @@
     <el-row class="container-header">
         <el-col :span="24" class="header">
             <div class="headerImg">
-                <img :src="proimg?proimg:'http://q.qjbim.com/qjbim-file/upload/101/public/001/2017/12/15/9d789ae6-84c4-422c-8391-e9f38db883e5.png'"/>
+                <img :src="proimg?proimg:require('../assets/bg_logo.png')"/>
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
