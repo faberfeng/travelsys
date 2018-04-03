@@ -5,75 +5,108 @@
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-            <el-table border :data="tableData5" style="width:100%"> 
-                <el-table-column  type="expand" >
-                    <template slot-scope="props">
-                        <el-table border  :data="tableData5" style="width:100%">
-                            <el-table-column label="序号" prop="index" >
-
-                            </el-table-column>
-                            <el-table-column label="编码" prop="code" >
-
-                            </el-table-column>
-                            <el-table-column label="标题" prop="title" >
-
-                            </el-table-column>
-                            <el-table-column label="来源" prop="source">
-
-                            </el-table-column>
-                            <el-table-column label="状态" prop="state">
-
-                            </el-table-column>
-                            <el-table-column label="操作" prop="action">
-
-                            </el-table-column>
-                        </el-table>
-                    </template>
-                </el-table-column>
-                <el-table-column label="序号" prop="index" >
-
-                </el-table-column>
-                <el-table-column label="编码" prop="code" >
-
-                </el-table-column>
-                <el-table-column label="标题" prop="title" >
-
-                </el-table-column>
-                <el-table-column label="来源" prop="source">
-
-                </el-table-column>
-                <el-table-column label="状态" prop="state">
-
-                </el-table-column>
-                <el-table-column label="操作" prop="action">
-
-                </el-table-column>
-            </el-table>
+            <zk-table :data="workToolData" :columns="columns" :tree-type="props.treeType"
+            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+            :border="props.border">
+                <template slot="operator">
+                   <p>222</p>
+                </template> 
+            </zk-table>
         </div>
     </div>
   </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
   name:'WorkTool',
-  data(){
-      return {
-          tableData5:[{
-            index: '01',
-            code:'010000',
-            title: '信息工具',
-            source: '行业标准',
-            state: '正常使用',
-        },
-        {
-            index: '02',
-            code:'020000',
-            title: '信息工具',
-            source: '行业标准',
-            state: '正常使用',
-        }]
-      }
-  }
+    data(){
+            return {
+                props: {
+                    stripe: false,
+                    border: true,
+                    showHeader: true,
+                    showSummary: false,
+                    showRowHover: true,
+                    showIndex: true,
+                    treeType: true,
+                    isFold: true,
+                    expandType: false,
+                    selectionType: false,
+                }, 
+                columns: [
+                    {
+                        label: '编码',
+                        prop: 'number',
+                        width: '200px',
+                    },
+                    {
+                        label: '标题',
+                        prop: 'title',
+                        minWidth: '50px',
+                    },
+                    {
+                        label: '来源',
+                        prop: 'score',
+                    },
+                    {
+                        label: '状态',
+                        prop: 'likes',
+                        minWidth: '200px',
+                    },
+                    {
+                        label:'操作',
+                        prop:'id',
+                        // type: 'template',
+                        // template: 'operator',
+                    }
+                ],
+                token:'',
+                projId:'',
+                baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+                workToolData:[]
+            }
+
+    },
+    created(){
+        this.projId = localStorage.getItem('projId');
+        this.token  = localStorage.getItem('token');
+        this.getWorkCode();
+    },
+    methods:{
+        //专业工种分类/作业工具分类编码信息
+        getWorkCode(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'config2/component/getWorkCode',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    tableNo:'t17'
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.workToolData = response.data.rt;
+                    // wData.forEach(item => {
+                    //     this.workToolData.push({
+                    //         number:item.number,
+                    //         title:item.title,
+                    //         children:item
+                    //     })
+                    // });
+                    console.log(this.workToolData);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        }
+    }
 }
 </script>
 <style scoped>
