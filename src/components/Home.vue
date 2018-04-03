@@ -54,7 +54,7 @@
                                     <span>工程场地与项目初始化</span>
                                 </template>
                                 <el-menu-item-group>
-                                    <el-menu-item index="/setting/initalsettings">工程初始化配置信息</el-menu-item>
+                                    <el-menu-item index="/setting/initalsettings">工程初始配置信息</el-menu-item>
                                     <el-menu-item index="/setting/groundsettings">场地与单体初始化</el-menu-item>
                                     <el-menu-item index="/setting/pageinital">分页与楼层初始化</el-menu-item>
                                 </el-menu-item-group>

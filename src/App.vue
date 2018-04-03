@@ -63,10 +63,11 @@ export default {
   right: 10px;
 }
 #inital .el-dialog__footer{
-  padding: 28px 0 30px 0;
+  padding: 0;
+  margin: 41px 0 33px 0;
 }
 #inital .el-dialog__body{
-  padding:40px 0 0px 0;
+  padding:30px 0 0px 0;
 }
 #inital .el-dialog__footer .el-button{
   height: 36px;

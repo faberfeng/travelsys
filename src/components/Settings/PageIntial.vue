@@ -800,6 +800,11 @@ export default {
         .el-table::before,.el-table--border::after, .el-table--group::after{
             display: none;
         }
+        .el-checkbox{
+            display: block;
+            float: left;
+            margin-left: 206px;
+         }
        
     }
     

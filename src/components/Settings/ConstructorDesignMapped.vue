@@ -3,45 +3,709 @@
     <h4 class="title"><span>设计结构分类编码</span></h4>
     <div class="manageWorktool">
         <span class="worktooltitle">分类编码</span>
-        <button class="btn"><i class="el-icon-plus"></i>添加</button>
+        <button class="btn" @click="addYingshe"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-            <div style="padding:0 20px;box-sizing: border-box;">
+            <div style="padding:0;box-sizing: border-box;">
                 <table class="UserList" border="1" width='100%'>
                     <thead>
                         <tr  class="userList-thead">
-                            <th width="15%">名称</th>
-                            <th width="20%">账号</th>
-                            <th width="10%">工程管理员</th>
-                            <th width="15%;">以被分配到的岗位</th>
-                            <th width="16%">添加时间</th>
-                            <th width="12%;">添加人</th>
+                            <th width="10%">序号</th>
+                            <th width="12%">Revit族类别</th>
+                            <th width="12%">Revit族类别</th>
+                            <th width="10%;">关键字类型</th>
+                            <th width="10%">关键字</th>
+                            <th width="12%;">T31编码</th>
+                            <th width="12%">T31标题</th>
+                            <th width="10%">来源</th>
                             <th width="12%">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(val,index) in userList" :key="index">
-                            <td v-text="val.userName"></td>
-                            <td v-text="val.account"></td>
-                            <td v-text="val.isAdmin ==2?'是':'不是'"></td>
+                        <tr v-for="(item,index) in constructorData" :key="index">
+                            <td v-text="index"></td>
+                            <td v-text="item.revitCategory"></td>
+                            <td v-text="item.chsCategory"></td>
+                            <td v-text="item.name"></td>
+                            <td v-text="item.keyWord"></td>
+                            <td v-text="item.genieClassCode"></td>
+                            <td v-text="item.genieClassName"></td>
+                            <td v-text="item.criterion == '0' ? '企业标准':'工程标准'"></td>
                             <td>
-                                <span v-for="(item,key) in val.userPositions" :key="key" v-text="item.posName"></span>
-                            </td>
-                            <td v-text="val.addTimeStr"></td>
-                            <td v-text="val.addUser"></td>
-                            <td>
-                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))"
-                                    class="editIcon" @click="addUser(val.userId)"></span>
-                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" 
-                                class="deleteIcon" @click="deleteUser(val.id)"></span>
+                                <span v-if="item.criterion!=0"
+                                    class="editIcon" @click="editUser(index)"></span>
+                                <span v-if="item.criterion!=0" 
+                                class="deleteIcon" @click="deleteUser(index)"></span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <!-- 分页 -->
+            <div class="datagrid-pager pagination">
+               <table cellspacing="0" cellpadding="0" border="0">
+                   <tbody>
+                       <tr>
+                           <td>
+                               <select class="pagination-page-list" @change="pagePerNumChange" v-model="pageDetial.pagePerNum">
+                               <option value="10">10</option>
+                               <option value="20">20</option>
+                               <option value="30">30</option>
+                               <option value="40">40</option>
+                               <option value="50">50</option>
+                               </select>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-left:5px;">第</span>
+                            </td>
+                            <td>
+                                  <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum)}}页</span>
+                            </td>
+                            <td>
+                                 <div class="pagination-btn-separator"></div>
+                            </td>
+                             <td>
+                                <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <a href="javascript:void(0)" @click="getInfo" class="btn-refresh btn-TAB"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
+                <div style="clear:both;"></div>
+            </div>
         </div>
     </div>
+    <!--编辑弹窗-->
+    <div id="edit">
+        <el-dialog title="修改映射" :visible.sync="editListShow" :before-close="listClose">
+            <div class="editBody">
+                <div class="editBodyone"><label class="editInpText">Revit族类别 :</label>
+                    <select  @change="revitChange" class="editSelect" disabled v-model="revitCategory">
+                        <option >{{revitCategory}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
+                    <select class="editSelect" v-model="keyTypeVal">
+                        <option v-for="(item,index) in keyTypeData" :key="index">{{item.name}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
+                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
+                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
+                    <select @change="designChange" v-model="designValue" class="editSelect">
+                        <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
+                    <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
+                        <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
+                    <select class="editSelect" v-model="goujianType">
+                        <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="editListSure">确定</button>
+                <button class="editBtnC" @click="listClose">取消</button>
+            </div>
+        </el-dialog>
+        <el-dialog title="添加映射" :visible.sync="addListShow" :before-close="addlistClose">
+            <div class="editBody">
+                <div class="editBodyone"><label class="editInpText">Revit族类别 :</label>
+                    <select v-model="revitCategory" @change="revitChange" class="editSelect">
+                        <option v-for="(item,index) in retiveData" :key="index">{{item.revitName}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
+                    <select class="editSelect"  v-model="keyTypeVal"> 
+                        <option v-for="(item,index) in keyTypeData" :key="index" >{{item.name}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
+                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
+                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
+                    <select @change="designChange" v-model="designValue" class="editSelect">
+                        <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
+                    <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
+                        <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
+                    <select class="editSelect">
+                        <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="addListSure">确定</button>
+                <button class="editBtnC" @click="addlistClose">取消</button>
+            </div>
+        </el-dialog>
+    </div>
+    <!-- 删除确定按钮 -->
+    <div id="inital">
+            <el-dialog  :visible.sync="deleteDialog" width="398px" :before-close="deletelistClose">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">你确定删除?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deletelistClose">取消</button>
+                </div>
+            </el-dialog>
+        </div>
   </div>
 </template>
+<script>
+import axios from 'axios';
+
+export default {
+    name:'ConstructorDesignMapped',
+    data(){
+        return {
+            token:'',
+            projId:'',
+            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
+            constructorData:[],
+            retiveData:[],//retive族值
+            keyTypeData:[],//关键字类型
+            geniceClassJson:[],
+            logicSystenData:[],//逻辑系统
+            categoryData:[],//构建类型
+            pageDetial:{
+              pagePerNum:20,//一页几份数据
+              currentPage:1,//初始查询页数 第一页
+              total:'',//所有数据
+          },
+          editListShow:false,
+          addListShow:false,
+          revitCategory:'',//retive族类别
+          chsCategory:'',
+          keyType:'',
+          keyWord:'',
+          genieClassCode:'',
+          designValue:'',
+          criterion:'',
+          genieClassName:'',
+          logicSystemValue:'',
+          categoryBase:'',//类型编码
+          keyTypeVal:'',
+          goujianType:'',//构建类别
+          editUserNum:'',
+          deleteNum:'',
+          oldFamilyNameKeyWord:'',//旧关键字值
+          deleteDialog:false,//删除确定按钮
+
+        }
+    },
+    created(){
+        this.token = localStorage.getItem('token');
+        this.projId = localStorage.getItem('projId');
+        this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+        this.getGeniceClassMapJson();
+        this.getGeniceClassJson();
+    },
+    watch:{
+        'pageDetial.currentPage':function(newVal,oldVal){//不能使用箭头函数
+            this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+        }
+    },
+    methods:{
+        //获取分类映射信息
+        getGeniceClassMapItem(index,num){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getGenieClassMapItem',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    page:index,
+                    rows:num
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.constructorData = response.data.rt.rows;
+                    this.pageDetial.total = response.data.rt.total;
+                    this.constructorData.forEach((item,index,arr)=>{
+                        if(item.keyType=='0'){
+                            arr[index].name = '族名称';
+                        }else if(item.keyType == '1'){
+                            arr[index].name = '类型名称';
+                        }else if(item.keyType == '2'){
+                            arr[index].name = '系统名称';
+                        }
+                    })
+                    //console.log(response.data);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //获取设计构建分类
+        getGeniceClassJson(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getGenieClassJson',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.geniceClassJson = response.data.rt;
+                    //console.log(response.data)
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //获取revit族类别
+        getGeniceClassMapJson(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getGenieClassMapJson',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.retiveData = response.data.rt;
+                    //console.log(this.retiveData)
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //刷新表格
+        getInfo(){
+            this.pageDetial.currentPage = 1;
+            this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+        },
+        //表格页码改变时
+        changePage(val){
+            if(val == 1){
+                if(this.pageDetial.currentPage<this.pageDetial.total/this.pageDetial.pagePerNum){
+                    this.pageDetial.currentPage= Math.floor(this.pageDetial.currentPage)+1;
+                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum)
+                }else{
+                    alert('已经是最后一页');
+                }
+            }else if(val == -1){
+                if(this.pageDetial.currentPage>1){
+                    this.pageDetial.currentPage= Math.floor(this.pageDetial.currentPage)-1;
+                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum)
+                }else{
+                    alert('已经是第一页');
+                }
+            }else if (val == '2'){
+                this.pageDetial.currentPage = Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum);
+                this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+            }else if(val == '0'){
+                this.getInfo();
+            }
+        },
+        //页码改变
+        pagePerNumChange(){
+            this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+        },
+        //编辑功能
+        editUser(num){
+            this.editUserNum = num;
+            var number = ''
+            
+            //this.getKeyTypeData(this.constructorData[num].revitCategory);
+            this.oldFamilyNameKeyWord = this.constructorData[num].keyWord;//获取旧关键字值
+           
+            this.revitCategory = this.constructorData[num].chsCategory;//Revit族类别
+            //先获取Revit族类别，在获取关键字类型集合
+            this.retiveData.forEach((item,index,arr)=>{
+                if(item.revitName == this.revitCategory){
+                    number = index;
+                }
+            })
+            this.getKeyTypeData(this.retiveData[number].revitCategory);
+
+            this.keyTypeVal = this.constructorData[num].keyType;//关键字类型
+
+            if( this.constructorData[num].keyType== '0'){
+                this.keyTypeVal = '族名称';
+            }else if(this.constructorData[num].keyType == '1'){
+                this.keyTypeVal ='类型名称';
+            }else if(this.constructorData[num].keyType == '2'){
+                this.keyTypeVal='系统名称';
+            }
+            this.categoryBase = this.constructorData[num].genieClassCode//类型编码
+            this.geniceClassJson.forEach((item,index,arr)=>{
+                
+                if(item.number.split('')[0] == this.categoryBase.split('')[0] && item.number.split('')[1] == this.categoryBase.split('')[1]){
+                    //console.log(item.title);
+                    this.designValue = item.title;//设计专业
+                    this.logicSystenData = this.geniceClassJson[index].children;
+                }
+            });
+            this.logicSystenData.forEach((item,index)=>{
+                if(item.number.split('')[0] == this.categoryBase.split('')[0] && item.number.split('')[1] == this.categoryBase.split('')[1]&& item.number.split('')[2] == this.categoryBase.split('')[2]){
+                   // console.log(item.title);
+                    this.logicSystemValue = item.title;//逻辑系统
+                    this.categoryData = this.logicSystenData[index].children;
+                }
+            })
+            this.keyWord = this.constructorData[num].keyWord;//包含关键字
+            this.goujianType = this.constructorData[num].genieClassName;//构建类别
+             this.editListShow = true;
+        },
+        //编辑确定
+        editListSure(){
+            this.editListShow = false;
+            var keyTypeName = '';
+            if( this.keyTypeVal = '族名称'){
+                keyTypeName = 0;
+            }else if(this.keyTypeVal ='类型名称'){
+                keyTypeName = 1;
+            }else if(this.keyTypeVal='系统名称'){
+                keyTypeName = 2;
+            }
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/updateGenieClassMap',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    familyNameKeyWord:this.keyWord,
+                    familyTypeKeyWord:keyTypeName,
+                    genieClassCode:this.categoryBase,
+                    id:this.constructorData[this.editUserNum].pkId,
+                    oldFamilyNameKeyWord:this.oldFamilyNameKeyWord,
+                    revitCategory:this.constructorData[this.editUserNum].revitCategory,
+                    revitName:this.revitCategory
+                }   
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.editListShow = false;
+                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                    this.revitCategory = '';
+                    this.keyWord = '';
+                    this.oldFamilyNameKeyWord = '';
+                    //console.log(response.data);
+                    this.revitCategory = '';
+                }else if(response.data.cd =='-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        listClose(){
+            this.editListShow = false;
+        },
+        //添加
+        addYingshe(){
+            this.addListShow = true;
+        },
+        addListSure(){
+            var value = 0; 
+            if(this.keyTypeVal == '族名称'){
+                value = 0;
+            }else if(this.keyTypeVal == '类型名称'){
+                value =1;
+            }else if(this.keyType == '系统名称'){
+                value=2;
+            }
+            //需要添加映射toDoList
+            var revitCa =''
+            if(this.revitCategory == '安全设备'){
+                revitCa = "SecurityDevices";
+            }else if(this.revitCategory == '常规模型'){
+                //revitCa = "Site";
+            }
+            else if(this.revitCategory == '场地构件'){
+                revitCa = "Site";
+            }else if(this.revitCategory == '橱柜'){
+                revitCa = "Casework";
+            }else if(this.revitCategory == '窗'){
+                revitCa = "Windows";
+            }else if(this.revitCategory == '道路'){
+                revitCa = "Roads";
+            }else if(this.revitCategory == '灯具装饰'){
+                revitCa = "LightingFixtures";
+            }else if(this.revitCategory == '地形'){
+                revitCa = "Topography";
+            }else if(this.revitCategory == '电器设备'){
+                revitCa = "ElectricalEquipment";
+            }else if(this.revitCategory == '电缆桥架'){
+                revitCa = "";
+            }
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/addGenieClassMap',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    familyNameKeyWord:this.keyWord,
+                    familyTypeKeyWord:value,
+                    genieClassCode:this.categoryBase,
+                    revitCategory:revitCa,
+                    revitName:this.revitCategory
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    //console.log(response.data);
+                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                    this.keyWord='';
+                    this.categoryBase ='';
+                    this.revitCategory ='';
+                    this.keyTypeVal ='';
+                    this.revitCategory = '';
+                    this.designValue = '';
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'login'
+                    })
+                }
+            })
+            this.addListShow = false;
+        },
+        addlistClose(){
+            this.addListShow = false;
+        },
+        //删除
+        deleteUser(num){
+            this.deleteNum = num;
+            this.deleteDialog = true;
+        },
+        //删除确定按钮
+        deleteMakeSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/deleteGenieClassMap',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    id:this.constructorData[this.deleteNum].pkId
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                    this.deleteDialog = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //删除按钮取消
+        deletelistClose(){
+            this.deleteDialog = false;
+            this.keyWord='';
+            this.categoryBase ='';
+            this.revitCategory ='';
+            this.keyTypeVal ='';
+            this.revitCategory = '';
+            this.designValue = '';
+        },
+        //retive族改变
+        revitChange(){
+            var number = ''
+            this.retiveData.forEach((item,index,arr)=>{
+                if(item.revitName == this.revitCategory){
+                    number = index;
+                }
+            })
+           this.getKeyTypeData(this.retiveData[number].revitCategory);
+        },
+        //根据族 获取关键词类型
+        getKeyTypeData(rev,type){
+            this.keyTypeData = [];
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getKeyWordsTypeByRevitCategory',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    revitCategory:rev,
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                var obj = response.data.rt;
+                console.log(obj)
+                for(let item of Object.values(obj)){
+                    this.keyTypeData.push({
+                       name:item
+                    });
+                }
+            })
+        },
+        //设计专业改变
+        designChange(){
+            this.geniceClassJson.forEach((item,index,arr)=>{
+                if(item.title == this.designValue){
+                    this.categoryBase = item.number;
+                    //console.log(index);
+                    this.logicSystenData = this.geniceClassJson[index].children;
+                }
+            })
+        },
+        //逻辑系统改变
+        logicSystemChange(){
+            this.logicSystenData.forEach((item,index)=>{
+                if(item.title == this.logicSystemValue){
+                    this.categoryData = this.logicSystenData[index].children;
+                }   
+            })
+        }        
+    }
+}
+</script>
+<style scoped>
+   .wrapper{
+        width: 100%;
+    }
+    .title{
+        border-bottom:1px solid #ccc; 
+        margin: 0 ;
+        text-align: left;
+    }
+    .title span{
+        display: inline-block;
+        margin-left: 15px;
+        color: #fc343a;
+        font-size: 18px;
+        line-height: 18px;
+        font-weight: bold;
+        margin: 22px 0 12px 15px;
+    }
+    .manageWorktool{
+        margin: 0 20px 0 15px;
+        text-align: left;
+    }
+    .worktooltitle{
+        color:#fc3439;
+        display: inline-block;
+        width: 50%;
+        text-align: left;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: bold;
+        margin: 0;
+        text-align: left;
+        margin: 30px 0 20px;
+    }   
+    .btn{
+        width: 96px;
+        height: 32px;
+        border: none;
+        border-radius: 2px;
+        float: right;
+        margin: 22px 0 12px 0;
+        cursor: pointer;
+        background: #fc3439;
+        color: #fff;
+        font-size: 14px;
+        font-weight: normal;
+    }
+    .btn:hover{
+        background: #ff5257
+    }
+    .btn i{
+        margin-right: 10px;
+    }
+    #edit .editSelect{
+        width: 388px;
+        height: 30px;
+        background: #fafafa;
+        border: 1px solid #d1d1d1;
+    }
+    /*删除弹框*/
+    .deleteDialogImg{
+        height: 50px;
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
+    }
+</style>
 <style  lang='less'>
 #ShejiGoujian{
     *{
@@ -61,14 +725,16 @@
             }
             /* 滚动槽 */
             ::-webkit-scrollbar-track {
-            -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+            box-shadow:inset 006px rgba(0, 0, 0, .5);
+            -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
             border-radius:10px;
             }
             /* 滚动条滑块 */
             ::-webkit-scrollbar-thumb {
             border-radius:10px;
             background:rgba(0,0,0,0.1);
-            -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+            box-shadow:inset 006px rgba(0, 0, 0, .5);
+            -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
             }
             ::-webkit-scrollbar-thumb:window-inactive {
             background:rgba(255,0,0,0.4);
@@ -170,7 +836,7 @@
                     color: #a5adb3;
                 }
             }
-            .el-dialog{
+            .manageWorktool .el-dialog{
                 width: 586px;
                 .el-dialog__header{
                     padding: 34px 0 17px 30px;
@@ -314,7 +980,7 @@
             /**********一下是分页器的样式***************/
             .datagrid-pager {
                 display: block;
-                margin: 0 20px;
+                margin: 0 0 40px 0;
                 height: 31px;
                 width: auto;
                 border:1px solid #d4d4d4;
@@ -394,134 +1060,6 @@
             .pagination-info{
                 margin-top: 5px;
             }
-}
-</style>
-<script>
-import axios from 'axios';
-
-export default {
-    name:'ConstructorDesignMapped',
-    data(){
-        return {
-            token:'',
-            projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
-            page:'0',
-            rows:'20'
-        }
-    },
-    created(){
-        this.token = localStorage.getItem('token');
-        this.projId = localStorage.getItem('projId');
-        this.getGeniceClassMapItem();
-        this.getGeniceClassMapJson();
-    },
-    methods:{
-        //获取分类映射信息
-        getGeniceClassMapItem(){
             
-            axios({
-                method:'post',
-                url:this.baseUrl+'Config/getGenieClassMapItem',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    page:this.page,
-                    rows:this.rows
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    console.log(response.data)
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-        },
-        getGeniceClassMapJson(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'Config/getGenieClassJson',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    console.log(response.data)
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-        }
-    }
 }
-</script>
-<style scoped>
-   .wrapper{
-        width: 100%;
-    }
-    .title{
-        border-bottom:1px solid #ccc; 
-        margin: 0 ;
-        text-align: left;
-    }
-    .title span{
-        display: inline-block;
-        margin-left: 15px;
-        color: #fc343a;
-        font-size: 18px;
-        line-height: 18px;
-        font-weight: bold;
-        margin: 22px 0 12px 15px;
-    }
-    .manageWorktool{
-        margin: 0 20px 0 15px;
-        text-align: left;
-    }
-    .worktooltitle{
-        color:#fc3439;
-        display: inline-block;
-        width: 50%;
-        text-align: left;
-        font-size: 16px;
-        line-height: 16px;
-        font-weight: bold;
-        margin: 0;
-        text-align: left;
-        margin: 30px 0 20px;
-    }   
-    .btn{
-        width: 96px;
-        height: 32px;
-        border: none;
-        border-radius: 2px;
-        float: right;
-        margin: 22px 0 12px 0;
-        cursor: pointer;
-        background: #fc3439;
-        color: #fff;
-        font-size: 14px;
-        font-weight: normal;
-    }
-    .btn:hover{
-        background: #ff5257
-    }
-    .btn i{
-        margin-right: 10px;
-    }
-
 </style>

@@ -97,7 +97,7 @@
             <el-dialog  :visible.sync="deleteDialog" width="398px">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">你确定删除【】?</p>
+                <p class="deleteDialogText">你确定删除?</p>
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
@@ -810,6 +810,7 @@ export default {
     }
     .deleteDialogWarning{
         font-size: 18px;
+        line-height: 18px;
         font-family: 'MicrosoftYahei';
         color: #fc3439;
         font-weight: bold;
@@ -818,9 +819,10 @@ export default {
     .deleteDialogText{
         color: #333333;
         font-size: 14px;
+        line-height: 14px;
         font-family: 'MicrosoftYahei';
         font-weight: normal;
-        margin: 10px 0 0 0;
+        margin: 16px 0 0 0;
     }
     /* 上传文件按钮 */
     #edit .imageBody{
