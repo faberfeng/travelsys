@@ -10,6 +10,7 @@ import ZkTable from 'vue-table-with-tree-grid'
 
 Vue.use(ZkTable)
 
+Vue.use(ZkTable)
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
