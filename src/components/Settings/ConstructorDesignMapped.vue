@@ -268,7 +268,7 @@ export default {
                             arr[index].name = '系统名称';
                         }
                     })
-                    //console.log(response.data);
+                    console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -316,7 +316,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.retiveData = response.data.rt;
-                    //console.log(this.retiveData)
+                    console.log(this.retiveData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -362,10 +362,7 @@ export default {
         editUser(num){
             this.editUserNum = num;
             var number = ''
-            
-            //this.getKeyTypeData(this.constructorData[num].revitCategory);
             this.oldFamilyNameKeyWord = this.constructorData[num].keyWord;//获取旧关键字值
-           
             this.revitCategory = this.constructorData[num].chsCategory;//Revit族类别
             //先获取Revit族类别，在获取关键字类型集合
             this.retiveData.forEach((item,index,arr)=>{
@@ -373,7 +370,7 @@ export default {
                     number = index;
                 }
             })
-            this.getKeyTypeData(this.retiveData[number].revitCategory);
+            this.getKeyTypeData(this.retiveData[number].revitCategory,this.retiveData[number].id);
 
             this.keyTypeVal = this.constructorData[num].keyType;//关键字类型
 
@@ -472,7 +469,7 @@ export default {
             if(this.revitCategory == '安全设备'){
                 revitCa = "SecurityDevices";
             }else if(this.revitCategory == '常规模型'){
-                //revitCa = "Site";
+                revitCa = "GenericModel";
             }
             else if(this.revitCategory == '场地构件'){
                 revitCa = "Site";
@@ -489,7 +486,113 @@ export default {
             }else if(this.revitCategory == '电器设备'){
                 revitCa = "ElectricalEquipment";
             }else if(this.revitCategory == '电缆桥架'){
-                revitCa = "";
+                revitCa = "CableTray";
+            }else if(this.revitCategory == '电话设备'){
+                revitCa = "TelephoneDevices";
+            }else if(this.revitCategory == '电话设备'){
+                revitCa = "TelephoneDevices";
+            }else if(this.revitCategory == '电气装置'){
+                revitCa = "ElectricalFixtures";
+            }else if(this.revitCategory == '电缆桥架配件'){
+                revitCa = "CableTrayFitting";
+            }else if(this.revitCategory == '叠层墙'){
+                revitCa = "StackedWalls";
+            }else if(this.revitCategory == '风管管件'){
+                revitCa = "DuctFitting";
+            }else if(this.revitCategory == '封檐带'){
+                revitCa = "Fascia";
+            }else if(this.revitCategory == '风管附件'){
+                revitCa = "DuctAccessory";
+            }else if(this.revitCategory == '风管'){
+                revitCa = "	DuctCurves";
+            }else if(this.revitCategory == '管道'){
+                revitCa = "DuctTerminal";
+            }else if(this.revitCategory == '管件'){
+                revitCa = "PipeFitting";
+            }else if(this.revitCategory == '管路附件'){
+                revitCa = "PipeAccessory";
+            }else if(this.revitCategory == '护理呼叫设备'){
+                revitCa = "NurseCallDevices";
+            }else if(this.revitCategory == '环境元素'){
+                revitCa = "Entourage";
+            }else if(this.revitCategory == '火警设备'){
+                revitCa = "FireAlarmDevices";
+            }else if(this.revitCategory == '机械设备'){
+                revitCa = "MechanicalEquipment	";
+            }else if(this.revitCategory == '家具'){
+                revitCa = "Furniture	";
+            }else if(this.revitCategory == '建筑柱'){
+                revitCa = "Columns	";
+            }else if(this.revitCategory == '建筑地坪'){
+                revitCa = "BuildingPad	";
+            }else if(this.revitCategory == '结构加强版'){
+                revitCa = "StructuralFraming";
+            }else if(this.revitCategory == '结构框架'){
+                revitCa = "StructuralFraming	";
+            }else if(this.revitCategory == '结构连接'){
+                revitCa = "StructConnections";
+            }else if(this.revitCategory == '结构柱'){
+                revitCa = "StructuralColumns";
+            }else if(this.revitCategory == '结构基础'){
+                revitCa = "StructuralFoundation";
+            }else if(this.revitCategory == '栏杆'){
+                revitCa = "StairsRailing";
+            }else if(this.revitCategory == '楼板'){
+                revitCa = "Floors";
+            }else if(this.revitCategory == '楼梯'){
+                revitCa = "Stairs";
+            }else if(this.revitCategory == '门'){
+                revitCa = "Doors";
+            }else if(this.revitCategory == '幕墙竖梃'){
+                revitCa = "CurtainWallMullions";
+            }else if(this.revitCategory == '幕墙嵌板'){
+                revitCa = "CurtainWallPanels";
+            }else if(this.revitCategory == '喷头'){
+                revitCa = "CurtainWallPanels";
+            }else if(this.revitCategory == '坡道'){
+                revitCa = "Ramps";
+            }else if(this.revitCategory == '幕墙嵌板'){
+                revitCa = "CurtainWallPanels";
+            }else if(this.revitCategory == '喷头'){
+                revitCa = "Sprinklers	";
+            }else if(this.revitCategory == '墙'){
+                revitCa = "Walls";
+            }else if(this.revitCategory == '墙饰条'){
+                revitCa = "Cornices";
+            }else if(this.revitCategory == '软管'){
+                revitCa = "FlexPipeCurves";
+            }else if(this.revitCategory == '软风管'){
+                revitCa = "FlexDuctCurves";
+            }else if(this.revitCategory == '数据设备'){
+                revitCa = "DataDevices";
+            }else if(this.revitCategory == '体量'){
+                revitCa = "Mass";
+            }else if(this.Ceilings == '天花板'){
+                revitCa = "Walls";
+            }else if(this.Ceilings == '停车场'){
+                revitCa = "Parking";
+            }else if(this.Ceilings == '天花板'){
+                revitCa = "Walls";
+            }else if(this.Ceilings == '卫浴装置'){
+                revitCa = "PlumbingFixtures";
+            }else if(this.Ceilings == '通迅设备'){
+                revitCa = "CommunicationDevices";
+            }else if(this.Ceilings == '屋檐底板'){
+                revitCa = "RoofSoffit";
+            }else if(this.Ceilings == '屋面'){
+                revitCa = "Roofs";
+            }else if(this.Ceilings == '线管'){
+                revitCa = "Conduit";
+            }else if(this.Ceilings == '线管配件'){
+                revitCa = "ConduitFitting";
+            }else if(this.Ceilings == '	檐沟'){
+                revitCa = "Gutter";
+            }else if(this.Ceilings == '照明设备'){
+                revitCa = "LightingDevices";
+            }else if(this.Ceilings == '专用设备'){
+                revitCa = "SpecialityEquipment";
+            }else if(this.Ceilings == '植物'){
+                revitCa = "Planting";
             }
             axios({
                 method:'post',
@@ -580,10 +683,12 @@ export default {
                     number = index;
                 }
             })
-           this.getKeyTypeData(this.retiveData[number].revitCategory);
+           this.getKeyTypeData(this.retiveData[number].revitCategory,this.retiveData[number].id);
+           //console.log(this.retiveData[number].id)
         },
         //根据族 获取关键词类型
-        getKeyTypeData(rev,type){
+        getKeyTypeData(rev,id){
+            console.log(id)
             this.keyTypeData = [];
             axios({
                 method:'post',
@@ -593,7 +698,8 @@ export default {
                 },
                 params:{
                     revitCategory:rev,
-                    projId:this.projId
+                    projId:this.projId,
+                    pkId:id
                 }
             }).then((response)=>{
                 var obj = response.data.rt;
