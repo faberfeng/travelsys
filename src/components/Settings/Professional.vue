@@ -8,25 +8,18 @@
         <table class="UserList" border="1" width='100%'>
             <thead>
                 <tr  class="userList-thead">
-                    <th width="5%">序号</th>
-                    <th width="28%">编码</th>
-                    <th width="20%">标题</th>
-                    <th width="22%">来源</th>
-                    <th width="12%">状态</th>
-                    <th width="13%;">操作 </th>
+                    <th width="50px">序号</th>
+                    <th >编码</th>
+                    <th width="186px">标题</th>
+                    <th width="206px">来源</th>
+                    <th width="120px">状态</th>
+                    <th width="125px">操作 </th>
                 </tr>
             </thead>
         </table>
           <el-tree :data="codingList" class="tree-item"    node-key="id" :props="defaultProps" @node-click="handleNodeClick">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                    <!-- <div class="item-code item-code-index" v-text="node.key"></div> -->
-                    <div class="item-code " style="width:28%"  v-text="data.number"></div>
-                    <div class="item-code " style="width:20%" v-text="data.title"></div>
-                    <div class="item-code " style="width:22%" v-text="formatterType(data.type)"></div>
-                    <div class="item-code " style="width:12%" v-text="formatterStatus(data.id,data)"></div>
-                    <div class="item-code " style="width:13%;padding-top: 17px;">
-                        <!-- <span  class="editIcon"></span>
-                        <span  class="deleteIcon"></span> -->
+                    <div class="item-code " style="min-width:125px;padding-top: 17px;">
                          <el-button
                             type="text"
                             class="editIcon"
@@ -35,6 +28,11 @@
                             type="text"
                             @click.stop="handleNodeClick"></el-button>
                      </div>
+                    <div class="item-code item-index" v-text="11"></div>
+                    <div class="item-code " style="min-width:120px" v-text="formatterStatus(data.id,data)"></div>
+                    <div class="item-code " style="min-width:206px" v-text="formatterType(data.type)"></div>
+                    <div class="item-code " style="min-width:186px;border-left: 1px solid #e0e0e0;" v-text="data.title"></div>
+                    <div class="item-code " style="min-width:260px;width:auto;float: left;border-right: none;"  v-text="data.number"></div>
                 </span>
           </el-tree>
         </div>
@@ -182,7 +180,17 @@ export default {
     }
     .el-tree-node__content{
         height: auto;
-        // padding-left:5%!important; 
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .el-tree-node{
+ border-bottom:1px solid #e0e0e0;
+    }
+    .el-tree-node:focus>.el-tree-node__content, .el-tree-node__content:hover {
+    background-color: #fff;
+}
+    .el-tree{
+        border-left:1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
     }
      .editIcon{
         float: left;
@@ -202,17 +210,31 @@ export default {
     .custom-tree-node{
         width: 100%;
         height: auto;
-        position: relative;
+    }
+    .el-tree-node__content{
+        border-bottom: 1px solid #e0e0e0;
     }
     .item-code{
-        float: left;
+        float: right;
         height: 50px;
         line-height: 50px;
         padding-left: 10px;
         font-size: 14px;
         color: #333333;
-        border-bottom: 1px solid #e0e0e0;
         border-right:  1px solid #e0e0e0;
+    }
+    .item-index{
+        display: block;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    .el-tree-node{
+        padding-left:50px!important; 
+        // position: relative;
     }
     .el-tree-node__expand-icon.expanded{
         transform: rotate(0deg); 
