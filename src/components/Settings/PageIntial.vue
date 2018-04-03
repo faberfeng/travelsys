@@ -87,6 +87,7 @@
                     <div class="editBodyone"><label class="editInpText">区域名称 :</label><input class="inp" placeholder="请输入" v-model="partitionName"/></div>
                     <div class="editBodytwo"><label class="editInpText">面积 :</label><input class="inp" placeholder="请输入" v-model="Area"/></div>
                 </div>
+                <el-checkbox v-model="partitionIsDefault">作为默认分区</el-checkbox>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeEditPartitionList">确定</button>
                     <button class="editBtnC" @click="cancleEditPartitionList">取消</button>
@@ -212,7 +213,8 @@ export default {
         addPartition:false,
         partitionIsDefault:false,
         deletePartionDialog:false,
-        deletepartitionContent:''
+        deletepartitionContent:'',
+        subProjectsIndex:0
 
       }
     },
@@ -228,7 +230,7 @@ export default {
         },
         //确认添加
         makeAddFloorList(){
-            console.log(this.setAsAuto)
+            //console.log(this.setAsAuto);
             axios({
                 method:'post',
                 url:this.baseUrl+'project2/Config/updateStorey',
@@ -269,6 +271,7 @@ export default {
                     //清空输入框的值
                     this.FloorName = '';
                     this.FloorValue = '';
+                    this.setAsAuto = false;
                     //console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -283,7 +286,6 @@ export default {
         //编辑竖向楼层
         listTableEdit(scope){
             this.floorIndex = scope.$index;
-
             this.setAsDefault = this.florData[this.floorIndex].IsDefault;
             this.FloorName = this.florData[this.floorIndex].Name;
             this.FloorValue = this.florData[this.floorIndex].BottomHeight;
@@ -314,18 +316,7 @@ export default {
                     IsDefault: this.setAsDefault
                 }
             }).then(response=>{
-                console.log(response.data);
-                this.florData[this.floorIndex].Name = this.FloorName;
-                this.florData[this.floorIndex].BottomHeight = this.FloorValue;
-                //修改备注
-                this.florData.forEach((item,index,arr)=>{
-                    arr[index].Remark = '';
-                    arr[index].IsDefault = false;
-                    //console.log( arr[index].Remark)
-                })
-                this.florData[this.floorIndex].Remark = "默认楼层";
-                this.florData[this.floorIndex].IsDefault = true;
-               // console.log(this.florData[this.floorIndex].Remark)
+               this.findStore(this.partitionList,this.partitionIndex);
                  //清空输入框的内容
                 this.FloorName ='';
                 this.FloorValue = '';
@@ -358,7 +349,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
+                    //console.log(response.data);
                     this.florData.splice(this.floorIndex,1);
                     this.deleteFloorDialog = false; 
                 }else if(response.data.cd = '-1'){
@@ -386,7 +377,6 @@ export default {
         deleteRow(){
 
         },
-        
         //分区与楼层初始化
         floorAndSceneInit(){
             axios({
@@ -402,7 +392,7 @@ export default {
                 if(response.data.cd == '0'){
                     this.subProjects= response.data.rt.subProjects;//单体信息
                     this.partitionList = response.data.rt.partitionList;//建筑分区
-                    console.log(this.partitionList)
+                    //console.log(this.subProjects)
                     this.partitionList.forEach((item,index)=>{
                         this.partitionListName.push({
                             label:item.name,
@@ -418,7 +408,6 @@ export default {
                     //初始化 单体名称 和 建筑分区的初始值
                     this.partitionListValue = this.partitionListName[0].label;
                     this.subProjectsValue = this.subProjectsName[0].label;
-                    
                 }
             }).then(()=>{
                 this.findStore(this.partitionList,0)
@@ -426,6 +415,8 @@ export default {
         },
         //改变单体名称值 来改变建筑分区的值
         changeSubProjects(val){
+            console.log(val)
+            this.subProjectsIndex = val;
             axios({
                 method:'get',
                 url:this.baseUrl+'project2/Config/getPartitionBySubProjId',
@@ -437,7 +428,7 @@ export default {
                 } 
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    
+                    console.log(response.data)
                     this.partitionListName = [];
                     this.partitionList = response.data.rt;
                     this.partitionList.forEach((item,index)=>{
@@ -461,21 +452,13 @@ export default {
         changePartionList(val){
             this.partitionIndex = val;
             this.findStore(this.partitionList,val);
-
         },
         //获取楼层
         findStore(val,index){
-            console.log(val);
-            console.log(index);
-            var nextUrl = '';
-            if(val[index].ID){
-                nextUrl = val[index].ID;
-            }else{
-                nextUrl = val[index].id;
-            }
+            console.log(val[index]);
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/findStorey/'+nextUrl,
+                url:this.baseUrl+'project2/Config/findStorey/'+val[index].ID,
                 headers:{
                     'token':this.token
                 }
@@ -497,13 +480,15 @@ export default {
         //编辑建筑分区
         editPartitionList(){
             this.editPartition = true;
-            this.partitionName = this.partitionList[this.partitionIndex].name || this.partitionList[this.partitionIndex].Name;
-            this.Area = this.partitionList[this.partitionIndex].areaValue || this.partitionList[this.partitionIndex].AreaValue;
+            this.partitionName = this.partitionList[this.partitionIndex].Name;
+            this.Area = this.partitionList[this.partitionIndex].AreaValue;
+            this.partitionIsDefault = this.partitionList[this.partitionIndex].IsDefault;
         },
         cancleEditPartitionList(){
             this.partitionName ='';
             this.Area ='';
             this.editPartition = false;
+            this.partitionIsDefault = false;
         },
         makeEditPartitionList(){
             axios({
@@ -519,7 +504,7 @@ export default {
                 data:{
                     AreaValue:this.Area,
                     ID:this.partitionList[this.partitionIndex].ID,
-                    IsDefault:this.partitionList[this.partitionIndex].IsDefault,
+                    IsDefault:this.partitionList[this.partitionIndex].partitionIsDefault,
                     Name:this.partitionName,
                     ParentID:this.partitionList[this.partitionIndex].ParentID,
                     Type:this.partitionList[this.partitionIndex].Type,
@@ -527,11 +512,13 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
+                    //console.log(response.data);
                     this.partitionListName[this.partitionIndex].label = this.partitionName;
                     this.partitionList[this.partitionIndex].AreaValue = this.Area;
+                    this.partitionList[this.partitionIndex].IsDefault = this.partitionIsDefault;
                     this.partitionName ='';
                     this.Area ='';
+                    this.partitionIsDefault = false;
                     this.editPartition = false;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -548,7 +535,6 @@ export default {
             this.addPartition = true;
         },
         makeAddPartitionList(){
-            
             axios({
                 method:'post',
                 url:this.baseUrl+'project2/Config/updatePartition',
@@ -565,13 +551,14 @@ export default {
                     Name:this.partitionName,
                 }
             }).then(response=>{
-                console.log(response.data);
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.partitionListName.push({
                         label:this.partitionName,
-                        value:this.partitionListName.length+1
+                        value:this.partitionListName.length
                     })
+
+                    this.changeSubProjects(this.subProjectsIndex);
+
                     this.partitionName ='';
                     this.Area ='';
                     this.addPartition = false;
