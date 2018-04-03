@@ -17,14 +17,24 @@
                 </tr>
             </thead>
         </table>
-          <el-tree :data="codingList"   node-key="id" :props="defaultProps" @node-click="handleNodeClick">
+          <el-tree :data="codingList" class="tree-item"    node-key="id" :props="defaultProps" @node-click="handleNodeClick">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                    <div class="item-code item-code-index" v-text="node.key"></div>
-                    <div class="item-code " style="width:28%">编码</div>
-                    <div class="item-code " style="width:20%">标题</div>
-                    <div class="item-code " style="width:22%">来源</div>
-                    <div class="item-code " style="width:12%">状态</div>
-                    <div class="item-code " style="width:13%;">操作 </div>
+                    <!-- <div class="item-code item-code-index" v-text="node.key"></div> -->
+                    <div class="item-code " style="width:28%"  v-text="data.number"></div>
+                    <div class="item-code " style="width:20%" v-text="data.title"></div>
+                    <div class="item-code " style="width:22%" v-text="formatterType(data.type)"></div>
+                    <div class="item-code " style="width:12%" v-text="formatterStatus(data.id,data)"></div>
+                    <div class="item-code " style="width:13%;padding-top: 17px;">
+                        <!-- <span  class="editIcon"></span>
+                        <span  class="deleteIcon"></span> -->
+                         <el-button
+                            type="text"
+                            class="editIcon"
+                            @click.stop="handleNodeClick"></el-button>
+                        <el-button class="deleteIcon"
+                            type="text"
+                            @click.stop="handleNodeClick"></el-button>
+                     </div>
                 </span>
           </el-tree>
         </div>
@@ -53,7 +63,44 @@ export default {
         this.getWorkCode()
     },
     methods:{
+        /**
+         * 格式化来源
+         * @param value
+         * @returns {String}
+         */
+        formatterType(value) {
+            if (value == 0) {
+                return "行业标准";
+            }else if (value == 1) {
+                return "企业标准";
+            } else {
+                return "工程标准";
+            }
+        },
+        /**
+         * 格式化状态
+         * @param value
+         * @param row
+         * @param index
+         * @returns {String}
+         */
+        formatterStatus(value, row, index) {
+            if (row.type == 0 || row.type == 1) {
+                return '正常使用';
+            } else {
+                if (value == 0) {
+                    return "未提请";
+                } else if (value == 1) {
+                    return "已提请";
+                } else if (value == 2) {
+                    return "已退回";
+                } else {
+                    return "正常使用 ";
+                }
+            }
+        },
         handleNodeClick(data) {
+            
             console.log(data);
         },
         //专业种类分类/作业工具分类编码信息
@@ -87,6 +134,7 @@ export default {
     }
 
 }
+
 </script>
 <style  lang='less'>
 #Professional{
@@ -134,11 +182,23 @@ export default {
     }
     .el-tree-node__content{
         height: auto;
-        padding-left:5%!important; 
+        // padding-left:5%!important; 
     }
-    // .el-tree-node__expand-icon{
-    //     display: none;
-    // }
+     .editIcon{
+        float: left;
+        width: 17px;
+        height: 17px;
+        background: url('../../assets/edit.png')no-repeat 0 0;
+        cursor: pointer;
+        margin-right: 20px;
+    }
+    .deleteIcon{
+        float: left;
+        width: 17px;
+        height: 17px;
+        background: url('../../assets/delete.png')no-repeat 0 0;
+        cursor: pointer;
+    }
     .custom-tree-node{
         width: 100%;
         height: auto;
@@ -148,10 +208,34 @@ export default {
         float: left;
         height: 50px;
         line-height: 50px;
+        padding-left: 10px;
         font-size: 14px;
         color: #333333;
         border-bottom: 1px solid #e0e0e0;
         border-right:  1px solid #e0e0e0;
+    }
+    .el-tree-node__expand-icon.expanded{
+        transform: rotate(0deg); 
+    }
+    .el-icon-caret-right::after{
+        display: block;
+        width: 15px;
+        height: 14px;
+        content: '';
+        position: absolute;
+        top: 0px;
+        left: -3px;
+        background: url('./images/folder.png')no-repeat 0 0;
+    }
+    .is-leaf::after{
+        display: block;
+        width: 15px;
+        height: 14px;
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 4px;
+        background: url('./images/file.png')no-repeat 0 0;
     }
     .item-code-index{
         position: absolute;

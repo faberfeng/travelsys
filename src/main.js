@@ -6,6 +6,10 @@ import router from './router'
 import store from '@/utils/store.js';
 import ElementUI from 'element-ui'
 import '../theme/index.css'
+// import ZkTable from 'vue-table-with-tree-grid'
+
+// Vue.use(ZkTable)
+
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
