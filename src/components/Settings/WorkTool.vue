@@ -5,17 +5,11 @@
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-<<<<<<< HEAD
-            <zk-table ref="table" :data="workToolData" :columns="columns" :tree-type="props.treeType"
-=======
-            <zk-table 
-             index-text="序号"
-            :data="workToolData" :columns="columns" :tree-type="props.treeType"
->>>>>>> 17564156984f7ca49487a1fe6050a3b14b139108
+            <zk-table :data="workToolData" :columns="columns" :tree-type="props.treeType"
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-            :border="props.border" @tree-icon-click="expandChange($event)" @row-key="Key(row,rowIndex)">
+            :border="props.border" >
                 <template slot="action" slot-scope="scope">
-                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
+                   <button class="editBtn actionBtn" @click="edit(scope.rowIndex)"></button>
                    <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)"></button>
                 </template> 
             </zk-table>
@@ -35,18 +29,13 @@ export default {
                     showHeader: true,
                     showSummary: false,
                     showRowHover: true,
-                    showIndex: false,
+                    showIndex: true,
                     treeType: true,
                     isFold: true,
                     expandType: false,
                     selectionType: false,
                 }, 
                 columns: [
-                    {
-                        label: '序号',
-                        prop: 'number',
-                        width: '100px',
-                    },
                     {
                         label: '编码',
                         prop: 'number',
@@ -71,7 +60,7 @@ export default {
                         prop:'operator',
                         type: 'template',
                         template: 'action',
-                        width:'150px'
+                        width:'100px'
                     }
                 ],
                 token:'',
@@ -102,10 +91,14 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.workToolData = response.data.rt;
-                    // for(let item of this.workToolData){
-                    //     console.log(item.title);
-                    // }
-                    //console.log(this.workToolData);
+                    // wData.forEach(item => {
+                    //     this.workToolData.push({
+                    //         number:item.number,
+                    //         title:item.title,
+                    //         children:item
+                    //     })
+                    // });
+                    console.log(this.workToolData);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -122,41 +115,6 @@ export default {
         //删除
         deleteItem(num){
             console.log(num)
-        },
-        //格式化来源
-        formatterType(val){
-            if (value == 0) {
-                return "行业标准";
-            }else if (value == 1) {
-                return "企业标准";
-            } else {
-                return "工程标准";
-            }
-        },
-        //格式化状态
-        formatterStatus(value, row, index) {
-            if (row.type == 0 || row.type == 1) {
-                return '正常使用';
-            } else {
-                if (value == 0) {
-                    return "未提请";
-                } else if (value == 1) {
-                    return "已提请";
-                } else if (value == 2) {
-                    return "已退回";
-                } else {
-                    return "正常使用 ";
-                }
-            }
-        },
-        expandChange($event){
-            //console.log(row);
-             //console.log(rowIndex);
-            console.log($event)
-        },
-        Key(row,rowIndex){
-            console.log(row);
-            console.log(rowIndex)
         }
     }
 }

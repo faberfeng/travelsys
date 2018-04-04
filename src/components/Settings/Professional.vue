@@ -24,40 +24,43 @@
       
       <div id=edit>
         <el-dialog title="编辑编码" :visible.sync="addCode" :before-close="userClose">
-            <!-- <div class="editBody">
-                <div class="editBodyone"><label class="editInpText">编码级别 :</label>
-                    <select  @change="revitChange" class="editSelect" disabled v-model="revitCategory">
-                        <option >{{revitCategory}}</option>
+            <div class="editBody">
+                <div class="editBodyone edit-item clearfix">
+                    <label class="editInpText">编码级别 :</label>
+                    <select  class="editSelect" disabled v-model="codingToEdit.level">
+                        <option v-for="(item,index) in codingToEdit.level" :key="index" :value="item" v-text="'Level'+item"></option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
-                    <select class="editSelect" v-model="keyTypeVal">
-                        <option v-for="(item,index) in keyTypeData" :key="index">{{item.name}}</option>
+                <div class="editBodytwo edit-item clearfix" v-for="(item,index) in codingToEdit.level" :key="index">
+                    <label class="editInpText" v-text="item+'级编码 :'"></label>
+                    <select class="editSelect" disabled>
+                        <option v-text="initCode(item)"></option>
                     </select>
+                     <i class="icon-sanjiao"></i>
+                    <span v-text="'标题：'+initTitle(item)" :title="'标题：'+initTitle(item)" class="edit-item-biaoti"></span>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
-                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
-                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
-                    <select @change="designChange" v-model="designValue" class="editSelect">
-                        <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
-                    </select>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">新建编码 :</label>
+                    <!-- <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)"/> -->
                 </div>
-                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
-                    <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
-                        <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
-                    </select>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">新标题 :</label>
+                    <input class="inp" placeholder="请输入" :value="codingToEdit.title"/>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
-                    <select class="editSelect" v-model="goujianType">
-                        <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
-                    </select>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">完整编码 :</label>
+                    <span v-text="codingToEdit.number"></span>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">完整标题 :</label>
+                    <span v-text="codingToEdit.title"></span>
+                </div>
             </div>
             <div slot="footer" class="dialog-footer">
                 <button class="editBtnS" @click="PostaddUser">确定</button>
                 <button class="editBtnC" @click="userClose">取消</button>
-            </div> -->
+            </div>
         </el-dialog>
     </div>
   </div>
@@ -71,6 +74,8 @@ export default {
     data(){
         return {
             codingList:[],//编码列表
+            codingToEdit:{},//要编辑的编码
+            levelNum:{},
             token:'',
             projId:'',
             baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
@@ -78,7 +83,7 @@ export default {
               children: 'children',
                label: 'number'
             },
-            addCode:true,
+            addCode:false,
              props: {
                     stripe: false,
                     border: true,
@@ -90,35 +95,35 @@ export default {
                     isFold: true,
                     expandType: false,
                     selectionType: false,
-                }, 
-                columns: [
-                    {
-                        label: '编码',
-                        prop: 'number',
-                        width: '200px',
-                    },
-                    {
-                        label: '标题',
-                        prop: 'title',
-                        minWidth: '50px',
-                    },
-                    {
-                        label: '来源',
-                        prop: 'type_',
-                    },
-                    {
-                        label: '状态',
-                        prop: 'status_',
-                        minWidth: '200px',
-                    },
-                    {
-                        label:'操作',
-                        prop:'operator',
-                        type: 'template',
-                        template: 'action',
-                        width:'100px'
-                    }
-                ],
+            }, 
+            columns: [
+                {
+                    label: '编码',
+                    prop: 'number',
+                    width: '200px',
+                },
+                {
+                    label: '标题',
+                    prop: 'title',
+                    minWidth: '50px',
+                },
+                {
+                    label: '来源',
+                    prop: 'type_',
+                },
+                {
+                    label: '状态',
+                    prop: 'status_',
+                    minWidth: '200px',
+                },
+                {
+                    label:'操作',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                    width:'100px'
+                }
+            ],
         }
     },
     created(){
@@ -132,6 +137,29 @@ export default {
       
     },
     methods:{
+        initCode(key){
+            var vm = this
+            var codingToEdit = key*2 -2
+            return vm.codingToEdit.number.substr(codingToEdit,2)
+        },
+        initTitle(key){
+            var vm = this
+            var codingToEdit = key*2 -2
+            var a1 = vm.codingToEdit.number.substr(0,2)
+            var a2 = vm.codingToEdit.number.substr(2,2)
+            var a3 = vm.codingToEdit.number.substr(4,2)
+            switch(key){
+                case 1:
+                    return vm.levelNum[a1].title;
+                break;
+                  case 2:
+                    return vm.levelNum[a1][a2].title;
+                break;
+                  case 3:
+                    return vm.levelNum[a1][a2][a3].title;
+                break;
+            }
+        },
         initKey(){
             var timer = setInterval(function(){
                 if($('.zk-table__body-row').length >0){
@@ -175,22 +203,18 @@ export default {
             console.log(num)
             var vm = this
             axios({
-                method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
                 headers:{
                     'token':vm.token
                 },
-                data:{
-                    authCodes:checkCode,
-                    posId: vm.jobID,
-                    posName: vm.jobDetial.posName,
-                    posType: vm.jobDetial.posType,
+                params:{
+                    genieClassId:num.row.id,
+                    tableNo: 't13'
                 }
             }).then((response)=>{
-                if(response.data.cd == 0){
-                    vm.adduser = false;
-                    vm.getInfo()
-                }
+                vm.codingToEdit = num.row
+                vm.addCode = true
             }).catch((err)=>{
                 console.log(err)
             })
@@ -248,11 +272,28 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                 var arr = response.data.rt
+                var levelNum = {}
                 for(var i=0;i<arr.length;i++){
-                    arr[i].KeyID = i+1
                     arr[i].type_ = vm.formatterType(arr[i].type)
                     arr[i].status_ = vm.formatterStatus(arr[i].id,arr[i])
+                    //根据level截取number
+                    switch(arr[i].level){
+                        case 1:
+                            levelNum[parseInt(arr[i].number.substr(0,2))]= {}
+                            levelNum[parseInt(arr[i].number.substr(0,2))].title = arr[i].title
+                        break;
+                        case 2:
+                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))]= {}
+                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))].title = arr[i].title
+                        break;
+                        case 3:
+                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))]= {}
+                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))].title = arr[i].title
+                        break;
+                    }
                 }
+                console.log(levelNum)
+                vm.levelNum = levelNum
                  var a = data.transformTozTreeFormat(setting, arr)
                 vm.codingList = a
                 }else if(response.data.cd == '-1'){
@@ -279,9 +320,47 @@ export default {
         padding: 0;
         box-sizing: border-box;
     }
+    .el-dialog__body{
+        margin-top: 30px;
+    }
+    .editBodytwo{
+    margin-top: 15px;
+    }
+    .editBodyone{
+         margin-bottom: 25px;
+    }
+    .edit-item{
+        position: relative;
+        .editSelect{
+            float: left;
+            width: 436px;
+            height: 40px;
+            padding: 10px;
+        }
+        .editInpText{
+            width: 100px;
+            text-align: right;
+            float: left;
+            height: 40px;
+            line-height: 40px;
+        }
+        .edit-item-biaoti{
+            display: block;
+            font-size: 12px;
+            color: #999999;
+            float: left;
+            line-height: 12px;
+            margin-left: 120px;
+            margin-top: 5px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .el-dialog{
         left: 50%;
-        width: 586px;
+        width: 586px!important;
         margin-left:-293px;
     }
     .clearfix{
