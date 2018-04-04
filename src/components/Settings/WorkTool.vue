@@ -7,9 +7,10 @@
         <div class="worktable">
             <zk-table :data="workToolData" :columns="columns" :tree-type="props.treeType"
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-            :border="props.border">
-                <template slot="operator">
-                   <p>222</p>
+            :border="props.border" >
+                <template slot="action" slot-scope="scope">
+                   <button class="editBtn actionBtn" @click="edit(scope.rowIndex)"></button>
+                   <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)"></button>
                 </template> 
             </zk-table>
         </div>
@@ -47,18 +48,19 @@ export default {
                     },
                     {
                         label: '来源',
-                        prop: 'score',
+                        prop: 'type',
                     },
                     {
                         label: '状态',
-                        prop: 'likes',
+                        prop: 'status',
                         minWidth: '200px',
                     },
                     {
                         label:'操作',
-                        prop:'id',
-                        // type: 'template',
-                        // template: 'operator',
+                        prop:'operator',
+                        type: 'template',
+                        template: 'action',
+                        width:'100px'
                     }
                 ],
                 token:'',
@@ -105,6 +107,14 @@ export default {
                     })
                 }
             })
+        },
+        //编辑
+        edit(num){
+            console.log(num)
+        },
+        //删除
+        deleteItem(num){
+            console.log(num)
         }
     }
 }
@@ -161,5 +171,18 @@ export default {
     }
     .btn i{
         margin-right: 10px;
+    }
+    .actionBtn{
+        width: 16px;
+        height: 16px;
+        border: none;
+        cursor: pointer;
+    }
+    .editBtn{
+        background: url('../../assets/edit.png') no-repeat;
+    }
+    .deleteBtn{
+        background: url('../../assets/delete.png') no-repeat;
+        margin-left: 20px;
     }
 </style>

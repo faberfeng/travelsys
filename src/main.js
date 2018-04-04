@@ -8,7 +8,7 @@ import ElementUI from 'element-ui'
 import '../theme/index.css'
 import ZkTable from 'vue-table-with-tree-grid'
 
-Vue.use(ZkTable)
+//Vue.use(ZkTable)
 
 Vue.use(ZkTable)
 
