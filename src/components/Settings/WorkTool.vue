@@ -3,50 +3,86 @@
       <h4 class="title"><span>作业工具分类编码</span></h4>
       <div class="manageWorktool">
         <span class="worktooltitle">分类编码</span>
-        <button class="btn"><i class="el-icon-plus"></i>添加</button>
+        <button class="btn" @click="addList"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-<<<<<<< HEAD
-            <zk-table ref="table" :data="workToolData" :columns="columns" :tree-type="props.treeType"
-=======
             <zk-table 
              index-text="序号"
             :data="workToolData" :columns="columns" :tree-type="props.treeType"
->>>>>>> 17564156984f7ca49487a1fe6050a3b14b139108
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-            :border="props.border" @tree-icon-click="expandChange($event)" @row-key="Key(row,rowIndex)">
+            :border="props.border">
                 <template slot="action" slot-scope="scope">
-                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
-                   <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)"></button>
+                   <button class=""   v-if="scope.row.status == 0" @click="edit(scope)">提请</button>
+                    <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">通过</button>
+                     <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">退回</button>
+                   <button class="editBtn actionBtn" @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                   <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                 </template> 
             </zk-table>
         </div>
     </div>
+      <div id="edit">
+        <el-dialog title="添加编码" :visible.sync="editListShow" :before-close="listClose">
+            <div class="editBody">
+                <div class="editBodyone"><label class="editInpText">编码级别 :</label>
+                    <select  @change="codeTypeChange" class="editSelect" v-model="codeType" >
+                        <option v-for="(item,index) in codeTypeData" :key="index">{{item}}</option>
+                    </select>
+                </div>
+                <div v-if="showFirst" class="editBodytwo"><label class="editInpText">一级编码 :</label>
+                    <select @change="firstTitleChange" class="editSelect" v-model="firstTitle">
+                        <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <label>标题:{{fTitle}}</label>
+                </div>
+                <div v-if="showTwo" class="editBodytwo"><label class="editInpText">二级编码 :</label>
+                    <select @change="secondTitleChange"  v-model="secondTitle" class="editSelect">
+                        <option v-for="(item,index) in secondTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <label>标题:{{twoTitle}}</label>
+                </div>
+                <div v-if="showThird" class="editBodytwo">
+                    <label class="editInpText">三级编码 :</label>
+                    <select @change="thirdTitleChange"  v-model="thirdTitle" class="editSelect">
+                        <option v-for="(item,index) in thirdTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <label>标题:{{thTitle}}</label>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">新建编码 :</label><input class="inp" placeholder="" v-model="newCode"/></div>
+                <div class="editBodytwo"><label class="editInpText">新标题 :</label><input class="inp" placeholder="" v-model="newTitle"/></div>
+                <div class="editBodytwo"><label class="editInpText">完整编码 :</label><input class="inp" placeholder="" v-model="totalCode"/></div>
+                <div class="editBodytwo"><label class="editInpText">完整标题 :</label><input class="inp" placeholder="" v-model="totalTitle"/></div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="addListSure">保存</button>
+                <button class="editBtnC" @click="listClose">取消</button>
+            </div>
+        </el-dialog>
   </div>
+  </div>
+
 </template>
 <script>
 import axios from 'axios';
+import './js/jquery-1.4.4.min.js'
+import data from './js/date.js'
 export default {
   name:'WorkTool',
     data(){
             return {
+                editListShow:false,
                 props: {
                     stripe: false,
                     border: true,
                     showHeader: true,
                     showSummary: false,
                     showRowHover: true,
-                    showIndex: false,
+                    showIndex: true,
                     treeType: true,
                     isFold: true,
                     expandType: false,
                     selectionType: false,
                 }, 
                 columns: [
-                    {
-                        label: '序号',
-                        prop: 'number',
-                        width: '100px',
-                    },
                     {
                         label: '编码',
                         prop: 'number',
@@ -59,11 +95,11 @@ export default {
                     },
                     {
                         label: '来源',
-                        prop: 'type',
+                        prop: 'type_',
                     },
                     {
                         label: '状态',
-                        prop: 'status',
+                        prop: 'status_',
                         minWidth: '200px',
                     },
                     {
@@ -77,7 +113,28 @@ export default {
                 token:'',
                 projId:'',
                 baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
-                workToolData:[]
+                workToolData:[],
+                codeType:'',//编码级别
+                codeTypeData:[],
+                firstTitle:'',//一级标题
+                firstTitleData:[],
+                secondTitle:'',//二级标题
+                secondTitleData:[],
+                thirdTitle:'',//三级标题
+                thirdTitleData:[],
+                newCode:'',//新建编码
+                newTitle:'',//新标题
+                levelData:[],//等级数组
+                showFirst: false,
+                showTwo:false,
+                showThird:false,
+                fTitle:'',
+                twoTitle:'',
+                thTitle:'',
+                firstIndex:'',
+                secondIndex:'',
+                totalCode:'',//完整编码
+                totalTitle:'',//完整标题
             }
 
     },
@@ -86,9 +143,32 @@ export default {
         this.token  = localStorage.getItem('token');
         this.getWorkCode();
     },
+    mounted(){
+        setTimeout(function(){
+            //console.log($('.zk-table__body-row').length);
+            var $allListElements = $('li');
+            for(var i=0;i<$('.zk-table__body-row').length;i++){
+                $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1;
+            }
+        },1000)
+    },
     methods:{
         //专业工种分类/作业工具分类编码信息
         getWorkCode(){
+            var setting = {
+                data: {
+                    key:{
+                        name: "authName",
+                        children:'children'
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "number",
+                        pIdKey: "parNumber",
+                        rootPId: 0
+                    }
+                }
+            };
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/getWorkCode',
@@ -96,16 +176,26 @@ export default {
                     token:this.token
                 },
                 params:{
-                    projId:this.projId,
+                    projectId:this.projId,
                     tableNo:'t17'
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.workToolData = response.data.rt;
-                    // for(let item of this.workToolData){
-                    //     console.log(item.title);
-                    // }
-                    //console.log(this.workToolData);
+                    var arrList = response.data.rt;
+                    arrList.forEach((item,index)=>{
+                        this.codeTypeData.push('Level'+item.level);
+                    })
+                    this.codeTypeData = Array.from(new Set(this.codeTypeData));
+                    this.codeType = this.codeTypeData[0];//初始化编码级别
+                    //console.log(this.codeTypeData)
+                    arrList.forEach((item,index,arr)=>{
+                        arr[index].KeyID = index+1;
+                        arr[index].type_ = this.formatterType(arr[index].type);
+                        arr[index].status_ = this.formatterStatus(arr[index].id,arr[index]);
+                    })
+                    this.workToolData = data.transformTozTreeFormat(setting, arrList);
+
+                    console.log(this.workToolData);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -124,7 +214,7 @@ export default {
             console.log(num)
         },
         //格式化来源
-        formatterType(val){
+        formatterType(value){
             if (value == 0) {
                 return "行业标准";
             }else if (value == 1) {
@@ -149,14 +239,113 @@ export default {
                 }
             }
         },
-        expandChange($event){
-            //console.log(row);
-             //console.log(rowIndex);
-            console.log($event)
+        //添加按钮
+        addList(){
+            this.editListShow = true;
         },
-        Key(row,rowIndex){
-            console.log(row);
-            console.log(rowIndex)
+        //编辑确定
+        addListSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'/config2/component/addWorkCode',
+                headers:{
+                    token:this.token
+                },
+                data:{
+                    level:this.codeType.substr(5,1),
+                    number:this.totalCode,
+                    status:0,
+                    table:'t17',
+                    title:this.newTitle
+                }
+            }).then(response=>{
+                console.log(response)
+            })
+            this.editListShow = false;
+        },
+        //编辑取消
+        listClose(){
+            this.editListShow = false;
+        },
+        //编码级别改变
+        codeTypeChange(){
+            this.firstTitleData = [];
+            if(this.codeType == 'Level2'){
+                this.showFirst = true;
+                this.showTwo = false;
+                this.showThird = false;
+            }else if(this.codeType == 'Level3'){
+                this.showFirst= true;
+                this.showTwo = true;
+                this.showThird = false;
+            }else if(this.codeType == 'Level4'){
+                this.showFirst= true;
+                this.showTwo = true;
+                this.showThird = true;
+            }else{
+                this.showFirst= false;
+                this.showTwo = false;
+                this.showThird = false;
+            };
+            this.workToolData.forEach((item,index,arr)=>{ 
+                this.firstTitleData.push(item.number.substr(0,2)); 
+                this.fTitle = arr[0].title;  
+            })
+            //一级编码操作
+            this.firstTitle = this.firstTitleData[0];//初始化一级编码
+            this.firstIndex = this.firstTitle.split('')[1];
+            this.workToolData[this.firstIndex-1].children.forEach((item,index)=>{
+                this.secondTitleData.push(item.number.substr(2,2)); 
+            })
+            this.totalCode = this.firstTitle+this.newCode;
+            this.totalTitle = this.fTitle+this.newTitle;
+        },
+        //一级编码改变
+        firstTitleChange(){
+            this.totalCode  = '';
+            this.secondTitleData = [];
+            this.workToolData.forEach((item,index)=>{
+                if(this.firstTitle == item.number.substr(0,2)){
+                    this.fTitle = item.title;
+                }
+            })
+            this.firstIndex = this.firstTitle.split('')[1];
+            this.workToolData[this.firstIndex-1].children.forEach((item,index)=>{
+                this.secondTitleData.push(item.number.substr(2,2)); 
+            });
+            this.totalCode = this.firstTitle+this.newCode;
+            this.totalTitle = this.fTitle+this.newTitle;
+        },
+        //二级编码改变
+        secondTitleChange(){
+            this.totalCode  = '';
+            this.thirdTitleData =[];
+
+            this.workToolData[this.firstIndex-1].children.forEach((item,index)=>{
+                if(this.secondTitle == item.number.substr(2,2)){
+                    this.twoTitle = item.title;
+                }
+            })
+
+            this.secondIndex = this.secondTitle.split('')[0];
+            var i =0;
+            //console.log(this.firstIndex,this.secondIndex);
+            this.workToolData[this.firstIndex-1].children[this.secondIndex-1].children.forEach((item,index)=>{
+                this.thirdTitleData.push(item.number.substr(4,2));
+            });
+            this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
+            this.totalTitle = this.fTitle+'-'+this.twoTitle+this.newTitle;
+        },
+        //三级编码改变
+        thirdTitleChange(){
+            this.totalCode  = '';
+            this.workToolData[this.firstIndex-1].children[this.secondIndex-1].children.forEach((item,index)=>{
+                if(this.thirdTitle == item.number.substr(4,2)){
+                    this.thTitle = item.title;
+                }
+            });
+            this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
+            this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+this.newTitle;
         }
     }
 }
@@ -226,5 +415,11 @@ export default {
     .deleteBtn{
         background: url('../../assets/delete.png') no-repeat;
         margin-left: 20px;
+    }
+    #edit .editSelect{
+        width: 308px;
+        height: 38px;
+        background: #fafafa;
+        border: 1px solid #d1d1d1;
     }
 </style>
