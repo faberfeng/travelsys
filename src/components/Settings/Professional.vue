@@ -14,11 +14,51 @@
                    <button class=""   v-if="scope.row.status == 0" @click="edit(scope)">提请</button>
                     <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">通过</button>
                      <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">退回</button>
-                   <button class="editBtn actionBtn" @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
+                   <!-- v-if="scope.row.status == 2 || scope.row.status == 0"-->
                    <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                 </template> 
             </zk-table>
         </div>
+    </div>
+      
+      <div id=edit>
+        <el-dialog title="编辑编码" :visible.sync="addCode" :before-close="userClose">
+            <!-- <div class="editBody">
+                <div class="editBodyone"><label class="editInpText">编码级别 :</label>
+                    <select  @change="revitChange" class="editSelect" disabled v-model="revitCategory">
+                        <option >{{revitCategory}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
+                    <select class="editSelect" v-model="keyTypeVal">
+                        <option v-for="(item,index) in keyTypeData" :key="index">{{item.name}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
+                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
+                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
+                    <select @change="designChange" v-model="designValue" class="editSelect">
+                        <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
+                    <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
+                        <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
+                    <select class="editSelect" v-model="goujianType">
+                        <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
+                    </select>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="PostaddUser">确定</button>
+                <button class="editBtnC" @click="userClose">取消</button>
+            </div> -->
+        </el-dialog>
     </div>
   </div>
 </template>
@@ -38,6 +78,7 @@ export default {
               children: 'children',
                label: 'number'
             },
+            addCode:true,
              props: {
                     stripe: false,
                     border: true,
@@ -51,12 +92,6 @@ export default {
                     selectionType: false,
                 }, 
                 columns: [
-                    
-                    // {
-                    //     label: '序号',
-                    //     prop: 'KeyID',
-                    //     width: '200px',
-                    // },
                     {
                         label: '编码',
                         prop: 'number',
@@ -92,15 +127,28 @@ export default {
         this.getWorkCode()
     },
     mounted(){
-        setTimeout(function(){
-        console.log($('.zk-table__body-row').length)
-        var $allListElements = $('li');
-        for(var i=0;i<$('.zk-table__body-row').length;i++){
-            $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1
-        }
-        },100)
+        var vm = this
+        vm.initKey()
+      
     },
     methods:{
+        initKey(){
+            var timer = setInterval(function(){
+                if($('.zk-table__body-row').length >0){
+                    clearInterval(timer)
+                    for(var i=0;i<$('.zk-table__body-row').length;i++){
+                        $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1
+                    }
+                }
+            },100)
+        },
+        userClose(){
+            var vm = this
+            vm.addCode = false
+        },
+        PostaddUser(){
+
+        },
         /**
          * 格式化来源
          * @param value
@@ -125,6 +173,27 @@ export default {
              //编辑
         edit(num){
             console.log(num)
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    authCodes:checkCode,
+                    posId: vm.jobID,
+                    posName: vm.jobDetial.posName,
+                    posType: vm.jobDetial.posType,
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.adduser = false;
+                    vm.getInfo()
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
         },
         //删除
         deleteItem(num){
@@ -210,24 +279,16 @@ export default {
         padding: 0;
         box-sizing: border-box;
     }
-//     .zk-table--tree-icon{
-//           position: absolute;
-//     left: 210px;
-// }
+    .el-dialog{
+        left: 50%;
+        width: 586px;
+        margin-left:-293px;
+    }
     .clearfix{
         clear: both;
         overflow: hidden;
         content: '';
     }
-    // .zk-table__body-row .zk-table__body-cell:first-of-type{
-    //     position: relative;
-    // }
-    // .zk-table__body-row .zk-table__body-cell:first-of-type .zk-table__cell-inner{
-    //     background: red;
-    //     position: absolute;
-    //     right: -30px;
-    //     top: 0;
-    // }
     .UserList{
         border-collapse: collapse;
         border: 1px solid #e6e6e6;
@@ -268,7 +329,7 @@ export default {
     }
     .zk-table__cell-inner {
     padding: 6px 12px;
-}
+}   
     .editBtn{
         background: url('../../assets/edit.png') no-repeat;
     }
