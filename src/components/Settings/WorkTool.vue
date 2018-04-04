@@ -5,11 +5,13 @@
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-            <zk-table :data="workToolData" :columns="columns" :tree-type="props.treeType"
+            <zk-table 
+             index-text="序号"
+            :data="workToolData" :columns="columns" :tree-type="props.treeType"
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
             :border="props.border" >
                 <template slot="action" slot-scope="scope">
-                   <button class="editBtn actionBtn" @click="edit(scope.rowIndex)"></button>
+                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
                    <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)"></button>
                 </template> 
             </zk-table>
