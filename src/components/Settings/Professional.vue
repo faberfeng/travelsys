@@ -14,8 +14,7 @@
                    <button class=""   v-if="scope.row.status == 0" @click="edit(scope)">提请</button>
                     <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">通过</button>
                      <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">退回</button>
-                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
-                   <!-- v-if="scope.row.status == 2 || scope.row.status == 0"-->
+                   <button class="editBtn actionBtn" @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                    <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                 </template> 
             </zk-table>
@@ -42,11 +41,11 @@
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">新建编码 :</label>
-                    <!-- <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)"/> -->
+                    <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)"/>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">新标题 :</label>
-                    <input class="inp" placeholder="请输入" :value="codingToEdit.title"/>
+                    <input class="inp" placeholder="请输入"   v-model="codingToEdit.title"/>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整编码 :</label>
@@ -138,6 +137,7 @@ export default {
     },
     methods:{
         initCode(key){
+            if(!key)return false;
             var vm = this
             var codingToEdit = key*2 -2
             return vm.codingToEdit.number.substr(codingToEdit,2)
@@ -174,8 +174,24 @@ export default {
             var vm = this
             vm.addCode = false
         },
-        PostaddUser(){
-
+        PostaddUser(){//保存修改
+                var vm = this
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projectId:vm.projId
+                    },
+                    data:vm.codingToEdit
+                }).then((response)=>{
+                    console.log(response)
+                    this.addCode =false
+                }).catch((err)=>{
+                    console.log(err)
+                })
         },
         /**
          * 格式化来源
