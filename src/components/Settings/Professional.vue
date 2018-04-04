@@ -188,7 +188,8 @@ export default {
                     data:vm.codingToEdit
                 }).then((response)=>{
                     console.log(response)
-                    this.addCode =false
+                    vm.addCode =false
+                    vm.getWorkCode()
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -282,7 +283,7 @@ export default {
                     token:this.token,
                 },
                 params:{
-                    projId:this.projId,
+                    projectId:this.projId,
                     tableNo:'t13'
                 }
             }).then(response=>{
