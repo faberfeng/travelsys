@@ -107,7 +107,7 @@ export default {
                         prop:'operator',
                         type: 'template',
                         template: 'action',
-                        width:'150px'
+                        width:'100px'
                     }
                 ],
                 token:'',
