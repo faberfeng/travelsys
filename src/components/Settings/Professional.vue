@@ -5,41 +5,26 @@
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
-        <table class="UserList" border="1" width='100%'>
-            <thead>
-                <tr  class="userList-thead">
-                    <th width="50px">序号</th>
-                    <th >编码</th>
-                    <th width="186px">标题</th>
-                    <th width="206px">来源</th>
-                    <th width="120px">状态</th>
-                    <th width="125px">操作 </th>
-                </tr>
-            </thead>
-        </table>
-          <el-tree :data="codingList" class="tree-item"    node-key="id" :props="defaultProps" @node-click="handleNodeClick">
-                <span class="custom-tree-node" slot-scope="{ node, data }">
-                    <div class="item-code " style="min-width:125px;padding-top: 17px;">
-                         <el-button
-                            type="text"
-                            class="editIcon"
-                            @click.stop="handleNodeClick"></el-button>
-                        <el-button class="deleteIcon"
-                            type="text"
-                            @click.stop="handleNodeClick"></el-button>
-                     </div>
-                    <div class="item-code item-index" v-text="11"></div>
-                    <div class="item-code " style="min-width:120px" v-text="formatterStatus(data.id,data)"></div>
-                    <div class="item-code " style="min-width:206px" v-text="formatterType(data.type)"></div>
-                    <div class="item-code " style="min-width:186px;border-left: 1px solid #e0e0e0;" v-text="data.title"></div>
-                    <div class="item-code " style="min-width:260px;width:auto;float: left;border-right: none;"  v-text="data.number"></div>
-                </span>
-          </el-tree>
+         <zk-table 
+             index-text="序号"
+            :data="codingList" :columns="columns" :tree-type="props.treeType" 
+            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+            :border="props.border" >
+                <template slot="action" slot-scope="scope">
+                   <button class=""   v-if="scope.row.status == 0" @click="edit(scope)">提请</button>
+                    <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">通过</button>
+                     <button class=""   v-if="scope.row.status == 1" @click="edit(scope)">退回</button>
+                   <button class="editBtn actionBtn" @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                   <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                </template> 
+            </zk-table>
         </div>
     </div>
   </div>
 </template>
 <script>
+import './js/jquery-1.4.4.min.js'
+import data from './js/date.js'
 import axios from 'axios'
 export default {
     name:'Professional',
@@ -52,13 +37,68 @@ export default {
             defaultProps:{
               children: 'children',
                label: 'number'
-            }
+            },
+             props: {
+                    stripe: false,
+                    border: true,
+                    showHeader: true,
+                    showSummary: false,
+                    showRowHover: true,
+                    showIndex: true,
+                    treeType: true,
+                    isFold: true,
+                    expandType: false,
+                    selectionType: false,
+                }, 
+                columns: [
+                    
+                    // {
+                    //     label: '序号',
+                    //     prop: 'KeyID',
+                    //     width: '200px',
+                    // },
+                    {
+                        label: '编码',
+                        prop: 'number',
+                        width: '200px',
+                    },
+                    {
+                        label: '标题',
+                        prop: 'title',
+                        minWidth: '50px',
+                    },
+                    {
+                        label: '来源',
+                        prop: 'type_',
+                    },
+                    {
+                        label: '状态',
+                        prop: 'status_',
+                        minWidth: '200px',
+                    },
+                    {
+                        label:'操作',
+                        prop:'operator',
+                        type: 'template',
+                        template: 'action',
+                        width:'100px'
+                    }
+                ],
         }
     },
     created(){
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.getWorkCode()
+    },
+    mounted(){
+        setTimeout(function(){
+        console.log($('.zk-table__body-row').length)
+        var $allListElements = $('li');
+        for(var i=0;i<$('.zk-table__body-row').length;i++){
+            $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1
+        }
+        },100)
     },
     methods:{
         /**
@@ -82,6 +122,14 @@ export default {
          * @param index
          * @returns {String}
          */
+             //编辑
+        edit(num){
+            console.log(num)
+        },
+        //删除
+        deleteItem(num){
+            console.log(num)
+        },
         formatterStatus(value, row, index) {
             if (row.type == 0 || row.type == 1) {
                 return '正常使用';
@@ -104,6 +152,20 @@ export default {
         //专业种类分类/作业工具分类编码信息
         getWorkCode(){
             var vm = this
+             var setting = {
+                data: {
+                    key:{
+                        name: "authName",
+                        children:'children'
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "number",
+                        pIdKey: "parNumber",
+                        rootPId: 0
+                    }
+                }
+            };
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/getWorkCode',
@@ -116,7 +178,14 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    vm.codingList = response.data.rt
+                var arr = response.data.rt
+                for(var i=0;i<arr.length;i++){
+                    arr[i].KeyID = i+1
+                    arr[i].type_ = vm.formatterType(arr[i].type)
+                    arr[i].status_ = vm.formatterStatus(arr[i].id,arr[i])
+                }
+                 var a = data.transformTozTreeFormat(setting, arr)
+                vm.codingList = a
                 }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'warning',
@@ -141,11 +210,24 @@ export default {
         padding: 0;
         box-sizing: border-box;
     }
+//     .zk-table--tree-icon{
+//           position: absolute;
+//     left: 210px;
+// }
     .clearfix{
         clear: both;
         overflow: hidden;
         content: '';
     }
+    // .zk-table__body-row .zk-table__body-cell:first-of-type{
+    //     position: relative;
+    // }
+    // .zk-table__body-row .zk-table__body-cell:first-of-type .zk-table__cell-inner{
+    //     background: red;
+    //     position: absolute;
+    //     right: -30px;
+    //     top: 0;
+    // }
     .UserList{
         border-collapse: collapse;
         border: 1px solid #e6e6e6;
@@ -177,6 +259,22 @@ export default {
                 }
             }
         }
+    }
+     .actionBtn{
+        width: 16px;
+        height: 16px;
+        border: none;
+        cursor: pointer;
+    }
+    .zk-table__cell-inner {
+    padding: 6px 12px;
+}
+    .editBtn{
+        background: url('../../assets/edit.png') no-repeat;
+    }
+    .deleteBtn{
+        background: url('../../assets/delete.png') no-repeat;
+        margin-left: 20px;
     }
     .el-tree-node__content{
         height: auto;

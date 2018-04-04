@@ -331,6 +331,28 @@ var data = {
             _init.zTreeTools[i].apply(this, arguments);
         }
     },
+    // forEachTreeArray: function (setting, nodes) {
+    //     if (!nodes) return [];
+    //     var r = [];
+    //     if ($.isArray(nodes)) {
+    //         for (var i = 0, l = nodes.length; i < l; i++) {
+    //             var node = nodes[i];
+    //             _do(node,i);
+    //         }
+    //     } else {
+    //         _do(nodes);
+    //     }
+    //     return r;
+
+    //     function _do(_node,i) {
+    //         var children = data.nodeChildren(setting, _node);
+    //         if (children) {//有子类
+    //             r = r.concat(data.transformToArrayFormat(setting, children));
+    //         }else{//无子类
+    //             r.push(_node);
+    //         }
+    //     }
+    // },
     transformToArrayFormat: function (setting, nodes) {
         if (!nodes) return [];
         var r = [];

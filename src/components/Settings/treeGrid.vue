@@ -116,7 +116,7 @@
         let me = this  
         let record = me.data[trIndex]  
         console.log(trIndex)
-        record._expanded = true  
+        record._expanded = tr  
       },  
     // 显示层级关系的空格和图标  
       spaceIconShow (index) {  

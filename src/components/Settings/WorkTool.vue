@@ -5,11 +5,17 @@
         <span class="worktooltitle">分类编码</span>
         <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
+<<<<<<< HEAD
             <zk-table ref="table" :data="workToolData" :columns="columns" :tree-type="props.treeType"
+=======
+            <zk-table 
+             index-text="序号"
+            :data="workToolData" :columns="columns" :tree-type="props.treeType"
+>>>>>>> 17564156984f7ca49487a1fe6050a3b14b139108
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
             :border="props.border" @tree-icon-click="expandChange($event)" @row-key="Key(row,rowIndex)">
                 <template slot="action" slot-scope="scope">
-                   <button class="editBtn actionBtn" @click="edit(scope.rowIndex)"></button>
+                   <button class="editBtn actionBtn" @click="edit(scope)"></button>
                    <button class="deleteBtn actionBtn" @click="deleteItem(scope.rowIndex)"></button>
                 </template> 
             </zk-table>
