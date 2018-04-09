@@ -47,8 +47,8 @@
                     </select>
                     <label>标题:{{thTitle}}</label>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">新建编码 :</label><input class="inp" placeholder="" v-model="newCode"/></div>
-                <div class="editBodytwo"><label class="editInpText">新标题 :</label><input class="inp" placeholder="" v-model="newTitle"/></div>
+                <div class="editBodytwo"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
+                <div class="editBodytwo"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                 <div class="editBodytwo"><label class="editInpText">完整编码 :</label><input class="inp" placeholder="" v-model="totalCode"/></div>
                 <div class="editBodytwo"><label class="editInpText">完整标题 :</label><input class="inp" placeholder="" v-model="totalTitle"/></div>
             </div>
@@ -107,7 +107,7 @@ export default {
                         prop:'operator',
                         type: 'template',
                         template: 'action',
-                        width:'100px'
+                        width:'150px'
                     }
                 ],
                 token:'',
@@ -135,22 +135,25 @@ export default {
                 secondIndex:'',
                 totalCode:'',//完整编码
                 totalTitle:'',//完整标题
+                arrList:[],//原始的数组
             }
 
     },
     created(){
         this.projId = localStorage.getItem('projId');
         this.token  = localStorage.getItem('token');
+        
         this.getWorkCode();
     },
     mounted(){
-        setTimeout(function(){
-            //console.log($('.zk-table__body-row').length);
-            var $allListElements = $('li');
-            for(var i=0;i<$('.zk-table__body-row').length;i++){
-                $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1;
+        var timer = setInterval(function(){
+            if($('.zk-table__body-row').length >0){
+                clearInterval(timer)
+                for(var i=0;i<$('.zk-table__body-row').length;i++){
+                    $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1
+                }
             }
-        },1000)
+        },100)
     },
     methods:{
         //专业工种分类/作业工具分类编码信息
@@ -181,19 +184,18 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    var arrList = response.data.rt;
-                    arrList.forEach((item,index)=>{
+                    this.arrList = response.data.rt;
+                    this.arrList.forEach((item,index)=>{
                         this.codeTypeData.push('Level'+item.level);
                     })
                     this.codeTypeData = Array.from(new Set(this.codeTypeData));
                     this.codeType = this.codeTypeData[0];//初始化编码级别
-                    //console.log(this.codeTypeData)
-                    arrList.forEach((item,index,arr)=>{
+                    this.arrList.forEach((item,index,arr)=>{
                         arr[index].KeyID = index+1;
                         arr[index].type_ = this.formatterType(arr[index].type);
-                        arr[index].status_ = this.formatterStatus(arr[index].id,arr[index]);
+                        arr[index].status_ = this.formatterStatus(arr[index].status,arr[index]);
                     })
-                    this.workToolData = data.transformTozTreeFormat(setting, arrList);
+                    this.workToolData = data.transformTozTreeFormat(setting, this.arrList);
 
                     console.log(this.workToolData);
                 }else if(response.data.cd == '-1'){
@@ -211,7 +213,20 @@ export default {
         },
         //删除
         deleteItem(num){
-            console.log(num)
+            console.log(num);
+            // axios({
+            //     method:'post',
+            //     url:this.baseUrl+'config2/component/deleteWorkCode',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         projectId:this.projId
+            //     },
+            //     data:{
+            //         id:
+            //     }
+            // })
         },
         //格式化来源
         formatterType(value){
@@ -243,13 +258,16 @@ export default {
         addList(){
             this.editListShow = true;
         },
-        //编辑确定
+        //添加确定
         addListSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'/config2/component/addWorkCode',
+                url:this.baseUrl+'config2/component/addWorkCode',
                 headers:{
                     token:this.token
+                },
+                params:{
+                    projectId:this.projId
                 },
                 data:{
                     level:this.codeType.substr(5,1),
@@ -259,9 +277,18 @@ export default {
                     title:this.newTitle
                 }
             }).then(response=>{
-                console.log(response)
+                if(response.data.cd == 0){
+                    console.log(response.data);
+                    this.getWorkCode();
+                    this.editListShow = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.push({
+                        path:'/login'
+                    })
+                }
             })
-            this.editListShow = false;
         },
         //编辑取消
         listClose(){
@@ -270,6 +297,8 @@ export default {
         //编码级别改变
         codeTypeChange(){
             this.firstTitleData = [];
+            this.totalCode = '';
+            this.totalTitle = '';
             if(this.codeType == 'Level2'){
                 this.showFirst = true;
                 this.showTwo = false;
@@ -292,13 +321,19 @@ export default {
                 this.fTitle = arr[0].title;  
             })
             //一级编码操作
+            this.secondTitleData = [];
             this.firstTitle = this.firstTitleData[0];//初始化一级编码
-            this.firstIndex = this.firstTitle.split('')[1];
+            this.workToolData.forEach((item,index)=>{
+                if(this.firstTitle == item.number.substr(0,2)){
+                    this.fTitle = item.title;
+                    this.firstIndex = item.KeyID;
+                };
+            })
+
             this.workToolData[this.firstIndex-1].children.forEach((item,index)=>{
                 this.secondTitleData.push(item.number.substr(2,2)); 
             })
-            this.totalCode = this.firstTitle+this.newCode;
-            this.totalTitle = this.fTitle+this.newTitle;
+            
         },
         //一级编码改变
         firstTitleChange(){
@@ -307,14 +342,13 @@ export default {
             this.workToolData.forEach((item,index)=>{
                 if(this.firstTitle == item.number.substr(0,2)){
                     this.fTitle = item.title;
-                }
+                    this.firstIndex = item.KeyID;
+                };
             })
-            this.firstIndex = this.firstTitle.split('')[1];
             this.workToolData[this.firstIndex-1].children.forEach((item,index)=>{
-                this.secondTitleData.push(item.number.substr(2,2)); 
+                    this.secondTitleData.push(item.number.substr(2,2)); 
             });
-            this.totalCode = this.firstTitle+this.newCode;
-            this.totalTitle = this.fTitle+this.newTitle;
+
         },
         //二级编码改变
         secondTitleChange(){
@@ -329,12 +363,10 @@ export default {
 
             this.secondIndex = this.secondTitle.split('')[0];
             var i =0;
-            //console.log(this.firstIndex,this.secondIndex);
             this.workToolData[this.firstIndex-1].children[this.secondIndex-1].children.forEach((item,index)=>{
                 this.thirdTitleData.push(item.number.substr(4,2));
             });
-            this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
-            this.totalTitle = this.fTitle+'-'+this.twoTitle+this.newTitle;
+
         },
         //三级编码改变
         thirdTitleChange(){
@@ -344,8 +376,32 @@ export default {
                     this.thTitle = item.title;
                 }
             });
-            this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
-            this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+this.newTitle;
+        },
+        newCodeChange(){
+            // if(this.firstTitle!=''&&this.secondTitle!=''&&this.thirdTitle!=''){
+            //     this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
+            // }else if (this.firstTitle!=''&&this.secondTitle!=''){
+            //     this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
+            // }else if(this.firstTitle!=''){
+            //     this.totalCode = this.firstTitle+this.newCode+'00';
+            // }else{
+            //     this.totalCode = this.newCode+'0000';
+            // }
+        },
+        newTitleChange(){
+            if(this.codeType == 'Level1'){
+                this.totalCode = this.newCode+'0000';
+                this.totalTitle = this.newTitle;
+            }else if (this.codeType == 'Level2'){
+                this.totalCode = this.firstTitle+this.newCode+'00';
+                this.totalTitle = this.fTitle+'-'+this.newTitle;
+            }else if(this.codeType == 'Level3'){
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.newTitle;
+                this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
+            }else if(this.codeType == 'Level4'){
+                this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+'-'+this.newTitle;
+            }
         }
     }
 }
