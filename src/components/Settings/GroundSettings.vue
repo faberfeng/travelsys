@@ -1021,7 +1021,7 @@ export default {
         }
         .editInpText{
             display: inline-block;
-            margin-left: 89px;
+            margin-left: 40px;
 
         }
     }

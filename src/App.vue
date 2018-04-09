@@ -292,8 +292,8 @@ padding-right: 14px;
         text-align: right;
     }
     #edit .inp{
-        width: 388px;
-        height: 30px;
+        width: 435px;
+        height: 38px;
         border: 1px solid #d1d1d1;
         border-radius: 2px;
         background: #fafafa;
