@@ -621,6 +621,7 @@ export default {
         top: 116px;
         left: 26px;
         bottom: 0;
+        z-index: 100;
     }
     .settingsRight{
         display: block;
