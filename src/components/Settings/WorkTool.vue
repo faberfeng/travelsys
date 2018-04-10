@@ -309,7 +309,7 @@ export default {
                     this.workToolData = data.transformTozTreeFormat(setting, this.arrList);
 
                     // console.log(this.arrList);
-                    console.log(this.workToolData)
+                    //console.log(this.workToolData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -674,12 +674,12 @@ export default {
             
             var parentNum = scope.row.parNumber;
             var type = '';
-            console.log(parentNum);
+            //console.log(parentNum);
             if(parentNum){
                 this.arrList.forEach((item,index,arr)=>{
                     if(item.number == parentNum){
                         console.log(item.type)
-                        type = item.type;
+                        type = item.status;
                     }
                 })
             }

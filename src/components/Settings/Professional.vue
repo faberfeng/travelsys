@@ -22,8 +22,6 @@
     </div>
       
       <div id='edit'>
-<<<<<<< HEAD
-=======
         <el-dialog title="添加编码" :visible.sync="editListShow" :before-close="listClose">
             <div class="editBody">
                 <div class="editBodyone edit-item clearfix"><label class="editInpText">编码级别 :</label>
@@ -70,7 +68,6 @@
                 <button class="editBtnC" @click="listClose">取消</button>
             </div>
         </el-dialog>
->>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         <el-dialog title="编辑编码" :visible.sync="addCode" :before-close="userClose">
             <div class="editBody">
                 <div class="editBodyone edit-item clearfix">
@@ -198,9 +195,6 @@ export default {
             confirm:{
                 msg:'',
                 title:''
-<<<<<<< HEAD
-            }
-=======
             },
             originalData:[],//原始未树状化数据,
             codeType:'',//编码级别
@@ -224,7 +218,6 @@ export default {
             thTitle:'',
             firstIndex:'',
             secondIndex:'',
->>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         }
     },
     created(){
@@ -271,9 +264,6 @@ export default {
 
         },
          reject(rows){//退回 status 为1时
-<<<<<<< HEAD
-
-=======
              var vm = this
             vm.confirmVisible_1 = true
             vm.confirm.title = '确认退回'
@@ -318,7 +308,6 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
->>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         },
         remindClose(){
             var vm = this
@@ -541,8 +530,6 @@ export default {
                 vm.levelNum = levelNum
                  var a = data.transformTozTreeFormat(setting, arr)
                 vm.codingList = a
-<<<<<<< HEAD
-=======
 
                 /*
                 从文的添加的代码
@@ -550,7 +537,6 @@ export default {
                 vm.codeTypeData = Array.from(new Set(vm.codeTypeData));
                 vm.codeType = vm.codeTypeData[0];//初始化编码级别
                 vm.initKey()
->>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
                 }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'warning',
