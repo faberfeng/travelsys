@@ -3,7 +3,7 @@
       <h4 class="title"><span>专业工种分类编码</span></h4>
       <div class="manageWorktool">
         <span class="worktooltitle">分类编码</span>
-        <button class="btn" @click="addList"><i class="el-icon-plus"></i>添加</button>
+        <button class="btn"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
          <zk-table 
              index-text="序号"
@@ -22,6 +22,8 @@
     </div>
       
       <div id='edit'>
+<<<<<<< HEAD
+=======
         <el-dialog title="添加编码" :visible.sync="editListShow" :before-close="listClose">
             <div class="editBody">
                 <div class="editBodyone edit-item clearfix"><label class="editInpText">编码级别 :</label>
@@ -68,6 +70,7 @@
                 <button class="editBtnC" @click="listClose">取消</button>
             </div>
         </el-dialog>
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         <el-dialog title="编辑编码" :visible.sync="addCode" :before-close="userClose">
             <div class="editBody">
                 <div class="editBodyone edit-item clearfix">
@@ -86,12 +89,12 @@
                     <span v-text="'标题：'+initTitle(item)" :title="'标题：'+initTitle(item)" class="edit-item-biaoti"></span>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
-                    <label class="editInpText"><i class="redDot"></i>新建编码 :</label>
-                    <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)" required/>
+                    <label class="editInpText">新建编码 :</label>
+                    <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)"/>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
-                    <label class="editInpText"><i class="redDot"></i>新标题 :</label>
-                    <input class="inp" placeholder="请输入"   v-model="codingToEdit.title" required/>
+                    <label class="editInpText">新标题 :</label>
+                    <input class="inp" placeholder="请输入"   v-model="codingToEdit.title"/>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整编码 :</label>
@@ -126,7 +129,7 @@
             <span class="title-confirm" v-text="confirm.title"></span>
             <span class="text-confirm" v-html="confirm.msg"></span>
              <div  class="dialog-footer">
-                <button class="editBtnS" @click="checkCode">确认</button>
+                <button class="editBtnS" @click="deleteCode">删除</button>
                 <button class="editBtnC" @click="remindClose">取消</button>
             </div>
         </el-dialog>
@@ -137,18 +140,10 @@
 import './js/jquery-1.4.4.min.js'
 import data from './js/date.js'
 import axios from 'axios'
-var deepCopy= function(source) { 
-    var result={};
-    for (var key in source) {
-        result[key] = typeof source[key]==='object'? deepCopy(source[key]): source[key];
-     } 
-   return result; 
-}
 export default {
     name:'Professional',
     data(){
         return {
-             editListShow:false,
             codingList:[],//编码列表
             codingToEdit:{},//要编辑的编码
             levelNum:{},
@@ -203,6 +198,9 @@ export default {
             confirm:{
                 msg:'',
                 title:''
+<<<<<<< HEAD
+            }
+=======
             },
             originalData:[],//原始未树状化数据,
             codeType:'',//编码级别
@@ -226,6 +224,7 @@ export default {
             thTitle:'',
             firstIndex:'',
             secondIndex:'',
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         }
     },
     created(){
@@ -233,124 +232,48 @@ export default {
         this.projId = localStorage.getItem('projId');
         this.getWorkCode()
     },
+    mounted(){
+        var vm = this
+        vm.initKey()
+      
+    },
     methods:{
-         //添加按钮
-        addList(){
-            this.editListShow = true;
-        },
-        //编辑取消
-        listClose(){
-            this.editListShow = false;
-        },
         request(rows){//提请 status为0时
+        // var projectId = window.parent.BIM.Tool.getCurrentProjId();
+        // var row = $('#treegrid').treegrid('find', id); // reload the all rows
+        // var parRow = $('#treegrid').treegrid('getParent', id);
+        // if(parRow!=null){
+        //     if(parRow.status==0||parRow.status==2){
+        //         $.messager.alert("警告", "该编码的所有父编码必须为【已提请】状态，才能提请", "warning");
+        //         return;
+        //     }
+        //     var parRow2 = $('#treegrid').treegrid('getParent', parRow.id);
+        //     if(parRow2!=null){
+        //         if(parRow2.status==0||parRow2.status==2){
+        //             $.messager.alert("警告", "该编码的所有父编码必须为【已提请】状态，才能提请", "warning");
+        //             return;
+        //         }
+        //         var parRow3 = $('#treegrid').treegrid('getParent', parRow2.id);
+        //         if(parRow3!=null){
+        //             if(parRow3.status==0||parRow3.status==2){
+        //                 $.messager.alert("警告", "该编码的所有父编码必须为【已提请】状态，才能提请", "warning");
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
             var vm = this
-            if(rows.row.parNumber != null){
-                var isOK = vm.submitGenieClass(rows.row.parNumber,0)
-                console.log(isOK)
-                if(isOK){
-                    vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                    vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 1 //提请状态
-                }
-            }else{
-                if(rows.row.status == 0 || rows.row.status == 2){
-                     //无法提请
-                    vm.$message({
-                        type:'warning',
-                        message:'警告, 该编码的所有父编码必须为【已提请】状态，才能提请'
-                    });
-                }else{
-                      vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                     vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 1 //提请状态
-                }
-            }
+            vm.confirmVisible_1 = true
+            vm.confirm.title = '确认提请'
+            vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
+        },
+        pass(rows){//通过 status为1时
 
         },
-        /**
-         * 提请分类编码
-         * @param id
-         */
-        submitGenieClass(id,index){//id=上一级的number
-            var vm = this
-            if(id !=null){
-                if(index == 0){
-                    for(var i=0;i<vm.originalData.length;i++){
-                        if(vm.originalData[i].number == id){
-                            if(vm.originalData[i].status == 0 || vm.originalData[i].status == 2){
-                                //无法提请
-                                vm.$message({
-                                    type:'warning',
-                                    message:'警告, 该编码的所有父编码必须为【已提请】状态，才能提请'
-                                });
-                                return false;
-                            }else{
-                                //可以提请，但必须向上再继续查找
-                                if(vm.originalData[i].parNumber != null){
-                                    console.log('找到父元素'+vm.originalData[i].parNumber)
-                                    return vm.submitGenieClass(vm.originalData[i].parNumber,0)//查找上级
-                                }else{
-                                    //现在就可以提请，显示确认提示框
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }else if(index == 1){
-                     for(var i=0;i<vm.originalData.length;i++){
-                        if(vm.originalData[i].number == id){
-                            if(vm.originalData[i].status == 0 || vm.originalData[i].status == 1 || vm.originalData[i].status == 2){
-                                //无法提请
-                                vm.$message({
-                                    type:'warning',
-                                    message:'警告, 该编码的所有父编码必须为【正常使用】状态，才能通过通过提请'
-                                });
-                                return false;
-                            }else{
-                                //可以提请，但必须向上再继续查找
-                                if(vm.originalData[i].parNumber != null){
-                                    console.log('找到父元素'+vm.originalData[i].parNumber)
-                                    return vm.submitGenieClass(vm.originalData[i].parNumber,1)//查找上级
-                                }else{
-                                    //现在就可以提请，显示确认提示框
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return '竟然没找到这条code'
-        },
-        /**
-         * 通过分类编码
-         * @param id
-         */
-        pass(rows){//通过 status为1时
-             var vm = this
-            if(rows.row.parNumber != null){
-                var isOK = vm.submitGenieClass(rows.row.parNumber,1)
-                console.log(isOK)
-                if(isOK){
-                    vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认通过提请'
-                    vm.confirm.msg = '确认通过本条分类编码的提请？<br>通过后编码和标题将无法再次修改。'
-                    vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 3 //通过状态
-                }
-            }else{
-                      vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认通过提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                     vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 3 //通过状态
-            }
-        },
          reject(rows){//退回 status 为1时
+<<<<<<< HEAD
+
+=======
              var vm = this
             vm.confirmVisible_1 = true
             vm.confirm.title = '确认退回'
@@ -395,6 +318,7 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         },
         remindClose(){
             var vm = this
@@ -414,9 +338,9 @@ export default {
         initTitle(key){
             var vm = this
             var codingToEdit = key*2 -2
-            var a1 = parseInt(vm.codingToEdit.number.substr(0,2))
-            var a2 = parseInt(vm.codingToEdit.number.substr(2,2))
-            var a3 = parseInt(vm.codingToEdit.number.substr(4,2))
+            var a1 = vm.codingToEdit.number.substr(0,2)
+            var a2 = vm.codingToEdit.number.substr(2,2)
+            var a3 = vm.codingToEdit.number.substr(4,2)
             switch(key){
                 case 1:
                     return vm.levelNum[a1].title;
@@ -533,11 +457,10 @@ export default {
                 }else{
                      vm.$message({
                         type:'success',
-                        message:'删除成功'
+                        message:response.data.msg
                     })
-                    vm.deleteWorkCode = {}
-                    vm.confirmVisible = false
-                    vm.getWorkCode()//重新获取列表，重新初始化序号
+                vm.deleteWorkCode = {}
+                vm.confirmVisible = false
                 } 
             }).catch((err)=>{
                 console.log(err)
@@ -616,9 +539,10 @@ export default {
                 }
                 console.log(levelNum)
                 vm.levelNum = levelNum
-                vm.originalData = arr
                  var a = data.transformTozTreeFormat(setting, arr)
                 vm.codingList = a
+<<<<<<< HEAD
+=======
 
                 /*
                 从文的添加的代码
@@ -626,6 +550,7 @@ export default {
                 vm.codeTypeData = Array.from(new Set(vm.codeTypeData));
                 vm.codeType = vm.codeTypeData[0];//初始化编码级别
                 vm.initKey()
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
                 }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'warning',
@@ -852,7 +777,7 @@ export default {
     background: #ffffff;
     }
     .zk-table--row-hover .zk-table--tree-icon{
- background: #ebf7ff;
+        background: #ebf7ff;
     }
     .zk-table--tree-icon::after {
        display: block;
@@ -1086,14 +1011,6 @@ export default {
     }
     .btn i{
         margin-right: 10px;
-    }
-    .redDot{
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        border-radius: 3px;
-        background: #fc3439;
-        margin: 4px 4px 2px;
     }
     .confirm{
         .el-dialog{

@@ -115,6 +115,15 @@
                     <button class="editBtnC" @click="confirmClose">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog class="confirm" :visible.sync="confirmVisibleTwo" :before-close="confirmCloseTwo">
+                <span class="icon-confirm icon-request"></span>
+                <span class="title-confirm">警告</span>
+                <span class="text-confirm">该编码的所有父编码必须为【已提请】状态，才能提请</span>
+                <div  class="dialog-footer">
+                    <button class="editBtnS" @click="confirmVisibleTwo=false">确认</button>
+                    <button class="editBtnC" @click="confirmCloseTwo">取消</button>
+                </div>
+            </el-dialog>
             <el-dialog class="confirm" :visible.sync="passVisible" :before-close="cancelPass">
                 <span class="icon-confirm icon-request"></span>
                 <span class="title-confirm">确认通过</span>
@@ -233,7 +242,8 @@ export default {
                 passVisible:false,
                 surePassObject:{},
                 rejectObject:{},
-                rejectVisible:false
+                rejectVisible:false,
+                confirmVisibleTwo:false
             }
 
     },
@@ -299,7 +309,7 @@ export default {
                     this.workToolData = data.transformTozTreeFormat(setting, this.arrList);
 
                     // console.log(this.arrList);
-                    // console.log(this.workToolData)
+                    console.log(this.workToolData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -661,7 +671,27 @@ export default {
         //提请按钮
         confirmBtn(scope){
             this.confirmObject = scope;
-            this.confirmVisible = true;
+            
+            var parentNum = scope.row.parNumber;
+            var type = '';
+            console.log(parentNum);
+            if(parentNum){
+                this.arrList.forEach((item,index,arr)=>{
+                    if(item.number == parentNum){
+                        console.log(item.type)
+                        type = item.type;
+                    }
+                })
+            }
+            if(type == 2){
+                this.confirmVisibleTwo = true;
+            }else if(type == 0 || type ==1){
+                this.confirmVisible = true;
+            }
+            
+        },
+        confirmCloseTwo(){
+            this.confirmVisibleTwo=false;
         },
         //确认提请
         deleteCode(){
