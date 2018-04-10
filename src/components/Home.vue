@@ -33,14 +33,7 @@
                                 </el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
-                                <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager">
-                                    <el-menu :default-active="activeIndex"  mode="horizontal">
-                                        <el-menu-item index="1"><router-link :to="{path:'/home/costover'}">最近文档</router-link></el-menu-item>
-                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">工程云盘</router-link></el-menu-item>
-                                        <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">已经分享</router-link></el-menu-item>
-                                        <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">个人中转</router-link></el-menu-item>
-                                    </el-menu>
-                                </el-tab-pane>
+                                <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
                                 </el-tab-pane>
                             </el-tabs>
