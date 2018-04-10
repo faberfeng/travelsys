@@ -22,6 +22,55 @@
     </div>
       
       <div id='edit'>
+<<<<<<< HEAD
+=======
+        <el-dialog title="添加编码" :visible.sync="editListShow" :before-close="listClose">
+            <div class="editBody">
+                <div class="editBodyone edit-item clearfix"><label class="editInpText">编码级别 :</label>
+                    <select  @change="codeTypeChange" class="editSelect" v-model="codeType" >
+                        <option v-for="(item,index) in codeTypeData" :key="index">{{item}}</option>
+                    </select>
+                    <i class="icon-sanjiao"></i>
+                </div>
+                <div v-if="showFirst" class="editBodytwo edit-item clearfix"><label class="editInpText">一级编码 :</label>
+                    <select @change="firstTitleChange" class="editSelect" v-model="firstTitle">
+                        <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <i class="icon-sanjiao"></i>
+                    <span v-text="'标题：'+fTitle" :title="'标题：'+fTitle" class="edit-item-biaoti"></span>
+                </div>
+                <div v-if="showTwo" class="editBodytwo edit-item clearfix"><label class="editInpText">二级编码 :</label>
+                    <select @change="secondTitleChange"  v-model="secondTitle" class="editSelect">
+                        <option v-for="(item,index) in secondTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <i class="icon-sanjiao"></i>
+                    <span v-text="'标题：'+twoTitle" :title="'标题：'+twoTitle" class="edit-item-biaoti"></span>
+                </div>
+                <div v-if="showThird" class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">三级编码 :</label>
+                    <select @change="thirdTitleChange"  v-model="thirdTitle" class="editSelect">
+                        <option v-for="(item,index) in thirdTitleData" :key="index">{{item}}</option>
+                    </select>
+                    <i class="icon-sanjiao"></i>
+                    <span v-text="'标题：'+thTitle" :title="'标题：'+thTitle" class="edit-item-biaoti"></span>
+                </div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newTitleCode" v-model="newCode"/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">完整编码 :</label>
+                    <span v-text="totalCode"></span>
+                </div>
+                <div class="editBodytwo edit-item clearfix">
+                    <label class="editInpText">完整标题 :</label>
+                    <span v-text="totalTitle"></span>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="addListSure">保存</button>
+                <button class="editBtnC" @click="listClose">取消</button>
+            </div>
+        </el-dialog>
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         <el-dialog title="编辑编码" :visible.sync="addCode" :before-close="userClose">
             <div class="editBody">
                 <div class="editBodyone edit-item clearfix">
@@ -149,7 +198,33 @@ export default {
             confirm:{
                 msg:'',
                 title:''
+<<<<<<< HEAD
             }
+=======
+            },
+            originalData:[],//原始未树状化数据,
+            codeType:'',//编码级别
+            codeTypeData:[],
+            firstTitle:'',//一级标题
+            firstTitleData:[],
+            secondTitle:'',//二级标题
+            secondTitleData:[],
+            thirdTitle:'',//三级标题
+            thirdTitleData:[],
+            showFirst: false,
+            showTwo:false,
+            showThird:false,
+            newCode:'',//新建编码
+            newTitle:'',//新标题
+            levelData:[],//等级数组
+            totalCode:'',//完整编码
+            totalTitle:'',//完整标题
+            fTitle:'',
+            twoTitle:'',
+            thTitle:'',
+            firstIndex:'',
+            secondIndex:'',
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         }
     },
     created(){
@@ -196,7 +271,54 @@ export default {
 
         },
          reject(rows){//退回 status 为1时
+<<<<<<< HEAD
 
+=======
+             var vm = this
+            vm.confirmVisible_1 = true
+            vm.confirm.title = '确认退回'
+            vm.confirm.msg = '确认退回本条分类编码的提请？'
+            vm.deleteWorkCode = deepCopy(rows.row)
+            vm.deleteWorkCode.status = 2 //退回状态
+            vm.deleteWorkCode.table = "t13"
+        },
+        checkCode(){
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                },
+                data:{
+                    "id":vm.deleteWorkCode.id,
+                    "number":vm.deleteWorkCode.number,
+                    "title":vm.deleteWorkCode.title,
+                    "status":vm.deleteWorkCode.status,
+                    "table":"t13"
+                }
+            }).then((response)=>{
+                if(response.data.cd != 0){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }else{
+                     vm.$message({
+                        type:'success',
+                        message:'操作成功！'
+                    })
+                    vm.deleteWorkCode = {}
+                    vm.confirmVisible_1 = false
+                    vm.getWorkCode()//重新获取列表，重新初始化序号
+                } 
+            }).catch((err)=>{
+                console.log(err)
+            })
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
         },
         remindClose(){
             var vm = this
@@ -395,6 +517,8 @@ export default {
                 var arr = response.data.rt
                 var levelNum = {}
                 for(var i=0;i<arr.length;i++){
+                    vm.codeTypeData.push('Level'+arr[i].level);
+                    arr[i].KeyID = i+1;
                     arr[i].type_ = vm.formatterType(arr[i].type)
                     arr[i].status_ = vm.formatterStatus(arr[i].status,arr[i])
                     //根据level截取number
@@ -417,6 +541,16 @@ export default {
                 vm.levelNum = levelNum
                  var a = data.transformTozTreeFormat(setting, arr)
                 vm.codingList = a
+<<<<<<< HEAD
+=======
+
+                /*
+                从文的添加的代码
+                */
+                vm.codeTypeData = Array.from(new Set(vm.codeTypeData));
+                vm.codeType = vm.codeTypeData[0];//初始化编码级别
+                vm.initKey()
+>>>>>>> 5b25f1d936861939323f388450c2ac70f05ad35f
                 }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'warning',
@@ -428,7 +562,156 @@ export default {
                     })
                 }
             })
-        }
+        },
+        newCodeChange(){
+
+        },
+          //编码级别改变
+        codeTypeChange(){
+            this.firstTitleData = [];
+            this.totalCode = '';
+            this.totalTitle = '';
+            if(this.codeType == 'Level2'){
+                this.showFirst = true;
+                this.showTwo = false;
+                this.showThird = false;
+            }else if(this.codeType == 'Level3'){
+                this.showFirst= true;
+                this.showTwo = true;
+                this.showThird = false;
+            }else if(this.codeType == 'Level4'){
+                this.showFirst= true;
+                this.showTwo = true;
+                this.showThird = true;
+            }else{
+                this.showFirst= false;
+                this.showTwo = false;
+                this.showThird = false;
+            };
+            this.codingList.forEach((item,index,arr)=>{ 
+                this.firstTitleData.push(item.number.substr(0,2)); 
+                this.fTitle = arr[0].title;  
+            })
+            //一级编码操作
+            this.secondTitleData = [];
+            this.firstTitle = this.firstTitleData[0];//初始化一级编码
+            this.codingList.forEach((item,index)=>{
+                if(this.firstTitle == item.number.substr(0,2)){
+                    this.fTitle = item.title
+                    this.firstIndex = item.KeyID
+                }
+            })
+
+            this.codingList[this.firstIndex-1].children.forEach((item,index)=>{
+                this.secondTitleData.push(item.number.substr(2,2)); 
+            })
+            
+        },
+        //一级编码改变
+        firstTitleChange(){
+            this.totalCode  = '';
+            this.secondTitleData = [];
+            this.codingList.forEach((item,index)=>{
+                if(this.firstTitle == item.number.substr(0,2)){
+                    this.fTitle = item.title;
+                    this.firstIndex = item.KeyID;
+                };
+            })
+            console.log(this.firstIndex-1)
+            this.codingList[this.firstIndex-1].children.forEach((item,index)=>{
+                    this.secondTitleData.push(item.number.substr(2,2)); 
+            });
+
+        },
+        //二级编码改变
+        secondTitleChange(){
+            this.totalCode  = '';
+            this.thirdTitleData =[];
+
+            this.codingList[this.firstIndex-1].children.forEach((item,index)=>{
+                if(this.secondTitle == item.number.substr(2,2)){
+                    this.twoTitle = item.title;
+                }
+            })
+
+            this.secondIndex = this.secondTitle.split('')[0];
+            var i =0;
+            this.codingList[this.firstIndex-1].children[this.secondIndex-1].children.forEach((item,index)=>{
+                this.thirdTitleData.push(item.number.substr(4,2));
+            });
+
+        },
+        //三级编码改变
+        thirdTitleChange(){
+            this.totalCode  = '';
+            this.codingList[this.firstIndex-1].children[this.secondIndex-1].children.forEach((item,index)=>{
+                if(this.thirdTitle == item.number.substr(4,2)){
+                    this.thTitle = item.title;
+                }
+            });
+        },
+        newTitleChange(){
+            if(this.codeType == 'Level1'){
+                this.totalCode = this.newCode+'0000';
+                this.totalTitle = this.newTitle;
+            }else if (this.codeType == 'Level2'){
+                this.totalCode = this.firstTitle+this.newCode+'00';
+                this.totalTitle = this.fTitle+'-'+this.newTitle;
+            }else if(this.codeType == 'Level3'){
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.newTitle;
+                this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
+            }else if(this.codeType == 'Level4'){
+                this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+'-'+this.newTitle;
+            }
+        },
+         //添加确定
+        addListSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'config2/component/addWorkCode',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId
+                },
+                data:{
+                    level:this.codeType.substr(5,1),
+                    number:this.totalCode,
+                    status:0,
+                    table:"t13",
+                    title:this.newTitle
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    console.log(response.data);
+                    this.getWorkCode();
+                    this.editListShow = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+         newTitleCode(){
+            if(this.codeType == 'Level1'){
+                this.totalCode = this.newCode+'0000';
+                this.totalTitle = this.newTitle;
+            }else if (this.codeType == 'Level2'){
+                this.totalCode = this.firstTitle+this.newCode+'00';
+                this.totalTitle = this.fTitle+'-'+this.newTitle;
+            }else if(this.codeType == 'Level3'){
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.newTitle;
+                this.totalCode = this.firstTitle+this.secondTitle+this.newCode;
+            }else if(this.codeType == 'Level4'){
+                this.totalCode = this.firstTitle+this.secondTitle+this.thirdTitle+this.newCode;
+                this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+'-'+this.newTitle;
+            }
+        },
     }
 
 }
@@ -440,6 +723,10 @@ export default {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    .inp {
+        position: relative;
+        left: -15px;
     }
     .el-dialog__body{
         margin-top: 30px;
