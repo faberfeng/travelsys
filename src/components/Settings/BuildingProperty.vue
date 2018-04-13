@@ -83,22 +83,16 @@
                             <input class="editSelect" v-model="codeType" disabled/>
                             <i class="icon-sanjiao"></i>
                         </div>
-                        <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">一级编码 :</label>
-                            <select class="editSelect" v-model="firstTitle">
-                                <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
-                            </select>
+                        <div v-show="showFirst" class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">一级编码 :</label>
+                            <input class="editSelect" v-model="firstTitle" disabled/>
                             <i class="icon-sanjiao"></i>
                         </div>
-                        <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">二级编码 :</label>
-                            <select class="editSelect" v-model="secondTitle">
-                                <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
-                            </select>
+                        <div v-show="showSecond"  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">二级编码 :</label>
+                            <input class="editSelect" v-model="secondTitle" disabled/>
                             <i class="icon-sanjiao"></i>
                         </div>
-                        <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">三级编码 :</label>
-                            <select class="editSelect" v-model="thirdTitle">
-                                <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
-                            </select>
+                        <div v-show="showThird"  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">三级编码 :</label>
+                            <input class="editSelect" v-model="thirdTitle" disabled/>
                             <i class="icon-sanjiao"></i>
                         </div>
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" disabled v-model="newCode"/></div>
@@ -204,15 +198,6 @@
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
                 </div>
             </el-dialog>
-            <!-- <el-dialog  :visible.sync="deletePropertyDialog" width="398px">
-                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
-                <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">确认删除本条属性定义？</p>
-                <div slot="footer" class="dialog-footer">
-                    <button class="deleteBtn" @click="deletePropertyMakeSure">删除</button>
-                    <button class="cancelBtn" @click="deletePropertyDialog=false">取消</button>
-                </div>
-            </el-dialog> -->
         </div>
     </div>
 </template>
@@ -305,12 +290,16 @@ export default {
             firstCodeData:[],
             thirdTitleText:'',
             thirdCodeData:[],
-            maxInputLength:'2'
+            maxInputLength:'2',
+            showFirst:false,
+            showSecond:false,
+            showThird:false
         }
     },
     created(){
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        this.propertyTable = 't41';
         this.getProjectGenClass(this.propertyTable);
     },
     mounted(){
@@ -386,6 +375,29 @@ export default {
                     }
                 })
             }
+            if(scope.row.level == '1'){
+                this.showFirst = false;
+                this.showSecond = false;
+                this.showThird = false;
+            }else if(scope.row.level == '2'){
+                this.showFirst = true;
+                this.showSecond = false;
+                this.showThird = false;
+                this.firstTitle = scope.row.number.substr(0,2);
+            }else if(scope.row.level == '3'){
+                this.showFirst = true;
+                this.showSecond = true;
+                this.showThird = false;
+                this.firstTitle = scope.row.number.substr(0,2);
+                this.secondTitle = scope.row.number.substr(2,2);
+            }else if(scope.row.level == '4'){
+                this.showFirst = true;
+                this.showSecond = true;
+                this.showThird = true;
+                this.firstTitle = scope.row.number.substr(0,2);
+                this.secondTitle = scope.row.number.substr(2,2);
+                this.thirdTitle = scope.row.number.substr(4,2);
+            }
             this.newTitle = scope.row.title;
             this.totalCode = scope.row.number;
             this.valueTypeTextT = scope.row.valueType;
@@ -413,7 +425,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.getProjectGenClass();
+                    this.getProjectGenClass(this.propertyTable);
                     this.totalTitle = '';
                     this.totalCode = '';
                     this.newCode = '';
@@ -441,6 +453,9 @@ export default {
             this.codeType = '';
             this.propertyTableName ="";
             this.valueTypeTextT = "";
+            this.thirdTitle="";
+            this.firstTitle = '';
+            this.secondTitle = '';
             this.editListShowtwice = false;
         },
         newCodeChange(){
@@ -504,7 +519,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.confirmVisible = false;
-                    this.getProjectGenClass();
+                    this.getProjectGenClass(this.propertyTable);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -553,7 +568,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.passVisible =false;
-                    this.getProjectGenClass();
+                    this.getProjectGenClass(this.propertyTable);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -598,7 +613,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.rejectVisible = false;
-                    this.getProjectGenClass();
+                    this.getProjectGenClass(this.propertyTable);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -636,7 +651,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     console.log(response.data)
-                    this.getProjectGenClass();
+                    this.getProjectGenClass(this.propertyTable);
                     this.deleteDialog = false;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
