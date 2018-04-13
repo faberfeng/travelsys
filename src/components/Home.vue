@@ -64,7 +64,7 @@
                                     <el-menu-item index="/setting/constructordesigncode">设计构件分类编码</el-menu-item>
                                     <el-menu-item index="/setting/projectsubmit">工程招标分类编码</el-menu-item>
                                     <el-menu-item index="/setting/materialpurchase">物资采购分类编码</el-menu-item>
-                                    <el-menu-item index="/setting/buildingproperty">构建属性语意编码</el-menu-item>
+                                    <el-menu-item index="/setting/buildingproperty">构件属性语意编码</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
                             <el-submenu index="/setting/jobmanage">

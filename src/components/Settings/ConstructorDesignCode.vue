@@ -271,7 +271,7 @@
                         <label class="editInpText">类型属性 :</label>
                         <span v-text="typeProperty" class="editInpTextInp"></span>
                     </div>
-                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">简写 :</label><input class="inp" placeholder="4个字以内" maxlength="4" v-model="jianxie"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">简写 :</label><input class="inp" placeholder="4个字以内" maxlength="4" v-model="jianxie"/></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addPropertySureBtn">保存</button>
@@ -301,6 +301,53 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="projectMappedSure">添加扩展属性</button>
                     <button class="editBtnC" @click="projectMappedCancel">取消</button>
+                </div>
+            </el-dialog>
+            <!--添加工程量条目-->
+            <el-dialog title="工程量映射" :visible.sync="addProjectMappedShow" :before-close="addProjectMappedCancel">
+                <div class="editBody">
+                    <div class="editBodytwo edit-item clearfix pNumber"><label class="editInpText">工程量条目 :</label><input class="inp"  disabled v-model="projectNumber"/></div>
+                    <div  class="editBodyone edit-item clearfix">
+                        <label class="editInpText">一级标题 :</label>
+                        <select class="editSelect" v-model="firstSelectTitle" @change="firstSelectTitleChange">
+                            <option v-for="(item,index) in firstSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix">
+                        <label class="editInpText">二级标题 :</label>
+                        <select class="editSelect" v-model="secondSelectTitle" @change="secondSelectTitleChange">
+                        <option v-for="(item,index) in secondSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix">
+                        <label class="editInpText">三级标题 :</label>
+                        <select class="editSelect" v-model="thirdSelectTitle" @change="thirdSelectTitleChange">
+                            <option v-for="(item,index) in thirdSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix">
+                        <label class="editInpText">四级标题 :</label>
+                        <select class="editSelect" v-model="fourthSelectTitle" @change="fourthSelectTitleChange">
+                            <option v-for="(item,index) in fourthSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <zk-table 
+                    index-text="序号"
+                    :data="addProjectMappingData" :columns="addProjectMappingDataColumns" :tree-type="props.treeType" 
+                    :expand-type="props.expandType" :selection-type="props.selectionType" 
+                    :border="props.border" >
+                        <template slot="action" slot-scope="scope">
+                            <button class="deleteBtn actionBtn" style="margin-right:10px" ></button>
+                        </template> 
+                    </zk-table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addProjectMappedSure">确定</button>
+                    <button class="editBtnC" @click="addProjectMappedCancel">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -416,6 +463,24 @@ export default {
                     template: 'action',
                 }
             ],
+            addProjectMappingDataColumns:[
+                {
+                    label: '特征',
+                    prop:'characterName',
+                    width:'150px'
+                },
+                {
+                    label: '值类型',
+                    prop: 'valueType_',
+                    width:'100px'
+                },
+                {
+                    label:'公式',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                }
+            ],
             columnsProject:[
                 {
                     label:'项目名称',
@@ -506,6 +571,18 @@ export default {
             showMaterialColorTwo:false,
             materialColorThird:'',
             showMaterialColorThree:false,
+            addProjectMappedShow:false,//添加工程量映射
+            projectNumber:'',
+            firstSelectData:[],
+            firstSelectTitle:'',
+            secondSelectData:[],
+            secondSelectTitle:'',
+            thirdSelectData:[],
+            thirdSelectTitle:'',
+            fourthSelectData:[],
+            fourthSelectTitle:'',
+            projectMappedObject:{},
+            addProjectMappingData:[]
         }
     },
     created(){
@@ -548,7 +625,6 @@ export default {
                         this.diGuiSource(this.constructorData);
                         this.diGuiColor(this.constructorData);
                     }
-                    console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -586,7 +662,6 @@ export default {
         },
         //确认提请
         confirmSure(){
-            console.log(this.confirmObject);
             axios({
                 method:'post',
                 url:this.baseUrl+'Config/updateGenieClass',
@@ -716,7 +791,6 @@ export default {
                     this.codeType = '';
                     this.editListShowtwice = false;
                 }else if(response.data.cd == '-1'){
-                    console.log(response.data.msg)
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -757,7 +831,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.deleteDialog = false;
                     this.getProjectGenieClassByProject();
                 }else if(response.data.cd == '-1'){
@@ -772,7 +845,6 @@ export default {
         },
         //通过
         pass(scope){
-            console.log(scope)
             this.passObject = scope;
             this.passVisible =true;
         },
@@ -800,7 +872,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.passVisible =false;
                     this.getProjectGenieClassByProject();
                 }else if(response.data.cd == '-1'){
@@ -1672,7 +1743,6 @@ export default {
         },
         //设定材料
         setMeterial(scope){
-            console.log(scope);
             var onArray = [];
             var twoArray = [];
             this.setMeterialShow = true;
@@ -1704,9 +1774,6 @@ export default {
             if(scope.row.materialIndex[0] == '10000'){
                 this.materialColorOne = 'white';
                 this.showMaterialColorOne = false;
-                // this.showMaterialColorOne = false;
-                // this.showMaterialColorTwo = false;
-                // this.showMaterialColorThree = false;
             }else{
                 
                 this.materialColorOne = this.toBeColor(scope.row.materialIndex[0]);
@@ -1784,7 +1851,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     if(response.data.rt.rows){
                         this.setProperty = response.data.rt.rows;
                         this.setProperty.forEach(item=>{
@@ -1810,8 +1876,6 @@ export default {
             this.expandPropertyData = scope;
             this.setPropertyShow = true;
             this.getExpandProperty();
-            console.log(this.expandPropertyData);
-            
         },
         //扩展属性确认
         setPropertySureBtn(){
@@ -1825,7 +1889,6 @@ export default {
         } ,
         //编辑属性简写
         editListProperty(scope){
-            console.log(scope);
             this.editProperty = scope;
             this.jianxieShow =true;
             this.jianxieText = scope.row.code;
@@ -1864,7 +1927,6 @@ export default {
         },  
         //删除属性
         deleteItemProperty(scope){
-            console.log(scope.row);
             this.delteProperty = scope;
             this.deletePropertyDialog = true;
         },
@@ -1882,7 +1944,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data)
                     this.getExpandProperty();
                     this.deletePropertyDialog = false;
                 }else if(response.data.cd == '-1'){
@@ -1928,7 +1989,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.jianxie = '';
                     this.getExpandProperty();
                 }else if (response.data.cd == '-1'){
@@ -1959,7 +2019,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     if(response.data.rt){
                         this.projectTitleData = response.data.rt;
                         this.projectTitleData.forEach(item=>{
@@ -1970,7 +2029,6 @@ export default {
                             })
                         })
                     }
-                    console.log(this.theFirstTitleData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -2086,7 +2144,7 @@ export default {
         projectMapped(scope){
             this.projectMapShow = true;
             console.log(scope);
-            //projectMappingData
+            this.projectMappedObject=scope;
             axios({
                 method:'post',
                 url:this.baseUrl+'Config/getEngineeringMapping',
@@ -2100,7 +2158,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.projectMappingData = response.data.rt.rows;
-                    console.log(response.data)
+                    //console.log(response.data)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -2111,10 +2169,192 @@ export default {
             })
         },
         projectMappedSure(){
-            this.projectMapShow = false;
+            this.addProjectMappedShow = true;
+            this.loadFirstSelectData();
+            
+        },
+        //加载第一个下拉框
+        loadFirstSelectData(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    obscureCode:'__0000',
+                    codeLength:6,
+                    tableNo:'t32',
+                    projId:this.projId,
+                    type:2
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.firstSelectData = response.data.rt;
+                    this.firstSelectTitle = this.firstSelectData[0].classifyCode;
+                    this.loadSecondSelectData(this.firstSelectTitle.substr(0,2));
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }) 
+        },
+        //加载第二个下拉框
+        loadSecondSelectData(oCode){
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    obscureCode:oCode+'__00',
+                    codeLength:6,
+                    tableNo:'t32',
+                    projId:this.projId,
+                    type:2
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.secondSelectData = response.data.rt;
+                    this.secondSelectTitle = this.secondSelectData[1].classifyCode;
+                    this.loadThirdSelectData(this.secondSelectTitle.substr(0,4));
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }) 
+        },
+        //加载第三个下拉框
+        loadThirdSelectData(oCode){
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    obscureCode:oCode+'__',
+                    codeLength:6,
+                    tableNo:'t32',
+                    projId:this.projId,
+                    type:2
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.thirdSelectData = response.data.rt;
+                    this.thirdSelectTitle = this.thirdSelectData[1].classifyCode;
+                    this.loadFourthSelectData(this.thirdSelectTitle.substr(0,6));
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }) 
+        },
+        //加载第四个下拉框
+        loadFourthSelectData(oCode){
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    obscureCode:oCode+'%',
+                    codeLength:9,
+                    tableNo:'t32',
+                    projId:this.projId,
+                    type:2
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.fourthSelectData = response.data.rt;
+                    this.fourthSelectTitle = this.fourthSelectData[0].classifyCode;
+                    this.projectNumber = this.fourthSelectTitle;
+                    this.getEngineeringInfo();
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }) 
+        },
+        //第一个下拉框改变
+        firstSelectTitleChange(){
+            var code = this.firstSelectTitle.substr(0,2);
+            this.loadSecondSelectData(code);
+            
+        },
+        //第二个下拉框改变
+        secondSelectTitleChange(){
+            var code = this.secondSelectTitle.substr(0,4);
+            this.loadThirdSelectData(code);
+        },
+        //第三个下拉框改变
+        thirdSelectTitleChange(){
+            var code = this.thirdSelectTitle.substr(0,6);
+            this.loadFourthSelectData(code);
+        },
+        //第四个下拉框改变
+        fourthSelectTitleChange(){
+            this.projectNumber = this.fourthSelectTitle;
+            this.getEngineeringInfo();
+        },
+        //获取工程量特性映射
+        getEngineeringInfo(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getEngineeringInfo',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    classifyCode:this.projectNumber,
+                    entityNumber:this.projectMappedObject.row.number,
+                    tableNo:'t32'
+
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    if(response.data.rt.rows){
+                        this.addProjectMappingData = response.data.rt.rows;
+                        this.addProjectMappingData.forEach(item=>{
+                            item.valueType_ = this.judgeValueType(item.valueType);
+                        })
+                    }
+                    
+
+                }else if (response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
         },
         projectMappedCancel(){
             this.projectMapShow = false;
+        },
+        //确认添加工程量映射
+        addProjectMappedSure(){
+            this.addProjectMappedShow = false;
+        },
+        //取消添加工程量映射
+        addProjectMappedCancel(){
+            this.addProjectMappedShow = false;
         },
         //材质颜色改变1
         materialColorChangeOne(){
@@ -2340,6 +2580,9 @@ export default {
             clear: both;
             overflow: hidden;
             content: '';
+        }
+        .pNumber{
+            margin-bottom: 15px;
         }
         .UserList{
             border-collapse: collapse;

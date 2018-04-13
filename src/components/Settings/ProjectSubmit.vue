@@ -45,7 +45,7 @@
                 </el-dialog>
                 <el-dialog title="新增特性" :visible.sync="addPropertyShow" :before-close="addPropertyancelBtn">
                     <div class="editBody">
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">特性 :</label><input class="inp"  placeholder="请输入" v-model="newProperty"/></div>
+                        <div class="editBodytwo edit-item clearfix addPropertyClass"><label class="editInpText">特性 :</label><input class="inp"  placeholder="请输入" v-model="newProperty"/></div>
                         <div class="editBodyone edit-item clearfix"><label class="editInpText">值类型 :</label>
                             <select class="editSelect" v-model="propertyValueType">
                                 <option value="0">数值</option>
@@ -1169,6 +1169,9 @@ export default {
             clear: both;
             overflow: hidden;
             content: '';
+        }
+        .addPropertyClass{
+            margin-bottom: 15px;
         }
         .UserList{
             border-collapse: collapse;
