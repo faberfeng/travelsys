@@ -6,22 +6,20 @@
             <span class="worktooltitle">分类编码</span>
             <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button>
             <div class="worktable">
-            <zk-table 
+                <zk-table 
                 index-text="序号"
                 :data="constructorData" :columns="columns" :tree-type="props.treeType" 
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                 :border="props.border" >
                     <template slot="appearence" slot-scope="scope">
-                       <div v-html="scope.row.color_">
-
+                       <div v-html="scope.row.color_0+scope.row.color_1+scope.row.color_2">
                        </div>
-                       <!-- <p>{{scope.row.status}}<p> -->
                     </template>
                     <template slot="action" slot-scope="scope">
                         <div v-if="scope.row.status == 3">
-                            <button class="actionBtn">材质设定</button>
-                            <button class="actionBtn">扩展属性</button>
-                            <button class="actionBtn">工程量映射</button>
+                            <button class="actionBtn" @click="setMeterial(scope)">材质设定</button>
+                            <button class="actionBtn" @click="expandProperty(scope)">扩展属性</button>
+                            <button class="actionBtn" @click="projectMapped(scope)">工程量映射</button>
                         </div>
                         <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                         <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
@@ -80,25 +78,25 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
-                        <span v-text="totalCode"></span>
+                        <span v-text="totalCode" class="editInpTextInp"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整标题 :</label>
-                        <span v-text="totalTitle"></span>
+                        <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">材料索引 :</label>
+                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
                         <select class="editSelect" v-model="firstTitle">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </div>
-                    <div  class="editBodytwo edit-item clearfix"><label class="editInpText">材质索引 :</label>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
                         <select class="editSelect" v-model="secondTitle">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </div>
-                    <div  class="editBodytwo edit-item clearfix"><label class="editInpText">材质索引 :</label>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
                         <select class="editSelect" v-model="thirdTitle">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
@@ -108,6 +106,192 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editListSureBtn">保存</button>
                     <button class="editBtnC" @click="editListCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+
+            <el-dialog title="新增编码" :visible.sync="addListShow" :before-close="addListCancelBtn">
+                <div class="editBody">
+                    <div class="editBodyone edit-item clearfix"><label class="editInpText">编码级别 :</label>
+                        <select class="editSelect" v-model="codeType" @change="codeTypeChange">
+                            <option>Level1</option>
+                            <option>Level2</option>
+                            <option>Level3</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div v-show="showO" class="editBodyone edit-item clearfix"><label class="editInpText">一级编码 :</label>
+                        <select class="editSelect" v-model="firstTitleText" @change="firstTitleChange">
+                            <option v-for="(item,index) in firstCodeData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                        <span v-text="'标题：'+fTitle" :title="'标题：'+fTitle" class="edit-item-biaoti"></span>
+                    </div>
+                    <div v-show="showT" class="editBodyone edit-item clearfix"><label class="editInpText">二级编码 :</label>
+                        <select class="editSelect" v-model="secondTitleText" @change="secondTitleChange">
+                            <option v-for="(item,index) in secondCodeData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                        <span v-text="'标题：'+sTitle" :title="'标题：'+sTitle" class="edit-item-biaoti"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">完整编码 :</label>
+                        <span v-text="totalCode" class="editInpTextInp"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">完整标题 :</label>
+                        <span v-text="totalTitle" class="editInpTextInp"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
+                        <select class="editSelect" v-model="firstTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
+                        <select class="editSelect" v-model="secondTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
+                        <select class="editSelect" v-model="thirdTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addListSureBtn">保存</button>
+                    <button class="editBtnC" @click="addListCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="材质设定" :visible.sync="setMeterialShow" :before-close="setMeterialCancelBtn">
+                <div class="editBody">
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">完整编码 :</label>
+                        <span v-text="totalCode" class="editInpTextInp"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">完整标题 :</label>
+                        <span v-text="totalTitle" class="editInpTextInp"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
+                        <select class="editSelect" v-model="firstTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
+                        <select class="editSelect" v-model="secondTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
+                        <select class="editSelect" v-model="thirdTitle">
+                            <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="setMeterialSureBtn">保存</button>
+                    <button class="editBtnC" @click="setMeterialCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="属性定义" :visible.sync="setPropertyShow" :before-close="setPropertyCancelBtn">
+                <div class="editBody">
+                   <zk-table 
+                    index-text="序号"
+                    :data="setProperty" :columns="columnsProperty" :tree-type="props.treeType" 
+                    :expand-type="props.expandType" :selection-type="props.selectionType" 
+                    :border="props.border" >
+                        <template slot="action" slot-scope="scope">
+                            <button class="editBtn actionBtn" style="margin-right:10px" @click="editListProperty(scope)" v-if="scope.row.isShowProperty"></button>
+                            <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteItemProperty(scope)" v-if="scope.row.isShowProperty"></button>
+                        </template> 
+                    </zk-table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="setPropertySureBtn">添加扩展属性</button>
+                    <button class="editBtnC" @click="setPropertyCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="添加属性" :visible.sync="addPropertyShow" :before-close="addPropertyCancelBtn">
+                <div class="editBody">
+                    <div class="editBodyone edit-item clearfix"><label class="editInpText">属性表 :</label>
+                        <select class="editSelect" v-model="propertyTable" @change="propertyTableChange">
+                            <option value="t41">Table41-常规属性</option>
+                            <option value="t42">Table42-呈现属性</option>
+                            <option value="t43">Table43-设计属性</option>
+                            <option value="t44">Table44-建造属性</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodyone edit-item clearfix"><label class="editInpText">一级标题 :</label>
+                        <select class="editSelect" v-model="theFirstTitle" @change="theFirstTitleChange">
+                            <option v-for="(item,index) in theFirstTitleData" :key="index" :value="item.number">{{item.number+'-'+item.title}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix"><label class="editInpText">二级标题 :</label>
+                        <select class="editSelect" v-model="theSecondTitle" @change="theSecondTitleChange">
+                            <option v-for="(item,index) in theSecondTitleData" :key="index" :value="item.number">{{item.number+'-'+item.title}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix"><label class="editInpText">三级标题 :</label>
+                        <select class="editSelect" v-model="theThirdTitle" @change="theThirdTitleChange">
+                            <option v-for="(item,index) in theThirdTitleData" :key="index" :value="item.number">{{item.number+'-'+item.title}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div  class="editBodyone edit-item clearfix"><label class="editInpText">四级标题 :</label>
+                        <select class="editSelect" v-model="theFourceTitle" @change="theFourceTitleChange">
+                            <option v-for="(item,index) in theFourceTitleData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">完整标题 :</label>
+                        <span v-text="totalPropertyTitle" class="editInpTextInp"></span>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">类型属性 :</label>
+                        <span v-text="typeProperty" class="editInpTextInp"></span>
+                    </div>
+                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">简写 :</label><input class="inp" placeholder="4个字以内" maxlength="4" v-model="jianxie"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addPropertySureBtn">保存</button>
+                    <button class="editBtnC" @click="addPropertyCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="编辑简写" :visible.sync="jianxieShow" :before-close="jianxieCancelBtn">
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">简写 :</label><input class="inp" placeholder="请输入" v-model="jianxieText"/></div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="jianxieSureBtn">保存</button>
+                    <button class="editBtnC" @click="jianxieCancelBtn">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="工程量条目信息" :visible.sync="projectMapShow" :before-close="projectMappedCancel">
+                <div class="editBody">
+                   <zk-table 
+                    index-text="序号"
+                    :data="projectMappingData" :columns="columnsProject" :tree-type="props.treeType" 
+                    :expand-type="props.expandType" :selection-type="props.selectionType" 
+                    :border="props.border" >
+                        <template slot="action" slot-scope="scope">
+                            <button class="editBtn actionBtn" style="margin-right:10px" @click="editListProperty(scope)"></button>
+                            <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteItemProperty(scope)"></button>
+                        </template> 
+                    </zk-table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="projectMappedSure">添加扩展属性</button>
+                    <button class="editBtnC" @click="projectMappedCancel">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -122,12 +306,22 @@
                 <button class="cancelBtn" @click="deleteDialog=false">取消</button>
             </div>
         </el-dialog>
+        <el-dialog  :visible.sync="deletePropertyDialog" width="398px">
+            <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+            <p class="deleteDialogWarning">删除提醒</p>
+            <p class="deleteDialogText">确认删除本条属性定义？</p>
+            <div slot="footer" class="dialog-footer">
+                <button class="deleteBtn" @click="deletePropertyMakeSure">删除</button>
+                <button class="cancelBtn" @click="deletePropertyDialog=false">取消</button>
+            </div>
+        </el-dialog>
     </div>
+    
   </div>
 </template>
 <script>
 import axios from 'axios';
-
+import './js/jquery-1.4.4.min.js';
 export default {
     name:'ConstructorDesignCode',
     data(){
@@ -165,7 +359,6 @@ export default {
                 },
                 {
                     label: '外观材质',
-                    //prop:'color_',
                     type: 'template',
                     template: 'appearence',
                     minWidth:'150px'
@@ -182,6 +375,58 @@ export default {
                     width:'150px'
                 }
             ],
+            columnsProperty:[
+                {
+                    label: '级别',
+                    prop: 'fromLevel',
+                },
+                {
+                    label: '属性表',
+                    prop: 'propertyTableName',
+                },
+                {
+                    label: '编码',
+                    prop: 'propertyNumber',
+                },
+                {
+                    label: '标题',
+                    prop: 'propertyTitle',
+                },
+                {
+                    label: '简写',
+                    prop:'code'
+                },
+                {
+                    label: '值类型',
+                    prop: 'valueTypeText',
+                },
+                {
+                    label:'操作',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                }
+            ],
+            columnsProject:[
+                {
+                    label:'项目名称',
+                    prop:'classifyName'
+                },
+                {
+                    label:'计量条件',
+                    prop:'calCondition'
+                },
+                {
+                    label:'计量公式',
+                    prop:'formula'
+                },
+                {
+                    label:'操作',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                },
+            ],
             token:'',
             projId:'',
             baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
@@ -192,6 +437,9 @@ export default {
             deleteDialog:false,
             passVisible:false,
             editListShowtwice:false,
+            addListShow:false,
+            showO:false,
+            showT:false,
             confirmObject:{},//提请行数据
             rejectObject:{},
             deleteObject:{},
@@ -211,7 +459,38 @@ export default {
             "B3室外玻璃-不透明反射天空","U1001自定义","U1002自定义","U1003自定义","U1004自定义","U1005自定义","U1006自定义","U1007自定义","U1008自定义"],
             firstTitle:'',
             secondTitle:'',
-            thirdTitle:''
+            thirdTitle:'',
+            firstCodeData:[],
+            secondCodeData:[],
+            sTitle:'',
+            fTitle:'',
+            firstTitleText:'',
+            secondTitleText:'',
+            setMeterialShow:false,//添加材料
+            setPropertyShow:false,//属性自定义
+            setProperty:[],//扩展属性数据
+            expandPropertyData:{},
+            addPropertyShow:false,
+            propertyTable:'',//属性表
+            theFirstTitle:'',
+            theFirstTitleData:[],
+            theSecondTitle:'',
+            theSecondTitleData:[],
+            theThirdTitle:'',
+            theThirdTitleData:[],
+            theFourceTitle:'',
+            theFourceTitleData:[],
+            deletePropertyDialog:false,
+            delteProperty:{},
+            jianxieShow:false,
+            jianxieText:'',
+            jianxie:'',
+            editProperty:'',
+            projectTitleData:[],
+            totalPropertyTitle:'',
+            typeProperty:'',
+            projectMapShow:false,//工程量映射
+            projectMappingData:[],
         }
     },
     created(){
@@ -220,7 +499,20 @@ export default {
         this.getProjectGenieClassByProject();
 
     },
+    mounted(){
+        this.initKey();
+    },
     methods:{
+        initKey(){
+            var timer = setInterval(function(){
+                if($('.zk-table__body-row').length >0){
+                    clearInterval(timer)
+                    for(var i=0;i<$('.zk-table__body-row').length;i++){
+                        $('.zk-table__body-row')[i].getElementsByClassName('zk-table__body-cell')[0].getElementsByClassName('zk-table__cell-inner')[0].innerHTML = i+1
+                    }
+                }
+            },100)
+        },
         //获取分类编码树列表
         getProjectGenieClassByProject(){
             axios({
@@ -235,11 +527,12 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.constructorData = response.data.rt;
-                    this.diGuiStatus(this.constructorData);
-                    this.diGuiSource(this.constructorData);
-                    this.diGuiColor(this.constructorData);
-                    console.log()
+                    if( response.data.rt){
+                        this.constructorData = response.data.rt;
+                        this.diGuiStatus(this.constructorData);
+                        this.diGuiSource(this.constructorData);
+                        this.diGuiColor(this.constructorData);
+                    }
                     console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -321,10 +614,6 @@ export default {
         },
         //编辑
         editList(scope){
-            console.log(scope);
-            this.firstTitle = this.firstTitleData[0];
-            this.secondTitle = this.firstTitleData[0];
-            this.thirdTitle = this.firstTitleData[0];
             this.editObject = scope;
             this.codeType = 'Level'+scope.row.level;
             if(scope.row.level == 1){
@@ -352,14 +641,17 @@ export default {
             }
             this.newTitle = scope.row.title;
             this.totalCode = scope.row.number;
-            this.firstTitle = scope.row.color_.split(':')[0];
-
-
-            
+            var colorObject = [];
+            this.firstTitle = scope.row.color_0.split(':')[0].split('>')[1] || '默认';
+            this.secondTitle = scope.row.color_1.split(':')[0].split('>')[1] || '默认';
+            this.thirdTitle = scope.row.color_2.split(':')[0].split('>')[1] || '默认';
             this.editListShowtwice = true;
         },
         //保存编辑
         editListSureBtn(){
+            var colorCode_0 = this.toBeColorCode(this.firstTitle);
+            var colorCode_1 = this.toBeColorCode(this.secondTitle);
+            var colorCode_2 = this.toBeColorCode(this.thirdTitle);
             axios({
                 method:'post',
                 url:this.baseUrl+'Config/updateGenieClass',
@@ -372,7 +664,7 @@ export default {
                 data:{
                     id:this.editObject.row.id,
                     level:this.editObject.row.level,
-                    materialIndex:this.editObject.row.materialIndex,
+                    materialIndex:[colorCode_0,colorCode_1,colorCode_2],
                     number:this.editObject.row.number,
                     parNumber:this.editObject.row.number,
                     status:0,
@@ -380,8 +672,12 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.getProjectGenieClassByProject();
+                    this.totalTitle = '';
+                    this.totalCode = '';
+                    this.newCode = '';
+                    this.newTitle = '';
+                    this.codeType = '';
                     this.editListShowtwice = false;
                 }else if(response.data.cd == '-1'){
                     console.log(response.data.msg)
@@ -395,6 +691,11 @@ export default {
         },
         //取消编辑
         editListCancelBtn(){
+            this.totalTitle = '';
+            this.totalCode = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.codeType = '';
             this.editListShowtwice = false;
         },
         //删除
@@ -520,14 +821,6 @@ export default {
         cancelReject(){
             this.rejectVisible = false;
         },
-        //新建编码改变
-        newCodeChange(){
-
-        },
-        //新建标题改变
-        newTitleChange(){
-
-        },
         //递归判断状态
         diGuiStatus(cData){
             cData.forEach((item,index,arr)=>{
@@ -550,8 +843,9 @@ export default {
         diGuiColor(cData){
             var colorObject = '';
             cData.forEach((item,index,arr)=>{
-                //datagrid-cell datagrid-cell-c2-materialIndex
-                item.color_ = this.selectColor(item.materialIndex[0]);
+                item.color_0 = this.selectColor(item.materialIndex[0]);
+                item.color_1 = this.selectColor(item.materialIndex[1]);
+                item.color_2 = this.selectColor(item.materialIndex[2]);
                 if(item.children.length!=0){
                     this.diGuiColor(item.children)
                 }
@@ -828,14 +1122,740 @@ export default {
             if(value == "10000"){
                 return "";
             }else{
-                //return text+':'+color;
-                 return "<span padding:10px;'>" + text + "：</span><span  style='background-color:" + color + ";padding:10px;'> </span>";
+                 return "<span>" + text + ": </span><span  style='background-color:" + color + ";display:inline-block;width:30px;height:20px;position:relative;top:5px;'></span>";
+            }
+        },
+        //判断颜色
+        toBeColorCode(value) {
+            switch (value) {
+                case "A2涂料-灰白127":
+                    return 12001;
+                    break;
+                case "A2涂料-灰白159":
+                    return 12002;
+                    break;
+                case "A2涂料-灰白191":
+                    return 12003;
+                    break;
+                case "A2涂料-灰白223":
+                    return 12004;
+                    break;
+                case "A2涂料-纯白":
+                    return 12005;
+                    break;
+                case "A2涂料-浅黄":
+                    return 12006 ;
+                    break;
+                case "A2涂料-米黄":
+                    return 12007
+                    break;
+                case "A2涂料-蛋黄":
+                    return 12008
+                    break;
+                case "A2涂料-淡粉":
+                    return 12009
+                    break;
+                case "A2涂料-中粉":
+                    return 12010;
+                    break;
+                case "A2涂料-深粉":
+                    return 12011;
+                    break;
+                case "A2涂料-淡红":
+                    return 12012;
+                    break;
+                case "A2涂料-中红":
+                    return 12013;
+                    break;
+                case "A2涂料-深红":
+                    return 12014; 
+                    break;
+                case "A2涂料-淡桔":
+                    return 12015;
+                    break;
+                case "A2涂料-桔黄":
+                    return 12016;
+                    break;
+                case "A2涂料-淡绿":
+                    return 12017;
+                    break;
+                case "A2涂料-深绿":
+                    return 12018;
+                    break;
+                case "A2涂料-蓝紫":
+                    return 12019;
+                    break;
+                case "A2涂料-天蓝":
+                    return 12020;
+                    break;
+                case "A3油漆-红色":
+                    return 13001;
+                    break;
+                case "A3油漆-黄色":
+                    return 13002
+                    break;
+                case "A3油漆-绿色":
+                    return 13003;
+                    break;
+                case "A3油漆-青色":
+                    return 13004;
+                    break;
+                case "A3油漆-蓝色":
+                    return 13005;
+                    break;
+                case "A3油漆-洋红":
+                    return 13006;
+                    break;
+                case "A3油漆-白色":
+                    return 13007;
+                    break;
+                case "A3油漆-浅灰":
+                    return 13008;
+                    break;
+                case "A3油漆-银色":
+                    return 13009;
+                    break;
+                case "A3油漆-桔黄":
+                    return 13010;
+                    break;
+                case "A3油漆-黄绿":
+                    return 13011;
+                    break;
+                case "A3油漆-蓝绿":
+                    return 13012;
+                    break;
+                case "A3油漆-天蓝":
+                    return 13013;
+                    break;
+                case "A3油漆-靛蓝":
+                    return 13014;
+                    break;
+                case "A3油漆-玫红":
+                    return 13015;
+                    break;
+                case "A3油漆-卡其":
+                    return 13016;
+                    break;
+                case "A3油漆-咖啡":
+                    return 13017;
+                    break;
+                case "A3油漆-灰白":
+                    return 13018;
+                    break;
+                case "A3油漆-深灰":
+                    return 13019;
+                    break;
+                case "A3油漆-黑色":
+                    return 13020;
+                    break;
+                case "B3室外玻璃-浅蓝":
+                    return 23001;
+                    break;
+                case "B3室外玻璃-深蓝":
+                    return 23002;
+                    break;
+                case "B3室外玻璃-浅绿":
+                    return 23003;
+                    break;
+                case "B3室外玻璃-深绿":
+                    return 23004;
+                    break;
+                case "B3室外玻璃-浅灰":
+                    return 23005;
+                    break;
+                case "B3室外玻璃-深灰":
+                    return 23006;
+                    break;
+                case "B3室外玻璃-蓝色反射天空":
+                    return 23007;
+                    break;
+                case "B3室外玻璃-绿色反射天空":
+                    return 23008;
+                    break;
+                case "B3室外玻璃-灰色反射天空":
+                    return 23009;
+                    break;
+                case "B3室外玻璃-不透明反射天空":
+                    return 23010;
+                    break;//暂定天蓝色
+                case "U1001自定义":
+                    return 91001;
+                    break;
+                case "U1002自定义":
+                    return 91002;
+                    break;
+                case "U1003自定义":
+                    return 91003;
+                    break;
+                case "U1004自定义":
+                    return 91004;
+                    break;
+                case "U1005自定义":
+                    return 91005;
+                    break;
+                case "U1006自定义":
+                    return 91006;
+                    break;
+                case "U1007自定义":
+                    return 91007;
+                    break;
+                case "U1008自定义":
+                    return 91008;
+                    break;
+                default:
+                    return 10000;
             }
         },
         //添加设计结构
         addConstructor(){
-            console.log(123);
+            this.addListShow = true;
+            this.firstTitle = '默认';
+            this.secondTitle = '默认';
+            this.thirdTitle = '默认';
+            this.codeType = "Level1";
+        },
+        //确认添加
+        addListSureBtn(){
+            if(this.totalCode =='' || this.newTitle ==''){
+                alert('请确认表单是否填写正确');
+            }else{
+                 if(this.newCode.split('').length != '2'){
+                    alert(`新建编码的长度必须是2`);
+                }else{
+                    axios({
+                        method:'post',
+                        url:this.baseUrl+'Config/addGenieClass',
+                        headers:{
+                            token:this.token
+                        },
+                        params:{
+                            projId:this.projId
+                        },
+                        data:{
+                            level:this.codeType.substr(5,1),
+                            materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
+                            number:this.totalCode,
+                            status:0,
+                            title:this.newTitle
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == '0'){
+                            this.getProjectGenieClassByProject();
+                            this.showO = false;
+                            this.showT = false;
+                            this.codeType = '';
+                            this.totalCode ='';
+                            this.newTitle ='';
+                            this.newCode ='';
+                            this.totalTitle ='';
+                            this.addListShow = false;
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+                }
+                
+            }
+            
+            
+        },
+        //取消添加
+        addListCancelBtn(){
+            this.addListShow = false;
+            this.showO = false;
+            this.showT = false;
+            this.codeType = '';
+            this.totalCode ='';
+            this.newTitle ='';
+            this.newCode ='';
+            this.totalTitle ='';
+        },
+        //编码级别改变
+        codeTypeChange(){
+            this.firstCodeData =[];
+            if(this.codeType == 'Level1'){
+                this.showO = false;
+                this.showT = false;
+            }else if(this.codeType == 'Level2'){
+                this.showO = true;
+                this.showT = false;
+            }else if (this.codeType = "Level3"){
+                this.showO = true;
+                this.showT = true;
+            };
+            this.constructorData.forEach(item=>{
+                this.firstCodeData.push(item.number.substr(0,2));
+            })
+        },
+        //一级编码改变
+        firstTitleChange(){
+            this.secondCodeData = [];
+            var firstTitleDataObject = [];
+            this.constructorData.forEach(item=>{
+                if(item.number.substr(0,2) == this.firstTitleText){
+                    firstTitleDataObject = item.children;
+                    this.fTitle = item.title;
+                }
+            });
+            firstTitleDataObject.forEach(item=>{
+                this.secondCodeData.push(item.number.substr(2,2));
+            })
+        },
+        //二级编码改变
+        secondTitleChange(){
+            var firstTitleDataObject = {};
+            this.constructorData.forEach(item=>{
+                if(item.number.substr(0,2) == this.firstTitleText){
+                    firstTitleDataObject = item.children;
+                    this.fTitle = item.title;
+                }
+            });
+            firstTitleDataObject.forEach(item=>{
+                if(item.number.substr(2,2) == this.secondTitleText){
+                    this.sTitle = item.title;
+                }
+            })
+        },
+        //新建编码改变
+        newCodeChange(){
+            if(this.codeType == "Level1"){
+                this.totalCode = this.newCode+'0000';
+            }else if(this.codeType == 'Level2'){
+                this.totalCode = this.firstTitleText+this.newCode+'00';
+            }else if(this.codeType == 'Level3'){
+                this.totalCode = this.firstTitleText+this.secondTitleText+this.newCode;
+            }   
+            
+        },
+        //新建标题改变
+        newTitleChange(){
+            if(this.codeType == "Level1"){
+                this.totalTitle = this.newTitle;
+            }else if(this.codeType == 'Level2'){
+                this.totalTitle = this.fTitle+'-'+ this.newTitle;
+            }else if(this.codeType == 'Level3'){
+                this.totalTitle = this.fTitle+'-'+this.sTitle+'-'+ this.newTitle
+            }
+        },
+        //设定材料
+        setMeterial(scope){
+            var onArray = [];
+            var twoArray = [];
+            this.setMeterialShow = true;
+            this.totalCode = scope.row.number;
+            this.constructorData.forEach(item=>{
+                if(this.totalCode.substr(0,2) == item.number.substr(0,2)){
+                    this.totalTitle = item.title;
+                    onArray = item.children;
+                }
+            });
+            if(this.totalCode.substr(2,2)){
+                onArray.forEach(item=>{
+                    if(this.totalCode.substr(2,2) == item.number.substr(2,2)){
+                        this.totalTitle+='-'+item.title;
+                        twoArray = item.children;
+                    }
+                })
+            }
+            if(this.totalCode.substr(4,2)){
+                twoArray.forEach(item=>{
+                    if(this.totalCode.substr(4,2) == item.number.substr(4,2)){
+                        this.totalTitle+='-'+item.title;
+                    }
+                })  
+            }
+            this.firstTitle = scope.row.color_0.split(':')[0].split('>')[1] || '默认';
+            this.secondTitle = scope.row.color_1.split(':')[0].split('>')[1] || '默认';
+            this.thirdTitle = scope.row.color_2.split(':')[0].split('>')[1] || '默认';
+        },
+        //确定设定材料
+        setMeterialSureBtn(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/updateMaterialIndex',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
+                    number:this.totalCode
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.getProjectGenieClassByProject();
+                    this.setMeterialShow = false;
+                    this.totalCode = '';
+                    this.totalTitle = '';
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+            
+        },
+        //取消设定材料
+        setMeterialCancelBtn(){
+            this.setMeterialShow = false;
+            this.totalCode = '';
+            this.totalTitle = '';
+        },
+        //获取扩展属性
+        getExpandProperty(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getCustomProperty/'+this.projId,
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    number:this.expandPropertyData.row.number,
+                    tableName:'t31'
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    if(response.data.rt.rows){
+                        this.setProperty = response.data.rt.rows;
+                        this.setProperty.forEach(item=>{
+                            item.valueTypeText = this.judgeValueType(item.valueType);
+                            if(item.fromLevel == this.expandPropertyData.row.level){
+                                item.isShowProperty = true;
+                            }
+                        })
+                    }
+                    
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            });
+        },
+        //扩展属性
+        expandProperty(scope){
+            
+            this.expandPropertyData = scope;
+            this.setPropertyShow = true;
+            this.getExpandProperty();
+            console.log(this.expandPropertyData);
+            
+        },
+        //扩展属性确认
+        setPropertySureBtn(){
+            this.addPropertyShow = true;
+
+        },
+        //取消扩展属性
+        setPropertyCancelBtn(){
+            this.setPropertyShow = false;
+            this.setProperty =[];
+        } ,
+        //编辑属性简写
+        editListProperty(scope){
+            console.log(scope);
+            this.editProperty = scope;
+            this.jianxieShow =true;
+            this.jianxieText = scope.row.code;
+        },
+        jianxieSureBtn(){
+            axios({
+                method:'post',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/addProperty',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    code:this.jianxieText,
+                    id:this.editProperty.row.id
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.getExpandProperty();
+                    this.jianxieShow = false;
+                    this.jianxieText
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        jianxieCancelBtn(){
+            this.jianxieShow = false;
+            this.jianxieText ='';
+        },  
+        //删除属性
+        deleteItemProperty(scope){
+            console.log(scope.row);
+            this.delteProperty = scope;
+            this.deletePropertyDialog = true;
+        },
+        deletePropertyMakeSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/deleteCustomProperty',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    numbers:this.delteProperty.row.number,
+                    id:this.delteProperty.row.id
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    console.log(response.data)
+                    this.getExpandProperty();
+                    this.deletePropertyDialog = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+            
+        },
+        //判断值类型
+        judgeValueType(value){
+            if (value == 0) {
+                    return "数值";
+            } else if (value == 1) {
+                return "文本";
+            } else if (value == 2) {
+                return "是否";
+            } else if (value == 3) {
+                return "时间";
+            }
+        },
+        addPropertySureBtn(){
+            axios({
+                method:'post',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/addProperty',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId
+                },
+                data:{
+                    code:this.jianxie,
+                    fromLevel:this.expandPropertyData.row.level,
+                    number:this.expandPropertyData.row.number,
+                    numbers:this.expandPropertyData.row.number,
+                    propertyNumber:this.theThirdTitle,
+                    propertyTableName:this.propertyTable,//todo List
+                    tableName:'t31'
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    this.jianxie = '';
+                    this.getExpandProperty();
+                }else if (response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+            this.addPropertyShow = false;
+        },
+        addPropertyCancelBtn(){
+            this.addPropertyShow = false;
+        },
+        //属性表值改变
+        propertyTableChange(){
+            this.theFirstTitleData = [];
+            axios({
+                method:'post',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/getProperty',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    tableName:this.propertyTable
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    console.log(response.data);
+                    if(response.data.rt){
+                        this.projectTitleData = response.data.rt;
+                        this.projectTitleData.forEach(item=>{
+                            this.theFirstTitleData.push({
+                                table:item.table,
+                                title:item.title,
+                                number:item.number
+                            })
+                        })
+                    }
+                    console.log(this.theFirstTitleData)
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        patg:'/login'
+                    })
+                }
+            })
+        },
+        //一级标题改变
+        theFirstTitleChange(){
+            this.theSecondTitleData =[];
+            var oneObject = [];
+            this.projectTitleData.forEach((item)=>{
+                if(item.number == this.theFirstTitle){
+                    oneObject = item.children;
+                    this.totalPropertyTitle = item.title;
+                }
+            })
+            oneObject.forEach(item=>{
+                this.theSecondTitleData.push({
+                    table:item.table,
+                    title:item.title,
+                    number:item.number
+                })
+            });
+             
+        },
+        //二级标题改变
+        theSecondTitleChange(){
+            this.theThirdTitleData = [];
+            var oneObject = [];
+            var twoObject = [];
+            this.projectTitleData.forEach((item)=>{
+                if(item.number == this.theFirstTitle){
+                    oneObject = item.children;
+                    
+                }
+            })
+            oneObject.forEach(item=>{
+                if(item.number == this.theSecondTitle){
+                    twoObject = item.children;
+                    this.totalPropertyTitle += '-'+item.title;
+                }
+                
+            });
+            twoObject.forEach(item=>{
+                this.theThirdTitleData.push({
+                    table:item.table,
+                    title:item.title,
+                    number:item.number
+                })
+            })
+        },
+        //三级标题改变
+        theThirdTitleChange(){
+            this.theFourceTitleData = [];
+            var oneObject = [];
+            var twoObject = [];
+            var threeObject = []
+            this.projectTitleData.forEach((item)=>{
+                if(item.number == this.theFirstTitle){
+                    oneObject = item.children; 
+                }
+            })
+            oneObject.forEach(item=>{
+                if(item.number == this.theSecondTitle){
+                    twoObject = item.children;
+                }
+            });
+            twoObject.forEach(item=>{
+                if(item.number == this.theThirdTitle){
+                    oneObject = item.children; 
+                    this.totalPropertyTitle += '-'+item.title;
+                }
+            });
+            threeObject.forEach(item=>{
+                this.theFourceTitleData.push({
+                    table:item.table,
+                    title:item.title,
+                    number:item.number
+                })
+            })
+        },
+        //四级标题改变
+        theFourceTitleChange(){
+            var oneObject = [];
+            var twoObject = [];
+            var threeObject = []
+            this.projectTitleData.forEach((item)=>{
+                if(item.number == this.theFirstTitle){
+                    oneObject = item.children; 
+                }
+            })
+            oneObject.forEach(item=>{
+                if(item.number == this.theSecondTitle){
+                    twoObject = item.children;
+                }
+            });
+            twoObject.forEach(item=>{
+                if(item.number == this.theThirdTitle){
+                    oneObject = item.children; 
+                }
+            });
+            threeObject.forEach(item=>{
+                if(item.number == this.theThirdTitle){
+                    oneObject = item.children; 
+                    this.totalPropertyTitle += '-'+item.title;
+                }
+            })
+        },
+        //工程量映射
+        projectMapped(scope){
+            this.projectMapShow = true;
+            console.log(scope);
+            //projectMappingData
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getEngineeringMapping',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    genieclassId:scope.row.id
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.projectMappingData = response.data.rt.rows;
+                    console.log(response.data)
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        projectMappedSure(){
+            this.projectMapShow = false;
+        },
+        projectMappedCancel(){
+            this.projectMapShow = false;
         }
+        
     }
 }
 </script>
@@ -937,6 +1957,13 @@ export default {
                 height: 40px;
                 line-height: 40px;
             }
+            .editInpTextInp{
+                line-height: 40px;
+                color: #333;
+                float: left;
+                font-size: 14px;
+                font-weight: normal;
+            }
             .edit-item-biaoti{
                 display: block;
                 font-size: 12px;
@@ -950,6 +1977,7 @@ export default {
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
+            
         }
         .zk-table{
             color: #333333;
@@ -1249,5 +2277,5 @@ export default {
             position: relative;
             left: -15px;
         }
-}
+    }
 </style>
