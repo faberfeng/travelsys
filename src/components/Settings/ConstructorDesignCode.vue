@@ -17,9 +17,9 @@
                     </template>
                     <template slot="action" slot-scope="scope">
                         <div v-if="scope.row.status == 3">
-                            <button class="actionBtn" @click="setMeterial(scope)">材质设定</button>
-                            <button class="actionBtn" @click="expandProperty(scope)">扩展属性</button>
-                            <button class="actionBtn" @click="projectMapped(scope)">工程量映射</button>
+                            <button class="actionBtn materialSettings" title="材质设定" @click="setMeterial(scope)"></button>
+                            <button class="actionBtn expandProperty" title="扩展属性" @click="expandProperty(scope)"></button>
+                            <button class="actionBtn projectYingShe" title="工程量映射" @click="projectMapped(scope)"></button>
                         </div>
                         <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                         <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
@@ -85,21 +85,24 @@
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
-                        <select class="editSelect" v-model="firstTitle">
+                        <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorOne" class="displayColor" :style="{'background-color':materialColorOne}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="secondTitle">
+                        <select class="editSelect" v-model="secondTitle" @change="materialColorChangeTwo">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorTwo" class="displayColor" :style="{'background-color':materialColorTwo}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="thirdTitle">
+                        <select class="editSelect" v-model="thirdTitle" @change="materialColorChangeThree">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                 </div>
@@ -144,21 +147,24 @@
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
-                        <select class="editSelect" v-model="firstTitle">
+                        <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorOne" class="displayColor" :style="{'background-color':materialColorOne}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="secondTitle">
+                        <select class="editSelect" v-model="secondTitle" @change="materialColorChangeTwo">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorTwo" class="displayColor" :style="{'background-color':materialColorTwo}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="thirdTitle">
+                        <select class="editSelect" v-model="thirdTitle" @change="materialColorChangeThree">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                 </div>
@@ -178,21 +184,24 @@
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
-                        <select class="editSelect" v-model="firstTitle">
+                        <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorOne" class="displayColor" :style="{'background-color':materialColorOne}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="secondTitle">
+                        <select class="editSelect" v-model="secondTitle" @change="materialColorChangeTwo">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorTwo" class="displayColor" :style="{'background-color':materialColorTwo}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                     <div  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材质索引 :</label>
-                        <select class="editSelect" v-model="thirdTitle">
+                        <select class="editSelect" v-model="thirdTitle" @change="materialColorChangeThree">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
+                        <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
                     </div>
                 </div>
@@ -491,6 +500,12 @@ export default {
             typeProperty:'',
             projectMapShow:false,//工程量映射
             projectMappingData:[],
+            materialColorOne:'',
+            showMaterialColorOne:false,
+            materialColorTwo:'',
+            showMaterialColorTwo:false,
+            materialColorThird:'',
+            showMaterialColorThree:false,
         }
     },
     created(){
@@ -643,8 +658,29 @@ export default {
             this.totalCode = scope.row.number;
             var colorObject = [];
             this.firstTitle = scope.row.color_0.split(':')[0].split('>')[1] || '默认';
+            if(this.firstTitle == '默认'){
+                this.showMaterialColorOne = false;
+                
+            }else{
+                this.showMaterialColorOne = true;
+                this.materialColorOne = this.toBeColor(this.toBeColorCode(this.firstTitle));
+            }
+
             this.secondTitle = scope.row.color_1.split(':')[0].split('>')[1] || '默认';
+            if(this.secondTitle == '默认'){
+                this.showMaterialColorTwo = false;
+            }else{
+                this.showMaterialColorTwo = true;
+                this.materialColorTwo = this.toBeColor(this.toBeColorCode(this.secondTitle));
+            }
+
             this.thirdTitle = scope.row.color_2.split(':')[0].split('>')[1] || '默认';
+            if(this.thirdTitle == '默认'){
+                this.showMaterialColorThree = false;
+            }else{
+                this.showMaterialColorThree = true;
+                this.materialColorThree = this.toBeColor(this.toBeColorCode(this.thirdTitle));
+            }
             this.editListShowtwice = true;
         },
         //保存编辑
@@ -697,6 +733,9 @@ export default {
             this.newTitle = '';
             this.codeType = '';
             this.editListShowtwice = false;
+            this.showMaterialColorOne = false;
+            this.showMaterialColorTwo = false;
+            this.showMaterialColorThree = false;
         },
         //删除
         deleteItem(scope){
@@ -1126,6 +1165,193 @@ export default {
             }
         },
         //判断颜色
+        toBeColor(value) {
+            var color = "";
+            switch (value) {
+                case 12001:
+                    color = "RGBA(127,127,127,255)";
+                    break;
+                case 12002:
+                    color = "RGBA(159,159,159,255)";
+                    break;
+                case 12003:
+                    color = "RGBA(191,191,191,255)";
+                    break;
+                case 12004:
+                    color = "RGBA(223,223,223,255)";
+                    break;
+                case 12005:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 12006:
+                    color = "RGBA(255,255,191,255)";
+                    break;
+                case 12007:
+                    color = "RGBA(255,240,191,255)";
+                    break;
+                case 12008:
+                    color = "RGBA(255,232,139,255)";
+                    break;
+                case 12009:
+                    color = "RGBA(255,214,238,255)";
+                    break;
+                case 12010:
+                    color = "RGBA(255,152,201,255)";
+                    break;
+                case 12011:
+                    color = "RGBA(255,62,160,255)";
+                    break;
+                case 12012:
+                    color = "RGBA(255,105,105,255)";
+                    break;
+                case 12013:
+                    color = "RGBA(255,62,62,255)";
+                    break;
+                case 12014:
+                    color = "RGBA(255,0,0,255)";
+                    break;
+                case 12015:
+                    color = "RGBA(255,186,116,255)";
+                    break;
+                case 12016:
+                    color = "RGBA(255,127,0,255)";
+                    break;
+                case 12017:
+                    color = "RGBA(99,255,99,255)";
+                    break;
+                case 12018:
+                    color = "RGBA(0,171,0,255)";
+                    break;
+                case 12019:
+                    color = "RGBA(173,173,255,255)";
+                    break;
+                case 12020:
+                    color = "RGBA(68,199,255,255)";
+                    break;
+                case 13001:
+                    color = "RGBA(255,0,0,255)";
+                    break;
+                case 13002:
+                    color = "RGBA(255,255,0,255)";
+                    break;
+                case 13003:
+                    color = "RGBA(0,255,0,255)";
+                    break;
+                case 13004:
+                    color = "RGBA(0,255,255,255)";
+                    break;
+                case 13005:
+                    color = "RGBA(0,0,255,255)";
+                    break;
+                case 13006:
+                    color = "RGBA(255,0,255,255)";
+                    break;
+                case 13007:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 13008:
+                    color = "RGBA(167,167,167,255)";
+                    break;
+                case 13009:
+                    color = "RGBA(214,214,214,255)";
+                    break;
+                case 13010:
+                    color = "RGBA(255,128,0,255)";
+                    break;
+                case 13011:
+                    color = "RGBA(128,255,0,255)";
+                    break;
+                case 13012:
+                    color = "RGBA(0,255,128,255)";
+                    break;
+                case 13013:
+                    color = "RGBA(0,128,255,255)";
+                    break;
+                case 13014:
+                    color = "RGBA(128,0,255,155)";
+                    break;
+                case 13015:
+                    color = "RGBA(255,0,128,255)";
+                    break;
+                case 13016:
+                    color = "RGBA(128,64,0,255)";
+                    break;
+                case 13017:
+                    color = "RGBA(75,38,0,255)";
+                    break;
+                case 13018:
+                    color = "RGBA(91,91,91,255)";
+                    break;
+                case 13019:
+                    color = "RGBA(63,63,63,255)";
+                    break;
+                case 13020:
+                    color = "RGBA(0,0,0,255)";
+                    break;
+                case 23001:
+                    color = "RGBA(127,191,255,40)";
+                    break;
+                case 23002:
+                    color = "RGBA(0,63,127,63)";
+                    break;
+                case 23003:
+                    color = "RGBA(127,255,192,63)";
+                    break;
+                case 23004:
+                    color = "RGBA(0,192,0,63)";
+                    break;
+                case 23005:
+                    color = "RGBA(75,75,75,128)";
+                    break;
+                case 23006:
+                    color = "RGBA(54,54,54,128)";
+                    break;
+                case 23007:
+                    color = "RGBA(0,63,127,40)";
+                    break;
+                case 23008:
+                    color = "RGBA(0,189,0,40)";
+                    break;
+                case 23009:
+                    color = "RGBA(56,56,56,40)";
+                    break;
+                case 23010:
+                    color = "RGBA(0,128,255,255)";
+                    break;//暂定天蓝色
+                case 91001:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91002:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91003:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91004:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91005:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91006:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91007:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                case 91008:
+                    color = "RGBA(255,255,255,255)";
+                    break;
+                default:
+                    color = "Black";
+            }
+            if(value == "10000"){
+                return "";
+            }else{
+                return color 
+            }
+        },
+        //判断颜色
         toBeColorCode(value) {
             switch (value) {
                 case "A2涂料-灰白127":
@@ -1373,6 +1599,9 @@ export default {
             this.newTitle ='';
             this.newCode ='';
             this.totalTitle ='';
+            this.showMaterialColorOne = false;
+            this.showMaterialColorTwo = false;
+            this.showMaterialColorThree = false;
         },
         //编码级别改变
         codeTypeChange(){
@@ -1443,6 +1672,7 @@ export default {
         },
         //设定材料
         setMeterial(scope){
+            console.log(scope);
             var onArray = [];
             var twoArray = [];
             this.setMeterialShow = true;
@@ -1471,6 +1701,33 @@ export default {
             this.firstTitle = scope.row.color_0.split(':')[0].split('>')[1] || '默认';
             this.secondTitle = scope.row.color_1.split(':')[0].split('>')[1] || '默认';
             this.thirdTitle = scope.row.color_2.split(':')[0].split('>')[1] || '默认';
+            if(scope.row.materialIndex[0] == '10000'){
+                this.materialColorOne = 'white';
+                this.showMaterialColorOne = false;
+                // this.showMaterialColorOne = false;
+                // this.showMaterialColorTwo = false;
+                // this.showMaterialColorThree = false;
+            }else{
+                
+                this.materialColorOne = this.toBeColor(scope.row.materialIndex[0]);
+                this.showMaterialColorOne = true;
+            }
+            if(scope.row.materialIndex[1] == '10000'){
+                this.materialColorTwo = 'white';
+                this.showMaterialColorTwo = false;
+            }else{
+                
+                this.materialColorTwo = this.toBeColor(scope.row.materialIndex[1]);
+                this.showMaterialColorTwo = true;
+            }
+            if(scope.row.materialIndex[2] == '10000'){
+                this.materialColorThird = 'white';
+                this.showMaterialColorThree = false;
+            }else{
+                this.materialColorThird = this.toBeColor(scope.row.materialIndex[2]);
+                this.showMaterialColorThree = true;
+            }
+            
         },
         //确定设定材料
         setMeterialSureBtn(){
@@ -1508,6 +1765,10 @@ export default {
             this.setMeterialShow = false;
             this.totalCode = '';
             this.totalTitle = '';
+            this.showMaterialColorOne =false;
+            this.showMaterialColorTwo = false;
+            this.showMaterialColorThree = false;
+            
         },
         //获取扩展属性
         getExpandProperty(){
@@ -1854,6 +2115,35 @@ export default {
         },
         projectMappedCancel(){
             this.projectMapShow = false;
+        },
+        //材质颜色改变1
+        materialColorChangeOne(){
+            if(this.firstTitle == '默认'){
+                this.showMaterialColorOne = false;
+            }else{
+                this.showMaterialColorOne = true;
+                this.materialColorOne = this.toBeColor(this.toBeColorCode(this.firstTitle));
+            }
+            
+        },
+        //材质颜色改变2
+        materialColorChangeTwo(){
+            if(this.secondTitle == '默认'){
+                this.showMaterialColorTwo = false;
+            }else{
+                this.showMaterialColorTwo = true;
+                this.materialColorTwo = this.toBeColor(this.toBeColorCode(this.secondTitle));
+            }
+            
+        },
+        //材质颜色改变3
+        materialColorChangeThree(){
+            if(this.thirdTitle == '默认'){
+                this.showMaterialColorThree = false;
+            }else{
+                this.showMaterialColorThree = true;
+                this.materialColorThree = this.toBeColor(this.toBeColorCode(this.thirdTitle));
+            }
         }
         
     }
@@ -1925,6 +2215,15 @@ export default {
     .tiqingBtn{
           background: url('./images/tiqing.png') no-repeat;
     }
+    .materialSettings{
+        background: url('./images/settings.png') no-repeat;
+    }
+    .expandProperty{
+        background: url('./images/expandProperty.png') no-repeat;
+    }
+    .projectYingShe{
+        background: url('./images/projectYingShe.png') no-repeat;
+    }
 </style>
 <style lang='less'>
     #constructorD{
@@ -1976,6 +2275,16 @@ export default {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+            .displayColor{
+                display: block;
+                width: 30px;
+                height: 30px;
+                border: 1px solid #ccc;
+                overflow: hidden;
+                float: left;
+                margin-left: 120px;
+                margin-top: 5px;
             }
             
         }
