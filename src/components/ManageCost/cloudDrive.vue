@@ -1,13 +1,13 @@
 <template>
-<div>
+<div id="cloudDrive">
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class="label-item-active label-item">
+                <span  class=" label-item">
                     <router-link :to="'/home/costover'">  
                     最近文档  
                    </router-link>
                 </span>
-                <span  class="label-item">
+                <span  class="label-item label-item-active">
                     <router-link :to="'/home/cloudDrive'">  
                     工程云盘  
                    </router-link>
@@ -99,14 +99,23 @@
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
                 </div>
-                <div :class="[screenLeft.item == 1?'active':'active-version']">
-                    <span class="item-property " @click="screenLeft.item = 1;">属<br>性</span>
-                    <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
+                <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                    <span class="item-property " @click="screenLeft.item = 1">目<br>录</span>
+                    <span class="item-version " @click="screenLeft.item = 2">属<br>性</span>
+                    <span class="item-version-3  " @click="screenLeft.item = 3">版<br>本</span>
                 </div>
             </div>
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
-            <div id="box-right" v-if="screenLeft.item == 1">
+            <div v-if="screenLeft.item == 1" class="screenRight_1">
+                <el-tree
+                :data="data6"
+                node-key="id"
+                default-expand-all
+                >
+                </el-tree>
+            </div>
+            <div id="box-right" v-else-if="screenLeft.item == 2">
                 <h3 class="header-attribute">
                     <i class="trrangle"></i>
                     基本属性
@@ -200,14 +209,44 @@
         </div>
 </div>
 </template>
-<style scoped lang='less'>
+<style  lang='less'>
+#cloudDrive{
+    /*
+        修改eleUI树形组件
+    */
+
+    .el-tree-node__label{
+        font-size: 12px;
+        color: #666666;
+        padding-left: 22px; 
+        position: relative;
+    }
+    .el-icon-caret-right:before{
+           content: "\E604";
+           color: #999999;
+           font-weight: bold;
+    }
+    .el-tree-node__label::before{
+        display: block;
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        width: 14px;
+        height: 13px;
+        background: url('./images/file.png')no-repeat 0 0;
+        content: '';
+    }
+    .el-tree-node__content{
+            height: 30px;
+    }
+    .is-current .el-tree-node__content{
+        color: #333333;
+        font-weight: bold;
+    }
     *{
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-    }
-    .show{
-        display: block!important;
     }
     li{
         list-style: none;
@@ -217,10 +256,12 @@
         overflow: hidden;
         content: '';
     }
+    .show{
+        display: block!important;
+    }
     .box-left-container{
         display: block;
         position: fixed;
-        overflow-x: hidden;
         top: 115px;
         left: 26px;
         bottom: 0;
@@ -254,7 +295,7 @@
                     transform: rotateZ(0deg);
                 }
             }
-            .item-property{
+            .item-property{//目录
                 display: block;
                 width: 25px;
                 height: 68px;
@@ -279,7 +320,7 @@
                     content: '';
                 }
             }   
-            .item-version{
+            .item-version{//属性
                 display: block;
                 width: 25px;
                 height: 56px;
@@ -304,29 +345,79 @@
                     content: '';
                 }
             }
-            .active-version{
-                .item-version{
+            .item-version-3{//版本
+                 display: block;
+                width: 25px;
+                height: 68px;
+                background: #fafafa;
+                padding-top:24px;
+                font-size: 12px;
+                color: #666666; 
+                text-align: center;
+                border-left: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                position: relative;
+                cursor: pointer;
+                &::after{
+                    display: block;
+                    position: absolute;
+                    bottom:-7px;
+                    width: 23px;
+                    height: 13px;
+                    background: #fafafa;
+                    border-bottom: 1px solid #cccccc;
+                    transform: skewY(30deg);
+                    content: '';
+                }
+            }
+            .active-version{//中间 属性 高显
+                .item-version{//属性
                       background: #fff;
                     color: #fc3439;
-                     width: 26px;
+                     z-index: 15;
                     &::after{
                         background: #fff;
-                        border-right: 1px solid #ffffff;
+                    }
+                }
+                .item-property::after{//目录
+                    background: #fff;
+                }
+                .item-version-3{//版本
+                    z-index: 10;
+                }
+            }
+            .active{//上边 目录 高显
+                .item-property{
+                      background: #fff;
+                      color: #fc3439;
+                }
+                 .item-version{
+                    z-index: 15;
+                }
+                  .item-version-3{
+                      z-index: 10;
+                }
+            }
+            .active-version-3{//下边 版本 高显
+                .item-version{
+                     z-index: 15;
+                    &::after{
+                        background: #fafafa;
                     }
                 }
                 .item-property::after{
                     background: #fff;
                 }
-            }
-            .active{
-                .item-property{
+                .item-version-3{
+                    z-index: 10;
                       background: #fff;
-                      color: #fc3439;
-                }
-                .item-property{
-                   width: 26px;
+                    color: #fc3439;
+                    &::after{
+                        background: #fff;
+                    }
                 }
             }
+            
         }
          .title-right{
             float: left;;
@@ -676,6 +767,9 @@
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        .screenRight_1{
+            padding: 10px 14px 10px 10px;
+        }
     }
     .box-right-avtive{
         right: 0;
@@ -953,6 +1047,7 @@
     background:rgba(255,0,0,0.4);
     }
     /*********************/
+}
 </style>
 <script>
 import axios from 'axios'
@@ -989,6 +1084,57 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
+
+
+         data6: [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2',
+            children: [{
+             id: 11,
+              label: '三级 3-2-1'
+            }, {
+              id: 12,
+              label: '三级 3-2-2'
+            }, {
+              id: 13,
+              label: '三级 3-2-3'
+            }]
+          }]
+        }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
       }
   },
   created(){
