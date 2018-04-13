@@ -3,22 +3,22 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
                 <span  class=" label-item">
-                    <router-link :to="'/home/costover'">  
+                    <router-link :to="'/Drive/costover'">  
                     最近文档  
                    </router-link>
                 </span>
                 <span  class="label-item label-item-active">
-                    <router-link :to="'/home/cloudDrive'">  
+                    <router-link :to="'/Drive/cloudDrive'">  
                     工程云盘  
                    </router-link>
                 </span>
                 <span  class="label-item">
-                <router-link :to="'/home/cloudDrive'">  
+                <router-link :to="'/Drive/cloudDrive'">  
                     已经分享  
                   </router-link>
                 </span>
                 <span  class="label-item">
-                  <router-link :to="'/home/cloudDrive'">  
+                  <router-link :to="'/Drive/cloudDrive'">  
                     个人中转  
                   </router-link>
                 </span>
@@ -108,6 +108,12 @@
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
             <div v-if="screenLeft.item == 1" class="screenRight_1">
+                 <p class="clearfix">
+                    <i class="icon-goujian icon-add"></i>
+                    <i class="icon-goujian icon-authrity"></i>
+                    <i class="icon-goujian icon-delete"></i>
+                    <i class="icon-goujian icon-edit"></i>
+                </p>
                 <el-tree
                 :data="data6"
                 node-key="id"
@@ -769,6 +775,47 @@
         z-index: 10;
         .screenRight_1{
             padding: 10px 14px 10px 10px;
+            >p{
+                padding-bottom:5px;
+                border-bottom: 1px solid #e6e6e6;
+                margin-bottom:10px;  
+            }
+             .icon-goujian{
+                float: left;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+            .icon-add{
+                background: url('./images/add.png')no-repeat 0 0;
+                margin-right: 75px;
+                &:hover{
+                    background: url('./images/add1.png')no-repeat 0 0;
+                }
+            }
+            .icon-authrity{
+                float: right;
+                background: url('./images/authority.png')no-repeat 0 0;
+                &:hover{
+                    background: url('./images/authority1.png')no-repeat 0 0;
+                } 
+            }
+            .icon-edit{
+                 float: right;
+                background: url('./images/edit.png')no-repeat 0 0;
+                margin-right: 10px;
+                &:hover{
+                    background: url('./images/edit1.png')no-repeat 0 0;
+                } 
+            }
+            .icon-delete{
+                 float: right;
+                background: url('./images/delete.png')no-repeat 0 0;
+                margin-right: 10px;
+                &:hover{
+                    background: url('./images/delete1.png')no-repeat 0 0;
+                } 
+            }
         }
     }
     .box-right-avtive{
@@ -1075,6 +1122,7 @@ export default {
           },
          token:'',
          projId:'',
+         userId:'',
          QJFileManageSystemURL:'',
          checkedItem:{},//选中的file
          GouJianItem:{},//选中file的构件
@@ -1087,50 +1135,50 @@ export default {
 
 
          data6: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
+            id: 1,
+            label: '一级 1',
             children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
+                id: 4,
+                label: '二级 1-1',
+                children: [{
+                id: 9,
+                label: '三级 1-1-1'
+                }, {
+                id: 10,
+                label: '三级 1-1-2'
+                }]
             }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2',
+            }, {
+            id: 2,
+            label: '一级 2',
             children: [{
-             id: 11,
-              label: '三级 3-2-1'
+                id: 5,
+                label: '二级 2-1'
             }, {
-              id: 12,
-              label: '三级 3-2-2'
-            }, {
-              id: 13,
-              label: '三级 3-2-3'
+                id: 6,
+                label: '二级 2-2'
             }]
-          }]
-        }],
+            }, {
+            id: 3,
+            label: '一级 3',
+            children: [{
+                id: 7,
+                label: '二级 3-1'
+            }, {
+                id: 8,
+                label: '二级 3-2',
+                children: [{
+                id: 11,
+                label: '三级 3-2-1'
+                }, {
+                id: 12,
+                label: '三级 3-2-2'
+                }, {
+                id: 13,
+                label: '三级 3-2-3'
+                }]
+            }]
+            }],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -1141,8 +1189,10 @@ export default {
       var vm = this
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
+        vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.getInfo()
+        // vm.getInfo() 获取 最近文件
+        vm.getFileTree()
   },
   watch:{
       checkAll:function(val){
@@ -1271,7 +1321,7 @@ export default {
                     return '未定义';
             }
       },
-    splitType(val){
+      splitType(val){
           return val.split('.')[0]
       },
       initData(val){
@@ -1405,6 +1455,32 @@ export default {
             }
         }
 
+    },
+    getFileTree(){
+        var vm = this
+        axios({
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/'+vm.userId+'/directory',
+            headers:{
+                'token':vm.token
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                console.log(response)
+                // if(response.data.rt.rows.length>0){
+                  
+                // }else{
+                //     vm.$message({
+                //         type:'info',
+                //         message:'未匹配到相应的数据'
+                //     })
+                //     vm.fileList = ''
+                // }
+            }
+
+        }).catch((err)=>{
+            console.log(err)
+        })
     },
     getInfo(){
         var vm = this

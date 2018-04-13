@@ -47,16 +47,6 @@ const router = new Router({
           component:resolve=>require(['@/components/ProjectHome/home'],resolve)
         },
         {
-          path:'/home/costover',
-          name:'Costover',
-          component:resolve=>require(['@/components/ManageCost/Costover'],resolve)
-        },
-        {
-          path:'/home/cloudDrive',
-          name:'cloudDrive',
-          component:resolve=>require(['@/components/ManageCost/cloudDrive'],resolve)
-        },
-        {
           path:'/home/goujian',
           name:'Goujian',
           component:resolve=>require(['@/components/ManageCost/Goujian'],resolve),
@@ -80,6 +70,26 @@ const router = new Router({
           path:'/home/designversion',
           name:'DesignVersion',
           component:resolve=>require(['@/components/ManageDesign/DesignVersion'],resolve)
+        },
+      ]
+    },
+    {
+      path:'/Drive',
+      name:'Drive',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+          path:'/Drive/costover',
+          name:'Costover',
+          component:resolve=>require(['@/components/ManageCost/Costover'],resolve)
+        },
+        {
+          path:'/Drive/cloudDrive',
+          name:'cloudDrive',
+          component:resolve=>require(['@/components/ManageCost/cloudDrive'],resolve)
         },
       ]
     },

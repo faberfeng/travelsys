@@ -3,22 +3,22 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
                 <span  class="label-item-active label-item">
-                    <router-link :to="'/home/costover'">  
+                    <router-link :to="'/Drive/costover'">  
                     最近文档  
                    </router-link>
                 </span>
                 <span  class="label-item">
-                    <router-link :to="'/home/cloudDrive'">  
+                    <router-link :to="'/Drive/cloudDrive'">  
                     工程云盘  
                    </router-link>
                 </span>
                 <span  class="label-item">
-                <router-link :to="'/home/cloudDrive'">  
+                <router-link :to="'/Drive/cloudDrive'">  
                     已经分享  
                   </router-link>
                 </span>
                 <span  class="label-item">
-                  <router-link :to="'/home/cloudDrive'">  
+                  <router-link :to="'/Drive/cloudDrive'">  
                     个人中转  
                   </router-link>
                 </span>
