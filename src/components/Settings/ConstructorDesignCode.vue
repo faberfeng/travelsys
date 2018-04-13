@@ -1721,10 +1721,10 @@ export default {
                 this.showMaterialColorTwo = true;
             }
             if(scope.row.materialIndex[2] == '10000'){
-                this.materialColorThird = 'white';
+                this.materialColorThree = 'white';
                 this.showMaterialColorThree = false;
             }else{
-                this.materialColorThird = this.toBeColor(scope.row.materialIndex[2]);
+                this.materialColorThree = this.toBeColor(scope.row.materialIndex[2]);
                 this.showMaterialColorThree = true;
             }
             
