@@ -52,6 +52,11 @@ const router = new Router({
           component:resolve=>require(['@/components/ManageCost/Costover'],resolve)
         },
         {
+          path:'/home/cloudDrive',
+          name:'cloudDrive',
+          component:resolve=>require(['@/components/ManageCost/cloudDrive'],resolve)
+        },
+        {
           path:'/home/goujian',
           name:'Goujian',
           component:resolve=>require(['@/components/ManageCost/Goujian'],resolve),
