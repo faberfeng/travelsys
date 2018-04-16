@@ -13,8 +13,8 @@
                     :border="props.border" >
                         <template slot="action" slot-scope="scope">
                             <div v-if="scope.row.level == 4">
-                                <button  @click="setMeterial(scope)">构件映射</button>
-                                <button  @click="eeditProperty(scope)">编辑特性</button>
+                                <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>
+                                <button class="actionBtn expandProperty" title="编辑特性"  @click="eeditProperty(scope)"></button>
                             </div>
                             <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                             <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
@@ -343,7 +343,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.projectSubmitData = response.data.rt;
                     this.reJudgeValueType(this.projectSubmitData);
                 }else if(response.data.cd == '-1'){
@@ -407,11 +406,9 @@ export default {
         },
         //编辑特性
         eeditProperty(scope){
-            console.log(scope);
             this.editPropertyObject = scope;
             this.editPropertyShow =true;
             this.getEditProperty(scope);
-            
         },
         getEditProperty(val){
             axios({
@@ -426,7 +423,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.propertyData= response.data.rt.rows;
                     this.propertyData.forEach(item=>{
                         item.valueTypeText = this.formatterValueType(item.valueType);
@@ -448,7 +444,6 @@ export default {
         //删除特性
         deleteProperty(scope){
             this.deleteDialog = true;
-            console.log(scope);
             this.deletePropertyObject = scope;
             this.peojectProperty = scope.row.characterName;
         },
@@ -466,7 +461,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.getEditProperty(this.editPropertyObject);
                     this.deleteDialog = false;
                 }else if(response.data.cd == '-1'){
@@ -502,7 +496,6 @@ export default {
                     }
                 }).then(response=>{
                     if(response.data.cd == '0'){
-                        console.log(response.data);
                         this.addPropertyShow =false;
                         this.propertyValueType ='';
                         this.newProperty = '';
@@ -564,7 +557,6 @@ export default {
                     }
                 }).then(response=>{
                     if(response.data.cd == 0){
-                        console.log(response.data);
                         this.getProjectGenieClass();
                         this.codeType = '';
                         this.firstTitleText = '';
@@ -712,7 +704,6 @@ export default {
         //提请
         confirm(scope){
             this.confirmObject = scope;
-            console.log(scope)
             var parentNum = scope.row.parNumber;
             var status = '';
             if(parentNum){
@@ -726,7 +717,6 @@ export default {
         },
         //确认提请
         confirmSure(){
-            console.log(this.confirmObject);
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
@@ -804,7 +794,6 @@ export default {
         },
         //通过
         pass(scope){
-            console.log(scope)
             this.passObject = scope;
             this.passVisible =true;
         },
@@ -1062,6 +1051,12 @@ export default {
         }
         .tiqingBtn{
             background: url('./images/tiqing.png') no-repeat;
+        }
+        .expandProperty{
+            background: url('./images/expandProperty.png') no-repeat;
+        }
+        .projectYingShe{
+            background: url('./images/projectYingShe.png') no-repeat;
         }
 </style>
 <style lang='less'>
