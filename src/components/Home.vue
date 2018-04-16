@@ -57,10 +57,10 @@
                                     <span>建筑信息模型标准管理</span>
                                 </template>
                                 <el-menu-item-group>
-                                    <el-menu-item index="/setting/datatransform">数据传递标准预览</el-menu-item>
-                                    <el-menu-item index="/setting/professional">专业种类分类编码</el-menu-item>
+                                    <el-menu-item index="/setting/datatransform">数据传递标准概览</el-menu-item>
+                                    <el-menu-item index="/setting/professional">专业工种分类编码</el-menu-item>
                                     <el-menu-item index="/setting/worktool">作业工具分类编码</el-menu-item>
-                                    <el-menu-item index="/setting/constructordesignmapped">设计结构分类映射</el-menu-item>
+                                    <el-menu-item index="/setting/constructordesignmapped">设计构件分类映射</el-menu-item>
                                     <el-menu-item index="/setting/constructordesigncode">设计构件分类编码</el-menu-item>
                                     <el-menu-item index="/setting/projectsubmit">工程招标分类编码</el-menu-item>
                                     <el-menu-item index="/setting/materialpurchase">物资采购分类编码</el-menu-item>

@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-      <h4 class="sTitle"><span>数据传递标准预览</span></h4>
+      <h4 class="sTitle"><span>数据传递标准概览</span></h4>
       <div class="dataTransformClass">
           <div class="dataCollectAnalysis">
              <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform1.png"/>标准汇总分析<span class="import"><span></span>导入标准</span><span class="export"><span></span>导出标准</span></h5>
