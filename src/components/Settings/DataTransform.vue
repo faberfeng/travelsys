@@ -122,7 +122,7 @@ export default {
                     
                     this.dataTransformData[1].sNumber = this.dataTransformInfo.t31Count;
                     this.dataTransformData[1].eNumber = this.dataTransformInfo.t31CompanyCount;
-                    this.dataTransformData[1].pNumber = this.dataTransformInfo.t31CompanyCount;
+                    this.dataTransformData[1].pNumber = this.dataTransformInfo.t31ProjectCount;
                     this.dataTransformData[1].tNumber = this.dataTransformData[1].sNumber+this.dataTransformData[1].eNumber+this.dataTransformData[1].pNumber;
                     
                     this.dataTransformData[2].sNumber = this.dataTransformInfo.t32Count;
