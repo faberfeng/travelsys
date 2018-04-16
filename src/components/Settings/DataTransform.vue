@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div id="datatransform">
       <h4 class="sTitle"><span>数据传递标准概览</span></h4>
       <div class="dataTransformClass">
           <div class="dataCollectAnalysis">
@@ -17,10 +17,16 @@
           <div class="dataTransAnalysis">
               <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform2.png"/>工程概况</h5>
               <div class="dataTransAnalysisImg">
-                <div class="pro"><el-progress type="circle" :percentage="0"></el-progress><p>构件总量</p></div>
-                <div class="pro"><el-progress type="circle" :percentage="25"></el-progress><p>设计识别</p></div>
-                <div class="pro"><el-progress type="circle" :percentage="100" status="success"></el-progress><p>工程计量</p></div>
-                <div class="pro"><el-progress type="circle" :percentage="50" status="exception"></el-progress><p>材料核实</p></div>
+                <div class="pro"><el-progress type="circle" :percentage="100"></el-progress>
+                <p>构件总量<span style="margin-left:15px;color:#666666;">{{component.elementCount}}</span></p>
+                </div>
+                <div class="pro"><el-progress type="circle" :percentage="component.designPercent"></el-progress>
+                      <p>设计识别<span style="margin-left:15px;color:#666666;">{{component.designIdentity}}</span></p>
+                </div>
+                <div class="pro"><el-progress type="circle" :percentage="component.outputPercent"></el-progress>
+                     <p>工程计量<span style="margin-left:15px;color:#666666;">{{component.outputTotal}}</span></p>
+                </div>
+                <div class="pro"><el-progress type="circle" :percentage="component.dischargePercent"></el-progress><p>材料核实<span style="margin-left:15px;color:#666666;">{{component.dischargeTotal}}</span></p></div>
               </div>
           </div>
       </div>
@@ -36,6 +42,7 @@ export default {
             projId:'',
             baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
             dataTransformInfo:{},
+            component:{},
             dataTransformData:[{
                 name:"设计构件分类映射（Revit映射）",
                 sNumber:0,
@@ -115,6 +122,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.dataTransformInfo = response.data.rt;
+                    this.component = response.data.rt.component
                     this.dataTransformData[0].sNumber = 0;
                     this.dataTransformData[0].eNumber = 0;
                     this.dataTransformData[0].pNumber = this.dataTransformInfo.mapProjectCount;
@@ -159,7 +167,7 @@ export default {
                     this.dataTransformData[8].eNumber = this.dataTransformInfo.t45CompanyCount;
                     this.dataTransformData[8].pNumber = this.dataTransformInfo.t45ProjectCount;
                     this.dataTransformData[8].tNumber = this.dataTransformData[8].sNumber+this.dataTransformData[8].eNumber+this.dataTransformData[8].pNumber;
-                    //console.log(this.dataTransformInfo)
+                    // console.log(this.component.elementCount)
                 }else if(response.data.cd = '-1'){
                     alert(response.data.msg)
                 }else{
@@ -190,12 +198,20 @@ export default {
     }
 }
 </script>
-<style scoped>
-    .wrapper{
-        width: 100%;
+<style lang="less">
+#datatransform{
+    .el-progress__text{
+        color: #666666;
+        font-size: 14px!important;
     }
     .dataTransformClass{
         margin: 0 20px 0 15px;
+    }
+    p{
+        font-size: 14px;
+        color: #333333;
+        line-height: 14px;
+        margin-top: 19px;
     }
     .sTitle{
         color: #fc343a;
@@ -282,4 +298,5 @@ export default {
     .dataTransAnalysisImg .pro{
         flex: 1;
     }
+}
 </style>

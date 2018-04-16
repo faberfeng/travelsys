@@ -1,5 +1,11 @@
 <template>
 <div id="cloudDrive">
+        <div id="GroupSelect">
+            <select v-model="selectUgId" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
+            </select>
+            <i class="icon-sanjiao"></i>
+        </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
                 <span  class=" label-item">
@@ -22,19 +28,48 @@
                     个人中转  
                   </router-link>
                 </span>
-                <div class="item-search">
+                <div class="item-search" v-if="!showQuanJing">
                     <span class="title-right">
                         <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
                         <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
                     </span>
+                     <select v-model="posType" class="inp-search">
+                        <option value="">全部文档</option>
+                        <option value="1">我的上传</option>
+                    </select>
+                    <i class="icon-sanjiao"></i>
                     <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
                 </div>
             </div>
-            <p class="select-header clearfix">
+            <p class="select-header clearfix" v-if="!showQuanJing">
                     <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
                     <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                      <span class="button-download" @click="downloadFile">下载</span>
             </p>
+            <p class="select-header clearfix" v-else>
+                <span class="icon icon-upload">上传平面图</span>
+                <span class="icon icon-refresh">更新平面图</span>
+                <span class="icon icon-new">新建平面图</span>
+                <ul class="operation">
+                    <li class="item">剪切</li>
+                    <li class="item">删除</li>
+                    <li class="item">更新</li>
+                    <li class="item">更名</li>
+                    <li class="item">复制</li>
+                    <li class="item">分享</li>
+                </ul>
+            </p>
+            <!--全景图代码-->
+            <div v-if="showQuanJing">
+                <div id="planeFigureDiv">
+                    <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
+                    <span class="round"></span>
+                    <span class="round"></span>
+                    <span class="round"></span>
+                </div>
+            </div>
+            <div v-else>
+            <!--文件夹代码-->
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
@@ -95,6 +130,7 @@
                     </tbody>
                 </table>
             </div>
+            </div>
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -115,9 +151,11 @@
                     <i class="icon-goujian icon-edit"></i>
                 </p>
                 <el-tree
-                :data="data6"
-                node-key="id"
-                default-expand-all
+                :data="FileTree"
+                node-key="nodeId"
+                :props="defaultProps"
+                highlight-current
+                @node-click="handleNodeClick"
                 >
                 </el-tree>
             </div>
@@ -262,8 +300,54 @@
         overflow: hidden;
         content: '';
     }
+     select.inp-search {  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        } 
     .show{
         display: block!important;
+    }
+    #GroupSelect{
+        display: block;
+        width: 168px;
+        height: 30px;
+        position: fixed;
+        top: 77px;
+        z-index: 1001;
+        right: 24px;
+        .inp-search{
+            width: 168px;
+            border-radius: 15px;
+            height: 30px;
+            border: 1px solid #cccccc;
+            position: relative;
+            background: #fafafa;
+            padding-left:10px;
+            padding-right:20px;
+            box-sizing: border-box;  
+            margin-right: 15px;
+            float: left;
+            color: #333333;
+            font-size: 14px;
+            outline: none;
+        }
+        .icon-sanjiao{
+            display: block;
+            position: absolute;
+            width: 12px;
+            height: 7px;
+            background-image:url('../Settings/images/sanjiao.png');
+            background-size: 100% 100%;
+            content: '';
+            top: 12px;
+            right: 11px;
+        }
     }
     .box-left-container{
         display: block;
@@ -459,6 +543,33 @@
             right: 35px;
             top: 10px;
             width: auto;
+            .inp-search{
+                width: 82px;
+                border-radius: 15px;
+                height: 30px;
+                border: 1px solid #e6e6e6;
+                position: relative;
+                background: #fafafa;
+                padding-left:10px;
+                padding-right:20px;
+                box-sizing: border-box;  
+                margin-right: 15px;
+                float: left;
+                color: #999999;
+                font-size: 12px;
+                outline: none;
+            }
+            .icon-sanjiao{
+                display: block;
+                position: absolute;
+                width: 8px;
+                height: 4px;
+                background-image:url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 14px;
+                right: 55px;
+            }
             .icon-type{
                 float: left;
                 width: 30px;
@@ -484,31 +595,110 @@
             }
         }
         .select-header{
-                padding: 15px 10px 0px 20px;
-                  .checkbox-fileItem{
-                    float: left;
-                    width: 14px;
-                    height: 14px;
-                    border: 1px solid #cccccc;
-                    cursor: pointer;
-                    margin-right: 5px;
-                    position: relative;
-                    &::after{
-                        font-size:12px;
-                        color:#cccccc;
-                       display: block;
-                       position: absolute;
-                       right: -30px;
-                       top: 0;
-                        line-height:12px;
-                        content: '全部';
-                    }
-                }
-                .active{
-                    background: url('./images/checked.png') no-repeat 1px 2px;
-                     border: 1px solid #fc3439;
+            padding: 15px 10px 0px 20px;
+            .checkbox-fileItem{
+                float: left;
+                width: 14px;
+                height: 14px;
+                border: 1px solid #cccccc;
+                cursor: pointer;
+                margin-right: 5px;
+                position: relative;
+                &::after{
+                    font-size:12px;
+                    color:#cccccc;
+                    display: block;
+                    position: absolute;
+                    right: -30px;
+                    top: 0;
+                    line-height:12px;
+                    content: '全部';
                 }
             }
+            .active{
+                background: url('./images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+            }
+            .operation{
+                float: right;
+                margin-right: 35px;
+                .item{
+                    float: left;
+                    width: 52px;
+                    height: 26px;
+                    line-height: 24px;
+                    border-top: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    border-right: 1px solid #cccccc;
+                    text-align: center;
+                    color: #333333;
+                    font-size: 12px;
+                    cursor: pointer;
+                    &:first-of-type{
+                        border-left: 1px solid #cccccc;
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+                    }
+                     &:last-of-type{
+                        border-top-right-radius: 2px;
+                        border-bottom-right-radius: 2px;
+                    }
+                    &:hover{
+                        background:  #fff6f7;
+                    }
+                }
+            }
+            .icon{
+                border:1px solid #cccccc;
+                float: left;
+                width: 99px;
+                height: 26px;
+                line-height: 26px;
+                text-align: left;
+                font-size: 12px;
+                color: #333333;
+                position: relative;
+                padding-left:28px; 
+                cursor: pointer;
+                &::before{
+                    display: block;
+                    position: absolute;
+                    top: 8px;
+                    left: 11px;
+                    width: 12px;
+                    height: 12px;
+                    content: '';
+                }
+                &:hover{
+                    background: #fff6f7;
+                }
+                
+            }
+            .icon:first-of-type{
+                border-right: 0;
+                border-top-left-radius: 2px;
+                border-bottom-left-radius: 2px;
+            }
+            .icon-upload{
+                 &::before{
+                   background: url('./images/upload.png')no-repeat 0 0;
+                }
+            }
+            .icon-refresh{
+                &::before{
+                   background: url('./images/refresh.png')no-repeat 0 0;
+                }
+            }
+            .icon-new{
+                border-left: 0;
+                 border-top-right-radius: 2px;
+                 border-bottom-right-radius: 2px;
+                &::before{
+                      top: 7px;
+                   background: url('./images/spot.png')no-repeat 0 0;
+                }
+            }
+        }
         .select-header{
             text-align: left;
             .el-checkbox{
@@ -958,17 +1148,7 @@
             }
         }
     }
-    #box-right-1{
-        select.inp-search {  
-            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-            /*很关键：将默认的select选择框样式清除*/  
-            appearance:none;  
-            -moz-appearance:none;  
-            -webkit-appearance:none;  
-            /*在选择框的最右侧中间显示小箭头图片*/  
-            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
-            padding-right: 14px;  
-        }  
+    #box-right-1{ 
         .head{
             padding: 11px 0 12px;
             height: 48px;
@@ -1100,6 +1280,7 @@
 import axios from 'axios'
 import '../Settings/js/jquery-1.4.4.min.js'
 import './js/date.js'
+import data from '../Settings/js/date.js'
 export default {
   name:'Costover',
   data(){
@@ -1132,67 +1313,28 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
-
-
-         data6: [{
-            id: 1,
-            label: '一级 1',
-            children: [{
-                id: 4,
-                label: '二级 1-1',
-                children: [{
-                id: 9,
-                label: '三级 1-1-1'
-                }, {
-                id: 10,
-                label: '三级 1-1-2'
-                }]
-            }]
-            }, {
-            id: 2,
-            label: '一级 2',
-            children: [{
-                id: 5,
-                label: '二级 2-1'
-            }, {
-                id: 6,
-                label: '二级 2-2'
-            }]
-            }, {
-            id: 3,
-            label: '一级 3',
-            children: [{
-                id: 7,
-                label: '二级 3-1'
-            }, {
-                id: 8,
-                label: '二级 3-2',
-                children: [{
-                id: 11,
-                label: '三级 3-2-1'
-                }, {
-                id: 12,
-                label: '三级 3-2-2'
-                }, {
-                id: 13,
-                label: '三级 3-2-3'
-                }]
-            }]
-            }],
+        FileTree:[],//文件夹树形图
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'nodeName'
+        },
+        selectUgId:'',//选中的群组id
+        ugList:[],//群组列表
+        showQuanJing:true,//控制全景和非全景的显隐
+        QJ:{
+            imageBackground:{},
+            point:[]
         }
       }
   },
   created(){
-      var vm = this
+        var vm = this
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         // vm.getInfo() 获取 最近文件
-        vm.getFileTree()
+        vm.getIntoCloudD()
   },
   watch:{
       checkAll:function(val){
@@ -1227,6 +1369,22 @@ export default {
       }
   },
   methods:{
+      handleNodeClick(obj){
+          console.log(obj)
+          var vm = this
+          if(!obj.children){
+            vm.$message({
+                type:'info',
+                message:'这个文件夹没有子文件!'
+            })
+          }
+          if(obj.holderId){
+               vm.showQuanJing = true
+          }else{
+             vm.showQuanJing = false
+          }
+    
+      },
       parseMStatus(mStatus){
             // 施工现场
             var constructionSite = mStatus.substring(0, 1);
@@ -1456,28 +1614,85 @@ export default {
         }
 
     },
-    getFileTree(){
+    getIntoCloudD(){
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/'+vm.userId+'/directory',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/documentCloudDisk',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                console.log(response)
+                vm.ugList = response.data.rt.ugList
+                vm.selectUgId = response.data.rt.selectUgId
+                vm.getFileTree()
+            }
+
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    getFileTree(){
+        var vm = this
+        var setting = {
+            data: {
+                key:{
+                    name: "nodeName",
+                    children:'children'
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "nodeId",
+                    pIdKey: "nodeParId",
+                    rootPId: 0
+                }
+            }
+        };
+        axios({
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/'+vm.selectUgId+'/directory',
             headers:{
                 'token':vm.token
             },
         }).then((response)=>{
             if(response.data.cd == 0){
-                console.log(response)
-                // if(response.data.rt.rows.length>0){
-                  
-                // }else{
-                //     vm.$message({
-                //         type:'info',
-                //         message:'未匹配到相应的数据'
-                //     })
-                //     vm.fileList = ''
-                // }
+                vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
+                console.log(vm.FileTree)
+                 vm.searchFileGroupInfo()
             }
 
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    searchFileGroupInfo(val){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFileGroupInfo',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                "dirId": val?val:vm.FileTree[0].nodeId,
+                "projId": vm.projId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                 console.log(response)
+                 response.data.rt.rows.forEach((item)=>{
+                     if(item.xAxial == -1 && item.yAxial == -1){
+                         vm.QJ.imageBackground = item
+                     }else{
+                         vm.QJ.point.push(item)
+                     }
+                 })
+            }
         }).catch((err)=>{
             console.log(err)
         })
