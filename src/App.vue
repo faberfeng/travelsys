@@ -175,8 +175,6 @@ padding-right: 14px;
   padding: 0;
   margin: 30px 0 40px 0;
 }
-
-
 .el-form-item{
   margin-bottom: 19px;
 }
@@ -308,6 +306,7 @@ padding-right: 14px;
         border: none;
         padding: 0;
         cursor: pointer;
+        border-radius: 2px;
     }
     #edit .editBtnS{
         background: #fc3439;
