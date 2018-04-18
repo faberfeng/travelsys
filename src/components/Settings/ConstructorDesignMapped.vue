@@ -102,34 +102,39 @@
     <div id="edit">
         <el-dialog title="修改映射" :visible.sync="editListShow" :before-close="listClose">
             <div class="editBody">
-                <div class="editBodyone"><label class="editInpText">Revit族类别 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">Revit族类别 :</label>
                     <select  @change="revitChange" class="editSelect" disabled v-model="revitCategory">
                         <option >{{revitCategory}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">关键字类型 :</label>
                     <select class="editSelect" v-model="keyTypeVal">
                         <option v-for="(item,index) in keyTypeData" :key="index">{{item.name}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
-                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
-                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">包含关键字 :</label><input class="editSelect" placeholder="请输入" v-model="keyWord"/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">映射类型 :</label><label class="classifyYingshe">分类映射</label></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">设计专业 :</label>
                     <select @change="designChange" v-model="designValue" class="editSelect">
                         <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">逻辑系统 :</label>
                     <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
                         <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
                     </select>
-                </div>
-                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
-                    <select class="editSelect" v-model="goujianType">
+                    <i class="icon-sanjiao"></i>
+                </div> 
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构建类别 :</label>
+                    <select class="editSelect" v-model="goujianType" @change="goujianTypeChange">
                         <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">类型编码 :</label><input class="editSelect" v-model="categoryBase" disabled/></div>
             </div>
             <div slot="footer" class="dialog-footer">
                 <button class="editBtnS" @click="editListSure">确定</button>
@@ -138,34 +143,39 @@
         </el-dialog>
         <el-dialog title="添加映射" :visible.sync="addListShow" :before-close="addlistClose">
             <div class="editBody">
-                <div class="editBodyone"><label class="editInpText">Revit族类别 :</label>
+                <div class="editBodyone edit-item clearfix"><label class="editInpText">Revit族类别 :</label>
                     <select v-model="revitCategory" @change="revitChange" class="editSelect">
                         <option v-for="(item,index) in retiveData" :key="index">{{item.revitName}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">关键字类型 :</label>
+                <div class="editBodytwo editBodyone edit-item clearfix"><label class="editInpText">关键字类型 :</label>
                     <select class="editSelect"  v-model="keyTypeVal"> 
                         <option v-for="(item,index) in keyTypeData" :key="index" >{{item.name}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">包含关键字 :</label><input class="inp" placeholder="请输入" v-model="keyWord"/></div>
-                <div class="editBodytwo"><label class="editInpText">映射类型 :</label><input class="inp" placeholder="" value="分类映射" disabled/></div>
-                <div class="editBodytwo"><label class="editInpText">设计专业 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">包含关键字 :</label><input class="editSelect" placeholder="请输入" v-model="keyWord"/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">映射类型 :</label><label class="classifyYingshe">分类映射</label></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">设计专业 :</label>
                     <select @change="designChange" v-model="designValue" class="editSelect">
                         <option v-for="(item,index) in geniceClassJson" :key="index">{{item.title}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">逻辑系统 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">逻辑系统 :</label>
                     <select @change="logicSystemChange"  v-model="logicSystemValue" class="editSelect">
                         <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">构建类别 :</label>
-                    <select class="editSelect">
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构建类别 :</label>
+                    <select class="editSelect" v-model="goujianType" @change="goujianTypeChange">
                         <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
                     </select>
+                    <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo"><label class="editInpText">类型编码 :</label><input class="inp" placeholder="" v-model="categoryBase" disabled/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">类型编码 :</label><input class="editSelect" placeholder="" v-model="categoryBase" disabled/></div>
             </div>
             <div slot="footer" class="dialog-footer">
                 <button class="editBtnS" @click="addListSure">确定</button>
@@ -268,7 +278,6 @@ export default {
                             arr[index].name = '系统名称';
                         }
                     })
-                    console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -292,7 +301,6 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.geniceClassJson = response.data.rt;
-                    //console.log(response.data)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -316,7 +324,6 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.retiveData = response.data.rt;
-                    console.log(this.retiveData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -385,14 +392,12 @@ export default {
             this.geniceClassJson.forEach((item,index,arr)=>{
                 
                 if(item.number.split('')[0] == this.categoryBase.split('')[0] && item.number.split('')[1] == this.categoryBase.split('')[1]){
-                    //console.log(item.title);
                     this.designValue = item.title;//设计专业
                     this.logicSystenData = this.geniceClassJson[index].children;
                 }
             });
             this.logicSystenData.forEach((item,index)=>{
                 if(item.number.split('')[0] == this.categoryBase.split('')[0] && item.number.split('')[1] == this.categoryBase.split('')[1]&& item.number.split('')[2] == this.categoryBase.split('')[2]){
-                   // console.log(item.title);
                     this.logicSystemValue = item.title;//逻辑系统
                     this.categoryData = this.logicSystenData[index].children;
                 }
@@ -435,10 +440,13 @@ export default {
                     this.editListShow = false;
                     this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
                     this.revitCategory = '';
+                    this.keyTypeVal = '';
                     this.keyWord = '';
+                    this.designValue = '';
                     this.oldFamilyNameKeyWord = '';
-                    //console.log(response.data);
-                    this.revitCategory = '';
+                    this.logicSystemValue = '';
+                    this.goujianType = '';
+                    this.categoryBase = '';
                 }else if(response.data.cd =='-1'){
                     alert(response.data.msg)
                 }else{
@@ -450,6 +458,14 @@ export default {
         },
         listClose(){
             this.editListShow = false;
+            this.revitCategory = '';
+            this.keyTypeVal = '';
+            this.keyWord = '';
+            this.designValue = '';
+            this.oldFamilyNameKeyWord = '';
+            this.logicSystemValue = '';
+            this.goujianType = '';
+            this.categoryBase = '';
         },
         //添加
         addYingshe(){
@@ -612,7 +628,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    //console.log(response.data);
                     this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
                     this.keyWord='';
                     this.categoryBase ='';
@@ -684,11 +699,9 @@ export default {
                 }
             })
            this.getKeyTypeData(this.retiveData[number].revitCategory,this.retiveData[number].id);
-           //console.log(this.retiveData[number].id)
         },
         //根据族 获取关键词类型
         getKeyTypeData(rev,id){
-            console.log(id)
             this.keyTypeData = [];
             axios({
                 method:'post',
@@ -703,7 +716,6 @@ export default {
                 }
             }).then((response)=>{
                 var obj = response.data.rt;
-                console.log(obj)
                 for(let item of Object.values(obj)){
                     this.keyTypeData.push({
                        name:item
@@ -713,11 +725,12 @@ export default {
         },
         //设计专业改变
         designChange(){
+            console.log(this.geniceClassJson)
             this.geniceClassJson.forEach((item,index,arr)=>{
                 if(item.title == this.designValue){
                     this.categoryBase = item.number;
-                    //console.log(index);
                     this.logicSystenData = this.geniceClassJson[index].children;
+                    this.categoryData = [];
                 }
             })
         },
@@ -725,8 +738,17 @@ export default {
         logicSystemChange(){
             this.logicSystenData.forEach((item,index)=>{
                 if(item.title == this.logicSystemValue){
+                    this.categoryBase = item.number;
                     this.categoryData = this.logicSystenData[index].children;
                 }   
+            })
+        },
+        //构件类别改变
+        goujianTypeChange(){
+            this.categoryData.forEach(item=>{
+                if(item.title == this.goujianType){
+                    this.categoryBase = item.number;
+                }
             })
         }        
     }
@@ -785,11 +807,32 @@ export default {
     .btn i{
         margin-right: 10px;
     }
+    #edit .editBody{
+        margin: 0 30px;
+        overflow: hidden;
+    }
+    #edit .editInpText{
+        width: 100px;
+        line-height: 40px;
+    }
     #edit .editSelect{
-        width: 388px;
-        height: 30px;
-        background: #fafafa;
-        border: 1px solid #d1d1d1;
+        width: 435px;
+        padding: 0 0 0 10px;     
+        box-sizing: content-box;
+    }
+    #edit .inp{
+        height: 38px;
+        border: 1px solid #ccc;
+        box-sizing: content-box;
+        width: 435px;
+        padding-left: 10px;
+    }
+    #edit .classifyYingshe{
+        width: 447px;
+        text-align: left;
+        float: left;
+        height: 40px;
+        line-height: 40px;
     }
     /*删除弹框*/
     .deleteDialogImg{
@@ -817,6 +860,53 @@ export default {
     *{
         box-sizing: border-box;
         
+    }
+    .edit-item{
+            position: relative;
+            .editSelect{
+                float: left;
+                width: 435px;
+                height: 38px;
+                // padding: 10px;
+            }
+            .editInpText{
+                width: 100px;
+                text-align: right;
+                float: left;
+                height: 40px;
+                line-height: 40px;
+            }
+            .editInpTextInp{
+                line-height: 40px;
+                color: #333;
+                float: left;
+                font-size: 14px;
+                font-weight: normal;
+            }
+            .edit-item-biaoti{
+                display: block;
+                font-size: 12px;
+                color: #999999;
+                float: left;
+                line-height: 12px;
+                margin-left: 120px;
+                margin-top: 5px;
+                max-width: 300px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        .displayColor{
+            display: block;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            float: left;
+            margin-left: 120px;
+            margin-top: 5px;
+        }
+            
     }
     .el-button{
         width: 112px;
