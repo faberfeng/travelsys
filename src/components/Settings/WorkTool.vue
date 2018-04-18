@@ -56,11 +56,11 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
-                        <span v-text="totalCode"></span>
+                        <span v-text="totalCode" class="totalCodeClass"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整标题 :</label>
-                        <span v-text="totalTitle"></span>
+                        <span v-text="totalTitle" class="totalCodeClass"></span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -94,11 +94,11 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
-                        <span v-text="totalCode"></span>
+                        <span v-text="totalCode" class="totalCodeClass"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整标题 :</label>
-                        <span v-text="totalTitle"></span>
+                        <span v-text="totalTitle" class="totalCodeClass"></span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -401,7 +401,6 @@ export default {
         },
         //编辑确认按钮
         editListSureBtn(){
-            console.log(this.editObject)
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/updateWorkCode',
@@ -435,6 +434,14 @@ export default {
         //编辑取消按钮
         editListCancelBtn(){
             this.editListShowtwice = false;
+            this.codeType = '';
+            this.firstTitle = '';
+            this.secondTitle = '';
+            this.totalCode = '';
+            this.totalTitle = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.thirdTitle = '';
         },
         //删除
         deleteItem(num){
@@ -522,11 +529,11 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data);
                     this.getWorkCode();
                     this.codeType = '';
                     this.firstTitle = '';
                     this.secondTitle = '';
+                    this.thirdTitle = '';
                     this.totalCode = '';
                     this.totalTitle = '';
                     this.newCode = '';
@@ -545,6 +552,14 @@ export default {
         //编辑取消
         listClose(){
             this.editListShow = false;
+            this.codeType = '';
+            this.firstTitle = '';
+            this.secondTitle = '';
+            this.totalCode = '';
+            this.totalTitle = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.thirdTitle = '';
         },
         //编码级别改变
         codeTypeChange(){
@@ -887,6 +902,13 @@ export default {
         background: #fafafa;
         border: 1px solid #d1d1d1;
     }
+    #edit .totalCodeClass{
+        width: 447px;
+        height: 40px;
+        line-height: 40px;
+        text-align: left;
+        float: left;
+    }
     /* 弹窗 */
     .edit-item-biaoti{
         display: block;
@@ -942,9 +964,10 @@ export default {
         position: relative;
         .editSelect{
             float: left;
-            width: 436px;
-            height: 40px;
-            padding: 10px;
+            width: 435px;
+            height: 38px;
+            padding: 0 0 0 10px;
+            box-sizing: content-box;
         }
         .editInpText{
             width: 100px;
@@ -1262,8 +1285,7 @@ export default {
         }
     }
     .inp{
-        position: relative;
-        left: -15px;
+        float: left;
     }
 
 }
