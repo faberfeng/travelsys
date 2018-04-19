@@ -95,8 +95,8 @@
                             <input class="editSelect" v-model="thirdTitle" disabled/>
                             <i class="icon-sanjiao"></i>
                         </div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" disabled v-model="newCode"/></div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" disabled v-model="newCode"/></div>
+                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                         <div class="editBodytwo edit-item clearfix">
                             <label class="editInpText">完整编码 :</label>
                             <span v-text="totalCode" class="editInpTextInp"></span>
@@ -161,8 +161,8 @@
                             <i class="icon-sanjiao"></i>
                             <span v-text="'标题：'+tTitle" :title="'标题：'+tTitle" class="edit-item-biaoti"></span>
                         </div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" :maxlength='maxInputLength' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" :maxlength='maxInputLength' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
+                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                         <div class="editBodytwo edit-item clearfix">
                             <label class="editInpText">完整编码 :</label>
                             <span v-text="totalCode" class="editInpTextInp"></span>
@@ -813,7 +813,6 @@ export default {
             this.newCode ='';
             this.totalTitle ='';
             this.valueTypeTextT ='';
-            this.propertyTable ="";
         },
         //编码级别改变
         codeTypeChange(){
@@ -1014,6 +1013,16 @@ export default {
         content: '';
         top: 13px;
         left: 180px;
+    }
+    .redDot{
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: #fc3439;
+        position: relative;
+        left: -5px;
+        top: -3px;
     }
 </style>
 <style lang='less'>

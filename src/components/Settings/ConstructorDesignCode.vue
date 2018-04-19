@@ -74,8 +74,8 @@
                         <input class="editSelect" v-model="codeType" disabled/>
                         <i class="icon-sanjiao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
                         <span v-text="totalCode" class="editInpTextInp"></span>
@@ -136,8 +136,14 @@
                         <i class="icon-sanjiao"></i>
                         <span v-text="'标题：'+sTitle" :title="'标题：'+sTitle" class="edit-item-biaoti"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>新建编码 :</label>
+                        <input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>新标题 :</label>
+                        <input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/>
+                    </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
                         <span v-text="totalCode" class="editInpTextInp"></span>
@@ -316,25 +322,25 @@
                     <div class="projectSelect">
                         <span class="projectSpan">
                              <select class="editSelect " v-model="firstSelectTitle" @change="firstSelectTitleChange">
-                                <option v-for="(item,index) in firstSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                                <option v-for="(item,index) in firstSelectData" :key="index" :value="item.classifyCode">{{item.classifyCode.substr(0,2)+'-'+item.classifyName}}</option>
                             </select>
                             <i class="icon-down icon-downOne"></i>
                         </span>
                         <span class="projectSpan">
                             <select class="editSelect" v-model="secondSelectTitle" @change="secondSelectTitleChange">
-                                <option v-for="(item,index) in secondSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                                <option v-for="(item,index) in secondSelectData" :key="index" :value="item.classifyCode">{{item.classifyCode.substr(2,2)+'-'+item.classifyName}}</option>
                             </select>
                             <i class="icon-down icon-downTwo"></i>
                         </span>
                         <span class="projectSpan">
                             <select class="editSelect" v-model="thirdSelectTitle" @change="thirdSelectTitleChange">
-                                <option v-for="(item,index) in thirdSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                                <option v-for="(item,index) in thirdSelectData" :key="index" :value="item.classifyCode">{{item.classifyCode.substr(4,2)+'-'+item.classifyName}}</option>
                             </select>
                             <i class="icon-down icon-downThree"></i>
                         </span>
                         <span class="projectSpan  projectSpanLast">
                             <select class="editSelect" v-model="fourthSelectTitle" @change="fourthSelectTitleChange">
-                                <option v-for="(item,index) in fourthSelectData" :key="index" :value="item.classifyCode">{{item.classifyName}}</option>
+                                <option v-for="(item,index) in fourthSelectData" :key="index" :value="item.classifyCode">{{item.classifyCode.substr(6,3)+'-'+item.classifyName}}</option>
                             </select>
                             <i class="icon-downFour icon-down"></i>
                         </span>
@@ -344,28 +350,43 @@
                             <span class="calculateResult">计量条件 : 结果为 <label>是/否</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangCondition"/>
-                                <button class="calculateBtn" @click="showConvenience">...</button>
+                                <button class="calculateBtn" @click="showConvenience(10000)">...</button>
                             </div>
                         </div>
                         <div class="calculateRight" style="overflow:hidden">
-                            <span class="calculateResult">计量公式 : 结果为 <label>m2</label></span>
+                            <span class="calculateResult">计量公式 : 结果为 <label>{{calculateResultFinall}}</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
-                                <button class="calculateBtn">...</button>
+                                <button class="calculateBtn" @click="showConvenience(20000)">...</button>
                             </div>
                         </div>
                     </div>
                     <div class="symbolYingshe">特征映射 : </div>
-                        <zk-table 
-                        index-text="序号"
-                        :data="addProjectMappingData" :columns="addProjectMappingDataColumns" :tree-type="props.treeType" 
-                        :expand-type="props.expandType" :selection-type="props.selectionType" 
-                        :border="props.border">
-                            <template slot="action" slot-scope="scope" >
-                                <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" />
-                                <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(scope)">...</button>
-                            </template> 
-                        </zk-table>
+                    <div class="tableInputClass">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:287px;">特征</th>
+                                    <th style="width:86px;">值类型</th>
+                                    <th>公式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in addProjectMappingData" :key="index">
+                                    <td>
+                                        {{item.characterName}}
+                                    </td>
+                                    <td>
+                                        {{item.valueType_}}
+                                    </td>
+                                    <td>
+                                        <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                        <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
+                                    </td>    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addProjectMappedSure">确定</button>
@@ -373,7 +394,7 @@
                 </div>
             </el-dialog>
             <!--编辑工程量映射-->
-            <el-dialog  title="工程量映射" :visible.sync="editProjectMappedShow" :before-close="addProjectMappedCancel">
+            <el-dialog  title="工程量映射" :visible.sync="editProjectMappedShow" :before-close="editProjectMappedCancel">
                 <div class="editBody">
                     <div class="projectTitle">
                         <label  class="TitleText">工程量条目 : </label>
@@ -402,29 +423,43 @@
                             <span class="calculateResult">计量条件 : 结果为 <label>是/否</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangCondition"/>
-                                <button class="calculateBtn" @click="showConvenience">...</button>
+                                <button class="calculateBtn" @click="showConvenience(1)">...</button>
                             </div>
                         </div>
                         <div class="calculateRight" style="overflow:hidden">
-                            <span class="calculateResult">计量公式 : 结果为 <label>m2</label></span>
+                            <span class="calculateResult">计量公式 : 结果为 <label>{{calculateResultFinall}}</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
-                                <button class="calculateBtn">...</button>
+                                <button class="calculateBtn" @click="showConvenience(2)">...</button>
                             </div>
                         </div>
                     </div>
                     <div class="symbolYingshe">特征映射 : </div>
-                        <zk-table 
-                        index-text="序号"
-                        :data="addProjectMappingData" :columns="addProjectMappingDataColumns" :tree-type="props.treeType" 
-                        :expand-type="props.expandType" :selection-type="props.selectionType" 
-                        :border="props.border">
-                            <template slot="action" slot-scope="scope" >
-                                <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="scope.row.formula.split('')[1]"/>
-                                <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(scope)">...</button>
-                            </template> 
-                            
-                        </zk-table>
+                    <div class="tableInputClass">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:287px;">特征</th>
+                                    <th style="width:86px;">值类型</th>
+                                    <th>公式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in addProjectMappingData" :key="index">
+                                    <td>
+                                        {{item.characterName}}
+                                    </td>
+                                    <td>
+                                        {{item.valueType_}}
+                                    </td>
+                                    <td>
+                                        <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                        <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
+                                    </td>    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editProjectMappedSure">确定</button>
@@ -432,70 +467,69 @@
                 </div>
             </el-dialog>
         </div>
-        <div id="CInput">
-            <el-dialog  title="表达式快捷输入面板" :visible.sync="convenientInput" :before-close="cancelConveient">
+        <div id="CInput" ref="convenienceInp">
+            <el-dialog  title="表达式快捷输入面板" :visible.sync="convenientInput" :before-close="cancelConveient"  :key="0">
                 <div class="editBody">
                     <div class="InputBody">
                         <div class="InputBodyLeft">
                             <div class="InputBodyTitle">
                                 <span>构件属性</span>
                             </div>
-                            <ul class="InputBodyUl">
-                                <li v-for="(item,index) in goujianProperty" :key="index">{{item.code}}({{item.classifyName}})</li>
-                            </ul>
+                            <select class="multipleSelectA" multiple="multiple" v-model="inputGouJianType">
+                                <option v-for="(item,index) in goujianProperty" :key="index">{{item.code}}({{item.classifyName}})</option>
+                            </select>
                         </div>
                         <div class="InputBodyMiddle">
                             <div class="InputBodyTitle">
                                 <span>运算符</span>
                             </div>
-                            <ul class="InputBodyUl">
-                                <li>+(加)</li>
-                                <li>-(减)</li>
-                                <li>*(乘)</li>
-                                <li>/(除)</li>
-                                <li>==(等于)</li>
-                                <li>！=(不等于)</li>
-                                <li>&lt;(小于)</li>
-                                <li>&le;(小于等于)</li>
-                                <li>&gt;(大于)</li>
-                                <li>&ge;(大于等于)</li>
-                                <li>&&(且)</li>
-                                <li>||(或)</li>
-                                <li>!(非)</li>
-                            </ul>
+                            <select class="multipleSelectB" multiple="multiple"  v-model="inputGouJianCalculate">
+                                <option>+(加)</option>
+                                <option>-(减)</option>
+                                <option>*(乘)</option>
+                                <option>/(除)</option>
+                                <option>==(等于)</option>
+                                <option>！=(不等于)</option>
+                                <option>&lt;(小于)</option>
+                                <option>&le;(小于等于)</option>
+                                <option>&gt;(大于)</option>
+                                <option>&ge;(大于等于)</option>
+                                <option>&&(且)</option>
+                                <option>||(或)</option>
+                                <option>!(非)</option>
+                            </select>
                         </div>
                         <div class="InputBodyRight">
                             <div class="InputBodyTitle">
                                 <span>函数</span>
                             </div>
-                            <ul class="InputBodyUl">
-                                <li>()</li>
-                                <li>IF(A,B,C)</li>
-                                <li>SUB(A,B)</li>
-                            </ul>
+                            <select class="multipleSelectC" multiple="multiple" v-model="inputGouJianFunction">
+                                <option>()</option>
+                                <option>IF(A,B,C)</option>
+                                <option>SUB(A,B)</option>
+                            </select>
                         </div>
                         <div class="InputBodyLast">
                             <div class="InputBodyTitle">
                                 <span>可取值</span>
                             </div>
-                            <ul class="InputBodyUl">
-                                <li>true</li>
-                                <li>false</li>
-                                <li>0</li>
-                                <li>1</li>
-                                <li>2</li>
-                                <li>3</li>
-                                <li>4</li>
-                                <li>5</li>
-                                <li>6</li>
-                                <li>7</li>
-                                <li>8</li>
-                                <li>9</li>
-                                <li>10</li>
-                                <li>100</li>
-                                <li>1000</li>
-                                <li>10000</li>
-                            </ul>
+                            <select multiple="multiple" class="multipleSelectD" v-model="inputGouJianValue">
+                                <option>true</option>
+                                <option>false</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>100</option>
+                                <option>1000</option>
+                                <option>10000</option>
+                            </select>
                         </div>
                     </div>
                 </div>   
@@ -527,7 +561,7 @@
         <el-dialog  :visible.sync="deletePropertyNumber" width="398px">
             <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
             <p class="deleteDialogWarning">删除提醒</p>
-            <p class="deleteDialogText">确认删除？</p>
+            <p class="deleteDialogText">确认删除该工程量映射信息？</p>
             <div slot="footer" class="dialog-footer">
                 <button class="deleteBtn" @click="deletePropertyNumberSure">删除</button>
                 <button class="cancelBtn" @click="deletePropertyNumber=false">取消</button>
@@ -540,6 +574,7 @@
 <script>
 import axios from 'axios';
 import './js/jquery-1.4.4.min.js';
+
 export default {
     name:'ConstructorDesignCode',
     data(){
@@ -635,12 +670,12 @@ export default {
                 {
                     label: '特征',
                     prop:'characterName',
-                    width:'180px'
+                    width:'200px'
                 },
                 {
                     label: '值类型',
                     prop: 'valueType_',
-                    width:'100px'
+                    width:'86px'
                 },
                 {
                     label:'公式',
@@ -764,6 +799,13 @@ export default {
             tableInput:'',
             deletePropertyNumber:false,
             deleteProjectNumberObject:{},
+            calculateResultFinall:'',//计算结果
+            inputGouJianType:[],
+            inputGouJianCalculate:[],
+            inputGouJianFunction:[],
+            inputGouJianValue:[],
+            showConvenienceType:'',
+            showConvenienceObject:{}
         }
     },
     created(){
@@ -2386,6 +2428,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
+                    console.log(response.data)
                     this.goujianProperty = response.data.rt;
                 }else if(response.data.cd  == '-1'){
                     alert(response.data.msg)
@@ -2401,7 +2444,6 @@ export default {
         deleteProjectProperty(scope){
             this.deletePropertyNumber = true;
             this.deleteProjectNumberObject = scope;
-            console.log(scope)
         },
         //确认删除
         deletePropertyNumberSure(){
@@ -2416,7 +2458,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd  =='0'){
-                    console.log(response.data);
                     this.getEngineeringMapping();
                     this.deletePropertyNumber = false;
                 }else if (response.data.cd == '-1'){
@@ -2435,7 +2476,6 @@ export default {
             this.jiLiangResult = scope.row.formula;
             this.projectNumber = scope.row.componentNumber;
             this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.classifyName;
-
             axios({
                 method:'get',
                 url:this.baseUrl+'Config/loadLevelXGenieClass',
@@ -2540,12 +2580,36 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    // console.log(response.data);
                     this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
-                            item.valueType_ = this.judgeValueType(item.valueType);
+                            item = Object.assign(item,{
+                                valueType_:this.judgeValueType(item.valueType),
+                                formula_:item.formula.split('@')[1]
+                            })
                         })
                 }else if(response.data.cd  == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/getGenieclassCriterion',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    classifyCode:scope.row.componentNumber,
+                    tableNo:'t32'
+                }
+            }).then(response=>{
+                if(response.data.cd  == '0'){
+                    this.calculateResultFinall = response.data.rt.other;
+                }else if (response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
                     this.$router.push({
@@ -2556,7 +2620,6 @@ export default {
         },
         //确定编辑
         editProjectMappedSure(){
-
             var arr = [];
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
@@ -2587,9 +2650,6 @@ export default {
                         this.addProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
-                        Array.from($('.TextInput')).forEach(item=>{
-                            item.value = '';
-                        })
                         this.editProjectMappedShow =false;
                         this.getEngineeringMapping();
                     }else if(response.data.cd == '-1'){
@@ -2605,6 +2665,8 @@ export default {
         //取消编辑
         editProjectMappedCancel(){
             this.editProjectMappedShow =false;
+            this.jiLiangCondition = '';
+            this.jiLiangResult = '';
         },
         //添加扩展属性
         projectMappedSure(){
@@ -2720,6 +2782,7 @@ export default {
                     this.fourthSelectTitle = this.fourthSelectData[0].classifyCode;
                     this.projectNumber = this.fourthSelectTitle;
                     this.getEngineeringInfo();
+                    this.getGenieclassCriterion();
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -2768,10 +2831,43 @@ export default {
                 if(response.data.cd == '0'){
                     if(response.data.rt.rows){
                         this.addProjectMappingData = response.data.rt.rows;
+                        // this.addProjectMappingData.forEach(item=>{
+                        //     item.valueType_ = this.judgeValueType(item.valueType);
+                        //     formula_:item.formula.split('@')[1]
+                        // })
                         this.addProjectMappingData.forEach(item=>{
-                            item.valueType_ = this.judgeValueType(item.valueType);
+                            item = Object.assign(item,{
+                                valueType_:this.judgeValueType(item.valueType),
+                                formula_:item.formula && item.formula.split('@')[1]
+                            })
+                            
                         })
                     }
+                }else if (response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //获取分类编码信息
+        getGenieclassCriterion(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'Config/getGenieclassCriterion',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    classifyCode:this.projectNumber,
+                    tableNo:'t32'
+                }
+            }).then(response=>{
+                if(response.data.cd  == '0'){
+                    this.calculateResultFinall = response.data.rt.other;
                 }else if (response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -2790,7 +2886,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+$('.TextInput')[index].value
+                    formula:'@'+item.formula_
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -2816,9 +2912,6 @@ export default {
                         this.addProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
-                        Array.from($('.TextInput')).forEach(item=>{
-                            item.value = '';
-                        })
                         this.getEngineeringMapping();
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -2835,9 +2928,6 @@ export default {
             this.addProjectMappedShow = false;
             this.jiLiangCondition = '';
             this.jiLiangResult = '';
-            Array.from($('.TextInput')).forEach(item=>{
-                item.value = '';
-            })
         },
         //材质颜色改变1
         materialColorChangeOne(){
@@ -2911,16 +3001,60 @@ export default {
         },
         //显示快捷输入面板
         showConvenience(scope){
-            console.log(scope)
+            this.showConvenienceObject = scope;
+            this.showConvenienceType = scope;
             this.convenientInput = true;
         },
-        saveConvenient(){
+        saveConvenient(type){
+            if(this.inputGouJianType.length != 0){
+                this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
+            }else {
+                this.inputGouJianType = '';
+            }
+            if(this.inputGouJianCalculate.length != 0){
+                this.inputGouJianCalculate = this.inputGouJianCalculate[0].split('(')[0];
+            }else{
+                this.inputGouJianCalculate = '';
+            }
+            if(this.inputGouJianFunction.length != 0){
+                this.inputGouJianFunction = this.inputGouJianFunction[0];
+            }else{
+                this.inputGouJianFunction = '';
+            }
+            if(this.convenientInput.length != 0){
+                this.convenientInput = this.convenientInput[0];
+            }else{
+                this.convenientInput = '';
+            }
+
+            if(this.showConvenienceType == 10000){
+                this.jiLiangCondition = '';
+                this.jiLiangCondition = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+            }else if(this.showConvenienceType == 20000){
+                this.jiLiangResult = '';
+                this.jiLiangResult = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+            }
+            var str = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
+            this.addProjectMappingData.forEach((item,index)=>{
+                if(index == this.showConvenienceObject){
+                    item = Object.assign(item,{
+                        formula_:str
+                    })
+                }
+            })
+            this.inputGouJianType = [];
+            this.inputGouJianCalculate = [];
+            this.inputGouJianFunction = [];
+            this.inputGouJianValue = [];
             this.convenientInput = false;
         },
         cancelConveient(){
             this.convenientInput = false;
-        }
-        
+            this.inputGouJianType = [];
+            this.inputGouJianCalculate = [];
+            this.inputGouJianFunction = [];
+            this.inputGouJianValue = [];
+        },
     }
 }
 </script>
@@ -2954,6 +3088,25 @@ export default {
         text-align: left;
         margin: 30px 0 20px;
     }   
+    .deleteDialogImg{
+        height: 50px;
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
+    }
     .btn{
         width: 96px;
         height: 32px;
@@ -2972,12 +3125,6 @@ export default {
     }
     .btn i{
         margin-right: 10px;
-    }
-    .actionBtn{
-        width: 16px;
-        height: 16px;
-        border: none;
-        cursor: pointer;
     }
     .editBtn{
         background: url('../../assets/edit.png') no-repeat;
@@ -2999,6 +3146,16 @@ export default {
     .projectYingShe{
         background: url('./images/projectYingShe.png') no-repeat;
     }
+    .redDot{
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: #fc3439;
+        position: relative;
+        left: -5px;
+        top: -3px;
+    }
 </style>
 <style lang='less'>
     #constructorD{
@@ -3006,6 +3163,39 @@ export default {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        .tableInputClass{
+            margin: 0 30px;
+            table{
+                width: 598px;
+                border: 1px solid #ccc;
+                text-align: left;
+                border-collapse:collapse;
+            }
+            tr{
+                margin: 0;
+            }
+            td{
+                height: 42px;
+                margin: 0;
+                padding: 0 0 0 10px;
+                border: 1px solid #ccc;
+                color: #333;
+            }
+            tr:nth-child(2n){
+                background: #f2f2f2;
+            }
+            tr:nth-child(2n) .TextInput{
+                background: #f2f2f2;
+            }
+            th{
+                height: 42px;
+                background: #f2f2f2;
+                margin: 0 ;
+                padding: 0 0 0 10px;
+                border: 1px solid #ccc;
+                color: #666666;
+            }
         }
         #ProjectTotalNumber{
             .el-dialog{
@@ -3029,6 +3219,7 @@ export default {
                 margin-left: 30px;
                 margin-bottom: 10px;
                 display: block;
+                text-align: left;
             }
             .zk-table{
                 width: 600px;
@@ -3139,16 +3330,18 @@ export default {
             }
             .editSelect{
                 border: none;
-                width: 102px;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
                 font-size: 14px;
                 height: 20px;
                 line-height: 20px;
                 -moz-appearance:none;  
                 -webkit-appearance:none; 
                 color:#333;
+                width: 100px;
+                float: left;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                word-break: break-all; 
             }
             .editSelectLast{
                 border: none;
@@ -3199,6 +3392,61 @@ export default {
            .el-dialog{
                 width: 586px!important;
             } 
+            .multipleSelectA{
+                border: none;
+                width: 159px;
+                height: 336px;
+                overflow: hidden;
+            }
+            .multipleSelectA:focus{
+                border: none;
+            }
+            .multipleSelectA option{
+                height: 26px;
+                line-height: 26px;
+                cursor: pointer;
+            }
+            .multipleSelectB{
+                border: none;
+                width: 121px;
+                height: 336px;
+                overflow: hidden;
+            }
+            .multipleSelectB:focus{
+                border: none;
+            }
+            .multipleSelectB option{
+                height: 26px;
+                line-height: 26px;
+                cursor: pointer;
+            }
+            .multipleSelectC{
+                border: none;
+                width: 118px;
+                height: 336px;
+                overflow: hidden;
+            }
+            .multipleSelectC:focus{
+                border: none;
+            }
+            .multipleSelectC option{
+                height: 26px;
+                line-height: 26px;
+                cursor: pointer;
+            }
+            .multipleSelectD{
+                border: none;
+                width: 122px;
+                height: 336px;
+            }
+            .multipleSelectD:focus{
+                border: none;
+            }
+            .multipleSelectD option{
+                height: 26px;
+                line-height: 26px;
+                cursor: pointer;
+            }
             .editBtnS,.editBtnC{
                 width: 111px;
                 height: 36px;
@@ -3239,7 +3487,7 @@ export default {
                 margin: 34px 0 15px 30px;
             }
             .el-dialog__header{
-                height: 68px;
+                height: 67px;
                 padding:0;
                 border-bottom: 2px solid #e6e6e6;
                 text-align: left;
@@ -3286,23 +3534,6 @@ export default {
                 color: #333;
                 font-size: 12px;
             }
-            .InputBodyUl{
-                list-style: none;
-                height: 336px;
-                overflow-y: scroll;
-                color: #333;
-                font-size: 12px;
-                text-align: left;
-            
-            }
-            .InputBodyUl li{
-                height: 26px;
-                cursor: pointer;
-                padding-left: 10px;
-            }
-            .InputBodyUl li:hover{
-                background: #f2f2f2;
-            }
         }
         .yingsheProject{
             overflow: hidden;
@@ -3327,18 +3558,11 @@ export default {
             font-size: 14px;
             line-height: 14px;
         }
-        .symbolYingshe{
-            color:#999;
-            font-size: 14px;
-            line-height: 14px;
-            float: left;
-            margin-left: 30px;
-            margin-bottom: 10px;
-        }
         .TextInput{
             height: 28px;
             margin-left: 10px;
-            border: 0;
+            border: none;
+            width: 100px;
         }
         .textAndBtn{
             width: 60px;
@@ -3347,6 +3571,8 @@ export default {
             border: none;
             cursor: pointer;
             color: #fff;
+            float: right;
+            margin-right: 10px;
         }
         .TextInput::-moz-placeholder{
             color: #ccc;
@@ -3505,6 +3731,7 @@ export default {
             border: none;
             cursor: pointer;
             margin-right: 16px;
+            margin-top:9px;
         }
         .zk-table__cell-inner {
             padding: 6px 12px;
