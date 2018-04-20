@@ -10,7 +10,7 @@
                 index-text="序号"
                 :data="workToolData" :columns="columns" :tree-type="props.treeType"
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border" @row-click="RowClick">
+                :border="props.border">
                     <template slot="action" slot-scope="scope">
                         <button class="actionBtn tiqingBtn" title="提请"  v-if="scope.row.status == 0" @click="confirmBtn(scope)"></button>
                         <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
@@ -52,15 +52,18 @@
                         <i class="icon-sanjiao"></i>
                         <span v-text="'标题：'+thTitle" :title="'标题：'+thTitle" class="edit-item-biaoti"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newTitleCode" v-model="newCode"/></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>新建编码 :</label>
+                        <input class="inp" maxlength='2' placeholder="请输入" @change="newTitleCode" v-model="newCode"/>
+                        </div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
-                        <span v-text="totalCode"></span>
+                        <span v-text="totalCode" class="totalCodeClass"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整标题 :</label>
-                        <span v-text="totalTitle"></span>
+                        <span v-text="totalTitle" class="totalCodeClass"></span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -90,15 +93,21 @@
                         <i class="icon-sanjiao"></i>
                         <span v-text="'标题：'+thTitle" :title="'标题：'+thTitle" class="edit-item-biaoti"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" disabled @change="newTitleCode" v-model="newCode"/></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>新建编码 :</label>
+                        <input class="inp" maxlength='2' placeholder="请输入" disabled @change="newTitleCode" v-model="newCode"/>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>新标题 :</label>
+                        <input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/>
+                    </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
-                        <span v-text="totalCode"></span>
+                        <span v-text="totalCode" class="totalCodeClass"></span>
                     </div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整标题 :</label>
-                        <span v-text="totalTitle"></span>
+                        <span v-text="totalTitle" class="totalCodeClass"></span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -109,7 +118,8 @@
             <el-dialog class="confirm" :visible.sync="confirmVisible" :before-close="confirmClose">
                 <span class="icon-confirm icon-request"></span>
                 <span class="title-confirm">确认提请</span>
-                <span class="text-confirm">确认提请本条分类编码？</span>
+                <span class="deleteDialogText">确认提请本条分类编码？</span>
+                <span class="text-confirm">处于提请状态时将无法删除。</span>
                 <div  class="dialog-footer">
                     <button class="editBtnS" @click="deleteCode">确认</button>
                     <button class="editBtnC" @click="confirmClose">取消</button>
@@ -150,6 +160,7 @@
             <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
             <p class="deleteDialogWarning">删除提醒</p>
             <p class="deleteDialogText">确认删除本条分类编码？</p>
+            <p class="deleteDialogText">删除后将无法撤销。</p>
             <div slot="footer" class="dialog-footer">
                 <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                 <button class="cancelBtn" @click="deleteDialog=false">取消</button>
@@ -307,9 +318,6 @@ export default {
                         arr[index].status_ = this.formatterStatus(arr[index].status,arr[index]);
                     })
                     this.workToolData = data.transformTozTreeFormat(setting, this.arrList);
-
-                    // console.log(this.arrList);
-                    //console.log(this.workToolData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -322,7 +330,6 @@ export default {
         //编辑
         editListBtn(scope){
             this.editObject=scope;
-            console.log(scope);
             this.editListShowtwice = true;
             if(scope.row.level=='1'){
                 this.codeType = 'Level'+scope.row.level;
@@ -401,7 +408,6 @@ export default {
         },
         //编辑确认按钮
         editListSureBtn(){
-            console.log(this.editObject)
             axios({
                 method:'post',
                 url:this.baseUrl+'config2/component/updateWorkCode',
@@ -421,7 +427,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.editListShowtwice = false;
+                    this.codeType = '';
+                    this.firstTitle = '';
+                    this.secondTitle = '';
+                    this.totalCode = '';
+                    this.totalTitle = '';
+                    this.newCode = '';
                     this.newTitle = '';
+                    this.thirdTitle = '';
+                    this.showFirst = false;
+                    this.showTwo = false;
+                    this.showThird = false;
                     this.getWorkCode();
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -435,13 +451,22 @@ export default {
         //编辑取消按钮
         editListCancelBtn(){
             this.editListShowtwice = false;
+            this.codeType = '';
+            this.firstTitle = '';
+            this.secondTitle = '';
+            this.totalCode = '';
+            this.totalTitle = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.thirdTitle = '';
+            this.showFirst = false;
+            this.showTwo = false;
+            this.showThird = false;
         },
         //删除
         deleteItem(num){
             this.deleteDialog = true;
             this.deleteObject = num;
-            console.log(num);
-            
         },
         deleteMakeSure(){
             axios({
@@ -460,7 +485,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     this.deleteDialog = false;
                     this.getWorkCode();
                 }else if (response.data.cd == '-1'){
@@ -504,47 +528,71 @@ export default {
         },
         //添加确定
         addListSure(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'config2/component/addWorkCode',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId
-                },
-                data:{
-                    level:this.codeType.substr(5,1),
-                    number:this.totalCode,
-                    status:0,
-                    table:'t17',
-                    title:this.newTitle
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    console.log(response.data);
-                    this.getWorkCode();
-                    this.codeType = '';
-                    this.firstTitle = '';
-                    this.secondTitle = '';
-                    this.totalCode = '';
-                    this.totalTitle = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.editListShow = false;
-
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.push({
-                        path:'/login'
-                    })
-                }
-            })
+            if(this.newCode == '' || this.newTitle == ''){
+                alert('请输入完整的表单');
+            }else{  
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'config2/component/addWorkCode',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId
+                    },
+                    data:{
+                        level:this.codeType.substr(5,1),
+                        number:this.totalCode,
+                        status:0,
+                        table:'t17',
+                        title:this.newTitle
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getWorkCode();
+                        this.codeType = '';
+                        this.firstTitle = '';
+                        this.secondTitle = '';
+                        this.thirdTitle = '';
+                        this.totalCode = '';
+                        this.totalTitle = '';
+                        this.newCode = '';
+                        this.newTitle = '';
+                        this.fTitle = '';
+                        this.twoTitle = '';
+                        this.thTitle = '';
+                        this.showFirst =false;
+                        this.showTwo = false;
+                        this.showThird = false;
+                        this.editListShow = false;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }
+            
         },
         //编辑取消
         listClose(){
             this.editListShow = false;
+            this.codeType = '';
+            this.firstTitle = '';
+            this.secondTitle = '';
+            this.totalCode = '';
+            this.totalTitle = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.thirdTitle = '';
+            this.fTitle = '';
+            this.twoTitle = '';
+            this.thTitle = '';
+            this.showFirst =false;
+            this.showTwo = false;
+            this.showThird = false;
         },
         //编码级别改变
         codeTypeChange(){
@@ -659,36 +707,34 @@ export default {
                 this.totalTitle = this.fTitle+'-'+this.twoTitle+'-'+this.thTitle+'-'+this.newTitle;
             }
         },
-        RowClick(row,rowIndex){
-            //console.log(row);
-            //console.log(rowIndex)
-            //console.log(row.path[2].children[1].children[0].children[0].innerHTML);
-            //console.log(rowIndex);
-            //console.log($event)
-            //console.log($('.zk-table__body-row')[1])
-            //$('.zk-table__body-row')[rowIndex.length].style.background = '#ccc';
-        },
         //提请按钮
         confirmBtn(scope){
             this.confirmObject = scope;
-            
             var parentNum = scope.row.parNumber;
+            console.log(parentNum)
             var type = '';
-            //console.log(parentNum);
+            var status = '';
             if(parentNum){
                 this.arrList.forEach((item,index,arr)=>{
                     if(item.number == parentNum){
-                        console.log(item.type)
-                        type = item.status;
+                        type = item.type;
+                        status =item.status;
                     }
                 })
             }
-            if(type == 2){
-                this.confirmVisibleTwo = true;
-            }else if(type == 0 || type ==1){
+            if (type == 0 || type == 1) {
                 this.confirmVisible = true;
-            }
-            
+            } else {
+                if (status == 0) {
+                    this.confirmVisibleTwo = true;
+                } else if (status == 1) {
+                    this.confirmVisible = true;
+                } else if (status == 2) {
+                    this.confirmVisibleTwo = true;
+                } else {
+                    this.confirmVisible = true;
+                }
+            } 
         },
         confirmCloseTwo(){
             this.confirmVisibleTwo=false;
@@ -887,6 +933,13 @@ export default {
         background: #fafafa;
         border: 1px solid #d1d1d1;
     }
+    #edit .totalCodeClass{
+        width: 447px;
+        height: 40px;
+        line-height: 40px;
+        text-align: left;
+        float: left;
+    }
     /* 弹窗 */
     .edit-item-biaoti{
         display: block;
@@ -921,6 +974,16 @@ export default {
         font-weight: normal;
         margin: 16px 0 0 0;
     }
+    .redDot{
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: #fc3439;
+        position: relative;
+        left: -5px;
+        top: -3px;
+    }
 </style>
 <style lang='less'>
     #workT{
@@ -942,9 +1005,10 @@ export default {
         position: relative;
         .editSelect{
             float: left;
-            width: 436px;
-            height: 40px;
-            padding: 10px;
+            width: 435px;
+            height: 38px;
+            padding: 0 0 0 10px;
+            box-sizing: content-box;
         }
         .editInpText{
             width: 100px;
@@ -1262,8 +1326,8 @@ export default {
         }
     }
     .inp{
-        position: relative;
-        left: -15px;
+        float: left;
+        box-sizing: content-box;
     }
 
 }

@@ -42,7 +42,7 @@
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv"  @click="deleteFloorRow(scope.$index, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv" v-if="scope.row.IsDefault==false"  @click="deleteFloorRow(scope, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -221,16 +221,15 @@ export default {
     created(){
         this.token = localStorage.getItem('token');//获取token
         this.projId = localStorage.getItem('projId');//获取项目projId
-        this.floorAndSceneInit();//分层与楼层初始化
+        this.floorAndSceneInit();//分区与楼层初始化
     },
     methods:{
         //新增竖向楼层列表
         addFlor(){
             this.addFloorList = true;
         },
-        //确认添加
+        //确认添加竖向楼层
         makeAddFloorList(){
-            //console.log(this.setAsAuto);
             axios({
                 method:'post',
                 url:this.baseUrl+'project2/Config/updateStorey',
@@ -252,29 +251,16 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.florData.forEach((item,index,arr)=>{
-                        arr[index].Remark = '';
-                        arr[index].IsDefault = false;
-                    })
-                    this.florData.push({
-                        "index":this.florData.length+1,
-                        "Name":this.FloorName,
-                        "BottomHeight":this.FloorValue,
-                        "IsDefault": this.setAsAuto,
-                    });
-                    //修改备注
-                    this.florData.forEach((item,index,arr)=>{
-                        if(item.IsDefault){
-                          arr[index].Remark = '默认楼层';  
-                        }
-                    })
-                    //清空输入框的值
+                    this.findStore(this.partitionList,this.partitionIndex);
                     this.FloorName = '';
                     this.FloorValue = '';
                     this.setAsAuto = false;
-                    //console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
             this.addFloorList = false;
@@ -329,13 +315,9 @@ export default {
             this.FloorValue = '';
         },
         //删除竖向楼层
-        deleteFloorRow(index){
-            this.floorIndex = index;
-            if(this.florData[index].IsDefault){
-                alert('默认楼层不能删除');
-            }else{  
-                this.deleteFloorDialog = true;
-            }
+        deleteFloorRow(scope){
+            this.floorIndex = scope.$index;
+            this.deleteFloorDialog = true;
         },
         deleteMakeSure(){
             axios({
@@ -349,8 +331,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    //console.log(response.data);
-                    this.florData.splice(this.floorIndex,1);
+                    this.findStore(this.partitionList,this.partitionIndex);
                     this.deleteFloorDialog = false; 
                 }else if(response.data.cd = '-1'){
                     alert(response.data.msg);
@@ -360,22 +341,6 @@ export default {
                     })
                 }
             })
-        },
-        //新增分区资源包
-        addSource(){
-            this.addpartitionShow = true;
-        },
-        addPartitionSure(){
-            this.addpartitionShow = false;
-        },
-        addPartitionCancel(){
-            this.addpartitionShow = false;
-        },
-        groundTableEdit(){
-
-        },
-        deleteRow(){
-
         },
         //分区与楼层初始化
         floorAndSceneInit(){
@@ -392,7 +357,6 @@ export default {
                 if(response.data.cd == '0'){
                     this.subProjects= response.data.rt.subProjects;//单体信息
                     this.partitionList = response.data.rt.partitionList;//建筑分区
-                    //console.log(this.subProjects)
                     this.partitionList.forEach((item,index)=>{
                         this.partitionListName.push({
                             label:item.name,
@@ -415,7 +379,6 @@ export default {
         },
         //改变单体名称值 来改变建筑分区的值
         changeSubProjects(val){
-            console.log(val)
             this.subProjectsIndex = val;
             axios({
                 method:'get',
@@ -424,11 +387,10 @@ export default {
                     'token':this.token
                 },
                 params:{
-                    subProjId:this.subProjects[val].id
+                    subProjId:this.subProjects[this.subProjectsIndex].id
                 } 
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
                     this.partitionListName = [];
                     this.partitionList = response.data.rt;
                     this.partitionList.forEach((item,index)=>{
@@ -439,6 +401,8 @@ export default {
                     })
                     this.partitionListValue = this.partitionListName[0].label;
                     this.partitionIndex = 0;
+                }else if(reeponse.data.cd == '-1'){
+                    alert(response.data.msg);
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -453,9 +417,8 @@ export default {
             this.partitionIndex = val;
             this.findStore(this.partitionList,val);
         },
-        //获取楼层
+        //获取竖向楼层
         findStore(val,index){
-            console.log(val[index]);
             axios({
                 method:'post',
                 url:this.baseUrl+'project2/Config/findStorey/'+val[index].ID,
@@ -463,18 +426,31 @@ export default {
                     'token':this.token
                 }
             }).then(response=>{
-                //console.log(response.data);
-                if(response.data.cd == '0' && response.data.rt.rows){
+                if(response.data.cd == '0'){
                     this.florData = response.data.rt.rows;
+                    console.log(this.florData)
                     this.florData.forEach((item,index,arr)=>{
-                        arr[index].index = index;
-                        arr[index].Remark = '';
                         if(item.IsDefault){
-                            arr[index].Remark = '默认楼层';
+                            item = Object.assign(item,{
+                                Remark:'默认楼层'
+                            })
+                        };
+                        if(item.BottomHeight == -2147483648){
+                            item = Object.assign(item,{
+                                BottomHeight:'最小值'
+                            })
                         }
+                        item = Object.assign(item,{
+                            index:index
+                        })
                     });
-                    
-                } 
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
             })
         },
         //编辑建筑分区
@@ -484,12 +460,14 @@ export default {
             this.Area = this.partitionList[this.partitionIndex].AreaValue;
             this.partitionIsDefault = this.partitionList[this.partitionIndex].IsDefault;
         },
+        //取消编辑
         cancleEditPartitionList(){
             this.partitionName ='';
             this.Area ='';
             this.editPartition = false;
             this.partitionIsDefault = false;
         },
+        //确认编辑
         makeEditPartitionList(){
             axios({
                 method:'post',
@@ -504,7 +482,7 @@ export default {
                 data:{
                     AreaValue:this.Area,
                     ID:this.partitionList[this.partitionIndex].ID,
-                    IsDefault:this.partitionList[this.partitionIndex].partitionIsDefault,
+                    IsDefault:this.partitionIsDefault,
                     Name:this.partitionName,
                     ParentID:this.partitionList[this.partitionIndex].ParentID,
                     Type:this.partitionList[this.partitionIndex].Type,
@@ -512,10 +490,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    //console.log(response.data);
-                    this.partitionListName[this.partitionIndex].label = this.partitionName;
-                    this.partitionList[this.partitionIndex].AreaValue = this.Area;
-                    this.partitionList[this.partitionIndex].IsDefault = this.partitionIsDefault;
+                    this.changeSubProjects(this.subProjectsIndex);
                     this.partitionName ='';
                     this.Area ='';
                     this.partitionIsDefault = false;
@@ -556,9 +531,7 @@ export default {
                         label:this.partitionName,
                         value:this.partitionListName.length
                     })
-
                     this.changeSubProjects(this.subProjectsIndex);
-
                     this.partitionName ='';
                     this.Area ='';
                     this.addPartition = false;
@@ -578,9 +551,19 @@ export default {
         },
         //删除建筑分区
         deletePartitionList(){
-            this.deletepartitionContent = this.partitionListName[this.partitionIndex].label;
-            this.deletePartionDialog = true;
+            this.partitionList.forEach((item,index)=>{
+                if(index == this.partitionIndex){
+                    if(item.IsDefault){
+                        alert('不能删除默认分区')
+                    }else{
+                        this.deletepartitionContent = this.partitionListName[this.partitionIndex].label;
+                        this.deletePartionDialog = true;
+                    }
+                }
+            })
+             
         },
+        //确认删除分区
         deletePartitionMakeSure(){
             axios({
                 method:'get',
@@ -594,17 +577,35 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
-                    this.partitionListName.splice(this.partitionIndex,1);
+                    this.changeSubProjects(this.subProjectsIndex);
                     this.partitionListValue = this.partitionListName[0].label;
                     this.deletePartionDialog = false;
                 } else if(response.data.cd == '-1'){
                     alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
             
         },
-        
+         //新增分区资源包
+        addSource(){
+            this.addpartitionShow = true;
+        },
+        addPartitionSure(){
+            this.addpartitionShow = false;
+        },
+        addPartitionCancel(){
+            this.addpartitionShow = false;
+        },
+        groundTableEdit(){
+
+        },
+        deleteRow(){
+
+        },
     }
 }
 </script>
@@ -617,18 +618,18 @@ export default {
             margin: 0 20px 0 15px;
         }
         .titleAll{
-           color: #fc343a;
-            font-size: 18px;
             font-weight: bold;
             border-bottom:1px solid #ccc; 
-            height: 50px;
-            line-height: 50px;
-            margin: 10px 20px 0 0px ;
-            text-align: left; 
+            margin: 0px 20px 0 0px ;
+            text-align: left;
         }
         .titleAll span{
             display: inline-block;
             margin-left: 15px;
+            color: #fc343a;
+            font-size: 18px;
+            line-height: 18px;
+            margin: 22px 0 11px 15px;
         }
         .title{
             color: #fc343a;
@@ -650,19 +651,26 @@ export default {
         .pageOption{
             flex: 1;
             text-align: left;
-            margin-left: 21px;
-            max-width: 290px;
+            // margin-left: 20px;
+            width: 270px;
+            float: left;
         }
         .pageOption1{
             margin-left: 60px;
+            float: left;
         }
         .pageOption label{
             color: #999;
             font-weight: normal;
             font-size: 14px;
+            line-height: 38px;
             font-family: 'MicrosoftYaHei';
-            display: inline-block;
             margin-right: 10px;
+            float: left;
+        }
+        .pageOption.el-select{
+            float: left;
+            
         }
         .pageBtn{
             // width: 250px;
@@ -750,12 +758,15 @@ export default {
         #sourceB{
             margin-top: 50px;
         }
+        .editBody{
+            margin: 0 30px;
+        }
         .editBodyone,.editBodytwo{
             text-align: left;
         }
         .editInpText{
             display: inline-block;
-            margin-left: 89px;
+            // margin-left: 89px;
         }
         .pageTable,.sourceTable{
 
@@ -803,8 +814,28 @@ export default {
         .el-checkbox{
             display: block;
             float: left;
-            margin-left: 206px;
-         }
+            margin-left: 140px;
+        }
+         /*删除弹框*/
+        .deleteDialogImg{
+            height: 50px;
+        }
+        .deleteDialogWarning{
+            font-size: 18px;
+            line-height: 18px;
+            font-family: 'MicrosoftYahei';
+            color: #fc3439;
+            font-weight: bold;
+            margin:20px 0 0 0;
+        }
+        .deleteDialogText{
+            color: #333333;
+            font-size: 14px;
+            line-height: 14px;
+            font-family: 'MicrosoftYahei';
+            font-weight: normal;
+            margin: 16px 0 0 0;
+        }
        
     }
     

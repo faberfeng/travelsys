@@ -4,12 +4,12 @@
         <div class="account">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
             <ul class="accountList" >
-                <li class="pre"><span>工程账号</span> <label>{{projectConfig.projAdminAccount}}</label></li>
+                <li class="pre"><span>工程账号</span> <label>{{projectConfig.projCode}}</label></li>
                 <li class="pre"><span>工程名称</span> <label>{{projectConfig.projName}}</label></li>
                 <li class="pre"><span>工程管理账号</span> <label>{{projectConfig.projAdminEmail}}</label></li>
                 <li class="pre"><span>工程管理员姓名</span> <label>{{projectConfig.projAdminName}}</label></li>
                 <li class="pre" v-show="isShow"><span>工程管理员电话</span> <label>{{projectConfig.projTelphone}}</label></li>
-                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>无限制使用  {{projectUseCount}}个已使用</label></li>
+                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>{{projectConfig.projUserNum}}  {{projectUseCount}}个已使用</label></li>
                 <li class="pre" v-show="isShow"><span>到期日期</span> <label>{{projectConfig.projExpireTime | toLocalD}}</label></li>
                 <li class="pre " id="pre" v-show="isShow">
                     <span>工程logo</span> 
@@ -39,7 +39,6 @@
                     </div>
                     <div class="imgBottom"><label @click="setAsCover(index)"><div class="setAsLogo"></div>{{item.text}}</label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
                 </li>
-                
                 <!--上传图片-->
                 <li class="imgLi" @click='updataCoverImg'>
                     <div class="imgD" >
@@ -49,7 +48,6 @@
                         </div>
                     </div>
                 </li>
-                
             </ul>
         </div>
         <!--弹出的对话框-->
@@ -70,7 +68,7 @@
                     <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="projectUnity"/></div>
                     <div class="editBodytwo"><label class="editInpText">取值 :</label><input class="inp" placeholder="请输入" v-model="projectName"/></div>
                 </div>
-                <p class="err" v-show="showErr">请输入完整信息</p>
+                <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editMakeSure">确定</button>
                     <button class="editBtnC" @click="editCancle">取消</button>
@@ -97,7 +95,7 @@
             <el-dialog  :visible.sync="deleteDialog" width="398px">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">你确定删除?</p>
+                <p class="deleteDialogText">您要删除当前所选记录吗?</p>
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
@@ -162,25 +160,11 @@ export default {
         }
     },
     methods:{
-        edit(index){
-            this.editDialog = true;
-            this.index = index;
-            this.projectUnity = this.sumaryData[index].viewKey;
-            this.projectName = this.sumaryData[index].viewVal;
-        },
-        del(index){
-            this.index = index;
-            this.deleteDialog = true;
-        },
         add(){
             this.addDialog = true;
         },
         addMakeSure(){
-             if(this.projectUnity !==''&& this.projectName !==''){
-                this.sumaryData.push({
-                    viewKey:this.projectUnity,
-                    viewVal:this.projectName
-                })
+            if(this.projectUnity !==''&& this.projectName !==''){
                 axios({
                     method:'post',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
@@ -196,20 +180,25 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd==='0'){
-                        alert('新增成功');
+                        this.getBasicSituation();
+                        this.projectUnity='';
+                        this.projectName='';
+                        this.addDialog = false;
+                    }else if(response.data.cd  == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
                     }
                 });
-                this.projectUnity='';
-                this.projectName='';
-                this.addDialog = false;
-                this.showErr = false;
-             }else{
-                this.showErr = true;
-             }
+            }
+        },
+        del(index){
+            this.index = index;
+            this.deleteDialog = true;
         },
         deleteMakeSure(){
-            this.sumaryData.splice(this.index,1);
-            this.deleteDialog = false;
             axios({
                 method:'post',
                 url:"http://10.252.26.240:8080/h2-bim-project/project2/delProjectOverview",
@@ -220,41 +209,53 @@ export default {
                     id:this.sumaryData[this.index].id
                 }
             }).then((response)=>{
-                //console.log(response);
                 if(response.data.cd === '0'){
-                    alert('删除成功');
+                    this.getBasicSituation();
+                    this.deleteDialog = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
+        edit(index){
+            this.editDialog = true;
+            this.index = index;
+            this.projectUnity = this.sumaryData[index].viewKey;
+            this.projectName = this.sumaryData[index].viewVal;
+        },
         editMakeSure(){
             if(this.projectUnity !==''&& this.projectName !==''){
-                this.sumaryData[this.index].viewKey = this.projectUnity;
-                this.sumaryData[this.index].viewVal = this.projectName;
                 axios({
                     method:'post',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
                     headers:{
                         'token':this.token,
-                        "Content-Type": "application/json"
                     },
                     data:{
                         id:this.sumaryData[this.index].id,
                         projId:this.sumaryData[this.index].projId,
-                        viewKey:this.sumaryData[this.index].viewKey,
-                        viewVal:this.sumaryData[this.index].viewVal
+                        viewKey:this.projectUnity,
+                        viewVal:this.projectName
                     }
                 }).then((response)=>{
-                    //console.log(response);
-                    if(response.data.cd==='0'){
-                        alert('修改成功');
+                    if(response.data.cd=='0'){
+                        console.log(response.data)
+                        this.getBasicSituation();
+                        this.projectUnity='';
+                        this.projectName='';
+                        this.editDialog = false;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
                     }
-                });
-                this.projectUnity='';
-                this.projectName='';
-                this.editDialog = false;
-                this.showErr = false;
-            }else{
-                this.showErr = true;
+                });   
             }
         },
         //上传新logo
@@ -275,8 +276,6 @@ export default {
 
         },
         deleteImage(index){
-            console.log(index);
-            console.log(this.projectImageList[index].id)
             axios({
                 method:'post',
                 url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
@@ -310,7 +309,6 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                //console.log( response.data.rt);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -333,15 +331,17 @@ export default {
                     projId:this.projId
                 }
             }).then((response)=>{
-                console.log(response.data.rt);
-                if(response.data.cd === '1'){
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }else{
+                if(response.data.cd == '0'){
+                    console.log(response.data)
                     this.projectConfig = response.data.rt.project;
                     this.projectUseCount = response.data.rt.projectUserCount;
                     this.projectImage = response.data.rt.projectImage;
+                }else if(response.data.cd === '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
@@ -357,7 +357,6 @@ export default {
                     projectId:this.projId
                 }
             }).then((response)=>{
-                console.log(response.data);
                 if(response.data.cd == '0'){
                     this.projectImageList = response.data.rt;
                     this.projectImageList.forEach((item,index,arr)=>{
@@ -390,7 +389,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                     alert('设置成功')
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
@@ -413,23 +411,6 @@ export default {
             formData.append('fileData',this.filesList[0]);
             formData.append('projId',this.projId);
             formData.append('imageType',this.imageType);
-            // axios.post(this.baseUrl+'/uploadImage',formData,{
-            //     headers:{
-            //         'token':this.token,
-            //         'Content-Type': 'multipart/form-data'
-            //     }
-            // }).then(response=>{
-            //     if(response.data.cd== '0'){
-            //         this.getProjectImageList();
-            //         console.log(response.data);
-            //     }else if(response.data.cd == '-1'){
-            //         alert(response.data.msg)
-            //     }else{
-            //         this.$router.push({
-            //             path:'/login'
-            //         })
-            //     }
-            // })
             axios({
                 method:'post',
                 url:this.baseUrl+'/uploadImage',
@@ -443,7 +424,6 @@ export default {
                     this.getProjectImageList();
                     this.getProjectInitalConfig();
                     this.upImg = false;
-                    console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -464,11 +444,9 @@ export default {
             const list = this.$refs.file.files;
             this.imageName = list[0].name;
             this.filesList = list;
-            console.log(this.filesList)
         },
         //是否为默认图片
         isAsDefault(){  
-            console.log(this.isAsdefault);
             axios({
                 method:'post',
                 url:this.baseUrl+'useDefaultLogo',
@@ -481,7 +459,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
