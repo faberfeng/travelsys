@@ -91,7 +91,20 @@ const router = new Router({
           name:'cloudDrive',
           component:resolve=>require(['@/components/ManageCost/cloudDrive'],resolve)
         },
+        {
+          path:'/Drive/Share',
+          name:'Share',
+          component:resolve=>require(['@/components/ManageCost/Share'],resolve)
+        },
       ]
+    },
+    {
+      path:'/Drive/panoramicView',
+      name:'panoramicView',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost/panoramicView'],resolve),
     },
     {
       path:'/setting',
