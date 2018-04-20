@@ -230,40 +230,45 @@ export default {
         },
         //确认添加竖向楼层
         makeAddFloorList(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'project2/Config/updateStorey',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    holderId:this.florData[0].ParentID,
-                    flag:0,
-                    projectId:this.projId
-                },
-                data:{
-                    "Type": this.florData[0].Type,
-                    "ParentID": this.florData[0].ParentID,
-                    "Name": this.FloorName,
-                    "BottomHeight": this.FloorValue,
-                    "Unit":this.florData[0].Unit,
-                    "IsDefault": this.setAsAuto
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.findStore(this.partitionList,this.partitionIndex);
-                    this.FloorName = '';
-                    this.FloorValue = '';
-                    this.setAsAuto = false;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-            this.addFloorList = false;
+            var reg = new RegExp("^[0-9]*$");
+            if(this.FloorValue != '' && reg.test(this.FloorValue)){
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'project2/Config/updateStorey',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        holderId:this.florData[0].ParentID,
+                        flag:0,
+                        projectId:this.projId
+                    },
+                    data:{
+                        "Type": this.florData[0].Type,
+                        "ParentID": this.florData[0].ParentID,
+                        "Name": this.FloorName,
+                        "BottomHeight": this.FloorValue,
+                        "Unit":this.florData[0].Unit,
+                        "IsDefault": this.setAsAuto
+                    }
+                }).then(response=>{
+                    if(response.data.cd == '0'){
+                        this.findStore(this.partitionList,this.partitionIndex);
+                        this.FloorName = '';
+                        this.FloorValue = '';
+                        this.setAsAuto = false;
+                        this.addFloorList = false;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }else{
+                alert('楼层标高请输入数字！')
+            }
         },
         //取消添加
         cancleAddFloorList(){
@@ -278,36 +283,57 @@ export default {
             this.editFloorList = true;
         },
         makeEditFloorList(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'project2/Config/updateStorey',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    holderId:this.florData[this.floorIndex].ID,
-                    flag:1,
-                    projectId:this.projId
-                },
-                data:{
-                    ID: this.florData[this.floorIndex].ID,
-                    Type: this.florData[this.floorIndex].Type,
-                    ParentID: this.florData[this.floorIndex].ParentID,
-                    Name: this.FloorName,
-                    Group: "",
-                    UnderID: this.florData[this.floorIndex].UnderID,
-                    OverID: this.florData[this.floorIndex].OverID,
-                    BottomHeight: this.FloorValue,
-                    Unit:this.florData[this.floorIndex].Unit,
-                    IsDefault: this.setAsDefault
-                }
-            }).then(response=>{
-               this.findStore(this.partitionList,this.partitionIndex);
-                 //清空输入框的内容
-                this.FloorName ='';
-                this.FloorValue = '';
-            })
-            this.editFloorList = false;
+            var reg = new RegExp("^[0-9]*$");
+            if(this.FloorValue=='最小值'){
+                this.FloorValue = -2147483648;
+            }
+            var floorArr = this.FloorValue.toString().split('');
+            if(this.FloorValue.toString().split('')[0] == '-'){
+                var str = floorArr.shift();
+                
+            }
+            if(floorArr != '' && reg.test(floorArr.join(''))){
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'project2/Config/updateStorey',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        holderId:this.florData[this.floorIndex].ID,
+                        flag:1,
+                        projectId:this.projId
+                    },
+                    data:{
+                        ID: this.florData[this.floorIndex].ID,
+                        Type: this.florData[this.floorIndex].Type,
+                        ParentID: this.florData[this.floorIndex].ParentID,
+                        Name: this.FloorName,
+                        Group: "",
+                        UnderID: this.florData[this.floorIndex].UnderID,
+                        OverID: this.florData[this.floorIndex].OverID,
+                        BottomHeight: this.FloorValue,
+                        Unit:this.florData[this.floorIndex].Unit,
+                        IsDefault: this.setAsDefault
+                    }
+                }).then(response=>{
+                    if(response.data.cd == '0'){
+                        this.editFloorList = false;
+                        this.findStore(this.partitionList,this.partitionIndex);
+                        this.FloorName ='';
+                        this.FloorValue = '';
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }else{
+                alert('楼层标高请输入数字！')
+            }
+
         },
         cancleEditFloorList(){
             this.editFloorList = false;
@@ -690,6 +716,7 @@ export default {
         }
         .pageSelect .el-input--suffix .el-input__inner{
             height: 38px;
+            width: 200px;
         }
         .add{
             float: right;

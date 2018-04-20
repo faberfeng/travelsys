@@ -392,8 +392,8 @@ export default {
         //确认新增单体列表子项
         addListSure(){
             var reg = new RegExp("^[0-9]*$");
-            if(this.addListhigh != '' && reg.test(this.addListhigh) && this.addListangle != '' && reg.test(this.addListangle) && this.addListname != ''){
-                if(this.addListcoordinate.split(' ').length == 2 && reg.test(this.addListcoordinate.split(' ')[0]) && reg.test(this.addListcoordinate.split(' ')[1])){
+            if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
+                if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
                     axios({
                         method:'post',
                         url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
@@ -454,9 +454,8 @@ export default {
         },
         //确认修改单体列表子项
         editListSure(){
-            var reg = new RegExp("^[0-9]*$");
-            if(this.addListhigh != '' && reg.test(this.addListhigh) && this.addListangle != '' && reg.test(this.addListangle) && this.addListname != ''){
-                if(this.addListcoordinate.split(' ').length == 2 && reg.test(this.addListcoordinate.split(' ')[0]) && reg.test(this.addListcoordinate.split(' ')[1])){
+            if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
+                if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
                     axios({
                         method:'post',
                         url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
