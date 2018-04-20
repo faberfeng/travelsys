@@ -101,7 +101,7 @@ export default {
   background: #e6e6e6;
 }
 #edit .el-dialog{
-  width: 660px !important;
+  width: 660px;
 }
 #edit .el-dialog__header{
   height: 68px;
