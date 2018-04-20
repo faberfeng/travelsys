@@ -20,7 +20,6 @@
             </zk-table>
         </div>
     </div>
-      
       <div id='edit'>
         <el-dialog title="添加编码" :visible.sync="editListShow" :before-close="listClose">
             <div class="editBody">
@@ -56,11 +55,11 @@
                 <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整编码 :</label>
-                    <span v-text="totalCode"></span>
+                    <span v-text="totalCode" class="totalCodeClass"></span>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整标题 :</label>
-                    <span v-text="totalTitle"></span>
+                    <span v-text="totalTitle" class="totalCodeClass"></span>
                 </div>
             </div>
             <div slot="footer" class="dialog-footer">
@@ -95,11 +94,11 @@
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整编码 :</label>
-                    <span v-text="codingToEdit.number"></span>
+                    <span v-text="codingToEdit.number" class="totalCodeClass"></span>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整标题 :</label>
-                    <span v-text="codingToEdit.title"></span>
+                    <span v-text="codingToEdit.title" class="totalCodeClass"></span>
                 </div>
             </div>
             <div slot="footer" class="dialog-footer">
@@ -130,6 +129,25 @@
                 <button class="editBtnC" @click="remindClose">取消</button>
             </div>
         </el-dialog>
+        <el-dialog class="confirm" :visible.sync="rejectVisible" :before-close="cancelReject">
+            <span class="icon-confirm icon-request"></span>
+            <span class="title-confirm">确认退回</span>
+            <span class="text-confirm">确认退回本条分类编码的提请？</span>
+            <div  class="dialog-footer">
+                <button class="editBtnS" @click="sureReject">确认</button>
+                <button class="editBtnC" @click="cancelReject">取消</button>
+            </div>
+        </el-dialog>
+        <el-dialog class="confirm" :visible.sync="passVisible" :before-close="cancelPass">
+                <span class="icon-confirm icon-request"></span>
+                <span class="title-confirm">确认通过</span>
+                <span class="text-confirm">确认通过本条分类编码的提请？<br/>
+                    通过后编码和标题将无法再次修改</span>
+                <div  class="dialog-footer">
+                    <button class="editBtnS" @click="surePass">确认</button>
+                    <button class="editBtnC" @click="cancelPass">取消</button>
+                </div>
+            </el-dialog>
     </div>
   </div>
 </template>
@@ -150,6 +168,7 @@ export default {
         return {
              editListShow:false,
             codingList:[],//编码列表
+            originCodingList:[],
             codingToEdit:{},//要编辑的编码
             levelNum:{},
             token:'',
@@ -226,6 +245,12 @@ export default {
             thTitle:'',
             firstIndex:'',
             secondIndex:'',
+            confirmVisible:false,
+            confirmVisibleTwo:false,
+            requestObject:{},//点击提请按钮时获得的行数据,
+            rejectVisible:false,//显示退回框标识
+            rejectObject:{},//点击退回按钮时获得的行数据
+            passVisible:false,//确认通过
         }
     },
     created(){
@@ -241,35 +266,56 @@ export default {
         //编辑取消
         listClose(){
             this.editListShow = false;
+            this.firstTitle = '';
+            this.secondTitle = '';
+            this.totalCode = '';
+            this.totalTitle = '';
+            this.newCode = '';
+            this.newTitle = '';
+            this.thirdTitle = '';
+            this.fTitle = '';
+            this.twoTitle = '';
+            this.thTitle = '';
+            this.showFirst =false;
+            this.showTwo = false;
+            this.showThird = false;
         },
         request(rows){//提请 status为0时
-            var vm = this
-            if(rows.row.parNumber != null){
-                var isOK = vm.submitGenieClass(rows.row.parNumber,0)
-                console.log(isOK)
-                if(isOK){
-                    vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                    vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 1 //提请状态
+            var parentNum = rows.row.parNumber;
+            this.requestObject = rows;
+            var type = '';
+            var status = '';
+            this.originalData.forEach(item=>{
+                if(item.number == parentNum){
+                    type = item.type,
+                    status = item.status
                 }
-            }else{
-                if(rows.row.status == 0 || rows.row.status == 2){
-                     //无法提请
-                    vm.$message({
+            });
+            if (type == 0 || type == 1) {
+                this.confirmVisible_1 = true;
+                this.confirm.title = '确认提请'
+                this.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
+            } else {
+                if (status == 0) {
+                    this.$message({
                         type:'warning',
                         message:'警告, 该编码的所有父编码必须为【已提请】状态，才能提请'
                     });
-                }else{
-                      vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                     vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 1 //提请状态
+                } else if (status == 1) {
+                    this.confirmVisible_1 = true;
+                    this.confirm.title = '确认提请'
+                    this.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
+                } else if (status == 2) {
+                    this.$message({
+                        type:'warning',
+                        message:'警告, 该编码的所有父编码必须为【已提请】状态，才能提请'
+                    });
+                } else {
+                    this.confirmVisible_1 = true;
+                    this.confirm.title = '确认提请'
+                    this.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
                 }
             }
-
         },
         /**
          * 提请分类编码
@@ -331,36 +377,86 @@ export default {
          * @param id
          */
         pass(rows){//通过 status为1时
-             var vm = this
-            if(rows.row.parNumber != null){
-                var isOK = vm.submitGenieClass(rows.row.parNumber,1)
-                console.log(isOK)
-                if(isOK){
-                    vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认通过提请'
-                    vm.confirm.msg = '确认通过本条分类编码的提请？<br>通过后编码和标题将无法再次修改。'
-                    vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 3 //通过状态
-                }
-            }else{
-                      vm.confirmVisible_1 = true
-                    vm.confirm.title = '确认通过提请'
-                    vm.confirm.msg = '确认提请本条分类编码？<br>处于提请状态时将无法删除。'
-                     vm.deleteWorkCode = rows.row
-                     vm.deleteWorkCode.status = 3 //通过状态
-            }
+             this.passVisible =true;
+             this.surePassObject = rows;
         },
-         reject(rows){//退回 status 为1时
-             var vm = this
-            vm.confirmVisible_1 = true
-            vm.confirm.title = '确认退回'
-            vm.confirm.msg = '确认退回本条分类编码的提请？'
-            vm.deleteWorkCode = deepCopy(rows.row)
-            vm.deleteWorkCode.status = 2 //退回状态
-            vm.deleteWorkCode.table = "t13"
+        //确认通过 modified by licongwen
+        surePass(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'config2/component/updateWorkCode',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId
+                },
+                data:{
+                    id:this.surePassObject.row.id,
+                    number:this.surePassObject.row.number,
+                    status:3,
+                    table:'t13',
+                    title:this.surePassObject.row.title
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                   this.passVisible = false;
+                    this.getWorkCode();
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //取消通过
+        cancelPass(){
+            this.passVisible = false;
+        },
+        //退回操作 add by licongwen
+        reject(scope){//退回 status 为1时
+            this.rejectVisible = true;
+            this.rejectObject = scope;
+        },
+        //确认退回
+        sureReject(){
+             axios({
+                method:'post',
+                url:this.baseUrl+'config2/component/updateWorkCode',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId
+                },
+                data:{
+                    id:this.rejectObject .row.id,
+                    number:this.rejectObject .row.number,
+                    status:2,
+                    table:'t13',
+                    title:this.rejectObject .row.title
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                   this.rejectVisible = false;
+                    this.getWorkCode();
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //取消退回
+        cancelReject(){
+            this.rejectVisible = false;
         },
         checkCode(){
-            var vm = this
+            var vm = this;
             axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
@@ -371,10 +467,10 @@ export default {
                     projectId:vm.projId
                 },
                 data:{
-                    "id":vm.deleteWorkCode.id,
-                    "number":vm.deleteWorkCode.number,
-                    "title":vm.deleteWorkCode.title,
-                    "status":vm.deleteWorkCode.status,
+                    "id":vm.requestObject.row.id,
+                    "number":vm.requestObject.row.number,
+                    "title":vm.requestObject.row.title,
+                    "status":1,
                     "table":"t13"
                 }
             }).then((response)=>{
@@ -456,7 +552,6 @@ export default {
                     },
                     data:vm.codingToEdit
                 }).then((response)=>{
-                    console.log(response)
                     vm.addCode =false
                     vm.getWorkCode()
                 }).catch((err)=>{
@@ -486,7 +581,6 @@ export default {
          */
              //编辑
         edit(num){
-            console.log(num)
             var vm = this
             axios({
                 method:'GET',
@@ -505,12 +599,11 @@ export default {
                 console.log(err)
             })
         },
-        //删除
+        //删除 modified by licongwen
         deleteItem(num){
-            console.log(num)
-            var vm = this
-            vm.confirmVisible = true
-            vm.deleteWorkCode = num.row
+            var vm = this;
+            this.confirmVisible = true;
+            this.deleteWorkCode = num.row;
         },
         deleteCode(){
              var vm = this
@@ -520,25 +613,28 @@ export default {
                 headers:{
                     'token':vm.token
                 },
-                data:vm.deleteWorkCode,
+                data:{
+                    id:this.deleteWorkCode.id,
+                    number:this.deleteWorkCode.number,
+                    table:'t13'
+                },
                 params:{
                     projectId:vm.projId,
                 }
             }).then((response)=>{
-                if(response.data.cd == 40001){
+                if(response.data.cd == '0'){
+                    vm.confirmVisible = false
+                    vm.getWorkCode()//重新获取列表，重新初始化序号
+                }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
                 }else{
-                     vm.$message({
-                        type:'success',
-                        message:'删除成功'
+                    this.$router.push({
+                        path:'/login'
                     })
-                    vm.deleteWorkCode = {}
-                    vm.confirmVisible = false
-                    vm.getWorkCode()//重新获取列表，重新初始化序号
-                } 
+                }
             }).catch((err)=>{
                 console.log(err)
             })
@@ -560,7 +656,6 @@ export default {
         },
         handleNodeClick(data) {
             
-            console.log(data);
         },
         //专业种类分类/作业工具分类编码信息
         getWorkCode(){
@@ -591,7 +686,8 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                var arr = response.data.rt
+                var arr = response.data.rt;
+                this.originCodingList = response.data.rt;
                 var levelNum = {}
                 for(var i=0;i<arr.length;i++){
                     vm.codeTypeData.push('Level'+arr[i].level);
@@ -614,12 +710,10 @@ export default {
                         break;
                     }
                 }
-                console.log(levelNum)
                 vm.levelNum = levelNum
                 vm.originalData = arr
                  var a = data.transformTozTreeFormat(setting, arr)
                 vm.codingList = a
-
                 /*
                 从文的添加的代码
                 */
@@ -692,7 +786,6 @@ export default {
                     this.firstIndex = item.KeyID;
                 };
             })
-            console.log(this.firstIndex-1)
             this.codingList[this.firstIndex-1].children.forEach((item,index)=>{
                     this.secondTitleData.push(item.number.substr(2,2)); 
             });
@@ -760,9 +853,21 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data);
                     this.getWorkCode();
                     this.editListShow = false;
+                    this.firstTitle = '';
+                    this.secondTitle = '';
+                    this.totalCode = '';
+                    this.totalTitle = '';
+                    this.newCode = '';
+                    this.newTitle = '';
+                    this.thirdTitle = '';
+                    this.fTitle = '';
+                    this.twoTitle = '';
+                    this.thTitle = '';
+                    this.showFirst =false;
+                    this.showTwo = false;
+                    this.showThird = false;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -798,6 +903,13 @@ export default {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    #edit .totalCodeClass{
+        width: 447px;
+        height: 40px;
+        line-height: 40px;
+        text-align: left;
+        float: left;
     }
     .inp {
         position: relative;

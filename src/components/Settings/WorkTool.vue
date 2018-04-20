@@ -711,7 +711,6 @@ export default {
         confirmBtn(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
-            console.log(parentNum)
             var type = '';
             var status = '';
             if(parentNum){
@@ -853,7 +852,6 @@ export default {
         cancelReject(){
             this.rejectVisible = false;
         }
-
     }
 }
 </script>
@@ -876,7 +874,7 @@ export default {
         margin: 22px 0 12px 15px;
     }
     .manageWorktool{
-        margin: 0 20px 0 15px;
+        margin: 0 20px 20px 15px;
         text-align: left;
     }
     .worktooltitle{
