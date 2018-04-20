@@ -118,7 +118,8 @@
             <el-dialog class="confirm" :visible.sync="confirmVisible" :before-close="confirmClose">
                 <span class="icon-confirm icon-request"></span>
                 <span class="title-confirm">确认提请</span>
-                <span class="text-confirm">确认提请本条分类编码？</span>
+                <span class="deleteDialogText">确认提请本条分类编码？</span>
+                <span class="text-confirm">处于提请状态时将无法删除。</span>
                 <div  class="dialog-footer">
                     <button class="editBtnS" @click="deleteCode">确认</button>
                     <button class="editBtnC" @click="confirmClose">取消</button>
@@ -159,6 +160,7 @@
             <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
             <p class="deleteDialogWarning">删除提醒</p>
             <p class="deleteDialogText">确认删除本条分类编码？</p>
+            <p class="deleteDialogText">删除后将无法撤销。</p>
             <div slot="footer" class="dialog-footer">
                 <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                 <button class="cancelBtn" @click="deleteDialog=false">取消</button>
@@ -425,7 +427,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.editListShowtwice = false;
+                    this.codeType = '';
+                    this.firstTitle = '';
+                    this.secondTitle = '';
+                    this.totalCode = '';
+                    this.totalTitle = '';
+                    this.newCode = '';
                     this.newTitle = '';
+                    this.thirdTitle = '';
+                    this.showFirst = false;
+                    this.showTwo = false;
+                    this.showThird = false;
                     this.getWorkCode();
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -447,6 +459,9 @@ export default {
             this.newCode = '';
             this.newTitle = '';
             this.thirdTitle = '';
+            this.showFirst = false;
+            this.showTwo = false;
+            this.showThird = false;
         },
         //删除
         deleteItem(num){
@@ -513,48 +528,53 @@ export default {
         },
         //添加确定
         addListSure(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'config2/component/addWorkCode',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId
-                },
-                data:{
-                    level:this.codeType.substr(5,1),
-                    number:this.totalCode,
-                    status:0,
-                    table:'t17',
-                    title:this.newTitle
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getWorkCode();
-                    this.codeType = '';
-                    this.firstTitle = '';
-                    this.secondTitle = '';
-                    this.thirdTitle = '';
-                    this.totalCode = '';
-                    this.totalTitle = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.fTitle = '';
-                    this.twoTitle = '';
-                    this.thTitle = '';
-                    this.showFirst =false;
-                    this.showTwo = false;
-                    this.showThird = false;
-                    this.editListShow = false;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.push({
-                        path:'/login'
-                    })
-                }
-            })
+            if(this.newCode == '' || this.newTitle == ''){
+                alert('请输入完整的表单');
+            }else{  
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'config2/component/addWorkCode',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId
+                    },
+                    data:{
+                        level:this.codeType.substr(5,1),
+                        number:this.totalCode,
+                        status:0,
+                        table:'t17',
+                        title:this.newTitle
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getWorkCode();
+                        this.codeType = '';
+                        this.firstTitle = '';
+                        this.secondTitle = '';
+                        this.thirdTitle = '';
+                        this.totalCode = '';
+                        this.totalTitle = '';
+                        this.newCode = '';
+                        this.newTitle = '';
+                        this.fTitle = '';
+                        this.twoTitle = '';
+                        this.thTitle = '';
+                        this.showFirst =false;
+                        this.showTwo = false;
+                        this.showThird = false;
+                        this.editListShow = false;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }
+            
         },
         //编辑取消
         listClose(){
@@ -691,20 +711,30 @@ export default {
         confirmBtn(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
+            console.log(parentNum)
             var type = '';
+            var status = '';
             if(parentNum){
                 this.arrList.forEach((item,index,arr)=>{
                     if(item.number == parentNum){
-                        type = item.status;
+                        type = item.type;
+                        status =item.status;
                     }
                 })
             }
-            if(type == 2){
-                this.confirmVisibleTwo = true;
-            }else if(type == 0 || type ==1){
+            if (type == 0 || type == 1) {
                 this.confirmVisible = true;
-            }
-            
+            } else {
+                if (status == 0) {
+                    this.confirmVisibleTwo = true;
+                } else if (status == 1) {
+                    this.confirmVisible = true;
+                } else if (status == 2) {
+                    this.confirmVisibleTwo = true;
+                } else {
+                    this.confirmVisible = true;
+                }
+            } 
         },
         confirmCloseTwo(){
             this.confirmVisibleTwo=false;
@@ -1297,6 +1327,7 @@ export default {
     }
     .inp{
         float: left;
+        box-sizing: content-box;
     }
 
 }

@@ -26,11 +26,11 @@
                             <div v-if="scope.row.status == 3">
                                 <button class="actionBtn" >-</button>
                             </div>
-                            <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
+                            <button class="actionBtn tiqingBtn" title="提请"  v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                             <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
                             <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
-                            <button class="editBtn actionBtn" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
-                            <button class="deleteBtn actionBtn" @click="deleteItemProperty(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                            <button class="editBtn actionBtn" title="编辑"  @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                            <button class="deleteBtn actionBtn" title="删除" @click="deleteItemProperty(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                         </template> 
                     </zk-table>
                 </div>
@@ -39,7 +39,8 @@
                 <el-dialog class="confirm" :visible.sync="confirmVisible" :before-close="confirmClose">
                     <span class="icon-confirm icon-request"></span>
                     <span class="title-confirm">确认提请</span>
-                    <span class="text-confirm">确认提请本条分类编码？</span>
+                    <span class="text-confirm">确认提请本条分类编码？<br/>处于提请状态时将无法删除。</span>
+                    <!-- <span class="text-confirm"></span> -->
                     <div  class="dialog-footer">
                         <button class="editBtnS" @click="confirmSure">确认</button>
                         <button class="editBtnC" @click="confirmClose">取消</button>
@@ -293,7 +294,9 @@ export default {
             maxInputLength:'2',
             showFirst:false,
             showSecond:false,
-            showThird:false
+            showThird:false,
+            localType:'',
+            localStatus:''
         }
     },
     created(){
@@ -484,13 +487,23 @@ export default {
         confirm(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
-            var status = '';
-            if(parentNum){
-                status = this.getParentNum(this.constructorData,parentNum);
-            }
-            if(status == 2){
-                this.confirmVisibleTwo = true;
-            }else if(status == 0 || status ==1){
+            // var status = '';
+            if(parentNum != 'null'){
+                this.getParentNum(this.constructorData,parentNum);
+                 if (this.localType == 0 || this.localType == 1) {
+                    this.confirmVisible = true;
+                } else {
+                    if (this.localStatus == 0) {
+                        this.confirmVisibleTwo = true;
+                    } else if (this.localStatus == 1) {
+                        this.confirmVisible = true;
+                    } else if (this.localStatus == 2) {
+                        this.confirmVisibleTwo = true;
+                    } else {
+                        this.confirmVisible = true;
+                    }
+                } 
+            }else{
                 this.confirmVisible = true;
             }
         },
@@ -536,10 +549,11 @@ export default {
         },
         confirmCloseTwo(){
             this.confirmVisibleTwo =false;
+            this.localType = '';
+            this.localStatus = '';
         },
         //通过
         pass(scope){
-            console.log(scope)
             this.passObject = scope;
             this.passVisible =true;
         },
@@ -668,15 +682,14 @@ export default {
             this.getProjectGenClass(this.propertyTable);
         },
         getParentNum(pData,pNum){
-            var type = '';
             pData.forEach((item,index,arr)=>{
                 if(item.number == pNum){
-                    type = item.status;
+                    this.localType = item.type;
+                    this.localStatus = item.status;
                 }else if(item.number != pNum && item.children.length!=0){
                     this.getParentNum(item.children,pNum);
                 }
             })
-            return type;
         },
         //判断属性表类型
         judgeType(value){
@@ -1023,6 +1036,25 @@ export default {
         position: relative;
         left: -5px;
         top: -3px;
+    }
+    .deleteDialogImg{
+        height: 50px;
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
     }
 </style>
 <style lang='less'>

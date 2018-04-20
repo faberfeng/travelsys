@@ -188,7 +188,7 @@
             <el-dialog  :visible.sync="deleteDialog" width="398px" :before-close="deletelistClose">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">你确定删除?</p>
+                <p class="deleteDialogText">你确定删除本条分类映射?</p>
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deletelistClose">取消</button>

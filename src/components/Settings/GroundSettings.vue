@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper" id="groundSetting">
-      <h4 class="title">场地与单体配置</h4>
+      <h4 class="title"><span>场地与单体配置</span></h4>
       <div class="main">
         <div class="groundInfo groundTitle">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<span :class="[{'groundEdit-active':!canEdit},'groundEdit']" @click="groundInfoEdit"></span></h5>
@@ -38,22 +38,22 @@
                 <div class="groundSettingBodyS">
                     <p class="firstP">
                         <label>效果等级</label>
-                        <el-select v-model="SceneEnvironmentList.EffectLevel" class="elSelect">
+                        <el-select v-model="SceneEnvironmentList.EffectLevel" class="elSelect" :disabled="sureToGroundSettings">
                             <el-option v-for="(item,index) in effectLevel" :key="index" :value="item.value" :label="item.label"></el-option>
                         </el-select>
                     </p>
                     <p>
                         <label>场景事件</label>
-                        <el-select v-model="SceneEnvironmentList.SceneTime">
+                        <el-select v-model="SceneEnvironmentList.SceneTime" :disabled="sureToGroundSettings">
                             <el-option v-for="(item,index) in groundThing" :key="index" :value="item.value" :label="item.label"></el-option>
                         </el-select>
                     </p>
                 </div>
                 <div class="groundSettingBodyP">
-                    <label>整体亮度</label><div><el-slider class="slider_P" v-model="SceneEnvironmentList.Brightness"></el-slider></div>
+                    <label>整体亮度</label><div><el-slider :disabled="sureToGroundSettings" class="slider_P" v-model="SceneEnvironmentList.Brightness"></el-slider></div>
                 </div>
                 <div class="groundSettingBodyC">
-                    <el-checkbox v-model="SceneEnvironmentList.showSky">显示天空</el-checkbox>
+                    <el-checkbox :disabled="sureToGroundSettings" v-model="SceneEnvironmentList.showSky">显示天空</el-checkbox>
                 </div>
                 <p v-show="!canEditCj" style="margin-bottom:-6px;"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
             </div>
@@ -70,7 +70,7 @@
                     <el-table-column prop="action" label="操作" width="150">
                         <template slot-scope="scope" >
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv"  @click="deleteListRow(scope.$index, listData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv"  @click="deleteListRow(scope)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -92,7 +92,7 @@
                         <template slot-scope="scope" >
                             <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
                             <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
-                            <div class="iconDiv " @click="deleteTableRow(scope.$index, groundSourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv " @click="deleteTableRow(scope)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -105,19 +105,19 @@
         </div>
         <!--dialog-->
         <div id="edit">
-            <el-dialog title="新增单体列表" :visible.sync="addListShow" :before-close="listClose">
+            <el-dialog title="新增单体列表" :visible.sync="addListShow" :before-close="addListClose">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
-                    <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入" v-model="addListcoordinate"/></div>
-                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入" v-model="addListhigh"/></div>
-                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入" v-model="addListangle"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入数字(例:0 0)" v-model="addListcoordinate"/></div>
+                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入数字"  v-model="addListhigh"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入数字"  v-model="addListangle"/></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addListSure">确定</button>
-                    <button class="editBtnC" @click="listClose">取消</button>
+                    <button class="editBtnC" @click="addListClose">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="修改单体列表" :visible.sync="editListShow" :before-close="listClose">
+            <el-dialog title="修改单体列表" :visible.sync="editListShow" :before-close="editListClose">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
                     <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入" v-model="addListcoordinate"/></div>
@@ -126,7 +126,7 @@
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editListSure">确定</button>
-                    <button class="editBtnC" @click="listClose">取消</button>
+                    <button class="editBtnC" @click="editListClose">取消</button>
                 </div>
             </el-dialog>
             <!--新增资源包弹窗-->
@@ -178,7 +178,7 @@
             <el-dialog  :visible.sync="deleteListDialog" width="398px">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">删除提醒</p>
-                <p class="deleteDialogText">你确定删除?</p>
+                <p class="deleteDialogText">你确定删除【{{deleProject}}】?</p>
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteListDialog=false">取消</button>
@@ -202,6 +202,7 @@ export default {
           addgroundShow:false,
           editgroundShow:false,
           editListShow:false,
+          sureToGroundSettings:true,
           addListindex:'',
           addListname:'',
           addListcoordinate:'',
@@ -218,7 +219,6 @@ export default {
           groundVersion:'',
           groundRemark:'',
           deleteListDialog:false,
-          listRow:[],
           groundState:'',
           effectLevel:[{
               value:'好',
@@ -274,7 +274,9 @@ export default {
             effectLevelVal:'很好',//效果等级值
             groundThingVal:'早晨',//场景事件值
             groundInfo:{},//场地信息
-            SceneEnvironmentList:{}//场景设置
+            SceneEnvironmentList:{},//场景设置
+            deleProject:'',
+            deleteListObject:{}
 
         }
 
@@ -308,20 +310,27 @@ export default {
                     pointX:this.groundInfo.pointX,
                     pointY:this.groundInfo.pointY,
                     projectScale:this.groundInfo.projectScale
-
                 }
             }).then((response)=>{
-                //console.log(response)
                 if(response.data.cd === '0'){
-                    console.log('修改成功');
+                    this.getGroundInformation();
                     this.canEdit = true;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
                 }else{
-                    this.canEdit = false;
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
          groundInfoEditCJ(){
             this.canEditCj = this.canEditCj?false:true;
+            if(this.sureToGroundSettings){
+                this.sureToGroundSettings = false;
+            }else{
+                this.sureToGroundSettings = true;
+            }
         },
         saveEditCJ(){
             if(this.SceneEnvironmentList.EffectLevel==='好'){
@@ -362,26 +371,14 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.canEditCj = true;
-                    if(this.SceneEnvironmentList.EffectLevel=='0'){
-                        this.SceneEnvironmentList.EffectLevel='好';
-                    }else if(this.SceneEnvironmentList.EffectLevel=='1'){
-                        this.SceneEnvironmentList.EffectLevel='很好';
-                    }else if(this.SceneEnvironmentList.EffectLevel=='2'){
-                        this.SceneEnvironmentList.EffectLevel='最好';
-                    };
-                    if(this.SceneEnvironmentList.SceneTime=='0'){
-                        this.SceneEnvironmentList.SceneTime='早晨';
-                    }else if(this.SceneEnvironmentList.SceneTime=='1'){
-                        this.SceneEnvironmentList.SceneTime='上午';
-                    }else if(this.SceneEnvironmentList.SceneTime=='2'){
-                        this.SceneEnvironmentList.SceneTime='中午';
-                    }else if(this.SceneEnvironmentList.SceneTime=='3'){
-                        this.SceneEnvironmentList.SceneTime='下午';
-                    }else if(this.SceneEnvironmentList.SceneTime=='4'){
-                        this.SceneEnvironmentList.SceneTime='傍晚';
-                    }
+                    this.sureToGroundSettings = true;
+                    this.getSceneEnvironment()
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
                 }else{
-                    this.canEditCj = false;
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
         },
@@ -411,36 +408,44 @@ export default {
                     UseCS:0
                 }
             }).then((response)=>{
-                console.log(response.data);
                 if(response.data.cd == '0'){
-                    this.listData.push({
-                        index: this.listData.length+1,
-                        Name: this.addListname,
-                        Origin: this.addListcoordinate,
-                        OriginHeight:this.addListhigh,
-                        AxisAngle:this.addListangle
-                    });
+                    this.findSubProject();
                     //清空输入
                     this.addListname = '';
                     this.addListcoordinate='';
                     this.addListhigh='';
                     this.addListangle='';
-
                     this.addListShow = false;
                 }else if(response.data.cd ='-1'){
                     alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
             
         },
-        //修改单体列表子项
+        //取消新增按钮
+        addListClose(){
+            this.addListname = '';
+            this.addListcoordinate='';
+            this.addListhigh='';
+            this.addListangle='';
+            this.addListShow = false;
+        },
+        //修改单体列表的信息
+        listTableEdit(index){
+            this.listIndexNumber = index.$index;
+            this.addListindex = this.listData[this.listIndexNumber].index,
+            this.addListname = this.listData[this.listIndexNumber].Name;
+            this.addListcoordinate = this.listData[this.listIndexNumber].Origin,
+            this.addListhigh = this.listData[this.listIndexNumber].OriginHeight;
+            this.addListangle = this.listData[this.listIndexNumber].AxisAngle;
+            this.editListShow = true;
+        },
+        //确认修改单体列表子项
         editListSure(){
-            
-            this.listData[this.listIndexNumber].index = this.addListindex ,
-            this.listData[this.listIndexNumber].Name = this.addListname;
-            this.listData[this.listIndexNumber].Origin = this.addListcoordinate,
-            this.listData[this.listIndexNumber].OriginHeight = this.addListhigh;
-            this.listData[this.listIndexNumber].AxisAngle = this.addListangle;
             axios({
                 method:'post',
                 url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
@@ -461,9 +466,8 @@ export default {
                     UseCS:this.listData[this.listIndexNumber].UseCS
                 }
             }).then((response)=>{
-                console.log(response.data);
                 if(response.data.cd == '0'){
-                    console.log(response.data);
+                    this.findSubProject();
                     this.editListShow = false;
                     //清空数据
                     this.addListindex = '';
@@ -477,28 +481,13 @@ export default {
             })
             
         },
-        //修改单体列表的信息
-        listTableEdit(index){
-            this.listIndexNumber = index.$index;
-            console.log(this.listIndexNumber);
-            this.addListindex = this.listData[this.listIndexNumber].index,
-            this.addListname = this.listData[this.listIndexNumber].Name;
-            this.addListcoordinate = this.listData[this.listIndexNumber].Origin,
-            this.addListhigh = this.listData[this.listIndexNumber].OriginHeight;
-            this.addListangle = this.listData[this.listIndexNumber].AxisAngle;
-            this.editListShow = true;
-
-        },
-        listClose(){
-            this.addListShow = false;
+        editListClose(){
             this.editListShow = false
-             //清空数据
             this.addListindex = '';
             this.addListname = '';
             this.addListcoordinate='';
             this.addListhigh='';
             this.addListangle='';
-            
         },
         groundSourceAdd(){
             this.addgroundShow = true;
@@ -534,8 +523,6 @@ export default {
             this.groundVersion = this.groundSourceData[this.groundIndexNumber].groundVersion;
             this.groundRemark = this.groundSourceData[this.groundIndexNumber].groundRemark;
             this.groundState = this.groundSourceData[this.groundIndexNumber].groundState;
-
-            console.log(index.$index);
             this.editgroundShow = true;
         },
         editGroundSure(){
@@ -571,11 +558,10 @@ export default {
             this.groundRemark = '';
             this.groundState = '';
         },
-        deleteListRow(index, rows) {
+        deleteListRow(scope) {
             this.deleteListDialog = true;
-            this.listRow = rows;
-            this.listIndexNumber = index;
-
+            this.deleProject = scope.row.Name;
+            this.deleteListObject = scope;
         },
         //确认删除单体列表子项
         deleteMakeSure(){
@@ -586,16 +572,21 @@ export default {
                     'token':this.token
                 },
                 params:{
-                    buildId:this.listData[this.listIndexNumber].ID,
+                    buildId:this.deleteListObject.row.ID,
                     projId:this.projId
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data);
+                    this.deleteListDialog = false;
+                    this.findSubProject();
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
             })
-            this.listRow.splice(this.listIndexNumber, 1);
-            this.deleteListDialog = false;
         },
         deleteTableRow(index, rows) {
             rows.splice(index, 1);
@@ -611,8 +602,17 @@ export default {
                     projId:this.projId
                 }
             }).then((response)=>{
-                this.groundInfo = response.data.rt.site;
-                this.groundInfo.siteId = response.data.rt.siteId;
+                if(response.data.cd == '0'){
+                    console.log(response.data)
+                    this.groundInfo = response.data.rt.site;
+                    this.groundInfo.siteId = response.data.rt.siteId;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
             })
         },
         getSceneEnvironment(){
@@ -652,7 +652,8 @@ export default {
                         response.data.rt.SceneTime='傍晚';
                     }
                     this.SceneEnvironmentList = response.data.rt;
-                    //console.log(response.data);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -675,7 +676,8 @@ export default {
                     this.listData.forEach((item,index,arr)=>{
                         arr[index].index = index;
                     })
-                   //console.log(this.listData);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -697,7 +699,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    //console.log(response.data)
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -715,25 +716,46 @@ export default {
 </script>
 <style lang="less">
     #groundSetting{
+        /*删除弹框*/
+        .deleteDialogImg{
+            height: 50px;
+        }
+        .deleteDialogWarning{
+            font-size: 18px;
+            line-height: 18px;
+            font-family: 'MicrosoftYahei';
+            color: #fc3439;
+            font-weight: bold;
+            margin:20px 0 0 0;
+        }
+        .deleteDialogText{
+            color: #333333;
+            font-size: 14px;
+            line-height: 14px;
+            font-family: 'MicrosoftYahei';
+            font-weight: normal;
+            margin: 16px 0 0 0;
+        }
         .wrapper{
             width: 100%;
         }
         .title{
+            font-weight: bold;
+            border-bottom:1px solid #ccc; 
+            margin: 0px 20px 0 0px ;
+            text-align: left;
+        }
+        .title span{
+            display: inline-block;
+            margin-left: 15px;
             color: #fc343a;
             font-size: 18px;
-            font-weight: bold;
-            width: 96%;
-            border-bottom:1px solid #ccc; 
-            height: 50px;
-            line-height: 50px;
-            padding:0px 15px;
-            margin: 10px 20px 0 0 ;
-            text-align: left;
+            line-height: 18px;
+            margin: 22px 0 11px 15px;
         }
         .groundTitle{
             width: 97%;
             padding-left: 20px;
-            // margin-right: 20px;
         }
         .groundIcon{
             float: right;

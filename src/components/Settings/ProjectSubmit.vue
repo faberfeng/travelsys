@@ -16,11 +16,11 @@
                                 <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>
                                 <button class="actionBtn expandProperty" title="编辑特性"  @click="editProperty(scope)"></button>
                             </div>
-                            <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
+                            <button class="actionBtn tiqingBtn" title="提请"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                             <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
                             <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
-                            <button class="editBtn actionBtn" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
-                            <button class="deleteBtn actionBtn" @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                            <button class="editBtn actionBtn" title="编辑" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                            <button class="deleteBtn actionBtn" title="删除" @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                         </template> 
                     </zk-table>
                 </div>
@@ -99,11 +99,11 @@
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                         <div class="editBodytwo edit-item clearfix">
                             <label class="editInpText">完整编码 :</label>
-                            <span v-text="totalCode"></span>
+                            <span v-text="totalCode" class="editInpTextInp"></span>
                         </div>
                         <div class="editBodytwo edit-item clearfix">
                             <label class="editInpText">完整标题 :</label>
-                            <span v-text="totalTitle"></span>
+                            <span v-text="totalTitle" class="editInpTextInp"></span>
                         </div>
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText">计量单位 :</label><input class="inp"  placeholder="请输入" v-model="jiliang"/></div>
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText">规则注释 :</label><input class="inp" placeholder="请输入" v-model="guize"/></div>
@@ -116,7 +116,7 @@
                 <el-dialog class="confirm" :visible.sync="confirmVisible" :before-close="confirmClose">
                     <span class="icon-confirm icon-request"></span>
                     <span class="title-confirm">确认提请</span>
-                    <span class="text-confirm">确认提请本条分类编码？</span>
+                    <span class="text-confirm">确认提请本条分类编码？<br/>处于提请状态时将无法删除。</span>
                     <div  class="dialog-footer">
                         <button class="editBtnS" @click="confirmSure">确认</button>
                         <button class="editBtnC" @click="confirmClose">取消</button>
@@ -635,7 +635,9 @@ export default {
             showConvenienceType:'',
             showConvenienceObject:{},
             convenientInput:false,
-            goujianProperty:[]
+            goujianProperty:[],
+            localType:'',
+            localStatus:''
         }
     },
     created(){
@@ -1305,6 +1307,10 @@ export default {
             this.addCodeShow = false;
             this.newTitle = '';
             this.jiliang = '';
+            this.guize = '';
+            this.fTitle = '';
+            this.twoTitle = '';
+            this.thTitle = '';
         },
         //添加确定
         addListSure(){
@@ -1344,6 +1350,10 @@ export default {
                         this.addCodeShow = false;
                         this.newTitle = '';
                         this.jiliang = '';
+                        this.guize = '';
+                        this.fTitle = '';
+                        this.twoTitle = '';
+                        this.thTitle = '';
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
                     }else{
@@ -1466,27 +1476,45 @@ export default {
         },
         //循环遍历数据
         getParentNum(pData,pNum){
-            var type = '';
             pData.forEach((item,index,arr)=>{
                 if(item.number == pNum){
-                    type = item.status;
+                    this.localType = item.type;
+                    this.localStatus = item.status;
                 }else if(item.number != pNum && item.children.length!=0){
                     this.getParentNum(item.children,pNum);
                 }
             })
-            return type;
         },
         //提请
         confirm(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
-            var status = '';
-            if(parentNum){
-                status = this.getParentNum(this.constructorData,parentNum);
-            }
-            if(status == 2){
-                this.confirmVisibleTwo = true;
-            }else if(status == 0 || status ==1){
+            // var status = '';
+            // if(parentNum){
+            //     status = this.getParentNum(this.projectSubmitData,parentNum);
+            // }
+            // if(status == 2){
+            //     this.confirmVisibleTwo = true;
+            // }else if(status == 0 || status ==1){
+            //     this.confirmVisible = true;
+            // }
+
+            if(parentNum != 'null'){
+                this.getParentNum(this.projectSubmitData,parentNum);
+                 if (this.localType == 0 || this.localType == 1) {
+                    this.confirmVisible = true;
+                } else {
+                    if (this.localStatus == 0) {
+                        this.confirmVisibleTwo = true;
+                    } else if (this.localStatus == 1) {
+                        this.confirmVisible = true;
+                    } else if (this.localStatus == 2) {
+                        this.confirmVisibleTwo = true;
+                    } else {
+                        this.confirmVisible = true;
+                    }
+                } 
+            }else{
                 this.confirmVisible = true;
             }
         },
@@ -1532,6 +1560,8 @@ export default {
         },
         confirmCloseTwo(){
             this.confirmVisibleTwo =false;
+            this.localType = '';
+            this.localStatus = '';
         },
         //删除
         deleteItem(scope){
@@ -1665,14 +1695,14 @@ export default {
                 this.totalTitle = scope.row.title;
             }else if(scope.row.level == 2){
                 this.newCode = scope.row.number.substr(2,2);
-                this.constructorData.forEach((item,index)=>{
+                this.projectSubmitData.forEach((item,index)=>{
                     if(item.number==scope.row.parNumber){
                         this.totalTitle = item.title+'-'+scope.row.title;
                     }
                 })
             }else if(scope.row.level == 3){
                 this.newCode = scope.row.number.substr(4,2);
-                this.constructorData.forEach((item,index)=>{
+                this.projectSubmitData.forEach((item,index)=>{
                     if(item.number.substr(0,2)==scope.row.parNumber.substr(0,2)){
                         this.totalTitle = item.title+'-';
                         item.children.forEach(item=>{

@@ -21,7 +21,7 @@
                             <button class="actionBtn expandProperty" title="扩展属性" @click="expandProperty(scope)"></button>
                             <button class="actionBtn projectYingShe" title="工程量映射" @click="projectMapped(scope)"></button>
                         </div>
-                        <button class="actionBtn tiqingBtn"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
+                        <button class="actionBtn tiqingBtn" title="提请"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                         <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
                         <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
                         <button class="editBtn actionBtn" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
@@ -34,7 +34,7 @@
             <el-dialog class="confirm" :visible.sync="confirmVisible" :before-close="confirmClose">
                 <span class="icon-confirm icon-request"></span>
                 <span class="title-confirm">确认提请</span>
-                <span class="text-confirm">确认提请本条分类编码？</span>
+                <span class="text-confirm">确认提请本条分类编码？<br/>处于提请状态时将无法删除。</span>
                 <div  class="dialog-footer">
                     <button class="editBtnS" @click="confirmSure">确认</button>
                     <button class="editBtnC" @click="confirmClose">取消</button>
@@ -805,7 +805,9 @@ export default {
             inputGouJianFunction:[],
             inputGouJianValue:[],
             showConvenienceType:'',
-            showConvenienceObject:{}
+            showConvenienceObject:{},
+            localType:'',
+            localStatus:''
         }
     },
     created(){
@@ -859,27 +861,35 @@ export default {
         },
         //循环遍历数据
         getParentNum(pData,pNum){
-            var type = '';
             pData.forEach((item,index,arr)=>{
                 if(item.number == pNum){
-                    type = item.status;
+                    this.localType = item.type;
+                    this.localStatus = item.status;
                 }else if(item.number != pNum && item.children.length!=0){
                     this.getParentNum(item.children,pNum);
                 }
             })
-            return type;
         },
         //提请
         confirm(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
-            var status = '';
-            if(parentNum){
-                status = this.getParentNum(this.constructorData,parentNum);
-            }
-            if(status == 2){
-                this.confirmVisibleTwo = true;
-            }else if(status == 0 || status ==1){
+            if(parentNum != 'null'){
+                this.getParentNum(this.constructorData,parentNum);
+                 if (this.localType == 0 || this.localType == 1) {
+                    this.confirmVisible = true;
+                } else {
+                    if (this.localStatus == 0) {
+                        this.confirmVisibleTwo = true;
+                    } else if (this.localStatus == 1) {
+                        this.confirmVisible = true;
+                    } else if (this.localStatus == 2) {
+                        this.confirmVisibleTwo = true;
+                    } else {
+                        this.confirmVisible = true;
+                    }
+                } 
+            }else{
                 this.confirmVisible = true;
             }
         },
@@ -924,6 +934,8 @@ export default {
         },
         confirmCloseTwo(){
             this.confirmVisibleTwo =false;
+            this.localType = '';
+            this.localStatus = '';
         },
         //编辑
         editList(scope){
