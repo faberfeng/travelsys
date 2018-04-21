@@ -16,7 +16,8 @@
                     <div class="preDiv">
                         <div class="imgDiv" @click="updataNewImage">
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
-                            <img :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/></div>
+                            <img v-if="projectImage" :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/>
+                            </div>
                         <div style="margin:0;"><el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> <label style="margin-left:
                         -10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
                     </div>
@@ -33,7 +34,7 @@
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-img.jpg">工程图片</h5>
             <ul class="imgUl">
                 <!--封面图片-->
-                <li class="imgLi" v-for="(item,index) in projectImageList" :key="index">
+                <li v-if="projectImageList.length>0" class="imgLi" v-for="(item,index) in projectImageList" :key="index">
                     <div>
                         <img :src="item.filePath"/>
                     </div>
@@ -243,7 +244,6 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
-                        console.log(response.data)
                         this.getBasicSituation();
                         this.projectUnity='';
                         this.projectName='';
@@ -289,8 +289,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.projectImageList.splice(index,1);
-                    alert('删除成功');
+                    this.getProjectImageList();
                 }else if(response.data.cd == '-1'){
                     alert(response.data.cd)
                 }else{
@@ -309,12 +308,14 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                if(response.data.cd === '1'){
+                if(response.data.cd == '0'){
+                    this.sumaryData = response.data.rt;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
                     this.$router.push({
                         path:'/login'
                     })
-                }else{
-                    this.sumaryData = response.data.rt;
                 }
             })
 
@@ -332,7 +333,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
                     this.projectConfig = response.data.rt.project;
                     this.projectUseCount = response.data.rt.projectUserCount;
                     this.projectImage = response.data.rt.projectImage;
@@ -358,14 +358,16 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.projectImageList = response.data.rt;
-                    this.projectImageList.forEach((item,index,arr)=>{
-                        if(item.imgType == '2'){
-                            arr[index].text = '设为封面';
-                        }else{
-                            arr[index].text = '封面'
-                        }
-                    })
+                    if(response.data.rt){
+                        this.projectImageList = response.data.rt;
+                        this.projectImageList.forEach((item,index,arr)=>{
+                            if(item.imgType == '2'){
+                                arr[index].text = '设为封面';
+                            }else{
+                                arr[index].text = '封面'
+                            }
+                        })
+                    }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
