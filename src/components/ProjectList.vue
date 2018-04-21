@@ -3,7 +3,7 @@
     <headerCommon :username="userName"></headerCommon>
     <div class="header-bar">
       <span class="bar-title">工程导航</span>
-      <span class="bar-button" @click="changeStyle">条形风格</span>
+      <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
     </div>
     <div class="clearfix item-proj-box0" v-if="show0">
       <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired)">
@@ -41,30 +41,30 @@
             <h1 v-text="item.projName"></h1>
             <div class="line-content-box">
               <p  class="clearfix line-p">
-                <span class="body-left-line" style="width:84px;">工程账号</span><span class="body-left-line" v-text="item.projCode"></span>
+                <span class="body-left-line" style="width:87px;">工程账号:</span><span class="body-left-line" v-text="item.projCode"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line" style="width:84px;">工程管理员账号</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
+                <span class="body-left-line" style="width:87px;">工程管理员账号:</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line" style="width:84px;">工程管理员姓名</span><span class="body-left-line" v-text="item.projAdminName"></span>
+                <span class="body-left-line" style="width:87px;">工程管理员姓名:</span><span class="body-left-line" v-text="item.projAdminName"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line" style="width:84px;">工程管理员电话</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
+                <span class="body-left-line" style="width:87px;">工程管理员电话:</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
               </p>
               <p class="clearfix line-p">
-                <span class="body-left-line" style="width:84px;">授权用户数量</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
+                <span class="body-left-line" style="width:87px;">授权用户数量:</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
               </p>
             </div>
             <div class="line-content-box">
               <table>
                 <tbody>
                   <tr class="line-table" >
-                    <td class="body-left-table">到期日期</td>
+                    <td class="body-left-table">到期日期:</td>
                     <td class="body-right-table" v-text="item.projExpireTime"></td>
                   </tr>
                   <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
-                    <td class="body-left-table" v-text="val.viewKey"></td>
+                    <td class="body-left-table" v-text="val.viewKey+':'"></td>
                     <td  class="body-right-table" v-text="val.viewVal"></td>
                   </tr>
                 </tbody>
@@ -81,7 +81,7 @@
   padding: 0;
 }
 .header-bar{
-  margin-top: 24px;
+  margin-top: 92px;
   border-bottom: 1px solid #cccccc;
   height: 43px;
 }
@@ -151,7 +151,7 @@
 .item-proj-line{
   width:100%;
   height: 272px;
-  box-shadow: 0px 0px 13px #f1f1f1;
+  box-shadow: 0px 0px 9px rgba(34, 24, 21, .17);
   position: relative;
   cursor: pointer;
   margin-top: 30px;
@@ -319,13 +319,14 @@ p>.body-left-line:first-of-type{
   color: #666666;
   line-height: 27px;
   text-align: left;
+  width: 55px;
 }
 .body-right-table{
   font-size: 12px;
   color: #666666;
   line-height: 27px;
   text-align: left;
-  padding-left: 10px; 
+  padding-left: 4px; 
 }
 </style>
 
@@ -342,6 +343,7 @@ export default {
         title:'我们的公司',
         userName:'',
         userId:'',
+        styleTitle:'条形风格'
       }
   },
   components: {
@@ -357,6 +359,7 @@ export default {
       changeStyle(){
         var vm = this
         vm.show0 = vm.show0?false:true
+         vm.styleTitle = vm.show0?'条形风格':'牌型风格'
       },
       getUserInfo(){
           var vm = this

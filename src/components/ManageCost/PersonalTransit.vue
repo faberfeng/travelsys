@@ -2,7 +2,7 @@
 <div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class="label-item-active label-item">
+                <span  class=" label-item">
                     <router-link :to="'/Drive/costover'">  
                     最近文档  
                    </router-link>
@@ -17,7 +17,7 @@
                     已经分享  
                   </router-link>
                 </span>
-                <span  class="label-item">
+                <span  class="label-item label-item-active">
                   <router-link :to="'/Drive/PersonalTransit'">  
                     个人中转  
                   </router-link>
