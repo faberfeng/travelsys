@@ -110,7 +110,7 @@
                     <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
                     <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入数字(例:0 0)" v-model="addListcoordinate"/></div>
                     <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入数字"  v-model="addListhigh"/></div>
-                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入数字"  v-model="addListangle"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入数字" v-model="addListangle"/></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addListSure">确定</button>
@@ -389,42 +389,50 @@ export default {
         updateList(){
             this.addListShow = true;
         },
-        //新增单体列表子项
+        //确认新增单体列表子项
         addListSure(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    AxisAngle:this.addListangle,
-                    Name:this.addListname,
-                    Origin:this.addListcoordinate,
-                    OriginHeight:this.addListhigh,
-                    UseCS:0
-                }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    this.findSubProject();
-                    //清空输入
-                    this.addListname = '';
-                    this.addListcoordinate='';
-                    this.addListhigh='';
-                    this.addListangle='';
-                    this.addListShow = false;
-                }else if(response.data.cd ='-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
+            var reg = new RegExp("^[0-9]*$");
+            if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
+                if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
+                    axios({
+                        method:'post',
+                        url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                        headers:{
+                            'token':this.token
+                        },
+                        params:{
+                            projId:this.projId
+                        },
+                        data:{
+                            AxisAngle:this.addListangle,
+                            Name:this.addListname,
+                            Origin:this.addListcoordinate,
+                            OriginHeight:this.addListhigh,
+                            UseCS:0
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == '0'){
+                            this.findSubProject();
+                            this.addListname = '';
+                            this.addListcoordinate='';
+                            this.addListhigh='';
+                            this.addListangle='';
+                            this.addListShow = false;
+                        }else if(response.data.cd ='-1'){
+                            alert(response.data.msg);
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
                     })
+                }else{
+                    alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
                 }
-            })
-            
+                
+            }else{
+                alert('请正确输入表单')
+            } 
         },
         //取消新增按钮
         addListClose(){
@@ -446,39 +454,49 @@ export default {
         },
         //确认修改单体列表子项
         editListSure(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    AxisAngle:this.addListangle,
-                    ID:this.listData[this.listIndexNumber].ID,
-                    Name:this.addListname,
-                    Origin:this.addListcoordinate,
-                    OriginHeight:this.addListhigh,
-                    ParentID:this.listData[this.listIndexNumber].ParentID,
-                    Type:this.listData[this.listIndexNumber].Type,
-                    UseCS:this.listData[this.listIndexNumber].UseCS
+            if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
+                if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
+                    axios({
+                        method:'post',
+                        url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                        headers:{
+                            'token':this.token
+                        },
+                        params:{
+                            projId:this.projId
+                        },
+                        data:{
+                            AxisAngle:this.addListangle,
+                            ID:this.listData[this.listIndexNumber].ID,
+                            Name:this.addListname,
+                            Origin:this.addListcoordinate,
+                            OriginHeight:this.addListhigh,
+                            ParentID:this.listData[this.listIndexNumber].ParentID,
+                            Type:this.listData[this.listIndexNumber].Type,
+                            UseCS:this.listData[this.listIndexNumber].UseCS
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == '0'){
+                            this.findSubProject();
+                            this.editListShow = false;
+                            //清空数据
+                            this.addListindex = '';
+                            this.addListname = '';
+                            this.addListcoordinate='';
+                            this.addListhigh='';
+                            this.addListangle='';
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg);
+                        }
+                    })
+                }else{
+                    alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
                 }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    this.findSubProject();
-                    this.editListShow = false;
-                    //清空数据
-                    this.addListindex = '';
-                    this.addListname = '';
-                    this.addListcoordinate='';
-                    this.addListhigh='';
-                    this.addListangle='';
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }
-            })
+                
+            }else{
+                alert('请正确输入表单')
+            }
+            
             
         },
         editListClose(){
@@ -603,7 +621,6 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
                     this.groundInfo = response.data.rt.site;
                     this.groundInfo.siteId = response.data.rt.siteId;
                 }else if(response.data.cd == '-1'){
