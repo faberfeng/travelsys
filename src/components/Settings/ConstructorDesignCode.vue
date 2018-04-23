@@ -3071,6 +3071,25 @@ export default {
 }
 </script>
 <style scoped>
+    /***********设置滚动条************/
+    /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+        width:7px;
+    }
+    /* 滚动槽 */
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+        border-radius:15px;
+    }
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.5);
+    }
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background:rgba(255,0,0,0.4);
+    }
     .wrapper{
         width: 100%;
     }
@@ -3417,6 +3436,7 @@ export default {
                 height: 26px;
                 line-height: 26px;
                 cursor: pointer;
+                padding: 6px 0 6px 10px;
             }
             .multipleSelectB{
                 border: none;
@@ -3431,6 +3451,7 @@ export default {
                 height: 26px;
                 line-height: 26px;
                 cursor: pointer;
+                padding: 6px 0 6px 10px;
             }
             .multipleSelectC{
                 border: none;
@@ -3445,6 +3466,7 @@ export default {
                 height: 26px;
                 line-height: 26px;
                 cursor: pointer;
+                padding: 6px 0 6px 10px;
             }
             .multipleSelectD{
                 border: none;
@@ -3458,6 +3480,7 @@ export default {
                 height: 26px;
                 line-height: 26px;
                 cursor: pointer;
+                padding: 6px 0 6px 10px;
             }
             .editBtnS,.editBtnC{
                 width: 111px;

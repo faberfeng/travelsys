@@ -19,7 +19,7 @@
               </p>
                 <p class="title-box">
                   <span class="title-left">创立时间:</span>
-                  <span class="info-title"  v-text="ugInfo.createTime"></span>
+                  <span class="info-title">{{ugInfo.createTime | toLocalD}}</span>
               </p>
                <p class="title-box">
                   <span class="title-left">群组标签:</span>
@@ -62,7 +62,7 @@
             <span class="icon icon-addqun" @click="addQR"></span>
         </h1>
         <ul style="max-height:500px;overflow-y:auto;">
-            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key)">
+            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item)">
                 <span class='title-qun' v-text="item.ugName"></span>
                 <span class="icon icon-delect-qun" @click="deleteQR(item.ugId)"></span>
             </li>
@@ -115,27 +115,607 @@
         </el-dialog>
   </div>
 </template>
-
+<script>
+import axios from 'axios'
+import index from '../../../node_modules/_vue@2.5.16@vue';
+export default {
+  name:'',
+    data(){
+        return {
+            ugEdit:{
+                name:'',
+                tag:'',
+                status:''
+            },
+            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            canEditname:true,
+            canEditlabel:true,
+            token:'',
+            projId:'',//项目id
+            userQunzuNum:'',
+            userQunzuList:[],
+            userInfo:'',
+            centerDialogVisible: false,
+            outsideUserList:[],//可添加的外部用户
+            ugList:[],//工程群组
+            activeugID:'',//正在查看的群组
+            activeugIDkey:0,//正在查看的群组的index
+            ugInfo:'',//群组详情
+            userListDEL:[],//打算删除的用户id数组
+            userListAdd:[],//打算添加的用户id数组
+            userDetialAdd:[],//打算添加的用户id详情的数组
+            checkedUgList:{},//被选中的工程群组
+        }
+    },
+    watch:{
+        'ugEdit.status':function(newval,old){
+            if(old != '' && newval != ''){
+                    this.EditStatus()
+            }
+        }
+    },
+    created(){
+        var vm = this
+        vm.projId = localStorage.getItem('projId')//项目id
+        vm.token  = localStorage.getItem('token')
+        vm.intoQunzu()
+    },
+    filters:{
+        toLocalD(val){
+            return new Date(val).toLocaleString();
+        }
+    },
+    methods:{
+        saveUserQR(){
+            var vm = this
+            if(vm.userListAdd.length>0){
+                for(var i=0;i<vm.userListAdd.length;i++){
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addUserGroupUser',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            userId:vm.userListAdd[i],
+                            ugId:vm.activeugID,//正在查看的群组ID
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.centerDialogVisible = false
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                    }
+                this.$message({
+                    type: 'success',
+                    message: '添加群组用户成功'
+                    });
+                setTimeout(function(){
+                        vm.getQRuser(vm.activeugID)
+                },1000)
+            }else{
+                this.$message({
+                    type: 'warming',
+                    message: '请选择用户'
+                });
+            }
+        },
+        removeUserAdd(val){
+            var vm = this
+            if(vm.userListAdd.indexOf(val) != -1){
+                var index = vm.userListAdd.indexOf(val)
+                vm.userListAdd.splice(index,1)
+                vm.userDetialAdd.splice(index,1)
+            }
+        },
+        addUser(val,name,count,tag){
+            var vm = this
+            if(vm.userListAdd.indexOf(val) == -1){
+                vm.userListAdd.push(val)
+                vm.userDetialAdd.push({
+                    id:val,
+                    name:name,
+                    count:count,
+                    userPositions:tag
+                })
+            }
+        },
+        deleteUser(){//删除用户 modified by licongwen
+            var vm = this;
+            if(vm.userListDEL.length == 0){
+                vm.$message({
+                    type:'warming',
+                    message: '请选择用户!'
+                })
+            }else{
+                vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    for(var i=0;i<vm.userListDEL.length;i++){
+                        axios({
+                            method:'POST',
+                            url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                userId:vm.userListDEL[i],
+                                ugId:vm.activeugID,//正在查看的群组ID
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == '0'){
+                                vm.getQRuser(vm.activeugID)
+                            }else if (response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+                    }
+                        vm.userListDEL = []
+                    }).catch(() => {
+                        vm.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                    });
+                }
+            },
+            pushUserID(id){
+                var vm = this
+                var index = vm.userListDEL.indexOf(id)
+                if(index == -1){
+                    vm.userListDEL.push(id)
+                }else{
+                    vm.userListDEL.splice(index,1)
+                }
+            },
+            EditName(){
+                var vm = this
+                this.$prompt('修改群组名称', '修改群组', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                    }).then(({ value }) => {
+                        axios({
+                                method:'POST',
+                                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/renameGroupNameNode',
+                                headers:{
+                                    'token':vm.token
+                                },
+                                data:{
+                                    projId:vm.projId,
+                                    ugId:vm.activeugID,//正在查看的群组ID
+                                    ugName:value,
+                                }
+                            }).then((response)=>{
+                                if(response.data.cd == 0){
+                                    this.$message({
+                                        type: 'success',
+                                        message: '修改群组名称成功'
+                                    });
+                                    vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                                }
+                            }).catch((err)=>{
+                                console.log(err)
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '取消修改'
+                        });       
+                    });
+            },
+            EditLabel(){
+                var vm = this
+                this.$prompt('修改群组标签', '修改群组', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                    }).then(({ value }) => {
+                        axios({
+                                method:'POST',
+                                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUgTag',
+                                headers:{
+                                    'token':vm.token
+                                },
+                                data:{
+                                    projId:vm.projId,
+                                    ugId:vm.activeugID,//正在查看的群组ID
+                                    ugTag:value,
+                                }
+                            }).then((response)=>{
+                                if(response.data.cd == 0){
+                                    this.$message({
+                                        type: 'success',
+                                        message: '修改群组标签成功'
+                                    });
+                                    vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                                }
+                            }).catch((err)=>{
+                                console.log(err)
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '取消修改'
+                        });       
+                    });
+            },
+            EditStatus(){
+                var vm = this
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUserGroupStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:{
+                        projId:vm.projId,
+                        ugId:vm.activeugID,//正在查看的群组ID
+                        ugStatus:vm.ugEdit.status,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        this.$message({
+                            type: 'success',
+                            message: '修改群组状态成功'
+                        });
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            addQR(){//添加群组
+                var vm = this
+                this.$prompt('群组名称', '新建群组', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/add',
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{
+                            projId:vm.projId,
+                            ugName:value,
+                            ugOrder:11,
+                            ugParId:0,
+                            ugStatus:1,
+                            ugType:0
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            this.$message({
+                                ype: 'success',
+                                message: '创建成功'
+                            });
+                            vm.getQunList()
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消添加'
+                    });       
+                });
+            },
+            deleteQR(ugId){//删除群组
+                var vm = this   
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/delGroupNode',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        ugId:ugId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            type:'success',
+                            message: '删除成功'
+                        })
+                    }else if(response.data.cd == -1){
+                        vm.$message({
+                            type:'error',
+                            message: response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            allowChangeName(){
+                var vm = this
+                vm.EditName()
+            },
+            allowChangeLabel(){
+                var vm = this
+                vm.EditLabel()
+            },
+        intoQunzu(){
+            var vm = this
+                axios({
+                    method:'GET',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/groupIndex',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId
+                    }
+                }).then((response)=>{
+                    if(response.data.rt.projId == vm.projId){
+                        vm.getUserInfo()
+                        vm.getQunList()
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+        },
+        getUserInfo(){//获得工程用户列表
+                var vm = this
+                axios({
+                    method:'GET',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/projectUserList',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId,
+                        queryParam:vm.userInfo
+                    }
+                }).then((response)=>{
+                    vm.outsideUserList = response.data.rt
+                }).catch((err)=>{
+                    console.log(err)
+                })
+        },
+        getQunList(){//获得工程群组列表
+                var vm = this;
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/list',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId,
+                        data :''
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        if(response.data.rt.ugList){
+                            vm.ugList = response.data.rt.ugList;//工程群组
+                            for(var i=0;i<vm.ugList.length;i++){
+                                if(vm.ugList[i].ugName == '默认群组'){
+                                    vm.activeugID = vm.ugList[i].ugId;
+                                    vm.activeugIDkey = i;
+                                    vm.changeQR(vm.ugList[i].ugId,i);
+                                    vm.getQRuser(vm.ugList[i].ugId);
+                                    this.checkedUgList = vm.ugList[i];
+                                }
+                            }
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg);
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    }  
+                    
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            //上下移动群组的功能modified by licongwen
+            changeQR_(index){
+                var vm = this;
+                if(index == -1){
+                    if(this.activeugIDkey == 0){
+                        alert('已经是最上面一个群组!');
+                    }else{
+                        var preUgid = '';
+                        this.ugList.forEach((item,index,arr)=>{
+                            if(item.ugName == this.checkedUgList.ugName){
+                                preUgid = arr[index-1].ugId;
+                                this.activeugIDkey= index;
+                            }
+                        });
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'config/userGroup/moveUpGroupNode',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{
+                                prevUgId:preUgid,
+                                ugId:this.checkedUgList.ugId
+                            } 
+                        }).then(response=>{
+                            if(response.data.cd == '0'){
+                                vm.getQunListOnce();
+                            }else if(response.data.cd == '-1'){
+                                    alert(response.data.msg);
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        })
+                    }
+                }else if(index == 1){
+                    if(this.activeugIDkey == this.ugList.length-1){
+                        alert('已经是最下面一个群组!');
+                    }else{
+                        var nextUgidC = '';
+                        this.ugList.forEach((item,index,arr)=>{
+                            if(item.ugName == this.checkedUgList.ugName){
+                                nextUgidC = arr[index+1].ugId;
+                                this.activeugIDkey = index;
+                            }
+                        });
+                        axios({ 
+                            method:'post',
+                            url:this.baseUrl+'config/userGroup/moveDownGroupNode',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{
+                                nextUgId:nextUgidC,
+                                ugId:this.checkedUgList.ugId
+                            },
+                            data:{} 
+                        }).then(response=>{
+                            if(response.data.cd == '0'){
+                                vm.getQunListOnce();
+                            }else if(response.data.cd == '-1'){
+                                    alert(response.data.msg);
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        })
+                    }
+                }
+            },
+        //工程群组，设置默认数组为当前数组
+        getQunListOnce(){
+            var vm = this;
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/list',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    data:''
+                },
+                
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    if(response.data.rt.ugList){
+                        vm.ugList = response.data.rt.ugList;//工程群组
+                        for(var i=0;i<vm.ugList.length;i++){
+                            if(vm.ugList[i].ugName == this.checkedUgList.ugName){
+                                vm.activeugID = vm.ugList[i].ugId;
+                                vm.activeugIDkey = i;
+                                vm.changeQR(vm.ugList[i].ugId,i);
+                                vm.getQRuser(vm.ugList[i].ugId);
+                                this.checkedUgList = vm.ugList[i];
+                            }
+                        }
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                }  
+                    
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        changeQR(val,index,item){//切换群组，根据群组ID获取群组信息
+            var vm = this;
+            this.checkedUgList = item;
+            if(val){
+                vm.ugEdit.status = ''
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/findCompanyUserGroupByNodeId',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        ugId:val,
+                    }
+                 }).then((response)=>{
+                    vm.activeugID = val
+                    vm.activeugIDkey = index
+                    vm.ugInfo = response.data.rt//工程群组
+                    //增添群组信息
+                    vm.ugEdit.name = vm.ugInfo.ugName 
+                    vm.ugEdit.tag = vm.ugInfo.ugTag
+                    vm.ugEdit.status = vm.ugInfo.ugStatus
+                    vm.ugEdit.status =  response.data.rt.ugStatus+''
+                    vm.getQRuser(val)
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
+        },
+        getQRuser(val){//根据群组ID获取群组用户列表
+            var vm = this;
+            if(val){
+                axios({
+                    method:'GET',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/userGroupUserList',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        ugId:val,
+                        projId:vm.projId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        vm.userQunzuNum = response.data.rt.length//工程用户总数
+                        vm.userQunzuList = response.data.rt//工程群组用户列表
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }   
+        },
+    }
+}
+</script>
 <style  lang='less'>
 #groupPage{
     /***********设置滚动条************/
     /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
-    width:7px;
+        width:7px;
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
-    -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
-    border-radius:10px;
+        box-shadow: inset006pxrgba(0,0,0,0.5);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+        border-radius:10px;
     }
     /* 滚动条滑块 */
     ::-webkit-scrollbar-thumb {
-    border-radius:10px;
-    background:rgba(0,0,0,0.1);
-    -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow: inset006pxrgba(0,0,0,0.5);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {
-    background:rgba(255,0,0,0.4);
+        background:rgba(255,0,0,0.4);
     }
     /*********************/
     .clearfix{
@@ -500,471 +1080,3 @@
         }
 }
 </style>
-
-<script>
-import axios from 'axios'
-import index from '../../../node_modules/_vue@2.5.16@vue';
-export default {
-  name:'',
-  data(){
-      return {
-          ugEdit:{
-              name:'',
-              tag:'',
-              status:''
-          },
-          canEditname:true,
-          canEditlabel:true,
-          token:'',
-          projId:'',//项目id
-          userQunzuNum:'',
-          userQunzuList:[],
-          userInfo:'',
-          centerDialogVisible: false,
-          outsideUserList:[],//可添加的外部用户
-          ugList:[],//工程群组
-          activeugID:'',//正在查看的群组
-          activeugIDkey:0,//正在查看的群组的index
-          ugInfo:'',//群组详情
-          userListDEL:[],//打算删除的用户id数组
-          userListAdd:[],//打算添加的用户id数组
-          userDetialAdd:[],//打算添加的用户id详情的数组
-      }
-  },
-  watch:{
-      'ugEdit.status':function(newval,old){
-          if(old != '' && newval != ''){
-                this.EditStatus()
-          }
-      }
-  },
-  created(){
-      var vm = this
-      vm.projId = localStorage.getItem('projId')//项目id
-      vm.token  = localStorage.getItem('token')
-      vm.intoQunzu()
-  },
-  methods:{
-        saveUserQR(){
-            var vm = this
-            if(vm.userListAdd.length>0){
-                for(var i=0;i<vm.userListAdd.length;i++){
-                    axios({
-                        method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addUserGroupUser',
-                        headers:{
-                            'token':vm.token
-                        },
-                        params:{
-                            userId:vm.userListAdd[i],
-                            ugId:vm.activeugID,//正在查看的群组ID
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == 0){
-                            vm.centerDialogVisible = false
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
-                }
-                this.$message({
-                    type: 'success',
-                    message: '添加群组用户成功'
-                });
-                setTimeout(function(){
-                    vm.getQRuser(vm.activeugID)
-                },1000)
-            }else{
-                this.$message({
-                    type: 'warming',
-                    message: '请选择用户'
-                });
-            }
-        },
-        removeUserAdd(val){
-            var vm = this
-            if(vm.userListAdd.indexOf(val) != -1){
-                var index = vm.userListAdd.indexOf(val)
-                vm.userListAdd.splice(index,1)
-                vm.userDetialAdd.splice(index,1)
-            }
-            console.log(vm.userListAdd)
-            console.log(vm.userDetialAdd)
-        },
-        addUser(val,name,count,tag){
-            var vm = this
-             if(vm.userListAdd.indexOf(val) == -1){
-                vm.userListAdd.push(val)
-                vm.userDetialAdd.push({
-                    id:val,
-                    name:name,
-                    count:count,
-                    userPositions:tag
-                })
-            }
-             console.log(vm.userListAdd)
-            console.log(vm.userDetialAdd)
-        },
-        deleteUser(){//删除用户
-          var vm = this
-          if(vm.userListDEL.length == 0){
-              vm.$message({
-                  type:'warming',
-                message: '请选择用户!'
-              })
-          }else{
-            vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                for(var i=0;i<vm.userListDEL.length;i++){
-                    axios({
-                        method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
-                        headers:{
-                            'token':vm.token
-                        },
-                        params:{
-                            userId:vm.userListDEL[i],
-                            ugId:vm.activeugID,//正在查看的群组ID
-                        }
-                    }).then((response)=>{
-                             vm.getQRuser(vm.activeugID)
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
-                }
-                vm.userListDEL = []
-            }).catch(() => {
-                vm.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });          
-            });
-          }
-        },
-        pushUserID(id){
-            var vm = this
-            var index = vm.userListDEL.indexOf(id)
-            if(index == -1){
-                vm.userListDEL.push(id)
-            }else{
-                vm.userListDEL.splice(index,1)
-            }
-            console.log(vm.userListDEL)
-        },
-        EditName(){
-              var vm = this
-               this.$prompt('修改群组名称', '修改群组', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                       axios({
-                            method:'POST',
-                            url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/renameGroupNameNode',
-                            headers:{
-                                'token':vm.token
-                            },
-                            data:{
-                                projId:vm.projId,
-                                ugId:vm.activeugID,//正在查看的群组ID
-                                ugName:value,
-                            }
-                        }).then((response)=>{
-                            if(response.data.cd == 0){
-                                this.$message({
-                                    type: 'success',
-                                    message: '修改群组名称成功'
-                                });
-                                vm.changeQR(vm.activeugID,vm.activeugIDkey)
-                            }
-                        }).catch((err)=>{
-                            console.log(err)
-                        })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '取消修改'
-                    });       
-                });
-        },
-        EditLabel(){
-               var vm = this
-               this.$prompt('修改群组标签', '修改群组', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                       axios({
-                            method:'POST',
-                            url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUgTag',
-                            headers:{
-                                'token':vm.token
-                            },
-                            data:{
-                                projId:vm.projId,
-                                ugId:vm.activeugID,//正在查看的群组ID
-                                ugTag:value,
-                            }
-                        }).then((response)=>{
-                            if(response.data.cd == 0){
-                                this.$message({
-                                    type: 'success',
-                                    message: '修改群组标签成功'
-                                });
-                                vm.changeQR(vm.activeugID,vm.activeugIDkey)
-                            }
-                        }).catch((err)=>{
-                            console.log(err)
-                        })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '取消修改'
-                    });       
-                });
-        },
-        EditStatus(){
-            var vm = this
-            axios({
-                method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUserGroupStatus',
-                headers:{
-                    'token':vm.token
-                },
-                data:{
-                    projId:vm.projId,
-                    ugId:vm.activeugID,//正在查看的群组ID
-                    ugStatus:vm.ugEdit.status,
-                }
-            }).then((response)=>{
-                if(response.data.cd == 0){
-                    this.$message({
-                        type: 'success',
-                        message: '修改群组状态成功'
-                    });
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        addQR(){//添加群组
-              var vm = this
-               this.$prompt('群组名称', '新建群组', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                       axios({
-                            method:'POST',
-                            url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/add',
-                            headers:{
-                                'token':vm.token
-                            },
-                            data:{
-                                projId:vm.projId,
-                                ugName:value,
-                                ugOrder:11,
-                                ugParId:0,
-                                ugStatus:1,
-                                ugType:0
-                            }
-                        }).then((response)=>{
-                            if(response.data.cd == 0){
-                                this.$message({
-                                    type: 'success',
-                                    message: '创建成功'
-                                });
-                                 vm.getQunList()
-                            }
-                        }).catch((err)=>{
-                            console.log(err)
-                        })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '取消添加'
-                    });       
-                });
-        },
-        deleteQR(ugId){//删除群组
-            var vm = this   
-            axios({
-                method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/delGroupNode',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    ugId:ugId
-                }
-            }).then((response)=>{
-                if(response.data.cd == 0){
-                    vm.$message({
-                        type:'success',
-                        message: '删除成功'
-                    })
-                }else if(response.data.cd == -1){
-                    vm.$message({
-                        type:'error',
-                        message: response.data.msg
-                    })
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        allowChangeName(){
-            var vm = this
-            vm.EditName()
-        },
-         allowChangeLabel(){
-              var vm = this
-               vm.EditLabel()
-        },
-       intoQunzu(){
-           var vm = this
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/groupIndex',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId
-                }
-            }).then((response)=>{
-                console.log(response)
-                if(response.data.rt.projId == vm.projId){
-                    vm.getUserInfo()
-                    vm.getQunList()
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-       },
-       getUserInfo(){//获得工程用户列表
-            var vm = this
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/projectUserList',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId,
-                    queryParam:vm.userInfo
-                }
-            }).then((response)=>{
-                console.log(response)
-               vm.outsideUserList = response.data.rt
-            }).catch((err)=>{
-                console.log(err)
-            })
-       },
-       getQunList(){//获得工程群组列表
-            var vm = this
-            axios({
-                method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/list',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId,
-                    data :''
-                }
-            }).then((response)=>{
-                console.log(response)
-                vm.ugList = response.data.rt.ugList//工程群组
-                if(vm.ugList){
-                    for(var i=0;i<vm.ugList.length;i++){
-                        if(vm.ugList[i].ugName == '默认群组'){
-                            vm.activeugID = vm.ugList[i].ugId
-                            vm.activeugIDkey = i
-                            vm.changeQR(vm.ugList[i].ugId,i)
-                            vm.getQRuser(vm.ugList[i].ugId)
-                            return false
-                        }
-                    }
-                }
-                
-            }).catch((err)=>{
-                console.log(err)
-            })
-       },
-       changeQR_(index){
-           var vm = this
-           if(index == -1){
-               if(parseInt(vm.activeugIDkey) >0){
-                    var activeIndex = vm.activeugIDkey-1
-                    vm.activeugIDkey--
-                    var ugid = vm.ugList[activeIndex].ugId
-                    vm.changeQR(ugid,activeIndex)
-               }else{
-                    vm.$message('这已经是最上一个群组!')
-               }
-           }else if(index == 1){
-                 if(parseInt(vm.activeugIDkey) < (vm.ugList.length-1)){
-                    var activeIndex = vm.activeugIDkey+1
-                    vm.activeugIDkey++
-                    var ugid = vm.ugList[activeIndex].ugId
-                    vm.changeQR(ugid,activeIndex)
-               }else{
-                    vm.$message('这已经是最后一个群组!')
-               }
-           }
-       },
-       changeQR(val,index){//切换群组，根据群组ID获取群组信息
-             var vm = this
-             if(val){
-                vm.ugEdit.status = ''
-                axios({
-                    method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/findCompanyUserGroupByNodeId',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        ugId:val,
-                    }
-                }).then((response)=>{
-                    vm.activeugID = val
-                    //  vm.activeugIDkey = index
-                    vm.ugInfo = response.data.rt//工程群组
-                    //增添群组信息
-                    vm.ugEdit.name = vm.ugInfo.ugName 
-                    vm.ugEdit.tag = vm.ugInfo.ugTag
-                    vm.ugEdit.status = vm.ugInfo.ugStatus
-                    vm.ugEdit.status =  response.data.rt.ugStatus+''
-                    vm.getQRuser(val)
-                }).catch((err)=>{
-                    console.log(err)
-                })
-             }
-       },
-       getQRuser(val){//根据群组ID获取群组用户列表
-             var vm = this
-             if(val){
-                axios({
-                    method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/userGroupUserList',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        ugId:val,
-                        projId:vm.projId
-                    }
-                }).then((response)=>{
-                    console.log(response)
-                    vm.userQunzuNum = response.data.rt.length//工程用户总数
-                    vm.userQunzuList = response.data.rt//工程群组用户列表
-                }).catch((err)=>{
-                    console.log(err)
-                })
-             }
-       },
-  }
-}
-</script>
- 

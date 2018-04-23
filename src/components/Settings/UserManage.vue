@@ -166,6 +166,7 @@
             }
             /* 滚动槽 */
             ::-webkit-scrollbar-track {
+            box-shadow:inset006pxrgba(0,0,0,0.3);
             -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
             border-radius:10px;
             }
@@ -173,6 +174,7 @@
             ::-webkit-scrollbar-thumb {
             border-radius:10px;
             background:rgba(0,0,0,0.1);
+            box-shadow:inset006pxrgba(0,0,0,0.3);
             -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
             }
             ::-webkit-scrollbar-thumb:window-inactive {
@@ -670,7 +672,6 @@ export default {
                     vm.jobTree_checked = jobTree_checked,
                     vm.jobTree_opend = jobTree_opend,
                     vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
-                    console.log(vm.jobTree)
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -696,7 +697,9 @@ export default {
             })
         },
         getInfo(){//获取用户列表
-            var vm = this
+            var vm = this;
+            console.log(this.pageDetial);
+            console.log(this.userSearchInfo)
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchProjectUserList/'+vm.projId,
@@ -709,10 +712,19 @@ export default {
                     userName: vm.userSearchInfo,
                 }
             }).then((response)=>{
-                vm.userSearchInfo =''//搜索完清空
-                vm.userList = response.data.rt.dgJson.rows
-                vm.pageDetial.total = response.data.rt.dgJson.total
-                vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                if(response.data.cd == '0'){
+                    vm.userSearchInfo ='';//搜索完清空
+                    vm.userList = response.data.rt.rows;
+                    vm.pageDetial.total = response.data.rt.dgJson.total;
+                    vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
             }).catch((err)=>{
                 console.log(err)
             })
@@ -737,7 +749,6 @@ export default {
                         userId: id,
                     }
                 }).then((response)=>{
-                    console.log(response)
                     vm.userDetial.info = response.data.rt.projectUser
                     vm.userDetial.positions = response.data.rt.positions
                     vm.position_default = response.data.rt.positions[0]//工程管理员岗位
@@ -787,7 +798,6 @@ export default {
                     posIds.push(vm.position_list[i].id+'')
                 }
             }
-            console.log(posIds)
             axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/saveProjectUser',
@@ -874,7 +884,7 @@ export default {
     select.inp-search {  
     /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
     /*很关键：将默认的select选择框样式清除*/  
-    appearance:none;  
+    /* appearance:none;   */
     -moz-appearance:none;  
     -webkit-appearance:none;  
     /*在选择框的最右侧中间显示小箭头图片*/  
