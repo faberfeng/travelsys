@@ -102,6 +102,15 @@
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog  :visible.sync="deleteImageVisiable" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">您要删除当前所选图片吗?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteImageSure">删除</button>
+                    <button class="cancelBtn" @click="deleteImageVisiable=false">取消</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -141,11 +150,13 @@ export default {
             projectImageList:[],//获取工程图片列表
             firstCoverImg:[],//封面图片
             header:{
-                 userName:'',
-                 userId:'', 
-                 projectName:'华建Q系列工程协同应用系统',
-                 projectImg:'',
+                userName:'',
+                userId:'', 
+                projectName:'华建Q系列工程协同应用系统',
+                projectImg:'',
             }, 
+            deleteImageVisiable:false,
+            deleteImageIndex:''
         }
     },
     created(){
@@ -275,7 +286,14 @@ export default {
             }
 
         },
+        //删除图片
         deleteImage(index){
+            this.deleteImageIndex = index;
+            this.deleteImageVisiable = true;
+            
+        },
+        //确认删除
+        deleteImageSure(){
             axios({
                 method:'post',
                 url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
@@ -284,11 +302,12 @@ export default {
                 },
                 params:{
                     projId:this.projId,
-                    imageId:this.projectImageList[index].id,
-                    fileId:this.projectImageList[index].fileId,
+                    imageId:this.projectImageList[this.deleteImageIndex].id,
+                    fileId:this.projectImageList[this.deleteImageIndex].fileId,
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
+                    this.deleteImageVisiable = false;
                     this.getProjectImageList();
                 }else if(response.data.cd == '-1'){
                     alert(response.data.cd)
