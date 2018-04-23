@@ -703,6 +703,7 @@ export default {
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
+        box-shadow: inset006pxrgba(0,0,0,0.5);
         -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
         border-radius:10px;
     }
@@ -710,6 +711,7 @@ export default {
     ::-webkit-scrollbar-thumb {
         border-radius:10px;
         background:rgba(0,0,0,0.1);
+        box-shadow: inset006pxrgba(0,0,0,0.5);
         -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {

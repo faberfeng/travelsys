@@ -1004,6 +1004,7 @@ export default {
         padding-left: 10px;
         font-size: 12px;
         display: inline-block;
+        border-radius: 32px;
     }
     .pTable{
         display: inline-block;
