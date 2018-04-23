@@ -166,6 +166,7 @@
             }
             /* 滚动槽 */
             ::-webkit-scrollbar-track {
+            box-shadow:inset006pxrgba(0,0,0,0.3);
             -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
             border-radius:10px;
             }
@@ -173,6 +174,7 @@
             ::-webkit-scrollbar-thumb {
             border-radius:10px;
             background:rgba(0,0,0,0.1);
+            box-shadow:inset006pxrgba(0,0,0,0.3);
             -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
             }
             ::-webkit-scrollbar-thumb:window-inactive {
@@ -882,7 +884,7 @@ export default {
     select.inp-search {  
     /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
     /*很关键：将默认的select选择框样式清除*/  
-    appearance:none;  
+    /* appearance:none;   */
     -moz-appearance:none;  
     -webkit-appearance:none;  
     /*在选择框的最右侧中间显示小箭头图片*/  

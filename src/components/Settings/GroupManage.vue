@@ -223,51 +223,51 @@ export default {
             }
         },
         deleteUser(){//删除用户 modified by licongwen
-        var vm = this;
-        if(vm.userListDEL.length == 0){
-            vm.$message({
-                type:'warming',
-                message: '请选择用户!'
-            })
-        }else{
-            vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                for(var i=0;i<vm.userListDEL.length;i++){
-                    axios({
-                        method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
-                        headers:{
-                            'token':vm.token
-                        },
-                        params:{
-                            userId:vm.userListDEL[i],
-                            ugId:vm.activeugID,//正在查看的群组ID
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == '0'){
-                            vm.getQRuser(vm.activeugID)
-                        }else if (response.data.cd == '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
+            var vm = this;
+            if(vm.userListDEL.length == 0){
+                vm.$message({
+                    type:'warming',
+                    message: '请选择用户!'
+                })
+            }else{
+                vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    for(var i=0;i<vm.userListDEL.length;i++){
+                        axios({
+                            method:'POST',
+                            url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                userId:vm.userListDEL[i],
+                                ugId:vm.activeugID,//正在查看的群组ID
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == '0'){
+                                vm.getQRuser(vm.activeugID)
+                            }else if (response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+                    }
+                        vm.userListDEL = []
+                    }).catch(() => {
+                        vm.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                    });
                 }
-                    vm.userListDEL = []
-                }).catch(() => {
-                    vm.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });          
-                });
-            }
             },
             pushUserID(id){
                 var vm = this
