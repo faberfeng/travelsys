@@ -348,6 +348,9 @@ export default {
         text-decoration: none;
         display: inline-block;
     }
+    .el-tabs__content{
+        display: none;
+    }
     .wrapper{
         width: 100%;
         height: 100%;

@@ -2,7 +2,7 @@
 <div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class="label-item-active label-item">
+                <span  class=" label-item">
                     <router-link :to="'/Drive/costover'">  
                     最近文档  
                    </router-link>
@@ -17,7 +17,7 @@
                     已经分享  
                   </router-link>
                 </span>
-                <span  class="label-item">
+                <span  class="label-item label-item-active">
                   <router-link :to="'/Drive/PersonalTransit'">  
                     个人中转  
                   </router-link>
@@ -33,6 +33,11 @@
             <p class="select-header clearfix">
                     <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
                     <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                    <ul class="operation">
+                        <li class="item icon icon-paste"  @click="paste" v-if="hasFileToPaste.is">粘贴</li>
+                        <li class="item icon icon-copy" v-if="checkOne" @click="copyfile">复制</li>
+                        <li class="item icon icon-delete"  @click="deleteFile">删除</li>
+                    </ul>
                      <span class="button-download" @click="downloadFile">下载</span>
             </p>
             <div id="file-container" v-if="listStyle == 'card'">
@@ -96,108 +101,6 @@
                 </table>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
-            <div id="center-selection">
-                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                    <i class="icon-right"></i>
-                </div>
-                <div :class="[screenLeft.item == 1?'active':'active-version']">
-                    <span class="item-property " @click="screenLeft.item = 1;">属<br>性</span>
-                    <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
-                </div>
-            </div>
-            <div id="box-right" v-if="screenLeft.item == 1">
-                <h3 class="header-attribute">
-                    <i class="trrangle"></i>
-                    基本属性
-                    <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
-                </h3>
-                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]">
-                    <li class="detial-item clearfix">
-                        <span class="detial-text-name">文件名</span>
-                        <span class="detial-text-value" v-text="checkedItem.fgName"></span>
-                    </li>
-                      <li class="detial-item clearfix">
-                        <span class="detial-text-name">版本</span>
-                        <span class="detial-text-value" v-text="checkedItem.version"></span>
-                    </li>
-                     <li class="detial-item clearfix">
-                        <span class="detial-text-name">上传人</span>
-                        <span class="detial-text-value" v-text="checkedItem.uploadUser"></span>
-                    </li>
-                     <li class="detial-item clearfix">
-                        <span class="detial-text-name">上传时间</span>
-                        <span class="detial-text-value" v-text="initData(checkedItem.uploadTime)"></span>
-                    </li>
-                     <li class="detial-item clearfix">
-                        <span class="detial-text-name">更新人</span>
-                        <span class="detial-text-value" v-text="checkedItem.updateUser"></span>
-                    </li>
-                     <li class="detial-item clearfix">
-                        <span class="detial-text-name">更新时间</span>
-                        <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
-                    </li>
-                </ul>
-                 <h3 class="header-attribute">
-                    <i class="trrangle"></i>
-                    绑定构件
-                    <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
-                </h3>
-                <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
-                    <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
-                        <p class="clearfix">
-                            <i class="icon-goujian icon-add"></i>
-                            <i class="icon-goujian icon-detial"></i>
-                            <i class="icon-goujian icon-QRcode"></i>
-                            <i class="icon-goujian icon-location"></i>
-                            <i class="icon-goujian icon-delete"></i>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">ID :</span>
-                           <span class="detial-text-value" v-text="item.main.pkId"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">状态 :</span>
-                           <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">明细 :</span>
-                           <span class="detial-text-value" v-text="item.details.length"></span>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">名称 :</span>
-                           <span class="detial-text-value" v-text="item.main.mName"></span>
-                        </p>
-                    </li>
-                </ul>
-            </div>
-            <div id="box-right-1" v-else>
-                <p class="head">
-                    <i class="icon-goujian icon-search" @click="view(checkedItem.filePath)"></i>
-                    <i class="icon-goujian icon-download" @click="downLoad(checkedItem.filePath)"></i>
-                     <select v-model="posType" class="inp-search">
-                        <option value="">所有版本</option>
-                        <option value="1">本周更新</option>
-                        <option value="2">本月更新</option>
-                        <option value="3">本年更新</option>
-                    </select>
-                    <i class="icon-sanjiao"></i>
-                </p>
-                <ul>
-                    <li class="item-version" v-for="(item,index) in  versionItem" :key="index">
-                        <div class="clearfix">
-                            <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
-                            <div class="versin-detial">
-                                <span class="user-name" v-text="item.uploadUserName"></span>
-                                <span class="version-number" v-text="'版本-'+item.version"></span>
-                                <p class="version-des">上传了新文档</p>
-                            </div>
-                        </div>
-                        <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFromExplorer == 1?'浏览器':'手机端')+'更新'}}</p>
-                    </li>
-                </ul>
-            </div>
-        </div>
 </div>
 </template>
 <style scoped lang='less'>
@@ -224,7 +127,7 @@
         top: 115px;
         left: 26px;
         bottom: 0;
-        right: 225px;
+        right: 0;
         transition:  all ease .5s;
         min-width: 950px;
         overflow-y: auto;
@@ -306,6 +209,72 @@
                         line-height:12px;
                         content: '全部';
                     }
+                }
+                 .operation{
+                    float: right;
+                    margin-right: 35px;
+                    .item{
+                        float: left;
+                        border-top: 1px solid #cccccc;
+                        border-bottom: 1px solid #cccccc;
+                        border-right: 1px solid #cccccc;
+                        &:first-of-type{
+                            border-left: 1px solid #cccccc;
+                            border-top-left-radius: 2px;
+                            border-bottom-left-radius: 2px;
+                        }
+                        &:last-of-type{
+                            border-top-right-radius: 2px;
+                            border-bottom-right-radius: 2px;
+                        }
+                        &:hover{
+                            background:  #fff6f7;
+                        }
+                    }
+                    .icon{
+                        cursor: pointer;
+                        position: relative;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            top: 6px;
+                            left: 22px;
+                            width: 14px;
+                            height: 14px;
+                            content: '';
+                        }
+                    }
+                    .icon-paste{
+                         &::after{
+                              background: url('./images/pasteBlack.png') no-repeat 0 0;
+                         }
+                    }
+                    .icon-copy{
+                        &::after{
+                      background: url('./images/copyBlack.png') no-repeat 0 0;
+                        }
+                    }
+                    .icon-delete{
+                        &::after{
+                      background: url('./images/deleteBlack.png') no-repeat 0 0;
+                        }
+                    }
+                }
+                .icon{
+                    float: left;
+                    width: 99px;
+                    height: 26px;
+                    line-height: 26px;
+                    text-align: left;
+                    font-size: 12px;
+                    color: #333333;
+                    position: relative;
+                    padding-left:45px; 
+                    cursor: pointer;
+                    &:hover{
+                        background: #fff6f7;
+                    }
+                    
                 }
                 .active{
                     background: url('./images/checked.png') no-repeat 1px 2px;
@@ -563,376 +532,6 @@
         border-bottom: 1px solid #fff;
         background: #ffffff;
     }
-    /*
-      右侧
-    */
-    .box-right-container{
-          display: block;
-        position: fixed;
-        right: -225px;
-        bottom: 0;
-        width: 250px;
-        padding-left: 25px;
-        top: 116px;
-        transition: all ease .5s;
-        background: #ffffff;
-        z-index: 10;
-          #center-selection{
-           position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 25px;
-            border-right: 1px solid #cccccc;
-            .SH_right{
-                width: 100%;
-                height: 48px;
-                border-left: 1px solid #cccccc;
-                border-bottom: 1px solid #cccccc;
-                position: relative;
-                cursor: pointer;
-                .icon-right{
-                    display: block;
-                    position: absolute;
-                    top: 19px;
-                    left: 6px;
-                    width: 14px;
-                    height: 14px;
-                    background: url('./images/right.png')no-repeat 0 0;
-                    transition: all ease .5s;
-                    transform: rotateZ(0deg);
-                }
-            }
-            .item-property{
-                display: block;
-                width: 25px;
-                height: 68px;
-                background: #fafafa;
-                padding-top:15px;
-                font-size: 12px;
-                color: #666666; 
-                text-align: center;
-                border-left: 1px solid #cccccc;
-                border-right: 1px solid #cccccc;
-                position: relative;
-                cursor: pointer;
-                &::after{
-                    display: block;
-                    position: absolute;
-                    bottom: -9px;
-                    width: 23px;
-                    height: 15px;
-                     background: #fafafa;
-                    border-top: 1px solid #cccccc;
-                    transform: skewY(30deg);
-                    content: '';
-                }
-            }   
-            .item-version{
-                display: block;
-                width: 25px;
-                height: 56px;
-                background: #fafafa;
-                padding-top:12px;
-                font-size: 12px;
-                color: #666666; 
-                text-align: center;
-                border-left: 1px solid #cccccc;
-                border-right: 1px solid #cccccc;
-                position: relative;
-                cursor: pointer;
-                &::after{
-                    display: block;
-                    position: absolute;
-                    bottom:-7px;
-                    width: 23px;
-                    height: 13px;
-                    background: #fafafa;
-                    border-bottom: 1px solid #cccccc;
-                    transform: skewY(30deg);
-                    content: '';
-                }
-            }
-            .active-version{
-                .item-version{
-                      background: #fff;
-                    color: #fc3439;
-                     width: 25px;
-                    &::after{
-                        background: #fff;
-                        // border-right: 1px solid #ffffff;
-                    }
-                }
-                .item-property::after{
-                    background: #fff;
-                }
-            }
-            .active{
-                .item-property{
-                      background: #fff;
-                      color: #fc3439;
-                }
-                .item-property{
-                   width: 25px;
-                }
-            }
-        }
-    }
-    .box-right-avtive{
-        right: 0;
-         transition: all ease .5s;
-    }
-    #box-right{
-        padding: 19px 13px 0 10px;
-        #basicAttributes{
-            display: none;
-            >li:last-of-type{
-                padding-bottom: 7px;
-            }
-        }
-        #BindingArtifacts{
-            display: none;
-        }
-        .header-attribute{
-            font-size: 14px;
-            color: #333333;
-            line-height: 14px;
-            padding-bottom:4px;
-            border-bottom: 1px solid #e6e6e6;
-            text-align: left; 
-            .trrangle{
-                display: inline-block;
-                width: 0px;
-                height: 0px;
-                border-left: 10px solid #fc3439;
-                border-top: 6px solid transparent;
-                border-bottom: 6px solid transparent;
-            }
-            .icon-dropDown{
-                display: block;
-                width: 12px;
-                height: 12px;
-                background:url('./images/arror.png')no-repeat 0 0; 
-                float: right;
-                cursor: pointer;
-                transition:  all ease .2s;
-                 transform: rotate(180deg);
-            }
-            .active{
-                transform: rotate(0deg);
-            }
-        }
-        .header-attribute:last-of-type{
-            margin-top: 30px;
-        }
-        .detial-item{
-            font-size: 12px;
-            line-height: 12px;
-            margin-top: 16px;
-            text-align: left;
-            .detial-text-name{
-                color: #999999;
-                width: 65px;
-                float: left;
-            }
-            .detial-text-value{
-               float: left;
-               color: #333333;
-                max-width: 130px;
-                overflow-x: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            &:first-of-type{
-                margin-top: 18px;
-            }
-        }
-        .goujian-item{
-            font-size: 12px;
-            line-height: 12px;
-            margin-top: 10px;
-            padding: 10px;
-            text-align: left;
-            box-shadow: 0px 0px 8px rgba(93,94,94,.16);
-            border-radius: 6px;
-            .icon-goujian{
-                float: left;
-                width: 16px;
-                height: 16px;
-                margin-right: 10px;
-                cursor: pointer;
-            }
-            .icon-add{
-                background: url('./images/add.png')no-repeat 0 0;
-                margin-right: 75px;
-                &:hover{
-                    background: url('./images/add1.png')no-repeat 0 0;
-                }
-            }
-            .icon-detial{
-                background: url('./images/detial.png')no-repeat 0 0;
-                &:hover{
-                    background: url('./images/detial1.png')no-repeat 0 0;
-                } 
-            }
-            .icon-QRcode{
-                background: url('./images/qrcode.png')no-repeat 0 0;
-                &:hover{
-                    background: url('./images/qrcode1.png')no-repeat 0 0;
-                } 
-            }
-            .icon-location{
-                background: url('./images/location.png')no-repeat 0 0;
-                width: 12px;
-                &:hover{
-                    background: url('./images/location1.png')no-repeat 0 0;
-                } 
-            }
-            .icon-delete{
-                background: url('./images/delete.png')no-repeat 0 0;
-                margin-right: 0;
-                &:hover{
-                    background: url('./images/delete1.png')no-repeat 0 0;
-                } 
-            }
-            .detial-text-name{
-                color: #999999;
-                width: 65px;
-                display: inline-block;
-            }
-            .detial-text-value{
-                color: #333333;
-                max-width: 130px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .item-detial{
-                margin-top: 16px;
-                &:first-of-type{
-                     margin-top: 10px;
-                }
-            }
-            &:first-of-type{
-                padding-top: 14px;
-            }
-        }
-    }
-    #box-right-1{
-        select.inp-search {  
-            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-            /*很关键：将默认的select选择框样式清除*/  
-            appearance:none;  
-            -moz-appearance:none;  
-            -webkit-appearance:none;  
-            /*在选择框的最右侧中间显示小箭头图片*/  
-            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
-            padding-right: 14px;  
-        }  
-        .head{
-            padding: 11px 0 12px;
-            height: 48px;
-            border-bottom: 1px solid #cccccc;
-            position: relative;
-              .icon-goujian{
-                float: left;
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-                margin-top: 6px;
-                }
-                .icon-download{
-                    background: url('./images/download.png')no-repeat 0 0;
-                    margin-left: 14px;
-                    &:hover{
-                        background: url('./images/download1.png')no-repeat 0 0;
-                    }
-                }
-                .icon-search{
-                    background: url('./images/search.png')no-repeat 0 0;
-                    margin-left: 10px;
-                    &:hover{
-                        background: url('./images/search1.png')no-repeat 0 0;
-                    }
-                  }
-               .inp-search{
-                    width: 96px;
-                    border-radius: 2px;
-                    height: 24px;
-                    border: 1px solid #e6e6e6;
-                    position: relative;
-                    background: #fafafa;
-                    padding-left:10px;
-                    padding-right:20px;
-                    box-sizing: border-box;  
-                    margin-right: 15px;
-                    float: right;
-                }
-                .icon-sanjiao{
-                    display: block;
-                    position: absolute;
-                    width: 12px;
-                    height: 7px;
-                    background-image:url('../Settings/images/sanjiao.png');
-                    background-size: 100% 100%;
-                    content: '';
-                    top: 20px;
-                    right: 22px;
-                }
-        }
-        .item-version{
-            margin:10px 15px 0 10px;
-            border-bottom: 1px solid #e6e6e6;
-            .img{
-                float: left;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #ededed;
-                margin-right:10px; 
-            }
-            .versin-detial{
-                float: left;
-                width: 150px;
-                height: auto;
-                position: relative;
-                .user-name{
-                    display: block;
-                    color: #333333;
-                    font-size: 14px;
-                    font-weight: bold;
-                    text-align: left;
-                    line-height: 22px;
-                }
-                .version-number{
-                    display: block;
-                    position: absolute;
-                    min-width: 45px;
-                    color: #fc3439;
-                    font-size: 12px;
-                    top: 0;
-                    right: 0;
-                    text-align: right;
-                }
-                .version-des{
-                    font-size: 12px;
-                    line-height: 18px;
-                    padding: 3px 10px;
-                    color: #666666;
-                    background: #fafafa;
-                    margin-top: 6px;
-                }
-            }
-            .item-date{
-                display: block;
-                font-size: 12px;
-                color: #cccccc;
-                line-height: 12px;
-                margin: 12px 0 11px;
-                text-align: left;
-            }
-        }
-    }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
     width:7px;
@@ -990,6 +589,11 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
+        hasFileToPaste:{
+            is:false,
+            obj:{}
+        },//session存在可以粘贴的文件
+        checkOne:false
       }
   },
   created(){
@@ -997,7 +601,8 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.getInfo()
+        vm.checkedPermission()
+        vm.checkFilePaste()
   },
   watch:{
       checkAll:function(val){
@@ -1032,6 +637,83 @@ export default {
       }
   },
   methods:{
+      paste(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/addFileToTransfer',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                fgIdListStr: vm.hasFileToPaste.obj.fgIds,
+                ugId:vm.hasFileToPaste.obj.oldUgId,
+                dirId:vm.hasFileToPaste.obj.dirId, //ugid是群组ID
+                projId: vm.projId,
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                sessionStorage.removeItem('fileObject')
+                vm.checkFilePaste()
+                vm.getInfo()
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      checkFilePaste(){
+            var vm = this
+            vm.hasFileToPaste.is = false
+            vm.hasFileToPaste.obj = {}
+            var filePaste = JSON.parse(sessionStorage.getItem('fileObject'))
+            if(filePaste && filePaste.fcIds ==''){
+                vm.hasFileToPaste.is = true
+                vm.hasFileToPaste.obj = filePaste
+            }
+      },
+      copyfile(val){
+        // 复制内容到剪贴板
+        var vm = this
+        var fgIdList = ''
+        var dirId = ''
+        var msg = ''
+        if(val){
+            msg = '剪切'
+        }else{
+             msg = '复制'    
+        }
+        vm.fileList.forEach((item,key)=>{
+            if(item.checked){
+                fgIdList = item.fgId
+                dirId = item.dirId
+            }
+        })
+        if(fgIdList != ''){
+            var fileObject = {
+                fgIds: fgIdList,
+                dirId: dirId,//当前文件夹ID
+                oldUgId:'', //ugid是群组ID
+                projId: vm.projId,
+                fcIds: ''
+            };
+            if(val){
+                 fileObject.shear = true
+            }else{
+              fileObject.shear = false   
+            }
+            sessionStorage.setItem("fileObject", JSON.stringify(fileObject)); 
+            vm.$message({
+                type:'success',
+                message:msg+'成功'
+            })
+            vm.checkFilePaste()
+        }else{
+            vm.$message({
+                type:'error',
+                message:msg+'失败'
+            })
+        }
+      },
       parseMStatus(mStatus){
             // 施工现场
             var constructionSite = mStatus.substring(0, 1);
@@ -1183,12 +865,59 @@ export default {
         }
        
     },
+     deleteFile(){//删除点位
+        var vm = this
+        var fgIdList = []
+        vm.fileList.forEach((item)=>{
+            if(item.checked){
+                fgIdList.push(item.fgId)
+            }
+        })
+        if(fgIdList.length == 0){
+            vm.$message({
+                type:'warning',
+                message:'请勾选文件'
+            })
+            return false
+        }
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/delTransferStation',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                fgIds:fgIdList
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.getInfo()
+                vm.$message({
+                    type:'success',
+                    message:'文件删除成功'
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
     checkItem(val){
         var vm = this
         vm.show.basicAttributes =true
          vm.show.BindingArtifacts =true
         vm.checkedItem = vm.fileList[val]
         vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+        var num = 0
+        vm.fileList.forEach((item)=>{
+            if(item.checked){
+                num++
+            }
+        })
+        if(num == 1){
+            vm.checkOne = true
+        }else{
+           vm.checkOne = false 
+        }
         vm.getGouJianInfo()
         vm.getVersion()
     },
@@ -1261,45 +990,51 @@ export default {
         }
 
     },
-    getInfo(){
+    checkedPermission(){
         var vm = this
         axios({
-            method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchLatestFileGroupInfo',
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/transferStation',
             headers:{
                 'token':vm.token
             },
-            data:{
-                condition:vm.fileSearchInfo,//文件名称
-                dirId:"",//
-                pageNo:vm.pageDetial.currentPage,
-                docType: "string",//
-                pageSize:vm.pageDetial.pagePerNum,
+            params:{
                 projId:vm.projId
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                if(response.data.rt.rows.length>0){
-                    if(vm.fileSearchInfo != ''){
-                        vm.fileList = response.data.rt.rows
-                    }else{
-                        // vm.fileList = vm.fileList.concat(response.data.rt.rows)
-                         vm.fileList = response.data.rt.rows
-                    }
+                vm.getInfo()
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    getInfo(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchTransferStationFileGroupInfo',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                condition:vm.fileSearchInfo,//文件名称
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                if(response.data.rt.length>0){
+                    vm.fileList = response.data.rt
                     vm.fileList.forEach((item,key)=>{
                         vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                     })
-                    console.log( vm.fileList)
-                    vm.pageDetial.currentPage++
                 }else{
                     vm.$message({
                         type:'info',
                         message:'未匹配到相应的数据'
                     })
-                    vm.fileList = ''
+                    vm.fileList = []
                 }
             }
-
         }).catch((err)=>{
             console.log(err)
         })

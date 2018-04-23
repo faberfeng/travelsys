@@ -96,6 +96,11 @@ const router = new Router({
           name:'Share',
           component:resolve=>require(['@/components/ManageCost/Share'],resolve)
         },
+        {
+          path:'/Drive/PersonalTransit',
+          name:'PersonalTransit',
+          component:resolve=>require(['@/components/ManageCost/PersonalTransit'],resolve)
+        },
       ]
     },
     {

@@ -1,8 +1,8 @@
 <template>
-<div>
+<div id="cloudDrive">
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class="label-item">
+                <span  class=" label-item">
                     <router-link :to="'/Drive/costover'">  
                     最近文档  
                    </router-link>
@@ -12,13 +12,13 @@
                     工程云盘  
                    </router-link>
                 </span>
-                <span  class="label-item label-item-active ">
+                <span  class="label-item label-item-active">
                 <router-link :to="'/Drive/Share'">  
                     已经分享  
                   </router-link>
                 </span>
                 <span  class="label-item">
-                  <router-link :to="'/Drive/cloudDrive'">  
+                  <router-link :to="'/Drive/PersonalTransit'">  
                     个人中转  
                   </router-link>
                 </span>
@@ -30,15 +30,36 @@
                     <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
                 </div>
             </div>
-            <p class="select-header clearfix">
-                    <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
-                    <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                     <span class="button-download" @click="downloadFile">下载</span>
+            <p class="antsLine">
+                文档管理<i class="icon-sanjiao-right"></i><span class="strong" @click="refreshPage()">已经分享</span><i class="icon-sanjiao-right"></i>
+                 <span class="strong SH" v-for="item in ShareBreadList" :key="item.nodeId+'antLine_1'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                  <span class="strong GD" v-for="item in FGBreadList" :key="item.nodeId+'antLine_2'" @click="IntoDir(item,true,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                <span class="strong" v-for="item in breadList" :key="item.nodeId+'antLine_3'" @click="IntoDir(item,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
             </p>
+            <p class="select-header clearfix">
+                <label   :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                <input  type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                <!--
+                    文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
+
+                    具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
+
+                -->
+                <ul class="operation">
+                    <li   @click="copyURL" v-if="fgList.length>0 && showLocation" class="item copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput">复制链接</li>
+                     <li class="item"   @click="showLink"  v-if="fgList.length>0 && showLocation">地址</li>
+                    <li class="item" @click="cancleShare" v-if='auth.canCancelShare'>取消分享</li>
+                </ul>
+                <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
+                <input type="text" id="copyInput" v-if="fgList.length>0"
+                :value="checkedItem.sharePassword !=null?'链接：http://10.252.26.240:8080/qjbim-project/cloud/share/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:'http://10.252.26.240:8080/qjbim-project/cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
+            </p>
+            <div>
+            <!--文件夹代码-->
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" >
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index,true)" ></label>
                         <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
@@ -50,9 +71,38 @@
                                 <p v-text="initData(item.updateTime)"></p>
                                 <p class="operation">
                                     <span v-text="'版本'+item.version"></span>
-                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                     <i class="icon-goujian icon-search" @click="view(item.filePath)"></i>
+                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
                                 </p>
+                            </span>
+                        </div>
+                    </li>
+                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fgList" :key="index+'folder_fg'"  @dblclick="IntoDir(item)">
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkShareItem(index)" ></label>
+                        <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
+                        <div class="item-file-box clearfix">
+                            <span  class="item-file-image item-folder-image">
+                            <img :src="require('./images/folderBig.png')" />
+                            </span>
+                            <span  class="item-file-detial">
+                                <h3 v-text="item.shareName"></h3>
+                                 <p style="line-height: 16px;" class="detial">由<span class="text-name"  v-text="item.userName"></span>通过<span  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></span>分享</p>
+                                <p class="operation">
+                                    <span v-text="item.sharePassword ==null?'公开分享':'私有分享'" :style="{color:item.sharePassword ==null?'#fc3439':'#336699'}"></span>
+                                    <span v-text="initData(item.shareTime)" style="color:#b3b3b3;float:right;padding-right:9px;"></span>
+                                </p>
+                            </span>
+                        </div>
+                    </li>
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'"  @dblclick="IntoDir(item,true)">
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index)" ></label>
+                        <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                        <div class="item-file-box clearfix">
+                            <span  class="item-file-image item-folder-image">
+                            <img :src="require('./images/folderBig.png')" />
+                            </span>
+                            <span  class="item-file-detial">
+                                <h3 v-text="item.nodeName"></h3>
                             </span>
                         </div>
                     </li>
@@ -61,20 +111,29 @@
             <div id="file-container-table" v-else>
                 <table class="UserList" width='100%'>
                     <thead>
-                        <tr  class="userList-thead">
+                          <tr  class="userList-thead" v-if="ShareStyleHeader">
                             <th style="width:55px;"></th>
                             <th style="min-width:428px;">文件名</th>
                             <th style="width:70px;"></th>
                             <th style="width:70px;">更新渠道</th>
-                            <th style="width:50px;">类型</th>
+                            <th style="width:80px;">类型</th>
                             <th style="width:40px;">版本</th>
                             <th style="min-width:60px;">上传人</th>
-                            <th style="min-width:150px;">更新时间</th>
+                            <th style="min-width:120px;">更新时间</th>
+                        </tr>
+                        <tr  class="userList-thead" v-else>
+                            <th style="width:55px;"></th>
+                            <th>文件名</th>
+                            <th style="width:70px;"></th>
+                            <th style="min-width:150px;">分享时间</th>
+                            <th style="width:150px;">类型</th>
+                            <th style="width:170px;">分享人</th>
+                            <th style="width:100px;">分享渠道</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index)">
-                            <td>
+                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" >
+                            <td @click="checkItem(index,true)">
                                 <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                 <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
@@ -83,27 +142,60 @@
                                 <span v-text="item.fgName"></span>
                             </td>
                             <td>
-                                <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                 <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
+                                 <i class="icon-goujian icon-search" @click="view(item.filePath)"></i>
                             </td>
-                            <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
+                            <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
                             <td v-text="splitType(item.icon)"></td>
                             <td v-text="item.version"></td>
                             <td v-text="item.uploadUser"></td>
                             <td v-text="initData(item.updateTime)"></td>
                         </tr>
+                         <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked}]"  @dblclick="IntoDir(item)">
+                            <td @click="checkShareItem(index)">
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
+                            </td>
+                            <td>
+                                <img :src="require('./images/folderBig.png')" />
+                                <span v-text="item.shareName"></span>
+                            </td>
+                            <td></td>
+                             <td v-text="initData(item.shareTime)"></td>
+                            <td v-text="item.sharePassword ==null?'公开分享':'私有分享'"></td>
+                             <td v-text="item.userName"></td>
+                            <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
+                        </tr>
+                          <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]"  @dblclick="IntoDir(item,true)">
+                            <td @click="checkItem(index)">
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                            </td>
+                            <td>
+                                <img :src="require('./images/folderBig.png')" />
+                                <span v-text="item.nodeName"></span>
+                            </td>
+                            <td></td>
+                            <td v-text="'-'"></td>
+                            <td v-text="'文件夹'"></td>
+                            <td v-text="'-'"></td>
+                            <td v-text="'-'"></td>
+                            <td v-text="item.createTime?initData(item.createTime):item.uploadTime?initData(item.uploadTime):'-'"></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
+            </div>
+          
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
                 </div>
-                <div :class="[screenLeft.item == 1?'active':'active-version']">
-                    <span class="item-property " @click="screenLeft.item = 1;">属<br>性</span>
-                    <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
+                <div :class="[screenLeft.item == 1?'active-version':'active-version-3']">
+                    <span class="item-version " @click="screenLeft.item = 1">属<br>性</span>
+                    <span class="item-version-3  " @click="screenLeft.item = 2">版<br>本</span>
                 </div>
             </div>
             <div id="box-right" v-if="screenLeft.item == 1">
@@ -172,9 +264,9 @@
                 </ul>
             </div>
             <div id="box-right-1" v-else>
-                <p class="head">
-                    <i class="icon-goujian icon-search" @click="view(checkedItem.filePath)"></i>
-                    <i class="icon-goujian icon-download" @click="downLoad(checkedItem.filePath)"></i>
+                <p class="head" ><!-- v-if="checkedItem.dirId"-->
+                    <i class="icon-goujian icon-search" @click="view()"></i>
+                    <i class="icon-goujian icon-download" @click="downLoad()"></i>
                      <select v-model="posType" class="inp-search">
                         <option value="">所有版本</option>
                         <option value="1">本周更新</option>
@@ -198,16 +290,65 @@
                 </ul>
             </div>
         </div>
+        <div id="edit">
+             <el-dialog title="分享地址" :visible.sync="sharePath.show" @close="closeLink">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody" v-if="sharePath.path !=''">
+                        <label class=" imageBodyText">地址 :</label>
+                        <textarea class="inp"  v-text="sharePath.path"></textarea>
+                    </div>
+                    <div class="editBodytwo imageBody" v-if="sharePath.password !=''">
+                        <label class=" imageBodyText">密钥 :</label>
+                        <input type="text" class="inp" :value="sharePath.password">
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="openUrl()">打开页面</button>
+                    <button class="editBtnS copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput" @click="copyURL" v-if="sharePath.path !=''">复制地址</button>
+                    <button class="editBtnS" @click="closeLink">关闭</button>
+                </div>
+            </el-dialog>
+        </div>
 </div>
 </template>
-<style scoped lang='less'>
+<style  lang='less'>
+#cloudDrive{
+    /*
+        修改eleUI树形组件
+    */
+
+    .el-tree-node__label{
+        font-size: 12px;
+        color: #666666;
+        padding-left: 22px; 
+        position: relative;
+    }
+    .el-icon-caret-right:before{
+           content: "\E604";
+           color: #999999;
+           font-weight: bold;
+    }
+    .el-tree-node__label::before{
+        display: block;
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        width: 14px;
+        height: 13px;
+        background: url('./images/file.png')no-repeat 0 0;
+        content: '';
+    }
+    .el-tree-node__content{
+            height: 30px;
+    }
+    .is-current .el-tree-node__content{
+        color: #333333;
+        font-weight: bold;
+    }
     *{
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-    }
-    .show{
-        display: block!important;
     }
     li{
         list-style: none;
@@ -217,10 +358,123 @@
         overflow: hidden;
         content: '';
     }
+     select.inp-search {  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        } 
+    .show{
+        display: block!important;
+    }
+    #edit .el-dialog{
+        margin: 0 auto;
+        .upInput{
+            display: none;
+        }
+          /* 上传文件按钮 */
+        .imageBody{
+        text-align: left;
+        }
+        .imageBody .imageBodyText{
+                color: #666;
+                font-size: 14px;
+                line-height: 14px;
+                font-weight: normal;
+                display: inline-block;
+                margin-right: 20px;
+                margin-left: 94px;
+                text-align: right;
+        }
+        .updataImageSpan{
+            overflow: hidden;
+            width: 98px;
+        }
+        .updataImageSpan input{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            opacity: 0;
+            /* -ms-filter: 'alpha(opacity=0)'; */
+        }
+        .selectionBox{
+            margin: 10px 50px;
+            border:1px solid #cccccc;
+            padding: 20px;
+            p{
+                text-align: left;
+                font-size: 14px;
+                line-height: 14px;
+                color: #666666;
+            }
+        }
+        .checkbox-fileItem{
+            float: left;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            margin-right: 5px;
+            position: relative;
+            &::after{
+                font-size:12px;
+                color:#cccccc;
+                display: block;
+                position: absolute;
+                right: -30px;
+                top: 0;
+                line-height:12px;
+                content: '';
+            }
+        }
+        .active{
+            background: url('./images/checked.png') no-repeat 1px 2px;
+                border: 1px solid #fc3439;
+        }
+    }
+    #GroupSelect{
+        display: block;
+        width: 168px;
+        height: 30px;
+        position: fixed;
+        top: 77px;
+        z-index: 1000;
+        right: 24px;
+        .inp-search{
+            width: 168px;
+            border-radius: 15px;
+            height: 30px;
+            border: 1px solid #cccccc;
+            position: relative;
+            background: #fafafa;
+            padding-left:10px;
+            padding-right:20px;
+            box-sizing: border-box;  
+            margin-right: 15px;
+            float: left;
+            color: #333333;
+            font-size: 14px;
+            outline: none;
+        }
+        .icon-sanjiao{
+            display: block;
+            position: absolute;
+            width: 12px;
+            height: 7px;
+            background-image:url('../Settings/images/sanjiao.png');
+            background-size: 100% 100%;
+            content: '';
+            top: 12px;
+            right: 11px;
+        }
+    }
     .box-left-container{
         display: block;
         position: fixed;
-        overflow-x: hidden;
         top: 115px;
         left: 26px;
         bottom: 0;
@@ -228,6 +482,36 @@
         transition:  all ease .5s;
         min-width: 950px;
         overflow-y: auto;
+        #planeFigureDiv{
+            overflow: auto;
+            position: absolute;
+            top: 106px;
+            left: 0;
+            bottom: 0;
+            right: 25px;
+            #planeDIV{
+                display:block;
+                position:absolute;
+                margin: 0 15px 15px;
+                #planeFigure{
+                    min-width: 700px;
+                    min-height: 500px;
+                }
+            }
+            .round{
+                display: block;
+                cursor: pointer;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 24px;
+                height: 32px;
+                background: url('./images/site.png')no-repeat 0 0;
+            }
+            .active{
+                background: url('./images/site1.png')no-repeat 0 0;
+            }
+        }
          .title-right{
             float: left;;
             width: 214px;
@@ -262,6 +546,33 @@
             right: 35px;
             top: 10px;
             width: auto;
+            .inp-search{
+                width: 82px;
+                border-radius: 15px;
+                height: 30px;
+                border: 1px solid #e6e6e6;
+                position: relative;
+                background: #fafafa;
+                padding-left:10px;
+                padding-right:20px;
+                box-sizing: border-box;  
+                margin-right: 15px;
+                float: left;
+                color: #999999;
+                font-size: 12px;
+                outline: none;
+            }
+            .icon-sanjiao{
+                display: block;
+                position: absolute;
+                width: 8px;
+                height: 4px;
+                background-image:url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 14px;
+                right: 55px;
+            }
             .icon-type{
                 float: left;
                 width: 30px;
@@ -286,32 +597,159 @@
                 }
             }
         }
-        .select-header{
-                padding: 15px 10px 0px 20px;
-                  .checkbox-fileItem{
-                    float: left;
-                    width: 14px;
-                    height: 14px;
-                    border: 1px solid #cccccc;
-                    cursor: pointer;
-                    margin-right: 5px;
-                    position: relative;
-                    &::after{
-                        font-size:12px;
-                        color:#cccccc;
-                       display: block;
-                       position: absolute;
-                       right: -30px;
-                       top: 0;
-                        line-height:12px;
-                        content: '全部';
-                    }
-                }
-                .active{
-                    background: url('./images/checked.png') no-repeat 1px 2px;
-                     border: 1px solid #fc3439;
+        .antsLine{
+            padding: 10px 10px 0px 20px;
+            font-size: 12px;
+            line-height: 12px;
+            color: #999999;
+            text-align: left;
+            .icon-sanjiao-right{
+                 display: inline-block;
+                width: 7px;
+                height: 10px;
+                margin: 2px 7px 0;
+                background-image:url('./images/sanjiaoright.png');
+                background-size: 100% 100%;
+            }
+            .strong{
+                cursor: pointer;
+                color: #333333;
+                font-weight: bold;
+                &:last-of-type .icon-sanjiao-right{
+                    display: none;
                 }
             }
+            
+        }
+        .select-header{
+            padding: 15px 10px 0px 20px;
+            min-height: 41px;
+            .checkbox-fileItem{
+                float: left;
+                width: 14px;
+                height: 14px;
+                border: 1px solid #cccccc;
+                cursor: pointer;
+                margin-right: 5px;
+                position: relative;
+                &::after{
+                    font-size:12px;
+                    color:#cccccc;
+                    display: block;
+                    position: absolute;
+                    right: -30px;
+                    top: 0;
+                    line-height:12px;
+                    content: '全部';
+                }
+            }
+            .active{
+                background: url('./images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+            }
+            .operation{
+                float: right;
+                margin-right: 35px;
+                .item{
+                    float: left;
+                    padding: 0 12px;
+                    height: 26px;
+                    line-height: 24px;
+                    border-top: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    border-right: 1px solid #cccccc;
+                    text-align: center;
+                    color: #333333;
+                    font-size: 12px;
+                    cursor: pointer;
+                    &:first-of-type{
+                        border-left: 1px solid #cccccc;
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+                    }
+                     &:last-of-type{
+                        border-top-right-radius: 2px;
+                        border-bottom-right-radius: 2px;
+                    }
+                    &:hover{
+                        background:  #fff6f7;
+                    }
+                }
+                .item-upload{
+                    background: #fc3439;
+                    color: #ffffff;
+                    font-size: 12px;
+                    height: 26px;
+                    border-radius: 2px;
+                    text-align: left;
+                    line-height: 26px;
+                    padding-left: 42px;
+                    padding-right: 16px;    
+                    position: relative;
+                    cursor: pointer;
+                    &::before{
+                        display: block;
+                        position: absolute;
+                        top: 8px;
+                        left: 19px;
+                        width: 12px;
+                        height: 11px;
+                        content: '';
+                        background: url('./images/uploadfile.png') no-repeat 0 0;
+                    }
+                }
+            }
+            .icon{
+                border:1px solid #cccccc;
+                float: left;
+                width: 99px;
+                height: 26px;
+                line-height: 26px;
+                text-align: left;
+                font-size: 12px;
+                color: #333333;
+                position: relative;
+                padding-left:28px; 
+                cursor: pointer;
+                &::before{
+                    display: block;
+                    position: absolute;
+                    top: 8px;
+                    left: 11px;
+                    width: 12px;
+                    height: 12px;
+                    content: '';
+                }
+                &:hover{
+                    background: #fff6f7;
+                }
+                
+            }
+            .icon:first-of-type{
+                border-right: 0;
+                border-top-left-radius: 2px;
+                border-bottom-left-radius: 2px;
+            }
+            .icon-upload{
+                 &::before{
+                   background: url('./images/upload.png')no-repeat 0 0;
+                }
+            }
+            .icon-refresh{
+                &::before{
+                   background: url('./images/refresh.png')no-repeat 0 0;
+                }
+            }
+            .icon-new{
+                // border-left: 0;
+                 border-top-right-radius: 2px;
+                 border-bottom-right-radius: 2px;
+                &::before{
+                      top: 7px;
+                   background: url('./images/spot.png')no-repeat 0 0;
+                }
+            }
+        }
         .select-header{
             text-align: left;
             .el-checkbox{
@@ -395,9 +833,27 @@
                             margin-left: 11px;
                         } 
                     }
+                    .item-folder-image{
+                        img{
+                            width: 36px;
+                            height: 33px;
+                            display: block;
+                            margin-top: 19PX;
+                            margin-left: 17px;
+                        }
+                    }
                     .item-file-detial{
                         display: block;
                         margin-left:80px; 
+                        .detial{
+                            span{
+                            color: rgb(51, 102, 153);
+                            max-width: 50px;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                            }
+                        }
                         >h3{
                             text-align: left;
                             font-size: 14px;
@@ -423,6 +879,7 @@
                             bottom: 0;
                             left: 88px;
                             right: 0;
+                            margin-bottom:14px; 
                             span{
                                 color: #fc3439;
                             }
@@ -435,7 +892,7 @@
             }
         }
         #file-container-table{
-           
+           margin-top: 10px;
             .UserList{
                 border-collapse: collapse;
                 thead{
@@ -567,7 +1024,7 @@
       右侧
     */
     .box-right-container{
-          display: block;
+        display: block;
         position: fixed;
         right: -225px;
         bottom: 0;
@@ -577,8 +1034,8 @@
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
-          #center-selection{
-           position: absolute;
+           #center-selection{
+            position: absolute;
             top: 0;
             bottom: 0;
             left: 0;
@@ -603,7 +1060,7 @@
                     transform: rotateZ(0deg);
                 }
             }
-            .item-property{
+            .item-property{//目录
                 display: block;
                 width: 25px;
                 height: 68px;
@@ -628,7 +1085,7 @@
                     content: '';
                 }
             }   
-            .item-version{
+            .item-version{//属性
                 display: block;
                 width: 25px;
                 height: 56px;
@@ -653,28 +1110,122 @@
                     content: '';
                 }
             }
-            .active-version{
-                .item-version{
+            .item-version-3{//版本
+                 display: block;
+                width: 25px;
+                height: 68px;
+                background: #fafafa;
+                padding-top:24px;
+                font-size: 12px;
+                color: #666666; 
+                text-align: center;
+                border-left: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                position: relative;
+                cursor: pointer;
+                &::after{
+                    display: block;
+                    position: absolute;
+                    bottom:-7px;
+                    width: 23px;
+                    height: 13px;
+                    background: #fafafa;
+                    border-bottom: 1px solid #cccccc;
+                    transform: skewY(30deg);
+                    content: '';
+                }
+            }
+            .active-version{//中间 属性 高显
+                .item-version{//属性
                       background: #fff;
                     color: #fc3439;
-                     width: 25px;
+                     z-index: 15;
                     &::after{
                         background: #fff;
-                        // border-right: 1px solid #ffffff;
+                    }
+                }
+                .item-property::after{//目录
+                    background: #fff;
+                }
+                .item-version-3{//版本
+                    z-index: 10;
+                }
+            }
+            .active{//上边 目录 高显
+                .item-property{
+                      background: #fff;
+                      color: #fc3439;
+                }
+                 .item-version{
+                    z-index: 15;
+                }
+                  .item-version-3{
+                      z-index: 10;
+                }
+            }
+            .active-version-3{//下边 版本 高显
+                .item-version{
+                     z-index: 15;
+                    &::after{
+                        background: #fafafa;
                     }
                 }
                 .item-property::after{
                     background: #fff;
                 }
-            }
-            .active{
-                .item-property{
+                .item-version-3{
+                    z-index: 10;
                       background: #fff;
-                      color: #fc3439;
+                    color: #fc3439;
+                    &::after{
+                        background: #fff;
+                    }
                 }
-                .item-property{
-                   width: 25px;
+            }
+            
+        }
+        .screenRight_1{
+            padding: 10px 14px 10px 10px;
+            >p{
+                padding-bottom:5px;
+                border-bottom: 1px solid #e6e6e6;
+                margin-bottom:10px;  
+            }
+             .icon-goujian{
+                float: left;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+            .icon-add{
+                background: url('./images/add.png')no-repeat 0 0;
+                margin-right: 75px;
+                &:hover{
+                    background: url('./images/add1.png')no-repeat 0 0;
                 }
+            }
+            .icon-authrity{
+                float: right;
+                background: url('./images/authority.png')no-repeat 0 0;
+                &:hover{
+                    background: url('./images/authority1.png')no-repeat 0 0;
+                } 
+            }
+            .icon-edit{
+                 float: right;
+                background: url('./images/edit.png')no-repeat 0 0;
+                margin-right: 10px;
+                &:hover{
+                    background: url('./images/edit1.png')no-repeat 0 0;
+                } 
+            }
+            .icon-delete{
+                 float: right;
+                background: url('./images/delete.png')no-repeat 0 0;
+                margin-right: 10px;
+                &:hover{
+                    background: url('./images/delete1.png')no-repeat 0 0;
+                } 
             }
         }
     }
@@ -818,17 +1369,7 @@
             }
         }
     }
-    #box-right-1{
-        select.inp-search {  
-            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-            /*很关键：将默认的select选择框样式清除*/  
-            appearance:none;  
-            -moz-appearance:none;  
-            -webkit-appearance:none;  
-            /*在选择框的最右侧中间显示小箭头图片*/  
-            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
-            padding-right: 14px;  
-        }  
+    #box-right-1{ 
         .head{
             padding: 11px 0 12px;
             height: 48px;
@@ -935,7 +1476,8 @@
     }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
-    width:7px;
+    width:15px;
+     height: 15px;
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
@@ -954,13 +1496,22 @@
     background:rgba(255,0,0,0.4);
     }
     /*********************/
+}
 </style>
 <script>
+import ClipboardJS from'clipboard'
 import axios from 'axios'
-import '../Settings/js/jquery-1.4.4.min.js'
+import './js/jquery-1.8.3.js'
+import './js/jquery-ui-1.9.2.custom.js'
 import './js/date.js'
+import data from '../Settings/js/date.js'
+import upload from '../uploadFile.vue'
+
 export default {
   name:'Costover',
+  components:{
+      upload
+  },
   data(){
       return {
         activeIndex:'1',
@@ -970,17 +1521,14 @@ export default {
          checkAll: false,
          isIndeterminate: false,
          fileList:[],//文件列表
+         folderList:[],//文件夹列表
          screenLeft:{
              show:true,
              item:1,
          },
-         pageDetial:{
-              pagePerNum:30,//一页几份数据
-              currentPage:1,//初始查询页数 第一页
-              total:0,//所有数据
-          },
          token:'',
          projId:'',
+         userId:'',
          QJFileManageSystemURL:'',
          checkedItem:{},//选中的file
          GouJianItem:{},//选中file的构件
@@ -989,16 +1537,63 @@ export default {
              basicAttributes:false,
              BindingArtifacts:false
          },
+        docType:'',//个人上传是 1
          posType:'',//versionType
+        selectUgId:'',//选中的群组id
+        ugList:[],//群组列表
+        checkFileDir:{},//选中的文件夹信息
+        QJ:{
+            imageBackground:{},
+            point:[]
+        },
+        sharePath:{
+            show:false,
+            path:'',
+            password:''
+        },
+        hasImg:false,//没有全景图
+        uploadImg:{
+            checked:false
+        },
+        uploadtitle:'',
+        isqj:0,
+        QJfgid:0,//要上传或更新的fgid
+        hasFileToPaste:{
+            is:false,
+            obj:{}
+        },//session存在可以粘贴的文件
+        expandedKeys:[],
+        fgList:[],
+        ShareBreadList:[],//蚂蚁线列表
+        FGBreadList:[],//蚂蚁线列表
+        breadList:[],//蚂蚁线列表
+        fileName:{
+            show:false,
+            newFileName:'',
+            currentFileName:'',
+            title:'',
+            new:true
+        },
+        ShareStyleHeader:false,
+        shareIdList:[],//选中的最外层分享文件
+        fileAll:[],//只要获取的文件（非分享层文件和fg层文件）都要往这里面添加
+        auth:{
+            canCancelShare:true
+        },
+        showLocation:false,
       }
   },
   created(){
-      var vm = this
+        var vm = this
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
+        vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.getInfo()
-  },
+        vm.getIntoShareList()
+    },
+    mounted(){
+        var vm = this 
+    },
   watch:{
       checkAll:function(val){
           var vm = this
@@ -1006,10 +1601,22 @@ export default {
             vm.fileList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
+             vm.folderList.forEach((item,key)=>{
+                vm.$set(item,'checked',true)
+            })
+              vm.fgList.forEach((item,key)=>{
+                vm.$set(item,'checked',true)
+            })
           }else{
             vm.fileList.forEach((item,key)=>{
-                    vm.$set(item,'checked',false)
-                })
+                vm.$set(item,'checked',false)
+            })
+            vm.folderList.forEach((item,key)=>{
+                vm.$set(item,'checked',false)
+            })
+            vm.fgList.forEach((item,key)=>{
+                vm.$set(item,'checked',false)
+            })
           }
       },
       'show.basicAttributes':function(val){
@@ -1029,9 +1636,380 @@ export default {
       posType:function(){
           var vm = this
           vm.getVersion()
+      },
+      docType:function(){
+           var vm = this
+           vm.getInfo()
+      },
+      checkFileDir:function(val){
+          var vm = this
+
+          /**
+           * 从头添加目录
+           * **/
+          if(val.shareId){//最外层是分享页签
+                vm.ShareBreadList = []
+                vm.ShareBreadList.unshift({
+                    nodeId:val.shareId,//目录id
+                    nodeName:val.shareName,//目录名称
+                })
+          }else if(val.fgId){
+                 vm.FGBreadList = []
+                 vm.FGBreadList.push({
+                    nodeId:val.fgId,//目录id
+                    nodeName:val.fgName,//目录名称
+                })
+          }else{
+              vm.breadList = []
+              if(!val.isFG){
+                vm.breadList.unshift({
+                    nodeId:val.nodeId,//目录id
+                    nodeName:val.nodeName,//目录名称
+                    nodeParId:val.nodeParId
+                })
+                console.log(val.nodeParId)
+                vm.findParent(val.nodeParId)
+              }
+          }
       }
   },
   methods:{
+      refreshPage(){
+          var vm = this
+          var timestamp = Date.parse(new Date());
+          /**
+           *    vm.$router.push({
+              path:`/home/projHome/${id}`,
+              query: { firstView: 'Y' }
+            })**/
+        vm.getIntoShareList()
+        vm.fileList = []
+        vm.folderList = []
+        vm.breadList = []
+        vm.ShareBreadList=[]//蚂蚁线列表
+        vm.FGBreadList=[]//蚂蚁线列表
+        vm.ShareStyleHeader = false
+        vm.showLocation = false
+      },
+        showLink(){
+            var vm = this
+            /**
+             *    sharePath:{
+                show:false,
+                path:'',
+                password:''
+             },**/
+             console.log(vm.checkedItem)
+            vm.sharePath.show = true
+            vm.sharePath.path = 'http://10.252.26.240:8080/qjbim-project/cloud/share/'+vm.checkedItem.shareNo
+            vm.sharePath.password = vm.checkedItem.sharePassword !=null?vm.checkedItem.sharePassword:''
+        },
+        closeLink(){
+            var vm = this
+            vm.sharePath.show = false
+            vm.sharePath.path = ''
+            vm.sharePath.password = ''
+        },
+        openUrl(){
+            var vm = this
+            window.open(vm.sharePath.path);
+        },
+        cancleShare(){
+            var vm = this
+            console.log(vm.checkedItem)
+            var fgIds = []
+            var shareIdList = []
+            if(vm.shareIdList.length==0){
+                 vm.fgList.forEach((item,index)=>{
+                    if(item.checked){
+                        shareIdList.push(item.shareId)
+                    }
+                })
+            }else{
+                shareIdList = vm.shareIdList
+                vm.folderList.forEach((item,index)=>{
+                    if(item.checked){
+                        if(item.fgId){
+                              fgIds.push(item.fgId)
+                        }else{
+                              fgIds.push(item.nodeId)
+                        }
+                    }
+                })
+                vm.fileList.forEach((item,index)=>{
+                    if(item.checked && item.fgId){
+                        fgIds.push(item.fgId)
+                    }
+                })
+            }
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/cancelShare',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    fgIds:fgIds,
+                    projId:vm.projId,
+                    shareIdList:shareIdList
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                     if(vm.shareIdList.length==0){
+                         vm.getIntoShareList()
+                     }else{
+                         if(vm.checkedItem.fgId){
+                              vm.getInfoFolder()
+                         }else{
+                                vm.getSFInfo()//从分享文件最外层进入
+                         }
+                     }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        findParent(val){
+          var vm = this
+          if(val == 0)return false
+          console.log(vm.fileAll)
+          for(var i=0;i<vm.fileAll.length;i++){
+              if(vm.fileAll[i].nodeId == val){
+                   vm.breadList.unshift({
+                        nodeId:vm.fileAll[i].nodeId,//目录id
+                        nodeName:vm.fileAll[i].nodeName,//目录名称
+                        nodeParId:vm.fileAll[i].nodeParId
+                    })
+                    if(vm.fileAll[i].nodeParId != 0){
+                          vm.findParent(vm.fileAll[i].nodeParId)
+                    }
+                    break
+              }
+          }
+      },
+        IntoDir(val,notsh,isFG){
+            var vm = this
+            vm.checkFileDir = val
+            vm.ShareStyleHeader = true
+            vm.shareIdList = []
+            if(notsh){
+                vm.getSFInfo()
+                if(isFG){
+                    vm.fileAll = []
+                     vm.$set(vm.checkFileDir,'isFG',true)
+                }
+            }else{
+                vm.shareIdList.push(val.shareId)
+                vm.fileAll = []
+                 if(!val.shareId){
+                     vm.$set(vm.checkFileDir,'shareId',val.nodeId)
+                    vm.$set(vm.checkFileDir,'shareName',val.nodeName)
+                 }
+                 vm.FGBreadList = []
+                 vm.breadList = []
+                vm.getInfoFolder()
+            }
+        },
+      addFile(){
+        var vm = this
+        vm.fileName.show = true
+        vm.fileName.new = true
+        vm.fileName.title = '新建目录'
+      },
+      addfileCancle(){
+          var vm = this
+           vm.fileName.newFileName = ''
+        vm.fileName.show = false
+      },
+      addfileConfirm(){
+        var vm = this
+        if(vm.fileName.new){
+             axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/add',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    dirName: vm.fileName.newFileName,
+                    dirParId: vm.checkFileDir.nodeId,//当前文件夹ID
+                    ugId:vm.selectUgId,
+                    projId: vm.projId,
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'目录添加成功'
+                    })
+                    vm.fileName.show = false
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                vm.fileName.newFileName = ''
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }else{
+             axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    dirName: vm.fileName.newFileName,
+                    projId: vm.projId,
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'目录修改成功'
+                    })
+                    vm.fileName.show = false
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                vm.fileName.newFileName = ''
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }
+      },
+      renameFile(){
+         var vm = this
+        vm.fileName.show = true
+         vm.fileName.new = false
+        vm.fileName.title = '重命名目录'
+      },
+      deleteFile(){
+        var vm = this
+         vm.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
+                headers:{
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'文件夹删除成功'
+                    })
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }).catch(() => {
+          vm.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+     
+      },
+      uploadfile(){
+        var vm = this
+            vm.updateImg('文件上传',false,0)//非点位类型是0
+      },
+      /**
+       * 私密分享：链接:http://10.252.26.240:8080/qjbim-project/cloud/share/2dfa27dc-3674-470a-86ed-363784268f7b  密码:b3yq
+       * 公开分享：http://10.252.26.240:8080/qjbim-project/cloud/share/bba7acb1-301a-4ac0-81ac-c6c05f439076
+       * **/
+      copyURL(){
+          var vm = this
+          var clipboard = new ClipboardJS('.copyhref');
+
+        clipboard.on('success', function(e) {
+             vm.$message({
+                    type:'success',
+                    message:'复制成功'
+                })
+            e.clearSelection();
+        });
+
+        clipboard.on('error', function(e) {
+             vm.$message({
+                type:'error',
+                message:'复制失败'
+            })
+        });
+      },
+      shareURL(){
+          var vm = this
+          vm.sharePath.show = true
+      },
+      shareBtn(val){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getShareFilePath',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                fcIdList:[],
+                fgIdList:[],
+                projId:vm.projId,
+                type:val
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.sharePath.path = response.data.rt.url
+                vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
+                console.log(response.data.rt.password)
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      updateImg(val,is,index){
+          var vm = this
+          vm.uploadtitle = val
+          if(is){
+                vm.isqj = 1
+          }else{
+              vm.isqj = 0
+          }
+        vm.QJfgid = index
+        vm.uploadImg.checked = true
+      },
+      hiddenupload(){
+        var vm = this
+        vm.uploadImg.checked = false
+      },
+      handleNodeClick(obj){
+          console.log(obj)
+          var vm = this
+          if(!obj.children){
+            vm.$message({
+                type:'info',
+                message:'这个文件夹没有子文件!'
+            })
+          }
+          vm.checkFileDir = obj//选中的文件夹
+          if(vm.expandedKeys.indexOf(vm.checkFileDir.nodeId) == -1){
+            vm.expandedKeys.push(vm.checkFileDir.nodeId)
+          }
+        vm.getInfo()
+      },
       parseMStatus(mStatus){
             // 施工现场
             var constructionSite = mStatus.substring(0, 1);
@@ -1126,7 +2104,7 @@ export default {
                     return '未定义';
             }
       },
-    splitType(val){
+      splitType(val){
           return val.split('.')[0]
       },
       initData(val){
@@ -1138,33 +2116,42 @@ export default {
          * 预览文件集文件
          * @param fileUuid
          */
-    view(filePath,fileId,fileName,fgId){
+    view(filePath){
         //latestFile(fileId,fgId,"预览了文件"+fileName);
-          var vm = this
-           if(!filePath){
-             vm.$message({
-                type:'info',
-                message:'请勾选要预览的文件'
-            })
-            return false
+        var vm = this
+        if(!filePath){
+            if(vm.checkedItem){
+                filePath =  vm.checkedItem.filePath
+            }
+        }
+        if(!filePath){
+            vm.$message({
+            type:'info',
+            message:'请勾选要预览的文件'
+        })
+        return false
         }
         window.open(vm.QJFileManageSystemURL+filePath+"/preview");
     },
-    downLoad(filePath, fileId, fileName,fgId){
+    downLoad(filePath){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
         var vm = this
-          if(!filePath){
+         if(!filePath){
+            if(vm.checkedItem){
+                filePath =  vm.checkedItem.filePath
+            }
+        }
+        if(!filePath){
              vm.$message({
                 type:'info',
                 message:'请勾选要下载的文件'
             })
             return false
         }
-        window.open(vm.QJFileManageSystemURL + filePath);
+        window.open(vm.QJFileManageSystemURL + filePath+'');
     },
     downloadFile(){
         var vm = this
-        console.log(vm.fileList)
         var url = '/multiDownloadUrl?'
         var hasFilePath = false
         vm.fileList.forEach((item,key)=>{
@@ -1181,19 +2168,102 @@ export default {
                 message:'请勾选要下载的文件'
             })
         }
-       
     },
-    checkItem(val){
+    downloadBatchFile(){
+        var vm = this
+        var url = '/multiDownloadUrl?'
+        var hasFilePath = false
+        var fileId = []
+        var empty = false
+        for(var i=0;i<vm.folderList.length;i++){
+            if(vm.folderList[i].checked){
+                fileId.push(vm.folderList[i].nodeId)
+            }
+        }
+        axios({
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileListByDirOrFile',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                dirId:vm.checkFileDir.nodeId,//目录id
+                fileId:fileId,//文件id
+                projId:vm.projId
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+               if(response.data.rt.length>0){
+                   for(var i= 0;i<response.data.rt.length;i++){
+                        url += 'urls='+response.data.rt[i]+'&'
+                   }
+               }else{
+                   empty = true
+                   vm.$message({
+                       type:'info',
+                       message:"您所选择的文件夹为空，里面一无所有"
+                   })
+               }
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+        var timer = setInterval(function(){
+            if(url != '/multiDownloadUrl?'){//如果url变化，结束定时器
+                vm.downLoad(url)
+                clearInterval(timer)
+            }
+            if(empty){//若ajax 执行完 empty为true，结束定时器
+                 clearInterval(timer)
+            }
+        },100)
+    },
+    checkShareItem(val){
+        var vm = this
+        vm.checkedItem = vm.fgList[val]
+        vm.fgList[val].checked =  vm.fgList[val].checked?false:true
+        vm.showLocation = false
+        var showLocationNum = 0
+        for(var i=0;i<vm.fgList.length;i++){
+            if(vm.fgList[i].checked){
+                showLocationNum++
+            }
+        }
+        if(showLocationNum == 1){//全部选中
+            vm.showLocation = true
+        }
+    },
+    checkItem(val,file){
         var vm = this
         vm.show.basicAttributes =true
-         vm.show.BindingArtifacts =true
-        vm.checkedItem = vm.fileList[val]
-        vm.fileList[val].checked =  vm.fileList[val].checked?false:true
-        vm.getGouJianInfo()
-        vm.getVersion()
+        vm.show.BindingArtifacts =true
+        vm.auth.canCancelShare = true
+        if(file){
+            vm.checkedItem = vm.fileList[val]
+             vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+            vm.getGouJianInfo()
+            vm.getVersion()
+        }else{
+             vm.checkedItem = vm.folderList[val]
+             vm.folderList[val].checked =  vm.folderList[val].checked?false:true
+        }
+        for(var i=0;i<vm.fileList.length;i++){
+            if(vm.fileList[i].checked && !vm.fileList[i].fgId){
+                vm.auth.canCancelShare = false
+                break
+            }
+        }
     },
     getVersion(){
          var vm = this
+         var fgId = ''
+         if(vm.checkedItem){
+             if(!vm.checkedItem.fgId){
+                 vm.versionItem = {}
+                 return false
+             }
+             fgId = vm.checkedItem.fgId
+         }
         axios({
             method:'POST',
             url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileGroupVersionList',
@@ -1201,9 +2271,9 @@ export default {
                 'token':vm.token
             },
             params:{
-                fgId:vm.checkedItem.fgId,
+                fgId:fgId,
                 versionType:vm.posType,
-                docType:''//获取是1
+                docType:vm.docType//获取是1
             },
         }).then((response)=>{
             if(response.data.cd == 0){
@@ -1216,6 +2286,15 @@ export default {
     },
     getGouJianInfo(){
         var vm = this
+        var relaId = ''
+       
+         if(vm.checkedItem){
+             if(!vm.checkedItem.fgId){
+                 vm.GouJianItem = []
+                 return false
+             }
+             relaId = vm.checkedItem.fgId
+         }
         axios({
             method:'GET',
             url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/entityRelation/list',
@@ -1223,7 +2302,7 @@ export default {
                 'token':vm.token
             },
             params:{
-                relaId:vm.checkedItem.fgId,
+                relaId:relaId,
                 relaType:1//获取是1
             },
         }).then((response)=>{
@@ -1234,79 +2313,182 @@ export default {
             console.log(err)
         })
     },
-    changePage(val){//分页 0 -1 1 2
-        var vm = this 
-        console.log(val)
-        if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
-            vm.$message('这已经是第一页!')
-            return false
-        }else if(vm.pageDetial.currentPage == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
-            vm.$message('这已经是最后一页!')
-            return false
-        }else{
-            switch(val){
-                case 0:
-                        vm.pageDetial.currentPage = 1
-                    break;
-                case -1:
-                        vm.pageDetial.currentPage--
-                    break;
-                case 1:
-                        vm.pageDetial.currentPage++
-                    break;
-                case 2:
-                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
-                    break;
-            }
-        }
-
-    },
-    getInfo(){
+    getIntoShareList(){
         var vm = this
         axios({
-            method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchLatestFileGroupInfo',
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/hasShared',
             headers:{
                 'token':vm.token
             },
-            data:{
-                condition:vm.fileSearchInfo,//文件名称
-                dirId:"",//
-                pageNo:vm.pageDetial.currentPage,
-                docType: "string",//
-                pageSize:vm.pageDetial.pagePerNum,
+            params:{
                 projId:vm.projId
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                if(response.data.rt.rows.length>0){
-                    if(vm.fileSearchInfo != ''){
-                        vm.fileList = response.data.rt.rows
-                    }else{
-                        // vm.fileList = vm.fileList.concat(response.data.rt.rows)
-                         vm.fileList = response.data.rt.rows
-                    }
-                    vm.fileList.forEach((item,key)=>{
-                        vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                    })
-                    console.log( vm.fileList)
-                    vm.pageDetial.currentPage++
-                }else{
-                    vm.$message({
-                        type:'info',
-                        message:'未匹配到相应的数据'
-                    })
-                    vm.fileList = ''
-                }
+                vm.selectUgId = response.data.rt.selectUgId
+                vm.getInfo()
             }
 
         }).catch((err)=>{
             console.log(err)
         })
     },
-    handleCheckAllChange(value){
-        console.log(value)
-    }
+    getInfo(){
+        var vm = this
+        /**
+         *             dirId: vm.checkFileDir.nodeId,//当前文件夹ID
+            ugId: vm.selectUgId, //ugid是群组ID
+         * **/
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchSharedFolderInfo',//查询单个文件 ，下面要查询单个文件夹
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                pageNo:1,
+                pageSize:20,
+                projId:vm.projId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                if(response.data.rt.length>0){
+                    vm.fgList = response.data.rt
+                    vm.fgList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    })
+                }else{
+                    vm.$message({
+                        type:'info',
+                        message:'未匹配到相应的数据'
+                    })
+                    vm.fgList = ''
+                }
+            }
+        })
+    },
+    getInfoFolder(){
+            /**
+             * 
+             * 点击进入fg文件夹
+             * **/
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchSharedFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    projId:vm.projId,
+                    pageNo: 1,
+                    dirId:vm.checkFileDir.shareId,
+                    pageSize:20,//文件名称
+                }
+            }).then((response)=>{
+                vm.fgList = []
+                vm.folderList = []
+                vm.fileList = []
+                if(response.data.cd == 0){
+                    if(response.data.rt.rows.length>0){
+                        response.data.rt.rows.forEach((item,key)=>{
+                            vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                            if(item.icon != null){
+                                 vm.fileList.push(item)
+                            }else{
+                                  vm.$set(item,'nodeName',item.fgName)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                                  vm.$set(item,'nodeId',item.fgId)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                                  vm.folderList.push(item)
+                            }
+                        })
+                    }else{
+                        vm.$message({
+                            type:'info',
+                            message:'未匹配到相应的数据'
+                        })
+                    }
+                }
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    getSFInfo(){
+        var vm = this
+        /**
+         *             dirId: vm.checkFileDir.nodeId,//当前文件夹ID
+            ugId: vm.selectUgId, //ugid是群组ID
+         * **/
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                dirId:vm.checkFileDir.nodeId,//
+                pageNo:1,
+                pageSize:20,
+                projId:vm.projId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                 vm.fileList = []
+                if(response.data.rt.rows.length>0){
+                    vm.fileList = response.data.rt.rows
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    })
+                }
+                vm.getSFFolder()
+            }
+        })
+    },
+    getSFFolder(){
+            /**
+             * 
+             * 获取单个文件夹
+             * **/
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    ugId: -1,
+                    parDirId:vm.checkFileDir.nodeId,
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt.length>0){
+                        vm.folderList = response.data.rt
+                        vm.folderList.forEach((item,key)=>{
+                            vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                             var alreadyHas = false
+                            for(var i= 0;i<vm.fileAll.length;i++){
+                                if(item.nodeId == vm.fileAll[i].nodeId){
+                                    alreadyHas = true
+                                    break
+                                }
+                            }
+                            /*
+                                查询所有记录 没有相同nodeID，插入信息
+                            */
+                            if(!alreadyHas)vm.fileAll.push(item)
+                        })
+                    }else{
+                        vm.folderList = []
+                    }
+                }else{
+                    vm.folderList = []
+                }
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
   }
 }
 </script>

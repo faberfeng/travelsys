@@ -24,7 +24,7 @@
                   </router-link>
                 </span>
                 <span  class="label-item">
-                  <router-link :to="'/Drive/cloudDrive'">  
+                  <router-link :to="'/Drive/PersonalTransit'">  
                     个人中转  
                   </router-link>
                 </span>
@@ -2099,6 +2099,26 @@ export default {
       },
       shareBtn(val){
         var vm = this
+        var fcIdList = []
+        var fgIdList = []
+        if(vm.showQuanJing){
+            // vm.fileList.forEach((item)=>{
+            //     if(item.checked){
+            //         fgIdList.push(item.dirId)
+            //     }
+            // })
+        }else{
+            vm.fileList.forEach((item)=>{
+                if(item.checked){
+                    fgIdList.push(item.dirId)
+                }
+            })
+            vm.folderList.forEach((item)=>{
+                if(item.checked){
+                    fcIdList.push(item.nodeId)
+                }
+            })
+        }
         axios({
             method:'POST',
             url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getShareFilePath',
@@ -2106,8 +2126,8 @@ export default {
                 'token':vm.token
             },
             data:{
-                fcIdList:[],
-                fgIdList:[],
+                fcIdList:fcIdList,
+                fgIdList:fgIdList,
                 projId:vm.projId,
                 type:val
             },
@@ -2525,6 +2545,8 @@ export default {
              vm.fileList[val].checked =  vm.fileList[val].checked?false:true
              vm.PointFigure.oldname = vm.fileList[val].fgName
              vm.PointFigure.fgID = vm.fileList[val].fgId
+            vm.getGouJianInfo()
+             vm.getVersion()
         }else{
              vm.checkedItem = vm.folderList[val]
              vm.folderList[val].checked =  vm.folderList[val].checked?false:true
@@ -2541,8 +2563,6 @@ export default {
                 break
             }
         }
-        vm.getGouJianInfo()
-        vm.getVersion()
     },
     IntoDir(val){
         var vm = this
