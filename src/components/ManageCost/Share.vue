@@ -58,7 +58,7 @@
             <!--文件夹代码-->
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" >
+                    <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" >
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index,true)" ></label>
                         <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
@@ -77,7 +77,7 @@
                             </span>
                         </div>
                     </li>
-                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fgList" :key="index+'folder_fg'"  @dblclick="IntoDir(item)">
+                     <li :class="[{'item-file-active':item.checked},'item-file','fgfile']" v-for="(item,index) in fgList" :key="index+'folder_fg'"  @dblclick="IntoDir(item)">
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkShareItem(index)" ></label>
                         <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
@@ -94,7 +94,7 @@
                             </span>
                         </div>
                     </li>
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'"  @dblclick="IntoDir(item,true)">
+                    <li :class="[{'item-file-active':item.checked},'item-file','folder']" v-for="(item,index) in folderList" :key="index+'folder'"  @dblclick="IntoDir(item,true)">
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index)" ></label>
                         <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
@@ -1722,25 +1722,28 @@ export default {
             if(vm.shareIdList.length==0){
                  vm.fgList.forEach((item,index)=>{
                     if(item.checked){
-                        shareIdList.push(item.shareId)
+                        shareIdList.push(item.shareId+'')
                     }
                 })
             }else{
                 shareIdList = vm.shareIdList
                 vm.folderList.forEach((item,index)=>{
-                    if(item.checked){
-                        if(item.fgId){
-                              fgIds.push(item.fgId)
-                        }else{
-                              fgIds.push(item.nodeId)
-                        }
-                    }
-                })
-                vm.fileList.forEach((item,index)=>{
-                    if(item.checked && item.fgId){
+                    if(item.checked && item.IsfgLevel){
                         fgIds.push(item.fgId)
                     }
                 })
+                vm.fileList.forEach((item,index)=>{
+                    if(item.checked && item.IsfgLevel){
+                        fgIds.push(item.fgId)
+                    }
+                })
+            }
+            if(shareIdList.length==0){
+                vm.$message({
+                    type:'info',
+                    message:'请勾选文件'
+                })
+                return false
             }
             axios({
                 method:'POST',
@@ -1799,7 +1802,7 @@ export default {
                      vm.$set(vm.checkFileDir,'isFG',true)
                 }
             }else{
-                vm.shareIdList.push(val.shareId)
+                vm.shareIdList.push(val.shareId+'')
                 vm.fileAll = []
                  if(!val.shareId){
                      vm.$set(vm.checkFileDir,'shareId',val.nodeId)
@@ -2395,10 +2398,12 @@ export default {
                         response.data.rt.rows.forEach((item,key)=>{
                             vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                             if(item.icon != null){
+                                 vm.$set(item,'IsfgLevel',true)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                                  vm.fileList.push(item)
                             }else{
                                   vm.$set(item,'nodeName',item.fgName)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                                   vm.$set(item,'nodeId',item.fgId)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                                   vm.$set(item,'IsfgLevel',true)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                                   vm.folderList.push(item)
                             }
                         })

@@ -104,7 +104,7 @@ const router = new Router({
       ]
     },
     {
-      path:'/Drive/panoramicView',
+      path:'/Drive/panoramicView/:id',
       name:'panoramicView',
       meta:{
         requireAuth:true

@@ -886,9 +886,7 @@ export default {
             headers:{
                 'token':vm.token
             },
-            data:{
-                fgIds:fgIdList
-            }
+            data:fgIdList
         }).then((response)=>{
             if(response.data.cd == 0){
                 vm.getInfo()

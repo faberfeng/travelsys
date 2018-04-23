@@ -77,7 +77,7 @@
                 <div  id="planeDIV">
                     <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
                     <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
-                    @click="checkRound(index)" @dblclick="dbcheckRound(index)"
+                    @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xAxial,item.yAxial)"
                     :data-left="item.xAxial" :data-top="item.yAxial"  :id="index+'round'"
                     :key="index" :style="{'top':item.yAxial+'px','left':item.xAxial+'px'}">
                     </span>
@@ -2110,7 +2110,7 @@ export default {
         }else{
             vm.fileList.forEach((item)=>{
                 if(item.checked){
-                    fgIdList.push(item.dirId)
+                    fgIdList.push(item.fgId)
                 }
             })
             vm.folderList.forEach((item)=>{
@@ -2295,8 +2295,16 @@ export default {
           })
           console.log(vm.checkedRound)
       },
-      dbcheckRound(index){
-          window.open('/#/Drive/panoramicView')
+      dbcheckRound(val,x,y){
+          if(!val)return false
+          var vm = this
+            var qjInfo = {
+                image: vm.QJFileManageSystemURL+vm.QJ.imageBackground.filePath+'',
+                x:x,//当前文件夹ID
+                y:y, //ugid是群组ID
+            };
+            sessionStorage.setItem("qjInfo", JSON.stringify(qjInfo)); 
+          window.open('/#/Drive/panoramicView/'+val)
       },
       handleNodeClick(obj){
           console.log(obj)
