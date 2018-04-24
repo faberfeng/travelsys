@@ -251,6 +251,7 @@ export default {
             rejectVisible:false,//显示退回框标识
             rejectObject:{},//点击退回按钮时获得的行数据
             passVisible:false,//确认通过
+            editObject:{}
         }
     },
     created(){
@@ -548,6 +549,7 @@ export default {
          */
         //编辑
         edit(num){
+            this.editObject = num;
             var vm = this;
             axios({
                 method:'GET',
@@ -568,8 +570,17 @@ export default {
             })
         },
         PostaddUser(){//保存修改
-                var vm = this;
-                console.log(this.codingToEdit)
+            var vm = this;
+            console.log(this.codingToEdit);
+            if(this.codingToEdit.title == ''){
+                alert('请输入新标题');
+            }else{
+                var flag = '';
+                if(this.editObject.row.status == 2){
+                    flag = 1;
+                }else if(this.editObject.row.status == 0){
+                    flag = 0;
+                }
                 axios({
                     method:'POST',
                     url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
@@ -582,7 +593,7 @@ export default {
                     data:{
                         id:this.codingToEdit.id,
                         number:this.codingToEdit.number,
-                        status:1,
+                        status:flag,
                         table:'t13',
                         title:this.codingToEdit.title
                     }
@@ -600,6 +611,8 @@ export default {
                 }).catch((err)=>{
                     console.log(err)
                 })
+            }
+                
         },
         /**
          * 格式化来源

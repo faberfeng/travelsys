@@ -408,45 +408,56 @@ export default {
         },
         //编辑确认按钮
         editListSureBtn(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId
-                },
-                data:{
-                    id:this.editObject.row.id,
-                    number:this.editObject.row.number,
-                    status:1,
-                    table:'t17',
-                    title:this.newTitle
+            if(this.newTitle == ''){
+                alert('请输入新的标题');
+            }else{
+                var flag = '';
+                if(this.editObject.row.status == 2){
+                    flag = 1;
+                }else if(this.editObject.row.status == 0){
+                    flag = 0;
                 }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    this.editListShowtwice = false;
-                    this.codeType = '';
-                    this.firstTitle = '';
-                    this.secondTitle = '';
-                    this.totalCode = '';
-                    this.totalTitle = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.thirdTitle = '';
-                    this.showFirst = false;
-                    this.showTwo = false;
-                    this.showThird = false;
-                    this.getWorkCode();
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.push({
-                        path:'/login'
-                    })
-                }
-            })
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'config2/component/updateWorkCode',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId
+                    },
+                    data:{
+                        id:this.editObject.row.id,
+                        number:this.editObject.row.number,
+                        status:flag,
+                        table:'t17',
+                        title:this.newTitle
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        this.editListShowtwice = false;
+                        this.codeType = '';
+                        this.firstTitle = '';
+                        this.secondTitle = '';
+                        this.totalCode = '';
+                        this.totalTitle = '';
+                        this.newCode = '';
+                        this.newTitle = '';
+                        this.thirdTitle = '';
+                        this.showFirst = false;
+                        this.showTwo = false;
+                        this.showThird = false;
+                        this.getWorkCode();
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }
+            
         },
         //编辑取消按钮
         editListCancelBtn(){

@@ -1724,6 +1724,12 @@ export default {
             if(this.guize == '' || this.jiliang == ''){
                 alert('请确定输入表单的完整性');
             }else{
+                var flag = '';
+                if(this.editObject.row.status == 2){
+                    flag = 1;
+                }else if(this.editObject.row.status == 0){
+                    flag = 0;
+                }
                 axios({
                     method:'post',
                     url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
@@ -1738,9 +1744,9 @@ export default {
                         id:this.editObject.row.id,
                         number:this.editObject.row.number,
                         regular:this.guize,
-                        status:1,
+                        status:flag,
                         table:'t32',
-                        title:this.editObject.row.title,
+                        title:this.newTitle,
                         unit:this.jiliang
                     }
                 }).then((response)=>{

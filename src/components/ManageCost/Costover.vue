@@ -822,7 +822,7 @@
         select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
             /*很关键：将默认的select选择框样式清除*/  
-            appearance:none;  
+            // appearance:none;  
             -moz-appearance:none;  
             -webkit-appearance:none;  
             /*在选择框的最右侧中间显示小箭头图片*/  
