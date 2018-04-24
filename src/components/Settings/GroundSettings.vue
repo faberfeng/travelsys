@@ -109,8 +109,8 @@
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">单体名称 :</label><input class="inp" placeholder="请输入" v-model="addListname"/></div>
                     <div class="editBodytwo"><label class="editInpText">轴网基点坐标 :</label><input class="inp" placeholder="请输入数字(例:0 0)" v-model="addListcoordinate"/></div>
-                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入数字"  v-model="addListhigh"/></div>
-                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入数字" v-model="addListangle"/></div>
+                    <div class="editBodytwo"><label class="editInpText">首层相对高度 :</label><input class="inp" placeholder="请输入数字(单位 m)"  v-model="addListhigh"/></div>
+                    <div class="editBodytwo"><label class="editInpText">轴网转角 :</label><input class="inp" placeholder="请输入数字(正北为0°，逆时针计)" v-model="addListangle"/></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addListSure">确定</button>

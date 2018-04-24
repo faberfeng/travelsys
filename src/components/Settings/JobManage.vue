@@ -6,7 +6,7 @@
               <span class="subSpan">
                   <select v-model="posType" class="inp-search">
                         <option value="">全部岗位</option>
-                         <option value="0">企业岗位</option>
+                        <option value="0">企业岗位</option>
                         <option value="1">工程内岗位</option>
                         <option value="2">合作方岗位</option>
                   </select>
@@ -45,11 +45,11 @@
                        <tr>
                            <td>
                                <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
-                               <option value="10">10</option>
-                               <option value="20">20</option>
-                               <option value="30">30</option>
-                               <option value="40">40</option>
-                               <option value="50">50</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                    <option value="50">50</option>
                                </select>
                             </td>
                             <td>
@@ -71,7 +71,7 @@
                                   <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
                             </td>
                             <td>
-                                 <span  class="pagination-title" style="padding-right:5px;">共2页</span>
+                                 <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
                             </td>
                             <td>
                                  <div class="pagination-btn-separator"></div>
@@ -83,10 +83,10 @@
                                 <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
                             </td>
                             <td>
-                                  <div class="pagination-btn-separator"></div>
+                                <div class="pagination-btn-separator"></div>
                             </td>
                             <td>
-                                 <a href="javascript:void(0)" @click="this.getInfo" class="btn-refresh btn-TAB"></a>
+                                <a href="javascript:void(0)" @click="this.getInfo" class="btn-refresh btn-TAB"></a>
                             </td>
                         </tr>
                     </tbody>
@@ -98,7 +98,7 @@
         <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
             <div class="log-head clearfix">
                 <span class="log-head-title">岗位名称:</span>
-                 <el-radio v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
+                <el-radio v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
                 <el-radio v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
             </div>
             <div  class="JobName">
@@ -126,7 +126,494 @@
   </div>
 </template>
 
-<style  lang='less'>
+<script>
+import axios from 'axios'
+import './js/jquery-1.4.4.min.js'
+import data from './js/date.js'
+export default {
+    name:'',
+    data(){
+        return {
+            title:'增加岗位',
+            jobList:[],//岗位列表
+            totalJobList:[],//总体的岗位列表
+            posType:'',//岗位类型
+            jobTree:[],
+            jobTree_checked:[],
+            jobTree_opend:[],
+            defaultProps: {
+                children: 'undefined',
+                label: 'authName'
+            },
+            adduser:false,
+            edituser:false,
+            radio: 'email',
+            checked:false,
+            projId:'',
+            jobID:0,
+            jobDetial:{
+                authCodes: [],
+                posId: '',
+                posName: "",
+                posType: '1'
+            },
+            pageDetial:{
+                pagePerNum:10,//一页几份数据
+                currentPage:1,//初始查询页数 第一页
+                total:'',//所有数据
+            },
+            token:'',
+            checkCode:[]
+        }
+    },
+    watch:{
+        posType:function(newVal,old){
+            this.getInfo()
+        },
+        'pageDetial.pagePerNum':function(newVal,old){//多重属性用''阔起
+            this.pageDetial.currentPage = 1;
+            this.getInfo();
+        },
+        'pageDetial.currentPage':function(newVal,old){//多重属性用''阔起
+            this.getInfo()
+        }
+    },
+    created(){
+        var vm = this
+        vm.projId = localStorage.getItem('projId')//项目id
+        vm.token  = localStorage.getItem('token')
+        vm.intoJobManager();
+        vm.getJobShuXingTu();
+    },
+    methods:{
+        changePage(val){//分页 0 -1 1 2
+            var vm = this; 
+            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                vm.$message('这已经是第一页!')
+                return false
+            }else if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                vm.$message('这已经是最后一页!')
+                return false
+            }else{
+                switch(val){
+                    case 0:
+                        vm.pageDetial.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pageDetial.currentPage--
+                        break;
+                    case 1:
+                        vm.pageDetial.currentPage++
+                        break;
+                    case 2:
+                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                        break;
+                }
+            }
+        },
+        getJobShuXingTu(){
+            var vm = this
+            var setting = {
+                data: {
+                    key:{
+                        name: "authName"
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "authId",
+                        pIdKey: "parAuthId",
+                        rootPId: 0
+                    }
+                }
+            };
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionTree',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    pId:vm.jobID
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    var jobTree_checked = [],jobTree_opend = []
+                    for(var i =0;i<response.data.rt.length;i++){
+                        if(response.data.rt[i].flag){
+                            jobTree_checked.push(response.data.rt[i].authCode)
+                        }
+                        if(response.data.rt[i].open){
+                            jobTree_opend.push(response.data.rt[i].authCode)
+                        }
+                    }
+                    vm.jobTree_checked = jobTree_checked,
+                    vm.jobTree_opend = jobTree_opend,
+                    vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        intoJobManager(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionIndex',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.rt.projId == vm.projId){
+                    vm.getInfo()
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        getInfo(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchPositionList/'+vm.projId,
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    page: vm.pageDetial.currentPage,
+                    rows: vm.pageDetial.pagePerNum,
+                    posType: vm.posType,
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    vm.jobList = response.data.rt.gridDataJson.rows;
+                    vm.pageDetial.total = response.data.rt.gridDataJson.total;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
+            }).then(()=>{
+                axios({
+                    method:'GET',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchPositionList/'+vm.projId,
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        page: 1,
+                        rows: vm.pageDetial.total,
+                        posType: vm.posType,
+                    }
+                }).then(response=>{
+                    if(response.data.cd == '0'){
+                        this.totalJobList = response.data.rt.gridDataJson.rows;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }).catch((err)=>{
+                console.log(err);
+            })
+        },
+        deleteRow(index, rows) {
+            rows.splice(index, 1);
+        },
+        addUser(type,name,val){
+            var vm = this;
+            vm.adduser = true;
+            if(val){
+                vm.jobDetial.posName = name;
+                vm.jobDetial.posType = ''+type;
+                vm.jobID = parseInt(val)
+                vm.getJobShuXingTu()//获取某val的权限
+            }
+        },
+        userClose(){
+            var vm = this
+                //清空数据
+            vm.jobDetial.posName = '';
+            vm.jobDetial.posType = '1';
+            vm.adduser = false;
+            //vm.$refs.tree_job.setCheckedKeys([]);
+            vm.getJobShuXingTu();
+        },
+        PostaddUser(){
+            var vm = this;
+            //var checkCode = [];
+            this.checkCode = vm.$refs.tree_job.getCheckedKeys();
+            var flag = this.totalJobList.some(item=>{
+                if(item.posName == this.jobDetial.posName){
+                    return true;
+                }else{
+                    return false;
+                }
+            })
+            
+            if(flag){
+                alert('岗位不能重复添加!');
+            }else{
+                if(this.jobDetial.posName == ''){
+                    alert("请输入岗位名称！");
+                }else if(this.checkCode.length == 0 ){
+                    alert("该用户至少选择一个岗位权限！");
+                }else{
+                    axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{
+                            authCodes:this.checkCode,
+                            posId: vm.jobID,
+                            posName: vm.jobDetial.posName,
+                            posType: vm.jobDetial.posType,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.adduser = false;
+                            this.jobDetial.posName = '';
+                            vm.jobDetial.posType ='1';
+                            vm.$refs.tree_job.setCheckedKeys([]);
+                            vm.getInfo();
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg);
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }
+            }
+        },
+        deleteJob(key){
+            var vm = this;
+            vm.$confirm('您要删除当前所选记录吗？', '请确认', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delProjectPosition',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:[key]
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        vm.getInfo();
+                        // if(this.pageDetial.currentPage > Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum)){
+                        //     this.pageDetial.currentPage = Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum);
+                        // }
+                    }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+        }
+    }
+}
+</script>
+<style scoped>
+    .wrapper{
+        width: 100%;
+    }
+    ::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #999999;
+    }
+    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color:    #999999;
+    }
+    ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color:    #999999;
+    }
+    :-ms-input-placeholder { /* Internet Explorer 10+ */
+        color:    #999999;
+    }
+    select.inp-search {  
+    /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+    /*很关键：将默认的select选择框样式清除*/  
+    /* appearance:none;   */
+    -moz-appearance:none;  
+    -webkit-appearance:none;  
+    /*在选择框的最右侧中间显示小箭头图片*/  
+    /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+    padding-right: 14px;  
+    }  
+    /*清除ie的默认选择框样式清除，隐藏下拉箭头*/  
+    select::-ms-expand { display: none; }  
+    select:focus{
+       outline: none;
+    }
+    .title{
+        color: #fc343a;
+        font-size: 18px;
+        font-weight: bold;
+        border-bottom:2px solid #ccc; 
+        height: 50px;
+        line-height: 50px;
+        padding:0px 15px;
+        margin: 10px 0 0 0 ;
+        text-align: left;
+    }
+    .subtitle{
+        color: #fc3439;
+        height: 40px;
+        line-height: 40px;
+        text-align: left;
+        margin: 20px 20px 15px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .subSpan{
+        float: right;
+        height: 40px;
+        line-height: 40px;
+        position: relative;
+    }
+    .inp-search{
+        width: 214px;
+        border-radius: 2px;
+        height: 30px;
+        border: 1px solid #e6e6e6;
+        position: relative;
+        background: #fafafa;
+        padding-left:10px;
+        padding-right:40px;
+        box-sizing: border-box;  
+        margin-right: 5px;
+    }
+     .icon-sanjiao{
+        display: block;
+         position: absolute;
+         width: 12px;
+         height: 7px;
+         background-image:url('./images/sanjiao.png');
+         background-size: 100% 100%;
+         content: '';
+        top: 18px;
+        left: 190px;
+     }
+   .btn{
+       display: inline-block;
+       width: 96px;
+       height: 32px;
+       border-radius: 2px;
+       background: #fc3439;
+       color: #ffffff;
+       font-size: 14px;
+       text-align: right;
+       line-height: 32px;
+       cursor: pointer;
+       position: relative;
+       padding: 0 20px;
+       box-sizing: border-box;
+       letter-spacing: 2px;
+       font-weight: normal;
+    } 
+     .btn::after{
+         display: block;
+         position: absolute;
+         width: 12px;
+         height: 12px;
+         background-image:url('./images/jiahao.png');
+         background-size: 100% 100%;
+         content: '';
+         top: 10px;
+         left: 23px;
+     }
+    .pagination{
+        width: 100%;
+        text-align: right;
+        margin-top: 10px;
+    }
+    .userTop,.userMiddle,.userBottom {
+        width: 100%;
+        display: flex;
+        color: black
+    }
+    .userTopLeft{
+        display: inline-block;
+        width: 100px;
+    }
+    .userTopRight,.userMiddleRight,.userBottomRight{
+        flex: 1;
+    }
+    .radio{
+        float: left;
+        width: 100%;
+        text-align: left;
+        height: 40px;
+    }
+    .dialogInp{
+        float: left;
+        width: 60%;
+    }
+    .userMiddleLeft,.userBottomLeft{
+        width: 100px;
+    }
+    .userMiddleRight .img{
+        width: 100px;
+        height: 100px;
+        float: left;
+    }
+    .userMiddleRight ul{
+        list-style: none;
+        padding: 0;
+        margin-top: 0;
+        margin-left: 120px;
+    }
+    .userMiddleRight li{
+        width: 70%;
+        height: 30px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    .userBottomRight p{
+        text-align: left;
+        margin: 0;
+        width: 90%;
+        margin-left: 20px;
+        position: relative;
+        top: 2px;
+    }
+    .userBottomRight ul{
+        list-style: none;
+        width: 70%;
+        border:1px solid #ccc;
+        height: 200px;
+        overflow: auto;
+    }
+    .userBottomRight li{
+        width: 80%;
+        text-align: left;
+        height: 30px;
+    }
+ </style>
+ <style  lang='less'>
 #jobPage{
         /***********设置滚动条************/
     /* 设置滚动条的样式 */
@@ -135,14 +622,16 @@
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
-    -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
-    border-radius:10px;
+        box-shadow:inset006pxrgba(0,0,0,0.3);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+        border-radius:10px;
     }
     /* 滚动条滑块 */
     ::-webkit-scrollbar-thumb {
-    border-radius:10px;
-    background:rgba(0,0,0,0.1);
-    -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow:inset006pxrgba(0,0,0,0.3);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {
     background:rgba(255,0,0,0.4);
@@ -372,431 +861,3 @@
     }
 }
 </style>
-
-<script>
-import axios from 'axios'
-import './js/jquery-1.4.4.min.js'
-import data from './js/date.js'
-
-export default {
-  name:'',
-  data(){
-      return {
-          title:'增加岗位',
-          jobList:[],//岗位列表
-          posType:'',//岗位类型
-          jobTree:[],
-          jobTree_checked:[],
-          jobTree_opend:[],
-          defaultProps: {
-            children: 'undefined',
-            label: 'authName'
-          },
-          adduser:false,
-          edituser:false,
-          radio: 'email',
-          checked:false,
-          projId:'',
-          jobID:0,
-          jobDetial:{
-            authCodes: [],
-            posId: '',
-            posName: "",
-            posType: '1'
-          },
-          pageDetial:{
-              pagePerNum:10,//一页几份数据
-              currentPage:1,//初始查询页数 第一页
-              total:'',//所有数据
-          },
-          token:''
-      }
-  },
-  watch:{
-      posType:function(newVal,old){
-          this.getInfo()
-      },
-       'pageDetial.pagePerNum':function(newVal,old){//多重属性用''阔起
-          this.getInfo()
-      },
-       'pageDetial.currentPage':function(newVal,old){//多重属性用''阔起
-          this.getInfo()
-      }
-  },
-  created(){
-      var vm = this
-      vm.projId = localStorage.getItem('projId')//项目id
-      vm.token  = localStorage.getItem('token')
-      vm.intoJobManager()
-      vm.getJobShuXingTu()
-  },
-  methods:{
-        changePage(val){//分页 0 -1 1 2
-            var vm = this 
-            console.log(val)
-            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
-                vm.$message('这已经是第一页!')
-                return false
-            }else if(vm.pageDetial.currentPage == Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
-                vm.$message('这已经是最后一页!')
-                return false
-            }else{
-                switch(val){
-                    case 0:
-                         vm.pageDetial.currentPage = 1
-                        break;
-                    case -1:
-                         vm.pageDetial.currentPage--
-                        break;
-                    case 1:
-                         vm.pageDetial.currentPage++
-                        break;
-                    case 2:
-                         vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
-                        break;
-                }
-            }
-
-        },
-        getJobShuXingTu(){
-            var vm = this
-            var setting = {
-                data: {
-                    key:{
-                        name: "authName"
-                    },
-                    simpleData: {
-                        enable: true,
-                        idKey: "authId",
-                        pIdKey: "parAuthId",
-                        rootPId: 0
-                    }
-                }
-            };
-             axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionTree',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    pId:vm.jobID
-                }
-            }).then((response)=>{
-                console.log(response)
-                if(response.data.rt){
-                    var jobTree_checked = [],jobTree_opend = []
-
-                    for(var i =0;i<response.data.rt.length;i++){
-                        if(response.data.rt[i].flag){
-                            jobTree_checked.push(response.data.rt[i].authCode)
-                        }
-                        if(response.data.rt[i].open){
-                             jobTree_opend.push(response.data.rt[i].authCode)
-                        }
-                    }
-                    vm.jobTree_checked = jobTree_checked,
-                    vm.jobTree_opend = jobTree_opend,
-                    vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
-                    console.log(vm.jobTree)
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        intoJobManager(){
-            var vm = this
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionIndex',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId
-                }
-            }).then((response)=>{
-                if(response.data.rt.projId == vm.projId){
-                    vm.getInfo()
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        getInfo(){
-            var vm = this
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchPositionList/'+vm.projId,
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    page: vm.pageDetial.currentPage,
-                    rows: vm.pageDetial.pagePerNum,
-                    posType: vm.posType,
-                }
-            }).then((response)=>{
-                vm.jobList = response.data.rt.gridDataJson.rows
-                vm.pageDetial.total = response.data.rt.gridDataJson.total
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        deleteRow(index, rows) {
-            rows.splice(index, 1);
-        },
-        addUser(type,name,val){
-            var vm = this
-            vm.adduser = true;
-            if(val){
-                vm.jobDetial.posName = name;
-                vm.jobDetial.posType = ''+type;
-                vm.jobID = parseInt(val)
-                vm.getJobShuXingTu()//获取某val的权限
-            }
-        },
-        userClose(){
-            var vm = this
-            //清空数据
-            vm.jobDetial.posName = '';
-            vm.jobDetial.posType = '1';
-            vm.adduser = false;
-            vm.getJobShuXingTu()
-        },
-        PostaddUser(){
-             var vm = this
-            var checkCode = vm.$refs.tree_job.getCheckedKeys();
-            axios({
-                method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
-                headers:{
-                    'token':vm.token
-                },
-                data:{
-                    authCodes:checkCode,
-                    posId: vm.jobID,
-                    posName: vm.jobDetial.posName,
-                    posType: vm.jobDetial.posType,
-                }
-            }).then((response)=>{
-                if(response.data.cd == 0){
-                    vm.adduser = false;
-                    vm.getInfo()
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-        deleteJob(key){
-            var vm = this
-            vm.$confirm('您要删除当前所选记录吗？', '请确认', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                    axios({
-                        method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delProjectPosition',
-                        headers:{
-                            'token':vm.token
-                        },
-                        data:[key]
-                    }).then((response)=>{
-                        if(response.data.cd == 0){
-                            vm.$message({
-                                type: 'success',
-                                message: '删除成功!'
-                            });
-                            vm.getInfo()
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
-            }).catch(() => {
-            vm.$message({
-                type: 'info',
-                message: '已取消删除'
-            });          
-            });
-        }
-  }
-}
-</script>
-<style scoped>
-    .wrapper{
-        width: 100%;
-    }
-    ::-webkit-input-placeholder { /* WebKit browsers */
-    color:    #999999;
-    }
-    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-        color:    #999999;
-    }
-    ::-moz-placeholder { /* Mozilla Firefox 19+ */
-        color:    #999999;
-    }
-    :-ms-input-placeholder { /* Internet Explorer 10+ */
-        color:    #999999;
-    }
-    select.inp-search {  
-    /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-    /*很关键：将默认的select选择框样式清除*/  
-    appearance:none;  
-    -moz-appearance:none;  
-    -webkit-appearance:none;  
-    /*在选择框的最右侧中间显示小箭头图片*/  
-    /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
-    padding-right: 14px;  
-    }  
-    /*清除ie的默认选择框样式清除，隐藏下拉箭头*/  
-    select::-ms-expand { display: none; }  
-    select:focus{
-       outline: none;
-    }
-    .title{
-        color: #fc343a;
-        font-size: 18px;
-        font-weight: bold;
-        border-bottom:2px solid #ccc; 
-        height: 50px;
-        line-height: 50px;
-        padding:0px 15px;
-        margin: 10px 0 0 0 ;
-        text-align: left;
-    }
-    .subtitle{
-        color: #fc3439;
-        height: 40px;
-        line-height: 40px;
-        text-align: left;
-        margin: 20px 20px 15px;
-        font-size: 16px;
-        font-weight: bold;
-    }
-    .subSpan{
-        float: right;
-        height: 40px;
-        line-height: 40px;
-        position: relative;
-    }
-    .inp-search{
-        width: 214px;
-        border-radius: 2px;
-        height: 30px;
-        border: 1px solid #e6e6e6;
-        position: relative;
-        background: #fafafa;
-        padding-left:10px;
-        padding-right:40px;
-        box-sizing: border-box;  
-        margin-right: 5px;
-    }
-     .icon-sanjiao{
-        display: block;
-         position: absolute;
-         width: 12px;
-         height: 7px;
-         background-image:url('./images/sanjiao.png');
-         background-size: 100% 100%;
-         content: '';
-        top: 18px;
-        left: 190px;
-     }
-   .btn{
-       display: inline-block;
-       width: 96px;
-       height: 32px;
-       border-radius: 2px;
-       background: #fc3439;
-       color: #ffffff;
-       font-size: 14px;
-       text-align: right;
-       line-height: 32px;
-       cursor: pointer;
-       position: relative;
-       padding: 0 20px;
-       box-sizing: border-box;
-       letter-spacing: 2px;
-       font-weight: normal;
-    } 
-     .btn::after{
-         display: block;
-         position: absolute;
-         width: 12px;
-         height: 12px;
-         background-image:url('./images/jiahao.png');
-         background-size: 100% 100%;
-         content: '';
-         top: 10px;
-         left: 23px;
-     }
-    .pagination{
-        width: 100%;
-        text-align: right;
-        margin-top: 10px;
-    }
-    .userTop,.userMiddle,.userBottom {
-        width: 100%;
-        display: flex;
-        color: black
-    }
-    .userTopLeft{
-        display: inline-block;
-        width: 100px;
-    }
-    .userTopRight,.userMiddleRight,.userBottomRight{
-        flex: 1;
-    }
-    .radio{
-        float: left;
-        width: 100%;
-        text-align: left;
-        height: 40px;
-    }
-    .dialogInp{
-        float: left;
-        width: 60%;
-    }
-    .userMiddleLeft,.userBottomLeft{
-        width: 100px;
-    }
-    .userMiddleRight .img{
-        width: 100px;
-        height: 100px;
-        float: left;
-    }
-    .userMiddleRight ul{
-        list-style: none;
-        padding: 0;
-        margin-top: 0;
-        margin-left: 120px;
-    }
-    .userMiddleRight li{
-        width: 70%;
-        height: 30px;
-        margin-bottom: 10px;
-        text-align: left;
-    }
-    .userBottomRight p{
-        text-align: left;
-        margin: 0;
-        width: 90%;
-        margin-left: 20px;
-        position: relative;
-        top: 2px;
-    }
-    .userBottomRight ul{
-        list-style: none;
-        width: 70%;
-        border:1px solid #ccc;
-        height: 200px;
-        overflow: auto;
-    }
-    .userBottomRight li{
-        width: 80%;
-        text-align: left;
-        height: 30px;
-    }
- </style>
- 

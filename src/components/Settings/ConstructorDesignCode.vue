@@ -10,7 +10,7 @@
                 index-text="序号"
                 :data="constructorData" :columns="columns" :tree-type="props.treeType" 
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border" >
+                :border="props.border" empty-text="正在加载...">
                     <template slot="appearence" slot-scope="scope">
                        <div v-html="scope.row.color_0+scope.row.color_1+scope.row.color_2">
                        </div>
@@ -998,41 +998,51 @@ export default {
             var colorCode_0 = this.toBeColorCode(this.firstTitle);
             var colorCode_1 = this.toBeColorCode(this.secondTitle);
             var colorCode_2 = this.toBeColorCode(this.thirdTitle);
-            axios({
-                method:'post',
-                url:this.baseUrl+'Config/updateGenieClass',
-                headers:{
-                    token:this.token,
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    id:this.editObject.row.id,
-                    level:this.editObject.row.level,
-                    materialIndex:[colorCode_0,colorCode_1,colorCode_2],
-                    number:this.editObject.row.number,
-                    parNumber:this.editObject.row.number,
-                    status:0,
-                    title:this.editObject.row.title
+            // console.log(editObject)
+            if(this.newTitle == '' || this.newCode == ''){
+                alert('请输入编码和标题')
+            }else{
+                var flag = '';
+                if(this.editObject.row.status == 2){
+                    flag = 1;
+                }else if(this.editObject.row.status == 0){
+                    flag = 0;
                 }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    this.getProjectGenieClassByProject();
-                    this.totalTitle = '';
-                    this.totalCode = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.codeType = '';
-                    this.editListShowtwice = false;
-                }else if(response.data.cd == '-1'){
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-            
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'Config/updateGenieClass',
+                    headers:{
+                        token:this.token,
+                    },
+                    params:{
+                        projId:this.projId
+                    },
+                    data:{
+                        id:this.editObject.row.id,
+                        level:this.editObject.row.level,
+                        materialIndex:[colorCode_0,colorCode_1,colorCode_2],
+                        number:this.editObject.row.number,
+                        parNumber:this.editObject.row.number,
+                        status:flag,
+                        title:this.newTitle
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        this.getProjectGenieClassByProject();
+                        this.totalTitle = '';
+                        this.totalCode = '';
+                        this.newCode = '';
+                        this.newTitle = '';
+                        this.codeType = '';
+                        this.editListShowtwice = false;
+                    }else if(response.data.cd == '-1'){
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }  
         },
         //取消编辑
         editListCancelBtn(){
@@ -3078,6 +3088,7 @@ export default {
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
+        box-shadow:inset006pxrgba(0,0,0,0.3);
         -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
         border-radius:15px;
     }
@@ -3085,6 +3096,7 @@ export default {
     ::-webkit-scrollbar-thumb {
         border-radius:10px;
         background:rgba(0,0,0,0.1);
+        box-shadow:inset006pxrgba(0,0,0,0.3);
         -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {

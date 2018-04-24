@@ -21,7 +21,7 @@
                     index-text="序号"
                     :data="constructorData" :columns="columns" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                    :border="props.border" >
+                    :border="props.border" empty-text="正在加载...">
                         <template slot="action" slot-scope="scope">
                             <div v-if="scope.row.status == 3">
                                 <button class="actionBtn" >-</button>
@@ -351,7 +351,6 @@ export default {
         },
         //编辑
         editList(scope){
-            console.log(scope)
             this.editObject = scope;
             this.propertyTableName = this.judgeType(this.propertyTable);
             this.codeType = 'Level'+scope.row.level;
@@ -408,44 +407,53 @@ export default {
         },
         //保存编辑
         editListSureBtn(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
-                headers:{
-                    token:this.token,
-                },
-                params:{
-                    projId:this.projId,
-                    type:1
-                },
-                data:{
-                    id:this.editObject.row.id,
-                    number:this.editObject.row.number,
-                    status:0,
-                    table:'t41',
-                    title:this.newTitle,
-                    valueType:this.valueTypeTextT
+            if(this.newTitle == ''){
+                alert('请输入新标题');
+            }else{
+                var flag = '';
+                if(this.editObject.row.status == 2){
+                    flag = 1;
+                }else if(this.editObject.row.status == 0){
+                    flag = 0;
                 }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    this.getProjectGenClass(this.propertyTable);
-                    this.totalTitle = '';
-                    this.totalCode = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.codeType = '';
-                    this.propertyTableName ="";
-                    this.valueTypeTextT ="";
-                    this.editListShowtwice = false;
-                }else if(response.data.cd == '-1'){
-                    console.log(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-            
+                axios({
+                    method:'post',
+                    url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                    headers:{
+                        token:this.token,
+                    },
+                    params:{
+                        projId:this.projId,
+                        type:1
+                    },
+                    data:{
+                        id:this.editObject.row.id,
+                        number:this.editObject.row.number,
+                        status:flag,
+                        table:'t41',
+                        title:this.newTitle,
+                        valueType:this.valueTypeTextT
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        this.getProjectGenClass(this.propertyTable);
+                        this.totalTitle = '';
+                        this.totalCode = '';
+                        this.newCode = '';
+                        this.newTitle = '';
+                        this.codeType = '';
+                        this.propertyTableName ="";
+                        this.valueTypeTextT ="";
+                        this.editListShowtwice = false;
+                    }else if(response.data.cd == '-1'){
+                        calert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            } 
         },
         //取消编辑
         editListCancelBtn(){
