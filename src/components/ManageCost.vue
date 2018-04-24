@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper" ref="allHeight">
       <!--2018/3/21 付伟超修改-->
-        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
+        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg' :userimg='header.userImg'></headerCommon>
         <div class="contentBody">
             <div class="sideBar" ref="sideB">
                 <a href="#" >
@@ -63,6 +63,7 @@ export default {
                  userId:'', 
                  projectName:'华建Q系列工程协同应用系统',
                  projectImg:'',
+                 userImg:''
             },          
             navigationPath:'projectPage',
             activeIndex:'1',
@@ -91,7 +92,8 @@ export default {
                 spaceManagement:false,
                 assetManagement:false,
                 configurationCenter:false
-            }
+            },
+            QJFileManageSystemURL:''
         }
     },
     created(){
@@ -108,6 +110,7 @@ export default {
         };
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial(vm.projId);
     },
     mounted(){
@@ -173,6 +176,7 @@ export default {
                // console.log('getUserInfo获取用户的姓名和项目权限')
                 vm.header.userName = response.data.rt.onlineInfo.userName
                 vm.header.userId = response.data.rt.onlineInfo.userId
+                vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.QJFileManageSystemURL+response.data.rt.onlineInfo.imgUuid:''
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、

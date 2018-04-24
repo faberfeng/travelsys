@@ -341,7 +341,7 @@ export default {
         float: left;
         width: 232px;
         height: 208px;
-        margin-left: 30px;
+        margin-right: 30px;
         margin-bottom: 30px;
         position: relative;
         box-shadow: 0px 0px 24px rgba(34,24,21,.09);

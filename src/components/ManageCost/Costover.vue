@@ -1208,6 +1208,9 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
+                vm.versionItem.forEach((item)=>{
+                    vm.$set(item,'checked',false)
+                })
                 console.log( vm.versionItem)
             }
         }).catch((err)=>{

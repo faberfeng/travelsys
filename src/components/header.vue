@@ -6,7 +6,7 @@
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
-                <img class="headerInfoImg" src='../assets/loginimg.png'/>
+                <img class="headerInfoImg" :src="userimg?userimg:require('../assets/loginimg.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
                     <p class="p2 p-hover" @click="logout">退出</p>
@@ -24,7 +24,7 @@ export default Vue.component('common-header', {
         return{
       }
      },
-    props: ['username','userid','proname','proimg'],
+    props: ['username','userid','proname','proimg','userimg'],
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
