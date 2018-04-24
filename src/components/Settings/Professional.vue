@@ -76,7 +76,7 @@
                     </select>
                     <i class="icon-sanjiao"></i>
                 </div>
-                <div v-if="codingToEdit.level>1" class="editBodytwo edit-item clearfix" v-for="(item,index) in (codingToEdit.level-1)" :key="index">
+                <div v-if="codingToEdit.levelT" class="editBodytwo edit-item clearfix" v-for="(item,index) in codingToEdit.levelT" :key="index">
                     <label class="editInpText" v-text="item+'级编码 :'"></label>
                     <select class="editSelect" disabled>
                         <option v-text="initCode(item)"></option>
@@ -549,7 +549,6 @@ export default {
         //编辑
         edit(num){
             var vm = this;
-            console.log(num)
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
@@ -562,7 +561,7 @@ export default {
                 }
             }).then((response)=>{
                 vm.codingToEdit = num.row;
-                console.log(vm.codingToEdit)
+                vm.codingToEdit.levelT = vm.codingToEdit.level-1;
                 vm.addCode = true;
             }).catch((err)=>{
                 console.log(err)
