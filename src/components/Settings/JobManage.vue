@@ -336,6 +336,11 @@ export default {
                 vm.jobDetial.posType = ''+type;
                 vm.jobID = parseInt(val)
                 vm.getJobShuXingTu()//获取某val的权限
+            }else{
+                vm.jobDetial.posName = '';
+                vm.jobDetial.posType = '1';
+                vm.jobID = 0
+                vm.getJobShuXingTu()//获取某val的权限
             }
         },
         userClose(){
