@@ -230,45 +230,62 @@ export default {
         },
         //确认添加竖向楼层
         makeAddFloorList(){
-            var reg = new RegExp("^[0-9]*$");
-            if(this.FloorValue != '' && reg.test(this.FloorValue)){
-                axios({
-                    method:'post',
-                    url:this.baseUrl+'project2/Config/updateStorey',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                        holderId:this.florData[0].ParentID,
-                        flag:0,
-                        projectId:this.projId
-                    },
-                    data:{
-                        "Type": this.florData[0].Type,
-                        "ParentID": this.florData[0].ParentID,
-                        "Name": this.FloorName,
-                        "BottomHeight": this.FloorValue,
-                        "Unit":this.florData[0].Unit,
-                        "IsDefault": this.setAsAuto
-                    }
-                }).then(response=>{
-                    if(response.data.cd == '0'){
-                        this.findStore(this.partitionList,this.partitionIndex);
-                        this.FloorName = '';
-                        this.FloorValue = '';
-                        this.setAsAuto = false;
-                        this.addFloorList = false;
-                    }else if(response.data.cd == '-1'){
-                        alert(response.data.msg)
-                    }else{
-                        this.$router.push({
-                            path:'/login'
+            
+            var reg = new RegExp("^-?\\d+$");//只能输入整数
+            if(this.FloorName == '' || this.FloorValue == ''){
+                alert('请输入完整表单！')
+            }else{
+                if(reg.test(this.FloorValue)){
+                    var flag = this.florData.some(item=>{
+                        if(item.Name == this.FloorName){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    })
+                    if(flag){
+                        alert('楼层名称或标高值已存在!')
+                    } else{
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'project2/Config/updateStorey',
+                            headers:{
+                                'token':this.token
+                            },
+                            params:{
+                                holderId:this.florData[0].ParentID,
+                                flag:0,
+                                projectId:this.projId
+                            },
+                            data:{
+                                "Type": this.florData[0].Type,
+                                "ParentID": this.florData[0].ParentID,
+                                "Name": this.FloorName,
+                                "BottomHeight": this.FloorValue,
+                                "Unit":this.florData[0].Unit,
+                                "IsDefault": this.setAsAuto
+                            }
+                         }).then(response=>{
+                            if(response.data.cd == '0'){
+                                this.findStore(this.partitionList,this.partitionIndex);
+                                this.FloorName = '';
+                                this.FloorValue = '';
+                                this.setAsAuto = false;
+                                this.addFloorList = false;
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
                         })
                     }
-                })
-            }else{
-                alert('楼层标高请输入数字！')
+                }else{
+                    alert('楼层标高只能输入正数！')
+                }
             }
+            
         },
         //取消添加
         cancleAddFloorList(){
@@ -454,7 +471,6 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.florData = response.data.rt.rows;
-                    console.log(this.florData)
                     this.florData.forEach((item,index,arr)=>{
                         if(item.IsDefault){
                             item = Object.assign(item,{
@@ -536,39 +552,49 @@ export default {
             this.addPartition = true;
         },
         makeAddPartitionList(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'project2/Config/updatePartition',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId,
-                    subProjId:this.partitionList[this.partitionIndex].ParentID
-                },
-                data:{
-                    AreaValue:this.Area,
-                    IsDefault:this.partitionIsDefault,
-                    Name:this.partitionName,
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.partitionListName.push({
-                        label:this.partitionName,
-                        value:this.partitionListName.length
-                    })
-                    this.changeSubProjects(this.subProjectsIndex);
-                    this.partitionName ='';
-                    this.Area ='';
-                    this.addPartition = false;
-                }else if(response.data.cd == "-1"){
-                    alert(response.data.msg)
+            if(this.partitionName == '' ){
+                alert('分区名称不能为空!');
+            }else if(this.Area == ''){
+                alert('面积不能为空!');
+            }else{
+                if(isNaN(this.Area)){
+                    alert('面积必须是数字!')
                 }else{
-                    this.$router.push({
-                        path:'/login'
+                    axios({
+                        method:'post',
+                        url:this.baseUrl+'project2/Config/updatePartition',
+                        headers:{
+                            token:this.token
+                        },
+                        params:{
+                            projId:this.projId,
+                            subProjId:this.partitionList[this.partitionIndex].ParentID
+                        },
+                        data:{
+                            AreaValue:this.Area,
+                            IsDefault:this.partitionIsDefault,
+                            Name:this.partitionName,
+                        }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.partitionListName.push({
+                                label:this.partitionName,
+                                value:this.partitionListName.length
+                            })
+                            this.changeSubProjects(this.subProjectsIndex);
+                            this.partitionName ='';
+                            this.Area ='';
+                            this.addPartition = false;
+                        }else if(response.data.cd == "-1"){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
                     })
                 }
-            })
+            }  
         },
         cancleAddPartitionList(){
             this.partitionName ='';

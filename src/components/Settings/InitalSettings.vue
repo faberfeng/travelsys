@@ -69,7 +69,6 @@
                     <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="projectUnity"/></div>
                     <div class="editBodytwo"><label class="editInpText">取值 :</label><input class="inp" placeholder="请输入" v-model="projectName"/></div>
                 </div>
-                <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editMakeSure">确定</button>
                     <button class="editBtnC" @click="editCancle">取消</button>
@@ -176,7 +175,9 @@ export default {
             this.addDialog = true;
         },
         addMakeSure(){
-            if(this.projectUnity !==''&& this.projectName !==''){
+            if(this.projectUnity ==''|| this.projectName ==''){
+                alert('请输入标题或取值');
+            }else{
                 axios({
                     method:'post',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
@@ -240,7 +241,9 @@ export default {
             this.projectName = this.sumaryData[index].viewVal;
         },
         editMakeSure(){
-            if(this.projectUnity !==''&& this.projectName !==''){
+            if(this.projectUnity =='' ||  this.projectName ==''){
+                alert('请输入标题或取值');
+            }else{
                 axios({
                     method:'post',
                     url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
@@ -266,7 +269,7 @@ export default {
                             path:'/login'
                         })
                     }
-                });   
+                }); 
             }
         },
         //上传新logo
