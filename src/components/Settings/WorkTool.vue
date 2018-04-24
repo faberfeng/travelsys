@@ -10,7 +10,7 @@
                 index-text="序号"
                 :data="workToolData" :columns="columns" :tree-type="props.treeType"
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border">
+                :border="props.border" empty-text="正在加载...">
                     <template slot="action" slot-scope="scope">
                         <button class="actionBtn tiqingBtn" title="提请"  v-if="scope.row.status == 0" @click="confirmBtn(scope)"></button>
                         <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>

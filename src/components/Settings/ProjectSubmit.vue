@@ -10,7 +10,7 @@
                     index-text="序号"
                     :data="projectSubmitData" :columns="columns" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                    :border="props.border" >
+                    :border="props.border" empty-text="正在加载...">
                         <template slot="action" slot-scope="scope">
                             <div v-if="scope.row.level == 4">
                                 <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>

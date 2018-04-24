@@ -21,7 +21,7 @@
                     index-text="序号"
                     :data="constructorData" :columns="columns" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                    :border="props.border" >
+                    :border="props.border" empty-text="正在加载...">
                         <template slot="action" slot-scope="scope">
                             <div v-if="scope.row.status == 3">
                                 <button class="actionBtn" >-</button>

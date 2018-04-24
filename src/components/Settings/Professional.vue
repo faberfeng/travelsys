@@ -9,7 +9,7 @@
              index-text="序号"
             :data="codingList" :columns="columns" :tree-type="props.treeType"
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-            :border="props.border" >
+            :border="props.border" empty-text="正在加载...">
                 <template slot="action" slot-scope="scope">
                    <button class="TiqingBtn actionBtn" title="提请"  v-if="scope.row.status == 0" @click="request(scope)"></button>
                     <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
@@ -81,7 +81,7 @@
                     <select class="editSelect" disabled>
                         <option v-text="initCode(item)"></option>
                     </select>
-                     <i class="icon-sanjiao"></i>
+                    <i class="icon-sanjiao"></i>
                     <span v-text="'标题：'+initTitle(item)" :title="'标题：'+initTitle(item)" class="edit-item-biaoti"></span>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
@@ -540,7 +540,8 @@ export default {
             vm.addCode = false
         },
         PostaddUser(){//保存修改
-                var vm = this
+                var vm = this;
+                console.log(this.codingToEdit)
                 axios({
                     method:'POST',
                     url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
@@ -552,8 +553,8 @@ export default {
                     },
                     data:vm.codingToEdit
                 }).then((response)=>{
-                    vm.addCode =false
-                    vm.getWorkCode()
+                    vm.addCode =false;
+                    vm.getWorkCode();
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -581,7 +582,7 @@ export default {
          */
              //编辑
         edit(num){
-            var vm = this
+            var vm = this;
             axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
@@ -593,8 +594,10 @@ export default {
                     tableNo: 't13'
                 }
             }).then((response)=>{
-                vm.codingToEdit = num.row
-                vm.addCode = true
+                
+                vm.codingToEdit = num.row;
+                console.log(vm.codingToEdit);
+                vm.addCode = true;
             }).catch((err)=>{
                 console.log(err)
             })
@@ -606,7 +609,7 @@ export default {
             this.deleteWorkCode = num.row;
         },
         deleteCode(){
-             var vm = this
+            var vm = this;
             axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/config2/component/deleteWorkCode',

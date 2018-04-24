@@ -10,7 +10,7 @@
                 index-text="序号"
                 :data="constructorData" :columns="columns" :tree-type="props.treeType" 
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border" >
+                :border="props.border" empty-text="正在加载...">
                     <template slot="appearence" slot-scope="scope">
                        <div v-html="scope.row.color_0+scope.row.color_1+scope.row.color_2">
                        </div>
