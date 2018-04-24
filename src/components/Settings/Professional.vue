@@ -76,7 +76,7 @@
                     </select>
                     <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo edit-item clearfix" v-for="(item,index) in codingToEdit.level" :key="index">
+                <div v-if="codingToEdit.level>1" class="editBodytwo edit-item clearfix" v-for="(item,index) in (codingToEdit.level-1)" :key="index">
                     <label class="editInpText" v-text="item+'级编码 :'"></label>
                     <select class="editSelect" disabled>
                         <option v-text="initCode(item)"></option>
@@ -539,6 +539,35 @@ export default {
             var vm = this
             vm.addCode = false
         },
+        /**
+         * 格式化状态
+         * @param value
+         * @param row
+         * @param index
+         * @returns {String}
+         */
+        //编辑
+        edit(num){
+            var vm = this;
+            console.log(num)
+            axios({
+                method:'GET',
+                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    genieClassId:num.row.id,
+                    tableNo: 't13'
+                }
+            }).then((response)=>{
+                vm.codingToEdit = num.row;
+                console.log(vm.codingToEdit)
+                vm.addCode = true;
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         PostaddUser(){//保存修改
                 var vm = this;
                 console.log(this.codingToEdit)
@@ -551,10 +580,24 @@ export default {
                     params:{
                         projectId:vm.projId
                     },
-                    data:vm.codingToEdit
+                    data:{
+                        id:this.codingToEdit.id,
+                        number:this.codingToEdit.number,
+                        status:1,
+                        table:'t13',
+                        title:this.codingToEdit.title
+                    }
                 }).then((response)=>{
-                    vm.addCode =false;
-                    vm.getWorkCode();
+                    if(response.data.cd == 0){
+                        vm.addCode =false;
+                        vm.getWorkCode();
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -572,35 +615,6 @@ export default {
             } else {
                 return "工程标准";
             }
-        },
-        /**
-         * 格式化状态
-         * @param value
-         * @param row
-         * @param index
-         * @returns {String}
-         */
-             //编辑
-        edit(num){
-            var vm = this;
-            axios({
-                method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    genieClassId:num.row.id,
-                    tableNo: 't13'
-                }
-            }).then((response)=>{
-                
-                vm.codingToEdit = num.row;
-                console.log(vm.codingToEdit);
-                vm.addCode = true;
-            }).catch((err)=>{
-                console.log(err)
-            })
         },
         //删除 modified by licongwen
         deleteItem(num){
