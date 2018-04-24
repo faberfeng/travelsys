@@ -420,7 +420,7 @@ export default {
                 data:{
                     id:this.editObject.row.id,
                     number:this.editObject.row.number,
-                    status:0,
+                    status:1,
                     table:'t17',
                     title:this.newTitle
                 }
