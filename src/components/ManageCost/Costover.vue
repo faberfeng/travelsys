@@ -38,7 +38,7 @@
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true)"></label>
                         <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
@@ -73,9 +73,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index)">
+                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index)">
                             <td>
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
                                 <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
                             <td>
@@ -107,12 +107,12 @@
                 </div>
             </div>
             <div id="box-right" v-if="screenLeft.item == 1">
-                <h3 class="header-attribute">
+                <h3 class="header-attribute" style="margin-top: 0px;">
                     <i class="trrangle"></i>
                     基本属性
                     <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                 </h3>
-                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]">
+                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="fileCheckedNum == 1">
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">文件名</span>
                         <span class="detial-text-value" v-text="checkedItem.fgName"></span>
@@ -138,43 +138,51 @@
                         <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
                     </li>
                 </ul>
-                 <h3 class="header-attribute">
-                    <i class="trrangle"></i>
-                    绑定构件
-                    <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
-                </h3>
-                <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
-                    <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
-                        <p class="clearfix">
-                            <i class="icon-goujian icon-add"></i>
-                            <i class="icon-goujian icon-detial"></i>
-                            <i class="icon-goujian icon-QRcode"></i>
-                            <i class="icon-goujian icon-location"></i>
-                            <i class="icon-goujian icon-delete"></i>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">ID :</span>
-                           <span class="detial-text-value" v-text="item.main.pkId"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">状态 :</span>
-                           <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">明细 :</span>
-                           <span class="detial-text-value" v-text="item.details.length"></span>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">名称 :</span>
-                           <span class="detial-text-value" v-text="item.main.mName"></span>
-                        </p>
+                 <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-else>
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">选择数量</span>
+                        <span class="detial-text-value" v-text="fileCheckedNum"></span>
                     </li>
                 </ul>
+                <div v-if="fileCheckedNum == 1">
+                    <h3 class="header-attribute">
+                        <i class="trrangle"></i>
+                        绑定构件
+                        <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
+                    </h3>
+                    <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
+                        <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
+                            <p class="clearfix">
+                                <i class="icon-goujian icon-add"></i>
+                                <i class="icon-goujian icon-detial"></i>
+                                <i class="icon-goujian icon-QRcode"></i>
+                                <i class="icon-goujian icon-location"></i>
+                                <i class="icon-goujian icon-delete"></i>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">ID :</span>
+                            <span class="detial-text-value" v-text="item.main.pkId"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">状态 :</span>
+                            <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">明细 :</span>
+                            <span class="detial-text-value" v-text="item.details.length"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">名称 :</span>
+                            <span class="detial-text-value" v-text="item.main.mName"></span>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div id="box-right-1" v-else>
+            <div id="box-right-1" v-else-if="fileCheckedNum == 1">
                 <p class="head">
-                    <i class="icon-goujian icon-search" @click="view(checkedItem.filePath)"></i>
-                    <i class="icon-goujian icon-download" @click="downLoad(checkedItem.filePath)"></i>
+                    <i class="icon-goujian icon-search" @click="view()"></i>
+                    <i class="icon-goujian icon-download" @click="downLoad()"></i>
                      <select v-model="posType" class="inp-search">
                         <option value="">所有版本</option>
                         <option value="1">本周更新</option>
@@ -184,7 +192,7 @@
                     <i class="icon-sanjiao"></i>
                 </p>
                 <ul>
-                    <li class="item-version" v-for="(item,index) in  versionItem" :key="index">
+                    <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem"  @click="selectVersion(index)" :key="index">
                         <div class="clearfix">
                             <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
                             <div class="versin-detial">
@@ -932,6 +940,9 @@
                 text-align: left;
             }
         }
+        .active-item{
+           box-shadow: 0px 1px 8px rgba(252, 52, 57, 0.2);
+        }
     }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
@@ -990,6 +1001,7 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
+         fileCheckedNum:0,//选中的文件数量
       }
   },
   created(){
@@ -1002,14 +1014,11 @@ export default {
   watch:{
       checkAll:function(val){
           var vm = this
+          console.log(val)
           if(val){
             vm.fileList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
-          }else{
-            vm.fileList.forEach((item,key)=>{
-                    vm.$set(item,'checked',false)
-                })
           }
       },
       'show.basicAttributes':function(val){
@@ -1126,6 +1135,13 @@ export default {
                     return '未定义';
             }
       },
+    selectVersion(val){
+        var vm = this
+         vm.versionItem.forEach((item)=>{
+            vm.$set(item,'checked',false)
+        })
+         vm.$set(vm.versionItem[val],'checked',true)
+    },
     splitType(val){
           return val.split('.')[0]
       },
@@ -1140,11 +1156,18 @@ export default {
          */
     view(filePath,fileId,fileName,fgId){
         //latestFile(fileId,fgId,"预览了文件"+fileName);
-          var vm = this
-           if(!filePath){
-             vm.$message({
+        var vm = this
+        if(vm.checkedItem && !filePath){
+            vm.versionItem.forEach((item)=>{
+                if(item.checked){
+                    filePath =  item.filePath
+                }
+            })
+        }
+        if(!filePath){
+            vm.$message({
                 type:'info',
-                message:'请勾选要预览的文件'
+                message:'请勾选要预览的文件的版本'
             })
             return false
         }
@@ -1153,10 +1176,17 @@ export default {
     downLoad(filePath, fileId, fileName,fgId){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
         var vm = this
-          if(!filePath){
-             vm.$message({
+         if(vm.checkedItem && !filePath){
+            vm.versionItem.forEach((item)=>{
+                if(item.checked){
+                    filePath =  item.filePath
+                }
+            })
+        }
+        if(!filePath){
+            vm.$message({
                 type:'info',
-                message:'请勾选要下载的文件'
+                message:'请勾选要下载的文件的版本'
             })
             return false
         }
@@ -1183,14 +1213,39 @@ export default {
         }
        
     },
-    checkItem(val){
+    checkItem(val,isCtrl){
         var vm = this
+        console.log(isCtrl)
         vm.show.basicAttributes =true
-         vm.show.BindingArtifacts =true
-        vm.checkedItem = vm.fileList[val]
-        vm.fileList[val].checked =  vm.fileList[val].checked?false:true
-        vm.getGouJianInfo()
-        vm.getVersion()
+        vm.show.BindingArtifacts =true
+        var fileCheckList = []
+        vm.fileCheckedNum = 0
+        vm.checkAll = false
+        if(isCtrl){//多选
+            vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+            for(var i=0;i<vm.fileList.length;i++){
+                if(vm.fileList[i].checked){
+                    vm.fileCheckedNum++
+                    fileCheckList.push(vm.fileList[i])
+                }
+            }
+            if(vm.fileCheckedNum > 1){
+                vm.checkedItem = {}
+            }else if(vm.fileCheckedNum == 1){
+                 vm.checkedItem = fileCheckList[0]
+                vm.getGouJianInfo()
+                vm.getVersion()
+            }
+        }else{//单选
+            for(var i=0;i<vm.fileList.length;i++){
+                vm.$set(vm.fileList[i],'checked',false)
+            }
+            vm.fileCheckedNum = 1
+            vm.$set(vm.fileList[val],'checked',true)
+            vm.checkedItem = vm.fileList[val]
+            vm.getGouJianInfo()
+            vm.getVersion()
+        }
     },
     getVersion(){
          var vm = this

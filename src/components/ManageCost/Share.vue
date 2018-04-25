@@ -58,8 +58,8 @@
             <!--文件夹代码-->
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                    <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" >
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index,true)" ></label>
+                    <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)" ></label>
                         <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
@@ -77,8 +77,8 @@
                             </span>
                         </div>
                     </li>
-                     <li :class="[{'item-file-active':item.checked},'item-file','fgfile']" v-for="(item,index) in fgList" :key="index+'folder_fg'"  @dblclick="IntoDir(item)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkShareItem(index)" ></label>
+                     <li :class="[{'item-file-active':item.checked},'item-file','fgfile']" v-for="(item,index) in fgList" :key="index+'folder_fg'"   @click="checkShareItem(index)" @dblclick="IntoDir(item)">
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkShareItem(index,true)" ></label>
                         <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image item-folder-image">
@@ -94,8 +94,8 @@
                             </span>
                         </div>
                     </li>
-                    <li :class="[{'item-file-active':item.checked},'item-file','folder']" v-for="(item,index) in folderList" :key="index+'folder'"  @dblclick="IntoDir(item,true)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click="checkItem(index)" ></label>
+                    <li :class="[{'item-file-active':item.checked},'item-file','folder']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
                         <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image item-folder-image">
@@ -132,8 +132,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" >
-                            <td @click="checkItem(index,true)">
+                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index,true)">
+                            <td @click.stop="checkItem(index,true,true)">
                                 <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                 <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
@@ -151,8 +151,8 @@
                             <td v-text="item.uploadUser"></td>
                             <td v-text="initData(item.updateTime)"></td>
                         </tr>
-                         <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked}]"  @dblclick="IntoDir(item)">
-                            <td @click="checkShareItem(index)">
+                         <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked}]" @click="checkShareItem(index)"  @dblclick="IntoDir(item)">
+                            <td @click.stop="checkShareItem(index,true)">
                                 <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                 <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
@@ -166,8 +166,8 @@
                              <td v-text="item.userName"></td>
                             <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
                         </tr>
-                          <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]"  @dblclick="IntoDir(item,true)">
-                            <td @click="checkItem(index)">
+                          <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
+                            <td @click.stop="checkItem(index,false,true)">
                                 <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                 <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
@@ -199,12 +199,12 @@
                 </div>
             </div>
             <div id="box-right" v-if="screenLeft.item == 1">
-                <h3 class="header-attribute">
+                <h3 class="header-attribute" style="margin-top:0;">
                     <i class="trrangle"></i>
                     基本属性
                     <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                 </h3>
-                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]">
+                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]"  v-if="fileCheckedNum == 1">
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">文件名</span>
                         <span class="detial-text-value" v-text="checkedItem.fgName"></span>
@@ -230,40 +230,48 @@
                         <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
                     </li>
                 </ul>
-                 <h3 class="header-attribute">
-                    <i class="trrangle"></i>
-                    绑定构件
-                    <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
-                </h3>
-                <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
-                    <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
-                        <p class="clearfix">
-                            <i class="icon-goujian icon-add"></i>
-                            <i class="icon-goujian icon-detial"></i>
-                            <i class="icon-goujian icon-QRcode"></i>
-                            <i class="icon-goujian icon-location"></i>
-                            <i class="icon-goujian icon-delete"></i>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">ID :</span>
-                           <span class="detial-text-value" v-text="item.main.pkId"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">状态 :</span>
-                           <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-                        </p>
-                         <p class="item-detial">
-                            <span class="detial-text-name">明细 :</span>
-                           <span class="detial-text-value" v-text="item.details.length"></span>
-                        </p>
-                        <p class="item-detial">
-                            <span class="detial-text-name">名称 :</span>
-                           <span class="detial-text-value" v-text="item.main.mName"></span>
-                        </p>
+                <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]"  v-else>
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">选择数量</span>
+                        <span class="detial-text-value" v-text="fileCheckedNum"></span>
                     </li>
                 </ul>
+                <div  v-if="fileCheckedNum == 1">
+                    <h3 class="header-attribute">
+                        <i class="trrangle"></i>
+                        绑定构件
+                        <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
+                    </h3>
+                    <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
+                        <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
+                            <p class="clearfix">
+                                <i class="icon-goujian icon-add"></i>
+                                <i class="icon-goujian icon-detial"></i>
+                                <i class="icon-goujian icon-QRcode"></i>
+                                <i class="icon-goujian icon-location"></i>
+                                <i class="icon-goujian icon-delete"></i>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">ID :</span>
+                            <span class="detial-text-value" v-text="item.main.pkId"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">状态 :</span>
+                            <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">明细 :</span>
+                            <span class="detial-text-value" v-text="item.details.length"></span>
+                            </p>
+                            <p class="item-detial">
+                                <span class="detial-text-name">名称 :</span>
+                            <span class="detial-text-value" v-text="item.main.mName"></span>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div id="box-right-1" v-else>
+            <div id="box-right-1" v-else-if="fileCheckedNum == 1">
                 <p class="head" ><!-- v-if="checkedItem.dirId"-->
                     <i class="icon-goujian icon-search" @click="view()"></i>
                     <i class="icon-goujian icon-download" @click="downLoad()"></i>
@@ -1581,6 +1589,7 @@ export default {
             canCancelShare:true
         },
         showLocation:false,
+        fileCheckedNum:0,
       }
   },
   created(){
@@ -1606,16 +1615,6 @@ export default {
             })
               vm.fgList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
-            })
-          }else{
-            vm.fileList.forEach((item,key)=>{
-                vm.$set(item,'checked',false)
-            })
-            vm.folderList.forEach((item,key)=>{
-                vm.$set(item,'checked',false)
-            })
-            vm.fgList.forEach((item,key)=>{
-                vm.$set(item,'checked',false)
             })
           }
       },
@@ -2221,39 +2220,89 @@ export default {
             }
         },100)
     },
-    checkShareItem(val){
+    checkShareItem(val,isMultiSelect){
         var vm = this
-        vm.checkedItem = vm.fgList[val]
-        vm.fgList[val].checked =  vm.fgList[val].checked?false:true
+        vm.checkedItem = {}
         vm.showLocation = false
         var showLocationNum = 0
-        for(var i=0;i<vm.fgList.length;i++){
-            if(vm.fgList[i].checked){
-                showLocationNum++
+        vm.checkAll = false
+        var checkList = []
+        console.log(isMultiSelect)
+        if(isMultiSelect){//多选
+            vm.fgList[val].checked =  vm.fgList[val].checked?false:true
+            for(var i=0;i<vm.fgList.length;i++){
+                if(vm.fgList[i].checked){
+                    showLocationNum++   
+                    checkList.push(vm.fgList[i])
+                }
             }
-        }
-        if(showLocationNum == 1){//全部选中
+            if(showLocationNum == 1){//全部选中
+                vm.showLocation = true
+                vm.checkedItem = checkList[0]
+            }
+        }else{//单选
+            for(var i=0;i<vm.fgList.length;i++){
+                 vm.fgList[i].checked =  false
+            }
             vm.showLocation = true
+            vm.fgList[val].checked =  true
+            vm.checkedItem = vm.fgList[val]
         }
     },
-    checkItem(val,file){
+    checkItem(val,file,isMultiSelect){
         var vm = this
         vm.show.basicAttributes =true
         vm.show.BindingArtifacts =true
         vm.auth.canCancelShare = true
-        if(file){
-            vm.checkedItem = vm.fileList[val]
-             vm.fileList[val].checked =  vm.fileList[val].checked?false:true
-            vm.getGouJianInfo()
-            vm.getVersion()
-        }else{
-             vm.checkedItem = vm.folderList[val]
-             vm.folderList[val].checked =  vm.folderList[val].checked?false:true
-        }
-        for(var i=0;i<vm.fileList.length;i++){
-            if(vm.fileList[i].checked && !vm.fileList[i].fgId){
-                vm.auth.canCancelShare = false
-                break
+        var fileCheckList = []
+        vm.fileCheckedNum = 0
+        vm.checkAll = false
+        console.log(isMultiSelect)
+        if(isMultiSelect){//多选
+            if(file){
+                vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+            }else{
+                vm.folderList[val].checked =  vm.folderList[val].checked?false:true
+            }
+            for(var i=0;i<vm.fileList.length;i++){
+                if(vm.fileList[i].checked){
+                    vm.fileCheckedNum++
+                    fileCheckList.push(vm.fileList[i])
+                    if(!vm.fileList[i].fgId){
+                        vm.auth.canCancelShare = false
+                    }
+                }
+            }
+            if(file){
+                vm.checkedItem = {}
+                if(vm.fileCheckedNum == 1){
+                    vm.checkedItem = fileCheckList[0]
+                    vm.getGouJianInfo()
+                    vm.getVersion()
+                }
+            }else{
+                vm.checkedItem = {}
+            }
+        }else{//单选
+            if(file){
+                vm.fileCheckedNum = 1
+                for(var i=0;i<vm.fileList.length;i++){
+                    vm.fileList[i].checked = false
+                    if(vm.fileList[i].checked && !vm.fileList[i].fgId){
+                        vm.auth.canCancelShare = false
+                    }
+                }
+                vm.fileList[val].checked = true
+
+                vm.checkedItem = vm.fileList[val]
+                vm.getGouJianInfo()
+                vm.getVersion()
+            }else{
+                for(var j=0;j<vm.folderList.length;j++){
+                    vm.folderList[j].checked = false
+                }
+                vm.folderList[val].checked = true
+                vm.checkedItem = {}
             }
         }
     },

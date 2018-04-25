@@ -43,7 +43,7 @@
             <div id="file-container" v-if="listStyle == 'card'">
                 <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
                         <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
@@ -80,7 +80,7 @@
                     <tbody>
                         <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index)">
                             <td>
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
                                 <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
                             </td>
                             <td>
@@ -611,10 +611,6 @@ export default {
             vm.fileList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
-          }else{
-            vm.fileList.forEach((item,key)=>{
-                    vm.$set(item,'checked',false)
-                })
           }
       },
       'show.basicAttributes':function(val){
@@ -899,25 +895,36 @@ export default {
             console.log(err)
         })
       },
-    checkItem(val){
+    checkItem(val,isMultiSelect){
         var vm = this
         vm.show.basicAttributes =true
          vm.show.BindingArtifacts =true
-        vm.checkedItem = vm.fileList[val]
-        vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+        vm.checkedItem = {}
         var num = 0
-        vm.fileList.forEach((item)=>{
-            if(item.checked){
-                num++
+        var checkList = []
+        vm.checkAll = false
+        if(isMultiSelect){
+             vm.fileList[val].checked =  vm.fileList[val].checked?false:true
+             vm.fileList.forEach((item)=>{
+                if(item.checked){
+                    num++
+                    checkList.push(item)
+                }
+            })
+            if(num == 1){
+                vm.checkOne = true
+                vm.checkedItem = checkList[0]
+            }else{
+                vm.checkOne = false 
             }
-        })
-        if(num == 1){
-            vm.checkOne = true
         }else{
-           vm.checkOne = false 
+            for(var i=0;i<vm.fileList.length;i++){
+                vm.fileList[i].checked = false
+            }
+            vm.fileList[val].checked = true
+            vm.checkedItem = vm.fileList[val]
+            vm.checkOne = true
         }
-        vm.getGouJianInfo()
-        vm.getVersion()
     },
     getVersion(){
          var vm = this
