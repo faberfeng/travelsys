@@ -492,12 +492,9 @@ export default {
                 }else{
                     alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
                 }
-                
             }else{
                 alert('请正确输入表单')
             }
-            
-            
         },
         editListClose(){
             this.editListShow = false

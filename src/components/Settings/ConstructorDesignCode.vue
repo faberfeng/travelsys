@@ -74,8 +74,8 @@
                         <input class="editSelect" v-model="codeType" disabled/>
                         <i class="icon-sanjiao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newCodeChange" v-model="newCode"/></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="editNewCodeChange" v-model="newCode"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="editNewTitleChange" v-model="newTitle"/></div>
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">完整编码 :</label>
                         <span v-text="totalCode" class="editInpTextInp"></span>
@@ -807,7 +807,8 @@ export default {
             showConvenienceType:'',
             showConvenienceObject:{},
             localType:'',
-            localStatus:''
+            localStatus:'',
+            addIsTrue:''
         }
     },
     created(){
@@ -993,55 +994,86 @@ export default {
             }
             this.editListShowtwice = true;
         },
+        editNewCodeChange(){
+            var arr1 = this.totalCode.substr(0,2);
+            var arr2 = this.totalCode.substr(2,2);
+            var arr3 = this.totalCode.substr(4,2);
+            if(this.codeType.substr(5,1) == 1){
+                this.totalCode = this.newCode+arr2+arr3;
+            }else if(this.codeType.substr(5,1) == 2){
+                this.totalCode = arr1+this.newCode+arr3;
+            }else if(this.codeType.substr(5,1) == 3){
+                this.totalCode = arr1+arr2+this.newCode;    
+            }
+        },
+        editNewTitleChange(){
+            if(this.codeType.substr(5,1) ==1){
+                this.totalTitle = this.newTitle;
+            }else if(this.codeType.substr(5,1) ==2){
+                this.totalTitle = this.totalTitle.split('-')[0]+'-'+this.newTitle;
+            }else if(this.codeType.substr(5,1) ==3){
+                this.totalTitle = this.totalTitle.split('-')[0]+'-'+this.totalTitle.split('-')[1]+'-'+this.newTitle;  
+            }
+        },
         //保存编辑
         editListSureBtn(){
             var colorCode_0 = this.toBeColorCode(this.firstTitle);
             var colorCode_1 = this.toBeColorCode(this.secondTitle);
             var colorCode_2 = this.toBeColorCode(this.thirdTitle);
-            // console.log(editObject)
             if(this.newTitle == '' || this.newCode == ''){
-                alert('请输入编码和标题')
+                alert('请输入编码和标题');
             }else{
-                var flag = '';
-                if(this.editObject.row.status == 2){
-                    flag = 1;
-                }else if(this.editObject.row.status == 0){
-                    flag = 0;
-                }
-                axios({
-                    method:'post',
-                    url:this.baseUrl+'Config/updateGenieClass',
-                    headers:{
-                        token:this.token,
-                    },
-                    params:{
-                        projId:this.projId
-                    },
-                    data:{
-                        id:this.editObject.row.id,
-                        level:this.editObject.row.level,
-                        materialIndex:[colorCode_0,colorCode_1,colorCode_2],
-                        number:this.editObject.row.number,
-                        parNumber:this.editObject.row.number,
-                        status:flag,
-                        title:this.newTitle
-                    }
-                }).then((response)=>{
-                    if(response.data.cd == '0'){
-                        this.getProjectGenieClassByProject();
-                        this.totalTitle = '';
-                        this.totalCode = '';
-                        this.newCode = '';
-                        this.newTitle = '';
-                        this.codeType = '';
-                        this.editListShowtwice = false;
-                    }else if(response.data.cd == '-1'){
+                if(isNaN(this.newCode)){
+                    alert(`新建编码必须为数字!`);
+                }else{
+                    var newCode = this.newCode;
+                    this.getItemNumber(this.constructorData,this.totalCode);
+                    if(this.addIsTrue && this.newCode != newCode){
+                        alert('编码已经存在,不能添加!');
+                        this.addIsTrue = false;
                     }else{
-                        this.$router.push({
-                            path:'/login'
+                        var flag = '';
+                        if(this.editObject.row.status == 2){
+                            flag = 1;
+                        }else if(this.editObject.row.status == 0){
+                            flag = 0;
+                        }
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'Config/updateGenieClass',
+                            headers:{
+                                token:this.token,
+                            },
+                            params:{
+                                projId:this.projId
+                            },
+                            data:{
+                                id:this.editObject.row.id,
+                                level:this.editObject.row.level,
+                                materialIndex:[colorCode_0,colorCode_1,colorCode_2],
+                                number:this.totalCode,
+                                parNumber:this.editObject.row.number,
+                                status:flag,
+                                title:this.newTitle
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == '0'){
+                                this.getProjectGenieClassByProject();
+                                this.totalTitle = '';
+                                this.totalCode = '';
+                                this.newCode = '';
+                                this.newTitle = '';
+                                this.codeType = '';
+                                this.editListShowtwice = false;
+                            }else if(response.data.cd == '-1'){
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
                         })
                     }
-                })
+                }
             }  
         },
         //取消编辑
@@ -1856,54 +1888,67 @@ export default {
             this.thirdTitle = '默认';
             this.codeType = "Level1";
         },
+        //循环遍历数据获得number
+        getItemNumber(pData,pNum){
+            pData.forEach((item,index,arr)=>{
+                if(item.number == pNum){
+                    this.addIsTrue = true;
+                }else if(item.number != pNum && item.children.length!=0){
+                    this.getItemNumber(item.children,pNum);
+                }
+            })
+        },
         //确认添加
         addListSureBtn(){
-            if(this.totalCode =='' || this.newTitle ==''){
+            if(this.totalCode =='' || this.newTitle =='' || this.codeType == ''){
                 alert('请确认表单是否填写正确');
             }else{
-                 if(this.newCode.split('').length != '2'){
-                    alert(`新建编码的长度必须是2`);
+                if(isNaN(this.newCode)){
+                    alert(`新建编码必须为数字!`);
                 }else{
-                    axios({
-                        method:'post',
-                        url:this.baseUrl+'Config/addGenieClass',
-                        headers:{
-                            token:this.token
-                        },
-                        params:{
-                            projId:this.projId
-                        },
-                        data:{
-                            level:this.codeType.substr(5,1),
-                            materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
-                            number:this.totalCode,
-                            status:0,
-                            title:this.newTitle
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == '0'){
-                            this.getProjectGenieClassByProject();
-                            this.showO = false;
-                            this.showT = false;
-                            this.codeType = '';
-                            this.totalCode ='';
-                            this.newTitle ='';
-                            this.newCode ='';
-                            this.totalTitle ='';
-                            this.addListShow = false;
-                        }else if(response.data.cd == '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
+                    this.getItemNumber(this.constructorData,this.totalCode);
+                    if(this.addIsTrue){
+                        alert('编码已经存在,不能添加!');
+                        this.addIsTrue = false;
+                    }else{
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'Config/addGenieClass',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{
+                                projId:this.projId
+                            },
+                            data:{
+                                level:this.codeType.substr(5,1),
+                                materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
+                                number:this.totalCode,
+                                status:0,
+                                title:this.newTitle
+                            }
+                        }).then((response)=>{
+                            if(response.data.cd == '0'){
+                                this.getProjectGenieClassByProject();
+                                this.showO = false;
+                                this.showT = false;
+                                this.codeType = '';
+                                this.totalCode ='';
+                                this.newTitle ='';
+                                this.newCode ='';
+                                this.totalTitle ='';
+                                this.addListShow = false;
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        })
+                    }
                 }
-                
             }
-            
-            
         },
         //取消添加
         addListCancelBtn(){
@@ -2450,7 +2495,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
                     this.goujianProperty = response.data.rt;
                 }else if(response.data.cd  == '-1'){
                     alert(response.data.msg)
