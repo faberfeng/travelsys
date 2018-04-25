@@ -366,7 +366,7 @@ export default {
                 this.constructorData.forEach((item,index)=>{
                     if(item.number==scope.row.parNumber){
                         this.totalTitle = item.title+'-'+scope.row.title;
-                        this.fTitle = scope.row.title;
+                        this.fTitle = item.title;
                     }
                 })
             }else if(scope.row.level == 3){
@@ -374,10 +374,11 @@ export default {
                 this.constructorData.forEach((item,index)=>{
                     if(item.number.substr(0,2)==scope.row.parNumber.substr(0,2)){
                         this.totalTitle = item.title+'-';
+                        this.fTitle = item.title;
                         item.children.forEach(item=>{
                             if(item.number == scope.row.parNumber){
                                 this.totalTitle = this.totalTitle+item.title+'-'+scope.row.title;
-                                this.sTitle = scope.row.title;
+                                this.sTitle = item.title;
                             }
                         })
                     }
@@ -387,15 +388,17 @@ export default {
                 this.constructorData.forEach((item,index)=>{
                     if(item.number.substr(0,2)==scope.row.parNumber.substr(0,2)){
                         this.totalTitle = item.title+'-';
+                        this.fTitle = item.title;
                         item.children.forEach(item=>{
-                            if(item.number == scope.row.parNumber){
-                                this.totalTitle = this.totalTitle+item.title+'-'+scope.row.title;
-                                // item.children.forEach(item=>{
-                                //     if(item.number == scope.row.parNumber){
-                                //         this.totalTitle = this.totalTitle+item.title+'-'+item.title+'-'+scope.row.title;
-                                //         this.tTitle = scope.row.title;
-                                //     }
-                                // })
+                            if(item.number.substr(2,2)==scope.row.parNumber.substr(2,2)){
+                                this.totalTitle = this.totalTitle+item.title+'-';
+                                this.sTitle = item.title;
+                                item.children.forEach(item=>{
+                                    if(item.number == scope.row.parNumber){
+                                        this.totalTitle = this.totalTitle+item.title+'-'+scope.row.title;
+                                        this.tTitle = item.title;
+                                    }
+                                })
                             }
                         })
                     }
