@@ -463,7 +463,6 @@ export default {
         },
         //编辑确定
         editListSure(){
-            
             var keyTypeName = 0;
             if( this.keyTypeVal == '族名称'){
                 keyTypeName = 0;
@@ -490,7 +489,7 @@ export default {
                         })
                         var copyKeyWord =  this.keyWord;
                         if(keyword){
-                            alert('已存在的族名称关键字不能包含当前族名称关键字!');
+                            alert('关键字已存在，不能添加!');
                         }else{
                             axios({
                                 method:'post',
@@ -704,7 +703,7 @@ export default {
                                 revitCa = "Planting";
                             }
                             var keyword = this.totalConstructorData.some(item=>{
-                                if(item.revitCategory == revitCa && item.keyType == value && item.keyWord == this.keyWord){
+                                if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord == this.keyWord){
                                     return true;
                                 }else{
                                     return false;
