@@ -1,9 +1,9 @@
 <template>
     <div class="wrapper">
         <div id="buildProperty">
-            <h4 class="title"><span>构建属性语意编码</span></h4>
+            <h4 class="title"><span>构件属性语意编码</span></h4>
             <div class="manageWorktool" >
-                <span class="worktooltitle">分类编码</span>
+                <span class="worktooltitle">分类构件</span>
                 <span class="pTable">属性表:</span>
                 <span class="inputSpan" style="display:inline-block;position:relative">
                     <select class="selectInp" v-model="propertyTable" @change="propertyTableChange">
@@ -820,7 +820,6 @@ export default {
         //添加编码
         addConstructor(){
             this.addListShow =true;
-            console.log(this.constructorData);
         },
         //循环遍历数据获得number
         getItemNumber(pData,pNum){
@@ -877,7 +876,6 @@ export default {
                                     this.newCode ='';
                                     this.totalTitle ='';
                                     this.valueTypeTextT =0;
-                                    this.propertyTable ="";
                                     this.addListShow = false;
                                 }else if(response.data.cd == '-1'){
                                     alert(response.data.msg)
