@@ -42,7 +42,7 @@
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv" v-if="scope.row.IsDefault==false"  @click="deleteFloorRow(scope, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv" v-if="scope.row.IsDefault==false" v-show="scope.row.BottomHeight != '最小值'"  @click="deleteFloorRow(scope, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -121,7 +121,7 @@
             <el-dialog title="编辑竖向楼层" :visible.sync="editFloorList" :before-close="cancleEditFloorList">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
-                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入" v-model="FloorValue"/></div>
+                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入"  :disabled="disableShowEdit" v-model="FloorValue"/></div>
                 </div>
                 <el-checkbox v-model="setAsDefault" :disabled="isDisabled">设置为默认楼层</el-checkbox>
                 <div slot="footer" class="dialog-footer">
@@ -203,6 +203,7 @@ export default {
             state:'加载'
         }],
         floorIndex:'',
+        floorScope:{},
         baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
         token:'',
         projId:'',
@@ -216,6 +217,7 @@ export default {
         deletepartitionContent:'',
         subProjectsIndex:0,
         isDisabled:false,
+        disableShowEdit:''
 
       }
     },
@@ -297,6 +299,14 @@ export default {
             }else{
                 this.isDisabled = false;
             }
+            // this.floorScope = scope;
+            console.log(scope)
+            if(scope.row.BottomHeight == '最小值'){
+                this.disableShowEdit = true;
+            }else{
+                this.disableShowEdit = false;
+            }
+
             this.floorIndex = scope.$index;
             this.setAsDefault = this.florData[this.floorIndex].IsDefault;
             this.FloorName = this.florData[this.floorIndex].Name;
@@ -361,6 +371,7 @@ export default {
         },
         //删除竖向楼层
         deleteFloorRow(scope){
+            
             this.floorIndex = scope.$index;
             this.deleteFloorDialog = true;
         },
@@ -481,13 +492,15 @@ export default {
                         };
                         if(item.BottomHeight == -2147483648){
                             item = Object.assign(item,{
-                                BottomHeight:'最小值'
+                                BottomHeight:'最小值',
+                                isShowDelete:false
                             })
                         }
                         item = Object.assign(item,{
                             index:index
                         })
                     });
+                    console.log(this.florData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{

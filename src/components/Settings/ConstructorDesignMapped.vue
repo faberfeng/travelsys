@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper" id="ShejiGoujian">
-    <h4 class="title"><span>设计构件分类编码</span></h4>
+    <h4 class="title"><span>设计构件分类映射</span></h4>
     <div class="manageWorktool">
-        <span class="worktooltitle">分类编码</span>
+        <span class="worktooltitle">分类映射</span>
         <button class="btn" @click="addYingshe"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
             <div style="padding:0;box-sizing: border-box;">
@@ -463,7 +463,6 @@ export default {
         },
         //编辑确定
         editListSure(){
-            
             var keyTypeName = 0;
             if( this.keyTypeVal == '族名称'){
                 keyTypeName = 0;
@@ -490,7 +489,7 @@ export default {
                         })
                         var copyKeyWord =  this.keyWord;
                         if(keyword){
-                            alert('已存在的族名称关键字不能包含当前族名称关键字!');
+                            alert('关键字已存在，不能添加!');
                         }else{
                             axios({
                                 method:'post',
@@ -565,12 +564,12 @@ export default {
                         if(this.designValue == ''){
                             alert('请至少选择设计专业！');
                         }else{
-                            var value = 0; 
+                            var value = ''; 
                             if(this.keyTypeVal == '族名称'){
                                 value = 0;
                             }else if(this.keyTypeVal == '类型名称'){
-                                value =1;
-                            }else if(this.keyType == '系统名称'){
+                                value = 1;
+                            }else if(this.keyTypeVal == '系统名称'){
                                 value = 2;
                             }
                             //需要添加映射toDoList
@@ -703,15 +702,19 @@ export default {
                             }else if(this.revitCategory == '植物'){
                                 revitCa = "Planting";
                             }
+                            console.log(this.revitCategory);
+                            console.log(value);
+                            console.log(this.keyWord);
                             var keyword = this.totalConstructorData.some(item=>{
-                                if(item.revitCategory == revitCa && item.keyType == value && item.keyWord == this.keyWord){
+                                if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord == this.keyWord){
                                     return true;
                                 }else{
                                     return false;
                                 }
                             })
+                            console.log(keyword)
                             if(keyword){
-                                alert('关键字已经存在，不能添加')
+                                alert('关键字已经存在，不能添加！')
                             }else{
                                 axios({
                                     method:'post',

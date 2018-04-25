@@ -998,6 +998,9 @@ export default {
             var arr1 = this.totalCode.substr(0,2);
             var arr2 = this.totalCode.substr(2,2);
             var arr3 = this.totalCode.substr(4,2);
+            if(this.newCode == ''){
+                this.newCode = '00';
+            }
             if(this.codeType.substr(5,1) == 1){
                 this.totalCode = this.newCode+arr2+arr3;
             }else if(this.codeType.substr(5,1) == 2){
@@ -1007,6 +1010,7 @@ export default {
             }
         },
         editNewTitleChange(){
+            
             if(this.codeType.substr(5,1) ==1){
                 this.totalTitle = this.newTitle;
             }else if(this.codeType.substr(5,1) ==2){
@@ -1026,9 +1030,10 @@ export default {
                 if(isNaN(this.newCode)){
                     alert(`新建编码必须为数字!`);
                 }else{
-                    var newCode = this.newCode;
+                    console.log(this.editObject)
                     this.getItemNumber(this.constructorData,this.totalCode);
-                    if(this.addIsTrue && this.newCode != newCode){
+                    console.log(this.addIsTrue);
+                    if(this.addIsTrue && this.totalCode != this.editObject.row.number){
                         alert('编码已经存在,不能添加!');
                         this.addIsTrue = false;
                     }else{
@@ -1123,7 +1128,16 @@ export default {
         //通过
         pass(scope){
             this.passObject = scope;
-            this.passVisible =true;
+            if(scope.row.parNumber){
+                this.getParentNum(this.constructorData,scope.row.parNumber)
+                if(this.localStatus == 0 || this.localStatus == 1 || this.localStatus == 2){
+                    alert('该编码的所有父编码必须为【正常使用】状态，才能通过提请!')
+                }else{
+                    this.passVisible =true;
+                }
+            }else{
+                this.passVisible =true;
+            }
         },
         //确认通过
         surePass(){
@@ -1159,7 +1173,6 @@ export default {
                     })
                 }
             })
-            
         },
         //取消通过
         cancelPass(){
