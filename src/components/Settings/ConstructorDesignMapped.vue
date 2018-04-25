@@ -236,6 +236,7 @@ export default {
           deleteNum:'',
           oldFamilyNameKeyWord:'',//旧关键字值
           deleteDialog:false,//删除确定按钮
+          totalConstructorData:[],//总的信息
 
         }
     },
@@ -245,6 +246,7 @@ export default {
         this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
         this.getGeniceClassMapJson();
         this.getGeniceClassJson();
+        this.firstGetGeniceClassMapItem();
     },
     watch:{
         'pageDetial.currentPage':function(newVal,oldVal){//不能使用箭头函数
@@ -252,6 +254,33 @@ export default {
         }
     },
     methods:{
+        //第一次加载获取总的数据量
+        firstGetGeniceClassMapItem(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getGenieClassMapItem',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    page:1,
+                    rows:20
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.pageDetial.total = response.data.rt.total;
+                }else if(response.data.cd == -1){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }).then(()=>{
+                this.getTotalGeniceClassMapItem();
+            })
+        },
         //获取分类映射信息
         getGeniceClassMapItem(index,num){
             axios({
@@ -280,6 +309,32 @@ export default {
                     })
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        //获取总的分类映射信息
+        getTotalGeniceClassMapItem(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'Config/getGenieClassMapItem',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    page:1,
+                    rows:this.pageDetial.total
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    console.log(response.data)
+                    this.totalConstructorData = response.data.rt.rows;
+                }else if (response.data.cd == -1){
+                    alert(response.data.msg);
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -408,53 +463,78 @@ export default {
         },
         //编辑确定
         editListSure(){
-            this.editListShow = false;
-            var keyTypeName = '';
-            if( this.keyTypeVal = '族名称'){
+            
+            var keyTypeName = 0;
+            if( this.keyTypeVal == '族名称'){
                 keyTypeName = 0;
-            }else if(this.keyTypeVal ='类型名称'){
+            }else if(this.keyTypeVal == '类型名称'){
                 keyTypeName = 1;
-            }else if(this.keyTypeVal='系统名称'){
+            }else if(this.keyTypeVal == '系统名称'){
                 keyTypeName = 2;
             }
-            axios({
-                method:'post',
-                url:this.baseUrl+'Config/updateGenieClassMap',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    familyNameKeyWord:this.keyWord,
-                    familyTypeKeyWord:keyTypeName,
-                    genieClassCode:this.categoryBase,
-                    id:this.constructorData[this.editUserNum].pkId,
-                    oldFamilyNameKeyWord:this.oldFamilyNameKeyWord,
-                    revitCategory:this.constructorData[this.editUserNum].revitCategory,
-                    revitName:this.revitCategory
-                }   
-            }).then(response=>{
-                if(response.data.cd=='0'){
-                    this.editListShow = false;
-                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
-                    this.revitCategory = '';
-                    this.keyTypeVal = '';
-                    this.keyWord = '';
-                    this.designValue = '';
-                    this.oldFamilyNameKeyWord = '';
-                    this.logicSystemValue = '';
-                    this.goujianType = '';
-                    this.categoryBase = '';
-                }else if(response.data.cd =='-1'){
-                    alert(response.data.msg)
+            if(this.keyTypeVal == ''){
+                alert('关键字类型不能为空!');
+            }else{
+                if(this.keyWord == ''){
+                    alert('包含关键字不能为空!');
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    if(this.designValue == ''){
+                        alert('至少选择设计专业!')
+                    }else{
+                        var keyword = this.totalConstructorData.some(item=>{
+                            if(item.chsCategory == this.revitCategory && item.keyType == keyTypeName && item.keyWord == this.keyWord){
+                                return true;
+                            }else{
+                                return false;
+                            }
+                        })
+                        var copyKeyWord =  this.keyWord;
+                        if(keyword){
+                            alert('已存在的族名称关键字不能包含当前族名称关键字!');
+                        }else{
+                            axios({
+                                method:'post',
+                                url:this.baseUrl+'Config/updateGenieClassMap',
+                                headers:{
+                                    token:this.token
+                                },
+                                params:{
+                                    projId:this.projId
+                                },
+                                data:{
+                                    familyNameKeyWord:this.keyWord,
+                                    familyTypeKeyWord:keyTypeName,
+                                    genieClassCode:this.categoryBase,
+                                    id:this.constructorData[this.editUserNum].pkId,
+                                    oldFamilyNameKeyWord:this.oldFamilyNameKeyWord,
+                                    revitCategory:this.constructorData[this.editUserNum].revitCategory,
+                                    revitName:this.revitCategory
+                                }   
+                            }).then(response=>{
+                                if(response.data.cd=='0'){
+                                    this.editListShow = false;
+                                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                                    this.revitCategory = '';
+                                    this.keyTypeVal = '';
+                                    this.keyWord = '';
+                                    this.designValue = '';
+                                    this.oldFamilyNameKeyWord = '';
+                                    this.logicSystemValue = '';
+                                    this.goujianType = '';
+                                    this.categoryBase = '';
+                                    this.editListShow = false;
+                                }else if(response.data.cd =='-1'){
+                                    alert(response.data.msg)
+                                }else{
+                                    this.$router.push({
+                                        path:'/login'
+                                    })
+                                }
+                            })
+                        }    
+                    }
                 }
-            })
+            }
         },
         listClose(){
             this.editListShow = false;
@@ -472,181 +552,224 @@ export default {
             this.addListShow = true;
         },
         addListSure(){
-            var value = 0; 
-            if(this.keyTypeVal == '族名称'){
-                value = 0;
-            }else if(this.keyTypeVal == '类型名称'){
-                value =1;
-            }else if(this.keyType == '系统名称'){
-                value=2;
-            }
-            //需要添加映射toDoList
-            var revitCa =''
-            if(this.revitCategory == '安全设备'){
-                revitCa = "SecurityDevices";
-            }else if(this.revitCategory == '常规模型'){
-                revitCa = "GenericModel";
-            }
-            else if(this.revitCategory == '场地构件'){
-                revitCa = "Site";
-            }else if(this.revitCategory == '橱柜'){
-                revitCa = "Casework";
-            }else if(this.revitCategory == '窗'){
-                revitCa = "Windows";
-            }else if(this.revitCategory == '道路'){
-                revitCa = "Roads";
-            }else if(this.revitCategory == '灯具装饰'){
-                revitCa = "LightingFixtures";
-            }else if(this.revitCategory == '地形'){
-                revitCa = "Topography";
-            }else if(this.revitCategory == '电器设备'){
-                revitCa = "ElectricalEquipment";
-            }else if(this.revitCategory == '电缆桥架'){
-                revitCa = "CableTray";
-            }else if(this.revitCategory == '电话设备'){
-                revitCa = "TelephoneDevices";
-            }else if(this.revitCategory == '电话设备'){
-                revitCa = "TelephoneDevices";
-            }else if(this.revitCategory == '电气装置'){
-                revitCa = "ElectricalFixtures";
-            }else if(this.revitCategory == '电缆桥架配件'){
-                revitCa = "CableTrayFitting";
-            }else if(this.revitCategory == '叠层墙'){
-                revitCa = "StackedWalls";
-            }else if(this.revitCategory == '风管管件'){
-                revitCa = "DuctFitting";
-            }else if(this.revitCategory == '封檐带'){
-                revitCa = "Fascia";
-            }else if(this.revitCategory == '风管附件'){
-                revitCa = "DuctAccessory";
-            }else if(this.revitCategory == '风管'){
-                revitCa = "	DuctCurves";
-            }else if(this.revitCategory == '管道'){
-                revitCa = "DuctTerminal";
-            }else if(this.revitCategory == '管件'){
-                revitCa = "PipeFitting";
-            }else if(this.revitCategory == '管路附件'){
-                revitCa = "PipeAccessory";
-            }else if(this.revitCategory == '护理呼叫设备'){
-                revitCa = "NurseCallDevices";
-            }else if(this.revitCategory == '环境元素'){
-                revitCa = "Entourage";
-            }else if(this.revitCategory == '火警设备'){
-                revitCa = "FireAlarmDevices";
-            }else if(this.revitCategory == '机械设备'){
-                revitCa = "MechanicalEquipment	";
-            }else if(this.revitCategory == '家具'){
-                revitCa = "Furniture	";
-            }else if(this.revitCategory == '建筑柱'){
-                revitCa = "Columns	";
-            }else if(this.revitCategory == '建筑地坪'){
-                revitCa = "BuildingPad	";
-            }else if(this.revitCategory == '结构加强版'){
-                revitCa = "StructuralFraming";
-            }else if(this.revitCategory == '结构框架'){
-                revitCa = "StructuralFraming	";
-            }else if(this.revitCategory == '结构连接'){
-                revitCa = "StructConnections";
-            }else if(this.revitCategory == '结构柱'){
-                revitCa = "StructuralColumns";
-            }else if(this.revitCategory == '结构基础'){
-                revitCa = "StructuralFoundation";
-            }else if(this.revitCategory == '栏杆'){
-                revitCa = "StairsRailing";
-            }else if(this.revitCategory == '楼板'){
-                revitCa = "Floors";
-            }else if(this.revitCategory == '楼梯'){
-                revitCa = "Stairs";
-            }else if(this.revitCategory == '门'){
-                revitCa = "Doors";
-            }else if(this.revitCategory == '幕墙竖梃'){
-                revitCa = "CurtainWallMullions";
-            }else if(this.revitCategory == '幕墙嵌板'){
-                revitCa = "CurtainWallPanels";
-            }else if(this.revitCategory == '喷头'){
-                revitCa = "CurtainWallPanels";
-            }else if(this.revitCategory == '坡道'){
-                revitCa = "Ramps";
-            }else if(this.revitCategory == '幕墙嵌板'){
-                revitCa = "CurtainWallPanels";
-            }else if(this.revitCategory == '喷头'){
-                revitCa = "Sprinklers	";
-            }else if(this.revitCategory == '墙'){
-                revitCa = "Walls";
-            }else if(this.revitCategory == '墙饰条'){
-                revitCa = "Cornices";
-            }else if(this.revitCategory == '软管'){
-                revitCa = "FlexPipeCurves";
-            }else if(this.revitCategory == '软风管'){
-                revitCa = "FlexDuctCurves";
-            }else if(this.revitCategory == '数据设备'){
-                revitCa = "DataDevices";
-            }else if(this.revitCategory == '体量'){
-                revitCa = "Mass";
-            }else if(this.Ceilings == '天花板'){
-                revitCa = "Walls";
-            }else if(this.Ceilings == '停车场'){
-                revitCa = "Parking";
-            }else if(this.Ceilings == '天花板'){
-                revitCa = "Walls";
-            }else if(this.Ceilings == '卫浴装置'){
-                revitCa = "PlumbingFixtures";
-            }else if(this.Ceilings == '通迅设备'){
-                revitCa = "CommunicationDevices";
-            }else if(this.Ceilings == '屋檐底板'){
-                revitCa = "RoofSoffit";
-            }else if(this.Ceilings == '屋面'){
-                revitCa = "Roofs";
-            }else if(this.Ceilings == '线管'){
-                revitCa = "Conduit";
-            }else if(this.Ceilings == '线管配件'){
-                revitCa = "ConduitFitting";
-            }else if(this.Ceilings == '	檐沟'){
-                revitCa = "Gutter";
-            }else if(this.Ceilings == '照明设备'){
-                revitCa = "LightingDevices";
-            }else if(this.Ceilings == '专用设备'){
-                revitCa = "SpecialityEquipment";
-            }else if(this.Ceilings == '植物'){
-                revitCa = "Planting";
-            }
-            axios({
-                method:'post',
-                url:this.baseUrl+'Config/addGenieClassMap',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId
-                },
-                data:{
-                    familyNameKeyWord:this.keyWord,
-                    familyTypeKeyWord:value,
-                    genieClassCode:this.categoryBase,
-                    revitCategory:revitCa,
-                    revitName:this.revitCategory
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
-                    this.keyWord='';
-                    this.categoryBase ='';
-                    this.revitCategory ='';
-                    this.keyTypeVal ='';
-                    this.revitCategory = '';
-                    this.designValue = '';
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
+           //Revit族类别 revitCategory 关键字类型 keyTypeVal 关键字 keyword
+            if(this.revitCategory == ''){
+                alert('请选择Revit族类别！');
+            }else{
+                if(this.keyTypeVal == ''){
+                    alert('请选择关键字类型！');
                 }else{
-                    this.$router.push({
-                        path:'login'
-                    })
+                    if(this.keyWord == ''){
+                        alert('请输入关键字！');
+                    }else{
+                        if(this.designValue == ''){
+                            alert('请至少选择设计专业！');
+                        }else{
+                            var value = 0; 
+                            if(this.keyTypeVal == '族名称'){
+                                value = 0;
+                            }else if(this.keyTypeVal == '类型名称'){
+                                value =1;
+                            }else if(this.keyType == '系统名称'){
+                                value = 2;
+                            }
+                            //需要添加映射toDoList
+                            var revitCa =''
+                            if(this.revitCategory == '安全设备'){
+                                revitCa = "SecurityDevices";
+                            }else if(this.revitCategory == '常规模型'){
+                                revitCa = "GenericModel";
+                            }
+                            else if(this.revitCategory == '场地构件'){
+                                revitCa = "Site";
+                            }else if(this.revitCategory == '橱柜'){
+                                revitCa = "Casework";
+                            }else if(this.revitCategory == '窗'){
+                                revitCa = "Windows";
+                            }else if(this.revitCategory == '道路'){
+                                revitCa = "Roads";
+                            }else if(this.revitCategory == '灯具装饰'){
+                                revitCa = "LightingFixtures";
+                            }else if(this.revitCategory == '地形'){
+                                revitCa = "Topography";
+                            }else if(this.revitCategory == '电器设备'){
+                                revitCa = "ElectricalEquipment";
+                            }else if(this.revitCategory == '电缆桥架'){
+                                revitCa = "CableTray";
+                            }else if(this.revitCategory == '电话设备'){
+                                revitCa = "TelephoneDevices";
+                            }else if(this.revitCategory == '电话设备'){
+                                revitCa = "TelephoneDevices";
+                            }else if(this.revitCategory == '电气装置'){
+                                revitCa = "ElectricalFixtures";
+                            }else if(this.revitCategory == '电缆桥架配件'){
+                                revitCa = "CableTrayFitting";
+                            }else if(this.revitCategory == '叠层墙'){
+                                revitCa = "StackedWalls";
+                            }else if(this.revitCategory == '风管管件'){
+                                revitCa = "DuctFitting";
+                            }else if(this.revitCategory == '封檐带'){
+                                revitCa = "Fascia";
+                            }else if(this.revitCategory == '风管附件'){
+                                revitCa = "DuctAccessory";
+                            }else if(this.revitCategory == '风管'){
+                                revitCa = "	DuctCurves";
+                            }else if(this.revitCategory == '管道'){
+                                revitCa = "DuctTerminal";
+                            }else if(this.revitCategory == '管件'){
+                                revitCa = "PipeFitting";
+                            }else if(this.revitCategory == '管路附件'){
+                                revitCa = "PipeAccessory";
+                            }else if(this.revitCategory == '护理呼叫设备'){
+                                revitCa = "NurseCallDevices";
+                            }else if(this.revitCategory == '环境元素'){
+                                revitCa = "Entourage";
+                            }else if(this.revitCategory == '火警设备'){
+                                revitCa = "FireAlarmDevices";
+                            }else if(this.revitCategory == '机械设备'){
+                                revitCa = "MechanicalEquipment	";
+                            }else if(this.revitCategory == '家具'){
+                                revitCa = "Furniture";
+                            }else if(this.revitCategory == '建筑柱'){
+                                revitCa = "Columns";
+                            }else if(this.revitCategory == '建筑地坪'){
+                                revitCa = "BuildingPad";
+                            }else if(this.revitCategory == '结构加强版'){
+                                revitCa = "StructuralFraming";
+                            }else if(this.revitCategory == '结构框架'){
+                                revitCa = "StructuralFraming";
+                            }else if(this.revitCategory == '结构连接'){
+                                revitCa = "StructConnections";
+                            }else if(this.revitCategory == '结构柱'){
+                                revitCa = "StructuralColumns";
+                            }else if(this.revitCategory == '结构基础'){
+                                revitCa = "StructuralFoundation";
+                            }else if(this.revitCategory == '栏杆'){
+                                revitCa = "StairsRailing";
+                            }else if(this.revitCategory == '楼板'){
+                                revitCa = "Floors";
+                            }else if(this.revitCategory == '楼梯'){
+                                revitCa = "Stairs";
+                            }else if(this.revitCategory == '门'){
+                                revitCa = "Doors";
+                            }else if(this.revitCategory == '幕墙竖梃'){
+                                revitCa = "CurtainWallMullions";
+                            }else if(this.revitCategory == '幕墙嵌板'){
+                                revitCa = "CurtainWallPanels";
+                            }else if(this.revitCategory == '喷头'){
+                                revitCa = "CurtainWallPanels";
+                            }else if(this.revitCategory == '坡道'){
+                                revitCa = "Ramps";
+                            }else if(this.revitCategory == '幕墙嵌板'){
+                                revitCa = "CurtainWallPanels";
+                            }else if(this.revitCategory == '喷头'){
+                                revitCa = "Sprinklers	";
+                            }else if(this.revitCategory == '墙'){
+                                revitCa = "Walls";
+                            }else if(this.revitCategory == '墙饰条'){
+                                revitCa = "Cornices";
+                            }else if(this.revitCategory == '软管'){
+                                revitCa = "FlexPipeCurves";
+                            }else if(this.revitCategory == '软风管'){
+                                revitCa = "FlexDuctCurves";
+                            }else if(this.revitCategory == '数据设备'){
+                                revitCa = "DataDevices";
+                            }else if(this.revitCategory == '体量'){
+                                revitCa = "Mass";
+                            }else if(this.revitCategory == '天花板'){
+                                revitCa = "Walls";
+                            }else if(this.revitCategory == '停车场'){
+                                revitCa = "Parking";
+                            }else if(this.revitCategory == '天花板'){
+                                revitCa = "Walls";
+                            }else if(this.revitCategory == '卫浴装置'){
+                                revitCa = "PlumbingFixtures";
+                            }else if(this.revitCategory == '通迅设备'){
+                                revitCa = "CommunicationDevices";
+                            }else if(this.revitCategory == '屋檐底板'){
+                                revitCa = "RoofSoffit";
+                            }else if(this.revitCategory == '屋面'){
+                                revitCa = "Roofs";
+                            }else if(this.revitCategory == '线管'){
+                                revitCa = "Conduit";
+                            }else if(this.revitCategory == '线管配件'){
+                                revitCa = "ConduitFitting";
+                            }else if(this.revitCategory == '檐沟'){
+                                revitCa = "Gutter";
+                            }else if(this.revitCategory == '照明设备'){
+                                revitCa = "LightingDevices";
+                            }else if(this.revitCategory == '专用设备'){
+                                revitCa = "SpecialityEquipment";
+                            }else if(this.revitCategory == '植物'){
+                                revitCa = "Planting";
+                            }
+                            var keyword = this.totalConstructorData.some(item=>{
+                                if(item.revitCategory == revitCa && item.keyType == value && item.keyWord == this.keyWord){
+                                    return true;
+                                }else{
+                                    return false;
+                                }
+                            })
+                            if(keyword){
+                                alert('关键字已经存在，不能添加')
+                            }else{
+                                axios({
+                                    method:'post',
+                                    url:this.baseUrl+'Config/addGenieClassMap',
+                                    headers:{
+                                        token:this.token
+                                    },
+                                    params:{
+                                        projId:this.projId
+                                    },
+                                    data:{
+                                        familyNameKeyWord:this.keyWord,
+                                        familyTypeKeyWord:value,
+                                        genieClassCode:this.categoryBase,
+                                        revitCategory:revitCa,
+                                        revitName:this.revitCategory
+                                    }
+                                }).then(response=>{
+                                    if(response.data.cd == '0'){
+                                        this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                                        this.keyWord='';
+                                        this.categoryBase ='';
+                                        this.revitCategory ='';
+                                        this.keyTypeVal ='';
+                                        this.revitCategory = '';
+                                        this.designValue = '';
+                                        this.logicSystemValue = '';
+                                        this.goujianType = '';
+                                        this.addListShow = false;
+                                    }else if(response.data.cd == '-1'){
+                                        alert(response.data.msg)
+                                    }else{
+                                        this.$router.push({
+                                            path:'/login'
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    }
                 }
-            })
-            this.addListShow = false;
+            }
+
+            
+            
+            
         },
         addlistClose(){
+            this.keyWord='';
+            this.categoryBase ='';
+            this.revitCategory ='';
+            this.keyTypeVal ='';
+            this.revitCategory = '';
+            this.designValue = '';
+            this.logicSystemValue = '';
+            this.goujianType = '';
             this.addListShow = false;
+
         },
         //删除
         deleteUser(num){
@@ -725,7 +848,6 @@ export default {
         },
         //设计专业改变
         designChange(){
-            console.log(this.geniceClassJson)
             this.geniceClassJson.forEach((item,index,arr)=>{
                 if(item.title == this.designValue){
                     this.categoryBase = item.number;
