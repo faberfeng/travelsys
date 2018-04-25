@@ -568,139 +568,9 @@ export default {
                             if(this.keyTypeVal == '族名称'){
                                 value = 0;
                             }else if(this.keyTypeVal == '类型名称'){
-                                value =1;
+                                value = 1;
                             }else if(this.keyType == '系统名称'){
                                 value = 2;
-                            }
-                            //需要添加映射toDoList
-                            var revitCa =''
-                            if(this.revitCategory == '安全设备'){
-                                revitCa = "SecurityDevices";
-                            }else if(this.revitCategory == '常规模型'){
-                                revitCa = "GenericModel";
-                            }
-                            else if(this.revitCategory == '场地构件'){
-                                revitCa = "Site";
-                            }else if(this.revitCategory == '橱柜'){
-                                revitCa = "Casework";
-                            }else if(this.revitCategory == '窗'){
-                                revitCa = "Windows";
-                            }else if(this.revitCategory == '道路'){
-                                revitCa = "Roads";
-                            }else if(this.revitCategory == '灯具装饰'){
-                                revitCa = "LightingFixtures";
-                            }else if(this.revitCategory == '地形'){
-                                revitCa = "Topography";
-                            }else if(this.revitCategory == '电器设备'){
-                                revitCa = "ElectricalEquipment";
-                            }else if(this.revitCategory == '电缆桥架'){
-                                revitCa = "CableTray";
-                            }else if(this.revitCategory == '电话设备'){
-                                revitCa = "TelephoneDevices";
-                            }else if(this.revitCategory == '电话设备'){
-                                revitCa = "TelephoneDevices";
-                            }else if(this.revitCategory == '电气装置'){
-                                revitCa = "ElectricalFixtures";
-                            }else if(this.revitCategory == '电缆桥架配件'){
-                                revitCa = "CableTrayFitting";
-                            }else if(this.revitCategory == '叠层墙'){
-                                revitCa = "StackedWalls";
-                            }else if(this.revitCategory == '风管管件'){
-                                revitCa = "DuctFitting";
-                            }else if(this.revitCategory == '封檐带'){
-                                revitCa = "Fascia";
-                            }else if(this.revitCategory == '风管附件'){
-                                revitCa = "DuctAccessory";
-                            }else if(this.revitCategory == '风管'){
-                                revitCa = "	DuctCurves";
-                            }else if(this.revitCategory == '管道'){
-                                revitCa = "DuctTerminal";
-                            }else if(this.revitCategory == '管件'){
-                                revitCa = "PipeFitting";
-                            }else if(this.revitCategory == '管路附件'){
-                                revitCa = "PipeAccessory";
-                            }else if(this.revitCategory == '护理呼叫设备'){
-                                revitCa = "NurseCallDevices";
-                            }else if(this.revitCategory == '环境元素'){
-                                revitCa = "Entourage";
-                            }else if(this.revitCategory == '火警设备'){
-                                revitCa = "FireAlarmDevices";
-                            }else if(this.revitCategory == '机械设备'){
-                                revitCa = "MechanicalEquipment	";
-                            }else if(this.revitCategory == '家具'){
-                                revitCa = "Furniture";
-                            }else if(this.revitCategory == '建筑柱'){
-                                revitCa = "Columns";
-                            }else if(this.revitCategory == '建筑地坪'){
-                                revitCa = "BuildingPad";
-                            }else if(this.revitCategory == '结构加强版'){
-                                revitCa = "StructuralFraming";
-                            }else if(this.revitCategory == '结构框架'){
-                                revitCa = "StructuralFraming";
-                            }else if(this.revitCategory == '结构连接'){
-                                revitCa = "StructConnections";
-                            }else if(this.revitCategory == '结构柱'){
-                                revitCa = "StructuralColumns";
-                            }else if(this.revitCategory == '结构基础'){
-                                revitCa = "StructuralFoundation";
-                            }else if(this.revitCategory == '栏杆'){
-                                revitCa = "StairsRailing";
-                            }else if(this.revitCategory == '楼板'){
-                                revitCa = "Floors";
-                            }else if(this.revitCategory == '楼梯'){
-                                revitCa = "Stairs";
-                            }else if(this.revitCategory == '门'){
-                                revitCa = "Doors";
-                            }else if(this.revitCategory == '幕墙竖梃'){
-                                revitCa = "CurtainWallMullions";
-                            }else if(this.revitCategory == '幕墙嵌板'){
-                                revitCa = "CurtainWallPanels";
-                            }else if(this.revitCategory == '喷头'){
-                                revitCa = "CurtainWallPanels";
-                            }else if(this.revitCategory == '坡道'){
-                                revitCa = "Ramps";
-                            }else if(this.revitCategory == '幕墙嵌板'){
-                                revitCa = "CurtainWallPanels";
-                            }else if(this.revitCategory == '喷头'){
-                                revitCa = "Sprinklers	";
-                            }else if(this.revitCategory == '墙'){
-                                revitCa = "Walls";
-                            }else if(this.revitCategory == '墙饰条'){
-                                revitCa = "Cornices";
-                            }else if(this.revitCategory == '软管'){
-                                revitCa = "FlexPipeCurves";
-                            }else if(this.revitCategory == '软风管'){
-                                revitCa = "FlexDuctCurves";
-                            }else if(this.revitCategory == '数据设备'){
-                                revitCa = "DataDevices";
-                            }else if(this.revitCategory == '体量'){
-                                revitCa = "Mass";
-                            }else if(this.revitCategory == '天花板'){
-                                revitCa = "Walls";
-                            }else if(this.revitCategory == '停车场'){
-                                revitCa = "Parking";
-                            }else if(this.revitCategory == '天花板'){
-                                revitCa = "Walls";
-                            }else if(this.revitCategory == '卫浴装置'){
-                                revitCa = "PlumbingFixtures";
-                            }else if(this.revitCategory == '通迅设备'){
-                                revitCa = "CommunicationDevices";
-                            }else if(this.revitCategory == '屋檐底板'){
-                                revitCa = "RoofSoffit";
-                            }else if(this.revitCategory == '屋面'){
-                                revitCa = "Roofs";
-                            }else if(this.revitCategory == '线管'){
-                                revitCa = "Conduit";
-                            }else if(this.revitCategory == '线管配件'){
-                                revitCa = "ConduitFitting";
-                            }else if(this.revitCategory == '檐沟'){
-                                revitCa = "Gutter";
-                            }else if(this.revitCategory == '照明设备'){
-                                revitCa = "LightingDevices";
-                            }else if(this.revitCategory == '专用设备'){
-                                revitCa = "SpecialityEquipment";
-                            }else if(this.revitCategory == '植物'){
-                                revitCa = "Planting";
                             }
                             var keyword = this.totalConstructorData.some(item=>{
                                 if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord == this.keyWord){
@@ -710,7 +580,7 @@ export default {
                                 }
                             })
                             if(keyword){
-                                alert('关键字已经存在，不能添加')
+                                alert('关键字已经存在，不能添加！')
                             }else{
                                 axios({
                                     method:'post',
