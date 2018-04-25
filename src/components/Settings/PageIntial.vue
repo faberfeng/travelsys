@@ -35,7 +35,7 @@
             <h5 class="title"><img class="imgicon"  src="../../assets/columFloor.png"/> 竖向楼层<span @click="addFlor" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="pageTable"> 
                 <el-table :data="florData" border class="table" style="width:100%">
-                    <el-table-column label="序号" prop="index"></el-table-column>
+                    <el-table-column label="序号" prop="index" width='100px'></el-table-column>
                     <el-table-column label="名称" prop="Name"></el-table-column>
                     <el-table-column label="标高值" prop="BottomHeight"></el-table-column>
                     <el-table-column label="备注" prop="Remark" ></el-table-column>
@@ -87,7 +87,7 @@
                     <div class="editBodyone"><label class="editInpText">区域名称 :</label><input class="inp" placeholder="请输入" v-model="partitionName"/></div>
                     <div class="editBodytwo"><label class="editInpText">面积 :</label><input class="inp" placeholder="请输入" v-model="Area"/></div>
                 </div>
-                <el-checkbox v-model="partitionIsDefault">作为默认分区</el-checkbox>
+                <el-checkbox v-model="partitionIsDefault" :disabled="isDisabled">作为默认分区</el-checkbox>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeEditPartitionList">确定</button>
                     <button class="editBtnC" @click="cancleEditPartitionList">取消</button>
@@ -123,7 +123,7 @@
                     <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
                     <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入" v-model="FloorValue"/></div>
                 </div>
-                <el-checkbox v-model="setAsDefault">设置为默认楼层</el-checkbox>
+                <el-checkbox v-model="setAsDefault" :disabled="isDisabled">设置为默认楼层</el-checkbox>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeEditFloorList">确定</button>
                     <button class="editBtnC" @click="cancleEditFloorList">取消</button>
@@ -214,7 +214,8 @@ export default {
         partitionIsDefault:false,
         deletePartionDialog:false,
         deletepartitionContent:'',
-        subProjectsIndex:0
+        subProjectsIndex:0,
+        isDisabled:false,
 
       }
     },
@@ -230,7 +231,6 @@ export default {
         },
         //确认添加竖向楼层
         makeAddFloorList(){
-            
             var reg = new RegExp("^-?\\d+$");//只能输入整数
             if(this.FloorName == '' || this.FloorValue == ''){
                 alert('请输入完整表单！')
@@ -285,7 +285,6 @@ export default {
                     alert('楼层标高只能输入正数！')
                 }
             }
-            
         },
         //取消添加
         cancleAddFloorList(){
@@ -293,6 +292,11 @@ export default {
         },
         //编辑竖向楼层
         listTableEdit(scope){
+            if(scope.row.IsDefault){
+                this.isDisabled = true;
+            }else{
+                this.isDisabled = false;
+            }
             this.floorIndex = scope.$index;
             this.setAsDefault = this.florData[this.floorIndex].IsDefault;
             this.FloorName = this.florData[this.floorIndex].Name;
@@ -307,7 +311,6 @@ export default {
             var floorArr = this.FloorValue.toString().split('');
             if(this.FloorValue.toString().split('')[0] == '-'){
                 var str = floorArr.shift();
-                
             }
             if(floorArr != '' && reg.test(floorArr.join(''))){
                 axios({
@@ -350,7 +353,6 @@ export default {
             }else{
                 alert('楼层标高请输入数字！')
             }
-
         },
         cancleEditFloorList(){
             this.editFloorList = false;
@@ -498,6 +500,11 @@ export default {
         //编辑建筑分区
         editPartitionList(){
             this.editPartition = true;
+            if(this.partitionList[this.partitionIndex].IsDefault){
+                this.isDisabled = true;
+            }else{
+                this.isDisabled = false;
+            }
             this.partitionName = this.partitionList[this.partitionIndex].Name;
             this.Area = this.partitionList[this.partitionIndex].AreaValue;
             this.partitionIsDefault = this.partitionList[this.partitionIndex].IsDefault;
