@@ -6,12 +6,12 @@
                 <input type="text" class="inp" v-model="des">
             </div>
             <div class="editBodytwo imageBody">
-                <label class=" imageBodyText">上传图片 :</label>
+                <label class=" imageBodyText">上传文件 :</label>
                 <span class="updataImageSpan">
                     <span @click="selectImg">
-                         <button class="upImgBtn">选择图片</button>
+                         <button class="upImgBtn">选择文件</button>
                     </span>
-                    <input class="upInput"  type="file" accept="image/*" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                    <input class="upInput"  type="file" :accept="accept?accept:''" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
                 </span>
                 <span class="upImgText">{{imageName}}</span> 
             </div>
@@ -30,7 +30,7 @@ export default Vue.component('common-upload',{
     data(){
         return {
             showErr:'',//错误信息
-            imageName:'未选择任何图片',
+            imageName:'未选择任何文件',
             filesList:{},
             QJFileManageSystemURL:'',
             userId:'',
@@ -39,7 +39,7 @@ export default Vue.component('common-upload',{
             des:'',//文件描述
         }
     },
-    props:['uploadshow','dirid','fgid','isqj','title'],
+    props:['uploadshow','dirid','fgid','isqj','title','accept'],
     mounted(){
         var vm = this
 
@@ -93,12 +93,12 @@ export default Vue.component('common-upload',{
                 console.log(response)
                 if(response.data.rt){
                     vm.des = ''
-                    vm.imageName ='未选择任何图片'
+                    vm.imageName ='未选择任何文件'
                      vm.$emit('refreshqj')
                 }
             }).catch((err)=>{
                 vm.des = ''
-                vm.imageName ='未选择任何图片'
+                vm.imageName ='未选择任何文件'
                  vm.$emit('refreshqj')
                 console.log(err)
             })

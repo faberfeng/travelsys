@@ -341,7 +341,7 @@
             </div>
         </div>
       <div id="edit">
-        <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.nodeId" :title="uploadtitle"
+        <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.nodeId" :title="uploadtitle" :accept="acceptType"
         :fgid="QJfgid" :isqj="isqj"
         ></upload>
         <el-dialog title="文件重命名" :visible="PointFigure.renameshow" @close="renameCancle">
@@ -1706,7 +1706,9 @@ export default {
         auth:{
             show:false,
             isSubUse:false
-        }
+        },
+        firstTime:1,
+        acceptType:'',//可接受的文件类型
       }
   },
   created(){
@@ -1758,6 +1760,14 @@ export default {
            var vm = this
            vm.getInfo()
       },
+      selectUgId:function(val){
+        var vm = this 
+        vm.checkFilePaste()
+        vm.getIntoCloudD()
+        setTimeout(function(){
+            vm.pointLocationBindClick()
+        },1000)
+      },
       checkFileDir:function(val){
           var vm = this
           vm.mayiList = []
@@ -1775,6 +1785,7 @@ export default {
   methods:{
       addFile(){
         var vm = this
+        vm.firstTime++
         vm.fileName.show = true
         vm.fileName.new = true
         vm.fileName.title = '新建目录'
@@ -1795,7 +1806,7 @@ export default {
                 },
                 data:{
                     dirName: vm.fileName.newFileName,
-                    dirParId: vm.checkFileDir.nodeId,//当前文件夹ID
+                    dirParId: vm.firstTime > 1?vm.checkFileDir.nodeId:null,//当前文件夹ID
                     ugId:vm.selectUgId,
                     projId: vm.projId,
                 },
@@ -2256,6 +2267,7 @@ export default {
       },
       updateImg(val,is,index){
           var vm = this
+          vm.acceptType = 'image/*'
           vm.uploadtitle = val
           if(is){
                 vm.isqj = 1
