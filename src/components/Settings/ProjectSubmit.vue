@@ -1489,16 +1489,6 @@ export default {
         confirm(scope){
             this.confirmObject = scope;
             var parentNum = scope.row.parNumber;
-            // var status = '';
-            // if(parentNum){
-            //     status = this.getParentNum(this.projectSubmitData,parentNum);
-            // }
-            // if(status == 2){
-            //     this.confirmVisibleTwo = true;
-            // }else if(status == 0 || status ==1){
-            //     this.confirmVisible = true;
-            // }
-
             if(parentNum != 'null'){
                 this.getParentNum(this.projectSubmitData,parentNum);
                  if (this.localType == 0 || this.localType == 1) {
@@ -1600,7 +1590,16 @@ export default {
         //通过
         pass(scope){
             this.passObject = scope;
-            this.passVisible =true;
+            if(scope.row.parNumber){
+                this.getParentNum(this.projectSubmitData,scope.row.parNumber);
+                if(this.localStatus == 0 || this.localStatus == 1 || this.localStatus == 2){
+                    alert('该编码的所有父编码必须为【正常使用】状态，才能通过提请!')
+                }else{
+                    this.passVisible =true;
+                }
+            }else{
+                this.passVisible =true;
+            }
         },
         //确认通过
         surePass(){

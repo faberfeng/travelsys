@@ -800,8 +800,22 @@ export default {
         },
         //通过
         pass(scope){
-            this.passVisible =true;
             this.surePassObject = scope;
+            var status = '';
+            if(scope.row.parNumber){
+                this.arrList.forEach(item=>{
+                    if(item.number == scope.row.parNumber ){
+                        status = item.status
+                    }
+                })
+                if(status == 0 || status == 1 || status == 2){
+                    alert('该编码的所有父编码必须为【正常使用】状态，才能通过提请!')
+                }else{
+                    this.passVisible =true;
+                }
+            }else{
+                this.passVisible =true;
+            }
             
         },
         surePass(){

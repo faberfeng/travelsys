@@ -377,9 +377,23 @@ export default {
          * 通过分类编码
          * @param id
          */
-        pass(rows){//通过 status为1时
-             this.passVisible =true;
-             this.surePassObject = rows;
+        pass(rows){//通过 status为1时 modified by licongwen
+            this.surePassObject = rows;
+            var status = '';
+            if(rows.row.parNumber){
+                this.originCodingList.forEach(item=>{
+                    if(item.number == rows.row.parNumber ){
+                        status = item.status
+                    }
+                })
+                if(status == 0 || status == 1 || status == 2){
+                    alert('该编码的所有父编码必须为【正常使用】状态，才能通过提请!')
+                }else{
+                    this.passVisible =true;
+                }
+            }else{
+                this.passVisible =true;
+            }
         },
         //确认通过 modified by licongwen
         surePass(){

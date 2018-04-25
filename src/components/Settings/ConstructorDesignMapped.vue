@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper" id="ShejiGoujian">
-    <h4 class="title"><span>设计构件分类编码</span></h4>
+    <h4 class="title"><span>设计构件分类映射</span></h4>
     <div class="manageWorktool">
-        <span class="worktooltitle">分类编码</span>
+        <span class="worktooltitle">分类映射</span>
         <button class="btn" @click="addYingshe"><i class="el-icon-plus"></i>添加</button>
         <div class="worktable">
             <div style="padding:0;box-sizing: border-box;">

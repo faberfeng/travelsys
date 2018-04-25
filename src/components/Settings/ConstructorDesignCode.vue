@@ -1123,7 +1123,16 @@ export default {
         //通过
         pass(scope){
             this.passObject = scope;
-            this.passVisible =true;
+            if(scope.row.parNumber){
+                this.getParentNum(this.constructorData,scope.row.parNumber)
+                if(this.localStatus == 0 || this.localStatus == 1 || this.localStatus == 2){
+                    alert('该编码的所有父编码必须为【正常使用】状态，才能通过提请!')
+                }else{
+                    this.passVisible =true;
+                }
+            }else{
+                this.passVisible =true;
+            }
         },
         //确认通过
         surePass(){
@@ -1159,7 +1168,6 @@ export default {
                     })
                 }
             })
-            
         },
         //取消通过
         cancelPass(){
