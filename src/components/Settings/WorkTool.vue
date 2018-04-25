@@ -261,7 +261,6 @@ export default {
     created(){
         this.projId = localStorage.getItem('projId');
         this.token  = localStorage.getItem('token');
-        
         this.getWorkCode();
     },
     mounted(){
@@ -409,7 +408,7 @@ export default {
         //编辑确认按钮
         editListSureBtn(){
             if(this.newTitle == ''){
-                alert('请输入新的标题');
+                alert('请输入新标题!');
             }else{
                 var flag = '';
                 if(this.editObject.row.status == 2){
@@ -539,58 +538,72 @@ export default {
         },
         //添加确定
         addListSure(){
-            if(this.newCode == '' || this.newTitle == ''){
+            if(this.newCode == '' || this.newTitle == '' || this.codeType == ''){
                 alert('请输入完整的表单');
             }else{  
-                axios({
-                    method:'post',
-                    url:this.baseUrl+'config2/component/addWorkCode',
-                    headers:{
-                        token:this.token
-                    },
-                    params:{
-                        projectId:this.projId
-                    },
-                    data:{
-                        level:this.codeType.substr(5,1),
-                        number:this.totalCode,
-                        status:0,
-                        table:'t17',
-                        title:this.newTitle
-                    }
-                }).then(response=>{
-                    if(response.data.cd == 0){
-                        this.getWorkCode();
-                        this.codeType = '';
-                        this.firstTitle = '';
-                        this.secondTitle = '';
-                        this.thirdTitle = '';
-                        this.totalCode = '';
-                        this.totalTitle = '';
-                        this.newCode = '';
-                        this.newTitle = '';
-                        this.fTitle = '';
-                        this.twoTitle = '';
-                        this.thTitle = '';
-                        this.showFirst =false;
-                        this.showTwo = false;
-                        this.showThird = false;
-                        this.editListShow = false;
-                    }else if(response.data.cd == '-1'){
-                        alert(response.data.msg)
+                if(isNaN(this.newCode)){
+                    alert('编码只能是数字');
+                }else{
+                    var flag = this.arrList.some(item=>{
+                        if(item.number == this.totalCode){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    })
+                    if(flag){
+                        alert('编码已经存在,不能添加');
                     }else{
-                        this.push({
-                            path:'/login'
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'config2/component/addWorkCode',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{
+                                projectId:this.projId
+                            },
+                            data:{
+                                level:this.codeType.substr(5,1),
+                                number:this.totalCode,
+                                status:0,
+                                table:'t17',
+                                title:this.newTitle
+                            }
+                        }).then(response=>{
+                            if(response.data.cd == 0){
+                                this.getWorkCode();
+                                //this.codeType = '';
+                                this.firstTitle = '';
+                                this.secondTitle = '';
+                                this.thirdTitle = '';
+                                this.totalCode = '';
+                                this.totalTitle = '';
+                                this.newCode = '';
+                                this.newTitle = '';
+                                this.fTitle = '';
+                                this.twoTitle = '';
+                                this.thTitle = '';
+                                this.showFirst =false;
+                                this.showTwo = false;
+                                this.showThird = false;
+                                this.editListShow = false;
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.push({
+                                    path:'/login'
+                                })
+                            }
                         })
-                    }
-                })
+                    } 
+                }
             }
-            
         },
         //编辑取消
         listClose(){
             this.editListShow = false;
-            this.codeType = '';
+            ///this.codeType = '';
             this.firstTitle = '';
             this.secondTitle = '';
             this.totalCode = '';

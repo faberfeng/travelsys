@@ -87,17 +87,20 @@
                         <div v-show="showFirst" class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">一级编码 :</label>
                             <input class="editSelect" v-model="firstTitle" disabled/>
                             <i class="icon-sanjiao"></i>
+                            <span v-text="'标题：'+fTitle" :title="'标题：'+fTitle" class="edit-item-biaoti"></span>
                         </div>
                         <div v-show="showSecond"  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">二级编码 :</label>
                             <input class="editSelect" v-model="secondTitle" disabled/>
                             <i class="icon-sanjiao"></i>
+                            <span v-text="'标题：'+sTitle" :title="'标题：'+sTitle" class="edit-item-biaoti"></span>
                         </div>
                         <div v-show="showThird"  class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">三级编码 :</label>
                             <input class="editSelect" v-model="thirdTitle" disabled/>
                             <i class="icon-sanjiao"></i>
+                            <span v-text="'标题：'+tTitle" :title="'标题：'+tTitle" class="edit-item-biaoti"></span>
                         </div>
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" disabled v-model="newCode"/></div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                        <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="editNewTitleChange" v-model="newTitle"/></div>
                         <div class="editBodytwo edit-item clearfix">
                             <label class="editInpText">完整编码 :</label>
                             <span v-text="totalCode" class="editInpTextInp"></span>
@@ -267,7 +270,7 @@ export default {
             rejectVisible:false,
             deleteDialog:false,
             editListShowtwice:false,
-            codeType:'',
+            codeType:'Level1',
             firstTitle:'',
             firstTitleData:[],
             secondTitle:'',
@@ -277,7 +280,7 @@ export default {
             newTitle:'',
             newCode:'',
             propertyTableName:'',
-            valueTypeTextT:'',
+            valueTypeTextT:0,
             addListShow:false,
             showO:false,
             showT:false,
@@ -296,7 +299,8 @@ export default {
             showSecond:false,
             showThird:false,
             localType:'',
-            localStatus:''
+            localStatus:'',
+            addIsTrue:false
         }
     },
     created(){
@@ -336,10 +340,9 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     if(response.data.rt){
-                    this.constructorData = response.data.rt;
-                       this.reJudgeValueType(this.constructorData);
+                        this.constructorData = response.data.rt;
+                        this.reJudgeValueType(this.constructorData);
                     }
-                    console.log(response.data)
                 }else if(response.data.cd =='-1'){
                     alert(response.data.msg)
                 }else{
@@ -352,6 +355,7 @@ export default {
         //编辑
         editList(scope){
             this.editObject = scope;
+            console.log(scope);
             this.propertyTableName = this.judgeType(this.propertyTable);
             this.codeType = 'Level'+scope.row.level;
             if(scope.row.level == 1){
@@ -362,6 +366,7 @@ export default {
                 this.constructorData.forEach((item,index)=>{
                     if(item.number==scope.row.parNumber){
                         this.totalTitle = item.title+'-'+scope.row.title;
+                        this.fTitle = scope.row.title;
                     }
                 })
             }else if(scope.row.level == 3){
@@ -372,6 +377,25 @@ export default {
                         item.children.forEach(item=>{
                             if(item.number == scope.row.parNumber){
                                 this.totalTitle = this.totalTitle+item.title+'-'+scope.row.title;
+                                this.sTitle = scope.row.title;
+                            }
+                        })
+                    }
+                })
+            }else if(scope.row.level == 4){
+                this.newCode = scope.row.number.substr(6,3);
+                this.constructorData.forEach((item,index)=>{
+                    if(item.number.substr(0,2)==scope.row.parNumber.substr(0,2)){
+                        this.totalTitle = item.title+'-';
+                        item.children.forEach(item=>{
+                            if(item.number == scope.row.parNumber){
+                                this.totalTitle = this.totalTitle+item.title+'-'+scope.row.title;
+                                // item.children.forEach(item=>{
+                                //     if(item.number == scope.row.parNumber){
+                                //         this.totalTitle = this.totalTitle+item.title+'-'+item.title+'-'+scope.row.title;
+                                //         this.tTitle = scope.row.title;
+                                //     }
+                                // })
                             }
                         })
                     }
@@ -404,6 +428,17 @@ export default {
             this.totalCode = scope.row.number;
             this.valueTypeTextT = scope.row.valueType;
             this.editListShowtwice = true;
+        },
+        editNewTitleChange(){
+            if(this.codeType == 'Level1'){
+                this.totalTitle = this.newTitle;
+            }else if(this.codeType == 'Level2'){
+                this.totalTitle =this.totalTitle.split('-')[0]+'-'+this.newTitle;
+            }else if(this.codeType == 'Level3'){
+                this.totalTitle =this.totalTitle.split('-')[0]+'-'+this.totalTitle.split('-')[1]+'-'+this.newTitle;
+            }else if(this.codeType == 'Level4'){
+                this.totalTitle =this.totalTitle.split('-')[0]+'-'+this.totalTitle.split('-')[1]+'-'+this.totalTitle.split('-')[2]+'-'+this.newTitle;
+            }
         },
         //保存编辑
         editListSureBtn(){
@@ -441,9 +476,9 @@ export default {
                         this.totalCode = '';
                         this.newCode = '';
                         this.newTitle = '';
-                        this.codeType = '';
+                        this.codeType = 'Level1';
                         this.propertyTableName ="";
-                        this.valueTypeTextT ="";
+                        this.valueTypeTextT =0;
                         this.editListShowtwice = false;
                     }else if(response.data.cd == '-1'){
                         calert(response.data.msg)
@@ -461,12 +496,15 @@ export default {
             this.totalCode = '';
             this.newCode = '';
             this.newTitle = '';
-            this.codeType = '';
+            this.codeType = 'Level1';
             this.propertyTableName ="";
-            this.valueTypeTextT = "";
+            this.valueTypeTextT = 0;
             this.thirdTitle="";
             this.firstTitle = '';
             this.secondTitle = '';
+            // this.fTitle = '';
+            // this.sTitle = '';
+            // this.tTitle = '';
             this.editListShowtwice = false;
         },
         newCodeChange(){
@@ -651,7 +689,6 @@ export default {
         },
         //删除属性
         deleteItemProperty(scope){
-            console.log(scope);
             this.delteProperty = scope;
             this.deleteDialog = true;
         },
@@ -672,7 +709,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data)
                     this.getProjectGenClass(this.propertyTable);
                     this.deleteDialog = false;
                 }else if(response.data.cd == '-1'){
@@ -771,6 +807,17 @@ export default {
         //添加编码
         addConstructor(){
             this.addListShow =true;
+            console.log(this.constructorData);
+        },
+        //循环遍历数据获得number
+        getItemNumber(pData,pNum){
+            pData.forEach((item,index,arr)=>{
+                if(item.number == pNum){
+                    this.addIsTrue = true;
+                }else if(item.number != pNum && item.children.length!=0){
+                    this.getItemNumber(item.children,pNum);
+                }
+            })
         },
         //确认添加
         addListSureBtn(){
@@ -780,45 +827,55 @@ export default {
                 if(this.newCode.split('').length != this.maxInputLength){
                     alert(`新建编码的长度必须是${this.maxInputLength}`);
                 }else{
-                    axios({
-                        method:'post',
-                        url:this.baseUrl+'config2/component/addAttributeCodeGenieClass',
-                        headers:{
-                            token:this.token
-                        },
-                        params:{
-                            projId:this.projId,
-                            type:1
-                        },
-                        data:{
-                            level:this.codeType.substr(5,1),
-                            number:this.totalCode,
-                            status:0,
-                            title:this.newTitle,
-                            table:this.propertyTable,
-                            valueType:this.valueTypeTextT,
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == '0'){
-                            this.getProjectGenClass(this.propertyTable);
-                            this.showO = false;
-                            this.showT = false;
-                            this.codeType = '';
-                            this.totalCode ='';
-                            this.newTitle ='';
-                            this.newCode ='';
-                            this.totalTitle ='';
-                            this.valueTypeTextT ='';
-                            this.propertyTable ="";
-                            this.addListShow = false;
-                        }else if(response.data.cd == '-1'){
-                            alert(response.data.msg)
+                    if(isNaN(this.newCode)){
+                        alert('新建编码必须是数字');
+                    }else{
+                        this.getItemNumber(this.constructorData,this.totalCode);
+                        if(this.addIsTrue){
+                            alert('编码已存在，不能添加！');
+                            this.addIsTrue = false;
                         }else{
-                            this.$router.push({
-                                path:'/login'
+                            axios({
+                                method:'post',
+                                url:this.baseUrl+'config2/component/addAttributeCodeGenieClass',
+                                headers:{
+                                    token:this.token
+                                },
+                                params:{
+                                    projId:this.projId,
+                                    type:1
+                                },
+                                data:{
+                                    level:this.codeType.substr(5,1),
+                                    number:this.totalCode,
+                                    status:0,
+                                    title:this.newTitle,
+                                    table:this.propertyTable,
+                                    valueType:this.valueTypeTextT,
+                                }
+                            }).then((response)=>{
+                                if(response.data.cd == '0'){
+                                    this.getProjectGenClass(this.propertyTable);
+                                    this.showO = false;
+                                    this.showT = false;
+                                    this.codeType = 'Level1';
+                                    this.totalCode ='';
+                                    this.newTitle ='';
+                                    this.newCode ='';
+                                    this.totalTitle ='';
+                                    this.valueTypeTextT =0;
+                                    this.propertyTable ="";
+                                    this.addListShow = false;
+                                }else if(response.data.cd == '-1'){
+                                    alert(response.data.msg)
+                                }else{
+                                    this.$router.push({
+                                        path:'/login'
+                                    })
+                                }
                             })
                         }
-                    })
+                    }
                 }
             }
             
@@ -828,12 +885,12 @@ export default {
             this.addListShow = false;
             this.showO = false;
             this.showT = false;
-            this.codeType = '';
+            this.codeType = 'Level1';
             this.totalCode ='';
             this.newTitle ='';
             this.newCode ='';
             this.totalTitle ='';
-            this.valueTypeTextT ='';
+            this.valueTypeTextT =0;
         },
         //编码级别改变
         codeTypeChange(){

@@ -51,8 +51,8 @@
                     <i class="icon-sanjiao"></i>
                     <span v-text="'标题：'+thTitle" :title="'标题：'+thTitle" class="edit-item-biaoti"></span>
                 </div>
-                <div class="editBodytwo edit-item clearfix"><label class="editInpText">新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newTitleCode" v-model="newCode"/></div>
-                <div class="editBodytwo edit-item clearfix"><label class="editInpText">新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新建编码 :</label><input class="inp" maxlength='2' placeholder="请输入" @change="newTitleCode" v-model="newCode" /></div>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText"><i class="redDot"></i>新标题 :</label><input class="inp" placeholder="请输入" @change="newTitleChange" v-model="newTitle"/></div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText">完整编码 :</label>
                     <span v-text="totalCode" class="totalCodeClass"></span>
@@ -86,7 +86,7 @@
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText"><i class="redDot"></i>新建编码 :</label>
-                    <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)" required/>
+                    <input class="inp" placeholder="请输入" :value="initCode(codingToEdit.level)" disabled/>
                 </div>
                 <div class="editBodytwo edit-item clearfix">
                     <label class="editInpText"><i class="redDot"></i>新标题 :</label>
@@ -571,7 +571,6 @@ export default {
         },
         PostaddUser(){//保存修改
             var vm = this;
-            console.log(this.codingToEdit);
             if(this.codingToEdit.title == ''){
                 alert('请输入新标题');
             }else{
@@ -715,40 +714,40 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                var arr = response.data.rt;
-                this.originCodingList = response.data.rt;
-                var levelNum = {}
-                for(var i=0;i<arr.length;i++){
-                    vm.codeTypeData.push('Level'+arr[i].level);
-                    arr[i].KeyID = i+1;
-                    arr[i].type_ = vm.formatterType(arr[i].type)
-                    arr[i].status_ = vm.formatterStatus(arr[i].status,arr[i])
-                    //根据level截取number
-                    switch(arr[i].level){
-                        case 1:
-                            levelNum[parseInt(arr[i].number.substr(0,2))]= {}
-                            levelNum[parseInt(arr[i].number.substr(0,2))].title = arr[i].title
-                        break;
-                        case 2:
-                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))]= {}
-                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))].title = arr[i].title
-                        break;
-                        case 3:
-                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))]= {}
-                                levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))].title = arr[i].title
-                        break;
+                    var arr = response.data.rt;
+                    this.originCodingList = response.data.rt;
+                    var levelNum = {}
+                    for(var i=0;i<arr.length;i++){
+                        vm.codeTypeData.push('Level'+arr[i].level);
+                        arr[i].KeyID = i+1;
+                        arr[i].type_ = vm.formatterType(arr[i].type)
+                        arr[i].status_ = vm.formatterStatus(arr[i].status,arr[i])
+                        //根据level截取number
+                        switch(arr[i].level){
+                            case 1:
+                                levelNum[parseInt(arr[i].number.substr(0,2))]= {}
+                                levelNum[parseInt(arr[i].number.substr(0,2))].title = arr[i].title
+                            break;
+                            case 2:
+                                    levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))]= {}
+                                    levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))].title = arr[i].title
+                            break;
+                            case 3:
+                                    levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))]= {}
+                                    levelNum[parseInt(arr[i].number.substr(0,2))][parseInt(arr[i].number.substr(2,2))][parseInt(arr[i].number.substr(4,2))].title = arr[i].title
+                            break;
+                        }
                     }
-                }
-                vm.levelNum = levelNum
-                vm.originalData = arr
-                 var a = data.transformTozTreeFormat(setting, arr)
-                vm.codingList = a
-                /*
-                从文的添加的代码
-                */
-                vm.codeTypeData = Array.from(new Set(vm.codeTypeData));
-                vm.codeType = vm.codeTypeData[0];//初始化编码级别
-                vm.initKey()
+                    vm.levelNum = levelNum
+                    vm.originalData = arr
+                    var a = data.transformTozTreeFormat(setting, arr)
+                    vm.codingList = a
+                    /*
+                    从文的添加的代码
+                    */
+                    vm.codeTypeData = Array.from(new Set(vm.codeTypeData));
+                    vm.codeType = vm.codeTypeData[0];//初始化编码级别
+                    vm.initKey()
                 }else if(response.data.cd == '-1'){
                     vm.$message({
                         type:'warning',
@@ -864,47 +863,66 @@ export default {
         },
          //添加确定
         addListSure(){
-            axios({
-                method:'post',
-                url:this.baseUrl+'config2/component/addWorkCode',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId
-                },
-                data:{
-                    level:this.codeType.substr(5,1),
-                    number:this.totalCode,
-                    status:0,
-                    table:"t13",
-                    title:this.newTitle
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getWorkCode();
-                    this.editListShow = false;
-                    this.firstTitle = '';
-                    this.secondTitle = '';
-                    this.totalCode = '';
-                    this.totalTitle = '';
-                    this.newCode = '';
-                    this.newTitle = '';
-                    this.thirdTitle = '';
-                    this.fTitle = '';
-                    this.twoTitle = '';
-                    this.thTitle = '';
-                    this.showFirst =false;
-                    this.showTwo = false;
-                    this.showThird = false;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
+            if(this.codeType == '' || this.newTitle == '' || this.newCode == ''){
+                alert('请输入完整表单！');
+            }else{
+                if(isNaN(this.newCode)){
+                    alert('编码只能为数字！');
                 }else{
-                    this.push({
-                        path:'/login'
+                    var flag = this.originCodingList.some(item=>{
+                        if(item.number == this.totalCode){
+                            return true;
+                        }else{
+                            return false;
+                        }
                     })
+                    if(flag){
+                        alert('编码已经存在,不能添加');
+                    }else{
+                        axios({
+                            method:'post',
+                            url:this.baseUrl+'config2/component/addWorkCode',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{
+                                projectId:this.projId
+                            },
+                            data:{
+                                level:this.codeType.substr(5,1),
+                                number:this.totalCode,
+                                status:0,
+                                table:"t13",
+                                title:this.newTitle
+                            }
+                        }).then(response=>{
+                            if(response.data.cd == 0){
+                                this.getWorkCode();
+                                this.editListShow = false;
+                                this.firstTitle = '';
+                                this.secondTitle = '';
+                                this.totalCode = '';
+                                this.totalTitle = '';
+                                this.newCode = '';
+                                this.newTitle = '';
+                                this.thirdTitle = '';
+                                this.fTitle = '';
+                                this.twoTitle = '';
+                                this.thTitle = '';
+                                this.showFirst =false;
+                                this.showTwo = false;
+                                this.showThird = false;
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg)
+                            }else{
+                                this.push({
+                                    path:'/login'
+                                })
+                            }
+                        })
+                    }
                 }
-            })
+            }
         },
          newTitleCode(){
             if(this.codeType == 'Level1'){

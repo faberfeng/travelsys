@@ -1026,8 +1026,9 @@ export default {
                 if(isNaN(this.newCode)){
                     alert(`新建编码必须为数字!`);
                 }else{
+                    var newCode = this.newCode;
                     this.getItemNumber(this.constructorData,this.totalCode);
-                    if(this.addIsTrue){
+                    if(this.addIsTrue && this.newCode != newCode){
                         alert('编码已经存在,不能添加!');
                         this.addIsTrue = false;
                     }else{
