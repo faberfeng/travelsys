@@ -454,47 +454,68 @@ export default {
         },
         //确认修改单体列表子项
         editListSure(){
-            if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
-                if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
-                    axios({
-                        method:'post',
-                        url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
-                        headers:{
-                            'token':this.token
-                        },
-                        params:{
-                            projId:this.projId
-                        },
-                        data:{
-                            AxisAngle:this.addListangle,
-                            ID:this.listData[this.listIndexNumber].ID,
-                            Name:this.addListname,
-                            Origin:this.addListcoordinate,
-                            OriginHeight:this.addListhigh,
-                            ParentID:this.listData[this.listIndexNumber].ParentID,
-                            Type:this.listData[this.listIndexNumber].Type,
-                            UseCS:this.listData[this.listIndexNumber].UseCS
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == '0'){
-                            this.findSubProject();
-                            this.editListShow = false;
-                            //清空数据
-                            this.addListindex = '';
-                            this.addListname = '';
-                            this.addListcoordinate='';
-                            this.addListhigh='';
-                            this.addListangle='';
-                        }else if(response.data.cd == '-1'){
-                            alert(response.data.msg);
-                        }
-                    })
-                }else{
-                    alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
-                }
+            if(this.addListname === ''){
+                alert('单体名称不能为空!');
             }else{
-                alert('请正确输入表单')
+                if(this.addListhigh === '' || isNaN(this.addListhigh)){
+                    alert('首层相对高度不能为空且为数字!');
+                }else{
+                    if(this.addListangle === '' || isNaN(this.addListangle)){
+                        alert('轴网转角不能为空且为数字!');
+                    }else{
+                        if(this.addListcoordinate === ''){
+                            alert('警告!轴网基点坐标不能为空!')
+                        }else{
+                            if(this.addListcoordinate.split(' ').length != 2 || isNaN(this.addListcoordinate.split(' ')[0])  || isNaN(this.addListcoordinate.split(' ')[1])){
+                                alert('轴网基点坐标取基点 X\Y 值被一个空格分隔!')
+                            }else{
+                                axios({
+                                    method:'post',
+                                    url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                                    headers:{
+                                        'token':this.token
+                                    },
+                                    params:{
+                                        projId:this.projId
+                                    },
+                                    data:{
+                                        AxisAngle:this.addListangle,
+                                        ID:this.listData[this.listIndexNumber].ID,
+                                        Name:this.addListname,
+                                        Origin:this.addListcoordinate,
+                                        OriginHeight:this.addListhigh,
+                                        ParentID:this.listData[this.listIndexNumber].ParentID,
+                                        Type:this.listData[this.listIndexNumber].Type,
+                                        UseCS:this.listData[this.listIndexNumber].UseCS
+                                    }
+                                }).then((response)=>{
+                                    if(response.data.cd == '0'){
+                                        this.findSubProject();
+                                        this.editListShow = false;
+                                        //清空数据
+                                        this.addListindex = '';
+                                        this.addListname = '';
+                                        this.addListcoordinate='';
+                                        this.addListhigh='';
+                                        this.addListangle='';
+                                    }else if(response.data.cd == '-1'){
+                                        alert(response.data.msg);
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
             }
+            // if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
+            //     if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
+                    
+            //     }else{
+            //         alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
+            //     }
+            // }else{
+            //     alert('请正确输入表单')
+            // }
         },
         editListClose(){
             this.editListShow = false
