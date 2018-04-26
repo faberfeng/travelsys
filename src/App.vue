@@ -20,6 +20,9 @@ export default {
   color: #2c3e50;
   min-width: 1200px;
 }
+.dialog-footer{
+    text-align: center;
+}
 /*更改组件配色*/
 .settingsLeft .el-menu{
   background: #fafafa;

@@ -911,11 +911,12 @@ export default {
                     checkList.push(item)
                 }
             })
+            vm.checkOne = false 
             if(num == 1){
                 vm.checkOne = true
                 vm.checkedItem = checkList[0]
-            }else{
-                vm.checkOne = false 
+            }else if(num == vm.fileList.length){
+                vm.checkAll = true 
             }
         }else{
             for(var i=0;i<vm.fileList.length;i++){

@@ -1513,13 +1513,9 @@ import './js/jquery-1.8.3.js'
 import './js/jquery-ui-1.9.2.custom.js'
 import './js/date.js'
 import data from '../Settings/js/date.js'
-import upload from '../uploadFile.vue'
 
 export default {
   name:'Costover',
-  components:{
-      upload
-  },
   data(){
       return {
         activeIndex:'1',
@@ -1616,6 +1612,9 @@ export default {
               vm.fgList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
+            vm.show.basicAttributes =true
+            vm.show.BindingArtifacts =true
+            vm.fileCheckedNum = vm.fileList.length
           }
       },
       'show.basicAttributes':function(val){
@@ -2239,6 +2238,8 @@ export default {
             if(showLocationNum == 1){//全部选中
                 vm.showLocation = true
                 vm.checkedItem = checkList[0]
+            }else if(showLocationNum == vm.fgList.length){
+                vm.checkAll = true
             }
         }else{//单选
             for(var i=0;i<vm.fgList.length;i++){
@@ -2279,6 +2280,8 @@ export default {
                     vm.checkedItem = fileCheckList[0]
                     vm.getGouJianInfo()
                     vm.getVersion()
+                }else if(vm.fileCheckedNum == vm.fileList.length){
+                     vm.checkAll = true
                 }
             }else{
                 vm.checkedItem = {}

@@ -48,15 +48,15 @@
             <p class="select-header clearfix">
                 <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
                 <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                <span class="icon icon-upload" v-if="!hasImg && showQuanJing" @click="updateImg('上传平面图',false,0)">上传平面图</span>
-                <span class="icon icon-refresh" v-if="hasImg && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground.fgId)">更新平面图</span>
+                <span class="icon icon-upload" v-if="!hasImg && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*')">上传平面图</span>
+                <span class="icon icon-refresh" v-if="hasImg && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground.fgId,'image/*')">更新平面图</span>
                 <!--
                     文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
 
                     具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
 
                 -->
-                <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0)">新建点位</span>
+                <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*')">新建点位</span>
                  <ul class="operation" style="margin-right: 10px;">
                     <li class="item-upload" v-if="!showQuanJing"  @click="uploadfile">上传文件</li>
                 </ul>
@@ -202,12 +202,13 @@
                 :default-expanded-keys="expandedKeys"
                 highlight-current
                 @node-click="handleNodeClick"
+                id="cloudDirveFileTree"
                 >
                 </el-tree>
             </div>
             <div id="box-right" v-else-if="screenLeft.item == 2">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
-                    <h3 class="header-attribute">
+                    <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
                         基本属性
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
@@ -360,7 +361,7 @@
                 <button class="editBtnC" @click="renameCancle">取消</button>
             </div>
         </el-dialog>
-          <el-dialog title="分享文件" :visible.sync="sharePath.show">
+          <el-dialog :title="sharePath.path ==''?'分享文件':'分享链接'" :visible.sync="sharePath.show" @close="sharePathHide">
             <div class="editBody">
                 <p style="font-size: 14px; line-height: 1.5em" v-if="sharePath.path ==''">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;文档一但被分享，获得该地址的任何人都可以浏览、下载和使用。将不再受到用户账号和工程授权的制约。如果相关文档涉工程内保密信息不建议进行公开分享。
@@ -376,8 +377,8 @@
                 <input type="text" id="copyInput" :value="sharePath.password !=''?'链接：'+sharePath.path+' 密码：'+sharePath.password:sharePath.path" style=" opacity: 0;">
             </div>
             <div slot="footer" class="dialog-footer">
-                <button class="editBtnS" @click="shareBtn(3)">公开分享</button>
-                <button class="editBtnS" @click="shareBtn(2)">密钥分享</button>
+                <button class="editBtnS" @click="shareBtn(3)" v-if="sharePath.path ==''">公开分享</button>
+                <button class="editBtnS" @click="shareBtn(2)" v-if="sharePath.path ==''">密钥分享</button>
                 <button class="editBtnS" id="copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput" @click="copyURL" v-if="sharePath.path !=''">复制</button>
             </div>
         </el-dialog>
@@ -398,9 +399,9 @@
                  <p style="font-size: 14px; line-height: 1.5em;text-align:left;padding-left:50px;" v-text="'下列勾选的群组可以访问文件夹：'"></p>
                 <p style="font-size: 14px; line-height: 1.5em;text-align:left;padding-left:50px;" v-text="checkFileDir.nodeName"></p>
                 <div class="selectionBox">
-                    <p  v-for="(item,index) in  ugList" :key="index">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']" :for="'ug-'+item.ugId"></label>
-                        <input type="checkbox" class="el-checkbox__original" v-model="item.checked" :id="'ug-'+item.ugId">
+                    <p  v-for="(item,index) in  fileAuthList" :key="index" style="margin-bottom:5px;">
+                        <label :class="[item.isCheck?'active':'','checkbox-fileItem']" :for="'ug-'+item.ugId"></label>
+                        <input type="checkbox" class="el-checkbox__original" v-model="item.isCheck" :id="'ug-'+item.ugId">
                         <label v-text="item.ugName" :for="'ug-'+item.ugId"></label>
                     </p>
                 </div>
@@ -1288,6 +1289,15 @@
         }
         .screenRight_1{
             padding: 10px 14px 10px 10px;
+            #cloudDirveFileTree{
+                display: block;
+                position: absolute;
+                left: 35px;
+                right: 0;
+                bottom: 0;
+                top: 42px;
+                overflow-y: auto;
+            }
             >p{
                 padding-bottom:5px;
                 border-bottom: 1px solid #e6e6e6;
@@ -1707,8 +1717,9 @@ export default {
             show:false,
             isSubUse:false
         },
-        firstTime:1,
+        firstTime:0,
         acceptType:'',//可接受的文件类型
+        fileAuthList:[],//文件群组权限列表
       }
   },
   created(){
@@ -1736,6 +1747,9 @@ export default {
              vm.folderList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
+            vm.show.basicAttributes =true
+            vm.show.BindingArtifacts =true
+            vm.checkedFile_Folder.fileCheckedNum = vm.fileList.length
           }
       },
       'show.basicAttributes':function(val){
@@ -1761,12 +1775,11 @@ export default {
            vm.getInfo()
       },
       selectUgId:function(val){
-        var vm = this 
-        vm.checkFilePaste()
-        vm.getIntoCloudD()
-        setTimeout(function(){
-            vm.pointLocationBindClick()
-        },1000)
+            var vm = this 
+            vm.getFileTree()
+            setTimeout(function(){
+                vm.pointLocationBindClick()
+            },1000)
       },
       checkFileDir:function(val){
           var vm = this
@@ -1785,7 +1798,6 @@ export default {
   methods:{
       addFile(){
         var vm = this
-        vm.firstTime++
         vm.fileName.show = true
         vm.fileName.new = true
         vm.fileName.title = '新建目录'
@@ -1798,6 +1810,8 @@ export default {
       addfileConfirm(){
         var vm = this
         if(vm.fileName.new){
+            console.log(vm.checkFileDir)
+            debugger
              axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/add',
@@ -1806,7 +1820,7 @@ export default {
                 },
                 data:{
                     dirName: vm.fileName.newFileName,
-                    dirParId: vm.firstTime > 1?vm.checkFileDir.nodeId:null,//当前文件夹ID
+                    dirParId: vm.firstTime > 0?vm.checkFileDir.nodeId:null,//当前文件夹ID
                     ugId:vm.selectUgId,
                     projId: vm.projId,
                 },
@@ -1861,12 +1875,26 @@ export default {
       },
       renameFile(){
          var vm = this
+        if(vm.checkFileDir.isAutoCreated == 1){
+            vm.$message({
+            type: 'error',
+            message: '系统文件，不能操作！'
+          });  
+          return false
+        }
         vm.fileName.show = true
          vm.fileName.new = false
         vm.fileName.title = '重命名目录'
       },
       deleteFile(){
         var vm = this
+         if(vm.checkFileDir.isAutoCreated == 1){
+            vm.$message({
+            type: 'error',
+            message: '系统文件，不能操作！'
+          });  
+          return false
+        }
          vm.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -1885,6 +1913,7 @@ export default {
                         message:'文件夹删除成功'
                     })
                     vm.getFileTree()
+                    vm.firstTime = 0
                 }else if(response.data.cd == -1){
                     vm.$message({
                         type:'error',
@@ -1904,7 +1933,31 @@ export default {
       },
       authrityFile(){
         var vm = this
+        if(vm.checkFileDir.isAutoCreated == 1){
+            vm.$message({
+            type: 'error',
+            message: '系统文件，不能操作！'
+          });  
+          return false
+        }
         vm.auth.show = true
+        axios({
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getAllUserGroup',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId: vm.projId,
+                dirId:vm.checkFileDir.nodeId, 
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                    vm.fileAuthList = response.data.rt
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
       },
       authCancle(){
           var vm = this
@@ -1913,8 +1966,8 @@ export default {
       authConfirm(){
           var vm = this
           var selectUgId = ''
-          vm.ugList.forEach((item)=>{
-              if(item.checked){
+          vm.fileAuthList.forEach((item)=>{
+              if(item.isCheck){
                   if(selectUgId == ''){
                     selectUgId = item.ugId
                   }else{
@@ -1922,6 +1975,13 @@ export default {
                   }
               }
           })
+          if(selectUgId == ''){
+              vm.$message({
+                  type:'warning',
+                  message:'请先选择一个群组节点'
+              })
+              return false
+          }
           axios({
                 method:'GET',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/setFileDirectoryUg',
@@ -1964,7 +2024,7 @@ export default {
       uploadfile(){
         var vm = this
         if(!vm.showQuanJing){
-            vm.updateImg('文件上传',false,0)//非点位类型是0
+            vm.updateImg('文件上传',false,0,'')//非点位类型是0
         }
       },
       paste(){
@@ -2124,6 +2184,12 @@ export default {
           var vm = this
           vm.sharePath.show = true
       },
+      sharePathHide(){
+          var vm = this
+        vm.sharePath.show = false
+        vm.sharePath.path = ''
+        vm.sharePath.password = ''
+      },
       shareBtn(val){
         var vm = this
         var fcIdList = []
@@ -2215,11 +2281,11 @@ export default {
       updatePoint(){//更新点位
         var vm = this
         if(vm.checkedRound.checked){
-          vm.updateImg('文件更新',true,vm.checkedRound.ID)//点位是1
+          vm.updateImg('文件更新',true,vm.checkedRound.ID,'image/*')//点位是1
         }else if(vm.checkedFile_Folder.file){
            for(var i=0;i<vm.fileList.length;i++){
                 if(vm.fileList[i].checked){
-                    vm.updateImg('文件更新',false,vm.fileList[i].fgId)//非点位类型是0
+                    vm.updateImg('文件更新',false,vm.fileList[i].fgId,'')//非点位类型是0
                    break;
                }
            }
@@ -2265,9 +2331,9 @@ export default {
             console.log(err)
         })
       },
-      updateImg(val,is,index){
+      updateImg(val,is,index,type){
           var vm = this
-          vm.acceptType = 'image/*'
+          vm.acceptType = type // 'image/*'
           vm.uploadtitle = val
           if(is){
                 vm.isqj = 1
@@ -2343,14 +2409,15 @@ export default {
           window.open('/#/Drive/panoramicView/'+val)
       },
       handleNodeClick(obj){
-          console.log(obj)
           var vm = this
+          vm.firstTime++
           if(!obj.children){
             vm.$message({
                 type:'info',
                 message:'这个文件夹没有子文件!'
             })
           }
+          vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
           if(vm.expandedKeys.indexOf(vm.checkFileDir.nodeId) == -1){
             vm.expandedKeys.push(vm.checkFileDir.nodeId)
@@ -2528,10 +2595,15 @@ export default {
         vm.latestFile(fileId,"下载了文件"+fileName);
         window.open(vm.QJFileManageSystemURL + filePath +'');
     },
+    downLoadWithURL(url,fileId,fileName){
+         var vm = this
+        if(fileId)vm.latestFile(fileId,"下载了文件"+fileName)
+        window.open(vm.QJFileManageSystemURL + url +'')
+    },
     latestFile(fileId,log){
         var vm = this
         axios({
-            method:'GET',
+            method:'POST',
             url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/latestFile',
             headers:{
                 'token':vm.token
@@ -2539,9 +2611,9 @@ export default {
             params:{
                 log:log,
                 userGroupId:vm.selectUgId,//目录id
-                fileId:fileId,//文件id
                 projId:vm.projId
             },
+            data:fileId,//文件id
         }).then((response)=>{
             if(response.data.cd == 0){
             }
@@ -2553,14 +2625,18 @@ export default {
         var vm = this
         var url = '/multiDownloadUrl?'
         var hasFilePath = false
+        var fileId = []
+        var fileName = ''
         vm.fileList.forEach((item,key)=>{
             if(item.checked){
                 hasFilePath = true
-              url += 'urls='+item.filePath+'&'
+                url += 'urls='+item.filePath+'&'
+                fileId.push(item.fileId)
+                fileName += item.fileName+','
             }
         })
         if(hasFilePath){
-             vm.downLoad(url)
+             vm.downLoadWithURL(url,fileId,fileName)
         }else{
             vm.$message({
                 type:'info',
@@ -2609,7 +2685,7 @@ export default {
         })
         var timer = setInterval(function(){
             if(url != '/multiDownloadUrl?'){//如果url变化，结束定时器
-                vm.downLoad(url)
+                vm.downLoadWithURL(url)
                 clearInterval(timer)
             }
             if(empty){//若ajax 执行完 empty为true，结束定时器
@@ -2654,6 +2730,8 @@ export default {
                     vm.checkedItem = fileCheckList[0]
                     vm.getGouJianInfo()
                     vm.getVersion()
+                }else if(vm.checkedFile_Folder.fileCheckedNum == vm.fileList.length){
+                    vm.checkAll = true
                 }
             }else{
                 vm.checkedItem = {}

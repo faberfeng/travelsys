@@ -1019,6 +1019,9 @@ export default {
             vm.fileList.forEach((item,key)=>{
                 vm.$set(item,'checked',true)
             })
+            vm.show.basicAttributes =true
+            vm.show.BindingArtifacts =true
+            vm.fileCheckedNum = vm.fileList.length
           }
       },
       'show.basicAttributes':function(val){
@@ -1229,12 +1232,13 @@ export default {
                     fileCheckList.push(vm.fileList[i])
                 }
             }
-            if(vm.fileCheckedNum > 1){
-                vm.checkedItem = {}
-            }else if(vm.fileCheckedNum == 1){
+            vm.checkedItem = {}
+            if(vm.fileCheckedNum == 1){
                  vm.checkedItem = fileCheckList[0]
                 vm.getGouJianInfo()
                 vm.getVersion()
+            }else if(vm.fileCheckedNum == vm.fileList.length){
+                vm.checkAll = true
             }
         }else{//单选
             for(var i=0;i<vm.fileList.length;i++){
