@@ -331,7 +331,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data)
                     this.totalConstructorData = response.data.rt.rows;
                 }else if (response.data.cd == -1){
                     alert(response.data.msg);
@@ -702,9 +701,6 @@ export default {
                             }else if(this.revitCategory == '植物'){
                                 revitCa = "Planting";
                             }
-                            console.log(this.revitCategory);
-                            console.log(value);
-                            console.log(this.keyWord);
                             var keyword = this.totalConstructorData.some(item=>{
                                 if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord == this.keyWord){
                                     return true;
@@ -712,7 +708,6 @@ export default {
                                     return false;
                                 }
                             })
-                            console.log(keyword)
                             if(keyword){
                                 alert('关键字已经存在，不能添加！')
                             }else{
@@ -735,6 +730,7 @@ export default {
                                 }).then(response=>{
                                     if(response.data.cd == '0'){
                                         this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                                        this.firstGetGeniceClassMapItem();
                                         this.keyWord='';
                                         this.categoryBase ='';
                                         this.revitCategory ='';
@@ -796,6 +792,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
+                    this.firstGetGeniceClassMapItem();
                     this.deleteDialog = false;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
