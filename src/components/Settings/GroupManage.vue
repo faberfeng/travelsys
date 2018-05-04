@@ -188,7 +188,7 @@ export default {
                         console.log(err)
                     })
                     }
-                this.$message({
+                vm.$message({
                     type: 'success',
                     message: '添加群组用户成功'
                     });
@@ -196,7 +196,7 @@ export default {
                         vm.getQRuser(vm.activeugID)
                 },1000)
             }else{
-                this.$message({
+                vm.$message({
                     type: 'warming',
                     message: '请选择用户'
                 });
@@ -252,7 +252,7 @@ export default {
                             }else if (response.data.cd == '-1'){
                                 alert(response.data.msg)
                             }else{
-                                this.$router.push({
+                                vm.$router.push({
                                     path:'/login'
                                 })
                             }
@@ -280,7 +280,7 @@ export default {
             },
             EditName(){
                 var vm = this
-                this.$prompt('修改群组名称', '修改群组', {
+                vm.$prompt('修改群组名称', '修改群组', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                     }).then(({ value }) => {
@@ -297,7 +297,7 @@ export default {
                                 }
                             }).then((response)=>{
                                 if(response.data.cd == 0){
-                                    this.$message({
+                                    vm.$message({
                                         type: 'success',
                                         message: '修改群组名称成功'
                                     });
@@ -307,7 +307,7 @@ export default {
                                 console.log(err)
                             })
                     }).catch(() => {
-                        this.$message({
+                        vm.$message({
                             type: 'info',
                             message: '取消修改'
                         });       
@@ -315,7 +315,7 @@ export default {
             },
             EditLabel(){
                 var vm = this
-                this.$prompt('修改群组标签', '修改群组', {
+                vm.$prompt('修改群组标签', '修改群组', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                     }).then(({ value }) => {
@@ -332,7 +332,7 @@ export default {
                                 }
                             }).then((response)=>{
                                 if(response.data.cd == 0){
-                                    this.$message({
+                                    vm.$message({
                                         type: 'success',
                                         message: '修改群组标签成功'
                                     });
@@ -342,7 +342,7 @@ export default {
                                 console.log(err)
                             })
                     }).catch(() => {
-                        this.$message({
+                        vm.$message({
                             type: 'info',
                             message: '取消修改'
                         });       
@@ -363,7 +363,7 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd == 0){
-                        this.$message({
+                        vm.$message({
                             type: 'success',
                             message: '修改群组状态成功'
                         });
@@ -374,7 +374,7 @@ export default {
             },
             addQR(){//添加群组
                 var vm = this
-                this.$prompt('群组名称', '新建群组', {
+                vm.$prompt('群组名称', '新建群组', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                 }).then(({ value }) => {
@@ -404,7 +404,7 @@ export default {
                         console.log(err)
                     })
                 }).catch(() => {
-                    this.$message({
+                    vm.$message({
                         type: 'info',
                         message: '取消添加'
                     });       
@@ -505,13 +505,13 @@ export default {
                                     vm.activeugIDkey = i;
                                     vm.changeQR(vm.ugList[i].ugId,i);
                                     vm.getQRuser(vm.ugList[i].ugId);
-                                    this.checkedUgList = vm.ugList[i];
+                                    vm.checkedUgList = vm.ugList[i];
                                 }
                             }
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg);
                         }else{
-                            this.$router.push({
+                            vm.$router.push({
                                 path:'/login'
                             })
                         }
@@ -525,25 +525,25 @@ export default {
             changeQR_(index){
                 var vm = this;
                 if(index == -1){
-                    if(this.activeugIDkey == 0){
+                    if(vm.activeugIDkey == 0){
                         alert('已经是最上面一个群组!');
                     }else{
                         var preUgid = '';
-                        this.ugList.forEach((item,index,arr)=>{
-                            if(item.ugName == this.checkedUgList.ugName){
+                        vm.ugList.forEach((item,index,arr)=>{
+                            if(item.ugName == vm.checkedUgList.ugName){
                                 preUgid = arr[index-1].ugId;
-                                this.activeugIDkey= index;
+                                vm.activeugIDkey= index;
                             }
                         });
                         axios({
                             method:'post',
-                            url:this.baseUrl+'config/userGroup/moveUpGroupNode',
+                            url:vm.baseUrl+'config/userGroup/moveUpGroupNode',
                             headers:{
-                                token:this.token
+                                token:vm.token
                             },
                             params:{
                                 prevUgId:preUgid,
-                                ugId:this.checkedUgList.ugId
+                                ugId:vm.checkedUgList.ugId
                             } 
                         }).then(response=>{
                             if(response.data.cd == '0'){
@@ -551,32 +551,32 @@ export default {
                             }else if(response.data.cd == '-1'){
                                     alert(response.data.msg);
                             }else{
-                                this.$router.push({
+                                vm.$router.push({
                                     path:'/login'
                                 })
                             }
                         })
                     }
                 }else if(index == 1){
-                    if(this.activeugIDkey == this.ugList.length-1){
+                    if(vm.activeugIDkey == vm.ugList.length-1){
                         alert('已经是最下面一个群组!');
                     }else{
                         var nextUgidC = '';
-                        this.ugList.forEach((item,index,arr)=>{
-                            if(item.ugName == this.checkedUgList.ugName){
+                        vm.ugList.forEach((item,index,arr)=>{
+                            if(item.ugName == vm.checkedUgList.ugName){
                                 nextUgidC = arr[index+1].ugId;
-                                this.activeugIDkey = index;
+                                vm.activeugIDkey = index;
                             }
                         });
                         axios({ 
                             method:'post',
-                            url:this.baseUrl+'config/userGroup/moveDownGroupNode',
+                            url:vm.baseUrl+'config/userGroup/moveDownGroupNode',
                             headers:{
-                                token:this.token
+                                token:vm.token
                             },
                             params:{
                                 nextUgId:nextUgidC,
-                                ugId:this.checkedUgList.ugId
+                                ugId:vm.checkedUgList.ugId
                             },
                             data:{} 
                         }).then(response=>{
@@ -585,7 +585,7 @@ export default {
                             }else if(response.data.cd == '-1'){
                                     alert(response.data.msg);
                             }else{
-                                this.$router.push({
+                                vm.$router.push({
                                     path:'/login'
                                 })
                             }
@@ -612,18 +612,18 @@ export default {
                     if(response.data.rt.ugList){
                         vm.ugList = response.data.rt.ugList;//工程群组
                         for(var i=0;i<vm.ugList.length;i++){
-                            if(vm.ugList[i].ugName == this.checkedUgList.ugName){
+                            if(vm.ugList[i].ugName == vm.checkedUgList.ugName){
                                 vm.activeugID = vm.ugList[i].ugId;
                                 vm.activeugIDkey = i;
                                 vm.changeQR(vm.ugList[i].ugId,i);
                                 vm.getQRuser(vm.ugList[i].ugId);
-                                this.checkedUgList = vm.ugList[i];
+                                vm.checkedUgList = vm.ugList[i];
                             }
                         }
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg);
                     }else{
-                        this.$router.push({
+                        vm.$router.push({
                             path:'/login'
                         })
                     }
@@ -635,7 +635,7 @@ export default {
         },
         changeQR(val,index,item){//切换群组，根据群组ID获取群组信息
             var vm = this;
-            this.checkedUgList = item;
+            vm.checkedUgList = item;
             if(val){
                 vm.ugEdit.status = ''
                 axios({
@@ -680,9 +680,9 @@ export default {
                         vm.userQunzuNum = response.data.rt.length//工程用户总数
                         vm.userQunzuList = response.data.rt//工程群组用户列表
                     }else if(response.data.cd == '-1'){
-                        alert(response.data.msg);
+                        // alert(response.data.msg);
                     }else{
-                        this.$router.push({
+                        vm.$router.push({
                             path:'/login'
                         })
                     }

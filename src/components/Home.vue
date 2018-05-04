@@ -16,13 +16,7 @@
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress">进度计划</el-tab-pane>
-                                <el-tab-pane label="设计管理" name="designManager">
-                                    <!-- <el-menu :default-active="activeIndex"  mode="horizontal">
-                                        <el-menu-item index="1"><router-link :to="{path:'/home/design'}">设计协调</router-link></el-menu-item>
-                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">属性管理</router-link></el-menu-item>
-                                        <el-menu-item index="3"><router-link :to="{path:'/home/designversion'}">设计版本</router-link></el-menu-item>
-                                    </el-menu> -->
-                                </el-tab-pane>
+                                <el-tab-pane label="设计管理" name="designManager"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage">
                                     <el-menu :default-active="activeIndex"  mode="horizontal">
                                         <el-menu-item index="1"><router-link :to="{path:'/Drive/costover'}">成本预览</router-link></el-menu-item>
@@ -293,7 +287,7 @@ export default {
                         })
                     }else if(vm.auth.design){
                         vm.$router.push({
-                            path:'/Drive/costover'//设计管理
+                            path:'/Design/management'//设计管理
                         })
                     }else if(vm.auth.costManagement){
                         vm.$router.push({
@@ -348,7 +342,7 @@ export default {
                 sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.label === '设计管理'){
                 this.$router.push({
-                    path:'/home/design'
+                    path:'/Design/management'
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

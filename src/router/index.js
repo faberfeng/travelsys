@@ -47,11 +47,6 @@ const router = new Router({
           component:resolve=>require(['@/components/ProjectHome/home'],resolve)
         },
         {
-          path:'/home/goujian',
-          name:'Goujian',
-          component:resolve=>require(['@/components/ManageCost/Goujian'],resolve),
-        },
-        {
           path:'/home/gongcheng',
           name:'Gongcheng',
           component:resolve=>require(['@/components/ManageCost/Gongcheng'],resolve)
@@ -61,13 +56,28 @@ const router = new Router({
           name:'Wuliao',
           component:resolve=>require(['@/components/ManageCost/Wuliao'],resolve)
         },
+      ]
+    },
+    {
+      path:'/Design',
+      name:'Design',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
         {
-          path:'/home/design',
-          name:'Design',
+          path:'/Design/management',
+          name:'ManageDesign',
           component:resolve=>require(['@/components/ManageDesign/Design'],resolve)
         },
         {
-          path:'/home/designversion',
+          path:'/Design/attributeManager',
+          name:'attributeManager',
+          component:resolve=>require(['@/components/ManageDesign/attributeManager'],resolve),
+        },
+        {
+          path:'/Design/designversion',
           name:'DesignVersion',
           component:resolve=>require(['@/components/ManageDesign/DesignVersion'],resolve)
         },

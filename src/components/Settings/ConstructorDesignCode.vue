@@ -380,7 +380,7 @@
                                         {{item.valueType_}}
                                     </td>
                                     <td>
-                                        <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                        <input type="text" class="TextInput" value="@" v-model="item.formula_"/>
                                         <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
                                     </td>    
                                 </tr>
@@ -453,7 +453,7 @@
                                         {{item.valueType_}}
                                     </td>
                                     <td>
-                                        <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                        <input  type="text" class="TextInput" value="@"  v-model="item.formula_"/>
                                         <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
                                     </td>    
                                 </tr>
@@ -2910,17 +2910,15 @@ export default {
                 if(response.data.cd == '0'){
                     if(response.data.rt.rows){
                         this.addProjectMappingData = response.data.rt.rows;
-                        // this.addProjectMappingData.forEach(item=>{
-                        //     item.valueType_ = this.judgeValueType(item.valueType);
-                        //     formula_:item.formula.split('@')[1]
-                        // })
                         this.addProjectMappingData.forEach(item=>{
-                            item = Object.assign(item,{
-                                valueType_:this.judgeValueType(item.valueType),
-                                formula_:item.formula && item.formula.split('@')[1]
-                            })
-                            
+                            // item = Object.assign(item,{
+                            //     valueType_:this.judgeValueType(item.valueType),
+                            //     formula_:item.formula && item.formula.split('@')[1]
+                            // })
+                            this.$set(item,'valueType_',this.judgeValueType(item.valueType))
+                            this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
                         })
+                        console.log(this.addProjectMappingData)
                     }
                 }else if (response.data.cd == '-1'){
                     alert(response.data.msg)

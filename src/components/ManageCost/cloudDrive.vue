@@ -299,7 +299,7 @@
                     </ul>
                 </div>
                 <div v-else>
-                     <h3 class="header-attribute">
+                     <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
                         基本属性
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
