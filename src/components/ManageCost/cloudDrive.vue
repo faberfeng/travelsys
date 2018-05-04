@@ -187,26 +187,28 @@
                     <span class="item-version-3  " @click="screenLeft.item = 3;getVersion()">版<br>本</span>
                 </div>
             </div>
-            <div v-if="screenLeft.item == 1" class="screenRight_1">
+            <div v-show="screenLeft.item == 1" class="screenRight_1">
                  <p class="clearfix">
                     <i class="icon-goujian icon-add" title="添加" @click="addFile"></i>
                     <i class="icon-goujian icon-authrity"  title="权限" @click="authrityFile"></i>
                     <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile"></i>
                     <i class="icon-goujian icon-edit"  title="重命名" @click="renameFile"></i>
                 </p>
-                <el-tree
-                :data="FileTree"
-                ref="fileTree_cloudDrive"
-                node-key="nodeId"
-                :props="defaultProps"
-                :default-expanded-keys="expandedKeys"
-                highlight-current
-                @node-click="handleNodeClick"
-                id="cloudDirveFileTree"
-                >
-                </el-tree>
+                <div   @click.stop="initTreeFolder()">
+                    <el-tree
+                    :data="FileTree"
+                    ref="fileTree_cloudDrive"
+                    node-key="nodeId"
+                    :props="defaultProps"
+                    :default-expanded-keys="expandedKeys"
+                    highlight-current
+                    @node-click="handleNodeClick"
+                    id="cloudDirveFileTree"
+                    >
+                    </el-tree>
+                </div>
             </div>
-            <div id="box-right" v-else-if="screenLeft.item == 2">
+            <div id="box-right" v-if="screenLeft.item == 2">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
                     <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
@@ -312,7 +314,7 @@
                     </ul>
                 </div>
             </div>
-            <div id="box-right-1" v-else>
+            <div id="box-right-1" v-if="screenLeft.item == 3">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
                     <p class="head" v-if="checkedItem.dirId || checkedRound">
                         <i class="icon-goujian icon-search" @click="view()"></i>
@@ -343,7 +345,7 @@
         </div>
       <div id="edit">
         <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.nodeId" :title="uploadtitle" :accept="acceptType"
-        :fgid="QJfgid" :isqj="isqj"
+        :fgid="QJfgid" :isqj="isqj" :ugid='selectUgId'
         ></upload>
         <el-dialog title="文件重命名" :visible="PointFigure.renameshow" @close="renameCancle">
             <div class="editBody">
@@ -1796,6 +1798,11 @@ export default {
       }
   },
   methods:{
+      initTreeFolder(){
+        var vm = this
+        vm.firstTime = 0
+        vm.getFileTree()
+      },
       addFile(){
         var vm = this
         vm.fileName.show = true
@@ -1811,7 +1818,6 @@ export default {
         var vm = this
         if(vm.fileName.new){
             console.log(vm.checkFileDir)
-            debugger
              axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/add',
@@ -2029,7 +2035,7 @@ export default {
       },
       paste(){
         var vm = this
-        if(vm.hasFileToPaste.obj.shear){
+        if(vm.hasFileToPaste.obj.shear){//剪切
              axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.hasFileToPaste.obj.dirId+'/pasteFileGroup/'+vm.checkFileDir.nodeId+'/'+vm.hasFileToPaste.obj.projId,
@@ -2055,7 +2061,7 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
-        }else{
+        }else{//复制
             axios({
                 method:'POST',
                 url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/pasteTransferStation',
@@ -2081,6 +2087,11 @@ export default {
                     }else{
                         vm.getInfo()
                     }
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -2110,25 +2121,39 @@ export default {
         if (vm.showQuanJing) {//如果是全景图文件
             fgIdList = vm.checkedRound.ID
         } else {
-            vm.fileList.forEach((item,key)=>{
-                if(item.checked){
+            for(var i=0;i<vm.fileList.length;i++){
+                if(vm.fileList[i].checked){
+                    if(vm.fileList[i].isAutoCreated == 1){
+                        vm.$message({
+                            type: 'error',
+                            message: '系统文件，不能操作！'
+                        });  
+                        return false
+                    }
                     if(fgIdList == ''){
-                         fgIdList = item.fgId
+                         fgIdList = vm.fileList[i].fgId
                     }else{
-                        fgIdList += ','+item.fgId
+                        fgIdList += ','+vm.fileList[i].fgId
                     }
                 }
-            })
-            vm.folderList.forEach((item,key)=>{
-                if(item.checked){
+            }
+            for(var j=0;j<vm.folderList.length;j++){
+                if(vm.folderList[j].checked){
+                     if(vm.folderList[j].isAutoCreated == 1){
+                        vm.$message({
+                            type: 'error',
+                            message: '系统文件，不能操作！'
+                        });  
+                        return false
+                    }
                     // 文件夹
                     if(fcIdList == ''){
-                         fcIdList = item.nodeId
+                         fcIdList = vm.folderList[j].nodeId
                     }else{
-                        fcIdList += ','+item.nodeId
+                        fcIdList += ','+vm.folderList[j].nodeId
                     }
                 }
-            })
+            }
         }
 
         if(fgIdList != '' || fcIdList != ''){
@@ -2201,16 +2226,20 @@ export default {
             //     }
             // })
         }else{
-            vm.fileList.forEach((item)=>{
-                if(item.checked){
-                    fgIdList.push(item.fgId)
-                }
-            })
-            vm.folderList.forEach((item)=>{
-                if(item.checked){
-                    fcIdList.push(item.nodeId)
-                }
-            })
+            if(vm.fileList){
+                 vm.fileList.forEach((item)=>{
+                    if(item.checked){
+                        fgIdList.push(item.fgId)
+                    }
+                })
+            }
+           if(vm.folderList){
+                vm.folderList.forEach((item)=>{
+                    if(item.checked){
+                        fcIdList.push(item.nodeId)
+                    }
+                })
+           }
         }
         axios({
             method:'POST',
@@ -2253,18 +2282,23 @@ export default {
             },
         }).then((response)=>{
             if(response.data.cd == 0){
+                var fileId = []
                 if(vm.showQuanJing){
                     vm.searchFileGroupInfo()
                     vm.$message({
                         type:'success',
                         message:'点位重命名成功'
                     })
+                    fileId.push(vm.checkedRound.fileId)
+                     vm.latestFile(fileId,"重命名了点位"+vm.checkedRound.fgName)
                 }else{
                     vm.getInfo()
                     vm.$message({
                         type:'success',
                         message:'文件重命名成功'
                     })
+                      fileId.push(vm.checkedItem.fileId)
+                     vm.latestFile(fileId,"重命名了文件"+vm.checkedItem.fileName)
                 }
                 vm.PointFigure.fgID = ''
                 vm.PointFigure.renameshow = false
@@ -2276,6 +2310,15 @@ export default {
       },
       rename(){
         var vm = this
+        for(var i=0;i<vm.fileList.length;i++){
+            if(vm.fileList[i].checked && vm.fileList[i].isAutoCreated == 1){
+                vm.$message({
+                    type:'error',
+                    message:'系统文件，不能操作！'
+                })
+                return false
+            }
+        }
         vm.PointFigure.renameshow = true
       },
       updatePoint(){//更新点位
@@ -2285,6 +2328,13 @@ export default {
         }else if(vm.checkedFile_Folder.file){
            for(var i=0;i<vm.fileList.length;i++){
                 if(vm.fileList[i].checked){
+                    if(vm.fileList[i].isAutoCreated == 1){
+                        vm.$message({
+                            type:'error',
+                            message:'系统文件，不能操作！'
+                        })
+                        return false
+                    }
                     vm.updateImg('文件更新',false,vm.fileList[i].fgId,'')//非点位类型是0
                    break;
                }
@@ -2294,16 +2344,26 @@ export default {
       deletePoint(){//删除点位
         var vm = this
         var fgIdList = []
+        var msg = ''
         if(vm.showQuanJing){
             if(vm.checkedRound.ID !=''){
                 fgIdList.push(vm.checkedRound.ID)
             }
+            msg = '点位'
         }else{
-            vm.fileList.forEach((item,key)=>{
-                if(item.checked){
-                    fgIdList.push(item.fgId)
+            for(var i=0;i<vm.fileList.length;i++){
+                if(vm.fileList[i].checked){
+                     if (vm.fileList[i].isAutoCreated == 1) {
+                        vm.$message({
+                            type:'error',
+                            message:'系统文件，不能操作！'
+                        })
+                        return false
+                    }
+                    fgIdList.push(vm.fileList[i].fgId)
                 }
-            })
+            }
+            msg = '文件'
         }
         axios({
             method:'POST',
@@ -2324,7 +2384,7 @@ export default {
                 }
                 vm.$message({
                     type:'success',
-                    message:'点位删除成功'
+                    message:msg+'删除成功'
                 })
             }
         }).catch((err)=>{
@@ -2345,16 +2405,9 @@ export default {
       },
       refreshqj(){
           var vm = this
-          var fileId = '',fileName=''
           if(vm.showQuanJing){
-                fileId = vm.checkedRound.fileId
-                fileName = vm.checkedRound.fgName
-                vm.latestFile(fileId,"更新了文件"+fileName);
-                vm.searchFileGroupInfo()
+                vm.searchFileGroupInfo(vm.checkFileDir.nodeId)
           }else{
-                fileId = vm.checkedItem.fileId
-                fileName = vm.checkedItem.fileName
-                vm.latestFile(fileId,"更新了文件"+fileName);
                 vm.getInfo()
           }
           vm.uploadImg.checked = false
@@ -2405,7 +2458,7 @@ export default {
                 y:y, //ugid是群组ID
             };
             sessionStorage.setItem("qjInfo", JSON.stringify(qjInfo)); 
-          vm.latestFile(id,"下载了文件"+name);
+          vm.latestFile(id,"查看了文件"+name);
           window.open('/#/Drive/panoramicView/'+val)
       },
       handleNodeClick(obj){
@@ -2424,7 +2477,7 @@ export default {
           }
           if(obj.holderId){
                vm.showQuanJing = true
-               vm.searchFileGroupInfo()
+               vm.searchFileGroupInfo(obj.nodeId)
           }else{
              vm.showQuanJing = false
              vm.getInfo()
@@ -2537,7 +2590,6 @@ export default {
          * @param fileUuid
          */
     view(filePath,fileId,fileName){
-        //latestFile(fileId,fgId,"预览了文件"+fileName);
         var vm = this
         if(!filePath){
             if(vm.checkedItem || vm.checkedRound){
@@ -2650,22 +2702,23 @@ export default {
         var hasFilePath = false
         var fileId = []
         var empty = false
+        var url_API  = 'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileListByDirOrFile?'
         for(var i=0;i<vm.folderList.length;i++){
             if(vm.folderList[i].checked){
-                fileId.push(vm.folderList[i].nodeId)
+                url_API += 'dirId='+vm.folderList[i].nodeId+'&'
             }
         }
+        url_API = url_API +'projId='+vm.projId
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileListByDirOrFile',
+            url:url_API,
             headers:{
                 'token':vm.token
             },
-            params:{
-                dirId:vm.checkFileDir.nodeId,//目录id
-                fileId:fileId,//文件id
-                projId:vm.projId
-            },
+            // params:{
+            //     fileId:'',//文件id
+            //     projId:vm.projId
+            // },
         }).then((response)=>{
             if(response.data.cd == 0){
                if(response.data.rt.length>0){
@@ -2916,12 +2969,14 @@ export default {
                 'token':vm.token
             },
             data:{
-                "dirId": val?val:vm.FileTree[0].nodeId,
+                "dirId": vm.checkFileDir.nodeId,
                 "projId": vm.projId
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                vm.QJ.point = []
+                 vm.hasImg = false
+                 vm.QJ.imageBackground = {}
+                 vm.QJ.point = []
                  response.data.rt.rows.forEach((item)=>{
                      if(item.xAxial == -1 && item.yAxial == -1){
                          vm.QJ.imageBackground = item
@@ -2931,6 +2986,9 @@ export default {
                          vm.QJ.point.push(item)
                      }
                  })
+                setTimeout(function(){
+                    vm.pointLocationBindClick()
+                },1000)
             }
         }).catch((err)=>{
             console.log(err)

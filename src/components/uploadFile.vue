@@ -31,7 +31,7 @@ export default Vue.component('common-upload',{
         return {
             showErr:'',//错误信息
             imageName:'未选择任何文件',
-            filesList:{},
+            filesList:null,
             QJFileManageSystemURL:'',
             userId:'',
             projId:'',
@@ -39,7 +39,7 @@ export default Vue.component('common-upload',{
             des:'',//文件描述
         }
     },
-    props:['uploadshow','dirid','fgid','isqj','title','accept'],
+    props:['uploadshow','dirid','fgid','isqj','title','accept','ugid'],
     mounted(){
         var vm = this
 
@@ -63,6 +63,27 @@ export default Vue.component('common-upload',{
             var vm = this
             vm.$emit('hiddenupload')
         },
+         latestFile(fileId,log){
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/latestFile',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    log:log,
+                    userGroupId:vm.ugid,//目录id
+                    projId:vm.projId
+                },
+                data:fileId,//文件id
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         uploadIMG(){
             var vm = this
             /*
@@ -71,6 +92,13 @@ export default Vue.component('common-upload',{
             fgId 
             fileDesc 描述
             **/
+           if(vm.filesList == null){
+               vm.$message({
+                   type:'error',
+                   message:'请选择文件！'
+               })
+               return false
+           }
            console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
             var returnUrl = "http://10.252.26.240:8080/h2-bim-project/project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
             returnUrl = encodeURIComponent(returnUrl);
@@ -90,16 +118,20 @@ export default Vue.component('common-upload',{
                 },
                 data:formData,
             }).then((response)=>{
-                console.log(response)
+                var fileId = []
                 if(response.data.rt){
                     vm.des = ''
                     vm.imageName ='未选择任何文件'
-                     vm.$emit('refreshqj')
+                    vm.filesList = null
+                    fileId.push(response.data.rt[0].fileId)
+                    vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
+                    vm.$refs.file.value = ''
+                    vm.$emit('refreshqj')
                 }
             }).catch((err)=>{
                 vm.des = ''
                 vm.imageName ='未选择任何文件'
-                 vm.$emit('refreshqj')
+                vm.$emit('refreshqj')
                 console.log(err)
             })
         }

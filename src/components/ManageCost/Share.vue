@@ -2408,7 +2408,7 @@ export default {
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                if(response.data.rt.length>0){
+                if(response.data.rt != null){
                     vm.fgList = response.data.rt
                     vm.fgList.forEach((item,key)=>{
                         vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom

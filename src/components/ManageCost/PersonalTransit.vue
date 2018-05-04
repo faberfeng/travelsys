@@ -35,7 +35,7 @@
                     <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                     <ul class="operation">
                         <li class="item icon icon-paste"  @click="paste" v-if="hasFileToPaste.is">粘贴</li>
-                        <li class="item icon icon-copy" v-if="checkOne" @click="copyfile">复制</li>
+                        <li class="item icon icon-copy" v-if="checkOne" @click="copyfile()">复制</li>
                         <li class="item icon icon-delete"  @click="deleteFile">删除</li>
                     </ul>
                      <span class="button-download" @click="downloadFile">下载</span>
@@ -662,40 +662,51 @@ export default {
             vm.hasFileToPaste.is = false
             vm.hasFileToPaste.obj = {}
             var filePaste = JSON.parse(sessionStorage.getItem('fileObject'))
-            if(filePaste && filePaste.fcIds ==''){
-                vm.hasFileToPaste.is = true
+             vm.hasFileToPaste.is = true
+            if(filePaste){//不能 粘贴 剪切的文件
                 vm.hasFileToPaste.obj = filePaste
+                for(var i=0;i<filePaste.length;i++){
+                    if(!filePaste[i].shear || !filePaste[i].fcIds == ''){
+                         vm.hasFileToPaste.is = false
+                         break;
+                    }
+                }
             }
       },
       copyfile(val){
         // 复制内容到剪贴板
         var vm = this
-        var fgIdList = ''
-        var dirId = ''
         var msg = ''
         if(val){
             msg = '剪切'
         }else{
              msg = '复制'    
         }
+        var fileObject = {}
+        var fgIdList = ''
+        var dirId = ''
         vm.fileList.forEach((item,key)=>{
             if(item.checked){
-                fgIdList = item.fgId
-                dirId = item.dirId
+                if(fgIdList == ''){
+                        fgIdList = item.fgId
+                }else{
+                    fgIdList += ','+item.fgId
+                }
+                if(dirId == ''){
+                        dirId = item.dirId
+                }else{
+                    dirId += ','+item.dirId
+                }
             }
         })
-        if(fgIdList != ''){
+        if(fileObject){
             var fileObject = {
                 fgIds: fgIdList,
                 dirId: dirId,//当前文件夹ID
                 oldUgId:'', //ugid是群组ID
                 projId: vm.projId,
-                fcIds: ''
-            };
-            if(val){
-                 fileObject.shear = true
-            }else{
-              fileObject.shear = false   
+                fcIds: '',
+                shear:val?true:false
             }
             sessionStorage.setItem("fileObject", JSON.stringify(fileObject)); 
             vm.$message({
@@ -911,9 +922,12 @@ export default {
                     checkList.push(item)
                 }
             })
-            vm.checkOne = false 
-            if(num == 1){
+            if(num == 0){
+                vm.checkOne = false 
+            }else{
                 vm.checkOne = true
+            }
+            if(num == 1){
                 vm.checkedItem = checkList[0]
             }else if(num == vm.fileList.length){
                 vm.checkAll = true 
