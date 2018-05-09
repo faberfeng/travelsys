@@ -1,0 +1,124 @@
+<template>
+      <div >
+          <h1>sendmess</h1>
+      </div>
+</template>
+<script>
+import Vue from 'vue'
+import axios from 'axios'
+export default Vue.component('common-upload',{
+    data(){
+        return {
+            showErr:'',//错误信息
+            imageName:'未选择任何文件',
+            filesList:null,
+            QJFileManageSystemURL:'',
+            userId:'',
+            projId:'',
+            token:'',
+            des:'',//文件描述
+        }
+    },
+    props:['uploadshow','dirid','fgid','isqj','title','accept','ugid'],
+    mounted(){
+        var vm = this
+        vm.token  = localStorage.getItem('token')
+        vm.userId  = localStorage.getItem('userid')
+        vm.projId = localStorage.getItem('projId');
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+    },
+    methods:{
+        selectImg(){
+             this.$refs.file.click()
+        },
+        fileChanged(file){
+            var vm = this
+            console.log(file)
+            const list = vm.$refs.file.files
+            vm.imageName = list[0].name
+            vm.filesList = list[0]
+        },
+        upImgCancle(){
+            var vm = this
+            vm.$emit('hiddenupload')
+        },
+         latestFile(fileId,log){
+            var vm = this
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/latestFile',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    log:log,
+                    userGroupId:vm.ugid,//目录id
+                    projId:vm.projId
+                },
+                data:fileId,//文件id
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        uploadIMG(){
+            var vm = this
+            /*
+            isUploadPoint 0不是全景类型 1是全景类型 
+            dirId 目录ID
+            fgId 
+            fileDesc 描述
+            **/
+           if(vm.filesList == null){
+               vm.$message({
+                   type:'error',
+                   message:'请选择文件！'
+               })
+               return false
+           }
+           console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
+            var returnUrl = "http://10.252.26.240:8080/h2-bim-project/project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData = new FormData()
+            formData.append('token',vm.token);
+            formData.append('projId',vm.projId);
+             formData.append('type',1);
+            formData.append('file',vm.filesList);
+            formData.append('userId',vm.userId);
+            formData.append('modelCode','002');
+            formData.append('returnUrl',returnUrl);
+            axios({
+                method:'POST',
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData,
+            }).then((response)=>{
+                var fileId = []
+                if(response.data.rt){
+                    vm.des = ''
+                    vm.imageName ='未选择任何文件'
+                    vm.filesList = null
+                    fileId.push(response.data.rt[0].fileId)
+                    vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
+                    vm.$refs.file.value = ''
+                    vm.$emit('refreshqj')
+                }
+            }).catch((err)=>{
+                vm.des = ''
+                vm.imageName ='未选择任何文件'
+                vm.$emit('refreshqj')
+                console.log(err)
+            })
+        }
+    }
+})
+</script>
+<style>
+
+</style>
+
+

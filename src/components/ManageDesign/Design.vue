@@ -7,6 +7,16 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
+            <div id="center-selection">
+                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                    <i class="icon-right"></i>
+                </div>
+                <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                    <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
+                    <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
+                    <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                </div>
+            </div>
             <div id="item-box-file">
                 <span  class="label-item-active label-item">
                     <router-link :to="'/Design/management'">  
@@ -70,35 +80,99 @@
                         </li>
                     </ul>
                 </div>
+                <sendMes></sendMes>
                  <div class="project">
                     <ul class="projectList">
-                            <li v-for="(item,index) in CommunicationList" :key="index">
-                                <div class="projectListInfo">
-                                    <div class="projectListImg">
-                                        <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
+                        <li v-for="(item,index) in CommunicationList" :key="index">
+                            <div class="projectListInfo">
+                                <div class="projectListImg">
+                                    <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/loginimg.png')">
+                                </div> 
+                                <div class="projectListText">
+                                    <span class="action_rightBox">
+                                        <span class="icon-finish" v-if="canEditMes && item.dcStatus == 1" @click="updateStatus(item.dcId,0,'完成',index)">完成</span>
+                                        <span class="icon-reconsider" v-if="canEditMes && item.dcStatus == 2" @click="updateStatus(item.dcId,1,'再议',index)">再议</span>
+                                        <span class="icon-start" v-if="canEditMes && item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
+                                        <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
+                                    </span>
+                                    <p class="projectListTextName">{{item.createUserAccount}}</p>
+                                    <p class="font-color1">{{item.dcContent}}</p>
+                                    <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                                        <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key">
+                                            <div class="item-file-box clearfix">
+                                                <span  class="item-file-image">
+                                                    <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
+                                                </span>
+                                                <span  class="item-file-detial">
+                                                    <h3 v-text="val.fileName"></h3>
+                                                    <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
+                                                    <p v-text="initData(val.uploadTime)"></p>
+                                                    <p class="operation">
+                                                        <span v-text="'版本'+val.version"></span>
+                                                        <i class="icon-goujian icon-search" @click="preview(val.filePath)"></i>
+                                                        <i class="icon-goujian icon-download" @click="downLoad(val.filePath)"></i>
+                                                    </p>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key" style="padding:0;overflow: hidden;">
+                                            <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                            <div class="actionbox clearfix">
+                                                <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                <i class="line"></i>
+                                                <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <p class="projectBottom">
+                                        <i class="icon-time"></i>{{initData(item.createTime)}}<label>{{item.from}}</label>
+                                        <span class="action">
+                                            <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
+                                            <span v-text="checkStatus(item.dcStatus)" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
+                                            <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
+                                            <span v-text="'收起回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="item.showFlowChart = false;item.showResponse = !item.showResponse;getComment(item.dcId)" :class="item.showResponse?'arrow':''"></span>
+                                            <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
+                                        </span>
+                                    </p>
+                                     <!--下面是评论的代码-->
+                                    <div class="flowCharts" v-if="item.showFlowChart">
+                                        <ul class="clearfix">
+                                            <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
+                                                <div class="top">
+                                                    <span class="horizontalLineL"></span>
+                                                    <span  class="redSpot"></span>
+                                                    <span  class="horizontalLineR"></span>
+                                                </div>
+                                                <p v-text="val.userName+val.dcStatus" class="title_"></p>
+                                                <p v-text="initData(val.operateTime)" class="date"></p>
+                                            </li>
+                                        </ul>
                                     </div> 
-                                    <div class="projectListText">
-                                        <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>
-                                        <p class="font-color1">{{item.title}}</p>
-                                        <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
+                                    <!--下面是流程图的代码-->
+                                    <div class="flowCharts" v-if="item.showFlowChart">
+                                        <ul class="clearfix">
+                                            <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
+                                                <div class="top">
+                                                    <span class="horizontalLineL"></span>
+                                                    <span  class="redSpot"></span>
+                                                    <span  class="horizontalLineR"></span>
+                                                </div>
+                                                <p v-text="val.userName+val.dcStatus" class="title_"></p>
+                                                <p v-text="initData(val.operateTime)" class="date"></p>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="pagenation">   
+                        <el-pagination background layout="prev, pager, next" :total="pageTotal" :current-page.sync="pageNo" @current-change="changePage" @prev-click="changePage" @next-click="changePage"></el-pagination>
+                    </div>
                 </div>
             </div>
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
-            <div id="center-selection">
-                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                    <i class="icon-right"></i>
-                </div>
-                <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                    <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
-                    <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
-                    <span class="item-version-3  " @click="screenLeft.item = 3;">属<br>性</span>
-                </div>
-            </div>
             <div v-if="screenLeft.item == 1" class="screenRight_1">
                 <div v-if="showAction">
                     <p class="clearfix" v-if="IsFolderAction">
@@ -108,10 +182,10 @@
                         <i class="icon-goujian icon-upload"  title="上传图纸" @click="uploadFile"></i>
                     </p>
                     <p class="clearfix" v-else>
-                        <i class="icon-goujian icon-load" title="加载" @click="addFile"></i>
-                        <i class="icon-goujian icon-view"  title="预览" ></i>
-                        <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile"></i>
-                        <i class="icon-goujian icon-edit"  title="编辑" @click="renameFile"></i>
+                        <i class="icon-goujian icon-load" title="加载" @click="loading()"></i>
+                        <i class="icon-goujian icon-view"  title="预览" @click="preview()"></i>
+                        <i class="icon-goujian icon-delete"  title="删除" @click="deleteDrawing"></i>
+                        <i class="icon-goujian icon-edit"  title="编辑" @click="editMap()"></i>
                     </p>
                 </div>
                 <el-tree
@@ -129,7 +203,20 @@
                 </el-tree>
             </div>
             <div id="box-right" v-else-if="screenLeft.item == 2">
-                222
+                <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;">
+                    <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i>
+                </p>
+                <ul class="container-contacts">
+                    <li class="member clearfix" v-for="(item,index) in contacts" :key="index">
+                        <img :src="item.imgUuid!=''?(QJFileManageSystemURL+item.imgUuid):''" alt="">
+                        <span class="member-name">
+                            <h3 v-text="item.userName"></h3>
+                            <p v-text="item.account"></p>
+                        </span>
+                        <i class="icon-ditial" title="详情" @click="ckeckUserInfo(item.id)"></i>
+                        <i class="icon-del" title="删除" @click="deleteContact(item.id,item.userId)"></i>
+                    </li>
+                </ul>
             </div>
             <div id="box-right-1" v-else>
                 333
@@ -150,6 +237,31 @@
             <div slot="footer" class="dialog-footer">
                 <button class="editBtnS" @click="renameIMG">更名</button>
                 <button class="editBtnC" @click="renameCancle">取消</button>
+            </div>
+        </el-dialog>
+         <el-dialog title="图纸编辑" :visible="editDrawing.renameshow" @close="editDrawingCancle">
+            <div class="editBody">
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">图号 :</label>
+                    <input type="text" class="inp" v-model="editDrawing.dcode">
+                </div>
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">图名 :</label>
+                    <input type="text" class="inp" v-model="editDrawing.dname">
+                </div>
+                 <div class="editBodytwo imageBody" style="position: relative;">
+                    <label class=" imageBodyText">比例 :</label>
+                    <select class="inp-search" v-model="editDrawing.dscale">
+                        <option value="1:20">1:20</option> 
+                        <option value="1:25">1:25</option> 
+                        <option value="1:30">1:30</option>
+                    </select>
+                    <i class="icon-sanjiao" style="top: 16px;left: 330px;"></i>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="confirmDrawing">确定</button>
+                <button class="editBtnC" @click="editDrawingCancle">取消</button>
             </div>
         </el-dialog>
          <el-dialog :title="fileName.title" :visible.sync="fileName.show" @close="addfileCancle">
@@ -211,7 +323,79 @@
                 <button class="editBtnC" @click="drawingsUploadCancel">关闭</button>
             </div>
         </el-dialog>
+        <el-dialog  title="添加联系人" :visible.sync="addUser.show" :before-close="userClose">
+            <div class="editBody">
+                <div class="editBodytwo imageBody">
+                    <span class="imageBodyText">添加方式:</span>
+                    <el-radio v-model="addUser.posType" label="1">邮箱</el-radio>
+                    <el-radio v-model="addUser.posType" label="2">账号</el-radio>
+                </div>
+                <div  class="editBodytwo imageBody">
+                    <span class="imageBodyText" v-text="'联系人'+(addUser.posType == '1'?'邮箱:':'账号:')"></span>
+                    <input type="text" v-model="addUser.posName" class="inp" placeholder="请输入" @keyup.enter="searchUser">
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">   
+                <button class="editBtnS" @click="searchUser">查找</button>
+                <button class="editBtnC" @click="userClose">取消</button>
+            </span>
+        </el-dialog> 
+        <el-dialog title="确认联系人" :visible="selectContact.show" @close="selectCancle">
+            <div class="editBody">
+                <h3 style="text-align:left;padding-left:90px;">查找到的用户信息如下：</h3>
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">邮箱 :</label>
+                    <span v-text="selectContact.obj.email"></span>
+                </div>
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">账号 :</label>
+                    <span v-text="selectContact.obj.account"></span>
+                </div>
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">姓名 :</label>
+                    <span v-text="selectContact.obj.realName"></span>
+                </div>
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">联系方式 :</label>
+                    <span v-text="selectContact.obj.phone"></span>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="SelectConfirm">添加为联系人</button>
+                <button class="editBtnC" @click="selectCancle">取消</button>
+            </div>
+        </el-dialog>
+        <el-dialog title="设计协调状态修改" :visible="dcStatus.show" @close="dcStatusCancle">
+            <div class="editBody">
+                <div class="editBodytwo imageBody" style="padding-left:120px;">
+                     <el-radio v-model="dcStatus.val" label="2">讨论主题已经解决完成</el-radio>
+                </div>
+                <div class="editBodytwo imageBody" style="padding-left:120px;">
+                      <el-radio v-model="dcStatus.val" label="3">关闭本讨论主题</el-radio>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="dcStatusConfirm">确定</button>
+                <button class="editBtnC" @click="dcStatusCancle">取消</button>
+            </div>
+        </el-dialog>
     </div>
+    <el-dialog title="联系人详情" id="contactINFO" :visible="selectContact.infoShow" @close="selectInfoCancle">
+        <div class="clearfix">
+            <img :src="selectContact.infoObj.imgUuid !=''?(QJFileManageSystemURL+selectContact.infoObj.imgUuid):require('../../assets/loginimg.png')" alt="" class="img">
+            <div class="info">
+                <h1 v-text="selectContact.infoObj.realName"></h1>
+                <div class="detial">
+                    <label>邮箱 :</label>
+                    <span v-text="selectContact.infoObj.email"></span>
+                </div>
+                <div class="detial">
+                    <label>账号 :</label>
+                    <span v-text="selectContact.infoObj.account"></span>
+                </div>
+            </div>
+        </div>
+    </el-dialog>
 </div>
 </template>
 <style  lang='less'>
@@ -296,6 +480,14 @@
             display: none;
         }
         #edit{ 
+             .inp-search{
+                width: 200px;
+                height: 38px;
+                border: 1px solid #d1d1d1;
+                border-radius: 2px;
+                background: #fafafa;
+                padding-left: 10px;
+            }
             .el-dialog{
             margin: 0 auto;
             .upInput{
@@ -305,15 +497,19 @@
             .imageBody{
             text-align: left;
             }
+            .el-radio__label{
+                padding-left: 10px;
+                padding-right: 10px;
+            }
             .imageBody .imageBodyText{
-                    color: #666;
-                    font-size: 14px;
-                    line-height: 14px;
-                    font-weight: normal;
-                    display: inline-block;
-                    margin-right: 20px;
-                    margin-left: 94px;
-                    text-align: right;
+                color: #666;
+                font-size: 14px;
+                line-height: 14px;
+                font-weight: normal;
+                display: inline-block;
+                width: 175px;
+                padding-left: 94px;
+                text-align: left;
             }
             .updataImageSpan{
                 overflow: hidden;
@@ -458,6 +654,63 @@
                 }
          }
         }
+        #contactINFO{
+            .el-dialog{
+                margin: 0 auto;
+                width: 412px;
+                border-radius: 2px;
+            }
+            .el-dialog__header {
+                height: 68px;
+                padding: 0;
+                border-bottom: 2px solid #e6e6e6;
+                text-align: left;
+                .el-dialog__title {
+                    color: #fc3439;
+                    font-size: 18px;
+                    line-height: 18px;
+                    font-weight: bold;
+                    font-family: 'MicrosoftYaHei';
+                    display: inline-block;
+                    margin: 34px 0 15px 30px;
+                }
+            }
+            .el-dialog__body{
+                padding: 30px 30px 50px;
+                .img{
+                    float: left;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 2px;
+                }
+                .info{
+                    float: left;
+                    width: 250px;
+                    height: 80px;
+                    margin-left: 22px;
+                    border-radius: 2px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    >h1{
+                        font-size: 18px;
+                        text-align: left;
+                        color: #333333;
+                        line-height: 18px;
+                        margin: 4px 0 16px;
+                    }
+                    .detial{
+                        text-align: left;
+                        color: #999999;
+                        font-size: 14px;
+                        line-height: 14px;
+                        &:first-of-type{
+                            margin-bottom: 14px;
+                        }
+                    }
+                }
+            }
+        }
         #GroupSelect{
             display: block;
             width: 168px;
@@ -504,6 +757,155 @@
             transition:  all ease .5s;
             min-width: 950px;
             overflow-y: auto;
+            #center-selection{
+                position: fixed;
+                top: 106px;
+                // bottom: 0;
+                right: 224px;
+                width: 25px;
+                z-index: 100;
+                transition: all ease .5s;
+                background: #ffffff;
+                .SH_right{
+                    width: 100%;
+                    height: 48px;
+                    border-left: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    .icon-right{
+                        display: block;
+                        position: absolute;
+                        top: 19px;
+                        left: 6px;
+                        width: 14px;
+                        height: 14px;
+                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
+                        transition: all ease .5s;
+                        transform: rotateZ(0deg);
+                    }
+                }
+                .item-property{//目录
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:15px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom: -9px;
+                        width: 23px;
+                        height: 15px;
+                        background: #fafafa;
+                        border-top: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }   
+                .item-version{//属性
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:12px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 23px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .item-version-3{//版本
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:24px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 23px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .active-version{//中间 属性 高显
+                    .item-version{//属性
+                        background: #fff;
+                        color: #fc3439;
+                        z-index: 15;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                    .item-property::after{//目录
+                        background: #fff;
+                    }
+                    .item-version-3{//版本
+                        z-index: 10;
+                    }
+                }
+                .active{//上边 目录 高显
+                    .item-property{
+                        background: #fff;
+                        color: #fc3439;
+                    }
+                    .item-version{
+                        z-index: 15;
+                    }
+                    .item-version-3{
+                        z-index: 10;
+                    }
+                }
+                .active-version-3{//下边 版本 高显
+                    .item-version{
+                        z-index: 15;
+                        &::after{
+                            background: #fafafa;
+                        }
+                    }
+                    .item-property::after{
+                        background: #fff;
+                    }
+                    .item-version-3{
+                        z-index: 10;
+                        background: #fff;
+                        color: #fc3439;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                }
+                
+            }
             #containerMessage{
                 padding-left:30px; 
                 .header{
@@ -579,8 +981,23 @@
                         }
                     }
                 }
-                  .project{
+                .project{
                     margin: 20px 0px 0 0px;
+                      .pagenation{
+                            width: 100%;
+                            text-align: right;
+                            height: 40px;
+                            margin-top: 20px;
+                            padding-right: 100px;
+                            button{
+                                margin-left: 15px;
+                            }
+                            .el-pager{
+                                .number,.more{
+                                       margin-left: 15px;
+                                }
+                            }
+                        }
                 }
                 .projectList{
                         width: 100%;
@@ -611,6 +1028,205 @@
                     margin: 0 2px;
                     float: left;
                     text-align: left;
+                    position: relative;
+                    .action_rightBox{
+                        position: absolute;
+                        display: block;
+                        width: auto;
+                        height: 16px;
+                        right: 30px;
+                        top: 28px;
+                        color: #fc3439;
+                        span{
+                            line-height: 16px;
+                            height: 16px;
+                            float: left;
+                            position: relative;
+                            cursor: pointer;
+                            margin-left: 20px
+                        }
+                        .icon-finish::before{
+                            display: inline-block;
+                            position: absolute;
+                            left: -18px;
+                            top: 2px;
+                            width: 14px;
+                            height: 14px;
+                            line-height: 14px;
+                            background: url('./images/finish.png')no-repeat 0 0;
+                            content: '';
+                        }
+                        .icon-reconsider::before{
+                            display: inline-block;
+                            position: absolute;
+                            left: -18px;
+                            top: 2px;
+                            width: 14px;
+                            height: 14px;
+                            line-height: 14px;
+                            background: orange;
+                            content: '';
+                        }
+                        .icon-start::before{
+                            display: inline-block;
+                            position: absolute;
+                            left: -18px;
+                            top: 2px;
+                            width: 14px;
+                            height: 14px;
+                            line-height: 14px;
+                            background: green;
+                            content: '';
+                        }
+                         .icon-delete{
+                            display: inline-block;
+                            width: 16px;
+                            height: 16px;
+                            background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                        }
+                    }
+                     .item-file{
+                        float: left;
+                        width: 290px;
+                        height: 120px;
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 120px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                        }
+                        .actionbox{
+                            display: block;
+                            position: absolute;
+                            bottom: 0;
+                            width: 100%;
+                            height: 36px;
+                            background: rgba(40, 40, 40, .4);
+                            transform: translateY(36px);
+                             transition: all ease .5s;
+                             .button-search{
+                                 float: left;
+                                 margin: 10px 64px;
+                                 width: 16px;
+                                 height: 16px;
+                                 background: url('./images/search2.png')no-repeat 0 0;
+                                 cursor: pointer;
+                             }
+                             .button-download{
+                                float: left;
+                                 margin: 10px 64px;
+                                 width: 16px;
+                                 height: 16px;
+                                 background: url('./images/download2.png')no-repeat 0 0;
+                                cursor: pointer;
+                             }
+                             .line{
+                                float: left;
+                                 margin: 6px 0px;
+                                 width: 1px;
+                                 height: 24px;
+                                 background: #cccccc;
+                             }
+                        }
+                        .checkbox-fileItem{
+                            display:block;
+                            position: absolute;
+                            top: 8px;
+                            left: 8px;
+                            width: 14px;
+                            height: 14px;
+                            border: 1px solid #cccccc;
+                            cursor: pointer;
+                        }
+                        .active{
+                            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                            border: 1px solid #fc3439;
+                        }
+                        .item-file-box{
+                            .item-file-image{
+                                float: left;
+                                margin-top:16px;
+                                width: 70px;
+                                height: 70PX;
+                                border-radius: 50%;
+                                background: #f2f2f2;
+                                img{
+                                    width: 48px;
+                                    height: 48px;
+                                    display: block;
+                                    margin-top: 13PX;
+                                    margin-left: 11px;
+                                } 
+                            }
+                            .item-file-detial{
+                                display: block;
+                                margin-left:80px;
+                                .icon-goujian{
+                                   float: right;
+                                    width: 16px;
+                                    height: 16px;
+                                    cursor: pointer;
+                                }
+                                .icon-download{
+                                    background: url('../ManageCost/images/download.png')no-repeat 0 0;
+                                    margin-right: 20px;
+                                    &:hover{
+                                        background: url('../ManageCost/images/download1.png')no-repeat 0 0;
+                                    }
+                                }
+                                .icon-search{
+                                    background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                                    margin-right: 20px;
+                                    &:hover{
+                                        background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                                    }
+                                } 
+                                >h3{
+                                    text-align: left;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    line-height: 20px;
+                                    margin: 9px 0 8px;
+                                    max-height: 40px;
+                                    overflow: hidden;
+                                }   
+                                >p{
+                                    font-size: 12px;
+                                    line-height: 12px;
+                                    color: #b3b3b3;
+                                    text-align: left;
+                                    margin-bottom:6px; 
+                                }
+                                .text-name{
+                                    color: #336699;
+                                }
+                                .operation{
+                                    display: block;
+                                    position: absolute;
+                                    bottom: 0;
+                                    left: 88px;
+                                    right: 0;
+                                    span{
+                                        color: #fc3439;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .item-file:hover{
+                        box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                        .actionbox{
+                            transform: translateY(0px);
+                            transition: all ease .5s;
+                        }
+                    }
                 }
                 .projectListText .title{
                     width: 100%;
@@ -655,24 +1271,59 @@
                 }
                 .projectListTextName{
                     font-size: 18px;
-                    font-family: '微软雅黑';
                     font-weight: bold;
-                    display: inline-block;
-                    /* float: left; */
+                    text-align: left;
+                    line-height: 18px;
+                    margin: 25px 0 16px;
                 }
                 .projectBottom{
                     width: 100%;
                     font-size: 12px;
+                    line-height: 12px;
                     font-family: '微软雅黑';
-                    overflow: hidden;
+                    // overflow: hidden;
                     color: #ccc;
                     margin-top: 20px;
                     margin-bottom: 6px;
+                    .icon-time{
+                        display: inline-block;
+                        width: 12px;
+                        height: 12px;
+                        background: url('./images/time.png');
+                        margin-right: 10px;
+                    }
+                    .action{
+                        float: right;
+                        span{
+                            margin-right:20px;
+                            font-size: 12px;
+                            color: #999999;
+                            cursor: pointer;
+                        }
+                          .arrow{
+                            position: relative;
+                            &::after{
+                                display: block;
+                                position: absolute;
+                                bottom: -21px;
+                                left: 50%;
+                                margin-left:-8px; 
+                                width: 16px;
+                                height: 16px;
+                                transform: rotateZ(45deg);
+                                border-left: 1px solid #f2f2f2;
+                                border-top: 1px solid #f2f2f2;
+                                background: #fafafa;
+                                content: '';
+                            }   
+                        }
+                    }
                 }
                 .projectBottom label{
                     display: inline-block;
                     width: 30%;
                     margin-left: 20px;
+                    line-height: 12px;
                 }
                 .font-color1{
                     color: #333;
@@ -684,11 +1335,90 @@
                     text-overflow: ellipsis;
                     max-width: 500px;
                 }
+                /*流程图*/
+                .flowCharts{
+                    border: 1px solid #f2f2f2;
+                    background: #fafafa;
+                    margin-top: 12px;
+                    margin-bottom: 20px;
+                    .flowChart-item{
+                        border: none;
+                        width: 132px;
+                        height: 86px;
+                        float: left;
+                        margin: 0;
+                        .title_{
+                            font-size: 14px;
+                            color: #333333;
+                            font-weight: normal;
+                            text-align: center;
+                            line-height: 14px;
+                            margin-bottom: 7px;
+                        }
+                        .date{
+                            font-size: 12px;
+                            color: #999999;
+                              text-align: center;
+                            line-height: 12px;
+                        }
+                         .top{
+                            height: 8px;
+                            width: 100%;
+                            margin: 20px 0 6px;
+                            text-align: center;
+                            position: relative;
+                            line-height: 8px;
+                            .horizontalLineL{
+                                display: block;
+                                position: absolute;
+                                top: 4px;
+                                left: 0;
+                                width: 57px;
+                                height: 1px;
+                                background: #d9d9d9;
+                            }
+                            .redSpot{
+                                display: inline-block;
+                                width: 8px;
+                                height: 8px;
+                                background: #fc3439;
+                                border-radius: 50%;
+                            }
+                            .horizontalLineR{
+                                display: block;
+                                position: absolute;
+                                top: 4px;
+                                right: 0;
+                                width: 57px;
+                                height: 1px;
+                                background: #d9d9d9;
+                            }
+                        }
+                        &:first-of-type {
+                            .top{
+                                .horizontalLineL{
+                                    display: none;
+                                }
+                            }
+                        }
+                        &:last-of-type {
+                            .top{
+                                .horizontalLineR{
+                                    display: none;
+                                }
+                            }
+                        }
+                    }
+                }   
             }
         }
         .box-left-avtive{
             right: 0px;
             transition:  all ease .5s;
+            #center-selection{
+                right: 0;
+                transition: all ease .5s;
+            }
             .icon-right{
                 transform: rotateZ(180deg)!important;
                 transition: all ease .5s;
@@ -737,162 +1467,12 @@
             position: fixed;
             right: -225px;
             bottom: 0;
-            width: 250px;
-            padding-left: 25px;
+            width: 225px;
             top: 116px;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
-            #center-selection{
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                width: 25px;
-                border-right: 1px solid #cccccc;
-                .SH_right{
-                    width: 100%;
-                    height: 48px;
-                    border-left: 1px solid #cccccc;
-                    border-bottom: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    .icon-right{
-                        display: block;
-                        position: absolute;
-                        top: 19px;
-                        left: 6px;
-                        width: 14px;
-                        height: 14px;
-                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
-                        transition: all ease .5s;
-                        transform: rotateZ(0deg);
-                    }
-                }
-                .item-property{//目录
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:15px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    border-right: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom: -9px;
-                        width: 23px;
-                        height: 15px;
-                        background: #fafafa;
-                        border-top: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }   
-                .item-version{//属性
-                    display: block;
-                    width: 25px;
-                    height: 56px;
-                    background: #fafafa;
-                    padding-top:12px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    border-right: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 23px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .item-version-3{//版本
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:24px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    border-right: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 23px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .active-version{//中间 属性 高显
-                    .item-version{//属性
-                        background: #fff;
-                        color: #fc3439;
-                        z-index: 15;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                    .item-property::after{//目录
-                        background: #fff;
-                    }
-                    .item-version-3{//版本
-                        z-index: 10;
-                    }
-                }
-                .active{//上边 目录 高显
-                    .item-property{
-                        background: #fff;
-                        color: #fc3439;
-                    }
-                    .item-version{
-                        z-index: 15;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                    }
-                }
-                .active-version-3{//下边 版本 高显
-                    .item-version{
-                        z-index: 15;
-                        &::after{
-                            background: #fafafa;
-                        }
-                    }
-                    .item-property::after{
-                        background: #fff;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                        background: #fff;
-                        color: #fc3439;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                }
-                
-            }
+            border-left:none;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
@@ -900,7 +1480,7 @@
                 #cloudDirveFileTree{
                     display: block;
                     position: absolute;
-                    left: 35px;
+                    left: 10px;
                     right: 0;
                     bottom: 0;
                     top: 42px;
@@ -975,9 +1555,102 @@
         .box-right-avtive{
             right: 0;
             transition: all ease .5s;
+            border-left: 1px solid #cccccc;
         }
         #box-right{
-            padding: 19px 13px 0 10px;
+            padding: 10px 13px 0 10px;
+            .icon-goujian{
+                float: left;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+            .icon-add{
+                background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                margin-right: 75px;
+                &:hover{
+                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                }
+            }
+            .container-contacts{
+                margin-top:10px; 
+                position: absolute;
+                overflow: auto;
+                top: 32px;
+                bottom: 10px;
+                right: 13px;
+                width: 202px;
+                .member{
+                    display: block;
+                    margin-bottom: 5px;
+                    height: 60px;
+                    cursor: pointer;
+                    position: relative;
+                    .member-name{
+                        float: left;
+                        width: 85px;
+                        text-align: left;
+                        >h3{
+                            margin: 15px 0 5px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            font-size: 14px;
+                            line-height: 14px;
+                        }
+                        >p{
+                            font-size: 12px;
+                            line-height: 12px;
+                            color: #999999;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            overflow: hidden;
+                        }
+                    }
+                    .icon-ditial{
+                        display: none;
+                        position: absolute;
+                        top: 10px;
+                        right: 36px;
+                        width: 15px;
+                        height: 14px;
+                        cursor: pointer;
+                        background-image: url('./images/contact.png');
+                        background-size: 100% 100%; 
+                        &:hover{
+                            background-image: url('./images/contact1.png');
+                        } 
+                    }
+                    .icon-del{
+                        display: none;
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        width: 16px;
+                        height: 16px;
+                        cursor: pointer;
+                        background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                        &:hover{
+                            background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                        } 
+                    }
+                    &:hover{
+                        background: #f2f2f2;
+                         .icon-ditial,.icon-del{
+                             display: block;
+                         }
+                    }
+                    >img{
+                        float: left;
+                        width: 40px;
+                        height: 40px;
+                        margin: 10px;
+                        background-image: url('../../assets/loginimg.png');
+                        background-size:100% 100%; 
+                        border-radius: 50%;
+                    }
+                }
+            }
             #basicAttributes{
                 display: none;
                 >li:last-of-type{
@@ -1219,8 +1892,8 @@
         }
         /* 设置滚动条的样式 */
         ::-webkit-scrollbar {
-        width:15px;
-        height: 15px;
+        width:10px;
+        height: 10px;
         }
         /* 滚动槽 */
         ::-webkit-scrollbar-track {
@@ -1242,15 +1915,17 @@
     }
 </style>
 <script>
-import ClipboardJS from'clipboard'
+import sendMes from'./sendMessage.vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
-import '../ManageCost/js/jquery-ui-1.9.2.custom.js'
 import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
 
 export default {
   name:'Costover',
+  components:{
+        sendMes
+  },
   data(){
       return {
          screenLeft:{
@@ -1283,6 +1958,13 @@ export default {
             oldname:'',//这是点位图的旧名称
             newname:'',//点位图新名称
             fgID:''
+        },
+        editDrawing:{
+            renameshow:false,
+            dId:'',
+            dcode:'',//这是点位图的旧名称
+            dname:'',//点位图新名称
+            dscale:''
         },
         expandedKeys:[],
         fileName:{
@@ -1371,18 +2053,29 @@ export default {
                 width:'100px'
             },
         ],
-        props: {
-            stripe: false,
-            border: true,
-            showHeader: true,
-            showSummary: false,
-            showRowHover: true,
-            showIndex: false,
-            treeType: true,
-            isFold: true,
-            expandType: false,
-            selectionType: false,
-        }, 
+        addUser:{
+            show:false,
+            posType:'1',
+            posName:'',
+        },
+        selectContact:{
+            show:false,
+            infoShow:false,
+            infoObj:{},
+            obj:{}
+        },
+        contacts:[],//联系人列表数组
+        posId:'',//因项目而不同
+        pageNo:1,//评论页数
+        pageTotal:0,//评论总页数
+        projAuth:[],//当前用户的权限列表
+        canEditMes:false,//当前用户可以修改消息状态
+        canDeleteMes:false,//当前用户可以删除消息
+        dcStatus:{
+            show:false,
+            val:'2',
+            obj:{}
+        },
       }
   },
   created(){
@@ -1392,8 +2085,11 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        vm.projAuth = localStorage.getItem('projAuth')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.getIntoDesignPage()
+        vm.getIntoDesignPage()//进入设计协调获取信息
+        vm.getPosID()//获取posID，
+        vm.checkAuth()//获取posID，
     },
   watch:{
       'show.basicAttributes':function(val){
@@ -1410,12 +2106,539 @@ export default {
             $("#BindingArtifacts").hide(200);
           }
       },
+      'addUser.posType':function(val){
+          var vm = this
+          vm.addUser.posName = ''
+      },
       selectUgId:function(val){
             var vm = this 
             vm.getFileTree()
       },
   },
   methods:{
+      getComment(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
+            headers:{
+                'token':vm.token
+            },
+        params:{
+            dcStatus:vm.dcStatus.val,//
+            operate:vm.dcStatus.obj.operate,//
+        }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.CommunicationList[vm.dcStatus.obj.index].dcStatus = vm.dcStatus.val
+                vm.$message({
+                    type:'success',
+                    message:'状态修改成功'
+                })
+                vm.dcStatusCancle()
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      changePage(val){
+          var vm = this
+        vm.getCommunicationList()
+      },
+      deleteMes(dcId,index){
+        var vm = this
+          vm.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                  axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/1/delete',
+                        headers:{
+                            'token':vm.token
+                        },
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.CommunicationList.splice(index,1)
+                            vm.$message({
+                                type:'success',
+                                message:'主题删除成功'
+                            })
+                        }else{
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+      },
+      dcStatusConfirm(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
+            headers:{
+                'token':vm.token
+            },
+        params:{
+            dcStatus:vm.dcStatus.val,//
+            operate:vm.dcStatus.obj.operate,//
+        }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.CommunicationList[vm.dcStatus.obj.index].dcStatus = vm.dcStatus.val
+                vm.$message({
+                    type:'success',
+                    message:'状态修改成功'
+                })
+                vm.dcStatusCancle()
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      dcStatusCancle(){
+        var vm = this
+        vm.dcStatus.val = '2'
+        vm.dcStatus.show = false
+        vm.dcStatus.obj = {}
+      },
+      updateStatus(dcId,dcStatus,operate,index){
+          var vm = this
+          if(!dcId)return false
+          if(dcStatus == 0){
+                vm.dcStatus.val = '2'
+                vm.dcStatus.show = true
+                vm.dcStatus.obj = {
+                    dcId:dcId,
+                    operate:operate,
+                    index:index
+                }
+               return false
+          }
+          if(dcStatus != 0){
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/1/updateStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                params:{
+                    dcStatus:dcStatus,//
+                    operate:operate,//
+                }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.CommunicationList[index].dcStatus = dcStatus
+                        vm.$message({
+                            type:'success',
+                            message:'状态修改成功'
+                        })
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+          }
+      },
+      checkAuth(){
+          var vm = this
+          if(vm.projAuth.indexOf("00400202") > 0){
+              vm.canEditMes = true
+          }
+          if(vm.projAuth.indexOf("00400203") > 0){
+              vm.canDeleteMes = true
+          }
+      },
+      collect(val,collect,index){
+          var vm = this
+          if(!val)return false
+          var isCollect = collect?0:1
+          axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+val+'/1/collect',
+            headers:{
+                'token':vm.token
+            },
+           params:{
+               isCollect:isCollect //
+           }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.CommunicationList[index].collect = collect?false:true
+            }else{
+                  vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+       downLoad(filePath){
+            //latestFile(fileId,fgId,"下载了文件"+fileName);
+            var vm = this
+            if(!filePath){
+                vm.$message({
+                    type:'info',
+                    message:'出错'
+                })
+                return false
+            }
+            window.open(vm.QJFileManageSystemURL + filePath);
+        },
+        checkStatus(val){
+            var status = "正在处理"
+            if(val){
+                switch(val){
+                    case 1:
+                        status ="正在处理"
+                        break;
+                    case 2:
+                        status ="解决完成"
+                        break;
+                    case 3:
+                        status ="主题关闭"
+                        break;
+                }
+            }
+            return status
+        },
+       getCommunicationList(){
+          var vm = this
+          axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/list',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                "builderId": vm.value_monomer,//单体 筛选
+                "pageNo": vm.pageNo,
+                "pageSize": 10,//默认是10
+                "pageType": 1,//设计协调
+                "projId": vm.projId,
+                "status": vm.value_status,//状态 筛选
+                "subProjId": vm.defaultSubProjId,
+                "type": vm.value_about,//相关 筛选
+                "ugId": vm.selectUgId,
+                "userId": vm.userId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+               vm.CommunicationList = response.data.rt.rows
+               vm.CommunicationList.forEach((item,index)=>{
+                   vm.$set(item,'showFlowChart',false)
+                   vm.$set(item,'showResponse',false)
+               })
+               vm.pageTotal = response.data.rt.pager.totalSize
+            }else{
+                  vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      deleteContact(projUserId,id){
+            var vm = this
+            vm.$confirm('您要删除该联系人吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/delContactUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userId:id,
+                        projUserId:projUserId,
+                        projId:vm.projId,
+                        ugId:vm.selectUgId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.getContacts()
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+
+      },
+      ckeckUserInfo(id){
+          var vm = this
+          axios({
+            method:'GET',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/viewContactDetails',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                userId:id,
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+               vm.selectContact.infoShow = true
+               vm.selectContact.infoObj = response.data.rt
+            }else{
+                  vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      selectInfoCancle(){
+        var vm = this
+        vm.selectContact.infoShow = false
+      },
+      SelectConfirm(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/addDcProjectUser',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                posId:vm.posId,
+                ugId:vm.selectUgId,
+                userId:vm.selectContact.obj.userId,
+            },
+            params:{
+                projId:vm.projId,
+                isActive:vm.selectContact.obj.isActive==0?false:true,
+                email:vm.selectContact.obj.email,
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.selectContact.show = false
+                vm.selectContact.obj = {}
+                vm.addUser.show = false
+                vm.addUser.posType = '1'
+                vm.addUser.posName = ''
+            }else if(response.data.cd == -1){
+                vm.$message({
+                    type:'warning',
+                    message:response.data.msg
+                })
+            }else{
+                  vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      selectCancle(){
+        var vm  = this
+        vm.selectContact.show = false
+        vm.selectContact.obj = {}
+      },
+      searchUser(){
+          var vm = this
+          if(vm.addUser.posName != ''){
+              if(vm.addUser.posType == '1'){
+                var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+                if(!myreg.test(vm.addUser.posName))
+                {
+                    vm.$message({
+                        type:'warning',
+                        message:'请输入有效的邮箱！'
+                    })
+                    return false
+                }
+              }
+          }else{
+               vm.$message({
+                    type:'warning',
+                    message:'请填写联系人'+vm.addUser.posType == '1'?'邮箱！':'账号！'
+                })
+              return false
+          }
+            axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/findUserByKeyWord',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    params:vm.addUser.posName
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.selectContact.show = true
+                    vm.selectContact.obj = response.data.rt
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'warning',
+                        message:'未找到相关人员'
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      userClose(){
+        var vm = this
+        vm.addUser.show = false
+        vm.addUser.posType = '1'
+        vm.addUser.posName = ''
+      },
+      addContact(){
+          var vm = this
+          vm.addUser.show = true
+      },
+      getPosID(){
+          var vm = this
+           axios({
+                method:'POST',
+                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/addContact',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    userId:0
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.posId = response.data.rt.posId
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      deleteDrawing(){
+          var vm = this
+            vm.$confirm('此操作将永久删除该图纸, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'POST',
+                    url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.checkFileDir.id+'/delete',
+                    headers:{
+                        'token':vm.token
+                    },
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            type:'success',
+                            message:'图纸删除成功'
+                        })
+                        vm.getFileTree()
+                    }else if(response.data.cd == -1){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+      },
+      confirmDrawing(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.editDrawing.dId+'/update',
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                dcode:vm.editDrawing.dcode,//这是图纸图号
+                dname:vm.editDrawing.dname,//图纸名称
+                dscale:vm.editDrawing.dscale//图纸比例
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.$message({
+                    type:'success',
+                    message:'图纸修改成功'
+                })
+                vm.getFileTree()
+            }else if(response.data.cd == -1){
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+            vm.editDrawing.renameshow = false
+            vm.editDrawing.dId = ''
+            vm.editDrawing.dcode =''
+            vm.editDrawing.dname = ''
+            vm.editDrawing.dscale = ''
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      editMap(){
+        var vm = this
+        vm.editDrawing.renameshow = true
+        vm.editDrawing.dId = vm.checkFileDir.id
+        vm.editDrawing.dcode = vm.checkFileDir.dcode
+        vm.editDrawing.dname = vm.checkFileDir.dname
+        vm.editDrawing.dscale = vm.checkFileDir.dscale
+      },
+      loading(){
+          var vm = this
+           vm.$message({
+                type:'info',
+                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+            })
+      },
       addFile(){
         var vm = this
         vm.fileName.show = true
@@ -1483,6 +2706,12 @@ export default {
                 if(response.data.rt){
                     vm.drawingsUploadShow = false
                     vm.fileList = []
+                }
+                if(cd == 10001){
+                     vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -1596,7 +2825,15 @@ export default {
       },
        renameCancle(){
         var vm = this
-        vm.PointFigure.renameshow = false
+         vm.PointFigure.renameshow = false
+      },
+      editDrawingCancle(){
+        var vm = this
+        vm.editDrawing.renameshow = false
+        vm.editDrawing.dId = ''
+        vm.editDrawing.dcode = ''
+        vm.editDrawing.dname = ''
+        vm.editDrawing.dscale = ''
       },
       renameFile(){
          var vm = this
@@ -1704,29 +2941,13 @@ export default {
          * 预览文件集文件
          * @param fileUuid
          */
-    view(filePath,fileId,fileName){
-        //latestFile(fileId,fgId,"预览了文件"+fileName);
+    preview(val){
         var vm = this
-        if(!filePath){
-            if(vm.checkedItem || vm.checkedRound){
-                vm.versionItem.forEach((item)=>{
-                    if(item.checked){
-                        filePath =  item.filePath
-                        fileId = item.fileId
-                        fileName = item.fileName
-                    }
-                })
-            }
+        if(val){
+             window.open(vm.QJFileManageSystemURL+val+"/preview");
+        }else{
+              window.open(vm.QJFileManageSystemURL+vm.checkFileDir.dpath+"/preview");
         }
-        if(!filePath){
-            vm.$message({
-            type:'info',
-            message:'请勾选要预览的文件的版本'
-        })
-        return false
-        }
-        vm.latestFile(fileId,"下载了文件"+fileName);
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
     },
     getIntoDesignPage(){
         var vm = this
@@ -1756,30 +2977,34 @@ export default {
                 },)
                 vm.value_monomer = response.data.rt.siteHolderId
                 vm.selectUgId = response.data.rt.selectUgId
-                // vm.getFileTree()
-                vm.getMessage()
+                vm.getContacts()
+                vm.getCommunicationList()//获取评论
             }
 
         }).catch((err)=>{
             console.log(err)
         })
     },
-    getMessage(){
-        // var vm = this
-        // axios({
-        //     method:'GET',
-        //     url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/'+vm.selectUgId+'/directory',
-        //     headers:{
-        //         'token':vm.token
-        //     },
-        // }).then((response)=>{
-        //     if(response.data.cd == 0){
-        //         vm.FileTree_original = response.data.rt
-        //         vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-        //     }
-        // }).catch((err)=>{
-        //     console.log(err)
-        // })
+    getContacts(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/searchDcProjectUserList',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                condition:'',
+                ugId:vm.selectUgId
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+               vm.contacts = response.data.rt
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
     },
     getFileTree(){
         var vm = this
@@ -1810,7 +3035,7 @@ export default {
                 drawingList.forEach((item,index) => {
                     vm.$set(item,'ddParId',item.ddId)
                     vm.$set(item,'isLeaf',true)
-                    vm.$set(item,'ddName',item.dname)
+                    vm.$set(item,'ddName',item.dcode+'('+item.dname+')')
                 });
                 var drawingDirList = response.data.rt.drawingDirList
                 var children = drawingDirList.concat(drawingList)
