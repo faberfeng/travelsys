@@ -1534,6 +1534,7 @@ export default {
          projId:'',
          userId:'',
          QJFileManageSystemURL:'',
+         BDMSUrl:'',
          checkedItem:{},//选中的file
          GouJianItem:{},//选中file的构件
          versionItem:{},//选中file的版本信息
@@ -1594,6 +1595,7 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoShareList()
     },
     mounted(){
@@ -1745,7 +1747,7 @@ export default {
             }
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/cancelShare',
+                url:vm.BDMSUrl+'project2/doc/cancelShare',
                 headers:{
                     'token':vm.token
                 },
@@ -1827,7 +1829,7 @@ export default {
         if(vm.fileName.new){
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/add',
+                url:vm.BDMSUrl+'project2/doc/directory/add',
                 headers:{
                     'token':vm.token
                 },
@@ -1857,7 +1859,7 @@ export default {
         }else{
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
+                url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
                 headers:{
                     'token':vm.token
                 },
@@ -1899,7 +1901,7 @@ export default {
         }).then(() => {
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
+                url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
                 headers:{
                     'token':vm.token
                 },
@@ -1961,7 +1963,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getShareFilePath',
+            url:vm.BDMSUrl+'project2/doc/getShareFilePath',
             headers:{
                 'token':vm.token
             },
@@ -2183,7 +2185,7 @@ export default {
         }
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileListByDirOrFile',
+            url:vm.BDMSUrl+'project2/doc/getFileListByDirOrFile',
             headers:{
                 'token':vm.token
             },
@@ -2321,7 +2323,7 @@ export default {
          }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileGroupVersionList',
+            url:vm.BDMSUrl+'project2/doc/getFileGroupVersionList',
             headers:{
                 'token':vm.token
             },
@@ -2352,7 +2354,7 @@ export default {
          }
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/entityRelation/list',
+            url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/entityRelation/list',
             headers:{
                 'token':vm.token
             },
@@ -2372,7 +2374,7 @@ export default {
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/hasShared',
+            url:vm.BDMSUrl+'project2/doc/hasShared',
             headers:{
                 'token':vm.token
             },
@@ -2397,7 +2399,7 @@ export default {
          * **/
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchSharedFolderInfo',//查询单个文件 ，下面要查询单个文件夹
+            url:vm.BDMSUrl+'project2/doc/searchSharedFolderInfo',//查询单个文件 ，下面要查询单个文件夹
             headers:{
                 'token':vm.token
             },
@@ -2431,7 +2433,7 @@ export default {
             var vm = this
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchSharedFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
+                url:vm.BDMSUrl+'project2/doc/searchSharedFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
                 headers:{
                     'token':vm.token
                 },
@@ -2478,7 +2480,7 @@ export default {
          * **/
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
+            url:vm.BDMSUrl+'project2/doc/searchFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
             headers:{
                 'token':vm.token
             },
@@ -2509,7 +2511,7 @@ export default {
             var vm = this
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
+                url:vm.BDMSUrl+'project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
                 headers:{
                     'token':vm.token
                 },

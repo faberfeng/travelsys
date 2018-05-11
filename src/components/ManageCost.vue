@@ -87,13 +87,14 @@ export default {
                 assetManagement:false,
                 configurationCenter:false
             },
-            QJFileManageSystemURL:''
+            QJFileManageSystemURL:'',
+            BDMSUrl:''
         }
     },
     created(){
         var vm = this
         vm.projId = localStorage.getItem('projId');//获取工程编号
-
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
@@ -134,7 +135,7 @@ export default {
             // console.log(vm.$route.params.id);
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/index?projId='+key,
+                url:vm.BDMSUrl+'project2/index?projId='+key,
                 headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -159,7 +160,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
+                url:vm.BDMSUrl+'project2/getOnlineInfo',
                 params:{
                     refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
                 },

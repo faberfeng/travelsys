@@ -343,7 +343,8 @@ export default {
         title:'我们的公司',
         userName:'',
         userId:'',
-        styleTitle:'条形风格'
+        styleTitle:'条形风格',
+        BDMSUrl:''
       }
   },
   components: {
@@ -352,6 +353,7 @@ export default {
   mounted(){
       var vm = this
       vm.token  = localStorage.getItem('token')
+      vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.viewFlag()
       vm.getUserInfo()
   },
@@ -370,7 +372,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/user2/index',
+                url:vm.BDMSUrl+'user2/index',
                  headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -395,7 +397,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/user2/project/list',
+                url:vm.BDMSUrl+'user2/project/list',
                  headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token

@@ -206,7 +206,7 @@ export default {
         return {
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
+            BDMSUrl:'',
             constructorData:[],
             retiveData:[],//retive族值
             keyTypeData:[],//关键字类型
@@ -241,8 +241,10 @@ export default {
         }
     },
     created(){
+        var vm = this
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl+'project2/'
         this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
         this.getGeniceClassMapJson();
         this.getGeniceClassJson();
@@ -258,7 +260,7 @@ export default {
         firstGetGeniceClassMapItem(){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getGenieClassMapItem',
+                url:this.BDMSUrl+'Config/getGenieClassMapItem',
                 headers:{
                     token:this.token
                 },
@@ -285,7 +287,7 @@ export default {
         getGeniceClassMapItem(index,num){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getGenieClassMapItem',
+                url:this.BDMSUrl+'Config/getGenieClassMapItem',
                 headers:{
                     token:this.token
                 },
@@ -320,7 +322,7 @@ export default {
         getTotalGeniceClassMapItem(){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getGenieClassMapItem',
+                url:this.BDMSUrl+'Config/getGenieClassMapItem',
                 headers:{
                     token:this.token
                 },
@@ -345,7 +347,7 @@ export default {
         getGeniceClassJson(){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getGenieClassJson',
+                url:this.BDMSUrl+'Config/getGenieClassJson',
                 headers:{
                     token:this.token
                 },
@@ -368,7 +370,7 @@ export default {
         getGeniceClassMapJson(){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getGenieClassMapJson',
+                url:this.BDMSUrl+'Config/getGenieClassMapJson',
                 headers:{
                     token:this.token
                 },
@@ -492,7 +494,7 @@ export default {
                         }else{
                             axios({
                                 method:'post',
-                                url:this.baseUrl+'Config/updateGenieClassMap',
+                                url:this.BDMSUrl+'Config/updateGenieClassMap',
                                 headers:{
                                     token:this.token
                                 },
@@ -713,7 +715,7 @@ export default {
                             }else{
                                 axios({
                                     method:'post',
-                                    url:this.baseUrl+'Config/addGenieClassMap',
+                                    url:this.BDMSUrl+'Config/addGenieClassMap',
                                     headers:{
                                         token:this.token
                                     },
@@ -779,7 +781,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/deleteGenieClassMap',
+                url:this.BDMSUrl+'Config/deleteGenieClassMap',
                 headers:{
                     token:this.token
                 },
@@ -828,7 +830,7 @@ export default {
             this.keyTypeData = [];
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getKeyWordsTypeByRevitCategory',
+                url:this.BDMSUrl+'Config/getKeyWordsTypeByRevitCategory',
                 headers:{
                     token:this.token
                 },

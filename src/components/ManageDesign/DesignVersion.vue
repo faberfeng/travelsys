@@ -59,22 +59,24 @@ export default {
             selectData:[],
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             selectValue:'',
             holderId:''
         }
     },
     created(){
-        this.token = localStorage.getItem('token');
-        this.projId = localStorage.getItem('projId');
-        this.getDesignVersion();
+        var vm = this
+        vm.token = localStorage.getItem('token');
+        vm.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.getDesignVersion();
     },
     methods:{
         //进入设计版本页面
         getDesignVersion(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/dc/designVersion',
+                url:this.BDMSUrl+'project2/dc/designVersion',
                 headers:{
                     token:this.token
                 },
@@ -101,7 +103,7 @@ export default {
         getModelCommitLogsFirst(val){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/dc/getModelCommitLogs',
+                url:this.BDMSUrl+'project2/dc/getModelCommitLogs',
                 headers:{
                     token:this.token
                 },
@@ -132,7 +134,7 @@ export default {
         getModelCommitLogs(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/dc/getModelCommitLogs',
+                url:this.BDMSUrl+'project2/dc/getModelCommitLogs',
                 headers:{
                     token:this.token
                 },

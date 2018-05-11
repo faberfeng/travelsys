@@ -22,19 +22,21 @@ import axios from 'axios'
 export default Vue.component('common-header', {
    data(){
         return{
+            BDMSUrl:'',
       }
      },
     props: ['username','userid','proname','proimg','userimg'],
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
     },
     methods:{
         logout(){
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/logout',
+                url:vm.BDMSUrl+'project2/logout',
                 headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token

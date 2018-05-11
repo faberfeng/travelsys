@@ -550,7 +550,8 @@ export default {
               pageNum:0//页面数
           },
           projUserId:0,//编辑的用户ID
-          token:''
+          token:'',
+          BDMSUrl:''
       }
   },
   watch:{
@@ -568,6 +569,7 @@ export default {
   created(){
       var vm = this
       var projAuth = localStorage.getItem('projAuth')
+      vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')
@@ -617,7 +619,7 @@ export default {
             }
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/findUserByKeyWord',
+                url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
                 headers:{
                     'token':vm.token
                 },
@@ -649,7 +651,7 @@ export default {
             };
              axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionTree',
+                url:vm.BDMSUrl+'project2/Config/positionTree',
                 headers:{
                     'token':vm.token
                 },
@@ -681,7 +683,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/userIndex',
+                url:vm.BDMSUrl+'project2/Config/userIndex',
                 headers:{
                     'token':vm.token
                 },
@@ -702,7 +704,7 @@ export default {
             console.log(this.userSearchInfo)
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchProjectUserList/'+vm.projId,
+                url:vm.BDMSUrl+'project2/Config/searchProjectUserList/'+vm.projId,
                 headers:{
                     'token':vm.token
                 },
@@ -740,7 +742,7 @@ export default {
                  vm.userDetial.show = false
                 axios({
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/editProjectUser',
+                    url:vm.BDMSUrl+'project2/Config/editProjectUser',
                     headers:{
                         'token':vm.token
                     },
@@ -762,7 +764,7 @@ export default {
                 vm.userDetial.show = true
                  axios({//添加用户
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addProjectUser',
+                    url:vm.BDMSUrl+'project2/Config/addProjectUser',
                     headers:{
                         'token':vm.token
                     },
@@ -800,7 +802,7 @@ export default {
             }
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/saveProjectUser',
+                url:vm.BDMSUrl+'project2/Config/saveProjectUser',
                 headers:{
                     'token':vm.token
                 },
@@ -838,7 +840,7 @@ export default {
                     console.log(arr)
                     axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delProjectUser',
+                        url:vm.BDMSUrl+'project2/Config/delProjectUser',
                         headers:{
                             'token':vm.token
                         },

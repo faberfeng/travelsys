@@ -33,6 +33,7 @@ export default Vue.component('common-upload',{
             imageName:'未选择任何文件',
             filesList:null,
             QJFileManageSystemURL:'',
+            BDMSUrl:'',
             userId:'',
             projId:'',
             token:'',
@@ -47,6 +48,7 @@ export default Vue.component('common-upload',{
         vm.userId  = localStorage.getItem('userid')
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
     },
     methods:{
         selectImg(){
@@ -67,7 +69,7 @@ export default Vue.component('common-upload',{
             var vm = this
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/latestFile',
+                url:vm.BDMSUrl+'project2/doc/latestFile',
                 headers:{
                     'token':vm.token
                 },
@@ -100,7 +102,7 @@ export default Vue.component('common-upload',{
                return false
            }
            console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
-            var returnUrl = "http://10.252.26.240:8080/h2-bim-project/project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
+            var returnUrl = vm.BDMSUrl+"project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
             formData.append('token',vm.token);

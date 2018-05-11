@@ -131,7 +131,7 @@ export default {
             isAsdefault:false,
             projectUnity:'',
             projectName:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
+            BDMSUrl:'',
             retractImg:shouqiImg,
             retractText:'收起',
             isShow:true,
@@ -159,8 +159,10 @@ export default {
         }
     },
     created(){
+        var vm = this
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl+'project2/'
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
@@ -180,7 +182,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
+                    url:this.BDMSUrl+'saveProjectOverview',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
@@ -214,7 +216,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:"http://10.252.26.240:8080/h2-bim-project/project2/delProjectOverview",
+                url:this.BDMSUrl+"delProjectOverview",
                 headers:{
                     'token':this.token
                 },
@@ -246,7 +248,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/saveProjectOverview',
+                    url:this.BDMSUrl+'saveProjectOverview',
                     headers:{
                         'token':this.token,
                     },
@@ -299,7 +301,7 @@ export default {
         deleteImageSure(){
             axios({
                 method:'post',
-                url:"http://10.252.26.240:8080/h2-bim-project/project2/deleteProjectImage",
+                url:this.BDMSUrl+"deleteProjectImage",
                 headers:{
                     'token':this.token
                 },
@@ -322,7 +324,7 @@ export default {
             })
         },
         getBasicSituation(){
-            var url = 'http://10.252.26.240:8080/h2-bim-project/project2/'+this.projId+'/overview/list';
+            var url = this.BDMSUrl+''+this.projId+'/overview/list';
             axios({
                 method:'GET',
                 url:url,
@@ -346,7 +348,7 @@ export default {
         getProjectInitalConfig(){
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/projectConfigIndex',
+                url:this.BDMSUrl+'projectConfigIndex',
                 headers:{
                     'token':this.token
                 },
@@ -371,7 +373,7 @@ export default {
         getProjectImageList(){
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/findProjectImage',
+                url:this.BDMSUrl+'findProjectImage',
                 headers:{
                     'token':this.token
                 },
@@ -403,7 +405,7 @@ export default {
         setAsCover(number){
             axios({
                 method:'post',
-                url:this.baseUrl+'setProjectCover',
+                url:this.BDMSUrl+'setProjectCover',
                 headers:{
                     'token':this.token
                 },
@@ -437,7 +439,7 @@ export default {
             formData.append('imageType',this.imageType);
             axios({
                 method:'post',
-                url:this.baseUrl+'/uploadImage',
+                url:this.BDMSUrl+'/uploadImage',
                 headers:{
                     'token':this.token,
                     'Content-Type': 'multipart/form-data'
@@ -473,7 +475,7 @@ export default {
         isAsDefault(){  
             axios({
                 method:'post',
-                url:this.baseUrl+'useDefaultLogo',
+                url:this.BDMSUrl+'useDefaultLogo',
                 headers:{
                     'token':this.token
                 },

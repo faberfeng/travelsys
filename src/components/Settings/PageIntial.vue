@@ -204,7 +204,7 @@ export default {
         }],
         floorIndex:'',
         floorScope:{},
-        baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+        BDMSUrl:'',
         token:'',
         projId:'',
         partitionName:'',
@@ -222,9 +222,11 @@ export default {
       }
     },
     created(){
-        this.token = localStorage.getItem('token');//获取token
-        this.projId = localStorage.getItem('projId');//获取项目projId
-        this.floorAndSceneInit();//分区与楼层初始化
+        var vm = this
+        vm.token = localStorage.getItem('token');//获取token
+        vm.projId = localStorage.getItem('projId');//获取项目projId
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.floorAndSceneInit();//分区与楼层初始化
     },
     methods:{
         //新增竖向楼层列表
@@ -250,7 +252,7 @@ export default {
                     } else{
                         axios({
                             method:'post',
-                            url:this.baseUrl+'project2/Config/updateStorey',
+                            url:this.BDMSUrl+'project2/Config/updateStorey',
                             headers:{
                                 'token':this.token
                             },
@@ -325,7 +327,7 @@ export default {
             if(floorArr != '' && reg.test(floorArr.join(''))){
                 axios({
                     method:'post',
-                    url:this.baseUrl+'project2/Config/updateStorey',
+                    url:this.BDMSUrl+'project2/Config/updateStorey',
                     headers:{
                         'token':this.token
                     },
@@ -378,7 +380,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/deleteStorey',
+                url:this.BDMSUrl+'project2/Config/deleteStorey',
                 headers:{
                     'token':this.token
                 },
@@ -402,7 +404,7 @@ export default {
         floorAndSceneInit(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/floorAndSceneInit',
+                url:this.BDMSUrl+'project2/Config/floorAndSceneInit',
                 headers:{
                     'token':this.token
                 },
@@ -438,7 +440,7 @@ export default {
             this.subProjectsIndex = val;
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/getPartitionBySubProjId',
+                url:this.BDMSUrl+'project2/Config/getPartitionBySubProjId',
                 headers:{
                     'token':this.token
                 },
@@ -477,7 +479,7 @@ export default {
         findStore(val,index){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/findStorey/'+val[index].ID,
+                url:this.BDMSUrl+'project2/Config/findStorey/'+val[index].ID,
                 headers:{
                     'token':this.token
                 }
@@ -533,7 +535,7 @@ export default {
         makeEditPartitionList(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/updatePartition',
+                url:this.BDMSUrl+'project2/Config/updatePartition',
                 headers:{
                     'token':this.token
                 },
@@ -582,7 +584,7 @@ export default {
                 }else{
                     axios({
                         method:'post',
-                        url:this.baseUrl+'project2/Config/updatePartition',
+                        url:this.BDMSUrl+'project2/Config/updatePartition',
                         headers:{
                             token:this.token
                         },
@@ -639,7 +641,7 @@ export default {
         deletePartitionMakeSure(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/deletePartition',
+                url:this.BDMSUrl+'project2/Config/deletePartition',
                 headers:{
                     token:this.token
                 },

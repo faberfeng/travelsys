@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state:{
         path:'',
-        QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径
+        QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
+        BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
     },
     getters:{
         changePath(state){

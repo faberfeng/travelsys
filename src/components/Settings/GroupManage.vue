@@ -127,7 +127,7 @@ export default {
                 tag:'',
                 status:''
             },
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             canEditname:true,
             canEditlabel:true,
             token:'',
@@ -156,6 +156,7 @@ export default {
     },
     created(){
         var vm = this
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.projId = localStorage.getItem('projId')//项目id
         vm.token  = localStorage.getItem('token')
         vm.intoQunzu()
@@ -172,7 +173,7 @@ export default {
                 for(var i=0;i<vm.userListAdd.length;i++){
                     axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/addUserGroupUser',
+                        url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
                         headers:{
                             'token':vm.token
                         },
@@ -238,7 +239,7 @@ export default {
                     for(var i=0;i<vm.userListDEL.length;i++){
                         axios({
                             method:'POST',
-                            url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delUserGroupUser',
+                            url:vm.BDMSUrl+'project2/Config/delUserGroupUser',
                             headers:{
                                 'token':vm.token
                             },
@@ -286,7 +287,7 @@ export default {
                     }).then(({ value }) => {
                         axios({
                                 method:'POST',
-                                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/renameGroupNameNode',
+                                url:vm.BDMSUrl+'config/userGroup/renameGroupNameNode',
                                 headers:{
                                     'token':vm.token
                                 },
@@ -321,7 +322,7 @@ export default {
                     }).then(({ value }) => {
                         axios({
                                 method:'POST',
-                                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUgTag',
+                                url:vm.BDMSUrl+'config/userGroup/updateUgTag',
                                 headers:{
                                     'token':vm.token
                                 },
@@ -352,7 +353,7 @@ export default {
                 var vm = this
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/updateUserGroupStatus',
+                    url:vm.BDMSUrl+'config/userGroup/updateUserGroupStatus',
                     headers:{
                         'token':vm.token
                     },
@@ -380,7 +381,7 @@ export default {
                 }).then(({ value }) => {
                     axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/add',
+                        url:vm.BDMSUrl+'config/userGroup/add',
                         headers:{
                             'token':vm.token
                         },
@@ -414,7 +415,7 @@ export default {
                 var vm = this   
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/delGroupNode',
+                    url:vm.BDMSUrl+'config/userGroup/delGroupNode',
                     headers:{
                         'token':vm.token
                     },
@@ -449,7 +450,7 @@ export default {
             var vm = this
                 axios({
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/groupIndex',
+                    url:vm.BDMSUrl+'project2/Config/groupIndex',
                     headers:{
                         'token':vm.token
                     },
@@ -469,7 +470,7 @@ export default {
                 var vm = this
                 axios({
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/projectUserList',
+                    url:vm.BDMSUrl+'project2/Config/projectUserList',
                     headers:{
                         'token':vm.token
                     },
@@ -487,7 +488,7 @@ export default {
                 var vm = this;
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/list',
+                    url:vm.BDMSUrl+'config/userGroup/list',
                     headers:{
                         'token':vm.token
                     },
@@ -537,7 +538,7 @@ export default {
                         });
                         axios({
                             method:'post',
-                            url:vm.baseUrl+'config/userGroup/moveUpGroupNode',
+                            url:vm.BDMSUrl+'config/userGroup/moveUpGroupNode',
                             headers:{
                                 token:vm.token
                             },
@@ -570,7 +571,7 @@ export default {
                         });
                         axios({ 
                             method:'post',
-                            url:vm.baseUrl+'config/userGroup/moveDownGroupNode',
+                            url:vm.BDMSUrl+'config/userGroup/moveDownGroupNode',
                             headers:{
                                 token:vm.token
                             },
@@ -598,7 +599,7 @@ export default {
             var vm = this;
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/list',
+                url:vm.BDMSUrl+'config/userGroup/list',
                 headers:{
                     'token':vm.token
                 },
@@ -640,7 +641,7 @@ export default {
                 vm.ugEdit.status = ''
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config/userGroup/findCompanyUserGroupByNodeId',
+                    url:vm.BDMSUrl+'config/userGroup/findCompanyUserGroupByNodeId',
                     headers:{
                         'token':vm.token
                     },
@@ -667,7 +668,7 @@ export default {
             if(val){
                 axios({
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/userGroupUserList',
+                    url:vm.BDMSUrl+'project2/Config/userGroupUserList',
                     headers:{
                         'token':vm.token
                     },

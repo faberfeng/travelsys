@@ -173,7 +173,7 @@ export default {
             levelNum:{},
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             addCode:false,
             confirmVisible:false,
             confirmVisible_1:false,
@@ -255,8 +255,10 @@ export default {
         }
     },
     created(){
+        var vm = this
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.getWorkCode()
     },
     methods:{
@@ -399,7 +401,7 @@ export default {
         surePass(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -439,7 +441,7 @@ export default {
         sureReject(){
              axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -474,7 +476,7 @@ export default {
             var vm = this;
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     'token':vm.token
                 },
@@ -567,7 +569,7 @@ export default {
             var vm = this;
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/editWorkCode',
+                url:this.BDMSUrl+'config2/component/editWorkCode',
                 headers:{
                     'token':vm.token
                 },
@@ -596,7 +598,7 @@ export default {
                 }
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config2/component/updateWorkCode',
+                    url:this.BDMSUrl+'config2/component/updateWorkCode',
                     headers:{
                         'token':vm.token
                     },
@@ -651,7 +653,7 @@ export default {
             var vm = this;
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/deleteWorkCode',
+                url:this.BDMSUrl+'config2/component/deleteWorkCode',
                 headers:{
                     'token':vm.token
                 },
@@ -718,7 +720,7 @@ export default {
             };
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/getWorkCode',
+                url:this.BDMSUrl+'config2/component/getWorkCode',
                 headers:{
                     token:this.token,
                 },
@@ -895,7 +897,7 @@ export default {
                     }else{
                         axios({
                             method:'post',
-                            url:this.baseUrl+'config2/component/addWorkCode',
+                            url:this.BDMSUrl+'config2/component/addWorkCode',
                             headers:{
                                 token:this.token
                             },

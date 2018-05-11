@@ -40,7 +40,7 @@ export default {
         return {
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             dataTransformInfo:{},
             component:{},
             dataTransformData:[{
@@ -102,8 +102,10 @@ export default {
         }
     },
     created(){
+        var vm = this
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.getDataTransformInfo();
         this.getExportStandarInfo();
     },
@@ -112,7 +114,7 @@ export default {
         getDataTransformInfo(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/dataTransferStandardOverview',
+                url:this.BDMSUrl+'project2/Config/dataTransferStandardOverview',
                 headers:{
                     'token':this.token
                 },
@@ -179,7 +181,7 @@ export default {
         },
         //获取构建分类的属性定义信息
         getExportStandarInfo(){
-            axios.get(this.baseUrl+'project2/Config/getexportStandardInfo?projId='+this.projId,{
+            axios.get(this.BDMSUrl+'project2/Config/getexportStandardInfo?projId='+this.projId,{
                 headers:{
                     token:this.token
                 }

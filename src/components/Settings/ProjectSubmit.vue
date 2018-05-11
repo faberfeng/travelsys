@@ -568,7 +568,7 @@ export default {
             projectSubmitData:[],
             projId:'',
             token:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             propertyData:[],
             editPropertyShow:false,
             deleteDialog:false,
@@ -641,6 +641,8 @@ export default {
         }
     },
     created(){
+        var vm = this
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.getProjectGenieClass();
@@ -650,7 +652,7 @@ export default {
         getProjectGenieClass(){
             axios({
                 method:'get',
-                url:this.baseUrl+'config2/component/getProjectGenieClass',
+                url:this.BDMSUrl+'config2/component/getProjectGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -721,7 +723,7 @@ export default {
         getEntityMapping(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/getEntityMapping',
+                url:this.BDMSUrl+'project2/Config/getEntityMapping',
                 headers:{
                     token:this.token
                 },
@@ -756,7 +758,7 @@ export default {
         loadFirstSelectData(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/loadLevelXGenieClass',
+                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -785,7 +787,7 @@ export default {
         loadSecondSelectData(oCode){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/loadLevelXGenieClass',
+                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -814,7 +816,7 @@ export default {
         loadThirdSelectData(oCode){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/loadLevelXGenieClass',
+                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -871,7 +873,7 @@ export default {
         getEngineeringInfo(){
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/getEngineeringInfo',
+                url:this.BDMSUrl+'project2/Config/getEngineeringInfo',
                 headers:{
                     token:this.token
                 },
@@ -901,7 +903,7 @@ export default {
         getEntityPropertiesForEngineering(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/getEntityPropertiesForEngineering',
+                url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
                 headers:{
                     token:this.token
                 },
@@ -939,7 +941,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'project2/Config/addDesignMapping',
+                    url:this.BDMSUrl+'project2/Config/addDesignMapping',
                     headers:{
                         token:this.token
                     },
@@ -990,7 +992,7 @@ export default {
             this.thirdSelectTitle = this.projectNumber.substr(4,4)+'-'+scope.row.classifyName;
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/loadLevelXGenieClass',
+                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1020,7 +1022,7 @@ export default {
             }) 
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/loadLevelXGenieClass',
+                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1050,7 +1052,7 @@ export default {
             }) 
             axios({
                 method:'post',
-                url:this.baseUrl+'project2/Config/getEngineeringInfo',
+                url:this.BDMSUrl+'project2/Config/getEngineeringInfo',
                 headers:{
                     token:this.token
                 },
@@ -1079,7 +1081,7 @@ export default {
             })
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/getEntityPropertiesForEngineering',
+                url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
                 headers:{
                     token:this.token
                 },
@@ -1113,7 +1115,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'project2/Config/addDesignMapping',
+                    url:this.BDMSUrl+'project2/Config/addDesignMapping',
                     headers:{
                         token:this.token
                     },
@@ -1161,7 +1163,7 @@ export default {
         deleteMappedSure(){
             axios({
                 method:'get',
-                url:this.baseUrl+'project2/Config/deleteEngineeringMapping',
+                url:this.BDMSUrl+'project2/Config/deleteEngineeringMapping',
                 headers:{
                     token:this.token
                 },
@@ -1190,7 +1192,7 @@ export default {
         getEditProperty(val){
             axios({
                 method:'get',
-                url:this.baseUrl+'config2/component/getGenieclassCharacter/'+this.projId,
+                url:this.BDMSUrl+'config2/component/getGenieclassCharacter/'+this.projId,
                 headers:{
                     token:this.token
                 },
@@ -1228,7 +1230,7 @@ export default {
         deletePropertySure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/removeCharacter',
+                url:this.BDMSUrl+'config2/component/removeCharacter',
                 headers:{
                     token:this.token
                 },
@@ -1259,7 +1261,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'config2/component/updateCharacter',
+                    url:this.BDMSUrl+'config2/component/updateCharacter',
                     headers:{
                         token:this.token
                     },
@@ -1319,7 +1321,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'config2/component/addAttributeCodeGenieClass',
+                    url:this.BDMSUrl+'config2/component/addAttributeCodeGenieClass',
                     headers:{
                         token:this.token
                     },
@@ -1512,7 +1514,7 @@ export default {
         confirmSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1562,7 +1564,7 @@ export default {
         deletePropertyMakeSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/deleteAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/deleteAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1605,7 +1607,7 @@ export default {
         surePass(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1650,7 +1652,7 @@ export default {
         sureReject(){
             axios({
                 method:'post',
-                 url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                 url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1731,7 +1733,7 @@ export default {
                 }
                 axios({
                     method:'post',
-                    url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                    url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                     headers:{
                         token:this.token,
                     },

@@ -1644,6 +1644,7 @@ export default {
          projId:'',
          userId:'',
          QJFileManageSystemURL:'',
+         BDMSUrl:'',
          checkedItem:{},//选中的file
          GouJianItem:{},//选中file的构件
          versionItem:{},//选中file的版本信息
@@ -1730,6 +1731,7 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.checkFilePaste()
         vm.getIntoCloudD()
     },
@@ -1820,7 +1822,7 @@ export default {
             console.log(vm.checkFileDir)
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/add',
+                url:vm.BDMSUrl+'project2/doc/directory/add',
                 headers:{
                     'token':vm.token
                 },
@@ -1851,7 +1853,7 @@ export default {
         }else{
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
+                url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
                 headers:{
                     'token':vm.token
                 },
@@ -1908,7 +1910,7 @@ export default {
         }).then(() => {
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
+                url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
                 headers:{
                     'token':vm.token
                 },
@@ -1949,7 +1951,7 @@ export default {
         vm.auth.show = true
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getAllUserGroup',
+            url:vm.BDMSUrl+'project2/doc/getAllUserGroup',
             headers:{
                 'token':vm.token
             },
@@ -1990,7 +1992,7 @@ export default {
           }
           axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/setFileDirectoryUg',
+                url:vm.BDMSUrl+'project2/doc/setFileDirectoryUg',
                 headers:{
                     'token':vm.token
                 },
@@ -2038,7 +2040,7 @@ export default {
         if(vm.hasFileToPaste.obj.shear){//剪切
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.hasFileToPaste.obj.dirId+'/pasteFileGroup/'+vm.checkFileDir.nodeId+'/'+vm.hasFileToPaste.obj.projId,
+                url:vm.BDMSUrl+'project2/doc/'+vm.hasFileToPaste.obj.dirId+'/pasteFileGroup/'+vm.checkFileDir.nodeId+'/'+vm.hasFileToPaste.obj.projId,
                 headers:{
                     'token':vm.token
                 },
@@ -2064,7 +2066,7 @@ export default {
         }else{//复制
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/pasteTransferStation',
+                url:vm.BDMSUrl+'project2/doc/pasteTransferStation',
                 headers:{
                     'token':vm.token
                 },
@@ -2243,7 +2245,7 @@ export default {
         }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getShareFilePath',
+            url:vm.BDMSUrl+'project2/doc/getShareFilePath',
             headers:{
                 'token':vm.token
             },
@@ -2272,7 +2274,7 @@ export default {
         var fgID = vm.PointFigure.fgID?vm.PointFigure.fgID:vm.checkedRound.ID
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/updateFileGroupName',
+            url:vm.BDMSUrl+'project2/doc/updateFileGroupName',
             headers:{
                 'token':vm.token
             },
@@ -2367,7 +2369,7 @@ export default {
         }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/delFileGroup',
+            url:vm.BDMSUrl+'project2/doc/delFileGroup',
             headers:{
                 'token':vm.token
             },
@@ -2656,7 +2658,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/latestFile',
+            url:vm.BDMSUrl+'project2/doc/latestFile',
             headers:{
                 'token':vm.token
             },
@@ -2702,7 +2704,7 @@ export default {
         var hasFilePath = false
         var fileId = []
         var empty = false
-        var url_API  = 'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileListByDirOrFile?'
+        var url_API  = vm.BDMSUrl+'project2/doc/getFileListByDirOrFile?'
         for(var i=0;i<vm.folderList.length;i++){
             if(vm.folderList[i].checked){
                 url_API += 'dirId='+vm.folderList[i].nodeId+'&'
@@ -2837,7 +2839,7 @@ export default {
          }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileGroupVersionList',
+            url:vm.BDMSUrl+'project2/doc/getFileGroupVersionList',
             headers:{
                 'token':vm.token
             },
@@ -2881,7 +2883,7 @@ export default {
          }
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/entityRelation/list',
+            url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/entityRelation/list',
             headers:{
                 'token':vm.token
             },
@@ -2901,7 +2903,7 @@ export default {
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/documentCloudDisk',
+            url:vm.BDMSUrl+'project2/doc/documentCloudDisk',
             headers:{
                 'token':vm.token
             },
@@ -2944,7 +2946,7 @@ export default {
         };
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/'+vm.selectUgId+'/directory',
+            url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/'+vm.selectUgId+'/directory',
             headers:{
                 'token':vm.token
             },
@@ -2964,7 +2966,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFileGroupInfo',
+            url:vm.BDMSUrl+'project2/doc/searchFileGroupInfo',
             headers:{
                 'token':vm.token
             },
@@ -3002,7 +3004,7 @@ export default {
          * **/
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
+            url:vm.BDMSUrl+'project2/doc/searchFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
             headers:{
                 'token':vm.token
             },
@@ -3045,7 +3047,7 @@ export default {
             var vm = this
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
+                url:vm.BDMSUrl+'project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
                 headers:{
                     'token':vm.token
                 },
@@ -3119,7 +3121,7 @@ export default {
                     if(_this.dataset.left !=ui.position.left || _this.dataset.top != ui.position.top ){
                         axios({
                             method:'GET',
-                            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/updatePointLocation',
+                            url:vm.BDMSUrl+'project2/doc/updatePointLocation',
                             headers:{
                                 'token':vm.token
                             },

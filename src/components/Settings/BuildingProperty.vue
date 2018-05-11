@@ -259,7 +259,7 @@ export default {
             constructorData:[],
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+            BDMSUrl:'',
             confirmObject:{},
             passObject:{},
             delteProperty:{},
@@ -304,10 +304,12 @@ export default {
         }
     },
     created(){
-        this.token = localStorage.getItem('token');
-        this.projId = localStorage.getItem('projId');
-        this.propertyTable = 't41';
-        this.getProjectGenClass(this.propertyTable);
+        var vm = this
+        vm.token = localStorage.getItem('token');
+        vm.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.propertyTable = 't41';
+        vm.getProjectGenClass(this.propertyTable);
     },
     mounted(){
         this.initKey();
@@ -328,7 +330,7 @@ export default {
             this.constructorData =[];
             axios({
                 method:'get',
-                url:this.baseUrl+'config2/component/getProjectGenieClass',
+                url:this.BDMSUrl+'config2/component/getProjectGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -456,7 +458,7 @@ export default {
                 }
                 axios({
                     method:'post',
-                    url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                    url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                     headers:{
                         token:this.token,
                     },
@@ -560,7 +562,7 @@ export default {
         confirmSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -620,7 +622,7 @@ export default {
         surePass(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -665,7 +667,7 @@ export default {
         sureReject(){
             axios({
                 method:'post',
-                 url:this.baseUrl+'config2/component/updateAttributeCodeGenieClass',
+                 url:this.BDMSUrl+'config2/component/updateAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -708,7 +710,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/deleteAttributeCodeGenieClass',
+                url:this.BDMSUrl+'config2/component/deleteAttributeCodeGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -849,7 +851,7 @@ export default {
                         }else{
                             axios({
                                 method:'post',
-                                url:this.baseUrl+'config2/component/addAttributeCodeGenieClass',
+                                url:this.BDMSUrl+'config2/component/addAttributeCodeGenieClass',
                                 headers:{
                                     token:this.token
                                 },

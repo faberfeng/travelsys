@@ -581,6 +581,7 @@ export default {
          token:'',
          projId:'',
          QJFileManageSystemURL:'',
+         BDMSUrl:'',
          checkedItem:{},//选中的file
          GouJianItem:{},//选中file的构件
          versionItem:{},//选中file的版本信息
@@ -601,6 +602,7 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.checkedPermission()
         vm.checkFilePaste()
   },
@@ -637,7 +639,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/addFileToTransfer',
+            url:vm.BDMSUrl+'project2/doc/addFileToTransfer',
             headers:{
                 'token':vm.token
             },
@@ -889,7 +891,7 @@ export default {
         }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/delTransferStation',
+            url:vm.BDMSUrl+'project2/doc/delTransferStation',
             headers:{
                 'token':vm.token
             },
@@ -945,7 +947,7 @@ export default {
          var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileGroupVersionList',
+            url:vm.BDMSUrl+'project2/doc/getFileGroupVersionList',
             headers:{
                 'token':vm.token
             },
@@ -967,7 +969,7 @@ export default {
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/'+vm.projId+'/entityRelation/list',
+            url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/entityRelation/list',
             headers:{
                 'token':vm.token
             },
@@ -1014,7 +1016,7 @@ export default {
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/transferStation',
+            url:vm.BDMSUrl+'project2/doc/transferStation',
             headers:{
                 'token':vm.token
             },
@@ -1033,7 +1035,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/searchTransferStationFileGroupInfo',
+            url:vm.BDMSUrl+'project2/doc/searchTransferStationFileGroupInfo',
             headers:{
                 'token':vm.token
             },

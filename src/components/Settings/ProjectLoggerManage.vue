@@ -49,7 +49,7 @@ export default {
       return{
         enterpriseLoggerData:[],
         loggerDate:[],
-        baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+        BDMSUrl:'',
         token:'',
         projId:'',
         totalLoggerNumber:0,
@@ -60,8 +60,10 @@ export default {
       }
   },
   created(){
+      var vm = this
       this.token = localStorage.getItem('token');
       this.projId = localStorage.getItem('projId');
+      vm.BDMSUrl = vm.$store.state.BDMSUrl
       this.getEnterpriseAuthorization();
   },
   methods:{
@@ -69,7 +71,7 @@ export default {
       getEnterpriseAuthorization(){
           axios({
               method:'get',
-              url:this.baseUrl+'project2/log/'+this.projId+'/index',
+              url:this.BDMSUrl+'project2/log/'+this.projId+'/index',
               headers:{
                   'token':this.token
               }
@@ -89,7 +91,7 @@ export default {
       getLoggerList(index,number,start,end){
           axios({
               method:'post',
-              url:this.baseUrl+'project2/log/'+this.projId+'/list',
+              url:this.BDMSUrl+'project2/log/'+this.projId+'/list',
               headers:{
                   'token':this.token
               },

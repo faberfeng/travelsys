@@ -37,12 +37,13 @@ export default {
     },
     data(){
         return{
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/showCompany',
+            url:'',
             pathInit:'',
             companyList:[],
             userName:'',
             userId:'',
             token:'',
+            BDMSUrl:'',
             active:'',
             companyType:{},
         }
@@ -50,6 +51,7 @@ export default {
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getProjectList();
         vm.getUserInfo()
     },
@@ -58,7 +60,7 @@ export default {
                 var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/logout',
+                url:vm.BDMSUrl+'project2/logout',
                     headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -79,7 +81,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/getOnlineInfo',
+                url:vm.BDMSUrl+'project2/getOnlineInfo',
                 headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -104,7 +106,7 @@ export default {
              var vm = this
             axios({
                 method:'GET',
-                url:this.url,
+                url:vm.BDMSUrl+'project2/showCompany',
                  headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -112,7 +114,7 @@ export default {
             }).then((response)=>{
                 console.log(response);
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
-                    vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+response.data.rt.companyId
+                    vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
                     console.log(response.data.rt.companyList);
@@ -158,7 +160,7 @@ export default {
              vm.active = 'Q'+index
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/listCompany',
+                url:vm.BDMSUrl+'project2/listCompany',
                 params:{
                     type:index
                 },
@@ -216,7 +218,7 @@ export default {
         },
         redirect(key){
            var vm = this
-            vm.pathInit = 'http://10.252.26.240:8080/h2-bim-project/project2/companyInstall/'+key
+            vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+key
             vm.initCompany()
         }
     }

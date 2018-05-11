@@ -167,7 +167,8 @@ export default {
           token:'',
           projId:'',
           fgId:'',//全景文件ID
-          QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file',
+          QJFileManageSystemURL:'',
+          BDMSUrl:'',
           QJ:{
               imageBackground:{},
               point:[]
@@ -183,6 +184,8 @@ export default {
       var vm = this
       vm.token = localStorage.getItem('token');
       vm.projId = localStorage.getItem('projId');
+      vm.BDMSUrl = vm.$store.state.BDMSUrl
+      vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
       vm.fgId = vm.$route.params.id
       var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
       vm.imgdetial.path = obj.image
@@ -225,7 +228,7 @@ export default {
         var vm = this
          axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/getFileGroupVersionList',
+            url:vm.BDMSUrl+'project2/doc/getFileGroupVersionList',
             headers:{
                 'token':vm.token
             },

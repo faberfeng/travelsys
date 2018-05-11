@@ -163,6 +163,7 @@ export default {
                 total:'',//所有数据
             },
             token:'',
+            BDMSUrl:'',
             checkCode:[]
         }
     },
@@ -182,6 +183,7 @@ export default {
         var vm = this
         vm.projId = localStorage.getItem('projId')//项目id
         vm.token  = localStorage.getItem('token')
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.intoJobManager();
         vm.getJobShuXingTu();
     },
@@ -228,7 +230,7 @@ export default {
             };
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionTree',
+                url:vm.BDMSUrl+'project2/Config/positionTree',
                 headers:{
                     'token':vm.token
                 },
@@ -258,7 +260,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/positionIndex',
+                url:vm.BDMSUrl+'project2/Config/positionIndex',
                 headers:{
                     'token':vm.token
                 },
@@ -277,7 +279,7 @@ export default {
             var vm = this
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchPositionList/'+vm.projId,
+                url:vm.BDMSUrl+'project2/Config/searchPositionList/'+vm.projId,
                 headers:{
                     'token':vm.token
                 },
@@ -301,7 +303,7 @@ export default {
             }).then(()=>{
                 axios({
                     method:'GET',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/searchPositionList/'+vm.projId,
+                    url:vm.BDMSUrl+'project2/Config/searchPositionList/'+vm.projId,
                     headers:{
                         'token':vm.token
                     },
@@ -374,7 +376,7 @@ export default {
                 }else{
                     axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/savePosition?projId='+vm.projId,
+                        url:vm.BDMSUrl+'project2/Config/savePosition?projId='+vm.projId,
                         headers:{
                             'token':vm.token
                         },
@@ -413,7 +415,7 @@ export default {
             }).then(() => {
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/Config/delProjectPosition',
+                    url:vm.BDMSUrl+'project2/Config/delProjectPosition',
                     headers:{
                         'token':vm.token
                     },

@@ -80,7 +80,7 @@
                         </li>
                     </ul>
                 </div>
-                <sendMes :showBox="'true'" v-if="goingToSend" v-on:hide="hideSendMes"></sendMes>
+                <sendMes :showBox="'true'" :iscomment="true" :selectugid="selectUgId" :holderid="siteHolderId" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
                  <div class="project">
                     <ul class="projectList">
                         <li v-for="(item,index) in CommunicationList" :key="index">
@@ -98,7 +98,7 @@
                                     <p class="projectListTextName">{{item.createUserAccount}}</p>
                                     <p class="font-color1">{{item.dcContent}}</p>
                                     <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                                        <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key">
+                                        <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                             <div class="item-file-box clearfix">
                                                 <span  class="item-file-image">
                                                     <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
@@ -115,7 +115,7 @@
                                                 </span>
                                             </div>
                                         </li>
-                                        <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key" style="padding:0;overflow: hidden;">
+                                        <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                             <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                             <div class="actionbox clearfix">
                                                 <i class="button-search"  @click="preview(val.relativePath)"></i>
@@ -130,12 +130,14 @@
                                             <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
                                             <span v-text="checkStatus(item.dcStatus)" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                             <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount)" :class="item.showResponse?'arrow':''"></span>
+                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false)" :class="item.showResponse?'arrow':''"></span>
                                             <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
                                         </span>
                                     </p>
                                      <!--下面是评论的代码-->
                                     <div class="comments" v-if="item.showResponse">
+                                        <sendMes :showBox="'true'" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
+                                          v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true)"></sendMes>
                                         <ul >
                                             <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
                                                 <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
@@ -146,7 +148,39 @@
                                                         <span v-text="initData(val.rvTime)"></span>
                                                         <span v-text="val.fromIn"></span>
                                                     </p>
-                                                    <p v-html="val.rvContent" class="detial"></p>
+                                                    <div class="detial">
+                                                        {{val.rvContent}}
+                                                    <!--下面是文件图片的代码-->
+                                                        <div>
+                                                            <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                                                                <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
+                                                                    <div class="item-file-box clearfix">
+                                                                        <span  class="item-file-image">
+                                                                            <img :src="require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png')" />
+                                                                        </span>
+                                                                        <span  class="item-file-detial">
+                                                                            <h3 v-text="left.fileName"></h3>
+                                                                            <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
+                                                                            <p v-text="initData(left.uploadTime)"></p>
+                                                                            <p class="operation">
+                                                                                <span v-text="'版本'+left.version"></span>
+                                                                                <i class="icon-goujian icon-search" @click="preview(left.filePath)"></i>
+                                                                                <i class="icon-goujian icon-download" @click="downLoad(left.filePath)"></i>
+                                                                            </p>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                                <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
+                                                                    <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
+                                                                    <div class="actionbox clearfix">
+                                                                        <i class="button-search"  @click="preview(left.relativePath)"></i>
+                                                                        <i class="line"></i>
+                                                                        <i class="button-download" @click="downLoad(left.relativePath)"></i>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </li>
                                         </ul>
@@ -1398,6 +1432,328 @@
                             }
                         }
                     }
+                      /**********以下是消息输入框样式***********/
+                        .sendmessage{
+                            margin: 30px 30px 20px 0;
+                            margin-top: 30px;
+                            .left{
+                                width: 80px;
+                                float: left;
+                                img{
+                                    width: 48px;
+                                    height: 48px;
+                                    border-radius: 50%;
+                                    margin: 15px 12px 10px;
+                                }
+                            }
+                            .center{
+                                padding-left: 80px;
+                                .box{
+                                    border: 1px solid #d9d9d9;
+                                    .input{
+                                        padding: 10px;
+                                        background: #ffffff;
+                                        .textArea{
+                                            textarea{
+                                                min-height: 116px;
+                                                width: 100%;
+                                                // height: auto;
+                                                margin: 0px; 
+                                                padding: 0px;
+                                                border-style: none;
+                                                border-width: 0px;
+                                                font-size: 14px; 
+                                                word-wrap: break-word; 
+                                                line-height: 18px; 
+                                                // overflow: hidden;
+                                                outline: none;
+                                                border: none;
+                                                color: #333333;
+                                                resize: none;
+                                            }
+                                        }
+                                        ::-webkit-input-placeholder { /* WebKit browsers */
+                                            color:    #cccccc;
+                                        }
+                                        :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+                                            color:     #cccccc;
+                                        }
+                                        ::-moz-placeholder { /* Mozilla Firefox 19+ */
+                                            color:    #cccccc;
+                                        }
+                                        :-ms-input-placeholder { /* Internet Explorer 10+ */
+                                            color:   #cccccc;
+                                        }
+                                    }
+                                    .func_area{
+                                        padding:15px  0px 0 10px;
+                                        background: #f2f2f2;
+                                        height: 45px;
+                                        border-top: 1px solid #e6e6e6;
+                                        position: relative;
+                                        .limits{
+                                            .cancle{
+                                                float: right;
+                                                font-size: 14px;
+                                                color: #999999;
+                                                margin-right: 130px;
+                                                text-decoration: none;
+                                            }
+                                            span{
+                                                line-height: 16px;
+                                                height: 16px;
+                                                float: left;
+                                                position: relative;
+                                                cursor: pointer;
+                                                margin-left: 24px;
+                                                margin-right: 20px;
+                                                font-size: 12px;
+                                                color: #666666;
+                                            }
+                                            .icon-eye::before{
+                                                display: inline-block;
+                                                position: absolute;
+                                                left: -24px;
+                                                top: 2px;
+                                                width: 18px;
+                                                height: 12px;
+                                                line-height: 14px;
+                                                background: url('./images/eye.png')no-repeat 0 0;
+                                                content: '';
+                                            }
+                                            .icon-image::before{
+                                                display: inline-block;
+                                                position: absolute;
+                                                left: -24px;
+                                                top: 2px;
+                                                width: 18px;
+                                                height: 14px;
+                                                line-height: 14px;
+                                                background: url('./images/image.png')no-repeat 0 0;
+                                                content: '';
+                                            }
+                                            .icon-file::before{
+                                                display: inline-block;
+                                                position: absolute;
+                                                left: -24px;
+                                                top: 2px;
+                                                width: 16px;
+                                                height: 18px;
+                                                line-height: 14px;
+                                                background: url('./images/file.png')no-repeat 0 0;
+                                                content: '';
+                                            }
+                                            .icon-message::before{
+                                                display: inline-block;
+                                                position: absolute;
+                                                left: -24px;
+                                                top: 2px;
+                                                width: 18px;
+                                                height: 15px;
+                                                line-height: 14px;
+                                                background: url('./images/message.png')no-repeat 0 0;
+                                                content: '';
+                                            }
+                                        }
+                                        .send{
+                                            display: block;
+                                            position: absolute;
+                                            top: -1px;
+                                            bottom: -1px;
+                                            right: -1px;
+                                            width: 110px;
+                                            background: #fc3439;
+                                            color: #ffffff;
+                                            text-align: center;
+                                            line-height: 45px;
+                                            font-size: 14px;
+                                            text-decoration: none;
+                                        }
+                                    }
+                            }
+                            .fileitem{
+                                .item-file{
+                                        float: left;
+                                        width: 290px;
+                                        height: 120px;
+                                        margin: 20px 15px 0 0;
+                                        border-radius: 6px;
+                                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                                        position: relative;
+                                        padding: 8px;
+                                        .item-file-attach{
+                                            width: 100%;
+                                            height: 120px;
+                                            margin: 0;
+                                            padding: 0;
+                                            border-radius:2px;
+                                            cursor: pointer;
+                                        }
+                                        .actionbox{
+                                            display: block;
+                                            position: absolute;
+                                            bottom: 0;
+                                            width: 100%;
+                                            height: 36px;
+                                            background: rgba(40, 40, 40, .4);
+                                            transform: translateY(36px);
+                                                transition: all ease .5s;
+                                                .button-search{
+                                                    float: left;
+                                                    margin: 10px 40px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    background: url('./images/search2.png')no-repeat 0 0;
+                                                    cursor: pointer;
+                                                }
+                                                .button-download{
+                                                float: left;
+                                                    margin: 10px 40px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    background: url('./images/download2.png')no-repeat 0 0;
+                                                cursor: pointer;
+                                                }
+                                                .icon-delete{
+                                                    float: left;
+                                                    margin: 10px 40px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    cursor: pointer;
+                                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                                } 
+                                                .line{
+                                                float: left;
+                                                    margin: 6px 0px;
+                                                    width: 1px;
+                                                    height: 24px;
+                                                    background: #cccccc;
+                                                }
+                                        }
+                                        .checkbox-fileItem{
+                                            display:block;
+                                            position: absolute;
+                                            top: 8px;
+                                            left: 8px;
+                                            width: 14px;
+                                            height: 14px;
+                                            border: 1px solid #cccccc;
+                                            cursor: pointer;
+                                        }
+                                        .active{
+                                            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                                            border: 1px solid #fc3439;
+                                        }
+                                        .item-file-box{
+                                            .item-file-image{
+                                                float: left;
+                                                margin-top:16px;
+                                                width: 70px;
+                                                height: 70PX;
+                                                border-radius: 50%;
+                                                background: #f2f2f2;
+                                                img{
+                                                    width: 48px;
+                                                    height: 48px;
+                                                    display: block;
+                                                    margin-top: 13PX;
+                                                    margin-left: 11px;
+                                                } 
+                                            }
+                                            .item-file-detial{
+                                                display: block;
+                                                margin-left:80px;
+                                                .icon-goujian{
+                                                    float: right;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    cursor: pointer;
+                                                }
+                                                .icon-download{
+                                                    background: url('../ManageCost/images/download.png')no-repeat 0 0;
+                                                    margin-right: 20px;
+                                                    &:hover{
+                                                        background: url('../ManageCost/images/download1.png')no-repeat 0 0;
+                                                    }
+                                                }
+                                                .icon-search{
+                                                    background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                                                    margin-right: 20px;
+                                                    &:hover{
+                                                        background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                                                    }
+                                                } 
+                                                .icon-delete{
+                                                    margin-right: 20px;
+                                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                                    &:hover{
+                                                        background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                                    } 
+                                                } 
+                                                >h3{
+                                                    text-align: left;
+                                                    font-size: 14px;
+                                                    color: #333333;
+                                                    line-height: 20px;
+                                                    margin: 9px 0 8px;
+                                                    max-height: 40px;
+                                                    overflow: hidden;
+                                                }   
+                                                >p{
+                                                    font-size: 12px;
+                                                    line-height: 12px;
+                                                    color: #b3b3b3;
+                                                    text-align: left;
+                                                    margin-bottom:6px; 
+                                                }
+                                                .text-name{
+                                                    color: #336699;
+                                                }
+                                                .operation{
+                                                    display: block;
+                                                    position: absolute;
+                                                    bottom: 0;
+                                                    left: 88px;
+                                                    right: 0;
+                                                    span{
+                                                        color: #fc3439;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                                .item-file:hover{
+                                    box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                                    .actionbox{
+                                        transform: translateY(0px);
+                                        transition: all ease .5s;
+                                    }
+                                }
+                            }
+                            #edit{
+                                position: fixed;
+                                z-index: 3001;
+                                background: #ffffff;
+                            }
+                            .hahahha{
+                                top: 15vh;
+                                left: 50%;
+                                width: 660px;
+                                margin-left:-330px;
+                                border-radius: 5px;
+                            }
+                            #mask{
+                                z-index: 3000;
+                                position: fixed;
+                                left: 0;
+                                top: 0;
+                                width: 100%;
+                                height: 100%;
+                                opacity: .5;
+                                background: #000;
+                            }
+                        }
                 }
                 /*流程图*/
                 .flowCharts{
@@ -1538,6 +1894,7 @@
             background: #ffffff;
             z-index: 10;
             border-left:none;
+            z-index: 1000;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
@@ -1996,6 +2353,7 @@
                     border: 1px solid #d9d9d9;
                     .input{
                         padding: 10px;
+                        background: #ffffff;
                         .textArea{
                             textarea{
                                 min-height: 116px;
@@ -2113,6 +2471,8 @@
                             text-decoration: none;
                         }
                     }
+            }
+            .fileitem{
                 .item-file{
                         float: left;
                         width: 290px;
@@ -2138,30 +2498,38 @@
                             height: 36px;
                             background: rgba(40, 40, 40, .4);
                             transform: translateY(36px);
-                             transition: all ease .5s;
-                             .button-search{
-                                 float: left;
-                                 margin: 10px 64px;
-                                 width: 16px;
-                                 height: 16px;
-                                 background: url('./images/search2.png')no-repeat 0 0;
-                                 cursor: pointer;
-                             }
-                             .button-download{
+                                transition: all ease .5s;
+                                .button-search{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('./images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                }
+                                .button-download{
                                 float: left;
-                                 margin: 10px 64px;
-                                 width: 16px;
-                                 height: 16px;
-                                 background: url('./images/download2.png')no-repeat 0 0;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('./images/download2.png')no-repeat 0 0;
                                 cursor: pointer;
-                             }
-                             .line{
-                                float: left;
-                                 margin: 6px 0px;
-                                 width: 1px;
-                                 height: 24px;
-                                 background: #cccccc;
-                             }
+                                }
+                                .icon-delete{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    cursor: pointer;
+                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                } 
+                                .line{
+                                  float: left;
+                                    margin: 6px 0px;
+                                    width: 1px;
+                                    height: 24px;
+                                    background: #cccccc;
+                                }
                         }
                         .checkbox-fileItem{
                             display:block;
@@ -2197,7 +2565,7 @@
                                 display: block;
                                 margin-left:80px;
                                 .icon-goujian{
-                                   float: right;
+                                    float: right;
                                     width: 16px;
                                     height: 16px;
                                     cursor: pointer;
@@ -2215,6 +2583,13 @@
                                     &:hover{
                                         background: url('../ManageCost/images/search1.png')no-repeat 0 0;
                                     }
+                                } 
+                                .icon-delete{
+                                    margin-right: 20px;
+                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                    &:hover{
+                                        background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                    } 
                                 } 
                                 >h3{
                                     text-align: left;
@@ -2247,13 +2622,13 @@
                                 }
                             }
                         }
-                    }
-                    .item-file:hover{
-                        box-shadow: 0px 1px 8px rgba(252,52,57,.2);
-                        .actionbox{
-                            transform: translateY(0px);
-                            transition: all ease .5s;
-                        }
+                }
+            }
+                .item-file:hover{
+                    box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                    .actionbox{
+                        transform: translateY(0px);
+                        transition: all ease .5s;
                     }
                 }
             }
@@ -2306,6 +2681,7 @@ export default {
          userId:'',
          defaultSubProjId:'',
          QJFileManageSystemURL:'',
+         BDMSUrl:'',
          checkedItem:{},//选中的file
          show:{
              basicAttributes:false,
@@ -2446,6 +2822,7 @@ export default {
         },
         CommentList:[],//评论列表
         goingToSend:false,//用户点击显示弹窗
+        siteHolderId:'',//holderID
       }
   },
   created(){
@@ -2457,6 +2834,7 @@ export default {
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.projAuth = localStorage.getItem('projAuth')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoDesignPage()//进入设计协调获取信息
         vm.getPosID()//获取posID，
         vm.checkAuth()//获取posID，
@@ -2519,7 +2897,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/updateLsug',
+            url:vm.BDMSUrl+'project2/dc/updateLsug',
             headers:{
                 'token':vm.token
             },
@@ -2540,39 +2918,33 @@ export default {
             console.log(err)
         })
       },
-      getComment(val,index,showResponse,reviewCount){
+      getComment(val,index,showResponse,reviewCount,reload){
         var vm = this
         if(reviewCount == 0){
              vm.$message({
                 type:'warning',
                 message:'还没有评论!'
             })
-            return false
-        }
-        if(showResponse){
-            vm.CommunicationList.forEach((item,key)=>{
-                if(key == index){
-                    item.showFlowChart = false
-                    item.showResponse = !item.showResponse
-                }else{
-                        item.showResponse = false
-                }
-            })
-            return false
         }
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+val+'/review/list',
+            url:vm.BDMSUrl+'project2/dc/'+val+'/review/list',
             headers:{
                 'token':vm.token
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(parseInt(response.data.cd) == 0){
                 vm.CommentList = response.data.rt.rows
                 vm.CommunicationList.forEach((item,key)=>{
                     if(key == index){
                         item.showFlowChart = false
-                        item.showResponse = !item.showResponse
+                        if(reload){
+                            vm.$set(item,'showResponse',true)
+                            var num = reviewCount++
+                            vm.$set(item,'reviewCount',(reviewCount++))
+                        }else{
+                                vm.$set(item,'showResponse',!showResponse)
+                        }
                     }else{
                          item.showResponse = false
                     }
@@ -2605,7 +2977,7 @@ export default {
             }).then(() => {
                   axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/'+dcReviewId+'/1/delete',
+                        url:vm.BDMSUrl+'project2/dc/'+dcId+'/'+dcReviewId+'/1/delete',
                         headers:{
                             'token':vm.token
                         },
@@ -2643,7 +3015,7 @@ export default {
             }).then(() => {
                   axios({
                         method:'POST',
-                        url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/1/delete',
+                        url:vm.BDMSUrl+'project2/dc/'+dcId+'/1/delete',
                         headers:{
                             'token':vm.token
                         },
@@ -2674,7 +3046,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
+            url:vm.BDMSUrl+'project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
             headers:{
                 'token':vm.token
             },
@@ -2722,7 +3094,7 @@ export default {
           if(dcStatus != 0){
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/1/updateStatus',
+                    url:vm.BDMSUrl+'project2/dc/'+dcId+'/1/updateStatus',
                     headers:{
                         'token':vm.token
                     },
@@ -2763,7 +3135,7 @@ export default {
           var isCollect = collect?0:1
           axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+val+'/1/collect',
+            url:vm.BDMSUrl+'project2/dc/'+val+'/1/collect',
             headers:{
                 'token':vm.token
             },
@@ -2816,7 +3188,7 @@ export default {
           var vm = this
           axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/list',
+            url:vm.BDMSUrl+'project2/dc/list',
             headers:{
                 'token':vm.token
             },
@@ -2861,7 +3233,7 @@ export default {
             }).then(() => {
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/delContactUser',
+                    url:vm.BDMSUrl+'project2/dc/delContactUser',
                     headers:{
                         'token':vm.token
                     },
@@ -2895,7 +3267,7 @@ export default {
           var vm = this
           axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/viewContactDetails',
+            url:vm.BDMSUrl+'project2/dc/viewContactDetails',
             headers:{
                 'token':vm.token
             },
@@ -2924,7 +3296,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/addDcProjectUser',
+            url:vm.BDMSUrl+'project2/dc/addDcProjectUser',
             headers:{
                 'token':vm.token
             },
@@ -2986,7 +3358,7 @@ export default {
           }
             axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/findUserByKeyWord',
+                url:vm.BDMSUrl+'project2/dc/findUserByKeyWord',
                 headers:{
                     'token':vm.token
                 },
@@ -3006,7 +3378,7 @@ export default {
                         }).then(() => {
                             axios({
                                 method:'POST',
-                                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/sendNoRegesterEmail',
+                                url:vm.BDMSUrl+'project2/dc/sendNoRegesterEmail',
                                 headers:{
                                     'token':vm.token
                                 },
@@ -3066,7 +3438,7 @@ export default {
           var vm = this
            axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/addContact',
+                url:vm.BDMSUrl+'project2/dc/addContact',
                 headers:{
                     'token':vm.token
                 },
@@ -3091,7 +3463,7 @@ export default {
             }).then(() => {
                 axios({
                     method:'POST',
-                    url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.checkFileDir.id+'/delete',
+                    url:vm.BDMSUrl+'project2/drawing/'+vm.checkFileDir.id+'/delete',
                     headers:{
                         'token':vm.token
                     },
@@ -3122,7 +3494,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.editDrawing.dId+'/update',
+            url:vm.BDMSUrl+'project2/drawing/'+vm.editDrawing.dId+'/update',
             headers:{
                 'token':vm.token
             },
@@ -3213,7 +3585,7 @@ export default {
             fgId 
             fileDesc 描述
             **/
-            var returnUrl = 'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/add?dcode='+item.drawingNo+'&ddId='+vm.checkFileDir.id+'&dname='+item.fileName+'&dscale='+item.proportion+'&entId='+vm.entId
+            var returnUrl = vm.BDMSUrl+'project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/add?dcode='+item.drawingNo+'&ddId='+vm.checkFileDir.id+'&dname='+item.fileName+'&dscale='+item.proportion+'&entId='+vm.entId
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
             formData.append('token',vm.token);
@@ -3249,52 +3621,12 @@ export default {
             })
         })
       },
-    uploadIMG(){
-            var vm = this
-            /*
-            isUploadPoint 0不是全景类型 1是全景类型 
-            dirId 目录ID
-            fgId 
-            fileDesc 描述
-            **/
-           console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
-            var returnUrl = "http://10.252.26.240:8080/h2-bim-project/project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
-            returnUrl = encodeURIComponent(returnUrl);
-            var formData = new FormData()
-            formData.append('token',vm.token);
-            formData.append('projId',vm.projId);
-             formData.append('type',1);
-            formData.append('file',vm.filesList);
-            formData.append('userId',vm.userId);
-            formData.append('modelCode','002');
-            formData.append('returnUrl',returnUrl);
-            axios({
-                method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
-                headers:{
-                    'Content-Type': 'multipart/form-data'
-                },
-                data:formData,
-            }).then((response)=>{
-                console.log(response)
-                if(response.data.rt){
-                    vm.des = ''
-                    vm.imageName ='未选择任何文件'
-                     vm.$emit('refreshqj')
-                }
-            }).catch((err)=>{
-                vm.des = ''
-                vm.imageName ='未选择任何文件'
-                 vm.$emit('refreshqj')
-                console.log(err)
-            })
-        },
       addfileConfirm(){
         var vm = this
         if(vm.fileName.new){
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/directory/add',
+                url:vm.BDMSUrl+'project2/drawing/directory/add',
                 headers:{
                     'token':vm.token
                 },
@@ -3325,7 +3657,7 @@ export default {
         }else{
              axios({
                 method:'POST',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/directory/'+vm.checkFileDir.id+'/rename',
+                url:vm.BDMSUrl+'project2/drawing/directory/'+vm.checkFileDir.id+'/rename',
                 headers:{
                     'token':vm.token
                 },
@@ -3393,7 +3725,7 @@ export default {
         }).then(() => {
             axios({
                 method:'GET',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/directory/'+vm.checkFileDir.id+'/delete',
+                url:vm.BDMSUrl+'project2/drawing/directory/'+vm.checkFileDir.id+'/delete',
                 headers:{
                     'token':vm.token
                 },
@@ -3426,7 +3758,7 @@ export default {
         var fgID = vm.PointFigure.fgID?vm.PointFigure.fgID:vm.checkedRound.ID
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/doc/updateFileGroupName',
+            url:vm.BDMSUrl+'project2/doc/updateFileGroupName',
             headers:{
                 'token':vm.token
             },
@@ -3482,7 +3814,7 @@ export default {
         var vm = this
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/designCoordination',
+            url:vm.BDMSUrl+'project2/dc/designCoordination',
             headers:{
                 'token':vm.token
             },
@@ -3491,6 +3823,7 @@ export default {
             }
         }).then((response)=>{
             if(response.data.cd == 0){
+                vm.siteHolderId = response.data.rt.siteHolderId
                 vm.ugList = response.data.rt.ugList
                 vm.ugList.forEach((item)=>{
                     if(item.ugId == response.data.rt.selectUgId){
@@ -3518,7 +3851,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/searchDcProjectUserList',
+            url:vm.BDMSUrl+'project2/dc/searchDcProjectUserList',
             headers:{
                 'token':vm.token
             },
@@ -3554,7 +3887,7 @@ export default {
         };
         axios({
             method:'GET',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/list',
+            url:vm.BDMSUrl+'project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/list',
             headers:{
                 'token':vm.token
             },

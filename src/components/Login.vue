@@ -43,7 +43,7 @@ export default {
               Password:''
           },
           checked:false,
-          loginUrl:'http://10.252.26.240:8080/h2-bim-project/project2/login',
+          BDMSUrl:'',
           projectData:{},
           token:'',
           isAuto:false
@@ -52,6 +52,7 @@ export default {
   created(){
       var vm = this;
       const token = localStorage.getItem('token') 
+      vm.BDMSUrl = vm.$store.state.BDMSUrl
       if(token != 'undefined'){
           vm.token = token
           //判断是否登陆
@@ -63,7 +64,7 @@ export default {
           var vm = this
           axios({
               method:'Get',
-              url:this.loginUrl,
+              url:vm.BDMSUrl+'project2/login',
               headers:{
                   'content-type':'application/json;charset=UTF-8',
                    'token':vm.token
@@ -82,7 +83,7 @@ export default {
           this.login.Password = md5(this.login.Password);
           axios({
               method:'Post',
-              url:this.loginUrl,
+              url:this.BDMSUrl+'project2/login',
               headers:{
                   'content-type':'application/json;charset=UTF-8',
               },

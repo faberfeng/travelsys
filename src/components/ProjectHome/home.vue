@@ -24,7 +24,7 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
+                            <img :src="item.userImg?('http://10.252.26.240:8080/qjbim-file/'+item.userImg):require('../../assets/loginimg.png')">
                         </div> 
                         <div class="projectListText">
                             <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span><a @click="gotoPath(index)">查看文档<i class="el-icon-arrow-right"></i></a></p>
@@ -59,6 +59,7 @@ export default {
             tabShow:1,
             token:'',
             baseUrl:'http://10.252.26.240:8080/qjbim-project/',
+            BDMSUrl:'',
             notbeenUse:true,
             projId:'',
             allData:{},//工程首页信息
@@ -74,14 +75,15 @@ export default {
         }
     },
     created(){
-
-        this.token = localStorage.getItem('token'); //获取token
-        this.projId = localStorage.getItem('projId');//获取工程id
-        this.getProjectInfo();//工程首页信息
-        this.getBasicSituation();//获取工程概况信息;
-        this.getProjectImageList()//获取工程图片列表
-        this.getProjectStationInfo()//获取用户动态信息列表
-        this.getProjectNoticeList();//获取通知列表
+        var vm = this
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.token = localStorage.getItem('token'); //获取token
+        vm.projId = localStorage.getItem('projId');//获取工程id
+        vm.getProjectInfo();//工程首页信息
+        vm.getBasicSituation();//获取工程概况信息;
+        vm.getProjectImageList()//获取工程图片列表
+        vm.getProjectStationInfo()//获取用户动态信息列表
+        vm.getProjectNoticeList();//获取通知列表
 
     },
     methods:{
@@ -92,9 +94,10 @@ export default {
             }
         },
         getProjectInfo(){
+            var vm = this
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080//h2-bim-project/project2/index?projId='+this.projId,
+                url:vm.BDMSUrl+'project2/index?projId='+this.projId,
                 headers:{
                     'token':this.token
                 }
@@ -111,27 +114,29 @@ export default {
         },
         //获取工程概况信息列表
         getBasicSituation(){
+            var vm = this
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/'+this.projId+'/overview/list',
+                url:vm.BDMSUrl+'project2/main/'+vm.projId+'/overview/list',
                 headers:{
                     'token':this.token
                 }
             }).then((response)=>{
                 //console.log(response.data);
                 if(response.data.cd === '1'){
-                    this.$router.push({
+                    vm.$router.push({
                         path:'/login'
                     })
                 }else{
-                    this.overviewList = response.data.rt;
+                    vm.overviewList = response.data.rt;
                 }
             })
         },
         getProjectImageList(){
+            var vm = this
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/findProjectImage?projectId='+this.projId,
+                url:vm.BDMSUrl+'project2/main/findProjectImage?projectId='+this.projId,
                 headers:{
                     'token':this.token
                 }
@@ -147,9 +152,10 @@ export default {
             })
         },
         getProjectStationInfo(){
+            var vm = this
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/list',
+                url:vm.BDMSUrl+'project2/main/list',
                 headers:{
                     'token':this.token
                 },
@@ -171,9 +177,10 @@ export default {
             })
         },
         getProjectNoticeList(){
+            var vm = this
             axios({
                 method:'get',
-                url:'http://10.252.26.240:8080/h2-bim-project/project2/main/noticeList',
+                url:vm.BDMSUrl+'project2/main/noticeList',
                 headers:{
                     'token':this.token,
                 },

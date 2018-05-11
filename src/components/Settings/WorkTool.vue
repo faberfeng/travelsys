@@ -220,7 +220,7 @@ export default {
                 ],
                 token:'',
                 projId:'',
-                baseUrl:'http://10.252.26.240:8080/h2-bim-project/',
+                BDMSUrl:'',
                 workToolData:[],
                 codeType:'',//编码级别
                 codeTypeData:[],
@@ -259,8 +259,10 @@ export default {
 
     },
     created(){
+        var vm = this
         this.projId = localStorage.getItem('projId');
         this.token  = localStorage.getItem('token');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.getWorkCode();
     },
     mounted(){
@@ -295,7 +297,7 @@ export default {
             };
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/getWorkCode',
+                url:this.BDMSUrl+'config2/component/getWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -418,7 +420,7 @@ export default {
                 }
                 axios({
                     method:'post',
-                    url:this.baseUrl+'config2/component/updateWorkCode',
+                    url:this.BDMSUrl+'config2/component/updateWorkCode',
                     headers:{
                         token:this.token
                     },
@@ -481,7 +483,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/deleteWorkCode',
+                url:this.BDMSUrl+'config2/component/deleteWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -556,7 +558,7 @@ export default {
                     }else{
                         axios({
                             method:'post',
-                            url:this.baseUrl+'config2/component/addWorkCode',
+                            url:this.BDMSUrl+'config2/component/addWorkCode',
                             headers:{
                                 token:this.token
                             },
@@ -766,7 +768,7 @@ export default {
         deleteCode(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -821,7 +823,7 @@ export default {
         surePass(){
             axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     token:this.token
                 },
@@ -860,7 +862,7 @@ export default {
         sureReject(){
              axios({
                 method:'post',
-                url:this.baseUrl+'config2/component/updateWorkCode',
+                url:this.BDMSUrl+'config2/component/updateWorkCode',
                 headers:{
                     token:this.token
                 },

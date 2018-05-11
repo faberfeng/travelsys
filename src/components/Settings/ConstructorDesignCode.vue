@@ -710,7 +710,7 @@ export default {
             ],
             token:'',
             projId:'',
-            baseUrl:'http://10.252.26.240:8080/h2-bim-project/project2/',
+            BDMSUrl:'',
             constructorData:[],
             confirmVisible:false,
             confirmVisibleTwo:false,
@@ -812,9 +812,11 @@ export default {
         }
     },
     created(){
-        this.token = localStorage.getItem('token');
-        this.projId = localStorage.getItem('projId');
-        this.getProjectGenieClassByProject();
+        var vm = this
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.token = localStorage.getItem('token');
+        vm.projId = localStorage.getItem('projId');
+        vm.getProjectGenieClassByProject();
 
     },
     mounted(){
@@ -833,9 +835,10 @@ export default {
         },
         //获取分类编码树列表
         getProjectGenieClassByProject(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getProjectGenieClassByProjId',
+                url:vm.BDMSUrl+'project2/Config/getProjectGenieClassByProjId',
                 headers:{
                     token:this.token
                 },
@@ -896,9 +899,10 @@ export default {
         },
         //确认提请
         confirmSure(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/updateGenieClass',
+                url:vm.BDMSUrl+'project2/Config/updateGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1021,6 +1025,7 @@ export default {
         },
         //保存编辑
         editListSureBtn(){
+            var vm = this
             var colorCode_0 = this.toBeColorCode(this.firstTitle);
             var colorCode_1 = this.toBeColorCode(this.secondTitle);
             var colorCode_2 = this.toBeColorCode(this.thirdTitle);
@@ -1045,7 +1050,7 @@ export default {
                         }
                         axios({
                             method:'post',
-                            url:this.baseUrl+'Config/updateGenieClass',
+                            url:vm.BDMSUrl+'project2/Config/updateGenieClass',
                             headers:{
                                 token:this.token,
                             },
@@ -1100,9 +1105,10 @@ export default {
         },
         //确认删除
         deleteMakeSure(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/deleteGenieClass',
+                url:vm.BDMSUrl+'project2/Config/deleteGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1141,9 +1147,10 @@ export default {
         },
         //确认通过
         surePass(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/updateGenieClass',
+                url:vm.BDMSUrl+'project2/Config/updateGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1185,9 +1192,10 @@ export default {
         },
         //确认退回
         sureReject(){
+            var vm = this
             axios({
                 method:'post',
-                 url:this.baseUrl+'Config/updateGenieClass',
+                 url:vm.BDMSUrl+'project2/Config/updateGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -1913,6 +1921,7 @@ export default {
         },
         //确认添加
         addListSureBtn(){
+            var vm = this
             if(this.totalCode =='' || this.newTitle =='' || this.codeType == ''){
                 alert('请确认表单是否填写正确');
             }else{
@@ -1926,7 +1935,7 @@ export default {
                     }else{
                         axios({
                             method:'post',
-                            url:this.baseUrl+'Config/addGenieClass',
+                            url:vm.BDMSUrl+'project2/Config/addGenieClass',
                             headers:{
                                 token:this.token
                             },
@@ -2101,9 +2110,10 @@ export default {
         },
         //确定设定材料
         setMeterialSureBtn(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/updateMaterialIndex',
+                url:vm.BDMSUrl+'project2/Config/updateMaterialIndex',
                 headers:{
                     token:this.token
                 },
@@ -2142,9 +2152,10 @@ export default {
         },
         //获取扩展属性
         getExpandProperty(){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/getCustomProperty/'+this.projId,
+                url:vm.BDMSUrl+'project2/Config/getCustomProperty/'+this.projId,
                 headers:{
                     token:this.token
                 },
@@ -2195,9 +2206,10 @@ export default {
             this.jianxieText = scope.row.code;
         },
         jianxieSureBtn(){
+            var vm = this
             axios({
                 method:'post',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/addProperty',
+                url:vm.BDMSUrl+'config2/component/addProperty',
                 headers:{
                     token:this.token
                 },
@@ -2232,9 +2244,10 @@ export default {
             this.deletePropertyDialog = true;
         },
         deletePropertyMakeSure(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/deleteCustomProperty',
+                url:vm.BDMSUrl+'project2/Config/deleteCustomProperty',
                 headers:{
                     token:this.token
                 },
@@ -2270,6 +2283,7 @@ export default {
             }
         },
         addPropertySureBtn(){
+            var vm = this
             if(this.validateJianxie){
                 alert('该简写不可以使用');
             }else{
@@ -2278,7 +2292,7 @@ export default {
                 }else{
                     axios({
                         method:'post',
-                        url:'http://10.252.26.240:8080/h2-bim-project/config2/component/addProperty',
+                        url:vm.BDMSUrl+'config2/component/addProperty',
                         headers:{
                             token:this.token
                         },
@@ -2316,10 +2330,11 @@ export default {
         },
         //属性表值改变
         propertyTableChange(){
+            var vm = this
             this.theFirstTitleData = [];
             axios({
                 method:'post',
-                url:'http://10.252.26.240:8080/h2-bim-project/config2/component/getProperty',
+                url:vm.BDMSUrl+'config2/component/getProperty',
                 headers:{
                     token:this.token
                 },
@@ -2469,9 +2484,10 @@ export default {
             this.totalPropertyTitle = titleOne+'-'+titleTwo+'-'+titleThree+'-'+titleFour;
         },
         getEngineeringMapping(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getEngineeringMapping',
+                url:vm.BDMSUrl+'project2/Config/getEngineeringMapping',
                 headers:{
                     token:this.token
                 },
@@ -2493,12 +2509,13 @@ export default {
         },
         //工程量映射
         projectMapped(scope){
+            var vm = this
             this.projectMapShow = true;
             this.projectMappedObject=scope;
             this.getEngineeringMapping();
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/getEntityProperties',
+                url:vm.BDMSUrl+'project2/Config/getEntityProperties',
                 headers:{
                     token:this.token
                 },
@@ -2526,9 +2543,10 @@ export default {
         },
         //确认删除
         deletePropertyNumberSure(){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/deleteEngineeringMapping',
+                url:vm.BDMSUrl+'project2/Config/deleteEngineeringMapping',
                 headers:{
                     token:this.token
                 },
@@ -2550,6 +2568,7 @@ export default {
         },
         //编辑工程量条目信息
         editProjectProperty(scope){
+            var vm = this
             this.editProjectMappedShow = true;
             this.jiLiangCondition = scope.row.calCondition;
             this.jiLiangResult = scope.row.formula;
@@ -2557,7 +2576,7 @@ export default {
             this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.classifyName;
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2587,7 +2606,7 @@ export default {
             }) 
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2617,7 +2636,7 @@ export default {
             }) 
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2647,7 +2666,7 @@ export default {
             }) 
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getEngineeringInfo',
+                url:vm.BDMSUrl+'project2/Config/getEngineeringInfo',
                 headers:{
                     token:this.token
                 },
@@ -2676,7 +2695,7 @@ export default {
             })
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/getGenieclassCriterion',
+                url:vm.BDMSUrl+'project2/Config/getGenieclassCriterion',
                 headers:{
                     token:this.token
                 },
@@ -2700,6 +2719,7 @@ export default {
         //确定编辑
         editProjectMappedSure(){
             var arr = [];
+            var vm = this
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
@@ -2711,7 +2731,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'Config/addDesignMapping',
+                    url:vm.BDMSUrl+'project2/Config/addDesignMapping',
                     headers:{
                         token:this.token
                     },
@@ -2755,9 +2775,10 @@ export default {
         },
         //加载第一个下拉框
         loadFirstSelectData(){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2784,9 +2805,10 @@ export default {
         },
         //加载第二个下拉框
         loadSecondSelectData(oCode){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2813,9 +2835,10 @@ export default {
         },
         //加载第三个下拉框
         loadThirdSelectData(oCode){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2842,9 +2865,10 @@ export default {
         },
         //加载第四个下拉框
         loadFourthSelectData(oCode){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/loadLevelXGenieClass',
+                url:vm.BDMSUrl+'project2/Config/loadLevelXGenieClass',
                 headers:{
                     token:this.token
                 },
@@ -2893,9 +2917,10 @@ export default {
         },
         //获取工程量特性映射
         getEngineeringInfo(){
+            var vm = this
             axios({
                 method:'post',
-                url:this.baseUrl+'Config/getEngineeringInfo',
+                url:vm.BDMSUrl+'project2/Config/getEngineeringInfo',
                 headers:{
                     token:this.token
                 },
@@ -2931,9 +2956,10 @@ export default {
         },
         //获取分类编码信息
         getGenieclassCriterion(){
+            var vm = this
             axios({
                 method:'get',
-                url:this.baseUrl+'Config/getGenieclassCriterion',
+                url:vm.BDMSUrl+'project2/Config/getGenieclassCriterion',
                 headers:{
                     token:this.token
                 },
@@ -2960,6 +2986,7 @@ export default {
         //确认添加工程量映射
         addProjectMappedSure(){
             var arr = [];
+            var vm = this
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
@@ -2971,7 +2998,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.baseUrl+'Config/addDesignMapping',
+                    url:vm.BDMSUrl+'project2/Config/addDesignMapping',
                     headers:{
                         token:this.token
                     },
@@ -3037,12 +3064,13 @@ export default {
         },
         //验证简写
         Validate(){
+            var vm = this
             if(this.jianxie == ''){
                 alert('请输入简写!');
             }else{
                 axios({
                     method:'get',
-                    url:'http://10.252.26.240:8080/h2-bim-project/config2/component/findCustomProperty',
+                    url:vm.BDMSUrl+'config2/component/findCustomProperty',
                     headers:{
                         token:this.token
                     },
