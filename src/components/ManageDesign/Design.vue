@@ -37,7 +37,7 @@
             <div id="containerMessage">
                 <p class="header clearfix">
                     <span class="title">设计协同</span>
-                    <span class="item-upload">新建主题</span>
+                    <span class="item-upload" @click="SendMes">新建主题</span>
                 </p>
                 <div class="ForumSelector">
                     <span class="name">筛选条件</span>
@@ -80,7 +80,7 @@
                         </li>
                     </ul>
                 </div>
-                <sendMes></sendMes>
+                <sendMes :showBox="'true'" v-if="goingToSend" v-on:hide="hideSendMes"></sendMes>
                  <div class="project">
                     <ul class="projectList">
                         <li v-for="(item,index) in CommunicationList" :key="index">
@@ -130,21 +130,24 @@
                                             <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
                                             <span v-text="checkStatus(item.dcStatus)" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                             <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                            <span v-text="'收起回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="item.showFlowChart = false;item.showResponse = !item.showResponse;getComment(item.dcId)" :class="item.showResponse?'arrow':''"></span>
+                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount)" :class="item.showResponse?'arrow':''"></span>
                                             <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
                                         </span>
                                     </p>
                                      <!--下面是评论的代码-->
-                                    <div class="flowCharts" v-if="item.showFlowChart">
-                                        <ul class="clearfix">
-                                            <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
-                                                <div class="top">
-                                                    <span class="horizontalLineL"></span>
-                                                    <span  class="redSpot"></span>
-                                                    <span  class="horizontalLineR"></span>
+                                    <div class="comments" v-if="item.showResponse">
+                                        <ul >
+                                            <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
+                                                <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
+                                                <div  class="center">
+                                                    <span class="icon-delete" v-if="val.editable"  @click="deleteComment(val.dcId,val.id,key,index)"></span>
+                                                    <p class="head">
+                                                        <span v-text="val.rvUserStr"></span>
+                                                        <span v-text="initData(val.rvTime)"></span>
+                                                        <span v-text="val.fromIn"></span>
+                                                    </p>
+                                                    <p v-html="val.rvContent" class="detial"></p>
                                                 </div>
-                                                <p v-text="val.userName+val.dcStatus" class="title_"></p>
-                                                <p v-text="initData(val.operateTime)" class="date"></p>
                                             </li>
                                         </ul>
                                     </div> 
@@ -166,7 +169,7 @@
                             </div>
                         </li>
                     </ul>
-                    <div class="pagenation">   
+                    <div class="pagenation" v-if="pageTotal>0">   
                         <el-pagination background layout="prev, pager, next" :total="pageTotal" :current-page.sync="pageNo" @current-change="changePage" @prev-click="changePage" @next-click="changePage"></el-pagination>
                     </div>
                 </div>
@@ -754,20 +757,21 @@
             left: 26px;
             bottom: 0;
             right: 225px;
+            z-index: 1001;
             transition:  all ease .5s;
             min-width: 950px;
             overflow-y: auto;
             #center-selection{
                 position: fixed;
-                top: 106px;
+                top: 115px;
                 // bottom: 0;
-                right: 224px;
+                right: 225px;
                 width: 25px;
                 z-index: 100;
                 transition: all ease .5s;
                 background: #ffffff;
                 .SH_right{
-                    width: 100%;
+                    width: 25px;
                     height: 48px;
                     border-left: 1px solid #cccccc;
                     border-bottom: 1px solid #cccccc;
@@ -801,7 +805,7 @@
                         display: block;
                         position: absolute;
                         bottom: -9px;
-                        width: 23px;
+                        width: 24px;
                         height: 15px;
                         background: #fafafa;
                         border-top: 1px solid #cccccc;
@@ -825,7 +829,7 @@
                         display: block;
                         position: absolute;
                         bottom:-7px;
-                        width: 23px;
+                        width: 24px;
                         height: 13px;
                         background: #fafafa;
                         border-bottom: 1px solid #cccccc;
@@ -849,7 +853,7 @@
                         display: block;
                         position: absolute;
                         bottom:-7px;
-                        width: 23px;
+                        width: 24px;
                         height: 13px;
                         background: #fafafa;
                         border-bottom: 1px solid #cccccc;
@@ -1025,7 +1029,7 @@
                 .projectListText{
                     font-size: 12px;
                     flex: 1;
-                    margin: 0 2px;
+                    margin: 0 0px 0 2px;
                     float: left;
                     text-align: left;
                     position: relative;
@@ -1299,8 +1303,12 @@
                             font-size: 12px;
                             color: #999999;
                             cursor: pointer;
+                            
                         }
-                          .arrow{
+                        :last-child{
+                                margin-right:30px;
+                        }
+                        .arrow{
                             position: relative;
                             &::after{
                                 display: block;
@@ -1335,12 +1343,69 @@
                     text-overflow: ellipsis;
                     max-width: 500px;
                 }
+                /*评论*/
+                .comments{
+                    border: 1px solid #f2f2f2;
+                    background: #fafafa;
+                    margin-top: 12px;
+                    margin-bottom: 20px;
+                    margin-right: 30px;
+                    .comments-item{
+                        border-bottom: none;
+                        .left{
+                            float: left;
+                            width: 40px;
+                            height: 40px;
+                            margin: 20px 10px 20px 16px;
+                            border-radius: 50%;
+                        }
+                        .center{
+                            display: block;
+                            padding-left:65px; 
+                            position: relative;
+                            .icon-delete{
+                                display: inline-block;     
+                                width: 16px;
+                                height: 16px;
+                                background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                position: absolute;
+                                right: 16px;
+                                top: -2px;
+                                cursor: pointer;
+                            }
+                            .head{
+                                height: 14px;
+                                line-height: 14px;
+                                font-size: 12px;
+                                color: #999999;
+                                margin: 30px 0 16px;
+                                overflow: hidden;
+                                :first-child{
+                                    font-size: 14px;
+                                    color: #fc3439;
+                                    cursor: pointer;
+                                    margin-right: 10px;
+                                }
+                                :last-child{
+                                    margin-left: 20px;
+                                }
+                            }
+                            .detial{
+                                border-bottom: 1px dashed #e6e6e6;
+                                font-size: 14px;
+                                color: #666666;
+                                padding-bottom:20px; 
+                            }
+                        }
+                    }
+                }
                 /*流程图*/
                 .flowCharts{
                     border: 1px solid #f2f2f2;
                     background: #fafafa;
                     margin-top: 12px;
                     margin-bottom: 20px;
+                    margin-right: 30px;
                     .flowChart-item{
                         border: none;
                         width: 132px;
@@ -1911,7 +1976,310 @@
         ::-webkit-scrollbar-thumb:window-inactive {
         background:rgba(255,0,0,0.4);
         }
-        /*********************/
+        /**********以下是消息输入框样式***********/
+         .sendmessage{
+            margin: 30px 30px 20px 0;
+            margin-top: 30px;
+            .left{
+                width: 80px;
+                float: left;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    margin: 15px 12px 10px;
+                }
+            }
+            .center{
+                padding-left: 80px;
+                .box{
+                    border: 1px solid #d9d9d9;
+                    .input{
+                        padding: 10px;
+                        .textArea{
+                            textarea{
+                                min-height: 116px;
+                                width: 100%;
+                                // height: auto;
+                                margin: 0px; 
+                                padding: 0px;
+                                border-style: none;
+                                border-width: 0px;
+                                font-size: 14px; 
+                                word-wrap: break-word; 
+                                line-height: 18px; 
+                                // overflow: hidden;
+                                outline: none;
+                                 border: none;
+                                color: #333333;
+                                resize: none;
+                            }
+                        }
+                        ::-webkit-input-placeholder { /* WebKit browsers */
+                            color:    #cccccc;
+                        }
+                        :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+                            color:     #cccccc;
+                        }
+                        ::-moz-placeholder { /* Mozilla Firefox 19+ */
+                            color:    #cccccc;
+                        }
+                        :-ms-input-placeholder { /* Internet Explorer 10+ */
+                            color:   #cccccc;
+                        }
+                    }
+                    .func_area{
+                        padding:15px  0px 0 10px;
+                        background: #f2f2f2;
+                        height: 45px;
+                        border-top: 1px solid #e6e6e6;
+                        position: relative;
+                        .limits{
+                            .cancle{
+                                float: right;
+                                font-size: 14px;
+                                color: #999999;
+                                margin-right: 130px;
+                                text-decoration: none;
+                            }
+                            span{
+                                line-height: 16px;
+                                height: 16px;
+                                float: left;
+                                position: relative;
+                                cursor: pointer;
+                                margin-left: 24px;
+                                margin-right: 20px;
+                                font-size: 12px;
+                                color: #666666;
+                            }
+                            .icon-eye::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 12px;
+                                line-height: 14px;
+                                background: url('./images/eye.png')no-repeat 0 0;
+                                content: '';
+                            }
+                              .icon-image::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 14px;
+                                line-height: 14px;
+                                background: url('./images/image.png')no-repeat 0 0;
+                                content: '';
+                            }
+                              .icon-file::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 16px;
+                                height: 18px;
+                                line-height: 14px;
+                                background: url('./images/file.png')no-repeat 0 0;
+                                content: '';
+                            }
+                              .icon-message::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 15px;
+                                line-height: 14px;
+                                background: url('./images/message.png')no-repeat 0 0;
+                                content: '';
+                            }
+                        }
+                        .send{
+                            display: block;
+                            position: absolute;
+                            top: -1px;
+                            bottom: -1px;
+                            right: -1px;
+                            width: 110px;
+                            background: #fc3439;
+                            color: #ffffff;
+                            text-align: center;
+                            line-height: 45px;
+                            font-size: 14px;
+                            text-decoration: none;
+                        }
+                    }
+                .item-file{
+                        float: left;
+                        width: 290px;
+                        height: 120px;
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 120px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                        }
+                        .actionbox{
+                            display: block;
+                            position: absolute;
+                            bottom: 0;
+                            width: 100%;
+                            height: 36px;
+                            background: rgba(40, 40, 40, .4);
+                            transform: translateY(36px);
+                             transition: all ease .5s;
+                             .button-search{
+                                 float: left;
+                                 margin: 10px 64px;
+                                 width: 16px;
+                                 height: 16px;
+                                 background: url('./images/search2.png')no-repeat 0 0;
+                                 cursor: pointer;
+                             }
+                             .button-download{
+                                float: left;
+                                 margin: 10px 64px;
+                                 width: 16px;
+                                 height: 16px;
+                                 background: url('./images/download2.png')no-repeat 0 0;
+                                cursor: pointer;
+                             }
+                             .line{
+                                float: left;
+                                 margin: 6px 0px;
+                                 width: 1px;
+                                 height: 24px;
+                                 background: #cccccc;
+                             }
+                        }
+                        .checkbox-fileItem{
+                            display:block;
+                            position: absolute;
+                            top: 8px;
+                            left: 8px;
+                            width: 14px;
+                            height: 14px;
+                            border: 1px solid #cccccc;
+                            cursor: pointer;
+                        }
+                        .active{
+                            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                            border: 1px solid #fc3439;
+                        }
+                        .item-file-box{
+                            .item-file-image{
+                                float: left;
+                                margin-top:16px;
+                                width: 70px;
+                                height: 70PX;
+                                border-radius: 50%;
+                                background: #f2f2f2;
+                                img{
+                                    width: 48px;
+                                    height: 48px;
+                                    display: block;
+                                    margin-top: 13PX;
+                                    margin-left: 11px;
+                                } 
+                            }
+                            .item-file-detial{
+                                display: block;
+                                margin-left:80px;
+                                .icon-goujian{
+                                   float: right;
+                                    width: 16px;
+                                    height: 16px;
+                                    cursor: pointer;
+                                }
+                                .icon-download{
+                                    background: url('../ManageCost/images/download.png')no-repeat 0 0;
+                                    margin-right: 20px;
+                                    &:hover{
+                                        background: url('../ManageCost/images/download1.png')no-repeat 0 0;
+                                    }
+                                }
+                                .icon-search{
+                                    background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                                    margin-right: 20px;
+                                    &:hover{
+                                        background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                                    }
+                                } 
+                                >h3{
+                                    text-align: left;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    line-height: 20px;
+                                    margin: 9px 0 8px;
+                                    max-height: 40px;
+                                    overflow: hidden;
+                                }   
+                                >p{
+                                    font-size: 12px;
+                                    line-height: 12px;
+                                    color: #b3b3b3;
+                                    text-align: left;
+                                    margin-bottom:6px; 
+                                }
+                                .text-name{
+                                    color: #336699;
+                                }
+                                .operation{
+                                    display: block;
+                                    position: absolute;
+                                    bottom: 0;
+                                    left: 88px;
+                                    right: 0;
+                                    span{
+                                        color: #fc3439;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .item-file:hover{
+                        box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                        .actionbox{
+                            transform: translateY(0px);
+                            transition: all ease .5s;
+                        }
+                    }
+                }
+            }
+            #edit{
+                position: fixed;
+                z-index: 3001;
+                background: #ffffff;
+            }
+            .hahahha{
+                top: 15vh;
+                left: 50%;
+                width: 660px;
+                margin-left:-330px;
+                border-radius: 5px;
+            }
+            #mask{
+                z-index: 3000;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                opacity: .5;
+                background: #000;
+            }
+        }
     }
 </style>
 <script>
@@ -2067,7 +2435,7 @@ export default {
         contacts:[],//联系人列表数组
         posId:'',//因项目而不同
         pageNo:1,//评论页数
-        pageTotal:0,//评论总页数
+        pageTotal:0,//评论总个数
         projAuth:[],//当前用户的权限列表
         canEditMes:false,//当前用户可以修改消息状态
         canDeleteMes:false,//当前用户可以删除消息
@@ -2076,6 +2444,8 @@ export default {
             val:'2',
             obj:{}
         },
+        CommentList:[],//评论列表
+        goingToSend:false,//用户点击显示弹窗
       }
   },
   created(){
@@ -2090,8 +2460,27 @@ export default {
         vm.getIntoDesignPage()//进入设计协调获取信息
         vm.getPosID()//获取posID，
         vm.checkAuth()//获取posID，
+        vm.getFileTree()
     },
   watch:{
+    //   <!-- options_monomer:[],//单体选项
+    //     options_status:[],//状态选项
+    //     options_about:[],//相关选项 -->
+      value_monomer:function(val){
+            var vm = this 
+            vm.getContacts()
+            vm.getCommunicationList()//获取评论
+      },
+       value_status:function(val){
+            var vm = this 
+            vm.getContacts()
+            vm.getCommunicationList()//获取评论
+      },
+       value_about:function(val){
+            var vm = this 
+            vm.getContacts()
+            vm.getCommunicationList()//获取评论
+      },
       'show.basicAttributes':function(val){
           if(val){
             $("#basicAttributes").show(200);
@@ -2112,30 +2501,82 @@ export default {
       },
       selectUgId:function(val){
             var vm = this 
-            vm.getFileTree()
+            vm.getContacts()
+            vm.getCommunicationList()//获取评论
+            vm.updateLsug()
       },
   },
   methods:{
-      getComment(){
+      SendMes(){
+          var vm = this
+          vm.goingToSend =true
+      },
+      hideSendMes(){
+          var vm = this
+          vm.goingToSend =false
+      },
+      updateLsug(){
         var vm = this
         axios({
             method:'POST',
-            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/updateLsug',
             headers:{
                 'token':vm.token
             },
-        params:{
-            dcStatus:vm.dcStatus.val,//
-            operate:vm.dcStatus.obj.operate,//
-        }
+            params:{
+                projId:vm.projId,
+                ugId:vm.selectUgId
+            }
         }).then((response)=>{
             if(response.data.cd == 0){
-                vm.CommunicationList[vm.dcStatus.obj.index].dcStatus = vm.dcStatus.val
+                
+            }else{
                 vm.$message({
-                    type:'success',
-                    message:'状态修改成功'
+                    type:'error',
+                    message:response.data.msg
                 })
-                vm.dcStatusCancle()
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      getComment(val,index,showResponse,reviewCount){
+        var vm = this
+        if(reviewCount == 0){
+             vm.$message({
+                type:'warning',
+                message:'还没有评论!'
+            })
+            return false
+        }
+        if(showResponse){
+            vm.CommunicationList.forEach((item,key)=>{
+                if(key == index){
+                    item.showFlowChart = false
+                    item.showResponse = !item.showResponse
+                }else{
+                        item.showResponse = false
+                }
+            })
+            return false
+        }
+        axios({
+            method:'POST',
+            url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+val+'/review/list',
+            headers:{
+                'token':vm.token
+            },
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                vm.CommentList = response.data.rt.rows
+                vm.CommunicationList.forEach((item,key)=>{
+                    if(key == index){
+                        item.showFlowChart = false
+                        item.showResponse = !item.showResponse
+                    }else{
+                         item.showResponse = false
+                    }
+                })
             }else{
                 vm.$message({
                     type:'error',
@@ -2149,6 +2590,49 @@ export default {
       changePage(val){
           var vm = this
         vm.getCommunicationList()
+      },
+      /****
+       * @augments
+       * index:评论的key值
+       * key:主题的key值
+      */
+      deleteComment(dcId,dcReviewId,index,key){
+           var vm = this
+          vm.$confirm('您要删除当前评论?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                  axios({
+                        method:'POST',
+                        url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/'+dcId+'/'+dcReviewId+'/1/delete',
+                        headers:{
+                            'token':vm.token
+                        },
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.CommentList.splice(index,1)
+                            vm.CommunicationList[key].reviewCount--
+                            if(vm.CommunicationList[key].reviewCount < 0)vm.CommunicationList[key].reviewCount = 0
+                            vm.$message({
+                                type:'success',
+                                message:'评论删除成功'
+                            })
+                        }else{
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
       },
       deleteMes(dcId,index){
         var vm = this
@@ -2349,6 +2833,8 @@ export default {
                 "userId": vm.userId
             }
         }).then((response)=>{
+            vm.pageTotal = 0
+            vm.CommunicationList = {}
             if(response.data.cd == 0){
                vm.CommunicationList = response.data.rt.rows
                vm.CommunicationList.forEach((item,index)=>{
@@ -2454,8 +2940,6 @@ export default {
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                vm.selectContact.show = false
-                vm.selectContact.obj = {}
                 vm.addUser.show = false
                 vm.addUser.posType = '1'
                 vm.addUser.posName = ''
@@ -2511,8 +2995,53 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    vm.selectContact.show = true
-                    vm.selectContact.obj = response.data.rt
+                    if(response.data.rt != null){
+                        vm.selectContact.show = true
+                        vm.selectContact.obj = response.data.rt
+                    }else{
+                        vm.$confirm('没有找到邮箱为['+vm.addUser.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            axios({
+                                method:'POST',
+                                url:'http://10.252.26.240:8080/h2-bim-project/project2/dc/sendNoRegesterEmail',
+                                headers:{
+                                    'token':vm.token
+                                },
+                                params:{
+                                    email:vm.addUser.posName,
+                                    projId:vm.projId,
+                                }
+                            }).then((response)=>{
+                                if(response.data.cd == 0){
+                                      vm.$message({
+                                        type:'success',
+                                        message:'邮箱为['+vm.addUser.posName+']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的联系人成员'
+                                    })
+                                    vm.selectContact.show = false
+                                    vm.selectContact.obj = {}
+                                    vm.addUser.show = false
+                                    vm.addUser.posType = '1'
+                                    vm.addUser.posName = ''
+                                }else{
+                                    vm.$message({
+                                        type:'error',
+                                        message:response.data.msg
+                                    })
+                                }
+                            }).catch((err)=>{
+                                console.log(err)
+                            })
+                        }).catch(() => {
+                            vm.$message({
+                                type: 'info',
+                                message: '已取消发送邮件'
+                            });          
+                        });
+                    }
+                
                 }else if(response.data.cd == -1){
                     vm.$message({
                         type:'warning',

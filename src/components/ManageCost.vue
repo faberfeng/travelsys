@@ -172,6 +172,7 @@ export default {
                 vm.header.userName = response.data.rt.onlineInfo.userName
                 vm.header.userId = response.data.rt.onlineInfo.userId
                 vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.QJFileManageSystemURL+response.data.rt.onlineInfo.imgUuid:''
+                localStorage.setItem('userImg',vm.header.userImg)
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
