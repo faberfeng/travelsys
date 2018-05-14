@@ -1030,7 +1030,7 @@ export default {
         .editIcon{
             margin-left: 10px;
         }
-        .icon-size::after{
+        .icon-size::before{
             display: block;
             position: absolute;
             right: 12px;
@@ -1040,7 +1040,7 @@ export default {
             color: #333333;
             content: '平方米';
         }
-        .icon-X::after{
+        .icon-X::before{
             display: block;
             position: absolute;
             left: 12px;
@@ -1050,7 +1050,17 @@ export default {
             color: #333333;
             content: 'X=';
         }
-        .icon-Y::after{
+        .icon-X::after,.icon-Y::after,.icon-Z::after{
+            display: block;
+            position: absolute;
+            left: 240px;
+            top: 13px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #333333;
+            content: '米';
+        }
+        .icon-Y::before{
             display: block;
             position: absolute;
             left: 12px;
@@ -1060,7 +1070,7 @@ export default {
             color: #333333;
             content: 'Y=';
         }
-        .icon-Z::after{
+        .icon-Z::before{
             display: block;
             position: absolute;
             left: 12px;
