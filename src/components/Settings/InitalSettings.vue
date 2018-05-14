@@ -137,7 +137,7 @@ export default {
             isShow:true,
             imageName:'未选择任何图片',
             imageType:'',
-            filesList:{},
+            filesList:[],
             token:'',
             projId:'',
             sumaryData:[],//工程概况信息列表
@@ -510,7 +510,6 @@ export default {
 }
 </script>
 <style scoped>
-
     .wrapper{
         width: 100%;
     }
@@ -529,7 +528,6 @@ export default {
         margin: 22px 0 11px 15px;
     }
     .account,.summary,.img{
-        /* width:97%; */
         margin-left: 15px;
         margin-right: 20px;
     }
@@ -576,17 +574,15 @@ export default {
     } 
     .pre span{
         display: inline-block;
-        width: 100px;
+        min-width: 100px;
         height: 40px;
         text-align: right;
         font-size: 14px;
         cursor: pointer;
         color: #999999;
-        font-size: '微软雅黑';
     }
     .pre label,.preDiv{
         color: #333333;
-        font-size: '微软雅黑';
         display: inline-block;
         flex: 1;
         margin-left: 21px;
