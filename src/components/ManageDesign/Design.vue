@@ -101,7 +101,7 @@
                                         <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                             <div class="item-file-box clearfix">
                                                 <span  class="item-file-image">
-                                                    <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
+                                                    <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" />
                                                 </span>
                                                 <span  class="item-file-detial">
                                                     <h3 v-text="val.fileName"></h3>
@@ -156,7 +156,7 @@
                                                                 <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                     <div class="item-file-box clearfix">
                                                                         <span  class="item-file-image">
-                                                                            <img :src="require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png')" />
+                                                                            <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" />
                                                                         </span>
                                                                         <span  class="item-file-detial">
                                                                             <h3 v-text="left.fileName"></h3>
@@ -2885,6 +2885,15 @@ export default {
       },
   },
   methods:{
+      checkIcon(val){
+          var vm = this
+          var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+          if(iconArr.indexOf(val) > -1){
+              return true
+          }else{
+              return false
+          }
+      },
       SendMes(){
           var vm = this
           vm.goingToSend =true
