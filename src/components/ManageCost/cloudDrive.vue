@@ -8,26 +8,18 @@
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class=" label-item">
-                    <router-link :to="'/Drive/costover'">  
-                    最近文档  
-                   </router-link>
-                </span>
-                <span  class="label-item label-item-active">
-                    <router-link :to="'/Drive/cloudDrive'">  
-                    工程云盘  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                <router-link :to="'/Drive/Share'">  
+                <router-link :to="'/Drive/costover'" class=" label-item">  
+                  最近文档  
+                </router-link>
+                <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
+                  工程云盘  
+                </router-link>
+                <router-link :to="'/Drive/Share'" class=" label-item">  
                     已经分享  
                   </router-link>
-                </span>
-                <span  class="label-item">
-                  <router-link :to="'/Drive/PersonalTransit'">  
+                  <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
                     个人中转  
                   </router-link>
-                </span>
                 <div class="item-search" v-if="!showQuanJing">
                     <span class="title-right">
                         <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
@@ -67,13 +59,13 @@
                     <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li>
                     <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="rename">更名</li>
                      <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
-                    <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(false)">复制</li>
+                    <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
                     <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="shareURL">分享</li>
                     <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
                 </ul>
             </p>
             <!--全景图代码-->
-            <div id="planeFigureDiv" v-if="showQuanJing && hasImg">
+            <div id="planeFigureDiv" v-if="showQuanJing">
                 <div  id="planeDIV">
                     <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
                     <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
@@ -187,6 +179,7 @@
                     <span class="item-version-3  " @click="screenLeft.item = 3;getVersion()">版<br>本</span>
                 </div>
             </div>
+            <div id="verticalBar"></div>
             <div v-show="screenLeft.item == 1" class="screenRight_1">
                  <p class="clearfix">
                     <i class="icon-goujian icon-add" title="添加" @click="addFile"></i>
@@ -202,6 +195,8 @@
                     :props="defaultProps"
                     :default-expanded-keys="expandedKeys"
                     highlight-current
+                    @node-expand="nodeClick"
+                    @node-collapse="nodeClickClose"
                     @node-click="handleNodeClick"
                     id="cloudDirveFileTree"
                     >
@@ -308,8 +303,12 @@
                     </h3>
                     <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
                         <li class="detial-item clearfix">
-                            <span class="detial-text-name">选择数量</span>
+                            <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
                             <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
+                            <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
                         </li>
                     </ul>
                 </div>
@@ -595,7 +594,7 @@
         bottom: 0;
         right: 225px;
         transition:  all ease .5s;
-        min-width: 950px;
+        // min-width: 950px;
         overflow-y: auto;
         #planeFigureDiv{
             overflow: auto;
@@ -1111,10 +1110,8 @@
         line-height: 30px;
         cursor: pointer;
         border-top: 3px solid #fafbfc;
-        a{
-            color: #999999;
-            text-decoration: none;
-        }
+        color: #999999;
+        text-decoration: none;
     }
     .label-item-active{
         color: #fc3439;
@@ -1139,13 +1136,23 @@
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        overflow-y: auto;
+            #verticalBar{
+                display: block;
+                position: fixed;
+                right: 225px;
+                bottom: 0;
+                width: 1px;
+                top: 116px;
+                background: #cccccc;
+                z-index: 10;
+            }
            #center-selection{
             position: absolute;
             top: 0;
             bottom: 0;
             left: 0;
             width: 25px;
-            border-right: 1px solid #cccccc;
             .SH_right{
                 width: 100%;
                 height: 48px;
@@ -1175,7 +1182,7 @@
                 color: #666666; 
                 text-align: center;
                 border-left: 1px solid #cccccc;
-                border-right: 1px solid #cccccc;
+                // border-right: 1px solid #cccccc;
                 position: relative;
                 cursor: pointer;
                 &::after{
@@ -1225,7 +1232,7 @@
                 color: #666666; 
                 text-align: center;
                 border-left: 1px solid #cccccc;
-                border-right: 1px solid #cccccc;
+                // border-right: 1px solid #cccccc;
                 position: relative;
                 cursor: pointer;
                 &::after{
@@ -1276,7 +1283,7 @@
                     }
                 }
                 .item-property::after{
-                    background: #fff;
+                    // background: #fff;
                 }
                 .item-version-3{
                     z-index: 10;
@@ -1313,7 +1320,7 @@
             }
             .icon-add{
                 background: url('./images/add.png')no-repeat 0 0;
-                margin-right: 75px;
+                margin-right: 60px;
                 &:hover{
                     background: url('./images/add1.png')no-repeat 0 0;
                 }
@@ -1400,7 +1407,7 @@
             .detial-text-value{
                float: left;
                color: #333333;
-                max-width: 130px;
+                max-width: 120px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1426,7 +1433,7 @@
             }
             .icon-add{
                 background: url('./images/add.png')no-repeat 0 0;
-                margin-right: 75px;
+                margin-right: 60px;
                 &:hover{
                     background: url('./images/add1.png')no-repeat 0 0;
                 }
@@ -1463,8 +1470,9 @@
                 display: inline-block;
             }
             .detial-text-value{
+                display: inline-block;
                 color: #333333;
-                max-width: 130px;
+                max-width: 90px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1701,7 +1709,8 @@ export default {
         checkedFile_Folder:{
             file:false,
             folder:false,
-            fileCheckedNum:0//选中的文件数量，多个文件不可同时更新，更名
+            fileCheckedNum:0,//选中的文件数量，多个文件不可同时更新，更名
+            folderCheckedNum:0//选中 的文件夹数量
         },
         hasFileToPaste:{
             is:false,
@@ -1723,6 +1732,7 @@ export default {
         firstTime:0,
         acceptType:'',//可接受的文件类型
         fileAuthList:[],//文件群组权限列表
+        fullscreenLoading: false,
       }
   },
   created(){
@@ -1754,6 +1764,7 @@ export default {
             vm.show.basicAttributes =true
             vm.show.BindingArtifacts =true
             vm.checkedFile_Folder.fileCheckedNum = vm.fileList.length
+            vm.checkedFile_Folder.folderCheckedNum = vm.folderList.length
           }
       },
       'show.basicAttributes':function(val){
@@ -1781,9 +1792,7 @@ export default {
       selectUgId:function(val){
             var vm = this 
             vm.getFileTree()
-            setTimeout(function(){
-                vm.pointLocationBindClick()
-            },1000)
+            // vm.searchFileGroupInfo()
       },
       checkFileDir:function(val){
           var vm = this
@@ -1833,7 +1842,7 @@ export default {
                     projId: vm.projId,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'目录添加成功'
@@ -1862,7 +1871,7 @@ export default {
                     projId: vm.projId,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'目录修改成功'
@@ -1915,7 +1924,7 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'文件夹删除成功'
@@ -1960,7 +1969,7 @@ export default {
                 dirId:vm.checkFileDir.nodeId, 
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                     vm.fileAuthList = response.data.rt
             }
         }).catch((err)=>{
@@ -2003,10 +2012,10 @@ export default {
                     isSubUse:vm.auth.isSubUse?1:0,//将权限应用到所有子目录
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                       vm.auth.show = false
                       vm.auth.isSubUse = false
-                      vm.getIntoCloudD()
+                      vm.getFileTree()
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -2037,6 +2046,7 @@ export default {
       },
       paste(){
         var vm = this
+        vm.fullscreenLoading = true
         if(vm.hasFileToPaste.obj.shear){//剪切
              axios({
                 method:'POST',
@@ -2051,19 +2061,24 @@ export default {
                     selectFolders: vm.hasFileToPaste.obj.fcIds,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     sessionStorage.removeItem('fileObject')
-                    vm.checkFilePaste()
                     if(vm.showQuanJing){
                         vm.searchFileGroupInfo()
                     }else{
                         vm.getInfo()
                     }
+                    vm.checkFilePaste()
                 }
+                vm.fullscreenLoading = false
             }).catch((err)=>{
                 console.log(err)
             })
         }else{//复制
+            var oldDirId = vm.hasFileToPaste.obj.dirId
+            if(vm.hasFileToPaste.obj.from != ''){
+                oldDirId = ''
+            }
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/pasteTransferStation',
@@ -2077,24 +2092,25 @@ export default {
                     oldUgId:vm.hasFileToPaste.obj.oldUgId, //ugid是群组ID
                     projId: vm.hasFileToPaste.obj.projId,
                     fcIds: vm.hasFileToPaste.obj.fcIds,
-                    oldDirId: vm.hasFileToPaste.obj.dirId,
+                    oldDirId: oldDirId,
                     newDirId:vm.checkFileDir.nodeId,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     sessionStorage.removeItem('fileObject')
-                    vm.checkFilePaste()
                     if(vm.showQuanJing){
                         vm.searchFileGroupInfo()
                     }else{
                         vm.getInfo()
                     }
+                    vm.checkFilePaste()
                 }else{
                     vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
                 }
+                 vm.fullscreenLoading = false
             }).catch((err)=>{
                 console.log(err)
             })
@@ -2106,7 +2122,9 @@ export default {
             if(filePaste){
                 vm.hasFileToPaste.is = true
                 vm.hasFileToPaste.obj = filePaste
-                console.log(vm.hasFileToPaste.obj)
+            }else{
+                vm.hasFileToPaste.is = false
+                vm.hasFileToPaste.obj = {}
             }
       },
       copyfile(val){
@@ -2125,13 +2143,13 @@ export default {
         } else {
             for(var i=0;i<vm.fileList.length;i++){
                 if(vm.fileList[i].checked){
-                    if(vm.fileList[i].isAutoCreated == 1){
-                        vm.$message({
-                            type: 'error',
-                            message: '系统文件，不能操作！'
-                        });  
-                        return false
-                    }
+                    // if(vm.fileList[i].isAutoCreated == 1){
+                    //     vm.$message({
+                    //         type: 'error',
+                    //         message: '系统文件，不能操作！'
+                    //     });  
+                    //     return false
+                    // }
                     if(fgIdList == ''){
                          fgIdList = vm.fileList[i].fgId
                     }else{
@@ -2141,13 +2159,13 @@ export default {
             }
             for(var j=0;j<vm.folderList.length;j++){
                 if(vm.folderList[j].checked){
-                     if(vm.folderList[j].isAutoCreated == 1){
-                        vm.$message({
-                            type: 'error',
-                            message: '系统文件，不能操作！'
-                        });  
-                        return false
-                    }
+                    //  if(vm.folderList[j].isAutoCreated == 1){
+                    //     vm.$message({
+                    //         type: 'error',
+                    //         message: '系统文件，不能操作！'
+                    //     });  
+                    //     return false
+                    // }
                     // 文件夹
                     if(fcIdList == ''){
                          fcIdList = vm.folderList[j].nodeId
@@ -2256,7 +2274,7 @@ export default {
                 type:val
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
                 console.log(response.data.rt.password)
@@ -2283,7 +2301,7 @@ export default {
                 fgName: vm.PointFigure.newname
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 var fileId = []
                 if(vm.showQuanJing){
                     vm.searchFileGroupInfo()
@@ -2378,7 +2396,7 @@ export default {
             },
             data:fgIdList
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 if(vm.showQuanJing){
                     vm.searchFileGroupInfo()
                 }else{
@@ -2474,15 +2492,24 @@ export default {
           }
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
-          if(vm.expandedKeys.indexOf(vm.checkFileDir.nodeId) == -1){
-            vm.expandedKeys.push(vm.checkFileDir.nodeId)
-          }
           if(obj.holderId){
                vm.showQuanJing = true
                vm.searchFileGroupInfo(obj.nodeId)
           }else{
              vm.showQuanJing = false
              vm.getInfo()
+          }
+      },
+      nodeClick(data,node,self){
+          var vm = this
+          if(vm.expandedKeys.indexOf(data.nodeId) == -1){
+            vm.expandedKeys.push(data.nodeId)
+          }
+      },
+      nodeClickClose(data,node,self){
+          var vm = this
+          if(vm.expandedKeys.indexOf(data.nodeId) != -1){
+            vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
           }
       },
       parseMStatus(mStatus){
@@ -2667,9 +2694,9 @@ export default {
                 userGroupId:vm.selectUgId,//目录id
                 projId:vm.projId
             },
-            data:fileId,//文件id
+            data:[fileId],//文件id
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
             }
         }).catch((err)=>{
             console.log(err)
@@ -2722,7 +2749,7 @@ export default {
             //     projId:vm.projId
             // },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                if(response.data.rt.length>0){
                    for(var i= 0;i<response.data.rt.length;i++){
                         url += 'urls='+response.data.rt[i]+'&'
@@ -2753,6 +2780,7 @@ export default {
         vm.show.basicAttributes =true
         vm.show.BindingArtifacts =true
         vm.checkedFile_Folder.fileCheckedNum = 0
+        vm.checkedFile_Folder.folderCheckedNum = 0
         vm.checkedFile_Folder.file = false
         vm.checkedFile_Folder.folder = false
         var fileCheckList = []
@@ -2774,6 +2802,7 @@ export default {
             for(var j=0;j<vm.folderList.length;j++){
                 if(vm.folderList[j].checked){
                     vm.checkedFile_Folder.folder = true
+                    vm.checkedFile_Folder.folderCheckedNum++
                     break
                 }
             }
@@ -2785,11 +2814,13 @@ export default {
                     vm.checkedItem = fileCheckList[0]
                     vm.getGouJianInfo()
                     vm.getVersion()
-                }else if(vm.checkedFile_Folder.fileCheckedNum == vm.fileList.length){
-                    vm.checkAll = true
                 }
             }else{
                 vm.checkedItem = {}
+            }
+            /*判断是否达到全选*/
+            if(vm.checkedFile_Folder.fileCheckedNum == vm.fileList.length &&  vm.checkedFile_Folder.folderCheckedNum == vm.folderList.length){
+                vm.checkAll = true
             }
         }else{//单选
             if(file){
@@ -2807,6 +2838,7 @@ export default {
                 vm.getVersion()
             }else{
                  vm.checkedFile_Folder.folder = true
+                vm.checkedFile_Folder.folderCheckedNum = 1
                 for(var j=0;j<vm.folderList.length;j++){
                     vm.folderList[j].checked = false
                 }
@@ -2821,7 +2853,9 @@ export default {
         vm.checkFileDir = val
         if(vm.expandedKeys.indexOf(val.nodeId) == -1){
             vm.expandedKeys.push(val.nodeId)
-          }
+        }else{
+            vm.expandedKeys.splice(vm.expandedKeys.indexOf(val.nodeId),1)
+        }
         vm.getInfo()
     },
     getVersion(){
@@ -2849,7 +2883,7 @@ export default {
                 docType:vm.docType//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
@@ -2892,7 +2926,7 @@ export default {
                 relaType:1//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
             }
         }).catch((err)=>{
@@ -2911,13 +2945,13 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.ugList = response.data.rt.ugList
                 vm.ugList.forEach((item)=>{
                     if(item.ugId == response.data.rt.selectUgId){
                         vm.$set(item,'checked',true)//设置checked属性，用于文件权限弹窗选择使用
                     }else{
-                    vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
+                         vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
                     }
                 })
                 vm.selectUgId = response.data.rt.selectUgId
@@ -2951,7 +2985,7 @@ export default {
                 'token':vm.token
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
                 vm.checkFileDir = vm.FileTree[0]
@@ -2975,10 +3009,11 @@ export default {
                 "projId": vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                  vm.hasImg = false
                  vm.QJ.imageBackground = {}
                  vm.QJ.point = []
+                 vm.showQuanJing = true
                  response.data.rt.rows.forEach((item)=>{
                      if(item.xAxial == -1 && item.yAxial == -1){
                          vm.QJ.imageBackground = item
@@ -2988,9 +3023,11 @@ export default {
                          vm.QJ.point.push(item)
                      }
                  })
-                setTimeout(function(){
-                    vm.pointLocationBindClick()
-                },1000)
+                 if(vm.hasImg){
+                    setTimeout(function(){
+                        vm.pointLocationBindClick()
+                    },1000)
+                 }
             }
         }).catch((err)=>{
             console.log(err)
@@ -3017,7 +3054,8 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
+                vm.fileList = []
                 if(response.data.rt.rows.length>0){
                     if(vm.fileSearchInfo != ''){
                         vm.fileList = response.data.rt.rows
@@ -3058,7 +3096,8 @@ export default {
                     condition:vm.fileSearchInfo,//文件名称
                 }
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
+                    vm.folderList = []
                     if(response.data.rt.length>0){
                         vm.folderList = response.data.rt
                         vm.folderList.forEach((item,key)=>{
@@ -3131,7 +3170,7 @@ export default {
                                 "yAxial": ui.position.top,
                             }
                         }).then((response)=>{
-                            if(response.data.cd == 0){
+                            if(Math.ceil(response.data.cd) == 0){
                             }
                         }).catch((err)=>{
                             console.log(err)

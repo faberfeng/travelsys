@@ -2,26 +2,18 @@
 <div id="cloudDrive">
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class=" label-item">
-                    <router-link :to="'/Drive/costover'">  
-                    最近文档  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                    <router-link :to="'/Drive/cloudDrive'">  
-                    工程云盘  
-                   </router-link>
-                </span>
-                <span  class="label-item label-item-active">
-                <router-link :to="'/Drive/Share'">  
+                <router-link :to="'/Drive/costover'" class=" label-item">  
+                 最近文档  
+                </router-link>
+                <router-link :to="'/Drive/cloudDrive'" class=" label-item">  
+                 工程云盘  
+                </router-link>
+                <router-link :to="'/Drive/Share'" class="label-item label-item-active">  
                     已经分享  
-                  </router-link>
-                </span>
-                <span  class="label-item">
-                  <router-link :to="'/Drive/PersonalTransit'">  
-                    个人中转  
-                  </router-link>
-                </span>
+                </router-link>
+                <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
+                  个人中转  
+                </router-link>
                 <div class="item-search">
                     <span class="title-right">
                         <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
@@ -1014,10 +1006,8 @@
         line-height: 30px;
         cursor: pointer;
         border-top: 3px solid #fafbfc;
-        a{
-            color: #999999;
-            text-decoration: none;
-        }
+        color: #999999;
+        text-decoration: none;
     }
     .label-item-active{
         color: #fc3439;
@@ -1042,6 +1032,7 @@
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        overflow-y: auto;
            #center-selection{
             position: absolute;
             top: 0;
@@ -1757,7 +1748,7 @@ export default {
                     shareIdList:shareIdList
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                      if(vm.shareIdList.length==0){
                          vm.getIntoShareList()
                      }else{
@@ -1840,7 +1831,7 @@ export default {
                     projId: vm.projId,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'目录添加成功'
@@ -1868,7 +1859,7 @@ export default {
                     projId: vm.projId,
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'目录修改成功'
@@ -1906,7 +1897,7 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
                         message:'文件夹删除成功'
@@ -1974,7 +1965,7 @@ export default {
                 type:val
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
                 console.log(response.data.rt.password)
@@ -2195,7 +2186,7 @@ export default {
                 projId:vm.projId
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                if(response.data.rt.length>0){
                    for(var i= 0;i<response.data.rt.length;i++){
                         url += 'urls='+response.data.rt[i]+'&'
@@ -2333,7 +2324,7 @@ export default {
                 docType:vm.docType//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
                 console.log( vm.versionItem)
             }
@@ -2363,7 +2354,7 @@ export default {
                 relaType:1//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
             }
         }).catch((err)=>{
@@ -2382,7 +2373,7 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.selectUgId = response.data.rt.selectUgId
                 vm.getInfo()
             }
@@ -2409,7 +2400,7 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 if(response.data.rt != null){
                     vm.fgList = response.data.rt
                     vm.fgList.forEach((item,key)=>{
@@ -2447,7 +2438,7 @@ export default {
                 vm.fgList = []
                 vm.folderList = []
                 vm.fileList = []
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     if(response.data.rt.rows.length>0){
                         response.data.rt.rows.forEach((item,key)=>{
                             vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
@@ -2491,7 +2482,7 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                  vm.fileList = []
                 if(response.data.rt.rows.length>0){
                     vm.fileList = response.data.rt.rows
@@ -2521,7 +2512,7 @@ export default {
                     parDirId:vm.checkFileDir.nodeId,
                 }
             }).then((response)=>{
-                if(response.data.cd == 0){
+                if(Math.ceil(response.data.cd) == 0){
                     if(response.data.rt.length>0){
                         vm.folderList = response.data.rt
                         vm.folderList.forEach((item,key)=>{

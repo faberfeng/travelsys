@@ -2,26 +2,18 @@
 <div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class=" label-item">
-                    <router-link :to="'/Drive/costover'">  
-                    最近文档  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                    <router-link :to="'/Drive/cloudDrive'">  
-                    工程云盘  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                <router-link :to="'/Drive/Share'">  
+                <router-link :to="'/Drive/costover'" class=" label-item">  
+                最近文档  
+                </router-link>
+                <router-link :to="'/Drive/cloudDrive'" class=" label-item">  
+                工程云盘  
+                </router-link>
+                <router-link :to="'/Drive/Share'" class=" label-item">  
                     已经分享  
                   </router-link>
-                </span>
-                <span  class="label-item label-item-active">
-                  <router-link :to="'/Drive/PersonalTransit'">  
+                  <router-link :to="'/Drive/PersonalTransit'" class="label-item label-item-active">  
                     个人中转  
                   </router-link>
-                </span>
                 <div class="item-search">
                     <span class="title-right">
                         <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
@@ -34,7 +26,7 @@
                     <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
                     <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                     <ul class="operation">
-                        <li class="item icon icon-paste"  @click="paste" v-if="hasFileToPaste.is">粘贴</li>
+                        <li class="item icon icon-paste"  @click="paste" v-if="hasFileToPaste.is" v-loading.fullscreen.lock="fullscreenLoading">粘贴</li>
                         <li class="item icon icon-copy" v-if="checkOne" @click="copyfile()">复制</li>
                         <li class="item icon icon-delete"  @click="deleteFile">删除</li>
                     </ul>
@@ -518,10 +510,8 @@
         line-height: 30px;
         cursor: pointer;
         border-top: 3px solid #fafbfc;
-        a{
-            color: #999999;
-            text-decoration: none;
-        }
+        color: #999999;
+        text-decoration: none;
     }
     .label-item-active{
         color: #fc3439;
@@ -594,7 +584,8 @@ export default {
             is:false,
             obj:{}
         },//session存在可以粘贴的文件
-        checkOne:false
+        checkOne:false,
+        fullscreenLoading:false,
       }
   },
   created(){
@@ -637,6 +628,7 @@ export default {
   methods:{
       paste(){
         var vm = this
+        vm.fullscreenLoading = true
         axios({
             method:'POST',
             url:vm.BDMSUrl+'project2/doc/addFileToTransfer',
@@ -650,11 +642,12 @@ export default {
                 projId: vm.projId,
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 sessionStorage.removeItem('fileObject')
-                vm.checkFilePaste()
                 vm.getInfo()
             }
+            vm.checkFilePaste()
+            vm.fullscreenLoading = false
         }).catch((err)=>{
             console.log(err)
         })
@@ -664,26 +657,30 @@ export default {
             vm.hasFileToPaste.is = false
             vm.hasFileToPaste.obj = {}
             var filePaste = JSON.parse(sessionStorage.getItem('fileObject'))
-             vm.hasFileToPaste.is = true
-            if(filePaste){//不能 粘贴 剪切的文件
-                vm.hasFileToPaste.obj = filePaste
-                for(var i=0;i<filePaste.length;i++){
-                    if(!filePaste[i].shear || !filePaste[i].fcIds == ''){
-                         vm.hasFileToPaste.is = false
-                         break;
-                    }
+            /***
+             * @param    fileObject = {
+                fgIds: fgIdList,
+                dirId: vm.checkFileDir.nodeId,//当前文件夹ID
+                oldUgId:vm.selectUgId, //ugid是群组ID
+                projId: vm.projId,
+                fcIds: fcIdList
+             };
+             * 
+             * **/
+            if(filePaste){//不能 粘贴 剪切的文件 ,不支持剪切
+                if(filePaste.shear || filePaste.fcIds != '' || filePaste.from != ''){
+                    vm.hasFileToPaste.is = false
+                    vm.hasFileToPaste.obj ={}
+                }else{
+                    vm.hasFileToPaste.obj = filePaste
+                    vm.hasFileToPaste.is = true
                 }
             }
       },
-      copyfile(val){
+      copyfile(){
         // 复制内容到剪贴板
         var vm = this
-        var msg = ''
-        if(val){
-            msg = '剪切'
-        }else{
-             msg = '复制'    
-        }
+        var msg = '复制'
         var fileObject = {}
         var fgIdList = ''
         var dirId = ''
@@ -708,7 +705,8 @@ export default {
                 oldUgId:'', //ugid是群组ID
                 projId: vm.projId,
                 fcIds: '',
-                shear:val?true:false
+                shear:false,
+                from:'PersonalTransit'//来自个人中转
             }
             sessionStorage.setItem("fileObject", JSON.stringify(fileObject)); 
             vm.$message({
@@ -897,7 +895,7 @@ export default {
             },
             data:fgIdList
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.getInfo()
                 vm.$message({
                     type:'success',
@@ -957,7 +955,7 @@ export default {
                 docType:''//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
                 console.log( vm.versionItem)
             }
@@ -978,7 +976,7 @@ export default {
                 relaType:1//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
             }
         }).catch((err)=>{
@@ -1024,7 +1022,7 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.getInfo()
             }
         }).catch((err)=>{
@@ -1043,7 +1041,7 @@ export default {
                 condition:vm.fileSearchInfo,//文件名称
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 if(response.data.rt.length>0){
                     vm.fileList = response.data.rt
                     vm.fileList.forEach((item,key)=>{

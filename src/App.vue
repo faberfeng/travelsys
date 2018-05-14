@@ -69,6 +69,9 @@ export default {
   padding: 0;
   margin: 41px 0 33px 0;
 }
+.el-dialog__footer{
+  text-align: center!important;
+}
 #inital .el-dialog__body{
   padding:30px 0 0px 0;
 }

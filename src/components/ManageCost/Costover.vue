@@ -2,26 +2,18 @@
 <div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div id="item-box-file">
-                <span  class="label-item-active label-item">
-                    <router-link :to="'/Drive/costover'">  
-                    最近文档  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                    <router-link :to="'/Drive/cloudDrive'">  
-                    工程云盘  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                <router-link :to="'/Drive/Share'">  
+                <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
+                 最近文档  
+                </router-link>
+                <router-link :to="'/Drive/cloudDrive'" class="label-item">  
+                 工程云盘  
+                </router-link>
+                <router-link :to="'/Drive/Share'" class="label-item">  
                     已经分享  
-                  </router-link>
-                </span>
-                <span  class="label-item">
-                  <router-link :to="'/Drive/PersonalTransit'">  
+                </router-link>
+                <router-link :to="'/Drive/PersonalTransit'" class="label-item">  
                     个人中转  
-                  </router-link>
-                </span>
+                </router-link>
                 <div class="item-search">
                     <span class="title-right">
                         <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
@@ -557,10 +549,8 @@
         line-height: 30px;
         cursor: pointer;
         border-top: 3px solid #fafbfc;
-        a{
-            color: #999999;
-            text-decoration: none;
-        }
+        color: #999999;
+        text-decoration: none;
     }
     .label-item-active{
         color: #fc3439;
@@ -585,6 +575,7 @@
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        overflow-y: auto;
           #center-selection{
            position: absolute;
             top: 0;
@@ -1267,7 +1258,7 @@ export default {
                 docType:''//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
@@ -1291,7 +1282,7 @@ export default {
                 relaType:1//获取是1
             },
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
             }
         }).catch((err)=>{
@@ -1342,7 +1333,7 @@ export default {
                 projId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
+            if(Math.ceil(response.data.cd) == 0){
                 if(response.data.rt.rows.length>0){
                     if(vm.fileSearchInfo != ''){
                         vm.fileList = response.data.rt.rows
