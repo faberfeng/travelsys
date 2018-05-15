@@ -21,7 +21,7 @@
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>
-                            <label :class="[newStmt?'active':'','checkbox-fileItem']" :id="iscomment?'allfile':('conmment'+keycomment)" ></label>
+                            <label :class="[newStmt?'active':'','checkbox-fileItem']" :for="iscomment?'allfile':('conmment'+keycomment)" ></label>
                             <input type="checkbox" :id="iscomment?'allfile':('conmment'+keycomment)" class="el-checkbox__original" v-model="newStmt">
                              <label :class="[checked?'active':'','checkbox-fileItem_same']" v-if="!iscomment" :for="'sameTime'+keycomment" ></label>
                             <input type="checkbox" :id="'sameTime'+keycomment"  v-if="!iscomment"  class="el-checkbox__original" v-model="checked">

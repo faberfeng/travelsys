@@ -200,6 +200,9 @@
                     @node-click="handleNodeClick"
                     id="cloudDirveFileTree"
                     >
+                     <span :class="['custom-tree-node','el-tree-node__label',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'">
+                         <span>hsahshhsdahha</span>
+                     </span>
                     </el-tree>
                 </div>
             </div>
@@ -433,9 +436,13 @@
     }
     .el-tree-node__label{
         font-size: 12px;
+        min-height: 16px;
         color: #666666;
         padding-left: 22px; 
         position: relative;
+    }
+    .qjLeaf{
+        font-weight: bold;
     }
     .el-icon-caret-right:before{
            content: "\E604";
@@ -457,7 +464,7 @@
     }
     .is-current .el-tree-node__content{
         color: #333333;
-        font-weight: bold;
+        // font-weight: bold;
     }
     *{
         margin: 0;
@@ -2068,7 +2075,13 @@ export default {
                     }else{
                         vm.getInfo()
                     }
+                    vm.getFileTree()
                     vm.checkFilePaste()
+                }else{
+                     vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
                 }
                 vm.fullscreenLoading = false
             }).catch((err)=>{
@@ -2103,6 +2116,7 @@ export default {
                     }else{
                         vm.getInfo()
                     }
+                    vm.getFileTree()
                     vm.checkFilePaste()
                 }else{
                     vm.$message({
@@ -2484,6 +2498,7 @@ export default {
       handleNodeClick(obj){
           var vm = this
           vm.firstTime++
+          console.log(obj)
           if(!obj.children){
             vm.$message({
                 type:'info',

@@ -1,5 +1,5 @@
 <template>
-<div id="DesignManagement">
+<div id="DesignManagement" v-loading.fullscreen.lock="fullscreenLoading">
         <div id="GroupSelect">
             <select v-model="selectUgId" class="inp-search">
                 <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
@@ -96,7 +96,7 @@
                                         <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
                                     </span>
                                     <p class="projectListTextName">{{item.createUserAccount}}</p>
-                                    <p class="font-color1">{{item.dcContent}}</p>
+                                    <p class="font-color1" v-html="item.dcContent"></p>
                                     <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
                                         <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                             <div class="item-file-box clearfix">
@@ -128,7 +128,7 @@
                                         <i class="icon-time"></i>{{initData(item.createTime)}}<label>{{item.from}}</label>
                                         <span class="action">
                                             <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
-                                            <span v-text="checkStatus(item.dcStatus)" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
+                                            <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                             <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
                                             <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false)" :class="item.showResponse?'arrow':''"></span>
                                             <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
@@ -191,7 +191,7 @@
                                             <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
                                                 <div class="top">
                                                     <span class="horizontalLineL"></span>
-                                                    <span  class="redSpot"></span>
+                                                    <span  :class="[val.nodeType == 1?'circle':'',val.nodeType == 2?'square':'',val.nodeType == 3?'diamond':'']"></span>
                                                     <span  class="horizontalLineR"></span>
                                                 </div>
                                                 <p v-text="val.userName+val.dcStatus" class="title_"></p>
@@ -236,11 +236,11 @@
                     id="cloudDirveFileTree"
                     :class="[showAction?'':'noTop']"
                 >
-                <span :class="['custom-tree-node','el-tree-node__label',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
+                <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                 </el-tree>
             </div>
             <div id="box-right" v-else-if="screenLeft.item == 2">
-                <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;">
+                <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;" v-if="hasAuthDelUser">
                     <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i>
                 </p>
                 <ul class="container-contacts">
@@ -251,7 +251,7 @@
                             <p v-text="item.account"></p>
                         </span>
                         <i class="icon-ditial" title="详情" @click="ckeckUserInfo(item.id)"></i>
-                        <i class="icon-del" title="删除" @click="deleteContact(item.id,item.userId)"></i>
+                        <i class="icon-del" title="删除" @click="deleteContact(item.id,item.userId)" v-if="hasAuthDelUser"></i>
                     </li>
                 </ul>
             </div>
@@ -440,6 +440,7 @@
         /*
             修改eleUI树形组件
         */
+        
         .el-tree-node:focus .el-tree-node__content{
             background-color: transparent;
         }
@@ -1783,7 +1784,6 @@
                             line-height: 12px;
                         }
                          .top{
-                            height: 8px;
                             width: 100%;
                             margin: 20px 0 6px;
                             text-align: center;
@@ -1792,27 +1792,57 @@
                             .horizontalLineL{
                                 display: block;
                                 position: absolute;
-                                top: 4px;
+                                top: 10px;
                                 left: 0;
-                                width: 57px;
-                                height: 1px;
-                                background: #d9d9d9;
+                                width: 55px;
+                                height: 2px;
+                                background: #219b21;
+                                z-index: 1;
                             }
-                            .redSpot{
-                                display: inline-block;
-                                width: 8px;
-                                height: 8px;
-                                background: #fc3439;
-                                border-radius: 50%;
+                            .circle{
+                                background-color: #fff;
+                                display: block;
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 12px;
+                                /* background-color: #efefef; */
+                                border: 2px #219b21 solid;
+                                -webkit-border-radius: 12px;
+                                margin: 5px auto;
+                                z-index: 2;
+                            }
+                            .diamond{
+                                display: block;
+                                width: 22px;
+                                height: 22px;
+                                border: 2px #219b21 solid;
+                                background-color: #fff;
+                                margin: 6px auto;
+                                -webkit-transform: rotate(-45deg);
+                                -moz-transform: rotate(-45deg);
+                                -o-transform: rotate(-45deg);
+                                -ms-transform: rotate(-45deg);
+                                transform: rotate(-45deg);
+                                z-index: 2;
+                            }
+                            .square{
+                                background-color: #fff;
+                                display: block;
+                                width: 22px;
+                                height: 22px;
+                                border: 2px #219b21 solid;
+                                margin: 6px auto;
+                                z-index: 2;
                             }
                             .horizontalLineR{
                                 display: block;
                                 position: absolute;
-                                top: 4px;
+                                top: 10px;
                                 right: 0;
-                                width: 57px;
-                                height: 1px;
-                                background: #d9d9d9;
+                                width: 55px;
+                                height: 2px;
+                                z-index: 1;
+                                background: #219b21;
                             }
                         }
                         &:first-of-type {
@@ -2823,6 +2853,9 @@ export default {
         CommentList:[],//评论列表
         goingToSend:false,//用户点击显示弹窗
         siteHolderId:'',//holderID
+        fullscreenLoading:false,
+        entType:'',
+        hasAuthDelUser:false,
       }
   },
   created(){
@@ -2833,6 +2866,10 @@ export default {
         vm.entId = localStorage.getItem('entId')
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.projAuth = localStorage.getItem('projAuth')
+        vm.entType = localStorage.getItem('entType')
+        if(vm.projAuth.indexOf("00400205") > 0 || vm.entType == 1){
+            vm.hasAuthDelUser = true
+        }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoDesignPage()//进入设计协调获取信息
@@ -3066,6 +3103,7 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 vm.CommunicationList[vm.dcStatus.obj.index].dcStatus = vm.dcStatus.val
+                vm.$set(vm.CommunicationList[vm.dcStatus.obj.index],'statusText',vm.checkStatus(vm.dcStatus.val))
                 vm.$message({
                     type:'success',
                     message:'状态修改成功'
@@ -3113,7 +3151,8 @@ export default {
                 }
                 }).then((response)=>{
                     if(response.data.cd == 0){
-                        vm.CommunicationList[index].dcStatus = dcStatus
+                        vm.$set(vm.CommunicationList[index],'dcStatus',dcStatus)
+                        vm.$set(vm.CommunicationList[index],'statusText',vm.checkStatus(dcStatus))
                         vm.$message({
                             type:'success',
                             message:'状态修改成功'
@@ -3179,7 +3218,7 @@ export default {
         checkStatus(val){
             var status = "正在处理"
             if(val){
-                switch(val){
+                switch(Math.ceil(val)){
                     case 1:
                         status ="正在处理"
                         break;
@@ -3221,6 +3260,7 @@ export default {
                vm.CommunicationList.forEach((item,index)=>{
                    vm.$set(item,'showFlowChart',false)
                    vm.$set(item,'showResponse',false)
+                   vm.$set(item,'statusText',vm.checkStatus(item.dcStatus))
                })
                vm.pageTotal = response.data.rt.pager.totalSize
             }else{
@@ -3303,6 +3343,7 @@ export default {
       },
       SelectConfirm(){
         var vm = this
+        vm.fullscreenLoading = true
         axios({
             method:'POST',
             url:vm.BDMSUrl+'project2/dc/addDcProjectUser',
@@ -3324,17 +3365,20 @@ export default {
                 vm.addUser.show = false
                 vm.addUser.posType = '1'
                 vm.addUser.posName = ''
-            }else if(response.data.cd == -1){
+                vm.selectContact.show = false
+                vm.selectContact.obj = {}
                 vm.$message({
-                    type:'warning',
-                    message:response.data.msg
+                    type:'success',
+                    message:'联系人添加成功!'
                 })
+                vm.getContacts()
             }else{
                   vm.$message({
                     type:'error',
                     message:response.data.msg
                 })
             }
+            vm.fullscreenLoading = false
         }).catch((err)=>{
             console.log(err)
         })
@@ -3344,8 +3388,13 @@ export default {
         vm.selectContact.show = false
         vm.selectContact.obj = {}
       },
+      trim(str){ 
+        /**去掉字符串前后所有空格*/
+        return str.replace(/(^\s*)|(\s*$)/g, ""); 
+      },
       searchUser(){
           var vm = this
+          vm.addUser.posName = vm.trim(vm.addUser.posName)
           if(vm.addUser.posName != ''){
               if(vm.addUser.posType == '1'){
                 var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
@@ -3380,46 +3429,59 @@ export default {
                         vm.selectContact.show = true
                         vm.selectContact.obj = response.data.rt
                     }else{
-                        vm.$confirm('没有找到邮箱为['+vm.addUser.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '提示', {
+                        var warmMes = ''
+                        if(vm.addUser.posType == '2'){//1是邮箱
+                            warmMes = '没有找到账号为['+vm.addUser.posName+']的用户记录。请采用邮箱的方式添加联系人。'
+                        }else{
+                            warmMes = '没有找到邮箱为['+vm.addUser.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?'
+                        }
+                        vm.$confirm(warmMes, '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
                             type: 'warning'
                         }).then(() => {
-                            axios({
-                                method:'POST',
-                                url:vm.BDMSUrl+'project2/dc/sendNoRegesterEmail',
-                                headers:{
-                                    'token':vm.token
-                                },
-                                params:{
-                                    email:vm.addUser.posName,
-                                    projId:vm.projId,
-                                }
-                            }).then((response)=>{
-                                if(response.data.cd == 0){
-                                      vm.$message({
-                                        type:'success',
-                                        message:'邮箱为['+vm.addUser.posName+']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的联系人成员'
-                                    })
-                                    vm.selectContact.show = false
-                                    vm.selectContact.obj = {}
-                                    vm.addUser.show = false
-                                    vm.addUser.posType = '1'
-                                    vm.addUser.posName = ''
-                                }else{
-                                    vm.$message({
-                                        type:'error',
-                                        message:response.data.msg
-                                    })
-                                }
-                            }).catch((err)=>{
-                                console.log(err)
-                            })
+                            if(vm.addUser.posType == '1'){
+                                axios({
+                                    method:'POST',
+                                    url:vm.BDMSUrl+'project2/dc/sendNoRegesterEmail',
+                                    headers:{
+                                        'token':vm.token
+                                    },
+                                    params:{
+                                        email:vm.addUser.posName,
+                                        projId:vm.projId,
+                                    }
+                                }).then((response)=>{
+                                    if(response.data.cd == 0){
+                                        vm.$message({
+                                            type:'success',
+                                            message:'邮箱为['+vm.addUser.posName+']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的联系人成员'
+                                        })
+                                        vm.selectContact.show = false
+                                        vm.selectContact.obj = {}
+                                        vm.addUser.show = false
+                                        vm.addUser.posType = '1'
+                                        vm.addUser.posName = ''
+                                    }else{
+                                        vm.$message({
+                                            type:'error',
+                                            message:response.data.msg
+                                        })
+                                    }
+                                }).catch((err)=>{
+                                    console.log(err)
+                                })
+                            }else{
+                                vm.addUser.posType = '1'
+                            }
                         }).catch(() => {
-                            vm.$message({
-                                type: 'info',
-                                message: '已取消发送邮件'
-                            });          
+                            if(vm.addUser.posType == '1'){//1是邮箱
+                                vm.$message({
+                                    type: 'info',
+                                    message: '已取消发送邮件'
+                                }); 
+                            }
+                                     
                         });
                     }
                 
