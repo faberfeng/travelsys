@@ -1,19 +1,27 @@
 <template>
-      <div v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}">
+      <div v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}"  v-loading.fullscreen.lock="fullscreenLoading">
           <div class="left" v-if="iscomment">
               <img :src="userImg" alt="" >
           </div>
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <!-- <textarea  title="发布新主题"  placeholder="发布新主题" @change="trimSpacesAndUppercase($event)" class="textArea"></textarea> -->
-                        <el-input
+                        <!-- <el-input
                              class="textArea"
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 14}"
-                            placeholder="发布新主题"
+                            :placeholder="iscomment?'发布新主题':'发布新回复'"
+                            :autofocus="true"
+                            @keyup.shift="showChange"
                             v-model="message">
-                        </el-input>
+                        </el-input> -->
+                        <textarea   @keyup.shift="showChange"  class="textArea" id="aaaaa" :placeholder="iscomment?'发布新主题':'发布新回复'" v-model="message"></textarea>
+                        <div id="userSelectBox" v-if="showUserSelectBox">
+                            <ul>
+                                <li class="tit">选择最近@的人或直接输入</li>
+                                <li class="tit" v-for="(val,key) in users" :key="key" v-text="val.userName" @click="initName(val.userName)"></li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="func_area">
                         <div class="limits">
@@ -99,11 +107,11 @@
                     </button>
                 </div>
                 <div class="el-dialog__body" style="margin-left:40px;margin-right:40px;">
-                    <div class="editBody">
+                    <div class="editBody" style="max-height: 402px;overflow-y: auto;">
                         <table class="UserList" width='100%'>
                             <thead>
                                 <tr  class="userList-thead">
-                                    <th style="min-width:428px;">文件名</th>
+                                    <th style="min-width:428px;">短语</th>
                                     <th style="width:50px;">操作</th>
                                 </tr>
                             </thead>
@@ -162,10 +170,12 @@ export default Vue.component('common-upload',{
             ShortStateMent:{
                 show:false,
                 obj:[],//短语列表
-            }
+            },
+            fullscreenLoading:false,
+            showUserSelectBox:false,
         }
     },
-    props:['showBox','selectugid','holderid','iscomment','keycomment','dcid'],
+    props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout','users'],
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
@@ -177,6 +187,15 @@ export default Vue.component('common-upload',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
     },
     methods:{
+        initName(name){
+            var vm = this
+            vm.message = vm.message + name+' '
+            vm.showUserSelectBox = false
+        },
+        showChange(value){
+            var vm = this
+            vm.showUserSelectBox = true
+        },
         checkItem(index){
             var vm = this
             vm.ShortStateMent.obj.forEach((item,key)=>{
@@ -324,8 +343,13 @@ export default Vue.component('common-upload',{
                 console.log(err)
             })
         },
+         trim(str){ 
+            /**去掉字符串前后所有空格*/
+            return str.replace(/(^\s*)|(\s*$)/g, ""); 
+        },
         sendInfo(){
             var vm = this
+            vm.message = vm.trim(vm.message)
             if(vm.message == ''){
                 vm.$message({
                     type:'error',
@@ -370,6 +394,18 @@ export default Vue.component('common-upload',{
                         dcId: vm.dcid,
                         rvContent: vm.message
                     },
+                    dcSearchCondition: {
+                        builderId: vm.valuemonomer,//单体
+                        pageNo: 0,//固定为0
+                        pageSize: 0,//固定为0
+                        pageType: 0,//固定为0
+                        projId: vm.projId,
+                        status: vm.valuestatus,//状态 筛选
+                        subProjId: vm.defaultSubProjId,
+                        type: vm.valueabout,//相关 筛选
+                        ugId: vm.selectugid,
+                        userId: vm.userId
+                    },
                     vpList: [],
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
@@ -377,6 +413,7 @@ export default Vue.component('common-upload',{
                 }
                 var url = '/project2/dc/'+vm.dcid+'/review/add'
             }
+            vm.fullscreenLoading = true
              axios({
                 method:'POST',
                 url:vm.BDMSUrl+url,//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
@@ -389,15 +426,25 @@ export default Vue.component('common-upload',{
                     if(vm.iscomment){
                          vm.$emit('refresh')
                     }else{
-                         vm.$emit('refreshcomment')
+                        if(vm.checked){
+                            vm.$emit('refreshcomment',response.data.rt)
+                        }else{
+                            vm.$emit('refreshcomment',null)
+                        }
+                       vm.checked = false
                     }
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
                     vm.message = ''
                     vm.newStmt = false
-                    vm.$refs.file.value = ''
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
                 }
+                vm.fullscreenLoading = false
             }).catch((err)=>{
                 vm.imageName ='未选择任何文件'
                 console.log(err)
@@ -464,6 +511,8 @@ export default Vue.component('common-upload',{
 <style lang="less" scoped>
     
     .UserList{
+        max-height: 402px;
+        overflow-y: auto;
         border-collapse: collapse;
         border: 1px solid #e1e1e1;
         thead{

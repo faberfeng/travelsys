@@ -2698,6 +2698,12 @@ export default {
     },
     latestFile(fileId,log){
         var vm = this
+        console.log(fileId)
+        if(typeof(fileId) == 'number'){
+            var arr = []
+            arr.push(fileId)
+            fileId = arr
+        }
         axios({
             method:'POST',
             url:vm.BDMSUrl+'project2/doc/latestFile',
@@ -2709,7 +2715,7 @@ export default {
                 userGroupId:vm.selectUgId,//目录id
                 projId:vm.projId
             },
-            data:[fileId],//文件id
+            data:fileId,//文件id
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
             }

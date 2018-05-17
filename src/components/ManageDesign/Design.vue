@@ -80,7 +80,7 @@
                         </li>
                     </ul>
                 </div>
-                <sendMes :showBox="'true'" :iscomment="true" :selectugid="selectUgId" :holderid="siteHolderId" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
+                <sendMes :showBox="'true'" :iscomment="true" :users="contacts" :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
                  <div class="project">
                     <ul class="projectList">
                         <li v-for="(item,index) in CommunicationList" :key="index">
@@ -95,7 +95,7 @@
                                         <span class="icon-start" v-if="canEditMes && item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
                                         <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
                                     </span>
-                                    <p class="projectListTextName">{{item.createUserAccount}}</p>
+                                    <p class="projectListTextName">{{item.createUserStr}}</p>
                                     <p class="font-color1" v-html="item.dcContent"></p>
                                     <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
                                         <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
@@ -130,14 +130,15 @@
                                             <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
                                             <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                             <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false)" :class="item.showResponse?'arrow':''"></span>
+                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="item.showResponse?'arrow':''"></span>
                                             <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
                                         </span>
                                     </p>
                                      <!--下面是评论的代码-->
                                     <div class="comments" v-if="item.showResponse">
-                                        <sendMes :showBox="'true'" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
-                                          v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true)"></sendMes>
+                                        <sendMes :showBox="(item.dcStatus == 1)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
+                                        :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  :users="contacts" 
+                                          v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                         <ul >
                                             <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
                                                 <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
@@ -149,7 +150,7 @@
                                                         <span v-text="val.fromIn"></span>
                                                     </p>
                                                     <div class="detial">
-                                                        {{val.rvContent}}
+                                                        <div v-html="val.rvContent"></div>
                                                     <!--下面是文件图片的代码-->
                                                         <div>
                                                             <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
@@ -1011,6 +1012,7 @@
                                     border:none;
                                     width: 100px;
                                     color:#333333;
+                                    height: 38px;
                                 }
                             }
                            
@@ -2384,8 +2386,8 @@
                     .input{
                         padding: 10px;
                         background: #ffffff;
+                        position: relative;
                         .textArea{
-                            textarea{
                                 min-height: 116px;
                                 width: 100%;
                                 // height: auto;
@@ -2401,6 +2403,29 @@
                                  border: none;
                                 color: #333333;
                                 resize: none;
+                        }
+                        #userSelectBox{
+                            position: absolute;
+                            top: 100px;
+                            left: 200px;
+                            display: block;
+                            width: 226px;
+                            height: auto;
+                            border: 1px solid #cccccc;
+                            z-index: 10;
+                            .tit{
+                                width: auto;
+                                height: 24px;
+                                line-height: 24px;
+                                background-color: #fff;
+                                padding: 0 10px;
+                                color: #666666;
+                                font-size: 14px;
+                                 background: #ffffff;
+                                 cursor: pointer;
+                                &:hover{
+                                    background: #e8e8e8;
+                                }
                             }
                         }
                         ::-webkit-input-placeholder { /* WebKit browsers */
@@ -2860,11 +2885,11 @@ export default {
   },
   created(){
         var vm = this
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
-        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.projAuth = localStorage.getItem('projAuth')
         vm.entType = localStorage.getItem('entType')
         if(vm.projAuth.indexOf("00400205") > 0 || vm.entType == 1){
@@ -2872,10 +2897,17 @@ export default {
         }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getIntoDesignPage()//进入设计协调获取信息
-        vm.getPosID()//获取posID，
-        vm.checkAuth()//获取posID，
-        vm.getFileTree()
+        var timer = setInterval(function(){
+            if(vm.defaultSubProjId != null){
+                vm.getIntoDesignPage()//进入设计协调获取信息
+                vm.getPosID()//获取posID，
+                vm.checkAuth()//获取posID，
+                vm.getFileTree()
+                clearInterval(timer)
+            }else{
+                vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+            }
+        },100)
     },
   watch:{
     //   <!-- options_monomer:[],//单体选项
@@ -2964,8 +2996,9 @@ export default {
             console.log(err)
         })
       },
-      getComment(val,index,showResponse,reviewCount,reload){
+      getComment(val,index,showResponse,reviewCount,reload,event){
         var vm = this
+        console.log(event)
         if(reviewCount == 0){
              vm.$message({
                 type:'warning',
@@ -2995,6 +3028,7 @@ export default {
                          item.showResponse = false
                     }
                 })
+                if(event != null)vm.CommunicationList.unshift(event)
             }else{
                 vm.$message({
                     type:'error',
@@ -3649,6 +3683,25 @@ export default {
       },
       drawingsUploadConfirm(){
         var vm = this
+        for(var i=0;i<vm.fileList.length;i++){
+            // <input  placeholder="请输入" v-model="item.drawingNo" class="calculateInp">
+            // <input  placeholder="请输入" v-model="item.drawingName" class="calculateInp">
+            if(vm.fileList[i].drawingNo == ''){
+                vm.$message({
+                    type:'error',
+                    message:'图号不能为空！'
+                })
+                return false
+            }
+            if(vm.fileList[i].drawingName == ''){
+                vm.$message({
+                    type:'error',
+                    message:'图名不能为空！'
+                })
+                return false
+            }
+        }
+        vm.fullscreenLoading = true
         vm.fileList.forEach((item,index)=>{
             /*
             isUploadPoint 0不是全景类型 1是全景类型 
@@ -3679,18 +3732,20 @@ export default {
                     vm.drawingsUploadShow = false
                     vm.fileList = []
                 }
-                if(cd == 10001){
+                if(response.data.cd == 10001){
                      vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
                 }
+                vm.getFileTree()
             }).catch((err)=>{
                 console.log(err)
                 vm.drawingsUploadShow = false
                 vm.fileList = []
             })
         })
+        vm.fullscreenLoading = false
       },
       addfileConfirm(){
         var vm = this
@@ -3955,7 +4010,7 @@ export default {
                     rootPId: 0
                 }
             }
-        };
+        }
         axios({
             method:'GET',
             url:vm.BDMSUrl+'project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/list',
@@ -3965,13 +4020,19 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 var drawingList = response.data.rt.drawingList
-                drawingList.forEach((item,index) => {
-                    vm.$set(item,'ddParId',item.ddId)
-                    vm.$set(item,'isLeaf',true)
-                    vm.$set(item,'ddName',item.dcode+'('+item.dname+')')
-                });
+                if(drawingList != null){
+                      drawingList.forEach((item,index) => {
+                        vm.$set(item,'ddParId',item.ddId)
+                        vm.$set(item,'isLeaf',true)
+                        vm.$set(item,'ddName',item.dcode+'('+item.dname+')')
+                    });
+                }
                 var drawingDirList = response.data.rt.drawingDirList
-                var children = drawingDirList.concat(drawingList)
+                if(drawingList != null){
+                      var children = drawingDirList.concat(drawingList)
+                }else{
+                     var children = drawingDirList
+                }
                 vm.FileTree_original = children
                 vm.FileTree = data.transformTozTreeFormat(setting, children)
             }

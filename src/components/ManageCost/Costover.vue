@@ -1008,14 +1008,19 @@ export default {
       checkAll:function(val){
           var vm = this
           console.log(val)
-          if(val){
-            vm.fileList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-            vm.show.basicAttributes =true
-            vm.show.BindingArtifacts =true
-            vm.fileCheckedNum = vm.fileList.length
-          }
+        //   if(val){
+        //     vm.fileList.forEach((item,key)=>{
+        //         vm.$set(item,'checked',true)
+        //     })
+        //     vm.show.basicAttributes =true
+        //     vm.show.BindingArtifacts =true
+        //     vm.fileCheckedNum = vm.fileList.length
+        //   }else{
+        //     vm.fileList.forEach((item,key)=>{
+        //         vm.$set(item,'checked',false)
+        //     })
+        //     vm.fileCheckedNum = 0
+        //   }
       },
       'show.basicAttributes':function(val){
           if(val){
@@ -1216,7 +1221,6 @@ export default {
         vm.show.BindingArtifacts =true
         var fileCheckList = []
         vm.fileCheckedNum = 0
-        vm.checkAll = false
         if(isCtrl){//多选
             vm.fileList[val].checked =  vm.fileList[val].checked?false:true
             for(var i=0;i<vm.fileList.length;i++){
@@ -1232,8 +1236,15 @@ export default {
                 vm.getVersion()
             }else if(vm.fileCheckedNum == vm.fileList.length){
                 vm.checkAll = true
+                console.log('1111')
+            }
+            if(vm.fileCheckedNum != vm.fileList.length){
+                  vm.checkAll = false
+                   console.log('2222')
             }
         }else{//单选
+            vm.checkAll = false
+             console.log('3333')
             for(var i=0;i<vm.fileList.length;i++){
                 vm.$set(vm.fileList[i],'checked',false)
             }
