@@ -795,8 +795,7 @@
             right: 225px;
             z-index: 1001;
             transition:  all ease .5s;
-            min-width: 950px;
-            overflow-y: auto;
+            overflow: auto;
             #center-selection{
                 position: fixed;
                 top: 115px;
@@ -948,6 +947,8 @@
             }
             #containerMessage{
                 padding-left:30px; 
+                min-width: 950px;
+               overflow-y: auto;
                 .header{
                     text-align: left;
                     margin: 15px 0;
@@ -1888,6 +1889,8 @@
             padding-left:20px; 
             background: #fafbfc;
             position: relative;
+            min-width: 950px;
+            overflow-y: auto;
         }
         .label-item{
             float: left;
@@ -1926,7 +1929,7 @@
             background: #ffffff;
             z-index: 10;
             border-left:none;
-            z-index: 1000;
+            z-index: 1002;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
@@ -3597,6 +3600,20 @@ export default {
       },
       confirmDrawing(){
         var vm = this
+        if(vm.editDrawing.dcode == ''){
+            vm.$message({
+                type:'error',
+                message:'图号不能为空！'
+            })
+            return false
+        }
+        if(vm.editDrawing.dname == ''){
+            vm.$message({
+                type:'error',
+                message:'图名不能为空！'
+            })
+            return false
+        }
         axios({
             method:'POST',
             url:vm.BDMSUrl+'project2/drawing/'+vm.editDrawing.dId+'/update',
@@ -3697,6 +3714,13 @@ export default {
                 vm.$message({
                     type:'error',
                     message:'图名不能为空！'
+                })
+                return false
+            }
+            if(vm.fileList[i].proportion == ''){
+                vm.$message({
+                    type:'error',
+                    message:'比例不能为空！'
                 })
                 return false
             }

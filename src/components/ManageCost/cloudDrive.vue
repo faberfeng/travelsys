@@ -7,166 +7,167 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div id="item-box-file">
-                <router-link :to="'/Drive/costover'" class=" label-item">  
-                  最近文档  
-                </router-link>
-                <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
-                  工程云盘  
-                </router-link>
-                <router-link :to="'/Drive/Share'" class=" label-item">  
-                    已经分享  
-                  </router-link>
-                  <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
-                    个人中转  
-                  </router-link>
-                <div class="item-search" v-if="!showQuanJing">
-                    <span class="title-right">
-                        <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
-                        <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
-                    </span>
-                     <select v-model="docType" class="inp-search">
-                        <option value="">全部文档</option>
-                        <option value="1">我的上传</option>
-                    </select>
-                    <i class="icon-sanjiao"></i>
-                    <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
+            <div style="min-width: 950px;overflow-y: auto;">
+                <div id="item-box-file">
+                    <router-link :to="'/Drive/costover'" class=" label-item">  
+                    最近文档  
+                    </router-link>
+                    <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
+                    工程云盘  
+                    </router-link>
+                    <router-link :to="'/Drive/Share'" class=" label-item">  
+                        已经分享  
+                    </router-link>
+                    <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
+                        个人中转  
+                    </router-link>
+                    <div class="item-search" v-if="!showQuanJing">
+                        <span class="title-right">
+                            <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
+                            <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
+                        </span>
+                        <select v-model="docType" class="inp-search">
+                            <option value="">全部文档</option>
+                            <option value="1">我的上传</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                        <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
+                    </div>
                 </div>
-            </div>
-            <p class="antsLine" v-if="!showQuanJing">
-                文档管理<i class="icon-sanjiao-right"></i>工程云盘<i class="icon-sanjiao-right"></i>
-                <span class="strong" v-for="item in mayiList" :key="item.nodeId+'antLine'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
-            </p>
-            <p class="select-header clearfix">
-                <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
-                <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                <span class="icon icon-upload" v-if="!hasImg && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*')">上传平面图</span>
-                <span class="icon icon-refresh" v-if="hasImg && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground.fgId,'image/*')">更新平面图</span>
-                <!--
-                    文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
+                <p class="antsLine" v-if="!showQuanJing">
+                    文档管理<i class="icon-sanjiao-right"></i>工程云盘<i class="icon-sanjiao-right"></i>
+                    <span class="strong" v-for="item in mayiList" :key="item.nodeId+'antLine'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                </p>
+                <p class="select-header clearfix">
+                    <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                    <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                    <span class="icon icon-upload" v-if="!hasImg && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*')">上传平面图</span>
+                    <span class="icon icon-refresh" v-if="hasImg && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground.fgId,'image/*')">更新平面图</span>
+                    <!--
+                        文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
 
-                    具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
+                        具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
 
-                -->
-                <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*')">新建点位</span>
-                 <ul class="operation" style="margin-right: 10px;">
-                    <li class="item-upload" v-if="!showQuanJing"  @click="uploadfile">上传文件</li>
-                </ul>
-                <ul class="operation">
-                    <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(true)">剪切</li>
-                     <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder" @click="downloadFile" >下载</li>
-                    <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
-                    <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li>
-                    <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="rename">更名</li>
-                     <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
-                    <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
-                    <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="shareURL">分享</li>
-                    <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
-                </ul>
-            </p>
-            <!--全景图代码-->
-            <div id="planeFigureDiv" v-if="showQuanJing">
-                <div  id="planeDIV">
-                    <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
-                    <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
-                    @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xAxial,item.yAxial,item.fileId,item.fileName)"
-                    :data-left="item.xAxial" :data-top="item.yAxial"  :id="index+'round'"
-                    :key="index" :style="{'top':item.yAxial+'px','left':item.xAxial+'px'}">
-                    </span>
+                    -->
+                    <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*')">新建点位</span>
+                    <ul class="operation" style="margin-right: 10px;">
+                        <li class="item-upload" v-if="!showQuanJing"  @click="uploadfile">上传文件</li>
+                    </ul>
+                    <ul class="operation">
+                        <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(true)">剪切</li>
+                        <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder" @click="downloadFile" >下载</li>
+                        <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
+                        <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li>
+                        <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="rename">更名</li>
+                        <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
+                        <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
+                        <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="shareURL">分享</li>
+                        <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
+                    </ul>
+                </p>
+                <!--全景图代码-->
+                <div id="planeFigureDiv" v-if="showQuanJing">
+                    <div  id="planeDIV">
+                        <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
+                        <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
+                        @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xAxial,item.yAxial,item.fileId,item.fileName)"
+                        :data-left="item.xAxial" :data-top="item.yAxial"  :id="index+'round'"
+                        :key="index" :style="{'top':item.yAxial+'px','left':item.xAxial+'px'}">
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div v-else>
-            <!--文件夹代码-->
-            <div id="file-container" v-if="listStyle == 'card'">
-                <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)"></label>
-                        <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                        <div class="item-file-box clearfix">
-                            <span  class="item-file-image">
-                              <img :src="require('./images/icon/'+item.icon)" />
-                            </span>
-                            <span  class="item-file-detial">
-                                <h3 v-text="item.fgName"></h3>
-                                <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
-                                <p v-text="initData(item.updateTime)"></p>
-                                <p class="operation">
-                                    <span v-text="'版本'+item.version"></span>
-                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName)"></i>
-                                    <i class="icon-goujian icon-download" @click="downLoad(index)"></i>
-                                </p>
-                            </span>
-                        </div>
-                    </li>
-                     <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
-                        <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
-                        <div class="item-file-box clearfix">
-                            <span  class="item-file-image item-folder-image">
-                            <img :src="require('./images/folderBig.png')" />
-                            </span>
-                            <span  class="item-file-detial">
-                                <h3 v-text="item.nodeName"></h3>
-                            </span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div id="file-container-table" v-else>
-                <table class="UserList" width='100%'>
-                    <thead>
-                        <tr  class="userList-thead">
-                            <th style="width:55px;"></th>
-                            <th style="min-width:428px;">文件名</th>
-                            <th style="width:70px;"></th>
-                            <th style="width:70px;">更新渠道</th>
-                            <th style="width:50px;">类型</th>
-                            <th style="width:40px;">版本</th>
-                            <th style="min-width:60px;">上传人</th>
-                            <th style="min-width:150px;">更新时间</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index,true)">
-                            <td @click.stop="checkItem(index,true,true)"><!--多选框-->
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            </td>
-                            <td>
+                <div v-else>
+                <!--文件夹代码-->
+                <div id="file-container" v-if="listStyle == 'card'">
+                    <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
+                        <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
+                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)"></label>
+                            <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                            <div class="item-file-box clearfix">
+                                <span  class="item-file-image">
                                 <img :src="require('./images/icon/'+item.icon)" />
-                                <span v-text="item.fgName"></span>
-                            </td>
-                            <td>
-                                <i class="icon-goujian icon-download" @click="downLoad(index)"></i>
-                                 <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName)"></i>
-                            </td>
-                            <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
-                            <td v-text="splitType(item.icon)"></td>
-                            <td v-text="item.version"></td>
-                            <td v-text="item.uploadUser"></td>
-                            <td v-text="initData(item.updateTime)"></td>
-                        </tr>
-                         <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item)">
-                            <td @click.stop="checkItem(index,false,true)"><!--多选框-->
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            </td>
-                            <td>
+                                </span>
+                                <span  class="item-file-detial">
+                                    <h3 v-text="item.fgName"></h3>
+                                    <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                    <p v-text="initData(item.updateTime)"></p>
+                                    <p class="operation">
+                                        <span v-text="'版本'+item.version"></span>
+                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName)"></i>
+                                        <i class="icon-goujian icon-download" @click="downLoad(index)"></i>
+                                    </p>
+                                </span>
+                            </div>
+                        </li>
+                        <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item)">
+                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
+                            <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                            <div class="item-file-box clearfix">
+                                <span  class="item-file-image item-folder-image">
                                 <img :src="require('./images/folderBig.png')" />
-                                <span v-text="item.nodeName"></span>
-                            </td>
-                            <td></td>
-                            <td  v-text="'-'"></td>
-                            <td v-text="'-'"></td>
-                            <td v-text="'-'"></td>
-                            <td v-text="'-'"></td>
-                            <td v-text="item.createTime?initData(item.createTime):'-'"></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </span>
+                                <span  class="item-file-detial">
+                                    <h3 v-text="item.nodeName"></h3>
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div id="file-container-table" v-else>
+                    <table class="UserList" width='100%'>
+                        <thead>
+                            <tr  class="userList-thead">
+                                <th style="width:55px;"></th>
+                                <th style="min-width:428px;">文件名</th>
+                                <th style="width:70px;"></th>
+                                <th style="width:70px;">更新渠道</th>
+                                <th style="width:50px;">类型</th>
+                                <th style="width:40px;">版本</th>
+                                <th style="min-width:60px;">上传人</th>
+                                <th style="min-width:150px;">更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index,true)">
+                                <td @click.stop="checkItem(index,true,true)"><!--多选框-->
+                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                    <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                </td>
+                                <td>
+                                    <img :src="require('./images/icon/'+item.icon)" />
+                                    <span v-text="item.fgName"></span>
+                                </td>
+                                <td>
+                                    <i class="icon-goujian icon-download" @click="downLoad(index)"></i>
+                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName)"></i>
+                                </td>
+                                <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
+                                <td v-text="splitType(item.icon)"></td>
+                                <td v-text="item.version"></td>
+                                <td v-text="item.uploadUser"></td>
+                                <td v-text="initData(item.updateTime)"></td>
+                            </tr>
+                            <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item)">
+                                <td @click.stop="checkItem(index,false,true)"><!--多选框-->
+                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                    <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                </td>
+                                <td>
+                                    <img :src="require('./images/folderBig.png')" />
+                                    <span v-text="item.nodeName"></span>
+                                </td>
+                                <td></td>
+                                <td  v-text="'-'"></td>
+                                <td v-text="'-'"></td>
+                                <td v-text="'-'"></td>
+                                <td v-text="'-'"></td>
+                                <td v-text="item.createTime?initData(item.createTime):'-'"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
             </div>
-            </div>
-          
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
             <div id="center-selection">
@@ -601,8 +602,7 @@
         bottom: 0;
         right: 225px;
         transition:  all ease .5s;
-        // min-width: 950px;
-        overflow-y: auto;
+        overflow: auto;
         #planeFigureDiv{
             overflow: auto;
             position: absolute;

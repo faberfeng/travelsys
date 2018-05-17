@@ -6,15 +6,6 @@
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <!-- <el-input
-                             class="textArea"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 14}"
-                            :placeholder="iscomment?'发布新主题':'发布新回复'"
-                            :autofocus="true"
-                            @keyup.shift="showChange"
-                            v-model="message">
-                        </el-input> -->
                         <textarea   @keyup.shift="showChange"  class="textArea" id="aaaaa" :placeholder="iscomment?'发布新主题':'发布新回复'" v-model="message"></textarea>
                         <div id="userSelectBox" v-if="showUserSelectBox">
                             <ul>

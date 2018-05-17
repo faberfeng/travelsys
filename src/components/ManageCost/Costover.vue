@@ -1,91 +1,93 @@
 <template>
 <div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div id="item-box-file">
-                <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
-                 最近文档  
-                </router-link>
-                <router-link :to="'/Drive/cloudDrive'" class="label-item">  
-                 工程云盘  
-                </router-link>
-                <router-link :to="'/Drive/Share'" class="label-item">  
-                    已经分享  
-                </router-link>
-                <router-link :to="'/Drive/PersonalTransit'" class="label-item">  
-                    个人中转  
-                </router-link>
-                <div class="item-search">
-                    <span class="title-right">
-                        <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
-                        <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
-                    </span>
-                    <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
+            <div style="min-width: 950px;overflow-y: auto;">
+                <div id="item-box-file">
+                    <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
+                    最近文档  
+                    </router-link>
+                    <router-link :to="'/Drive/cloudDrive'" class="label-item">  
+                    工程云盘  
+                    </router-link>
+                    <router-link :to="'/Drive/Share'" class="label-item">  
+                        已经分享  
+                    </router-link>
+                    <router-link :to="'/Drive/PersonalTransit'" class="label-item">  
+                        个人中转  
+                    </router-link>
+                    <div class="item-search">
+                        <span class="title-right">
+                            <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
+                            <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
+                        </span>
+                        <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
+                    </div>
                 </div>
-            </div>
-            <p class="select-header clearfix">
-                    <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
-                    <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                     <span class="button-download" @click="downloadFile">下载</span>
-            </p>
-            <div id="file-container" v-if="listStyle == 'card'">
-                <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
-                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true)"></label>
-                        <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                        <div class="item-file-box clearfix">
-                            <span  class="item-file-image">
-                              <img :src="require('./images/icon/'+item.icon)" />
-                            </span>
-                            <span  class="item-file-detial">
-                                <h3 v-text="item.fgName"></h3>
-                                <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
-                                <p v-text="initData(item.updateTime)"></p>
-                                <p class="operation">
-                                    <span v-text="'版本'+item.version"></span>
-                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                </p>
-                            </span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div id="file-container-table" v-else>
-                <table class="UserList" width='100%'>
-                    <thead>
-                        <tr  class="userList-thead">
-                            <th style="width:55px;"></th>
-                            <th style="min-width:428px;">文件名</th>
-                            <th style="width:70px;"></th>
-                            <th style="width:70px;">更新渠道</th>
-                            <th style="width:50px;">类型</th>
-                            <th style="width:40px;">版本</th>
-                            <th style="min-width:60px;">上传人</th>
-                            <th style="min-width:150px;">更新时间</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index)">
-                            <td>
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
-                                <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            </td>
-                            <td>
+                <p class="select-header clearfix">
+                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                        <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                        <span class="button-download" @click="downloadFile">下载</span>
+                </p>
+                <div id="file-container" v-if="listStyle == 'card'">
+                    <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
+                        <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
+                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true)"></label>
+                            <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                            <div class="item-file-box clearfix">
+                                <span  class="item-file-image">
                                 <img :src="require('./images/icon/'+item.icon)" />
-                                <span v-text="item.fgName"></span>
-                            </td>
-                            <td>
-                                <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                 <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                            </td>
-                            <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
-                            <td v-text="splitType(item.icon)"></td>
-                            <td v-text="item.version"></td>
-                            <td v-text="item.uploadUser"></td>
-                            <td v-text="initData(item.updateTime)"></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </span>
+                                <span  class="item-file-detial">
+                                    <h3 v-text="item.fgName"></h3>
+                                    <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                    <p v-text="initData(item.updateTime)"></p>
+                                    <p class="operation">
+                                        <span v-text="'版本'+item.version"></span>
+                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                        <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                    </p>
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div id="file-container-table" v-else>
+                    <table class="UserList" width='100%'>
+                        <thead>
+                            <tr  class="userList-thead">
+                                <th style="width:55px;"></th>
+                                <th style="min-width:428px;">文件名</th>
+                                <th style="width:70px;"></th>
+                                <th style="width:70px;">更新渠道</th>
+                                <th style="width:50px;">类型</th>
+                                <th style="width:40px;">版本</th>
+                                <th style="min-width:60px;">上传人</th>
+                                <th style="min-width:150px;">更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index)">
+                                <td>
+                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
+                                    <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                </td>
+                                <td>
+                                    <img :src="require('./images/icon/'+item.icon)" />
+                                    <span v-text="item.fgName"></span>
+                                </td>
+                                <td>
+                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                </td>
+                                <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
+                                <td v-text="splitType(item.icon)"></td>
+                                <td v-text="item.version"></td>
+                                <td v-text="item.uploadUser"></td>
+                                <td v-text="initData(item.updateTime)"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
@@ -226,8 +228,7 @@
         bottom: 0;
         right: 225px;
         transition:  all ease .5s;
-        min-width: 950px;
-        overflow-y: auto;
+        overflow: auto;
          .title-right{
             float: left;;
             width: 214px;
