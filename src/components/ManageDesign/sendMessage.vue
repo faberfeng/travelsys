@@ -6,13 +6,8 @@
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <textarea   @keyup.shift="showChange"  class="textArea" id="aaaaa" :placeholder="iscomment?'发布新主题':'发布新回复'" v-model="message"></textarea>
-                        <div id="userSelectBox" v-if="showUserSelectBox">
-                            <ul>
-                                <li class="tit">选择最近@的人或直接输入</li>
-                                <li class="tit" v-for="(val,key) in users" :key="key" v-text="val.userName" @click="initName(val.userName)"></li>
-                            </ul>
-                        </div>
+                        <textarea   class="textArea" :id="'dc-add-content'+dcid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
+                        <div id="at_userslist"></div>
                     </div>
                     <div class="func_area">
                         <div class="limits">
@@ -132,6 +127,8 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+import '../ManageCost/js/jquery-1.8.3.js'
+import './js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
     data(){
         return {
@@ -163,10 +160,9 @@ export default Vue.component('common-upload',{
                 obj:[],//短语列表
             },
             fullscreenLoading:false,
-            showUserSelectBox:false,
         }
     },
-    props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout','users'],
+    props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout'],
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
@@ -176,17 +172,15 @@ export default Vue.component('common-upload',{
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        var setting = {
+            projId:vm.projId,
+            ugid:vm.selectugid,
+            basePath:vm.BDMSUrl,
+            token:vm.token
+        }
+        $('#dc-add-content'+vm.dcid).showAtUsers(setting)
     },
     methods:{
-        initName(name){
-            var vm = this
-            vm.message = vm.message + name+' '
-            vm.showUserSelectBox = false
-        },
-        showChange(value){
-            var vm = this
-            vm.showUserSelectBox = true
-        },
         checkItem(index){
             var vm = this
             vm.ShortStateMent.obj.forEach((item,key)=>{
@@ -228,7 +222,7 @@ export default Vue.component('common-upload',{
                     }
                 })
             }
-            vm.message+=mes
+            vm.$refs.message.value+=mes
             vm.duanyuClose()
         },
         duanyuClose(){
@@ -276,7 +270,7 @@ export default Vue.component('common-upload',{
             vm.$emit('hide')
             vm.fileId = []
             vm.attachId = []
-            vm.message = ''
+            vm.$refs.message.value = ''
         },
         showUploadBox_img(){
             var vm = this
@@ -340,8 +334,8 @@ export default Vue.component('common-upload',{
         },
         sendInfo(){
             var vm = this
-            vm.message = vm.trim(vm.message)
-            if(vm.message == ''){
+            vm.$refs.message.value = vm.trim(vm.$refs.message.value)
+            if(vm.$refs.message.value == ''){
                 vm.$message({
                     type:'error',
                     message:'请输入信息！'
@@ -363,7 +357,7 @@ export default Vue.component('common-upload',{
                     pageType:1,	//设计协调
                     newStmt:vm.newStmt,
                     designCoordinate:{
-                        dcContent: vm.message,
+                        dcContent: vm.$refs.message.value,
                         ugId: vm.selectugid,
                         projId: vm.projId,
                         subProjId: vm.defaultSubProjId,
@@ -383,7 +377,7 @@ export default Vue.component('common-upload',{
                     themeStatus: '',//主题状态
                     dcReview: {
                         dcId: vm.dcid,
-                        rvContent: vm.message
+                        rvContent: vm.$refs.message.value
                     },
                     dcSearchCondition: {
                         builderId: vm.valuemonomer,//单体
@@ -417,17 +411,26 @@ export default Vue.component('common-upload',{
                     if(vm.iscomment){
                          vm.$emit('refresh')
                     }else{
+                        
                         if(vm.checked){
-                            vm.$emit('refreshcomment',response.data.rt)
+                            var recall = {
+                                isChecked:true,
+                                data:response.data.rt
+                            }
+                            vm.$emit('refreshcomment',recall)
                         }else{
-                            vm.$emit('refreshcomment',null)
+                            var recall = {
+                                isChecked:false,
+                                data:response.data.rt
+                            }
+                            vm.$emit('refreshcomment',recall)
                         }
                        vm.checked = false
                     }
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
-                    vm.message = ''
+                    vm.$refs.message.value = ''
                     vm.newStmt = false
                 }else{
                     vm.$message({

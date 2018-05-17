@@ -80,7 +80,7 @@
                         </li>
                     </ul>
                 </div>
-                <sendMes :showBox="'true'" :iscomment="true" :users="contacts" :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
+                <sendMes :showBox="'true'" :dcid="''" :iscomment="true"  :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
                  <div class="project">
                     <ul class="projectList">
                         <li v-for="(item,index) in CommunicationList" :key="index">
@@ -137,7 +137,7 @@
                                      <!--下面是评论的代码-->
                                     <div class="comments" v-if="item.showResponse">
                                         <sendMes :showBox="(item.dcStatus == 1)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
-                                        :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  :users="contacts" 
+                                        :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  
                                           v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                         <ul >
                                             <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
@@ -1929,7 +1929,7 @@
             background: #ffffff;
             z-index: 10;
             border-left:none;
-            z-index: 1002;
+            z-index: 1000;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
@@ -2407,17 +2407,18 @@
                                 color: #333333;
                                 resize: none;
                         }
-                        #userSelectBox{
+                        #at_userslist{
                             position: absolute;
-                            top: 100px;
-                            left: 200px;
-                            display: block;
+                            display: none;
                             width: 226px;
-                            height: auto;
+                            height: 270px;
+                            overflow-y:auto; 
                             border: 1px solid #cccccc;
                             z-index: 10;
+                            background: #ffffff;
                             .tit{
-                                width: auto;
+                                display: block;
+                                width: 100%;
                                 height: 24px;
                                 line-height: 24px;
                                 background-color: #fff;
@@ -2426,6 +2427,7 @@
                                 font-size: 14px;
                                  background: #ffffff;
                                  cursor: pointer;
+                                 border: none;
                                 &:hover{
                                     background: #e8e8e8;
                                 }
@@ -3001,6 +3003,7 @@ export default {
       },
       getComment(val,index,showResponse,reviewCount,reload,event){
         var vm = this
+        // console.log('liucheng')
         console.log(event)
         if(reviewCount == 0){
              vm.$message({
@@ -3031,7 +3034,10 @@ export default {
                          item.showResponse = false
                     }
                 })
-                if(event != null)vm.CommunicationList.unshift(event)
+                if(event != null && event.isChecked)vm.CommunicationList.unshift(event)
+                if(event != null){
+                    vm.CommunicationList[index].flowCharts = event.data.flowCharts
+                }
             }else{
                 vm.$message({
                     type:'error',
