@@ -367,6 +367,7 @@ export default Vue.component('common-upload',{
                     attachList: imguuid,
                     fileIdList: fuuid
                 };
+                var params = {}
                 var url = '/project2/dc/add'
             }else{
                 var data = {
@@ -396,16 +397,20 @@ export default Vue.component('common-upload',{
                     attachList: imguuid,
                     fileIdList: fuuid
                 }
+                var params = {
+                    builderId:vm.valuemonomer
+                }
                 var url = '/project2/dc/'+vm.dcid+'/review/add'
             }
             vm.fullscreenLoading = true
              axios({
                 method:'POST',
-                url:vm.BDMSUrl+url,//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.BDMSUrl+url,//vm.BDMSUrl+url
                 headers:{
                     'token':vm.token
                 },
-                data:data
+                data:data,
+                params:params
             }).then((response)=>{
                 if(parseInt(response.data.cd) == 0){
                     if(vm.iscomment){

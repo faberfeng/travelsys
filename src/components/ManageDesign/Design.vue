@@ -7,205 +7,201 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div id="center-selection">
-                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                    <i class="icon-right"></i>
+            <div style="min-width: 950px;overflow-y: auto;">
+                <div id="center-selection">
+                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                        <i class="icon-right"></i>
+                    </div>
+                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
+                        <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
+                        <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                    </div>
                 </div>
-                <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                    <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
-                    <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
-                    <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                <div id="item-box-file">
+                    <router-link :to="'/Design/management'" class="label-item-active label-item">  
+                     设计协调  
+                    </router-link>
+                    <router-link :to="'/Design/attributeManager'"  class="label-item">  
+                        属性管理  
+                    </router-link>
+                    <router-link :to="'/Design/designversion'"  class="label-item">  
+                        设计版本  
+                    </router-link>
                 </div>
-            </div>
-            <div id="item-box-file">
-                <span  class="label-item-active label-item">
-                    <router-link :to="'/Design/management'">  
-                    设计协调  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                    <router-link :to="'/Design/attributeManager'">  
-                    属性管理  
-                   </router-link>
-                </span>
-                <span  class="label-item">
-                <router-link :to="'/Design/designversion'">  
-                    设计版本  
-                  </router-link>
-                </span>
-            </div>
-            <div id="containerMessage">
-                <p class="header clearfix">
-                    <span class="title">设计协同</span>
-                    <span class="item-upload" @click="SendMes">新建主题</span>
-                </p>
-                <div class="ForumSelector">
-                    <span class="name">筛选条件</span>
-                    <ul>
-                            <!-- options_monomer:[],//单体选项
-                            options_status:[],//状态选项
-                            options_about:[],//相关选项 -->
-                        <li class="selectItem">
-                            <span class="title">单体</span>
-                            <el-select v-model="value_monomer" placeholder="请选择">
-                                <el-option
-                                v-for="item in options_monomer"
-                                :key="item.id"
-                                :label="item.Name"
-                                :value="item.id">
-                                </el-option>
-                            </el-select>
-                        </li>
-                          <li class="selectItem">
-                            <span class="title">状态</span>
-                            <el-select v-model="value_status" placeholder="请选择">
-                                <el-option
-                                v-for="item in options_status"
-                                :key="item.id"
-                                :label="item.Name"
-                                :value="item.id">
-                                </el-option>
-                            </el-select>
-                        </li>
-                          <li class="selectItem">
-                            <span class="title">相关</span>
-                            <el-select v-model="value_about" placeholder="请选择">
-                                <el-option
-                                v-for="item in options_about"
-                                :key="item.id"
-                                :label="item.Name"
-                                :value="item.id">
-                                </el-option>
-                            </el-select>
-                        </li>
-                    </ul>
-                </div>
-                <sendMes :showBox="'true'" :dcid="''" :iscomment="true"  :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
-                 <div class="project">
-                    <ul class="projectList">
-                        <li v-for="(item,index) in CommunicationList" :key="index">
-                            <div class="projectListInfo">
-                                <div class="projectListImg">
-                                    <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/loginimg.png')">
-                                </div> 
-                                <div class="projectListText">
-                                    <span class="action_rightBox">
-                                        <span class="icon-finish" v-if="canEditMes && item.dcStatus == 1" @click="updateStatus(item.dcId,0,'完成',index)">完成</span>
-                                        <span class="icon-reconsider" v-if="canEditMes && item.dcStatus == 2" @click="updateStatus(item.dcId,1,'再议',index)">再议</span>
-                                        <span class="icon-start" v-if="canEditMes && item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
-                                        <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
-                                    </span>
-                                    <p class="projectListTextName">{{item.createUserStr}}</p>
-                                    <p class="font-color1" v-html="item.dcContent"></p>
-                                    <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                                        <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
-                                            <div class="item-file-box clearfix">
-                                                <span  class="item-file-image">
-                                                    <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" />
-                                                </span>
-                                                <span  class="item-file-detial">
-                                                    <h3 v-text="val.fileName"></h3>
-                                                    <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
-                                                    <p v-text="initData(val.uploadTime)"></p>
-                                                    <p class="operation">
-                                                        <span v-text="'版本'+val.version"></span>
-                                                        <i class="icon-goujian icon-search" @click="preview(val.filePath)"></i>
-                                                        <i class="icon-goujian icon-download" @click="downLoad(val.filePath)"></i>
-                                                    </p>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                            <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
-                                            <div class="actionbox clearfix">
-                                                <i class="button-search"  @click="preview(val.relativePath)"></i>
-                                                <i class="line"></i>
-                                                <i class="button-download" @click="downLoad(val.relativePath)"></i>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <p class="projectBottom">
-                                        <i class="icon-time"></i>{{initData(item.createTime)}}<label>{{item.from}}</label>
-                                        <span class="action">
-                                            <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
-                                            <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
-                                            <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                            <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="item.showResponse?'arrow':''"></span>
-                                            <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
+                <div id="containerMessage">
+                    <p class="header clearfix">
+                        <span class="title">设计协同</span>
+                        <span class="item-upload" @click="SendMes">新建主题</span>
+                    </p>
+                    <div class="ForumSelector">
+                        <span class="name">筛选条件</span>
+                        <ul>
+                                <!-- options_monomer:[],//单体选项
+                                options_status:[],//状态选项
+                                options_about:[],//相关选项 -->
+                            <li class="selectItem">
+                                <span class="title">单体</span>
+                                <el-select v-model="value_monomer" placeholder="请选择">
+                                    <el-option
+                                    v-for="item in options_monomer"
+                                    :key="item.id"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </li>
+                            <li class="selectItem">
+                                <span class="title">状态</span>
+                                <el-select v-model="value_status" placeholder="请选择">
+                                    <el-option
+                                    v-for="item in options_status"
+                                    :key="item.id"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </li>
+                            <li class="selectItem">
+                                <span class="title">相关</span>
+                                <el-select v-model="value_about" placeholder="请选择">
+                                    <el-option
+                                    v-for="item in options_about"
+                                    :key="item.id"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </li>
+                        </ul>
+                    </div>
+                    <sendMes :showBox="'true'" :dcid="''" :iscomment="true"  :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
+                    <div class="project">
+                        <ul class="projectList">
+                            <li v-for="(item,index) in CommunicationList" :key="index">
+                                <div class="projectListInfo">
+                                    <div class="projectListImg">
+                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/loginimg.png')">
+                                    </div> 
+                                    <div class="projectListText">
+                                        <span class="action_rightBox">
+                                            <span class="icon-finish" v-if="canEditMes && item.dcStatus == 1" @click="updateStatus(item.dcId,0,'完成',index)">完成</span>
+                                            <span class="icon-reconsider" v-if="canEditMes && item.dcStatus == 2" @click="updateStatus(item.dcId,1,'再议',index)">再议</span>
+                                            <span class="icon-start" v-if="canEditMes && item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
+                                            <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
                                         </span>
-                                    </p>
-                                     <!--下面是评论的代码-->
-                                    <div class="comments" v-if="item.showResponse">
-                                        <sendMes :showBox="(item.dcStatus == 1)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
-                                        :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  
-                                          v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
-                                        <ul >
-                                            <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
-                                                <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
-                                                <div  class="center">
-                                                    <span class="icon-delete" v-if="val.editable"  @click="deleteComment(val.dcId,val.id,key,index)"></span>
-                                                    <p class="head">
-                                                        <span v-text="val.rvUserStr"></span>
-                                                        <span v-text="initData(val.rvTime)"></span>
-                                                        <span v-text="val.fromIn"></span>
-                                                    </p>
-                                                    <div class="detial">
-                                                        <div v-html="val.rvContent"></div>
-                                                    <!--下面是文件图片的代码-->
-                                                        <div>
-                                                            <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
-                                                                <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
-                                                                    <div class="item-file-box clearfix">
-                                                                        <span  class="item-file-image">
-                                                                            <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" />
-                                                                        </span>
-                                                                        <span  class="item-file-detial">
-                                                                            <h3 v-text="left.fileName"></h3>
-                                                                            <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
-                                                                            <p v-text="initData(left.uploadTime)"></p>
-                                                                            <p class="operation">
-                                                                                <span v-text="'版本'+left.version"></span>
-                                                                                <i class="icon-goujian icon-search" @click="preview(left.filePath)"></i>
-                                                                                <i class="icon-goujian icon-download" @click="downLoad(left.filePath)"></i>
-                                                                            </p>
-                                                                        </span>
-                                                                    </div>
-                                                                </li>
-                                                                <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
-                                                                    <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
-                                                                    <div class="actionbox clearfix">
-                                                                        <i class="button-search"  @click="preview(left.relativePath)"></i>
-                                                                        <i class="line"></i>
-                                                                        <i class="button-download" @click="downLoad(left.relativePath)"></i>
-                                                                    </div>
-                                                                </li>
-                                                            </ul>
+                                        <p class="projectListTextName">{{item.createUserStr}}</p>
+                                        <p class="font-color1" v-html="item.dcContent"></p>
+                                        <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                                            <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
+                                                <div class="item-file-box clearfix">
+                                                    <span  class="item-file-image">
+                                                        <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" />
+                                                    </span>
+                                                    <span  class="item-file-detial">
+                                                        <h3 v-text="val.fileName"></h3>
+                                                        <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
+                                                        <p v-text="initData(val.uploadTime)"></p>
+                                                        <p class="operation">
+                                                            <span v-text="'版本'+val.version"></span>
+                                                            <i class="icon-goujian icon-search" @click="preview(val.filePath)"></i>
+                                                            <i class="icon-goujian icon-download" @click="downLoad(val.filePath)"></i>
+                                                        </p>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                            <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                                <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <div class="actionbox clearfix">
+                                                    <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                    <i class="line"></i>
+                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <p class="projectBottom">
+                                            <i class="icon-time"></i>{{initData(item.createTime)}}<label>{{item.from}}</label>
+                                            <span class="action">
+                                                <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
+                                                <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
+                                                <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
+                                                <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="item.showResponse?'arrow':''"></span>
+                                                <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
+                                            </span>
+                                        </p>
+                                        <!--下面是评论的代码-->
+                                        <div class="comments" v-if="item.showResponse">
+                                            <sendMes :showBox="(item.dcStatus == 1)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="selectUgId" :holderid="siteHolderId"
+                                            :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  
+                                            v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
+                                            <ul >
+                                                <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
+                                                    <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
+                                                    <div  class="center">
+                                                        <span class="icon-delete" v-if="val.editable"  @click="deleteComment(val.dcId,val.id,key,index)"></span>
+                                                        <p class="head">
+                                                            <span v-text="val.rvUserStr"></span>
+                                                            <span v-text="initData(val.rvTime)"></span>
+                                                            <span v-text="val.fromIn"></span>
+                                                        </p>
+                                                        <div class="detial">
+                                                            <div v-html="val.rvContent"></div>
+                                                        <!--下面是文件图片的代码-->
+                                                            <div>
+                                                                <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                                                                    <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
+                                                                        <div class="item-file-box clearfix">
+                                                                            <span  class="item-file-image">
+                                                                                <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" />
+                                                                            </span>
+                                                                            <span  class="item-file-detial">
+                                                                                <h3 v-text="left.fileName"></h3>
+                                                                                <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
+                                                                                <p v-text="initData(left.uploadTime)"></p>
+                                                                                <p class="operation">
+                                                                                    <span v-text="'版本'+left.version"></span>
+                                                                                    <i class="icon-goujian icon-search" @click="preview(left.filePath)"></i>
+                                                                                    <i class="icon-goujian icon-download" @click="downLoad(left.filePath)"></i>
+                                                                                </p>
+                                                                            </span>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
+                                                                        <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
+                                                                        <div class="actionbox clearfix">
+                                                                            <i class="button-search"  @click="preview(left.relativePath)"></i>
+                                                                            <i class="line"></i>
+                                                                            <i class="button-download" @click="downLoad(left.relativePath)"></i>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div> 
-                                    <!--下面是流程图的代码-->
-                                    <div class="flowCharts" v-if="item.showFlowChart">
-                                        <ul class="clearfix">
-                                            <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
-                                                <div class="top">
-                                                    <span class="horizontalLineL"></span>
-                                                    <span  :class="[val.nodeType == 1?'circle':'',val.nodeType == 2?'square':'',val.nodeType == 3?'diamond':'']"></span>
-                                                    <span  class="horizontalLineR"></span>
-                                                </div>
-                                                <p v-text="val.userName+val.dcStatus" class="title_"></p>
-                                                <p v-text="initData(val.operateTime)" class="date"></p>
-                                            </li>
-                                        </ul>
+                                                </li>
+                                            </ul>
+                                        </div> 
+                                        <!--下面是流程图的代码-->
+                                        <div class="flowCharts" v-if="item.showFlowChart">
+                                            <ul class="clearfix">
+                                                <li v-for="(val,key) in item.flowCharts" :key="key" class="flowChart-item">
+                                                    <div class="top">
+                                                        <span class="horizontalLineL"></span>
+                                                        <span  :class="[val.nodeType == 1?'circle':'',val.nodeType == 2?'square':'',val.nodeType == 3?'diamond':'']"></span>
+                                                        <span  class="horizontalLineR"></span>
+                                                    </div>
+                                                    <p v-text="val.userName+val.dcStatus" class="title_"></p>
+                                                    <p v-text="initData(val.operateTime)" class="date"></p>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="pagenation" v-if="pageTotal>0">   
-                        <el-pagination background layout="prev, pager, next" :total="pageTotal" :current-page.sync="pageNo" @current-change="changePage" @prev-click="changePage" @next-click="changePage"></el-pagination>
+                            </li>
+                        </ul>
+                        <div class="pagenation" v-if="pageTotal>0">   
+                            <el-pagination background layout="prev, pager, next" :total="pageTotal" :current-page.sync="pageNo" @current-change="changePage" @prev-click="changePage" @next-click="changePage"></el-pagination>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -947,8 +943,6 @@
             }
             #containerMessage{
                 padding-left:30px; 
-                min-width: 950px;
-               overflow-y: auto;
                 .header{
                     text-align: left;
                     margin: 15px 0;
@@ -1889,8 +1883,6 @@
             padding-left:20px; 
             background: #fafbfc;
             position: relative;
-            min-width: 950px;
-            overflow-y: auto;
         }
         .label-item{
             float: left;
@@ -1901,10 +1893,8 @@
             line-height: 30px;
             cursor: pointer;
             border-top: 3px solid #fafbfc;
-            a{
-                color: #999999;
-                text-decoration: none;
-            }
+            color: #999999;
+            text-decoration: none;
         }
         .label-item-active{
             color: #fc3439;
@@ -3034,10 +3024,10 @@ export default {
                          item.showResponse = false
                     }
                 })
-                if(event != null && event.isChecked)vm.CommunicationList.unshift(event)
                 if(event != null){
-                    vm.CommunicationList[index].flowCharts = event.data.flowCharts
+                    vm.CommunicationList[index].flowCharts = event.data[index].flowCharts
                 }
+                if(event != null && event.isChecked)vm.CommunicationList.unshift(event.data[0])
             }else{
                 vm.$message({
                     type:'error',
@@ -3678,17 +3668,67 @@ export default {
           var vm = this
           vm.fileList.splice(index,1)
       },
+      //图片尺寸验证  
+      verificationPicFile(file) {  
+            var filePath = file.value;  
+            if(filePath){  
+                //读取图片数据  
+                var filePic = file.files[0];  
+                var reader = new FileReader();  
+                reader.onload = function (e) {  
+                    var data = e.target.result;  
+                    //加载图片获取图片真实宽度和高度  
+                    var image = new Image();  
+                    image.onload=function(){  
+                        var width = image.width;  
+                        var height = image.height;  
+                        if (width == 720 | height == 1280){  
+                            alert("文件尺寸符合！");  
+                        }else {  
+                            alert("文件尺寸应为：720*1280！");  
+                            file.value = "";  
+                            return false;  
+                        }  
+                    };  
+                    image.src= data;  
+                };  
+                reader.readAsDataURL(filePic);  
+            }else{  
+                return false;  
+            }  
+        },
        fileChanged(file){
             var vm = this
             const list = vm.$refs.drawingsInfo.files
-            vm.fileList.push({
-                file:list[0],//文件
-                drawingNo:'',//图号
-                proportion:'',//比例
-                fileName:list[0].name,//文件名
-                drawingName:list[0].name.split('.')[0],//图纸名
-            })
-            console.log(vm.fileList)
+            var reader = new FileReader();  
+            var dwidth = 0
+            var dheight = 0
+
+            reader.onload = function (e) {  
+                var data = e.target.result;  
+                //加载图片获取图片真实宽度和高度  
+                var image = new Image();  
+                image.onload=function(){  
+                    dwidth = image.width;  
+                    dheight = image.height;  
+                    console.log(dwidth+'::'+dheight)
+                }; 
+                image.src= data;   
+            };  
+            reader.readAsDataURL(list[0])
+            // console.log(dwidth+'::::'+dheight)
+            setTimeout(function(){
+                  vm.fileList.push({
+                    file:list[0],//文件
+                    drawingNo:'',//图号
+                    proportion:'',//比例
+                    fileName:list[0].name,//文件名
+                    drawingName:list[0].name.split('.')[0],//图纸名
+                    dwidth:dwidth,
+                    dheight:dheight
+                })
+                console.log(vm.fileList)
+            },0)
         },
       addfileCancle(){
           var vm = this
@@ -3739,8 +3779,8 @@ export default {
             fgId 
             fileDesc 描述
             **/
-            var returnUrl = vm.BDMSUrl+'project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/add?dcode='+item.drawingNo+'&ddId='+vm.checkFileDir.id+'&dname='+item.fileName+'&dscale='+item.proportion+'&entId='+vm.entId
-            returnUrl = encodeURIComponent(returnUrl);
+            var returnUrl = vm.BDMSUrl+'project2/drawing/'+vm.projId+'/'+vm.defaultSubProjId+'/add?dcode='+item.drawingNo+'&ddId='+vm.checkFileDir.id+'&dname='+item.fileName+'&dscale='+item.proportion+'&entId='+vm.entId+'&dheight='+item.dheight+'&dwidth='+item.dwidth
+           returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
             formData.append('token',vm.token);
             formData.append('projId',vm.projId);
@@ -3751,7 +3791,7 @@ export default {
             formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 },
@@ -3762,7 +3802,7 @@ export default {
                     vm.drawingsUploadShow = false
                     vm.fileList = []
                 }
-                if(response.data.cd == 10001){
+                if(response.data.cd != 0){
                      vm.$message({
                         type:'error',
                         message:response.data.msg

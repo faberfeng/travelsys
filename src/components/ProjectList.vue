@@ -354,6 +354,10 @@ export default {
       var vm = this
       vm.token  = localStorage.getItem('token')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
+      var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
+      if(defaultSubProjId != 'undefined'){
+          localStorage.removeItem('defaultSubProjId')
+      }
       vm.viewFlag()
       vm.getUserInfo()
   },

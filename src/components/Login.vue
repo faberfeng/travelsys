@@ -53,6 +53,10 @@ export default {
       var vm = this;
       const token = localStorage.getItem('token') 
       vm.BDMSUrl = vm.$store.state.BDMSUrl
+      var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
+      if(defaultSubProjId != 'undefined'){
+          localStorage.removeItem('defaultSubProjId')
+      }
       if(token != 'undefined'){
           vm.token = token
           //判断是否登陆
