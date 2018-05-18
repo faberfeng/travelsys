@@ -6,7 +6,7 @@
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <textarea   class="textArea" :id="'dc-add-content'+dcid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
+                        <textarea   class="textArea" :id="'dc-add-content'+dcid+selectugid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
                         <div id="at_userslist"></div>
                     </div>
                     <div class="func_area">
@@ -178,7 +178,21 @@ export default Vue.component('common-upload',{
             basePath:vm.BDMSUrl,
             token:vm.token
         }
-        $('#dc-add-content'+vm.dcid).showAtUsers(setting)
+        $('#dc-add-content'+vm.dcid+vm.selectugid).showAtUsers(setting)
+    },
+    watch:{
+         selectugid:function(val,oldval){
+            var vm = this 
+            var setting = {
+                projId:vm.projId,
+                ugid:vm.selectugid,
+                basePath:vm.BDMSUrl,
+                token:vm.token
+            }
+            setTimeout(function(){
+                $('#dc-add-content'+vm.dcid+vm.selectugid).showAtUsers(setting)
+            },1000)
+        },
     },
     methods:{
         checkItem(index){

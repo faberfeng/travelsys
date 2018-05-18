@@ -2401,7 +2401,7 @@
                             position: absolute;
                             display: none;
                             width: 226px;
-                            height: 270px;
+                            max-height: 270px;
                             overflow-y:auto; 
                             border: 1px solid #cccccc;
                             z-index: 10;
@@ -2993,8 +2993,6 @@ export default {
       },
       getComment(val,index,showResponse,reviewCount,reload,event){
         var vm = this
-        // console.log('liucheng')
-        console.log(event)
         if(reviewCount == 0){
              vm.$message({
                 type:'warning',
@@ -3290,11 +3288,13 @@ export default {
             vm.CommunicationList = {}
             if(response.data.cd == 0){
                vm.CommunicationList = response.data.rt.rows
-               vm.CommunicationList.forEach((item,index)=>{
-                   vm.$set(item,'showFlowChart',false)
-                   vm.$set(item,'showResponse',false)
-                   vm.$set(item,'statusText',vm.checkStatus(item.dcStatus))
-               })
+               if(vm.CommunicationList != null){
+                vm.CommunicationList.forEach((item,index)=>{
+                    vm.$set(item,'showFlowChart',false)
+                    vm.$set(item,'showResponse',false)
+                    vm.$set(item,'statusText',vm.checkStatus(item.dcStatus))
+                })
+               }
                vm.pageTotal = response.data.rt.pager.totalSize
             }else{
                   vm.$message({
@@ -4031,7 +4031,7 @@ export default {
                 vm.options_monomer = response.data.rt.subProjects//单体列表
                 vm.options_monomer.unshift({
                     id:response.data.rt.siteHolderId,
-                    Name:'场地总体'
+                    Name:'总体场地'
                 },)
                 vm.value_monomer = response.data.rt.siteHolderId
                 vm.selectUgId = response.data.rt.selectUgId

@@ -83,7 +83,7 @@ function comm_queryJsonData(props){
         
 $.fn.showAtUsers = function(setting) {
     if($("#at_textarea").length == 0){
-        $("body").append("<pre id='at_textarea'></pre>");   
+        $("body").append("<pre id='at_textarea' style='display:none;'></pre>");   
         //首先模拟一个输入框和显示用户列表的div，有人说pre会把有回车的内容，跟原先一样的展示，
         // 但测试后，算出@的位置还是不对，难道pre一说是传说吗。。。
     }
