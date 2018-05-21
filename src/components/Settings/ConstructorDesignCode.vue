@@ -574,7 +574,7 @@
 <script>
 import axios from 'axios';
 import './js/jquery-1.4.4.min.js';
-
+import './js/jquery-ui-1.9.2.custom.js'
 export default {
     name:'ConstructorDesignCode',
     data(){
@@ -3109,6 +3109,7 @@ export default {
             this.showConvenienceObject = scope;
             this.showConvenienceType = scope;
             this.convenientInput = true;
+            $('#CInput .el-dialog').draggable();
         },
         saveConvenient(type){
             if(this.inputGouJianType.length != 0){
