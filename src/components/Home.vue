@@ -513,6 +513,7 @@ export default {
         top: 68px;
         left: 0;
         bottom: 0;
+        z-index: 100;
     }
     .sideBar img{
         position: relative;

@@ -1053,7 +1053,7 @@ export default {
         .icon-X::after,.icon-Y::after,.icon-Z::after{
             display: block;
             position: absolute;
-            left: 240px;
+            left: 90%;
             top: 13px;
             font-size: 14px;
             line-height: 14px;
