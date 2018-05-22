@@ -3498,8 +3498,9 @@ export default {
             }
         }
         #CInput{
-           .el-dialog{
+            .el-dialog{
                 width: 586px!important;
+                margin-left:-693px;
             } 
             .multipleSelectA{
                 border: none;
