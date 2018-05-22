@@ -26,15 +26,17 @@
                 <div id="containerMessage">
                     <p class="header clearfix">
                         <span class="title">
-                          数据版本 <input type="tel" v-model="dataVision">/{{dataVision}}
+                          数据版本 <input type="tel" v-model="dataVision">/{{holderMaxVersion}}
                            <span class="reset" @click="selectData">重设</span>
                         </span>
-                        <span class="item-btn">
-                           <label>专业预设</label>
-                           <label>基本属性</label>
-                           <label>扩展属性</label>
+                        <span style="float: right;margin-right: 30px;">
+                            <span class="item-btn clearfix">
+                                <label>专业预设</label>
+                                <label @click="basicAttributes_auth.show = true">基本属性</label>
+                                <label @click="showExtension()">扩展属性</label>
+                            </span>
+                            <span class="item-upload" @click="editAttribute">编辑属性</span>
                         </span>
-                        <span class="item-upload" @click="editAttribute">编辑属性</span>
                     </p>
                     <div class="ForumSelector">
                         <p  class="selectBar clearfix">
@@ -75,12 +77,12 @@
                               </li>
                           </ul>
                         </p>
-                        <p class="selectBar clearfix">
+                        <p class="selectBar clearfix" v-if="!ShowClassify">
                           <span class="name">分类筛选</span>
                           <ul>
                               <li class="selectItem">
                                   <span class="title">专业</span>
-                                  <el-select v-model="value_professional" placeholder="请选择">
+                                  <el-select v-model="value_professional" ref="professional" placeholder="请选择">
                                       <el-option
                                       v-for="item in option_professional"
                                       :key="item.id"
@@ -91,7 +93,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">系统</span>
-                                  <el-select v-model="value_system" placeholder="请选择">
+                                  <el-select v-model="value_system"  ref="system" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_system"
                                       :key="item.id"
@@ -102,7 +104,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">类型</span>
-                                  <el-select v-model="value_type" placeholder="请选择">
+                                  <el-select v-model="value_type"  ref="type" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_type"
                                       :key="item.id"
@@ -116,36 +118,76 @@
                     </div>
                     <p class="btn-selection clearfix">
                        <span class="redbtn" @click="selectData">筛选</span>
-                       <span class="whitebtn">更多</span>
+                       <span class="whitebtn" v-if="ShowClassify" @click="ShowClassify = false">更多</span>
                     </p>
-                    <div class="project">
-                        <!-- <div style="padding:0 20px;box-sizing: border-box;">
+                    <div class="project" v-loading="loading">
+                        <!--以下是列表-->
+                        <div style="padding-right:30px;">
                           <table class="UserList" border="1" width='100%'>
                               <thead>
                                   <tr  class="userList-thead">
-                                      <th width="18%">岗位名称</th>
-                                      <th width="18%">岗位类型</th>
-                                      <th width="50%">授权的功能模块</th>
-                                      <th width="14%;">操作 </th>
+                                      <th width="34px;" style="padding-right:10px;">
+                                          <label  :class="[checkAll?'active':'','checkbox-fileItem']" for="allAttribute"></label>
+                                          <input  type="checkbox" id='allAttribute' class="checkbox-att" v-model="checkAll">
+                                      </th>
+                                      <th v-if="basicAttributes_auth.old.holderType">所在空间</th>
+                                      <th v-if="basicAttributes_auth.old.guid">元素GUID</th>
+                                      <th v-if="basicAttributes_auth.old.originalFile">原始文件</th>
+                                      <th v-if="basicAttributes_auth.old.originalCategory">原始分类</th>
+                                      <th v-if="basicAttributes_auth.old.originalId">原始ID</th>
+                                      <th v-if="basicAttributes_auth.old.originalName">原始名称</th>
+                                      <th v-if="basicAttributes_auth.old.gccode">类型编码</th>
+                                      <th v-if="basicAttributes_auth.old.gccodeName">类型名称</th>
+                                      <th v-if="basicAttributes_auth.old.name">构件名称</th>
+                                      <th v-if="basicAttributes_auth.old.creator">创建者</th>
+                                      <th v-if="basicAttributes_auth.old.editor">编辑者</th>
+                                      <th v-if="basicAttributes_auth.old.updateTime">更新时间</th>
+                                      <th v-if="basicAttributes_auth.old.comments">注释</th>
+                                      <th v-if="basicAttributes_auth.old.tag">标记</th>
+                                      <th v-if="basicAttributes_auth.old.revision">版本号</th>
+                                      <!--
+                                            GCPropertyList:[],//扩展属性头部
+                                            GCPropertyValueList:[],//扩展属性查询的值 库
+                                      -->
+                                       <th v-for="(item,key) in GCPropertyList" :key="key" v-if="item.checked">{{item.propertyTitle}}</th>
                                   </tr>
                               </thead>
                               <tbody>
-                                  <tr v-for="(val,index) in jobList" :key="index">
-                                          <td v-text="val.posName"></td>
-                                          <td v-text="val.posTypeName"></td>
-                                          <td v-text="val.posAuthNameList"></td>
-                                          <td>
-                                              <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))"
-                                              class="editIcon" @click="addUser(val.posType,val.posName,val.id)"></span>
-                                              <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" 
-                                              class="deleteIcon" @click="deleteJob(val.id)"></span>
-                                          </td>
-                                      </tr>
+                                  <tr v-for="(val,index) in attributeList" :key="index">
+                                      <td>
+                                          <label  :class="[val.checked?'active':'','checkbox-fileItem']" :for="val.holderId+'Attribute'" ></label>
+                                          <input  type="checkbox" :id="val.holderId+'Attribute'" class="checkbox-att" v-model="val.checked">
+                                      </td>
+                                      <td v-text="val.holderType"  v-if="basicAttributes_auth.old.holderType"></td>
+                                      <td v-text="val.guid"  v-if="basicAttributes_auth.old.guid"></td>
+                                      <td v-text="val.originalFile"  v-if="basicAttributes_auth.old.originalFile"></td>
+                                      <td v-text="val.originalCategory"  v-if="basicAttributes_auth.old.originalCategory"></td>
+                                      <td v-text="val.originalId"  v-if="basicAttributes_auth.old.originalId"></td>
+                                      <td v-text="val.originalName"  v-if="basicAttributes_auth.old.originalName"></td>
+                                      <td v-text="val.gccode"  v-if="basicAttributes_auth.old.gccode"></td>
+                                      <td v-text="getGenieclassTitle(val.gccode)"  v-if="basicAttributes_auth.old.gccodeName"></td>
+                                      <td v-text="val.name"  v-if="basicAttributes_auth.old.name"></td>
+                                      <td v-text="val.creator"  v-if="basicAttributes_auth.old.creator"></td>
+                                      <td v-text="val.editor"  v-if="basicAttributes_auth.old.editor"></td>
+                                      <td v-text="val.updateTime"  v-if="basicAttributes_auth.old.updateTime"></td>
+                                      <td v-text="val.comments"  v-if="basicAttributes_auth.old.comments"></td>
+                                      <td v-text="val.tag"  v-if="basicAttributes_auth.old.tag"></td>
+                                      <td v-text="val.revision"  v-if="basicAttributes_auth.old.revision"></td>
+                                        <!--
+                                            GCPropertyList:[],//扩展属性头部
+                                            GCPropertyValueList:[],//扩展属性查询的值 库
+                                      -->
+                                     <td   v-if="item.checked" v-text="initVal(item.id,val.traceId)"  v-for="(item,key) in GCPropertyList" :key="key"></td>
+                                  </tr>
                               </tbody>
                           </table>
+                            <div v-if="empty" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
+                                  无符合当前筛选条件的记录
+                            </div>
                         </div>
-                        <div class="datagrid-pager pagination">
-                            <table cellspacing="0" cellpadding="0" border="0">
+                        <!--以下是page-navigitation-->
+                        <div class="datagrid-pager pagination" v-if="attributeList.length>0">
+                            <table cellspacing="0" cellpadding="0" border="0" >
                               <tbody>
                                   <tr>
                                       <td>
@@ -191,14 +233,14 @@
                                             <div class="pagination-btn-separator"></div>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" @click="this.getInfo" class="btn-refresh btn-TAB"></a>
+                                            <a href="javascript:void(0)" @click="selectData" class="btn-refresh btn-TAB"></a>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                             <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
                             <div style="clear:both;"></div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -207,6 +249,90 @@
             <div v-if="screenLeft.item == 1" class="screenRight_1">
                111
             </div>
+        </div>
+        <div id="edit">
+            <el-dialog title="基本属性" :visible="basicAttributes_auth.show" @close="basicCancle">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.holderType?'active':'','checkbox-fileItem holderType_Attribute']" for="holderType_Attribute" ></label>
+                          <input  type="checkbox" id="holderType_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.holderType">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.guid?'active':'','checkbox-fileItem guid_Attribute']" for="guid_Attribute" ></label>
+                          <input  type="checkbox" id="guid_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.guid">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.originalFile?'active':'','checkbox-fileItem originalFile_Attribute']" for="originalFile_Attribute" ></label>
+                          <input  type="checkbox" id="originalFile_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.originalFile">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.originalCategory?'active':'','checkbox-fileItem originalCategory_Attribute']" for="originalCategory_Attribute" ></label>
+                          <input  type="checkbox" id="originalCategory_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.originalCategory">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.originalId?'active':'','checkbox-fileItem originalId_Attribute']" for="originalId_Attribute" ></label>
+                          <input  type="checkbox" id="originalId_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.originalId">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.originalName?'active':'','checkbox-fileItem originalName_Attribute']" for="originalName_Attribute" ></label>
+                          <input  type="checkbox" id="originalName_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.originalName">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.gccode?'active':'','checkbox-fileItem gccode_Attribute']" for="gccode_Attribute" ></label>
+                          <input  type="checkbox" id="gccode_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.gccode">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.gccodeName?'active':'','checkbox-fileItem gccodeName_Attribute']" for="gccodeName_Attribute" ></label>
+                          <input  type="checkbox" id="gccodeName_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.gccodeName">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.name?'active':'','checkbox-fileItem name_Attribute']" for="name_Attribute" ></label>
+                          <input  type="checkbox" id="name_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.name">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.creator?'active':'','checkbox-fileItem creator_Attribute']" for="creator_Attribute" ></label>
+                          <input  type="checkbox" id="creator_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.creator">
+                    </span>
+                    <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.editor?'active':'','checkbox-fileItem editor_Attribute']" for="editor_Attribute" ></label>
+                          <input  type="checkbox" id="editor_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.editor">
+                    </span>
+
+                     <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.updateTime?'active':'','checkbox-fileItem updateTime_Attribute']" for="updateTime_Attribute" ></label>
+                          <input  type="checkbox" id="updateTime_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.updateTime">
+                    </span>
+                     <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.comments?'active':'','checkbox-fileItem comments_Attribute']" for="comments_Attribute" ></label>
+                          <input  type="checkbox" id="comments_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.comments">
+                    </span>
+                     <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.tag?'active':'','checkbox-fileItem tag_Attribute']" for="tag_Attribute" ></label>
+                          <input  type="checkbox" id="tag_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.tag">
+                    </span>
+                     <span class="item-attibuteAuth">
+                          <label  :class="[basicAttributes_auth.new.revision?'active':'','checkbox-fileItem revision_Attribute']" for="revision_Attribute" ></label>
+                          <input  type="checkbox" id="revision_Attribute" class="checkbox-arr" v-model="basicAttributes_auth.new.revision">
+                    </span>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="basicConfirm">确定</button>
+                    <button class="editBtnC" @click="basicCancle">取消</button>
+                </div>
+            </el-dialog>
+             <el-dialog title="显示扩展属性" :visible="extensionAttributesShow" @close="extensionCancle">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth" v-for="(item,key) in GCPropertyList_to_select" :key="key">
+                          <label  :class="[item.extension_checked?'active':'','checkbox-fileItem']" :for="'extension_Attribute_'+key" ></label>
+                          <input  type="checkbox" :id="'extension_Attribute_'+key" class="checkbox-arr" v-model="item.extension_checked">
+                          <span  v-text="item.propertyTitle" class="text"></span>
+                    </span>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="extensionConfirm">确定</button>
+                    <button class="editBtnC" @click="extensionCancle">取消</button>
+                </div>
+            </el-dialog>
         </div>
 </div>       
 </template>
@@ -250,179 +376,94 @@
             display: none;
         }
         #edit{ 
-             .inp-search{
-                width: 200px;
-                height: 38px;
-                border: 1px solid #d1d1d1;
-                border-radius: 2px;
-                background: #fafafa;
-                padding-left: 10px;
-            }
             .el-dialog{
-            margin: 0 auto;
-            .upInput{
-                display: none;
+                margin: 0 auto;
             }
-            /* 上传文件按钮 */
-            .imageBody{
-            text-align: left;
-            }
-            .el-radio__label{
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-            .imageBody .imageBodyText{
-                color: #666;
-                font-size: 14px;
-                line-height: 14px;
-                font-weight: normal;
-                display: inline-block;
-                width: 175px;
-                padding-left: 94px;
-                text-align: left;
-            }
-            .updataImageSpan{
-                overflow: hidden;
-                width: 98px;
-            }
-            .updataImageSpan input{
-                position: absolute;
-                left: 0px;
-                top: 0px;
-                opacity: 0;
-                /* -ms-filter: 'alpha(opacity=0)'; */
-            }
-            .selectionBox{
-                margin: 10px 50px;
-                border:1px solid #cccccc;
-                padding: 20px;
-                p{
-                    text-align: left;
+             .item-attibuteAuth{
+                 float: left;
+                 width: 33.3%;
+                 padding-left: 78px;
+                 height: 14px;
+                 line-height: 14px;
+                 margin-bottom: 26px;
+                 text-align: left;
+                 .text{
                     font-size: 14px;
-                    line-height: 14px;
                     color: #666666;
-                }
-            }
-            .checkbox-fileItem{
-                float: left;
-                width: 14px;
-                height: 14px;
-                border: 1px solid #cccccc;
-                cursor: pointer;
-                margin-right: 5px;
-                position: relative;
-                &::after{
-                    font-size:12px;
-                    color:#cccccc;
-                    display: block;
-                    position: absolute;
-                    right: -30px;
-                    top: 0;
-                    line-height:12px;
-                    content: '';
-                }
-            }
-            .active{
-                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                    border: 1px solid #fc3439;
-            }
-            .yingsheProject{
-                overflow: hidden;
-                margin-bottom: 10px;
-            }
-            .yingsheProjectText{
-                color: #999;
-                display: block;
-                float: left;
-                margin-left: 30px;
-                font-size: 14px;
-                line-height: 36px;
-            }
-            .yingsheProjectBtn{
-                float: right;
-                margin-right: 30px;
-                line-height: 36px;
-            }
-         }
-         .uploadBox .el-dialog__body{
-                margin-top: 21px;
-                .fileContainer{
-                    width: 600px;
-                    margin: 0px 30px;
-                    border-collapse: collapse;
-                    border: 1px solid #e6e6e6;
-                    thead{
-                        background: #f8f8f9;
-                        th{
-                            padding-left: 10px;
-                            height: 40px;
-                            text-align: left;
-                            box-sizing: border-box;
-                            border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
-                            color: #333333;
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                        }
-                    }
-                    tbody{
-                        tr{
-                            td{
-                                padding-left: 5px;
-                                padding-right: 5px;
-                                height: 40px;
-                                text-align: left;
-                                box-sizing: border-box;
-                                border-right: 1px solid #e6e6e6;
-                                font-size: 12px;
-                                color: #333333;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                position: relative;
-                                input,select{
-                                    float: left;
-                                    width: 100%;
-                                    height: 32px;
-                                    border: 1px solid #d1d1d1;
-                                    border-radius: 2px;
-                                    background: #fafafa;
-                                    padding-left: 10px;
-                                }
-                                .icon-sanjiao{
-                                    display: block;
-                                    position: absolute;
-                                    width: 12px;
-                                    height: 7px;
-                                    background-image:url('../Settings/images/sanjiao.png');
-                                    background-size: 100% 100%;
-                                    content: '';
-                                    top: 16px;
-                                    right: 11px;
-                                }
-                            }
-                            &:hover{
-                                background: #fafafa;
-                            }
-                        }
-                    }
-                }
-                .actionBtn{
-                    width: 16px;
-                    height: 16px;
-                    border: none;
+                    margin-left: 10px;
+                 }
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
                     cursor: pointer;
-                    margin-right: 16px;
-                    margin-top:9px;
+                    position: relative;
+                    &::after{
+                        font-size: 14px;
+                        color: #666666;
+                        display: block;
+                        position: absolute;
+                        left: 24px;
+                        width: 100px;
+                        text-align: left;
+                        top: 0;
+                        line-height: 12px;
+                    }
                 }
-                .editBtn{
-                    background: url('../../assets/edit.png') no-repeat;
+                .holderType_Attribute::after{
+                    content: '所在空间';
                 }
-                .deleteBtn{
-                    background: url('../../assets/delete.png') no-repeat;
+                .guid_Attribute::after{
+                    content: '元素GUID';
                 }
-         }
+                .originalFile_Attribute::after{
+                    content: '原始文件';
+                }
+                .originalCategory_Attribute::after{
+                    content: '原始分类';
+                }
+                .originalId_Attribute::after{
+                    content: '原始ID';
+                }
+                .originalName_Attribute::after{
+                    content: '原始名称';
+                }
+                .gccode_Attribute::after{
+                    content: '类型编码';
+                }
+                .gccodeName_Attribute::after{
+                    content: '类型名称';
+                }
+                .name_Attribute::after{
+                    content: '构件名称';
+                }
+                .creator_Attribute::after{
+                    content: '创建者';
+                }
+                .editor_Attribute::after{
+                    content: '编辑者';
+                }
+                .updateTime_Attribute::after{
+                    content: '更新时间';
+                }
+                .comments_Attribute::after{
+                    content: '注释';
+                }
+                .tag_Attribute::after{
+                    content: '标记';
+                }
+                .revision_Attribute::after{
+                    content: '修订版本号';
+                }
+                .active{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+                }
+                .checkbox-arr{
+                    display: none;
+                }
+             }
         }
         .box-left-container{
             display: block;
@@ -585,6 +626,7 @@
             }
             #containerMessage{
                 padding-left:30px; 
+                padding-bottom: 65px;
                 .header{
                     text-align: left;
                     margin: 15px 0;
@@ -615,15 +657,33 @@
                         }
                     }
                     .item-btn{
-                       float: right;
+                       float: left;
                         margin-right: 30px;
                         label{
-                          border: 1px solid #e6e6e6;
+                          float:left;
+                          width:74px;
+                          height:26px;
+                          border-top: 1px solid #e6e6e6;
+                          border-bottom: 1px solid #e6e6e6;
+                          text-align:center;
+                          line-height:24px;
+                          font-size:12px;
+                          color:#666666;
+                          cursor: pointer;
+                          border-left: 1px solid #e6e6e6;
+                          &:first-of-type{
+                            border-top-left-radius: 2px;
+                            border-bottom-left-radius: 2px;
+                          }
+                          &:last-of-type{
+                            border-right: 1px solid #e6e6e6;
+                              border-top-right-radius: 2px;
+                            border-bottom-right-radius: 2px;
+                          }
                         }
                     }
                     .item-upload{
-                        float: right;
-                        margin-right: 30px;
+                        float: left;
                         background: #fc3439;
                         color: #ffffff;
                         font-size: 12px;
@@ -731,23 +791,42 @@
                     .UserList{
                         border-collapse: collapse;
                         border: 1px solid #e6e6e6;
+                        .checkbox-att{
+                          display:none;
+                        }
+                        .checkbox-fileItem{
+                            float: left;
+                            width: 14px;
+                            height: 14px;
+                            border: 1px solid #cccccc;
+                            cursor: pointer;
+                            position: relative;
+                            margin-left:4px;
+                        }
+                        .active{
+                            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                            border: 1px solid #fc3439;
+                        }
                         thead{
                             background: #f2f2f2;
                             th{
-                                padding-left: 10px;
-                                height: 52px;
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 55px;
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
                                 font-size: 12px;
                                 color: #333333;
+                                font-weight: normal;
                             }
                         }
                         tbody{
                             tr{
                                 td{
-                                    padding-left: 10px;
-                                    height: 52px;
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 55px;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -763,7 +842,7 @@
                      /**********一下是分页器的样式***************/
                     .datagrid-pager {
                         display: block;
-                        margin: 0 20px;
+                        margin-right: 30px;
                         height: 31px;
                         width: auto;
                         border:1px solid #d4d4d4;
@@ -841,7 +920,9 @@
                         color: #333333;
                     }
                     .pagination-info{
+                        float: right;
                         margin-top: 5px;
+                        margin-right: 25px;
                     }
                 }
             }
@@ -1062,16 +1143,68 @@ export default {
           },
         ],//楼层选项
         value_monomer: '',//单体 筛选关键词
-        value_partition: '0',//单体 筛选关键词
+        value_partition: '0',//分区 筛选关键词
         value_floor: '0',//单体 筛选关键词
         value_professional:'-1',//专业 筛选关键字
         value_system:'-1',//系统 筛选关键字
         value_type:'-1',//类型 筛选关键字
         projAuth:[],//当前用户的权限列表
         fullscreenLoading:false,
+        loading:false,
         entType:'',
         dataVision:0,
-        currentPage:1,//当前的页面的页数
+        holderMaxVersion:0,//最大版本的id
+        attributeList:[],//属性的列表
+        GCPropertyList:[],//扩展属性头部
+        GCPropertyList_to_select:[],//扩展属性头部
+        GCPropertyValueList:[],//扩展属性查询的值 库
+        GenieclassTitle:[],//类型信息列表
+        checkAll:false,//全选所有
+        ShowClassify:true,//显示分类筛选项
+        basicAttributes_auth:{
+            show:false,
+            new:{
+                holderType:true,//所在空间
+                guid:false,//元素GUID
+                originalFile:true,//原始文件
+                originalCategory:true,//原始分类
+                originalId:false,//原始ID
+                originalName:true,//原始名称
+                gccode:false,//类型编码
+                gccodeName:true,//类型名称
+                name:false,//构件名称
+                creator:false,//创建者
+                editor:true,//编辑者
+                updateTime:true,//更新时间
+                comments:true,//注释
+                tag:true,//标记
+                revision:true,//修订版本号
+            },
+            old:{
+                holderType:true,//所在空间
+                guid:false,//元素GUID
+                originalFile:true,//原始文件
+                originalCategory:true,//原始分类
+                originalId:false,//原始ID
+                originalName:true,//原始名称
+                gccode:false,//类型编码
+                gccodeName:true,//类型名称
+                name:false,//构件名称
+                creator:false,//创建者
+                editor:true,//编辑者
+                updateTime:true,//更新时间
+                comments:true,//注释
+                tag:true,//标记
+                revision:true,//修订版本号
+            }
+        },//这是基本属性的table展示列表
+        extensionAttributesShow:false,//扩展属性显隐
+        pageDetial:{
+            pagePerNum:10,//一页几份数据
+            currentPage:1,//初始查询页数 第一页
+            total:'',//所有数据
+        },
+        empty:false,
       }
   },
   created(){
@@ -1094,12 +1227,33 @@ export default {
     //     options_floor:[],//相关选项 -->
       value_monomer:function(val){
             var vm = this 
+             if(val == 0) {
+                vm.options_partition = [
+                    {
+                        id:'0',
+                        Name:'无'
+                }]
+                    vm.options_floor = [
+                    {
+                        id:'0',
+                        Name:'无'
+                    }
+                ]
+            }else {
+                vm.getPartitionBySubProjId() //加载分区
+            }
       },
        value_partition:function(val){
             var vm = this 
+            vm.findStorey()
       },
-       value_floor:function(val){
+      value_professional:function(val){
             var vm = this 
+            vm.getGenieClass(2)
+      },
+      value_system:function(val){
+            var vm = this 
+            vm.getGenieClass(3)
       },
       'show.basicAttributes':function(val){
           if(val){
@@ -1115,8 +1269,358 @@ export default {
             $("#BindingArtifacts").hide(200);
           }
       },
+      'pageDetial.currentPage':function(val,oldval){
+          var vm = this
+          vm.selectData()
+      },
+      'pageDetial.pagePerNum':function(val,oldval){
+          var vm = this
+          vm.selectData()
+      },
   },
   methods:{
+      showExtension(){
+          var vm = this
+          if(vm.GCPropertyList.length >0){
+               vm.extensionAttributesShow = true
+          }else{
+              vm.$message({
+                  type:'warning',
+                  message:'没有扩展属性!'
+              })
+          }
+      },
+      initVal(id,traceId){
+          /**
+           * @param id 扩展属性headr id
+           * @param traceId row列表traceId
+           * **/
+        var vm = this
+        var valueFrom=1
+        var pValue=""
+        if(vm.GCPropertyValueList.length>0){
+            for(var k=0;k<vm.GCPropertyValueList.length;k++) {
+                if(vm.GCPropertyValueList[k].projectGcPropertyId == id && vm.GCPropertyValueList[k].traceId == traceId){
+                    valueFrom=vm.GCPropertyValueList[k].valueFrom
+                    pValue= vm.GCPropertyValueList[k].propertyValue
+                    break
+                }
+            }
+        }
+        return pValue
+      },
+      changePage(val){//分页 0 -1 1 2
+            var vm = this; 
+            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                vm.$message('这已经是第一页!')
+                return false
+            }
+            if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                vm.$message('这已经是最后一页!')
+                return false
+            }
+            switch(val){
+                case 0:
+                    vm.pageDetial.currentPage = 1
+                    break;
+                case -1:
+                    vm.pageDetial.currentPage--
+                    break;
+                case 1:
+                    vm.pageDetial.currentPage++
+                    break;
+                case 2:
+                    vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                    break;
+            }
+      },
+      extensionCancle(){
+         var vm =this
+          vm.extensionAttributesShow = false
+           vm.GCPropertyList.forEach((item,index)=>{
+              if(item.checked){
+                  vm.GCPropertyList_to_select[index].extension_checked = true
+              }else{
+                  vm.GCPropertyList_to_select[index].extension_checked = false
+              }
+          })
+      },
+      extensionConfirm(){
+          var vm = this
+          vm.extensionAttributesShow = false
+          vm.GCPropertyList_to_select.forEach((item,index)=>{
+              if(item.extension_checked){
+                  vm.GCPropertyList[index].checked = true
+              }else{
+                  vm.GCPropertyList[index].checked = false
+              }
+          })
+      },
+      basicCancle(){
+          var vm =this
+          vm.basicAttributes_auth.show = false
+          var b = {}
+          $.extend(b,vm.basicAttributes_auth.old)
+          vm.basicAttributes_auth.new = b
+      },
+      basicConfirm(){
+          var vm = this
+          vm.basicAttributes_auth.show = false
+          var b = {}
+          $.extend(b,vm.basicAttributes_auth.new)
+          vm.basicAttributes_auth.old = b
+      },
+      getGenieClass(level,val){
+            var vm = this
+            var parentClassifyCode='';
+            var gcCode = vm.value_professional
+            var gcCode1 = vm.value_system
+            var gcCode2 = vm.value_type
+            if(level==2){
+                parentClassifyCode= vm.value_professional
+                vm.options_type = [
+                    {
+                        id:'0',
+                        Name:'无'
+                    },
+                ]
+            }else if(level==3){
+                parentClassifyCode = vm.value_system
+                if(parentClassifyCode==0){
+                     vm.options_type = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        },
+                    ]
+                }else if(parentClassifyCode==-1){
+                    vm.options_type = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        },
+                        {
+                            id:'-1',
+                            Name:'全部'
+                        },
+                    ]
+                }
+            }
+            if(parentClassifyCode==-1 || parentClassifyCode==0){
+                return false
+            }
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/dc/getGenieClass',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    level:level,
+                    parentClassifyCode:parentClassifyCode
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null && response.data.rt.length > 0){
+                        if(level == 2){
+                            vm.options_system = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                                },
+                                {
+                                    id:'-1',
+                                    Name:'全部'
+                                }
+                            ]
+                            response.data.rt.forEach((item,key)=>{
+                                vm.options_system.push({
+                                        id:item.number,
+                                        Name:item.title
+                                })//分区列表
+                            })
+                        }else if(level == 3){
+                            vm.options_type = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                                },
+                                {
+                                    id:'-1',
+                                    Name:'全部'
+                                }
+                            ]
+                            response.data.rt.forEach((item,key)=>{
+                                vm.options_type.push({
+                                        id:item.number,
+                                        Name:item.title
+                                })//分区列表
+                            })
+                        }
+                      
+                    }else{
+                        if(level == 2){
+                             vm.options_system = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                            },
+                            {
+                                    id:'-1',
+                                    Name:'全部'
+                            }]
+                        }else if(level == 3){
+                             vm.options_type = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                            },{
+                                    id:'-1',
+                                    Name:'全部'
+                            }]
+                        }
+                       
+                    }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      getPartitionBySubProjId(){
+          var vm = this
+        axios({
+            method:'GET',
+            url:vm.BDMSUrl+'project2/dc/getPartitionBySubProjId',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                subProjId:vm.value_monomer
+            }
+        }).then((response)=>{
+            if(response.data.cd == 0){
+                 vm.options_partition = [
+                        {
+                        id:'0',
+                        Name:'无'
+                    },
+                    {
+                        id:'-1',
+                        Name:'全部'
+                    }
+                ]
+                vm.options_floor = [
+                    {
+                        id:'0',
+                        Name:'无'
+                    }
+                ]
+                if(response.data.rt != null && response.data.rt.length > 0){
+                    response.data.rt.forEach((item,key)=>{
+                          vm.options_partition.push({
+                                id:item.ID,
+                                Name:item.Name
+                          })//分区列表
+                    })
+                }               
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },    
+      findStorey(){
+            var vm = this
+            if(vm.value_partition==-1){
+                vm.options_floor = [
+                    {
+                        id:'0',
+                        Name:'无'
+                    },
+                    {
+                        id:'-1',
+                        Name:'全部'
+                    }
+                ]
+                return false
+            }
+            if(vm.value_partition==0){
+                 vm.options_floor = [
+                    {
+                        id:'0',
+                        Name:'无'
+                    },
+                ]
+                return false
+            }
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/dc/findStorey/'+vm.value_partition,
+                headers:{
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null && response.data.rt.rows.length > 0){
+                        vm.options_floor = [
+                            {
+                                id:'0',
+                                Name:'无'
+                            },
+                            {
+                                id:'-1',
+                                Name:'全部'
+                            }
+                        ]
+                        response.data.rt.rows.forEach((item,key)=>{
+                            vm.options_floor.push({
+                                    id:item.ID,
+                                    Name:item.Name
+                            })//分区列表
+                        })
+                    }else{
+                        vm.options_floor = [
+                            {
+                                id:'0',
+                                Name:'无'
+                        }]
+                    }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      getGenieclassTitle(gcCode){
+            /**
+             *
+             * @param GenieclassTitle  类型信息列表
+             * @param gcCode  类型编码
+             * @param typeName  专业+系统
+             * @returns {*}
+             */
+            var vm = this
+            var typeName='';
+          //   @param   value_professional:'-1',//专业 筛选关键字
+          //   @param        value_system:'-1',//系统 筛选关键字
+          //   @param        value_type:'-1',//类型 筛选关键字
+            if(vm.value_professional != -1){
+                typeName= vm.$refs.professional.selectedLabel +"-"
+            }
+            if(vm.value_system !=-1 && vm.value_system !=0){
+                typeName+=vm.$refs.system.selectedLabel+"-"
+            }
+            if((vm.value_system ==-1 || vm.value_system ==0) && vm.value_type ==-1 || vm.value_type ==0){
+                typeName=''
+            }
+            if(vm.GenieclassTitle && vm.GenieclassTitle.length>0){
+                  for(var i=0;i<vm.GenieclassTitle.length;i++){
+                      if(vm.GenieclassTitle[i].classifyCode==gcCode){
+                          return typeName+vm.GenieclassTitle[i].classifyName;
+                      }
+                  }
+            }
+            return '';
+      },
       editAttribute(){
           var vm = this
       },
@@ -1164,6 +1668,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == 0){
                     vm.dataVision = response.data.rt.holderMaxVersion
+                    vm.holderMaxVersion = response.data.rt.holderMaxVersion
                 }
 
             }).catch((err)=>{
@@ -1173,6 +1678,86 @@ export default {
     },
     selectData(){
           var vm = this
+          if(isNaN(vm.dataVision) || vm.dataVision <=0 || vm.dataVision>vm.holderMaxVersion){
+            vm.$message({
+              type:'warning',
+              message:'数据版本只能是1到'+vm.holderMaxVersion+'的正整数！'
+            })
+            return false
+          }
+          vm.fullscreenLoading = true
+          /**
+           * 下面是判断单体和单体类型
+           * **/
+          var holderId=''
+          var isChildren=1
+          var selectBuild=3//单体选择 1：选择了总体场地，2：全部单体，3：单个单体
+          var holderType=7//6:场地，7：单体，8：分区，9：楼层
+          if(vm.value_monomer == 0) {
+              selectBuild = 1
+              holderType=6
+          }else if(vm.value_monomer == 'all'){
+              selectBuild=2
+              holderType=7
+          }else{
+              selectBuild=3
+          }
+
+          if(vm.value_monomer != -1){
+              holderId = vm.value_monomer
+              if(vm.value_partition!=-1){
+                  if(vm.value_partition==0){//分区选择了（无）
+                      isChildren=0
+                  }else {
+                      holderType=8
+                      holderId = vm.value_partition
+                      if (vm.value_floor != -1) {
+                          isChildren=0
+                          if(vm.value_floor==0){//楼层选择了（无）
+                              //isChildren=0;
+                          }else {
+                              holderType=9
+                              holderId = vm.value_floor
+                          }
+                      }else{
+                          holderType = 9
+                      }
+                  }
+              }else{
+                      holderType = 8
+                      if (vm.value_floor != 0) {
+                          holderType = 9
+                      }
+              }
+          }
+          /**
+           * 以下是第二行筛选的值
+           * @param   value_professional:'-1',//专业 筛选关键字
+            @param        value_system:'-1',//系统 筛选关键字
+            @param        value_type:'-1',//类型 筛选关键字
+           * **/
+          
+          var gcCode = vm.value_professional
+          var gcCode1 = vm.value_system
+          var gcCode2 = vm.value_type
+          var gcNumber=''
+          if(vm.value_professional!=-1){ //专业
+              if(vm.value_system ==0){
+                  gcNumber = vm.value_professional
+              }else {
+                  gcNumber = vm.value_professional
+                  if (vm.value_system  != -1) { //系统
+                      if (vm.value_type == 0) {
+                          gcNumber = vm.value_system 
+                      } else {
+                          gcNumber = vm.value_system 
+                          if (vm.value_type != -1) {//类型
+                              gcNumber = vm.value_type
+                          }
+                      }
+                  }
+              }
+          }
           axios({
               method:'POST',
               url:vm.BDMSUrl+'project2/dc/searchPropertyData',
@@ -1182,21 +1767,52 @@ export default {
               params:{
                   projId:vm.projId,
                   dataVision:vm.dataVision,//数据版本
-                  isChildren:'',
-                  selectBuild:'',
-                  holderType:'',
-                  holderId:'',
-                  gcCode:'',
-                  gcCode1:'',
-                  gcCode2:'',
-                  gcNumber:'',
-                  rows:15,
-                  page:vm.currentPage,
+                  isChildren:isChildren,
+                  selectBuild:selectBuild,
+                  holderType:holderType,
+                  holderId:holderId,
+                  gcCode:gcCode,
+                  gcCode1:gcCode1,
+                  gcCode2:gcCode2,
+                  gcNumber:gcNumber,
+                  rows:vm.pageDetial.pagePerNum,
+                  page:vm.pageDetial.currentPage,
               }
           }).then((response)=>{
               if(response.data.cd == 0){
-                vm.contacts = response.data.rt
+                  if(response.data.rt.gridDataJson.rows != null){
+                    vm.empty = false
+                    vm.attributeList = response.data.rt.gridDataJson.rows
+                    vm.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
+                    var b = []
+                    $.extend(b,vm.GCPropertyList)
+                    vm.GCPropertyList_to_select = b//扩展属性头部
+                    vm.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+                    vm.pageDetial.total = response.data.rt.gridDataJson.total
+                    vm.attributeList.forEach(element => {
+                        vm.$set(element,'checked',false)
+                    });
+                    vm.GCPropertyList.forEach(element => {
+                        vm.$set(element,'checked',true)
+                    })
+                    vm.GCPropertyList_to_select.forEach(element => {
+                        vm.$set(element,'extension_checked',true)
+                    })
+                  }else{
+                    vm.empty = true
+                    vm.pageDetial.total = 0
+                    vm.attributeList = []
+                    vm.GCPropertyList = []//扩展属性头部
+                    vm.GCPropertyList_to_select = []
+                    vm.GCPropertyValueList = []//扩展属性查询的值 库
+                  }
+                  if(response.data.rt.genieclassTitle != null){
+                    vm.GenieclassTitle = response.data.rt.genieclassTitle
+                  }else{
+                    vm.GenieclassTitle = []
+                  }
               }
+              vm.fullscreenLoading = false
           }).catch((err)=>{
               console.log(err)
           })
