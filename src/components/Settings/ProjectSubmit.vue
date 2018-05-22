@@ -178,7 +178,7 @@
                     <div class="editBody" style="margin:0 30px">
                         <div class="yingsheProject">
                             <label class="yingsheProjectText">已添加的映射信息 : </label>
-                            <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure" style="margin-right:0;">添加扩展属性</button>
+                            <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure" style="margin-right:0;">添加</button>
                         </div>
                         <zk-table 
                         index-text="序号"
@@ -257,7 +257,7 @@
                                             {{item.valueType_}}
                                         </td>
                                         <td>
-                                            <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                            <input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
                                             <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
                                         </td>    
                                     </tr>
@@ -326,7 +326,7 @@
                                             {{item.valueType_}}
                                         </td>
                                         <td>
-                                            <label class="textAnd">@</label><input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
+                                            <input class="TextInput" placeholder="请输入" v-model="item.formula_"/>
                                             <button class="textAndBtn" style="margin-right:10px" @click="showConvenience(index)">...</button>
                                         </td>    
                                     </tr>
@@ -888,7 +888,10 @@ export default {
                     if(response.data.rt.rows){
                         this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
-                            item.valueType_ = this.judgeValueType(item.valueType);
+                            item = Object.assign(item,{
+                                valueType_:this.judgeValueType(item.valueType),
+                                formula_:item.formula===null? '@':item.formula
+                            })
                         })
                     }
                 }else if (response.data.cd == '-1'){
@@ -933,7 +936,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+$('.TextInput')[index].value
+                    formula:$('.TextInput')[index].value
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -959,9 +962,6 @@ export default {
                         this.addProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
-                        // Array.from($('.TextInput')).forEach(item=>{
-                        //     item.value = '';
-                        // })
                         this.getEntityMapping();
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -1068,7 +1068,7 @@ export default {
                         this.addProjectMappingData.forEach(item=>{
                             item = Object.assign(item,{
                                 valueType_:this.judgeValueType(item.valueType),
-                                formula_:item.formula.split('@')[1]
+                                formula_:item.formula===null? '@':item.formula
                             })
                         })
                 }else if(response.data.cd  == '-1'){
@@ -1107,7 +1107,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+$('.TextInput')[index].value
+                    formula:$('.TextInput')[index].value
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -1133,10 +1133,6 @@ export default {
                         this.editProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
-                        // Array.from($('.TextInput')).forEach(item=>{
-                        //     item.value = '';
-                        // })
-                        this.editProjectMappedShow =false;
                         this.getEntityMapping();
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -1792,6 +1788,7 @@ export default {
             this.showConvenienceObject = scope;
             this.showConvenienceType = scope;
             this.convenientInput = true;
+            $('#CInput .el-dialog').draggable();
         },
         saveConvenient(type){
             if(this.inputGouJianType.length != 0){
@@ -1822,7 +1819,7 @@ export default {
                 this.jiLiangResult = '';
                 this.jiLiangResult = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }
-            var str = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
+            var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
             this.addProjectMappingData.forEach((item,index)=>{
                 if(index == this.showConvenienceObject){
                     item = Object.assign(item,{
@@ -2008,8 +2005,9 @@ export default {
             }
         }
         #CInput{
-           .el-dialog{
+            .el-dialog{
                 width: 586px!important;
+                margin-left:-693px;
             } 
             .multipleSelectA{
                 border: none;
@@ -2164,6 +2162,9 @@ export default {
                 margin-left: 10px;
                 border: none;
                 width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .textAndBtn{
                 width: 60px;
@@ -2417,14 +2418,14 @@ export default {
             background: #ebf7ff;
         }
         .zk-table--tree-icon::after {
-        display: block;
-        position: absolute;
+            display: block;
+            position: absolute;
             top: 6px;
             left: 20px;
-        width: 15px;
-        height: 12px;
-        background:url('./images/folder_1.png')no-repeat 0 0; 
-        content: '';
+            width: 15px;
+            height: 12px;
+            background:url('./images/folder_1.png')no-repeat 0 0; 
+            content: '';
         }
         .zk-icon-minus-square-o::after{
             background:url('./images/folder.png')no-repeat 0 0; 
@@ -2433,18 +2434,18 @@ export default {
             width: 45px;
         }
         .zk-table--level-4-cell,.zk-table--level-3-cell,.zk-table--level-2-cell,.zk-table--level-1-cell,.zk-table--level-5-cell{
-        position: relative;
+            position: relative;
         }
         .zk-table--level-4-cell::before,.zk-table--level-3-cell::before,.zk-table--level-2-cell::before,.zk-table--level-1-cell::before,.zk-table--level-5-cell::before{
             display: block;
-        position: absolute;
+            position: absolute;
             top: 2px;
             left: 2px;
-        width: 12px;
-        height: 14px;
-        background:url('./images/file.png')no-repeat 0 0; 
-        content: '';
-        z-index: 1;
+            width: 12px;
+            height: 14px;
+            background:url('./images/file.png')no-repeat 0 0; 
+            content: '';
+            z-index: 1;
         }
         .el-dialog{
             left: 50%;

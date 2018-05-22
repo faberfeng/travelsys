@@ -667,9 +667,9 @@ export default {
     .summary .pre{
         display: flex;
     }
-    .summary .pre span{
+    /* .summary .pre span{
         width: 100px;
-    }
+    } */
     .summary .pre label{
         flex: 1;
     }

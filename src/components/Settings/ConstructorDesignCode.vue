@@ -294,7 +294,7 @@
                 <div class="editBody">
                     <div class="yingsheProject">
                         <label class="yingsheProjectText">可以映射到的工程量条目 : </label>
-                        <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure">添加扩展属性</button>
+                        <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure">添加</button>
                     </div>
                    <zk-table 
                     index-text="序号"
@@ -661,24 +661,6 @@ export default {
                 },
                 {
                     label:'操作',
-                    prop:'operator',
-                    type: 'template',
-                    template: 'action',
-                }
-            ],
-            addProjectMappingDataColumns:[
-                {
-                    label: '特征',
-                    prop:'characterName',
-                    width:'200px'
-                },
-                {
-                    label: '值类型',
-                    prop: 'valueType_',
-                    width:'86px'
-                },
-                {
-                    label:'公式',
                     prop:'operator',
                     type: 'template',
                     template: 'action',
@@ -2682,7 +2664,7 @@ export default {
                         this.addProjectMappingData.forEach(item=>{
                             item = Object.assign(item,{
                                 valueType_:this.judgeValueType(item.valueType),
-                                formula_:item.formula.split('@')[1]
+                                formula_:item.formula===null? '@':item.formula
                             })
                         })
                 }else if(response.data.cd  == '-1'){
@@ -2723,7 +2705,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+$('.TextInput')[index].value
+                    formula:$('.TextInput')[index].value
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -2936,12 +2918,12 @@ export default {
                     if(response.data.rt.rows){
                         this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
-                            // item = Object.assign(item,{
-                            //     valueType_:this.judgeValueType(item.valueType),
-                            //     formula_:item.formula && item.formula.split('@')[1]
-                            // })
-                            this.$set(item,'valueType_',this.judgeValueType(item.valueType))
-                            this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
+                            item = Object.assign(item,{
+                                valueType_:this.judgeValueType(item.valueType),
+                                formula_:item.formula===null? '@':item.formula
+                            })
+                            //this.$set(item,'valueType_',this.judgeValueType(item.valueType))
+                            //this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
                         })
                         console.log(this.addProjectMappingData)
                     }
@@ -2990,7 +2972,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+item.formula_
+                    formula:item.formula_
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -3140,8 +3122,8 @@ export default {
                 this.jiLiangResult = '';
                 this.jiLiangResult = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }
-            var str = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
-            this.addProjectMappingData.forEach((item,index)=>{
+            var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
+            this.addProjectMappingData.forEach((item,index,arr)=>{
                 if(index == this.showConvenienceObject){
                     item = Object.assign(item,{
                         formula_:str
@@ -3516,8 +3498,9 @@ export default {
             }
         }
         #CInput{
-           .el-dialog{
+            .el-dialog{
                 width: 586px!important;
+                margin-left:-693px;
             } 
             .multipleSelectA{
                 border: none;
@@ -3694,6 +3677,9 @@ export default {
             margin-left: 10px;
             border: none;
             width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .textAndBtn{
             width: 60px;

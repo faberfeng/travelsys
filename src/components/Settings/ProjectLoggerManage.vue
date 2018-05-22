@@ -8,22 +8,14 @@
                     <el-date-picker v-model="startDay" type="date" placeholder="选择开始日期"  @change="dateChange1"></el-date-picker>
                     <span class="yi"></span>
                     <el-date-picker v-model="endDay" type="date" placeholder="选择结束日期"  @change="dateChange2"></el-date-picker>
-                    <!-- <el-date-picker
-                        v-model="loggerDate"
-                        type="daterange"
-                        range-separator="-"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
-                        @change="dateChange">
-                    </el-date-picker> -->
                 </div>
                 <button class="queryBtn"  @click="queryLogger">查询</button>
             </div>
             <div class="projectTable">
                 <el-table class="table" border :data="enterpriseLoggerData" style="width:100%">
-                    <el-table-column prop="operateUser" label="操作人"></el-table-column>
+                    <el-table-column prop="operateUser" label="操作人" width="200px"></el-table-column>
                     <el-table-column prop="operateContent" label="事件"></el-table-column>
-                    <el-table-column prop="operateTime" label="操作时间"></el-table-column>
+                    <el-table-column prop="operateTime" label="操作时间" width="250px"></el-table-column>
                 </el-table>
             </div>
             <!--分页-->
@@ -119,7 +111,6 @@ export default {
       },
       //分页改动加载数据
       pageSizeChange(val){
-          console.log(val)
           this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
       },
       currentPageChange(val){
@@ -133,7 +124,6 @@ export default {
             }else{
                 this.startDay = '';
             }
-            console.log(this.startDay);
       },
       dateChange2(){
             if(this.endDay){
@@ -141,7 +131,6 @@ export default {
             }else{
                 this.endDay = '';
             }
-            console.log(this.endDay);
       },
       //查询 可复用getLoggerList（）函数
       queryLogger(){
