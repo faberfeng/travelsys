@@ -294,7 +294,7 @@
                 <div class="editBody">
                     <div class="yingsheProject">
                         <label class="yingsheProjectText">可以映射到的工程量条目 : </label>
-                        <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure">添加扩展属性</button>
+                        <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure">添加</button>
                     </div>
                    <zk-table 
                     index-text="序号"
@@ -661,24 +661,6 @@ export default {
                 },
                 {
                     label:'操作',
-                    prop:'operator',
-                    type: 'template',
-                    template: 'action',
-                }
-            ],
-            addProjectMappingDataColumns:[
-                {
-                    label: '特征',
-                    prop:'characterName',
-                    width:'200px'
-                },
-                {
-                    label: '值类型',
-                    prop: 'valueType_',
-                    width:'86px'
-                },
-                {
-                    label:'公式',
                     prop:'operator',
                     type: 'template',
                     template: 'action',

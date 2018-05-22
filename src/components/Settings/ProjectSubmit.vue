@@ -178,7 +178,7 @@
                     <div class="editBody" style="margin:0 30px">
                         <div class="yingsheProject">
                             <label class="yingsheProjectText">已添加的映射信息 : </label>
-                            <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure" style="margin-right:0;">添加扩展属性</button>
+                            <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure" style="margin-right:0;">添加</button>
                         </div>
                         <zk-table 
                         index-text="序号"
