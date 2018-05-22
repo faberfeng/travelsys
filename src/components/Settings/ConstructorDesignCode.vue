@@ -2664,7 +2664,7 @@ export default {
                         this.addProjectMappingData.forEach(item=>{
                             item = Object.assign(item,{
                                 valueType_:this.judgeValueType(item.valueType),
-                                formula_:item.formula.split('@')[1]
+                                formula_:item.formula===null? '@':item.formula
                             })
                         })
                 }else if(response.data.cd  == '-1'){
@@ -2705,7 +2705,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+$('.TextInput')[index].value
+                    formula:$('.TextInput')[index].value
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -2918,12 +2918,12 @@ export default {
                     if(response.data.rt.rows){
                         this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
-                            // item = Object.assign(item,{
-                            //     valueType_:this.judgeValueType(item.valueType),
-                            //     formula_:item.formula && item.formula.split('@')[1]
-                            // })
-                            this.$set(item,'valueType_',this.judgeValueType(item.valueType))
-                            this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
+                            item = Object.assign(item,{
+                                valueType_:this.judgeValueType(item.valueType),
+                                formula_:item.formula===null? '@':item.formula
+                            })
+                            //this.$set(item,'valueType_',this.judgeValueType(item.valueType))
+                            //this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
                         })
                         console.log(this.addProjectMappingData)
                     }
@@ -2972,7 +2972,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:'@'+item.formula_
+                    formula:item.formula_
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -3122,8 +3122,8 @@ export default {
                 this.jiLiangResult = '';
                 this.jiLiangResult = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }
-            var str = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
-            this.addProjectMappingData.forEach((item,index)=>{
+            var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
+            this.addProjectMappingData.forEach((item,index,arr)=>{
                 if(index == this.showConvenienceObject){
                     item = Object.assign(item,{
                         formula_:str
@@ -3676,6 +3676,9 @@ export default {
             margin-left: 10px;
             border: none;
             width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .textAndBtn{
             width: 60px;
