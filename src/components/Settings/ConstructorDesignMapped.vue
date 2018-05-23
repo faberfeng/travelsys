@@ -481,16 +481,18 @@ export default {
                     if(this.designValue == ''){
                         alert('至少选择设计专业!')
                     }else{
-                        var keyword = this.totalConstructorData.some(item=>{
-                            if(item.chsCategory == this.revitCategory && item.keyType == keyTypeName && item.keyWord == this.keyWord){
+                        //编辑时，不对自己做检验
+                        var totalObject = this.totalConstructorData;
+                        totalObject.splice(this.editUserNum,1);
+                        var keyword = totalObject.some(item=>{
+                            if(item.chsCategory == this.revitCategory && item.keyType == keyTypeName && item.keyWord.includes(this.keyWord)){
                                 return true;
                             }else{
                                 return false;
                             }
                         })
-                        var copyKeyWord =  this.keyWord;
                         if(keyword){
-                            alert('关键字已存在，不能添加!');
+                            alert('关键字已经存在或关键字是已存在关键字的子集，不能添加！');
                         }else{
                             axios({
                                 method:'post',
@@ -523,8 +525,8 @@ export default {
                                     this.goujianType = '';
                                     this.categoryBase = '';
                                     this.editListShow = false;
-                                }else if(response.data.cd =='-1'){
-                                    alert(response.data.msg)
+                                }else if(response.data.cd =='-1' || response.data.cd =='40012'){
+                                    alert(response.data.msg);
                                 }else{
                                     this.$router.push({
                                         path:'/login'
@@ -704,14 +706,14 @@ export default {
                                 revitCa = "Planting";
                             }
                             var keyword = this.totalConstructorData.some(item=>{
-                                if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord == this.keyWord){
+                                if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord.includes(this.keyWord)){
                                     return true;
                                 }else{
                                     return false;
                                 }
                             })
                             if(keyword){
-                                alert('关键字已经存在，不能添加！')
+                                alert('关键字已经存在或关键字是已存在关键字的子集，不能添加！')
                             }else{
                                 axios({
                                     method:'post',
