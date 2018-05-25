@@ -1,15 +1,14 @@
 <template>
 <div id="attributeManager" v-loading.fullscreen.lock="fullscreenLoading">
-        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
+        <div :class="[{'box-left-avtive':!screenLeft.show,'box-left-avtive_pre':!SHOWMain},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
-                <div id="center-selection">
+                <div id="center-selection" v-if="SHOWMain">
                     <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
-                        <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
-                        <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                        <span class="item-property " @click="screenLeft.item = 1">属<br>性</span>
+                        <span class="item-version " @click="screenLeft.item = 2">模<br>板</span>
                     </div>
                 </div>
                 <div id="item-box-file">
@@ -23,15 +22,15 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div id="containerMessage">
+                <div id="containerMessage" v-if="SHOWMain">
                     <p class="header clearfix">
                         <span class="title">
                           数据版本 <input type="tel" v-model="dataVision">/{{holderMaxVersion}}
                            <span class="reset" @click="selectData">重设</span>
                         </span>
-                        <span style="float: right;margin-right: 30px;">
+                        <span style="float: right;">
                             <span class="item-btn clearfix">
-                                <label>专业预设</label>
+                                <label @click="SHOWMain = false">专业预设</label>
                                 <label @click="basicAttributes_auth.show = true">基本属性</label>
                                 <label @click="showExtension()">扩展属性</label>
                             </span>
@@ -122,7 +121,7 @@
                     </p>
                     <div class="project" v-loading="loading">
                         <!--以下是列表-->
-                        <div style="padding-right:30px;">
+                        <div style="overflow: auto;margin-top:10px;">
                           <table class="UserList" border="1" width='100%'>
                               <thead>
                                   <tr  class="userList-thead">
@@ -130,6 +129,7 @@
                                           <label  :class="[checkAll?'active':'','checkbox-fileItem']" for="allAttribute"></label>
                                           <input  type="checkbox" id='allAttribute' class="checkbox-att" v-model="checkAll">
                                       </th>
+                                      <th v-if="GCPropertyList.length>0">定位</th>
                                       <th v-if="basicAttributes_auth.old.holderType">所在空间</th>
                                       <th v-if="basicAttributes_auth.old.guid">元素GUID</th>
                                       <th v-if="basicAttributes_auth.old.originalFile">原始文件</th>
@@ -153,10 +153,12 @@
                                   </tr>
                               </thead>
                               <tbody>
-                                  <tr v-for="(val,index) in attributeList" :key="index">
+                                  <tr v-for="(val,index) in attributeList" :key="index" :class="[val.checked?'activeTr':'']" @click.stop="checkLabel(index,false)">
                                       <td>
-                                          <label  :class="[val.checked?'active':'','checkbox-fileItem']" :for="val.holderId+'Attribute'" ></label>
-                                          <input  type="checkbox" :id="val.holderId+'Attribute'" class="checkbox-att" v-model="val.checked">
+                                          <label  :class="[val.checked?'active':'','checkbox-fileItem']"  @click.stop="checkLabel(index,true)"></label>
+                                      </td>
+                                      <td  v-if="GCPropertyList.length>0">
+                                          <i class="location"></i>
                                       </td>
                                       <td v-text="val.holderType"  v-if="basicAttributes_auth.old.holderType"></td>
                                       <td v-text="val.guid"  v-if="basicAttributes_auth.old.guid"></td>
@@ -177,7 +179,7 @@
                                             GCPropertyList:[],//扩展属性头部
                                             GCPropertyValueList:[],//扩展属性查询的值 库
                                       -->
-                                     <td   v-if="item.checked" v-text="initVal(item.id,val.traceId)"  v-for="(item,key) in GCPropertyList" :key="key"></td>
+                                     <td   v-if="item.checked" v-text="initVal(item.id,val.traceId,false)" :class="[{'Strong':(initVal(item.id,val.traceId,true)==1)}]"  v-for="(item,key) in GCPropertyList" :key="key"></td>
                                   </tr>
                               </tbody>
                           </table>
@@ -243,11 +245,234 @@
                         </div>
                     </div>
                 </div>
+                 <div id="containerMessage" v-else>
+                    <p class="header clearfix">
+                        <span class="button-add">添加</span>
+                        <span class="button-back" @click="SHOWMain = true">返回</span>
+                    </p>
+                    <div class="ForumSelector">
+                        <p  class="selectBar clearfix">
+                          <span class="name">专业</span>
+                          <ul>
+                             <li :class="['selectItem-preset',{'selectItem-preset-active':item.checked}]" @click="initSelect(key)" v-for="(item,key) in option_professional_preset" :key="key" v-text="item.Name" :data-value="item.id"></li>
+                          </ul>
+                        </p>
+                    </div>
+                    <div class="project" v-loading="loading">
+                        <!--以下是列表-->
+                        <div style="overflow: auto;">
+                          <table class="UserList" border="1" width='100%'>
+                              <thead>
+                                  <tr  class="userList-thead">
+                                    <th>空间范围</th>
+                                    <th>构件类型</th>
+                                    <th>属性名称</th>
+                                    <th>取值</th>
+                                    <th>操作</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr v-for="(val,index) in professionalList" :key="index" :class="[val.checked?'activeTr':'']">
+                                        <td v-text="val.holderPathName"></td>
+                                        <td v-text="val.gcName"></td>
+                                        <td v-text="val.pGcName"></td>
+                                        <td v-text="val.pValue"></td>
+                                        <td >操作</td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                            <div v-if="empty" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
+                                  无符合当前筛选条件的记录
+                            </div>
+                        </div>
+                        <!--以下是page-navigitation-->
+                        <div class="datagrid-pager pagination" v-if="professionalList.length>0">
+                            <table cellspacing="0" cellpadding="0" border="0" >
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <select class="pagination-page-list" v-model="pre_pageDetial.pagePerNum">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                          </select>
+                                        </td>
+                                        <td>
+                                              <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                                        </td>
+                                        <td>
+                                              <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                        </td>
+                                        <td>
+                                              <input class="pagination-num" type="text" v-model="pre_pageDetial.currentPage">
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pre_pageDetial.total/pre_pageDetial.pagePerNum)}}页</span>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" @click="getPrevData" class="btn-refresh btn-TAB"></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-info pagination-title" v-text="'显示1到'+pre_pageDetial.pagePerNum+',共'+pre_pageDetial.total+'记录'"></div>
+                            <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
+        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']" v-if="SHOWMain">
             <div v-if="screenLeft.item == 1" class="screenRight_1">
-               111
+                <div v-if="ListCheckedNum == 1">
+                        <h3 class="header-attribute" style="margin-top: 0px;">
+                            <i class="trrangle"></i>
+                            基本属性
+                            <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                        </h3>
+                        <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">所在空间</span>
+                                <span class="detial-text-value" v-text="checkedItem.holderType"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始文件</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalFile"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始ID</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalId"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">构件名称</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalName"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">脚本名称</span>
+                                <span class="detial-text-value" v-text="checkedItem.name"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">分类编码</span>
+                                <span class="detial-text-value" v-text="checkedItem.gccode"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">构件分类</span>
+                                <span class="detial-text-value" v-text="checkedItem.gccodeName"></span>
+                            </li>
+                        
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">创建程序</span>
+                                <span class="detial-text-value" v-text="checkedItem.creator"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新用户</span>
+                                <span class="detial-text-value" v-text="checkedItem.editor"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新时间</span>
+                                <span class="detial-text-value" v-text="checkedItem.updateTime"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">标记</span>
+                                <span class="detial-text-value" v-text="checkedItem.tag?checkedItem.tag:'（空）'"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">注释</span>
+                                <span class="detial-text-value" v-text="checkedItem.comments?checkedItem.comments:'（空）'"></span>
+                            </li>
+                        </ul>
+                        <div v-if="mapInfo.length>0" style="margin-top:13px;">
+                            <h3 class="header-attribute" style="margin-top: 0px;">
+                                <i class="trrangle"></i>
+                                设计属性
+                                <i :class="[{'active':show.designAttributes},'icon-dropDown']" @click="show.designAttributes = show.designAttributes?false:true;"></i>
+                            </h3>
+                            <ul id="designAtt" :class="[{'show':show.designAttributes},'Att']" >
+                                <li class="detial-item clearfix" v-for="(item,index) in mapInfo" :key="index">
+                                    <span class="detial-text-name" v-text="item.classifyName"></span>
+                                    <span class="detial-text-value" v-text="item.value?item.value:'（空）'"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-if="GCPropertyList.length>0" style="margin-top:13px;">
+                            <h3 class="header-attribute" style="margin-top: 0px;">
+                                <i class="trrangle"></i>
+                                扩展属性
+                                <i :class="[{'active':show.extensionAttributes},'icon-dropDown']" @click="show.extensionAttributes = show.extensionAttributes?false:true;"></i>
+                            </h3>
+                            <ul id="extensionAtt" :class="[{'show':show.extensionAttributes},'Att']" >
+                                <li class="detial-item clearfix" v-for="(item,index) in GCPropertyList" :key="index">
+                                    <span class="detial-text-name" v-text="item.propertyTitle"></span>
+                                    <span class="detial-text-value" v-text="initVal(item.id,checkedItem.traceId,false)"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-if="fgList.length>0" style="margin-top:13px;">
+                            <h3 class="header-attribute" style="margin-top: 0px;">
+                                <i class="trrangle"></i>
+                                关联文档
+                                <i :class="[{'active':show.relevantDoc},'icon-dropDown']" @click="show.relevantDoc = show.relevantDoc?false:true;"></i>
+                            </h3>
+                            <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" >
+                                <li class="detial-item clearfix" v-for="(item,index) in fgList" :key="index">
+                                    <span class="detial-text-name" v-text="item.fgName" style="max-width: 120px;width: auto;float: left;"></span>
+                                    <span class="icon-goujian icon-search" @click="view(item.filePath)"></span>
+                                </li>
+                            </ul>
+                        </div>
+                </div>
+                <div v-if="ListCheckedNum > 1">
+                     <h3 class="header-attribute" style="margin-top: 0px;">
+                        <i class="trrangle"></i>
+                        多个选择
+                        <i :class="[{'active':show.designAttributes},'icon-dropDown']" @click="show.designAttributes = show.designAttributes?false:true;"></i>
+                    </h3>
+                    <ul class="Att" >
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">构件数量</span>
+                            <span class="detial-text-value" v-text="ListCheckedNum"></span>
+                        </li>
+                    </ul>
+                     <!-- <div style="margin-top:13px;">
+                        <h3 class="header-attribute" style="margin-top: 0px;">
+                            <i class="trrangle"></i>
+                            公共属性
+                            <i :class="[{'active':show.designAttributes},'icon-dropDown']" @click="show.designAttributes = show.designAttributes?false:true;"></i>
+                        </h3>
+                        <ul  :class="[{'show':show.designAttributes},'Att']" >
+                            <li class="detial-item clearfix" v-for="(item,index) in mapInfo" :key="index">
+                                <span class="detial-text-name" v-text="item.classifyName"></span>
+                                <span class="detial-text-value" v-text="item.value?item.value:'（空）'"></span>
+                            </li>
+                        </ul>
+                    </div> -->
+                </div>
+            </div>
+             <div v-if="screenLeft.item == 2" class="screenRight_1">
+               模板
             </div>
         </div>
         <div id="edit">
@@ -325,12 +550,58 @@
                     <span class="item-attibuteAuth" v-for="(item,key) in GCPropertyList_to_select" :key="key">
                           <label  :class="[item.extension_checked?'active':'','checkbox-fileItem']" :for="'extension_Attribute_'+key" ></label>
                           <input  type="checkbox" :id="'extension_Attribute_'+key" class="checkbox-arr" v-model="item.extension_checked">
-                          <span  v-text="item.propertyTitle" class="text"></span>
+                          <label  v-text="item.propertyTitle" class="text" :for="'extension_Attribute_'+key"></label>
                     </span>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="extensionConfirm">确定</button>
                     <button class="editBtnC" @click="extensionCancle">取消</button>
+                </div>
+            </el-dialog>
+             <el-dialog :title="'编辑属性(已勾选'+extension.num+'个构件)'" :visible="extension.show" @close="editCancle">
+                <div class="table-extension" >
+                    <table class="UserList" border="1" width='100%'>
+                        <thead>
+                            <tr  class="userList-thead">
+                                <th  width="100px">属性</th>
+                                <th width="60px">值类型</th>
+                                <th>取值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(val,index) in GCPropertyList" :key="index">
+                                <td v-text="val.propertyTitle"></td>
+                                <td v-text="initValue(val.valueType)"></td>
+                                <td :class="val.extendValue">
+                                    <input :class="['inputvalue','property_value'+index]" type="text" v-if="val.valueType == 0 || val.valueType == 1" v-model="val.extendValue"/>
+                                    <select style="width: 140px;" :class="['inputvalue-select','property_value'+index]" v-if="val.valueType == 2" v-model="val.extendValue">
+                                        <option value="是">是</option> 
+                                        <option value="否">否</option>
+                                        <option value="@">@</option>
+                                    </select>
+                                    <span  v-if="val.valueType == 3"  :class="['inputvalue-date','property_value'+index]">
+                                        <!-- <input class=""  width="40px;" v-model="val.extendValue"/> -->
+                                         <el-date-picker
+                                            v-model="val.extendValue"
+                                            :editable="false"
+                                            type="date"
+                                            placeholder="选择日期"
+                                            format="yyyy 年 MM 月 dd 日"
+                                            value-format="yyyy-MM-dd"
+                                            :disabled="val.timeChecked"
+                                            >
+                                        </el-date-picker>
+                                          <input  type="checkbox" :id="index+'_allAttribute'" class="checkbox-att" v-model="val.timeChecked">
+                                         <label  :class="[val.timeChecked?'active':'','checkbox-fileItem']"  :for="index+'_allAttribute'"></label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editConfirm">确定</button>
+                    <button class="editBtnC" @click="editCancle">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -359,16 +630,6 @@
             overflow: hidden;
             content: '';
         }
-        select.inp-search {  
-                /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
-                /*很关键：将默认的select选择框样式清除*/  
-                appearance:none;  
-                -moz-appearance:none;  
-                -webkit-appearance:none;  
-                /*在选择框的最右侧中间显示小箭头图片*/  
-                /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
-                padding-right: 14px;  
-            } 
         .show{
             display: block!important;
         }
@@ -399,6 +660,7 @@
                     border: 1px solid #cccccc;
                     cursor: pointer;
                     position: relative;
+                    background: #fff;
                     &::after{
                         font-size: 14px;
                         color: #666666;
@@ -462,6 +724,116 @@
                 }
                 .checkbox-arr{
                     display: none;
+                }
+             }
+             .table-extension{
+                 margin: 0 30px;
+                .UserList{
+                    border-collapse: collapse;
+                    border: 1px solid #e6e6e6;
+                    overflow: auto;
+                    max-width: 100%;
+                    .checkbox-att{
+                        display:none;
+                    }
+                    .checkbox-fileItem{
+                        float: left;
+                        width: 14px;
+                        height: 14px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        position: relative;
+                        margin-left:4px;
+                    }
+                    .active{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                    }
+                    thead{
+                        background: #f2f2f2;
+                        th{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 55px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 12px;
+                            color: #333333;
+                            font-weight: normal;
+                        }
+                    }
+                    tbody{
+                        tr{
+                            td{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 55px;
+                                text-align: left;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 12px;
+                                color: #333333;
+                                .location{
+                                    display: block;
+                                    width: 12px;
+                                    height: 16px;
+                                    background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                }
+                                .inputvalue{
+                                    display: block;
+                                    width: 100%;
+                                    height: 100%;
+                                    border: none;
+                                }
+                                .inputvalue-select{
+                                    width: 214px;
+                                    border-radius: 2px;
+                                    height: 30px;
+                                    border: 1px solid #e6e6e6;
+                                    position: relative;
+                                    background: #fafafa;
+                                    padding-left: 10px;
+                                    padding-right: 40px;
+                                    margin-top: 5px;
+                                    -webkit-appearance: menulist;
+                                    
+                                }
+                                .inputvalue-date{
+                                    .el-input__inner{
+                                        width: 100%;
+                                        height: 36px;
+                                        padding:0 30px;
+                                    }
+                                    .checkbox-fileItem{
+                                        display: inline-block;
+                                        float: initial;
+                                        margin-right: 10px;
+                                        position: relative;
+                                        &::after{
+                                            display: block;
+                                            position: absolute;
+                                            top: -1px;
+                                            right: -29px;
+                                            line-height: 14px;
+                                            content: '继承';
+                                        }
+                                    }
+                                }
+                            }
+                            .Strong{
+                                font-weight: bold;
+                            }
+                            &:hover{
+                                background: #fafafa;
+                            }
+                        }
+                        .activeTr{
+                            background: #0081c2;
+                            color: #fff;
+                        }
+                    }
                 }
              }
         }
@@ -530,7 +902,7 @@
                 .item-version{//属性
                     display: block;
                     width: 25px;
-                    height: 68px;
+                    height: 55px;
                     background: #fafafa;
                     padding-top:12px;
                     font-size: 12px;
@@ -603,30 +975,11 @@
                         z-index: 10;
                     }
                 }
-                .active-version-3{//下边 版本 高显
-                    .item-version{
-                        z-index: 15;
-                        &::after{
-                            background: #fafafa;
-                        }
-                    }
-                    .item-property::after{
-                        background: #fff;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                        background: #fff;
-                        color: #fc3439;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                }
-                
             }
             #containerMessage{
                 padding-left:30px; 
                 padding-bottom: 65px;
+                margin-right: 30px;
                 .header{
                     text-align: left;
                     margin: 15px 0;
@@ -658,8 +1011,8 @@
                     }
                     .item-btn{
                        float: left;
-                        margin-right: 30px;
-                        label{
+                       margin-right: 30px;
+                        label,.label-item{
                           float:left;
                           width:74px;
                           height:26px;
@@ -680,6 +1033,9 @@
                               border-top-right-radius: 2px;
                             border-bottom-right-radius: 2px;
                           }
+                        }
+                        .label-item{
+                             border-right: none!important;
                         }
                     }
                     .item-upload{
@@ -706,12 +1062,48 @@
                             background: url('./images/edit_white.png') no-repeat 0 0;
                         }
                     }
+                     .button-back{
+                        float: right;
+                        background: #ffffff;
+                        color: #fc3439;
+                        border: 1px solid #fc3439;
+                        font-size: 12px;
+                        height: 26px;
+                        width: 86px;
+                        border-radius: 2px;
+                        line-height: 26px;
+                        cursor: pointer;
+                        text-align: center;
+                    }
+                    .button-add{
+                        float: left;
+                        background: #fc3439;
+                        color: #ffffff;
+                        font-size: 12px;
+                        height: 26px;
+                        border-radius: 2px;
+                        text-align: left;
+                        line-height: 26px;
+                        padding-left: 42px;
+                        padding-right: 16px;    
+                        position: relative;
+                        cursor: pointer;
+                        &::before{
+                            display: block;
+                            position: absolute;
+                            top: 7px;
+                            left: 19px;
+                            width: 12px;
+                            height: 12px;
+                            content: '';
+                            background: url('./images/whiteJiahao.png') no-repeat 0 0;
+                        }
+                    }
                 }
                 .ForumSelector{
                     border: 1px solid #d9d9d9;
                     color: #999999;
                     font-size: 12px;
-                    margin-right: 30px;
                     .selectBar{
                       border-bottom: 1px dashed #e6e6e6;
                         &:last-of-type{
@@ -728,6 +1120,17 @@
                         }
                         >ul{
                             float: left;
+                            .selectItem-preset{
+                                float: left;
+                                margin: 0 20px;
+                                height: 38px;
+                                line-height: 38px;
+                                color: #666666;
+                                cursor: pointer;
+                            }
+                            .selectItem-preset-active{
+                                color: #fc3439;
+                            }
                             .selectItem{
                                 float: left;
                                 .title{
@@ -832,9 +1235,22 @@
                                     border-right: 1px solid #e6e6e6;
                                     font-size: 12px;
                                     color: #333333;
+                                    .location{
+                                        display: block;
+                                        width: 12px;
+                                        height: 16px;
+                                        background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                        cursor: pointer;
+                                    }
                                 }
-                                &:hover{
-                                    background: #fafafa;
+                                .Strong{
+                                    font-weight: bold;
+                                }
+                            }
+                            .activeTr{
+                                background: #0081c2;
+                                td{
+                                   color: #fff!important;
                                 }
                             }
                         }
@@ -842,7 +1258,6 @@
                      /**********一下是分页器的样式***************/
                     .datagrid-pager {
                         display: block;
-                        margin-right: 30px;
                         height: 31px;
                         width: auto;
                         border:1px solid #d4d4d4;
@@ -927,7 +1342,7 @@
                 }
             }
         }
-        .box-left-avtive{
+        .box-left-avtive,.box-left-avtive_pre{
             right: 0px;
             transition:  all ease .5s;
             #center-selection{
@@ -978,6 +1393,7 @@
         .box-right-container{
             display: block;
             position: fixed;
+            overflow-y: auto;
             right: -225px;
             bottom: 0;
             width: 225px;
@@ -1000,10 +1416,73 @@
                     margin-bottom:10px;  
                 }
                 .icon-goujian{
-                    float: left;
+                    display: inline-block;
                     width: 16px;
                     height: 16px;
                     cursor: pointer;
+                }
+                .icon-search{
+                    background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                    margin-left: 10px;
+                    &:hover{
+                        background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                    }
+                }
+                 .header-attribute{
+                    font-size: 14px;
+                    color: #333333;
+                    line-height: 14px;
+                    padding-bottom:4px;
+                    border-bottom: 1px solid #e6e6e6;
+                    text-align: left; 
+                    .trrangle{
+                        display: inline-block;
+                        width: 0px;
+                        height: 0px;
+                        border-left: 10px solid #fc3439;
+                        border-top: 6px solid transparent;
+                        border-bottom: 6px solid transparent;
+                    }
+                    .icon-dropDown{
+                        display: block;
+                        width: 12px;
+                        height: 12px;
+                        background:url('../ManageCost/images/arror.png')no-repeat 0 0; 
+                        float: right;
+                        cursor: pointer;
+                        transition:  all ease .2s;
+                        transform: rotate(180deg);
+                    }
+                    .active{
+                        transform: rotate(0deg);
+                    }
+                }
+                .header-attribute:last-of-type{
+                    margin-top: 30px;
+                }
+                 .Att{
+                    >li:last-of-type{
+                        padding-bottom: 7px;
+                    }
+                    .detial-item{
+                        font-size: 12px;
+                        line-height: 12px;
+                        margin-top: 16px;
+                        text-align: left;
+                    }
+                     .detial-text-name{
+                        color: #999999;
+                        width: 65px;
+                        display: inline-block;
+                    }
+                    .detial-text-value{
+                        color: #333333;
+                        max-width: 120px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        display: inline-block;
+                    }
                 }
             }
         }
@@ -1059,8 +1538,10 @@ export default {
          QJFileManageSystemURL:'',
          BDMSUrl:'',
          show:{
-             basicAttributes:false,
-             BindingArtifacts:false
+             basicAttributes:true,
+             designAttributes:true,
+             extensionAttributes:true,
+             relevantDoc:true,
          },
         selectUgId:'',//选中的群组id
         ugList:[],//群组列表
@@ -1120,6 +1601,57 @@ export default {
             {
                 id:'900000',
                 Name:'未知'
+            }
+        ],
+        option_professional_preset:[
+            {
+                id:'110000',
+                Name:'场地',
+                checked:true,
+            },{
+                id:'210000',
+                Name:'结构',
+                checked:false,
+            },{
+                id:'310000',
+                Name:'建筑',
+                checked:false,
+            },{
+                id:'350000',
+                Name:'室内',
+                checked:false,
+            },
+            {
+                id:'410000',
+                Name:'暖通',
+                checked:false,
+            },
+             {
+                id:'430000',
+                Name:'动力',
+                checked:false,
+            },
+            {
+                id:'450000',
+                Name:'给排水',
+                checked:false,
+            },{
+                id:'500000',
+                Name:'电气',
+                checked:false,
+            },{
+                id:'510000',
+                Name:'强电',
+                checked:false,
+            },{
+                id:'530000',
+                Name:'弱电',
+                checked:false,
+            },
+            {
+                id:'900000',
+                Name:'未知',
+                checked:false,
             }
         ],
         options_system:[
@@ -1204,7 +1736,23 @@ export default {
             currentPage:1,//初始查询页数 第一页
             total:'',//所有数据
         },
+        pre_pageDetial:{
+            pagePerNum:10,//一页几份数据
+            currentPage:1,//初始查询页数 第一页
+            total:'',//所有数据
+        },
         empty:false,
+        extension:{
+            show:false,
+            num:0,
+        },
+        checkedItem:{},//被选中的列表
+        ListCheckedNum:0,
+        mapInfo:[],//设计属性的列表
+        fgList:[],//文档关联列表
+        SHOWMain:true,
+        checkedValue:'',
+        professionalList:[],//扩展属性列表
       }
   },
   created(){
@@ -1222,9 +1770,18 @@ export default {
         vm.getIntoDesignPage()
     },
   watch:{
-    //   <!-- options_monomer:[],//单体选项
-    //     options_partition:[],//状态选项
-    //     options_floor:[],//相关选项 -->
+      checkAll:function(val,oldval){
+          var vm = this
+          if(val){
+                 vm.attributeList.forEach((item,key)=>{
+                    item.checked  = true
+                })
+          }else{
+             vm.attributeList.forEach((item,key)=>{
+                item.checked  = false
+            })
+          }
+      },
       value_monomer:function(val){
             var vm = this 
              if(val == 0) {
@@ -1257,16 +1814,30 @@ export default {
       },
       'show.basicAttributes':function(val){
           if(val){
-            $("#basicAttributes").show(200);
+            $("#basicAtt").show(200);
           }else{
-            $("#basicAttributes").hide(200);
+            $("#basicAtt").hide(200);
           }
       },
-     'show.BindingArtifacts':function(val){
+     'show.designAttributes':function(val){
           if(val){
-            $("#BindingArtifacts").show(200);
+            $("#designAtt").show(200);
           }else{
-            $("#BindingArtifacts").hide(200);
+            $("#designAtt").hide(200);
+          }
+      },
+      'show.extensionAttributes':function(val){
+          if(val){
+            $("#extensionAtt").show(200);
+          }else{
+            $("#extensionAtt").hide(200);
+          }
+      },
+     'show.relevantDoc':function(val){
+          if(val){
+            $("#relevantDoc").show(200);
+          }else{
+            $("#relevantDoc").hide(200);
           }
       },
       'pageDetial.currentPage':function(val,oldval){
@@ -1277,8 +1848,277 @@ export default {
           var vm = this
           vm.selectData()
       },
+    'pre_pageDetial.currentPage':function(val,oldval){
+          var vm = this
+          vm.getPrevData()
+      },
+      'pre_pageDetial.pagePerNum':function(val,oldval){
+          var vm = this
+          vm.getPrevData()
+      },
+      checkedValue:function(val){
+          var vm = this
+          vm.getPrevData()
+      },
   },
   methods:{
+      initSelect(key){
+         var vm =this
+         vm.option_professional_preset.forEach((item,index)=>{
+             if(key == index){
+                 item.checked = true
+                 vm.checkedValue = item.id
+             }else{
+                item.checked = false
+             }
+         })
+      },
+      getPrevData(val){
+        var vm = this
+        axios({
+            method:'GET',
+            url:vm.BDMSUrl+'project2/dc/pageProfessionalSetting',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                gcCode:vm.checkedValue,
+                page:vm.pre_pageDetial.currentPage,
+                rows:vm.pre_pageDetial.pagePerNum,
+            },
+        }).then((response)=>{
+            if(parseInt(response.data.cd) == 0){
+                vm.professionalList = response.data.rt.rows
+                vm.pre_pageDetial.total = response.data.rt.total
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      initValue(val){
+          if(val == 0){
+                return '数值'
+          }else if(val == 1){
+                return '文本'
+          }else if(val == 2){
+                 return '是否'
+          }else if(val == 3){
+                return '时间'
+          }
+          return ''
+      },
+       /**
+         * 预览文件集文件
+         * @param fileUuid
+         */
+        view(filePath){
+            //latestFile(fileId,fgId,"预览了文件"+fileName);
+            var vm = this
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        },
+      checkLabel(index,ismultiSelect){
+        var vm = this
+        vm.mapInfo = []
+        if(ismultiSelect){
+             vm.attributeList[index].checked = !vm.attributeList[index].checked
+             var num = 0
+             vm.checkedItem = {}
+             vm.attributeList.forEach((item,key)=>{
+                if(item.checked){
+                    if(num == 0){
+                        vm.checkedItem = item
+                    }else{
+                         vm.checkedItem = {}
+                    }
+                    num++
+                }
+            })
+            vm.ListCheckedNum = num
+            if(vm.ListCheckedNum == 1){
+                vm.getDesignAtt()
+            }
+        }else{
+            vm.attributeList.forEach((item,key)=>{
+                if(key == index){
+                    vm.$set(item,'checked',true)
+                    vm.checkedItem = item
+                }else{
+                    vm.$set(item,'checked',false)
+                }
+            })
+             vm.ListCheckedNum = 1
+              vm.getDesignAtt()
+        }
+      },
+      getDesignAtt(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:vm.BDMSUrl+'project2/dc/getPropertyInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                TraceId:vm.checkedItem.traceId,
+                type:vm.checkedItem.type
+            },
+        }).then((response)=>{
+            if(parseInt(response.data.cd) == 0){
+               vm.mapInfo = response.data.rt.mapInfo//这是设计属性
+               vm.fgList = response.data.rt.fgList//这是设计属性
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      editAttribute(){
+          var vm = this
+          if(vm.GCPropertyList.length < 0){
+             vm.$message({
+                  type:'warning',
+                  message:'没有可编辑的扩展属性!'
+              })
+              return false
+          }
+          var num = 0
+          var c=0
+          var isInherit=-1;//0：自身 1：来自继承
+          /**
+           * @param  vm.GCPropertyList 扩展属性
+           * @param  vm.attributeList 属性列表
+           * **/
+          vm.GCPropertyList.forEach((val,index)=>{
+                c=0
+                num = 0
+                vm.attributeList.forEach((item,key)=>{
+                    if(item.checked){
+                        var tempValue='' //将要编辑的扩展属性的内容
+                        var  valueFrom = vm.initVal(val.id,item.traceId,true)//扩展属性 的 来源
+                        var  value = vm.initVal(val.id,item.traceId,false)//扩展属性的内容
+                        if (c == 0) {//选则的第一条列表
+                            if(valueFrom==1){
+                                isInherit=0;
+                            }else{
+                                isInherit=1;
+                            }
+                            tempValue = value
+                        }else{
+                            if(isInherit==1){ //如果来自继承 继续
+                                if(valueFrom==1){
+                                    isInherit=0;
+                                }else{
+                                    isInherit=1;
+                                }
+                            }
+                            if (tempValue != value) {
+                                tempValue = '多样'
+                                if(val.valueType == 2 || val.valueType == 3){//是否 和 时间
+                                    tempValue = '@'//@ 不会修改任意列表的值
+                                }
+                            }
+                        }
+                        /**下面定义了extendvalue的取值方法**/
+                        if(isInherit==0) {
+                            vm.$set(val,'extend_to_submit',tempValue)
+                            vm.$set(val,'extendValue',tempValue)
+                            if(val.valueType == 3){
+                                vm.$set(val,'timeChecked',false)
+                                vm.$set(val,'timeChecked_to_submit',false)
+                            }
+                        }else{//都来自继承  赋值@
+                            vm.$set(val,'extend_to_submit',"@")
+                            vm.$set(val,'extendValue',"@")
+                             if(val.valueType == 3){
+                                vm.$set(val,'timeChecked',true)
+                                vm.$set(val,'timeChecked_to_submit',true)
+                            }
+                        }
+                       
+                        c++
+                        num++
+                    }
+                })
+          })
+          if(num == 0){
+              vm.$message({
+                  type:'warning',
+                  message:'请勾选需要编辑的构件!'
+              })
+              return false
+          }
+          vm.extension.num = num
+          vm.extension.show = true
+      },
+      editConfirm(){
+        var vm = this
+        var traceIds = ''
+        vm.attributeList.forEach((item,key)=>{
+            if(item.checked){
+                var traceid = encodeURIComponent(item.traceId)
+                if(traceIds == ''){
+                    traceIds = traceid
+                }else{
+                    traceIds += ','+traceid
+                }
+            }
+        })
+        var formData = []//formData只需要projectGcPropertyId和propertyValue
+        for(var i=0;i<vm.GCPropertyList.length;i++){
+            if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '@' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
+                vm.$message({
+                    type:'warning',
+                    message:vm.GCPropertyList[i].propertyTitle+' 的值类型为数值，请输入数值!'
+                })
+              return false
+            }
+            if(vm.GCPropertyList[i].valueType == 3 && vm.GCPropertyList[i].timeChecked){//日期 并且 选择了继承
+                formData.push({
+                    projectGcPropertyId:vm.GCPropertyList[i].id,
+                    propertyValue:'@',
+                })
+            }else{
+                formData.push({
+                    projectGcPropertyId:vm.GCPropertyList[i].id,
+                    propertyValue:vm.GCPropertyList[i].extendValue,
+                })
+            }
+        }
+        axios({
+            method:'POST',
+            url:vm.BDMSUrl+'project2/dc/updatePropertyValue',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                traceIds:traceIds
+            },
+            data:formData,
+        }).then((response)=>{
+            if(parseInt(response.data.cd) == 0){
+                 for(var i=0;i<vm.GCPropertyList.length;i++){
+                    vm.GCPropertyList[i].extend_to_submit = vm.GCPropertyList[i].extendValue
+                    if(vm.GCPropertyList[i].valueType == 3)vm.GCPropertyList[i].timeChecked_to_submit = vm.GCPropertyList[i].timeChecked
+                }
+                setTimeout(function(){
+                    vm.selectData()
+                },0)
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+          vm.extension.show = false
+      },
+      editCancle(){
+        var vm = this
+        vm.extension.show = false
+        vm.GCPropertyList.forEach((item,key)=>{
+            item.extendValue = item.extend_to_submit
+            if(item.valueType == 3)item.timeChecked = item.timeChecked_to_submit
+        })
+      },
       showExtension(){
           var vm = this
           if(vm.GCPropertyList.length >0){
@@ -1290,7 +2130,7 @@ export default {
               })
           }
       },
-      initVal(id,traceId){
+      initVal(id,traceId,from){
           /**
            * @param id 扩展属性headr id
            * @param traceId row列表traceId
@@ -1307,7 +2147,11 @@ export default {
                 }
             }
         }
-        return pValue
+        if(from){
+             return valueFrom
+        }else{
+            return pValue
+        }
       },
       changePage(val){//分页 0 -1 1 2
             var vm = this; 
@@ -1621,9 +2465,6 @@ export default {
             }
             return '';
       },
-      editAttribute(){
-          var vm = this
-      },
       trim(str){ 
         /**去掉字符串前后所有空格*/
         return str.replace(/(^\s*)|(\s*$)/g, ""); 
@@ -1758,6 +2599,20 @@ export default {
                   }
               }
           }
+        //   var params = {
+        //           projId:vm.projId,
+        //           dataVision:vm.dataVision,//数据版本
+        //           isChildren:1,
+        //           selectBuild:2,
+        //           holderType:9,
+        //           holderId:'all',
+        //           gcCode:210000,
+        //           gcCode1:212000,
+        //           gcCode2:212010,
+        //           gcNumber:212010,
+        //           rows:vm.pageDetial.pagePerNum,
+        //           page:vm.pageDetial.currentPage,
+        //   } 
           axios({
               method:'POST',
               url:vm.BDMSUrl+'project2/dc/searchPropertyData',
@@ -1783,21 +2638,29 @@ export default {
                   if(response.data.rt.gridDataJson.rows != null){
                     vm.empty = false
                     vm.attributeList = response.data.rt.gridDataJson.rows
-                    vm.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
-                    var b = []
-                    $.extend(b,vm.GCPropertyList)
-                    vm.GCPropertyList_to_select = b//扩展属性头部
-                    vm.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+                    if(response.data.rt.gcproperty != null){
+                        vm.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
+                        var b = []
+                        $.extend(b,vm.GCPropertyList)
+                        vm.GCPropertyList_to_select = b//扩展属性头部
+                        vm.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+                         if(vm.GCPropertyList != null){
+                            vm.GCPropertyList.forEach(element => {
+                                vm.$set(element,'checked',true)
+                            })
+                        }
+                        if(vm.GCPropertyList_to_select != null){
+                            vm.GCPropertyList_to_select.forEach(element => {
+                                vm.$set(element,'extension_checked',true)
+                            })
+                        }
+                    }
                     vm.pageDetial.total = response.data.rt.gridDataJson.total
-                    vm.attributeList.forEach(element => {
-                        vm.$set(element,'checked',false)
-                    });
-                    vm.GCPropertyList.forEach(element => {
-                        vm.$set(element,'checked',true)
-                    })
-                    vm.GCPropertyList_to_select.forEach(element => {
-                        vm.$set(element,'extension_checked',true)
-                    })
+                    if(vm.attributeList != null){
+                        vm.attributeList.forEach(element => {
+                            vm.$set(element,'checked',false)
+                        })
+                    }
                   }else{
                     vm.empty = true
                     vm.pageDetial.total = 0

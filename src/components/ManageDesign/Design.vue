@@ -3787,7 +3787,7 @@ export default {
              formData.append('type',1);
             formData.append('file',item.file);
             formData.append('userId',vm.userId);
-            formData.append('modelCode','002');
+            formData.append('modelCode','004');
             formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
