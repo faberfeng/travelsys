@@ -494,7 +494,7 @@ export default Vue.component('common-upload',{
                 formData.append('file',vm.filesList);
             }
             formData.append('userId',vm.userId);
-            formData.append('modelCode','014');
+            formData.append('modelCode','004');
             formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
