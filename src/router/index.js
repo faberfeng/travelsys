@@ -77,11 +77,6 @@ const router = new Router({
           component:resolve=>require(['@/components/ManageDesign/attributeManager'],resolve),
         },
         {
-          path:'/Design/ProfessionalPreset',
-          name:'ProfessionalPreset',
-          component:resolve=>require(['@/components/ManageDesign/ProfessionalPreset'],resolve),
-        },
-        {
           path:'/Design/designversion',
           name:'DesignVersion',
           component:resolve=>require(['@/components/ManageDesign/DesignVersion'],resolve)
