@@ -247,7 +247,7 @@
                 </div>
                  <div id="containerMessage" v-else>
                     <p class="header clearfix">
-                        <span class="button-add">添加</span>
+                        <span class="button-add" @click="preAddEdit.show = true;getGenieClass(2,true)">添加</span>
                         <span class="button-back" @click="SHOWMain = true">返回</span>
                     </p>
                     <div class="ForumSelector">
@@ -272,12 +272,15 @@
                                   </tr>
                               </thead>
                               <tbody>
-                                  <tr v-for="(val,index) in professionalList" :key="index" :class="[val.checked?'activeTr':'']">
+                                  <tr v-for="(val,index) in professionalList" :key="index">
                                         <td v-text="val.holderPathName"></td>
                                         <td v-text="val.gcName"></td>
                                         <td v-text="val.pGcName"></td>
                                         <td v-text="val.pValue"></td>
-                                        <td >操作</td>
+                                        <td >
+                                            <button class="editBtn actionBtn" title="修改"  @click="edit(val)" ></button>
+                                            <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.pkId)" ></button>
+                                        </td>
                                   </tr>
                               </tbody>
                           </table>
@@ -604,6 +607,92 @@
                     <button class="editBtnC" @click="editCancle">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog :title="pretitle" :visible.sync="preAddEdit.show" @close="addEditCancle">
+                 <!-- object:{
+                    monomer: '',//单体 筛选关键词
+                    partition: '',//分区 筛选关键词
+                    floor: '',//单体 筛选关键词
+                    system:'',//系统 筛选关键字
+                    type:'',//类型 筛选关键字
+                    name:'',//属性名称
+                    value:'',//属性取值
+                } -->
+                <div class="editBody">
+                    <div class="editBodytwo clearfix">
+                        <label class=" imageBodyText">空间范围 :</label>
+                        <span class="item-select" id="monomer">
+                             <el-select v-model="preAddEdit.object.monomer" @change="monomerChange"   multiple placeholder="单体">
+                                <el-option
+                                    v-for="(item,index) in options_monomer_pre"
+                                    :key="index"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </span>
+                         <span class="item-select" id="partition">
+                              <el-select v-model="preAddEdit.object.partition" @change="partitionChange" multiple placeholder="分区">
+                                <el-option
+                                    v-for="(item,index) in options_partition_pre"
+                                    :key="index+item.Name"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </span>
+                         <span class="item-select" id="floor">
+                            <el-select v-model="preAddEdit.object.floor"  multiple placeholder="楼层">
+                                <el-option
+                                    v-for="(item,index) in options_floor_pre"
+                                    :key="index"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </span>
+                    </div>
+                      <div class="editBodytwo clearfix">
+                        <label class=" imageBodyText">构建类型 :</label>
+                        <span class="item-select" style="width:212px;" id="system">
+                              <el-select v-model="preAddEdit.object.system" @change="systemChange" placeholder="构件大类">
+                                <el-option
+                                    v-for="(item,index) in options_system_pre"
+                                    :key="index"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </span>
+                         <span class="item-select" style="width:212px;" id="type">
+                              <el-select v-model="preAddEdit.object.type" @change="typeChange(null)"  placeholder="构件小类">
+                                <el-option
+                                    v-for="(item,index) in options_type_pre"
+                                    :key="index"
+                                    :label="item.Name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </span>
+                    </div>
+                    <div class="editBodytwo clearfix">
+                        <label class=" imageBodyText">属性名称 :</label>
+                        <span class="item-select" style="width:212px;">
+                            <select class="editSelect" v-model="preAddEdit.object.name" ref="attributeName">
+                                <option v-for="(item,index) in options_name" :value="item.propertyNumber"  :key="index">{{item.propertyTitle}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </div>
+                     <div class="editBodytwo clearfix">
+                        <label class=" imageBodyText">取值 :</label>
+                        <input type="text" class="inp" v-model="preAddEdit.object.value" placeholder="请输入">
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addEditPreConfirm">确认</button>
+                    <button class="editBtnC" @click="addEditCancle">取消</button>
+                </div>
+            </el-dialog>
         </div>
 </div>       
 </template>
@@ -836,6 +925,75 @@
                     }
                 }
              }
+             .imageBodyText{
+                 float: left;
+                 width: 140px;
+                 text-align: right;
+                 padding-right: 20px;
+                 height: 38px;
+                 line-height: 38px;
+             }
+             .inp{
+                 float: left;
+             }
+             .editBodytwo{
+                .item-select{
+                    position: relative;
+                    float: left;
+                    margin-right: 10px;
+                    width: 138px;
+                    .el-select{
+                        width: 100%;
+                    }
+                    .el-select__tags{
+                        margin:0 5px;
+                    }
+                    .el-icon-close{
+                      right: 0;
+                      top: -2px;
+                    }
+                    .el-input__inner{
+                        width: 100%;
+                        padding-left: 10px;
+                        height: 40px;
+                    }
+                    &:last-of-type{
+                        margin-right: 0px;
+                    }
+                    .editSelect{
+                        float: left;
+                        width: 100%;
+                        height: 38px;
+                        padding: 10px;
+                        border-radius: 2px;
+                    }
+                    .hideplace{
+                        display: none;
+                    }
+                    .placeHolder{
+                        display: block;
+                        position: absolute;
+                        width: auto;
+                        height: 14px;
+                        line-height: 14px;
+                        color: #cccccc;
+                        top: 12px;
+                        left: 11px;
+                    }
+                     .icon-sanjiao {
+                        display: block;
+                        position: absolute;
+                        width: 12px;
+                        height: 7px;
+                        background-image: url('../Settings/images/sanjiao.png');
+                        background-size: 100% 100%;
+                        content: '';
+                        top: 15px;
+                        right: 15px;
+                    }
+                }
+             }
+            
         }
         .box-left-container{
             display: block;
@@ -1071,7 +1229,7 @@
                         height: 26px;
                         width: 86px;
                         border-radius: 2px;
-                        line-height: 26px;
+                        line-height: 24px;
                         cursor: pointer;
                         text-align: center;
                     }
@@ -1104,6 +1262,7 @@
                     border: 1px solid #d9d9d9;
                     color: #999999;
                     font-size: 12px;
+                    margin-bottom: 10px;
                     .selectBar{
                       border-bottom: 1px dashed #e6e6e6;
                         &:last-of-type{
@@ -1245,6 +1404,19 @@
                                 }
                                 .Strong{
                                     font-weight: bold;
+                                }
+                                .actionBtn{
+                                    width: 16px;
+                                    height: 16px;
+                                    border: none;
+                                    cursor: pointer;
+                                    margin-right: 16px;
+                                }
+                                .editBtn{
+                                    background: url('../../assets/edit.png') no-repeat;
+                                }
+                                .deleteBtn{
+                                    background: url('../../assets/delete.png') no-repeat;
                                 }
                             }
                             .activeTr{
@@ -1547,18 +1719,21 @@ export default {
         ugList:[],//群组列表
         /*以下为后期添加数据*/
         options_monomer:[],//单体选项
+        options_monomer_pre:[],
         options_partition:[
           {
               id:'0',
               Name:'无'
           },
         ],//分区选项
+        options_partition_pre:[],
         options_floor:[
            {
               id:'0',
               Name:'无'
           },
         ],//楼层选项
+        options_floor_pre:[],
         option_professional:[
             {
                 id:'-1',
@@ -1664,6 +1839,7 @@ export default {
               Name:'全部'
           },
         ],//系统选项
+        options_system_pre:[],
         options_type:[
             {
               id:'0',
@@ -1674,6 +1850,7 @@ export default {
               Name:'全部'
           },
         ],//楼层选项
+        options_type_pre:[],
         value_monomer: '',//单体 筛选关键词
         value_partition: '0',//分区 筛选关键词
         value_floor: '0',//单体 筛选关键词
@@ -1751,8 +1928,22 @@ export default {
         mapInfo:[],//设计属性的列表
         fgList:[],//文档关联列表
         SHOWMain:true,
-        checkedValue:'',
+        checkedValue:'110000',
         professionalList:[],//扩展属性列表
+        pretitle:'专业预设添加',
+        preAddEdit:{
+            show:false,
+            object:{
+                monomer: '',//单体 筛选关键词
+                partition: '',//分区 筛选关键词
+                floor: '',//单体 筛选关键词
+                system:'',//系统 筛选关键字
+                type:'',//类型 筛选关键字
+                name:'',//属性名称
+                value:'',//属性取值
+            }
+        },
+        options_name:[],//属性名称的列表
       }
   },
   created(){
@@ -1797,20 +1988,20 @@ export default {
                     }
                 ]
             }else {
-                vm.getPartitionBySubProjId() //加载分区
+                vm.getPartitionBySubProjId(false) //加载分区
             }
       },
        value_partition:function(val){
             var vm = this 
-            vm.findStorey()
+            vm.findStorey(false)
       },
       value_professional:function(val){
             var vm = this 
-            vm.getGenieClass(2)
+            vm.getGenieClass(2,false)
       },
       value_system:function(val){
             var vm = this 
-            vm.getGenieClass(3)
+            vm.getGenieClass(3,false)
       },
       'show.basicAttributes':function(val){
           if(val){
@@ -1862,12 +2053,302 @@ export default {
       },
   },
   methods:{
+      typeChange(val){
+        var vm = this
+         axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/dc/getPgcData',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    gcNumber:vm.preAddEdit.object.type,
+                    projId:vm.projId,
+                },
+            }).then((response)=>{
+                if(parseInt(response.data.cd) == 0){
+                    if(response.data.rt != null){
+                        vm.options_name = response.data.rt
+                        if(val != null){
+                             vm.preAddEdit.object.name = val
+                        }else{
+                             vm.preAddEdit.object.name = response.data.rt[0].propertyNumber
+                        }
+                      
+                    }else{
+                        vm.options_name = []
+                        vm.preAddEdit.object.name = ''
+                    }
+                  
+                }
+                if(vm.options_name.length == 0){
+                    vm.$message({
+                        type:'warning',
+                        message:'无扩展属性！'
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      systemChange(){
+           var vm = this
+           vm.getGenieClass(3,true)
+      },
+      partitionChange(){
+          var vm = this
+           vm.findStorey(true) //加载分区
+      },
+      monomerChange(val,index){
+          var vm = this
+          vm.getPartitionBySubProjId(true) //加载分区
+      },
+      addEditCancle(){
+            var vm = this
+            vm.preAddEdit.show = false
+            vm.preAddEdit.object.monomer = []
+            vm.preAddEdit.object.partition = []
+            vm.preAddEdit.object.floor = []
+            vm.preAddEdit.object.system = ''
+            vm.preAddEdit.object.type = ''
+            vm.preAddEdit.object.name = ''
+            vm.preAddEdit.object.value = ''
+      },
+      edit(val){
+            var vm = this 
+            vm.preAddEdit.show = true
+            //单体id 列表 
+            var monomer_arr = val.holderBuild.split(',')
+            vm.preAddEdit.object.monomer = monomer_arr
+            //分区id 列表 
+            if(val.holderPartition != ''){
+                vm.getPartitionBySubProjId(true) //加载分区
+                setTimeout(() => {
+                      var Partition_arr = val.holderPartition.split(',')
+                      vm.preAddEdit.object.partition = Partition_arr
+                       //列表id 列表 
+                        if(val.holderStorey != ''){
+                            vm.findStorey(true) //加载楼层
+                            setTimeout(() => {
+                                var floor_arr = val.holderStorey.split(',')
+                                vm.preAddEdit.object.floor = floor_arr
+                            }, 0)
+                        }else{
+                            vm.preAddEdit.object.floor = []
+                        }
+                }, 0)
+            }else{
+                vm.preAddEdit.object.partition = []
+            }
+            var Sys_type = val.gcName.split('-')
+            vm.preAddEdit.object.system = ''
+            vm.preAddEdit.object.type = ''
+            for(var k=0;k<vm.options_system_pre.length;k++){
+                if(vm.options_system_pre[k].Name == Sys_type[0]){
+                     vm.preAddEdit.object.system = vm.options_system_pre[k].id
+                }
+            }
+            if(Sys_type.length == 2){
+                 vm.getGenieClass(3,true)
+                 var timer = setInterval(function(){
+                    for(var k=0;k<vm.options_type_pre.length;k++){
+                        if(vm.options_type_pre[k].Name == Sys_type[1]){
+                            clearInterval(timer)
+                            vm.preAddEdit.object.type = vm.options_type_pre[k].id
+                            vm.typeChange(val.pGcCode)
+                        }
+                    } 
+                 },100)
+            }
+            vm.preAddEdit.object.value = val.pValue
+      },
+      addEditPreConfirm(){
+          var vm = this
+        //    preAddEdit:{
+        //     show:false,
+        //     object:{
+        //         monomer: '',//单体 筛选关键词
+        //         partition: '',//分区 筛选关键词
+        //         floor: '',//单体 筛选关键词
+        //         system:'',//系统 筛选关键字
+        //         type:'',//类型 筛选关键字
+        //         name:'',//属性名称
+        //         value:'',//属性取值
+        //     }
+        var type = 1
+        var holderPathName = ''
+        var monomerName = $('#monomer .el-select__tags-text')
+        var monomerValue = ''
+        if(vm.preAddEdit.object.monomer.length == 0){
+            vm.$message({
+                type:'warning',
+                message:'请选择空间范围!'
+            })
+            return false
+        }
+        for(var i=0;i<monomerName.length;i++){
+            if(monomerValue == ''){
+                monomerValue = monomerName[i].innerHTML
+            }else{
+                monomerValue += '/'+ monomerName[i].innerHTML
+            }
+        }
+        var partitionName = $('#partition .el-select__tags-text')
+        var partitionValue = ''
+        if(partitionName.length > 0){
+           type = 2
+        }
+        for(var i=0;i<partitionName.length;i++){
+            if(monomerValue == ''){
+                partitionValue = partitionName[i].innerHTML
+            }else{
+                partitionValue += '/'+ partitionName[i].innerHTML
+            }
+        }
+         var floorName = $('#floor .el-select__tags-text')
+        var floorValue = ''
+         if(floorName.length > 0){
+           type = 3
+        }
+        for(var i=0;i<floorName.length;i++){
+            if(floorValue == ''){
+                floorValue = floorName[i].innerHTML
+            }else{
+                floorValue += '/'+ floorName[i].innerHTML
+            }
+        }
+        var holderBuild = ''//单体id
+        var holderPartition = ''//分区id
+        var holderStorey = ''//楼层id
+        /********获取单体id******/
+        for(var j = 0;j<vm.preAddEdit.object.monomer.length;j++){
+            if(j == 0){
+                holderBuild = vm.preAddEdit.object.monomer[j]
+            }else{
+                holderBuild += ','+vm.preAddEdit.object.monomer[j]
+            }
+        }
+        /********获取分区id******/
+        for(var j = 0;j<vm.preAddEdit.object.partition.length;j++){
+            if(j == 0){
+                holderPartition = vm.preAddEdit.object.partition[j]
+            }else{
+                holderPartition += ','+vm.preAddEdit.object.partition[j]
+            }
+        }
+        /********获取楼层id******/
+        for(var j = 0;j<vm.preAddEdit.object.floor.length;j++){
+            if(j == 0){
+                holderStorey = vm.preAddEdit.object.floor[j]
+            }else{
+                holderStorey += ','+vm.preAddEdit.object.floor[j]
+            }
+        }
+        if(type == 1){
+              holderPathName = monomerValue
+        }else if(type == 2){
+              holderPathName = monomerValue+'-'+partitionValue
+        }else{
+              holderPathName = monomerValue+'-'+partitionValue+'-'+floorValue
+        }
+        var gcName_system = $('#system .el-input__inner')[0].value
+        if(gcName_system == ''){
+            vm.$message({
+                type:'warning',
+                message:'请选择构件类型!'
+            })
+            return false
+        }
+        var gcName_type = $('#type .el-input__inner')[0].value
+        var gcName = ''
+        gcName = gcName_system+'-'+gcName_type
+
+
+        // options_name" :value="item.propertyNumber" :valuetype="item.valueType" :propertyTableName="item.propertyTableName" 
+        var pValueType = ''
+        var pTable = ''
+        var pGcName = ''
+        for(var i=0;i<vm.options_name.length;i++){
+            if(vm.options_name[i].propertyNumber == vm.preAddEdit.object.name){
+                pValueType = vm.options_name[i].valueType
+                pTable = vm.options_name[i].propertyTableName
+                pGcName = vm.options_name[i].propertyTitle
+            }
+        }
+
+        var gcCode='';
+        if(vm.preAddEdit.object.system != ''){
+            gcCode = vm.preAddEdit.object.system
+        }
+        if(vm.preAddEdit.object.type != ''){
+            gcCode = vm.preAddEdit.object.type
+        }
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/dc/addProfessionalSetting',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    holderPathName:holderPathName,
+                    holderBuild:holderBuild,//单体
+                    holderPartition:holderPartition,//分区
+                    holderStorey:holderStorey,//楼层
+                    type:type,
+                    gcCode:gcCode,
+                    gcName:gcName,
+                    pGcCode:vm.preAddEdit.object.name,//属性名称
+                    pValueType:pValueType,//属性 类型
+                    pValue:vm.preAddEdit.object.value,//取值
+                    pGcName:pGcName,//元素注释
+                    projectId:vm.projId,
+                    pTable:pTable// t43
+                },
+            }).then((response)=>{
+                if(parseInt(response.data.cd) == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'添加成功！'
+                    })
+                    vm.professionalList.push(response.data.rt)
+                    vm.pre_pageDetial.total++
+                    vm.addEditCancle()
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+      deleteItem(val){
+          var vm = this
+        axios({
+            method:'GET',
+            url:vm.BDMSUrl+'project2/dc/deleteProfessionalSetting',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                pkId:val
+            },
+        }).then((response)=>{
+            if(parseInt(response.data.cd) == 0){
+                vm.$message({
+                    type:'success',
+                    message:'删除成功！'
+                })
+                vm.getPrevData()
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
       initSelect(key){
          var vm =this
          vm.option_professional_preset.forEach((item,index)=>{
              if(key == index){
                  item.checked = true
                  vm.checkedValue = item.id
+                 vm.getGenieClass(2,true)
              }else{
                 item.checked = false
              }
@@ -1889,8 +2370,13 @@ export default {
             },
         }).then((response)=>{
             if(parseInt(response.data.cd) == 0){
-                vm.professionalList = response.data.rt.rows
-                vm.pre_pageDetial.total = response.data.rt.total
+                if(response.data.rt.rows != null){
+                    vm.professionalList = response.data.rt.rows
+                    vm.pre_pageDetial.total = response.data.rt.total
+                }else{
+                    vm.professionalList = []
+                    vm.pre_pageDetial.total = 0
+                }
             }
         }).catch((err)=>{
             console.log(err)
@@ -1975,7 +2461,7 @@ export default {
       },
       editAttribute(){
           var vm = this
-          if(vm.GCPropertyList.length < 0){
+          if(vm.GCPropertyList.length == 0){
              vm.$message({
                   type:'warning',
                   message:'没有可编辑的扩展属性!'
@@ -2214,44 +2700,56 @@ export default {
           $.extend(b,vm.basicAttributes_auth.new)
           vm.basicAttributes_auth.old = b
       },
-      getGenieClass(level,val){
+      getGenieClass(level,isPre){
             var vm = this
-            var parentClassifyCode='';
-            var gcCode = vm.value_professional
-            var gcCode1 = vm.value_system
-            var gcCode2 = vm.value_type
-            if(level==2){
-                parentClassifyCode= vm.value_professional
-                vm.options_type = [
-                    {
-                        id:'0',
-                        Name:'无'
-                    },
-                ]
-            }else if(level==3){
-                parentClassifyCode = vm.value_system
-                if(parentClassifyCode==0){
-                     vm.options_type = [
-                        {
-                            id:'0',
-                            Name:'无'
-                        },
-                    ]
-                }else if(parentClassifyCode==-1){
+            if(!isPre){
+                var parentClassifyCode='';
+                var gcCode = vm.value_professional
+                var gcCode1 = vm.value_system
+                var gcCode2 = vm.value_type
+                if(level==2){
+                    parentClassifyCode= vm.value_professional
                     vm.options_type = [
                         {
                             id:'0',
                             Name:'无'
                         },
-                        {
-                            id:'-1',
-                            Name:'全部'
-                        },
                     ]
+                }else if(level==3){
+                    parentClassifyCode = vm.value_system
+                    if(parentClassifyCode==0){
+                        vm.options_type = [
+                            {
+                                id:'0',
+                                Name:'无'
+                            },
+                        ]
+                    }else if(parentClassifyCode==-1){
+                        vm.options_type = [
+                            {
+                                id:'0',
+                                Name:'无'
+                            },
+                            {
+                                id:'-1',
+                                Name:'全部'
+                            },
+                        ]
+                    }
+                }
+                if(parentClassifyCode==-1 || parentClassifyCode==0){
+                    return false
                 }
             }
-            if(parentClassifyCode==-1 || parentClassifyCode==0){
-                return false
+            var pCode = ''
+            if(isPre){
+                if(level == 2){
+                    pCode = vm.checkedValue
+                }else{
+                    pCode = vm.preAddEdit.object.system
+                }
+            }else{
+                pCode = parentClassifyCode
             }
             axios({
                 method:'POST',
@@ -2262,77 +2760,113 @@ export default {
                 params:{
                     projId:vm.projId,
                     level:level,
-                    parentClassifyCode:parentClassifyCode
+                    parentClassifyCode:pCode
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    if(response.data.rt != null && response.data.rt.length > 0){
-                        if(level == 2){
-                            vm.options_system = [
-                                {
-                                    id:'0',
-                                    Name:'无'
+                    if(!isPre){
+                        if(response.data.rt != null && response.data.rt.length > 0){
+                            if(level == 2){
+                                vm.options_system = [
+                                    {
+                                        id:'0',
+                                        Name:'无'
+                                    },
+                                    {
+                                        id:'-1',
+                                        Name:'全部'
+                                    }
+                                ]
+                                response.data.rt.forEach((item,key)=>{
+                                    vm.options_system.push({
+                                            id:item.number,
+                                            Name:item.title
+                                    })//分区列表
+                                })
+                            }else if(level == 3){
+                                vm.options_type = [
+                                    {
+                                        id:'0',
+                                        Name:'无'
+                                    },
+                                    {
+                                        id:'-1',
+                                        Name:'全部'
+                                    }
+                                ]
+                                response.data.rt.forEach((item,key)=>{
+                                    vm.options_type.push({
+                                            id:item.number,
+                                            Name:item.title
+                                    })//分区列表
+                                })
+                            }
+                        
+                        }else{
+                            if(level == 2){
+                                vm.options_system = [
+                                    {
+                                        id:'0',
+                                        Name:'无'
                                 },
                                 {
-                                    id:'-1',
-                                    Name:'全部'
-                                }
-                            ]
-                            response.data.rt.forEach((item,key)=>{
-                                vm.options_system.push({
-                                        id:item.number,
-                                        Name:item.title
-                                })//分区列表
-                            })
-                        }else if(level == 3){
-                            vm.options_type = [
-                                {
-                                    id:'0',
-                                    Name:'无'
-                                },
-                                {
-                                    id:'-1',
-                                    Name:'全部'
-                                }
-                            ]
-                            response.data.rt.forEach((item,key)=>{
-                                vm.options_type.push({
-                                        id:item.number,
-                                        Name:item.title
-                                })//分区列表
-                            })
+                                        id:'-1',
+                                        Name:'全部'
+                                }]
+                            }else if(level == 3){
+                                vm.options_type = [
+                                    {
+                                        id:'0',
+                                        Name:'无'
+                                },{
+                                        id:'-1',
+                                        Name:'全部'
+                                }]
+                            }
+                        
                         }
-                      
                     }else{
                         if(level == 2){
-                             vm.options_system = [
-                                {
-                                    id:'0',
-                                    Name:'无'
-                            },
-                            {
-                                    id:'-1',
-                                    Name:'全部'
-                            }]
-                        }else if(level == 3){
-                             vm.options_type = [
-                                {
-                                    id:'0',
-                                    Name:'无'
-                            },{
-                                    id:'-1',
-                                    Name:'全部'
-                            }]
+                            vm.options_system_pre = []
+                            if(response.data.rt != null && response.data.rt.length > 0){
+                                    response.data.rt.forEach((item,key)=>{
+                                        vm.options_system_pre.push({
+                                                id:item.number,
+                                                Name:item.title
+                                        })//分区列表
+                                    })
+                            }
+                        }else{
+                            vm.options_type_pre = []
+                            if(response.data.rt != null && response.data.rt.length > 0){
+                                    response.data.rt.forEach((item,key)=>{
+                                        vm.options_type_pre.push({
+                                                id:item.number,
+                                                Name:item.title
+                                        })//分区列表
+                                    })
+                            }
                         }
-                       
                     }
                 }
             }).catch((err)=>{
                 console.log(err)
             })
       },
-      getPartitionBySubProjId(){
+      getPartitionBySubProjId(ispre){
           var vm = this
+          if(ispre){
+              var subProjId = ''
+              if(vm.preAddEdit.object.monomer.length>1 || vm.preAddEdit.object.monomer.length == 0){
+                  /**如果单体单选，那么分区和楼层都清空**/
+                  vm.options_partition_pre = []
+                  vm.options_floor_pre = []
+                  vm.preAddEdit.object.partition = []
+                  vm.preAddEdit.object.floor = []
+                  return false
+              }
+              subProjId = vm.preAddEdit.object.monomer[0]
+          }
         axios({
             method:'GET',
             url:vm.BDMSUrl+'project2/dc/getPartitionBySubProjId',
@@ -2340,94 +2874,140 @@ export default {
                 'token':vm.token
             },
             params:{
-                subProjId:vm.value_monomer
+                subProjId:ispre?subProjId:vm.value_monomer
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                 vm.options_partition = [
+                if(!ispre){
+                    vm.options_partition = [
+                            {
+                            id:'0',
+                            Name:'无'
+                        },
                         {
-                        id:'0',
-                        Name:'无'
-                    },
-                    {
-                        id:'-1',
-                        Name:'全部'
+                            id:'-1',
+                            Name:'全部'
+                        }
+                    ]
+                    vm.options_floor = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        }
+                    ]
+                    if(response.data.rt != null && response.data.rt.length > 0){
+                        response.data.rt.forEach((item,key)=>{
+                            vm.options_partition.push({
+                                    id:item.ID,
+                                    Name:item.Name
+                            })//分区列表
+                            vm.options_partition_pre = []
+                            vm.options_partition_pre.push({
+                                    id:item.ID,
+                                    Name:item.Name
+                            })//分区列表
+                        })
                     }
-                ]
-                vm.options_floor = [
-                    {
-                        id:'0',
-                        Name:'无'
+                }else{
+                    vm.options_partition_pre = []
+                     if(response.data.rt != null && response.data.rt.length > 0){
+                        response.data.rt.forEach((item,key)=>{
+                            vm.options_partition_pre.push({
+                                    id:item.ID,
+                                    Name:item.Name
+                            })//分区列表
+                        })
                     }
-                ]
-                if(response.data.rt != null && response.data.rt.length > 0){
-                    response.data.rt.forEach((item,key)=>{
-                          vm.options_partition.push({
-                                id:item.ID,
-                                Name:item.Name
-                          })//分区列表
-                    })
-                }               
+                }             
             }
         }).catch((err)=>{
             console.log(err)
         })
       },    
-      findStorey(){
+      findStorey(isPre){
             var vm = this
-            if(vm.value_partition==-1){
-                vm.options_floor = [
-                    {
-                        id:'0',
-                        Name:'无'
-                    },
-                    {
-                        id:'-1',
-                        Name:'全部'
-                    }
-                ]
-                return false
-            }
-            if(vm.value_partition==0){
-                 vm.options_floor = [
-                    {
-                        id:'0',
-                        Name:'无'
-                    },
-                ]
-                return false
+            if(!isPre){
+                if(vm.value_partition==-1){
+                    vm.options_floor = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        },
+                        {
+                            id:'-1',
+                            Name:'全部'
+                        }
+                    ]
+                    return false
+                }
+                if(vm.value_partition==0){
+                    vm.options_floor = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        },
+                    ]
+                    return false
+                }
+                var url = vm.BDMSUrl+'project2/dc/findStorey/'+vm.value_partition
+            }else{
+                if(vm.preAddEdit.object.partition.length>1 || vm.preAddEdit.object.partition.length == 0){
+                    /**如果单体单选，那么分区和楼层都清空**/
+                    vm.options_floor_pre = []
+                    vm.preAddEdit.object.floor = []
+                    return false
+                }
+                var url = vm.BDMSUrl+'project2/dc/findStorey/'+vm.preAddEdit.object.partition[0]
             }
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'project2/dc/findStorey/'+vm.value_partition,
+                url:url,
                 headers:{
                     'token':vm.token
                 },
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    if(response.data.rt != null && response.data.rt.rows.length > 0){
-                        vm.options_floor = [
-                            {
-                                id:'0',
-                                Name:'无'
-                            },
-                            {
-                                id:'-1',
-                                Name:'全部'
-                            }
-                        ]
-                        response.data.rt.rows.forEach((item,key)=>{
-                            vm.options_floor.push({
-                                    id:item.ID,
-                                    Name:item.Name
-                            })//分区列表
-                        })
+                    if(!isPre){
+                        if(response.data.rt != null && response.data.rt.rows.length > 0){
+                            vm.options_floor = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                                },
+                                {
+                                    id:'-1',
+                                    Name:'全部'
+                                }
+                            ]
+                            vm.options_floor_pre = []
+                            response.data.rt.rows.forEach((item,key)=>{
+                                vm.options_floor.push({
+                                        id:item.ID,
+                                        Name:item.Name
+                                })//分区列表
+                                vm.options_floor_pre.push({
+                                        id:item.ID,
+                                        Name:item.Name
+                                })//分区列表
+                            })
+                        }else{
+                            vm.options_floor_pre = []
+                            vm.options_floor = [
+                                {
+                                    id:'0',
+                                    Name:'无'
+                            }]
+                        }
                     }else{
-                        vm.options_floor = [
-                            {
-                                id:'0',
-                                Name:'无'
-                        }]
+                        vm.options_floor_pre = []
+                        if(response.data.rt != null && response.data.rt.rows.length > 0){
+                            response.data.rt.rows.forEach((item,key)=>{
+                                vm.options_floor_pre.push({
+                                        id:item.ID,
+                                        Name:item.Name
+                                })//分区列表
+                            })
+                        }
                     }
                 }
             }).catch((err)=>{
@@ -2482,7 +3062,8 @@ export default {
             }
         }).then((response)=>{
             if(response.data.cd == 0){
-                vm.options_monomer = response.data.rt.subProjects//单体列表
+                $.extend(vm.options_monomer,response.data.rt.subProjects)//单体列表
+                $.extend(vm.options_monomer_pre,response.data.rt.subProjects)//单体列表
                 vm.options_monomer.unshift({
                     id:'0',
                     Name:'总体场地'
@@ -2490,7 +3071,6 @@ export default {
                     id:'all',
                     Name:'全部单体'
                 },)
-                // vm.value_monomer = response.data.rt.siteHolderId
                  vm.value_monomer = '0'
             }
 
@@ -2599,20 +3179,6 @@ export default {
                   }
               }
           }
-        //   var params = {
-        //           projId:vm.projId,
-        //           dataVision:vm.dataVision,//数据版本
-        //           isChildren:1,
-        //           selectBuild:2,
-        //           holderType:9,
-        //           holderId:'all',
-        //           gcCode:210000,
-        //           gcCode1:212000,
-        //           gcCode2:212010,
-        //           gcNumber:212010,
-        //           rows:vm.pageDetial.pagePerNum,
-        //           page:vm.pageDetial.currentPage,
-        //   } 
           axios({
               method:'POST',
               url:vm.BDMSUrl+'project2/dc/searchPropertyData',
