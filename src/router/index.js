@@ -84,6 +84,46 @@ const router = new Router({
       ]
     },
     {
+      path:'/Cost',
+      name:'Cost',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+          path:'/Cost/management',
+          name:'manageCost',
+          component:resolve=>require(['@/components/planCost/overview'],resolve)
+        },
+        {
+          path:'/Cost/goujianList',
+          name:'goujianList',
+          component:resolve=>require(['@/components/planCost/goujianList'],resolve),
+        },
+        // {
+        //   path:'/Design/designversion',
+        //   name:'DesignVersion',
+        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
+        // },
+        // {
+        //   path:'/Design/designversion',
+        //   name:'DesignVersion',
+        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
+        // },
+        // {
+        //   path:'/Design/designversion',
+        //   name:'DesignVersion',
+        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
+        // },
+        // {
+        //   path:'/Design/designversion',
+        //   name:'DesignVersion',
+        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
+        // },
+      ]
+    },
+    {
       path:'/Drive',
       name:'Drive',
       meta:{

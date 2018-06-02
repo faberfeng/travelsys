@@ -17,14 +17,7 @@
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress">进度计划</el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager"></el-tab-pane>
-                                <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage">
-                                    <el-menu :default-active="activeIndex"  mode="horizontal">
-                                        <el-menu-item index="1"><router-link :to="{path:'/Drive/costover'}">成本预览</router-link></el-menu-item>
-                                        <el-menu-item index="2"><router-link :to="{path:'/home/goujian'}">构建量清单</router-link></el-menu-item>
-                                        <el-menu-item index="3"><router-link :to="{path:'/home/gongcheng'}">工程量清单</router-link></el-menu-item>
-                                        <el-menu-item index="4"><router-link :to="{path:'/home/wuliao'}">物料量清单</router-link></el-menu-item>
-                                    </el-menu>
-                                </el-tab-pane>
+                                <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
@@ -292,7 +285,7 @@ export default {
                         })
                     }else if(vm.auth.costManagement){
                         vm.$router.push({
-                            path:'/Drive/costover'//成本管理
+                            path:'/Cost/management'//成本管理
                         })
                     }else if(vm.auth.materialPurchasing){
                         vm.$router.push({
@@ -349,7 +342,7 @@ export default {
                 sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.label === '成本管理'){
                 this.$router.push({
-                    path:'/Drive/costover'
+                    path:'/Cost/management'
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
