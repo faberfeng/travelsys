@@ -128,7 +128,7 @@
                     </select>
                     <i class="icon-sanjiao"></i>
                 </div> 
-                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构建类别 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构件类别 :</label>
                     <select class="editSelect" v-model="goujianType" @change="goujianTypeChange">
                         <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
                     </select>
@@ -169,7 +169,7 @@
                     </select>
                     <i class="icon-sanjiao"></i>
                 </div>
-                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构建类别 :</label>
+                <div class="editBodytwo edit-item clearfix"><label class="editInpText">构件类别 :</label>
                     <select class="editSelect" v-model="goujianType" @change="goujianTypeChange">
                         <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
                     </select>
@@ -212,7 +212,7 @@ export default {
             keyTypeData:[],//关键字类型
             geniceClassJson:[],
             logicSystenData:[],//逻辑系统
-            categoryData:[],//构建类型
+            categoryData:[],//构件类型
             pageDetial:{
               pagePerNum:20,//一页几份数据
               currentPage:1,//初始查询页数 第一页
@@ -231,7 +231,7 @@ export default {
           logicSystemValue:'',
           categoryBase:'',//类型编码
           keyTypeVal:'',
-          goujianType:'',//构建类别
+          goujianType:'',//构件类别
           editUserNum:'',
           deleteNum:'',
           oldFamilyNameKeyWord:'',//旧关键字值
@@ -343,7 +343,7 @@ export default {
                 }
             })
         },
-        //获取设计构建分类
+        //获取设计构件分类
         getGeniceClassJson(){
             axios({
                 method:'post',
@@ -459,7 +459,7 @@ export default {
                 }
             })
             this.keyWord = this.constructorData[num].keyWord;//包含关键字
-            this.goujianType = this.constructorData[num].genieClassName;//构建类别
+            this.goujianType = this.constructorData[num].genieClassName;//构件类别
              this.editListShow = true;
         },
         //编辑确定

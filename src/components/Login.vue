@@ -3,8 +3,8 @@
         <div class="loginHeader">
             <div style="width:1200px;position:relative;margin:0 auto;height:72px;">
                 <div class="firstTitle">
-                    <span class="firstTitleText">华建H系列 </span> 
-                    <span class="sendTitle">工程协同应用系统</span></div>
+                    <span class="firstTitleText">BDMS建筑数据管理系统 </span> 
+                    <span class="sendTitle">工程建设全过程项目管理系统</span></div>
                 <button class="registerBtn">注册</button>
             </div>
         </div>
@@ -147,7 +147,6 @@ export default {
             font-size: 32px;
             display: inline-block;
             line-height: 32px;
-            width: 155px;
          }
         .sendTitle{
             color: #333;
@@ -156,7 +155,6 @@ export default {
             display: inline-block;
             font-weight: normal;
             margin-left: 22px;
-            width: 160px;
         }
         .registerBtn{
             width: 56px;

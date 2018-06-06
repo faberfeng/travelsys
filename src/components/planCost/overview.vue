@@ -7,10 +7,10 @@
             <router-link :to="'/Cost/goujianList'"  class="label-item">  
                 构件量清单  
             </router-link>
-            <router-link :to="'/Design/designversion'"  class="label-item">  
+            <router-link :to="'/Cost/quantities'"  class="label-item">  
                 工程量清单  
             </router-link>
-             <router-link :to="'/Design/management'" class=" label-item">  
+             <router-link :to="'/Cost/inventory'" class=" label-item">  
                 物料量清单  
             </router-link>
             <router-link :to="''"  class="label-item">  
@@ -218,6 +218,7 @@ export default {
         left: 26px;
         bottom:0;
         right: 0;
+        overflow: auto;
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;

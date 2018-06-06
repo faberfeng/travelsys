@@ -101,16 +101,16 @@ const router = new Router({
           name:'goujianList',
           component:resolve=>require(['@/components/planCost/goujianList'],resolve),
         },
-        // {
-        //   path:'/Design/designversion',
-        //   name:'DesignVersion',
-        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
-        // },
-        // {
-        //   path:'/Design/designversion',
-        //   name:'DesignVersion',
-        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
-        // },
+        {
+          path:'/Cost/quantities',
+          name:'quantities',
+          component:resolve=>require(['@/components/planCost/quantities'],resolve)
+        },
+        {
+          path:'/Cost/inventory',
+          name:'inventory',
+          component:resolve=>require(['@/components/planCost/inventory'],resolve)
+        },
         // {
         //   path:'/Design/designversion',
         //   name:'DesignVersion',

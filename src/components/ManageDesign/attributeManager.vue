@@ -652,7 +652,7 @@
                         </span>
                     </div>
                       <div class="editBodytwo clearfix">
-                        <label class=" imageBodyText">构建类型 :</label>
+                        <label class=" imageBodyText">构件类型 :</label>
                         <span class="item-select" style="width:212px;" id="system">
                               <el-select v-model="preAddEdit.object.system" @change="systemChange" placeholder="构件大类">
                                 <el-option
@@ -1436,6 +1436,9 @@
                         // padding: 3px 4px;
                         box-sizing: border-box;
                         background: #f5f5f5;
+                    }
+                     .pagination{
+                        border-top: none;
                     }
                     .pagination table {
                         float: left;

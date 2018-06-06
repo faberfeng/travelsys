@@ -1,7 +1,7 @@
 <template>
 <div id="cloudDrive">
         <div id="GroupSelect">
-            <select v-model="selectUgId" class="inp-search">
+            <select v-model="selectUgId" class="inp-search" @change="InitselectUgId">
                 <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
             </select>
             <i class="icon-sanjiao"></i>
@@ -201,9 +201,7 @@
                     @node-click="handleNodeClick"
                     id="cloudDirveFileTree"
                     >
-                     <span :class="['custom-tree-node','el-tree-node__label',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'">
-                         <span>hsahshhsdahha</span>
-                     </span>
+                     <span :class="['custom-tree-node','el-tree-node__label',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'"></span>
                     </el-tree>
                 </div>
             </div>
@@ -466,6 +464,9 @@
     .is-current .el-tree-node__content{
         color: #333333;
         // font-weight: bold;
+    }
+    .is-current_fistload > .el-tree-node__content {
+        background-color: #dfdfdf;
     }
     *{
         margin: 0;
@@ -1796,11 +1797,6 @@ export default {
            var vm = this
            vm.getInfo()
       },
-      selectUgId:function(val){
-            var vm = this 
-            vm.getFileTree()
-            // vm.searchFileGroupInfo()
-      },
       checkFileDir:function(val){
           var vm = this
           vm.mayiList = []
@@ -1816,6 +1812,16 @@ export default {
       }
   },
   methods:{
+       InitselectUgId(val){
+            var vm = this 
+            for(var i =0;i<vm.ugList.length;i++){
+                if(vm.ugList[i].ugId == vm.selectUgId){ //ugName
+                     vm.expandedKeys = []
+                     vm.getFileTree(vm.ugList[i].ugName)
+                     break
+                }
+            }
+      },
       initTreeFolder(){
         var vm = this
         vm.firstTime = 0
@@ -2498,7 +2504,6 @@ export default {
       handleNodeClick(obj){
           var vm = this
           vm.firstTime++
-          console.log(obj)
           if(!obj.children){
             vm.$message({
                 type:'info',
@@ -2507,6 +2512,7 @@ export default {
           }
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
+        $('#cloudDirveFileTree .el-tree-node').removeClass('is-current_fistload')
           if(obj.holderId){
                vm.showQuanJing = true
                vm.searchFileGroupInfo(obj.nodeId)
@@ -2975,15 +2981,15 @@ export default {
                          vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
                     }
                 })
-                vm.selectUgId = response.data.rt.selectUgId
-                vm.getFileTree()
+                vm.selectUgId = response.data.rt.ugList[0].ugId
+                vm.getFileTree(vm.ugList[0].ugName)
             }
 
         }).catch((err)=>{
             console.log(err)
         })
     },
-    getFileTree(){
+    getFileTree(name){
         var vm = this
         var setting = {
             data: {
@@ -3009,8 +3015,22 @@ export default {
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-                vm.checkFileDir = vm.FileTree[0]
-                vm.searchFileGroupInfo()
+                if(name){
+                    for(var k=0;k<vm.FileTree.length;k++){
+                        if(vm.FileTree[k].nodeName.replace('_','') == name){
+                            vm.handleNodeClick(vm.FileTree[k])
+                            setTimeout(()=>{
+                                var n = k+1
+                                $('#cloudDirveFileTree .el-tree-node:nth-child('+n+')').addClass('is-current_fistload')
+                            },0)
+                            break
+                        }
+                    }
+                }else{
+                    vm.checkFileDir = vm.FileTree[0]
+                    vm.searchFileGroupInfo()
+                }
+                
             }
 
         }).catch((err)=>{
@@ -3088,10 +3108,6 @@ export default {
                         vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                     })
                 }else{
-                    vm.$message({
-                        type:'info',
-                        message:'未匹配到相应的数据'
-                    })
                     vm.fileList = ''
                 }
                 vm.getInfoFolder()
@@ -3126,10 +3142,6 @@ export default {
                         })
                     }else{
                         vm.folderList = []
-                        vm.$message({
-                            type:'info',
-                            message:'未匹配到相应的数据'
-                        })
                     }
                 }else{
                     vm.folderList = []

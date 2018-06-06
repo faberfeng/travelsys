@@ -21,38 +21,38 @@
                 </div>
             </div>
         </div>
-        <div class="tableBox">
-            <table class="UserList" border="1" width="100%" >
-                <tbody class="head">
+        <div class="tableBox" id="table-resizable">
+            <table class="UserList" border="1" width="100%" style="padding-right:20px;" >
+                <thead class="head">
                     <tr>
-                        <td width="7%">版本号</td>
-                        <td width="10%">相关空间</td>
-                        <td width="7%">空间操作</td>
-                        <td width="7%;">相关内容节点</td>
-                        <td width="10%">结点操作</td>
-                        <td width="7%;">新增元素</td>
-                        <td width="7%">更新元素</td>
-                        <td width="7%">删除元素</td>
-                        <td width="7%">元素总和源</td>
-                        <td width="10%">更新用户</td>
-                        <td width="10%">更新时间</td>
+                        <th>版本号</th>
+                        <th>相关空间</th>
+                        <th>空间操作</th>
+                        <th>相关内容节点</th>
+                        <th>结点操作</th>
+                        <th>新增元素</th>
+                        <th>更新元素</th>
+                        <th>删除元素</th>
+                        <th>元素总和源</th>
+                        <th>更新用户</th>
+                        <th>更新时间</th>
                     </tr>
-                </tbody>
+                </thead>
             </table>
             <table class="UserList"  id="detial-table" border="1" width="100%" >
                 <tbody>
                     <tr v-for="(item,index) in designVersionData" :key="index">
-                        <td width="7%">{{item.RootHolderVersion}}</td>
-                        <td width="10%">{{item.RefHolderName}}</td>
-                        <td width="7%">{{item.holderOperator}}</td>
-                        <td  width="10%">{{item.RefNodeName?item.RefNodeName:'无'}}</td>
-                        <td  width="7%">{{item.nodeOperator}}</td>
-                        <td  width="7%">{{item.AddElementCount}}</td>
-                        <td  width="7%">{{item.ModifyElementCount}}</td>
-                        <td  width="7%">{{item.DeleteElementCount}}</td>
-                        <td  width="7%">{{item.ElementCount}}</td>
-                        <td  width="10%">{{item.UpdateUser}}</td>
-                        <td width="10%">{{item.UpdateTime}}</td>
+                        <td>{{item.RootHolderVersion}}</td>
+                        <td>{{item.RefHolderName}}</td>
+                        <td>{{item.holderOperator}}</td>
+                        <td>{{item.RefNodeName?item.RefNodeName:'无'}}</td>
+                        <td >{{item.nodeOperator}}</td>
+                        <td >{{item.AddElementCount}}</td>
+                        <td >{{item.ModifyElementCount}}</td>
+                        <td >{{item.DeleteElementCount}}</td>
+                        <td >{{item.ElementCount}}</td>
+                        <td>{{item.UpdateUser}}</td>
+                        <td>{{item.UpdateTime}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -61,7 +61,9 @@
     </div>
 </template>
 <script>
-import axios from 'axios';
+import axios from 'axios'
+import '../ManageCost/js/jquery-1.8.3.js'
+import tableResizable from '../planCost/js/table.js'
 export default {
   name:'DesignVersion',
     data(){
@@ -80,7 +82,11 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getDesignVersion();
+        vm.getDesignVersion()
+    },
+    mounted(){
+        var vm = this
+        const table1 = new tableResizable('table-resizable');
     },
     methods:{
         //进入设计版本页面
@@ -277,7 +283,7 @@ export default {
                 border: 1px solid #e6e6e6;
                 .head{
                     background: #f2f2f2;
-                    td{
+                    td,th{
                         padding-left: 9px;
                         height: 52px;
                         text-align: left;
@@ -323,6 +329,27 @@ export default {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+        width:5px;
+        height: 10px;
+        }
+        /* 滚动槽 */
+        ::-webkit-scrollbar-track {
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
+        -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+        border-radius:10px;
+        }
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
+        -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+        }
+        ::-webkit-scrollbar-thumb:window-inactive {
+        background:rgba(255,0,0,0.4);
         }
     }
 </style>

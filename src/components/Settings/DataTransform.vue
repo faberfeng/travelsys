@@ -179,7 +179,7 @@ export default {
                 }
             })
         },
-        //获取构建分类的属性定义信息
+        //获取构件分类的属性定义信息
         getExportStandarInfo(){
             axios.get(this.BDMSUrl+'project2/Config/getexportStandardInfo?projId='+this.projId,{
                 headers:{
