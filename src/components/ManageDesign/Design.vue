@@ -4034,7 +4034,7 @@ export default {
                     Name:'总体场地'
                 },)
                 vm.value_monomer = response.data.rt.siteHolderId
-                vm.selectUgId = response.data.rt.selectUgId
+                vm.selectUgId = vm.ugList[0].ugId
                 vm.getContacts()
                 vm.getCommunicationList()//获取评论
             }

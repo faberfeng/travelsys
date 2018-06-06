@@ -22,7 +22,7 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div id="containerMessage" v-if="SHOWMain">
+                <div id="containerMessage" v-show="SHOWMain">
                     <p class="header clearfix">
                         <span class="title">
                           数据版本 <input type="tel" v-model="dataVision">/{{holderMaxVersion}}
@@ -30,7 +30,7 @@
                         </span>
                         <span style="float: right;">
                             <span class="item-btn clearfix">
-                                <label @click="SHOWMain = false">专业预设</label>
+                                <label @click="SHOWMain = false;getPrevData()">专业预设</label>
                                 <label @click="basicAttributes_auth.show = true">基本属性</label>
                                 <label @click="showExtension()">扩展属性</label>
                             </span>
@@ -84,7 +84,7 @@
                                   <el-select v-model="value_professional" ref="professional" placeholder="请选择">
                                       <el-option
                                       v-for="item in option_professional"
-                                      :key="item.id"
+                                      :key="item.key"
                                       :label="item.Name"
                                       :value="item.id">
                                       </el-option>
@@ -245,7 +245,7 @@
                         </div>
                     </div>
                 </div>
-                 <div id="containerMessage" v-else>
+                 <div id="containerMessage" v-show="!SHOWMain">
                     <p class="header clearfix">
                         <span class="button-add" @click="preAddEdit.show = true;getGenieClass(2,true)">添加</span>
                         <span class="button-back" @click="SHOWMain = true">返回</span>
@@ -359,52 +359,52 @@
                         <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">所在空间</span>
-                                <span class="detial-text-value" v-text="checkedItem.holderType"></span>
+                                <span class="detial-text-value" v-text="checkedItem.holderType?checkedItem.holderType:'（空）'" :title="checkedItem.holderType?checkedItem.holderType:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">原始文件</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalFile"></span>
+                                <span class="detial-text-value" v-text="checkedItem.originalFile?checkedItem.originalFile:'（空）'" :title="checkedItem.originalFile?checkedItem.originalFile:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">原始ID</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalId"></span>
+                                <span class="detial-text-value" v-text="checkedItem.originalId?checkedItem.originalId:'（空）'" :title="checkedItem.originalId?checkedItem.originalId:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">构件名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalName"></span>
+                                <span class="detial-text-value" v-text="checkedItem.originalName?checkedItem.originalName:'（空）'" :title="checkedItem.originalName?checkedItem.originalName:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">脚本名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.name"></span>
+                                <span class="detial-text-value" v-text="checkedItem.name?checkedItem.name:'（空）'" :title="checkedItem.name?checkedItem.name:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">分类编码</span>
-                                <span class="detial-text-value" v-text="checkedItem.gccode"></span>
+                                <span class="detial-text-value" v-text="checkedItem.gccode?checkedItem.gccode:'（空）'" :title="checkedItem.gccode?checkedItem.gccode:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">构件分类</span>
-                                <span class="detial-text-value" v-text="checkedItem.gccodeName"></span>
+                                <span class="detial-text-value" v-text="getGenieclassTitle(checkedItem.gccode)" :title="getGenieclassTitle(checkedItem.gccode)"></span>
                             </li>
                         
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">创建程序</span>
-                                <span class="detial-text-value" v-text="checkedItem.creator"></span>
+                                <span class="detial-text-value" v-text="checkedItem.creator?checkedItem.creator:'（空）'" :title="checkedItem.creator?checkedItem.creator:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">更新用户</span>
-                                <span class="detial-text-value" v-text="checkedItem.editor"></span>
+                                <span class="detial-text-value" v-text="checkedItem.editor?checkedItem.editor:'（空）'" :title="checkedItem.editor?checkedItem.editor:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">更新时间</span>
-                                <span class="detial-text-value" v-text="checkedItem.updateTime"></span>
+                                <span class="detial-text-value" v-text="checkedItem.updateTime?checkedItem.updateTime:'（空）'" :title="checkedItem.updateTime?checkedItem.updateTime:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">标记</span>
-                                <span class="detial-text-value" v-text="checkedItem.tag?checkedItem.tag:'（空）'"></span>
+                                <span class="detial-text-value" v-text="checkedItem.tag?checkedItem.tag:'（空）'" :title="checkedItem.tag?checkedItem.tag:'（空）'"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">注释</span>
-                                <span class="detial-text-value" v-text="checkedItem.comments?checkedItem.comments:'（空）'"></span>
+                                <span class="detial-text-value" v-text="checkedItem.comments?checkedItem.comments:'（空）'" :title="checkedItem.comments?checkedItem.comments:'（空）'"></span>
                             </li>
                         </ul>
                         <div v-if="mapInfo.length>0" style="margin-top:13px;">
@@ -416,7 +416,7 @@
                             <ul id="designAtt" :class="[{'show':show.designAttributes},'Att']" >
                                 <li class="detial-item clearfix" v-for="(item,index) in mapInfo" :key="index">
                                     <span class="detial-text-name" v-text="item.classifyName"></span>
-                                    <span class="detial-text-value" v-text="item.value?item.value:'（空）'"></span>
+                                    <span class="detial-text-value" v-text="item.value?item.value:'（空）'" :title="item.value?item.value:'（空）'"></span>
                                 </li>
                             </ul>
                         </div>
@@ -429,17 +429,17 @@
                             <ul id="extensionAtt" :class="[{'show':show.extensionAttributes},'Att']" >
                                 <li class="detial-item clearfix" v-for="(item,index) in GCPropertyList" :key="index">
                                     <span class="detial-text-name" v-text="item.propertyTitle"></span>
-                                    <span class="detial-text-value" v-text="initVal(item.id,checkedItem.traceId,false)"></span>
+                                    <span class="detial-text-value" v-text="initVal(item.id,checkedItem.traceId,false)" :title="initVal(item.id,checkedItem.traceId,false)"></span>
                                 </li>
                             </ul>
                         </div>
-                        <div v-if="fgList.length>0" style="margin-top:13px;">
+                        <div  style="margin-top:13px;">
                             <h3 class="header-attribute" style="margin-top: 0px;">
                                 <i class="trrangle"></i>
                                 关联文档
                                 <i :class="[{'active':show.relevantDoc},'icon-dropDown']" @click="show.relevantDoc = show.relevantDoc?false:true;"></i>
                             </h3>
-                            <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" >
+                            <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" v-if="fgList.length>0">
                                 <li class="detial-item clearfix" v-for="(item,index) in fgList" :key="index">
                                     <span class="detial-text-name" v-text="item.fgName" style="max-width: 120px;width: auto;float: left;"></span>
                                     <span class="icon-goujian icon-search" @click="view(item.filePath)"></span>
@@ -685,7 +685,25 @@
                     </div>
                      <div class="editBodytwo clearfix">
                         <label class=" imageBodyText">取值 :</label>
-                        <input type="text" class="inp" v-model="preAddEdit.object.value" placeholder="请输入">
+                        <input type="text" class="inp" v-model="preAddEdit.object.value" v-if="preAddEdit.object.valueType == 0 || preAddEdit.object.valueType == 1"  placeholder="请输入">
+                         <span class="item-select" style="width:212px;" v-if="preAddEdit.object.valueType == 2">
+                            <select  class="editSelect"   v-model="preAddEdit.object.value">
+                                <option value="是">是</option> 
+                                <option value="否">否</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                        <span  v-if="preAddEdit.object.valueType == 3"  class="inputvalue-date">
+                            <el-date-picker
+                                v-model="preAddEdit.object.value"
+                                :editable="false"
+                                type="date"
+                                placeholder="选择日期"
+                                format="yyyy 年 MM 月 dd 日"
+                                value-format="yyyy-MM-dd"
+                                >
+                            </el-date-picker>
+                        </span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -990,6 +1008,31 @@
                         content: '';
                         top: 15px;
                         right: 15px;
+                    }
+                }
+                .inputvalue-date{
+                    float: left;
+                    .el-input{
+                        width: 212px;
+                    }
+                    .el-input__inner{
+                        width: 100%;
+                        height: 36px;
+                        padding:0 30px;
+                    }
+                    .checkbox-fileItem{
+                        display: inline-block;
+                        float: initial;
+                        margin-right: 10px;
+                        position: relative;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            top: -1px;
+                            right: -29px;
+                            line-height: 14px;
+                            content: '继承';
+                        }
                     }
                 }
              }
@@ -1737,101 +1780,8 @@ export default {
           },
         ],//楼层选项
         options_floor_pre:[],
-        option_professional:[
-            {
-                id:'-1',
-                Name:'全部'
-            },
-            {
-                id:'110000',
-                Name:'场地'
-            },{
-                id:'210000',
-                Name:'结构'
-            },{
-                id:'310000',
-                Name:'建筑'
-            },{
-                id:'350000',
-                Name:'室内'
-            },
-            {
-                id:'410000',
-                Name:'暖通'
-            },
-             {
-                id:'430000',
-                Name:'动力'
-            },
-            {
-                id:'450000',
-                Name:'给排水'
-            },{
-                id:'500000',
-                Name:'电气'
-            },{
-                id:'510000',
-                Name:'强电'
-            },{
-                id:'530000',
-                Name:'弱电'
-            },
-            {
-                id:'900000',
-                Name:'未知'
-            }
-        ],
-        option_professional_preset:[
-            {
-                id:'110000',
-                Name:'场地',
-                checked:true,
-            },{
-                id:'210000',
-                Name:'结构',
-                checked:false,
-            },{
-                id:'310000',
-                Name:'建筑',
-                checked:false,
-            },{
-                id:'350000',
-                Name:'室内',
-                checked:false,
-            },
-            {
-                id:'410000',
-                Name:'暖通',
-                checked:false,
-            },
-             {
-                id:'430000',
-                Name:'动力',
-                checked:false,
-            },
-            {
-                id:'450000',
-                Name:'给排水',
-                checked:false,
-            },{
-                id:'500000',
-                Name:'电气',
-                checked:false,
-            },{
-                id:'510000',
-                Name:'强电',
-                checked:false,
-            },{
-                id:'530000',
-                Name:'弱电',
-                checked:false,
-            },
-            {
-                id:'900000',
-                Name:'未知',
-                checked:false,
-            }
-        ],
+        option_professional:[],
+        option_professional_preset:[],
         options_system:[
            {
               id:'0',
@@ -1931,7 +1881,7 @@ export default {
         mapInfo:[],//设计属性的列表
         fgList:[],//文档关联列表
         SHOWMain:true,
-        checkedValue:'110000',
+        checkedValue:'',
         professionalList:[],//扩展属性列表
         pretitle:'专业预设添加',
         preAddEdit:{
@@ -1944,6 +1894,8 @@ export default {
                 type:'',//类型 筛选关键字
                 name:'',//属性名称
                 value:'',//属性取值
+                pkId:'',
+                valueType:0
             }
         },
         options_name:[],//属性名称的列表
@@ -2122,48 +2074,83 @@ export default {
             vm.preAddEdit.show = true
             //单体id 列表 
             var monomer_arr = val.holderBuild.split(',')
-            vm.preAddEdit.object.monomer = monomer_arr
-            //分区id 列表 
-            if(val.holderPartition != ''){
-                vm.getPartitionBySubProjId(true) //加载分区
-                setTimeout(() => {
-                      var Partition_arr = val.holderPartition.split(',')
-                      vm.preAddEdit.object.partition = Partition_arr
-                       //列表id 列表 
-                        if(val.holderStorey != ''){
-                            vm.findStorey(true) //加载楼层
-                            setTimeout(() => {
-                                var floor_arr = val.holderStorey.split(',')
-                                vm.preAddEdit.object.floor = floor_arr
-                            }, 0)
+            if(monomer_arr.length > 1){
+                vm.preAddEdit.object.monomer = monomer_arr
+                //分区id 列表 
+                if(val.holderPartition != ''){
+                    vm.getPartitionBySubProjId(true) //加载分区
+                    setTimeout(() => {
+                        var Partition_arr = val.holderPartition.split(',')
+                        if(Partition_arr.length > 1){
+                            vm.preAddEdit.object.partition = Partition_arr
+                              //列表id 列表 
+                            if(val.holderStorey != ''){
+                                vm.findStorey(true) //加载楼层
+                                setTimeout(() => {
+                                    var floor_arr = val.holderStorey.split(',')
+                                    if(floor_arr.length > 1){
+                                         vm.preAddEdit.object.floor = floor_arr
+                                    }else{
+                                         vm.preAddEdit.object.floor = []
+                                    }
+                                   
+                                }, 0)
+                            }else{
+                                vm.preAddEdit.object.floor = []
+                            }
                         }else{
+                            vm.preAddEdit.object.partition = []
                             vm.preAddEdit.object.floor = []
                         }
-                }, 0)
+                    }, 0)
+                }else{
+                    vm.preAddEdit.object.partition = []
+                }
             }else{
+                vm.preAddEdit.object.monomer = []
                 vm.preAddEdit.object.partition = []
+                vm.preAddEdit.object.floor = []
             }
             var Sys_type = val.gcName.split('-')
             vm.preAddEdit.object.system = ''
             vm.preAddEdit.object.type = ''
-            for(var k=0;k<vm.options_system_pre.length;k++){
-                if(vm.options_system_pre[k].Name == Sys_type[0]){
-                     vm.preAddEdit.object.system = vm.options_system_pre[k].id
-                }
-            }
-            if(Sys_type.length == 2){
-                 vm.getGenieClass(3,true)
-                 var timer = setInterval(function(){
-                    for(var k=0;k<vm.options_type_pre.length;k++){
-                        if(vm.options_type_pre[k].Name == Sys_type[1]){
-                            clearInterval(timer)
-                            vm.preAddEdit.object.type = vm.options_type_pre[k].id
-                            vm.typeChange(val.pGcCode)
+            if(Sys_type.length > 1){
+                vm.getGenieClass(2,true)
+                var timer3 = setInterval(function(){
+                    if(vm.options_system_pre.length >0){
+                        clearInterval(timer3)
+                         for(var k=0;k<vm.options_system_pre.length;k++){
+                            if(vm.options_system_pre[k].Name == Sys_type[0]){
+                                vm.preAddEdit.object.system = vm.options_system_pre[k].id
+                                //当存在构件大类时，此时判断存不存在构件小类
+                                 if(Sys_type.length == 2){
+                                        vm.getGenieClass(3,true)
+                                        var timer = setInterval(function(){
+                                            for(var k=0;k<vm.options_type_pre.length;k++){
+                                                if(vm.options_type_pre[k].Name == Sys_type[1]){
+                                                    clearInterval(timer)
+                                                    vm.preAddEdit.object.type = vm.options_type_pre[k].id
+                                                    vm.typeChange(val.pGcCode)
+                                                    break
+                                                }
+                                            } 
+                                        },100)
+                                    }
+                                break
+                            }
                         }
-                    } 
-                 },100)
+                    }
+                },100)
+               
+            }else{
+                vm.preAddEdit.object.system =''
+                vm.preAddEdit.object.type = ''
             }
             vm.preAddEdit.object.value = val.pValue
+
+            if(val.pkId)vm.preAddEdit.object.pkId = val.pkId
+
+            if(val.pValueType)vm.preAddEdit.object.valueType = val.pValueType
       },
       addEditPreConfirm(){
           var vm = this
@@ -2286,6 +2273,15 @@ export default {
         if(vm.preAddEdit.object.type != ''){
             gcCode = vm.preAddEdit.object.type
         }
+
+        // preAddEdit.object.valueType
+        if(vm.preAddEdit.object.valueType == 0 && isNaN(vm.preAddEdit.object.value)){
+            vm.$message({
+                type:'warning',
+                message:'当前专业预设的取值类型为数值，请输入数值!'
+            })
+            return false
+        }
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/dc/addProfessionalSetting',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
@@ -2300,6 +2296,7 @@ export default {
                     type:type,
                     gcCode:gcCode,
                     gcName:gcName,
+                    pkId:vm.preAddEdit.object.pkId,
                     pGcCode:vm.preAddEdit.object.name,//属性名称
                     pValueType:pValueType,//属性 类型
                     pValue:vm.preAddEdit.object.value,//取值
@@ -2311,10 +2308,9 @@ export default {
                 if(parseInt(response.data.cd) == 0){
                     vm.$message({
                         type:'success',
-                        message:'添加成功！'
+                        message:'编辑成功！'
                     })
-                    vm.professionalList.push(response.data.rt)
-                    vm.pre_pageDetial.total++
+                    vm.getPrevData()
                     vm.addEditCancle()
                 }
             }).catch((err)=>{
@@ -2637,9 +2633,17 @@ export default {
             }
         }
         if(from){
-             return valueFrom
+            if(valueFrom){
+                return valueFrom
+            }else{
+                return '(空)'
+            }
         }else{
-            return pValue
+             if(pValue){
+                return pValue
+            }else{
+                return '(空)'
+            }
         }
       },
       changePage(val){//分页 0 -1 1 2
@@ -2971,7 +2975,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == 0){
                     if(!isPre){
-                        if(response.data.rt != null && response.data.rt.rows.length > 0){
+                        if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
                             vm.options_floor = [
                                 {
                                     id:'0',
@@ -3003,7 +3007,7 @@ export default {
                         }
                     }else{
                         vm.options_floor_pre = []
-                        if(response.data.rt != null && response.data.rt.rows.length > 0){
+                        if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
                             response.data.rt.rows.forEach((item,key)=>{
                                 vm.options_floor_pre.push({
                                         id:item.ID,
@@ -3030,13 +3034,13 @@ export default {
           //   @param   value_professional:'-1',//专业 筛选关键字
           //   @param        value_system:'-1',//系统 筛选关键字
           //   @param        value_type:'-1',//类型 筛选关键字
-            if(vm.value_professional != -1){
+            if(parseInt(vm.value_professional) != -1){
                 typeName= vm.$refs.professional.selectedLabel +"-"
             }
-            if(vm.value_system !=-1 && vm.value_system !=0){
+            if(parseInt(vm.value_system) !=-1 && parseInt(vm.value_system) !=0){
                 typeName+=vm.$refs.system.selectedLabel+"-"
             }
-            if((vm.value_system ==-1 || vm.value_system ==0) && vm.value_type ==-1 || vm.value_type ==0){
+            if((parseInt(vm.value_system ==-1) || parseInt(vm.value_system) ==0) && parseInt(vm.value_type) ==-1 || parseInt(vm.value_type) ==0){
                 typeName=''
             }
             if(vm.GenieclassTitle && vm.GenieclassTitle.length>0){
@@ -3046,7 +3050,7 @@ export default {
                       }
                   }
             }
-            return '';
+            return '(空)';
       },
       trim(str){ 
         /**去掉字符串前后所有空格*/
@@ -3093,6 +3097,37 @@ export default {
                 if(response.data.cd == 0){
                     vm.dataVision = response.data.rt.holderMaxVersion
                     vm.holderMaxVersion = response.data.rt.holderMaxVersion
+                    vm.option_professional = [{
+                        id:'-1',
+                        Name:'全部',
+                        key:'000000'
+                    }]
+                    vm.option_professional_preset = []
+                    if(response.data.rt.genieClassList != null){
+                        response.data.rt.genieClassList.forEach((element,index)=>{
+                            vm.option_professional.push({
+                                id:element.number,
+                                Name:element.title,
+                                key:element.id
+                            })
+                            if(index == 0){
+                                vm.option_professional_preset.push({
+                                    id:element.number,
+                                    Name:element.title,
+                                    key:element.id,
+                                    checked:true,
+                                })
+                                vm.checkedValue = element.number
+                            }else{
+                                vm.option_professional_preset.push({
+                                    id:element.number,
+                                    Name:element.title,
+                                    key:element.id,
+                                    checked:false,
+                                })
+                            }
+                        })
+                    }
                 }
 
             }).catch((err)=>{
@@ -3181,6 +3216,20 @@ export default {
                       }
                   }
               }
+          }
+          var params = {
+                projId:vm.projId,
+                dataVision:vm.dataVision,//数据版本
+                isChildren:1,
+                selectBuild:2,
+                holderType:9,
+                holderId:'all',
+                gcCode:210000,
+                gcCode1:-1,
+                gcCode2:-1,
+                gcNumber:210000,
+                rows:vm.pageDetial.pagePerNum,
+                page:vm.pageDetial.currentPage,
           }
           axios({
               method:'POST',
