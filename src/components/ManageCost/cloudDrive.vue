@@ -1763,12 +1763,16 @@ export default {
       checkAll:function(val){
           var vm = this
           if(val){
-            vm.fileList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-             vm.folderList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
+            if(vm.fileList.length>0){
+                vm.fileList.forEach((item,key)=>{
+                    vm.$set(item,'checked',true)
+                }) 
+            }
+            if(vm.folderList.length>0){
+                vm.folderList.forEach((item,key)=>{
+                    vm.$set(item,'checked',true)
+                })
+            }
             vm.show.basicAttributes =true
             vm.show.BindingArtifacts =true
             vm.checkedFile_Folder.fileCheckedNum = vm.fileList.length
@@ -2163,13 +2167,13 @@ export default {
         } else {
             for(var i=0;i<vm.fileList.length;i++){
                 if(vm.fileList[i].checked){
-                    // if(vm.fileList[i].isAutoCreated == 1){
-                    //     vm.$message({
-                    //         type: 'error',
-                    //         message: '系统文件，不能操作！'
-                    //     });  
-                    //     return false
-                    // }
+                    if(vm.fileList[i].isAutoCreated == 1 && val){
+                        vm.$message({
+                            type: 'error',
+                            message: '"'+vm.fileList[i].fgName+'"'+'为系统文件，不能操作！'
+                        });  
+                        return false
+                    }
                     if(fgIdList == ''){
                          fgIdList = vm.fileList[i].fgId
                     }else{
@@ -2179,13 +2183,13 @@ export default {
             }
             for(var j=0;j<vm.folderList.length;j++){
                 if(vm.folderList[j].checked){
-                    //  if(vm.folderList[j].isAutoCreated == 1){
-                    //     vm.$message({
-                    //         type: 'error',
-                    //         message: '系统文件，不能操作！'
-                    //     });  
-                    //     return false
-                    // }
+                     if(vm.folderList[j].isAutoCreated == 1 && val){
+                        vm.$message({
+                            type: 'error',
+                            message:  '"'+vm.folderList[j].nodeName+'"'+'  为系统文件，不能操作！'
+                        });  
+                        return false
+                    }
                     // 文件夹
                     if(fcIdList == ''){
                          fcIdList = vm.folderList[j].nodeId
@@ -2499,7 +2503,7 @@ export default {
             };
             sessionStorage.setItem("qjInfo", JSON.stringify(qjInfo)); 
           vm.latestFile(id,"查看了文件"+name);
-          window.open('/#/Drive/panoramicView/'+val)
+          window.open('./#/Drive/panoramicView/'+val)
       },
       handleNodeClick(obj){
           var vm = this
@@ -2830,7 +2834,6 @@ export default {
                 if(vm.folderList[j].checked){
                     vm.checkedFile_Folder.folder = true
                     vm.checkedFile_Folder.folderCheckedNum++
-                    break
                 }
             }
             if(file){
@@ -3064,6 +3067,7 @@ export default {
                          vm.QJ.point.push(item)
                      }
                  })
+                 console.log(vm.QJ.point)
                  if(vm.hasImg){
                     setTimeout(function(){
                         vm.pointLocationBindClick()
@@ -3150,22 +3154,22 @@ export default {
             console.log(err)
         })
     },
-    pointLocationBindClick(e){
+    pointLocationBindClick(){
         var vm = this
-        var $rounds = e || $('#planeDIV').find('.round');
+        var $rounds = $('#planeDIV').find('.round');
         if ($rounds && $('#planeFigure')[0]) {
             var imgHeight = $('#planeFigure')[0].offsetHeight
             var imgWidth = $('#planeFigure')[0].offsetWidth
             $rounds.draggable({
                 drag: function(e,ui) {// 在拖动过程中触发，当不能再拖动时返回false
-                    if(ui.position.top<=0){
+                    if(ui.position.top<=-10){
                         vm.$message({
                             type:'warning',
                             message:'已到最顶部'
                         })
                         return false
                     }
-                    if(ui.position.left<=0){
+                    if(ui.position.left<= -10){
                          vm.$message({
                             type:'warning',
                             message:'已到最左边'
@@ -3177,14 +3181,15 @@ export default {
                             type:'warning',
                             message:'已到最右边'
                         })
-                        return false
+                        ui.position.left = imgWidth
+                        // return false
                     }
                      if(ui.position.top >= imgHeight){
                          vm.$message({
                             type:'warning',
                             message:'已到最底边'
                         })
-                        return false
+                        ui.position.top = imgHeight
                     }
                 },
                 stop: function (e,ui) {
@@ -3204,6 +3209,8 @@ export default {
                             }
                         }).then((response)=>{
                             if(Math.ceil(response.data.cd) == 0){
+                                _this.dataset.left =  ui.position.left
+                                _this.dataset.top = ui.position.top
                             }
                         }).catch((err)=>{
                             console.log(err)

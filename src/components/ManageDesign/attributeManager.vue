@@ -43,7 +43,7 @@
                           <ul>
                               <li class="selectItem">
                                   <span class="title">单体</span>
-                                  <el-select v-model="value_monomer" placeholder="请选择">
+                                  <el-select v-model="value_monomer" @change="canSearch = true" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_monomer"
                                       :key="item.id"
@@ -54,7 +54,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">分区</span>
-                                  <el-select v-model="value_partition" placeholder="请选择">
+                                  <el-select v-model="value_partition" @change="canSearch = true" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_partition"
                                       :key="item.id"
@@ -65,7 +65,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">楼层</span>
-                                  <el-select v-model="value_floor" placeholder="请选择">
+                                  <el-select v-model="value_floor" @change="canSearch = true" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_floor"
                                       :key="item.id"
@@ -81,7 +81,7 @@
                           <ul>
                               <li class="selectItem">
                                   <span class="title">专业</span>
-                                  <el-select v-model="value_professional" ref="professional" placeholder="请选择">
+                                  <el-select v-model="value_professional" @change="canSearch = true" ref="professional" placeholder="请选择">
                                       <el-option
                                       v-for="item in option_professional"
                                       :key="item.key"
@@ -92,7 +92,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">系统</span>
-                                  <el-select v-model="value_system"  ref="system" placeholder="请选择">
+                                  <el-select v-model="value_system" @change="canSearch = true" ref="system" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_system"
                                       :key="item.id"
@@ -103,7 +103,7 @@
                               </li>
                               <li class="selectItem">
                                   <span class="title">类型</span>
-                                  <el-select v-model="value_type"  ref="type" placeholder="请选择">
+                                  <el-select v-model="value_type" @change="canSearch = true" ref="type" placeholder="请选择">
                                       <el-option
                                       v-for="item in options_type"
                                       :key="item.id"
@@ -116,7 +116,7 @@
                         </p>
                     </div>
                     <p class="btn-selection clearfix">
-                       <span class="redbtn" @click="selectData">筛选</span>
+                       <button :class="['redbtn',{'disabledBtn':!canSearch}]" @click="selectData" :disabled="canSearch?false:'disabled'">筛选</button>
                        <span class="whitebtn" v-if="ShowClassify" @click="ShowClassify = false">更多</span>
                     </p>
                     <div class="project" v-loading="loading">
@@ -126,8 +126,8 @@
                               <thead>
                                   <tr  class="userList-thead">
                                       <th width="34px;" style="padding-right:10px;">
-                                          <label  :class="[checkAll?'active':'','checkbox-fileItem']" for="allAttribute"></label>
-                                          <input  type="checkbox" id='allAttribute' class="checkbox-att" v-model="checkAll">
+                                          <label  :class="[checkAll?'active':'','checkbox-fileItem']" for="allAttribute" @click="initAll()"></label>
+                                          <input  type="checkbox" id='allAttribute' class="checkbox-att" v-model="checkAll" >
                                       </th>
                                       <th v-if="GCPropertyList.length>0">定位</th>
                                       <th v-if="basicAttributes_auth.old.holderType">所在空间</th>
@@ -1360,6 +1360,7 @@
                   margin: 10px 0 30px;
                   .redbtn{
                     float: left;
+                    border: none;
                     width: 128px;
                     height: 36px;
                     line-height: 36px;
@@ -1373,6 +1374,12 @@
                     &:hover{
                         background: #ff5257;
                     }
+                  }
+                  .disabledBtn{
+                       background: grey;
+                        &:hover{
+                            background: grey;
+                        }
                   }
                   .whitebtn{
                      float: left;
@@ -1899,6 +1906,7 @@ export default {
             }
         },
         options_name:[],//属性名称的列表
+        canSearch:true,
       }
   },
   created(){
@@ -1916,18 +1924,6 @@ export default {
         vm.getIntoDesignPage()
     },
   watch:{
-      checkAll:function(val,oldval){
-          var vm = this
-          if(val){
-                 vm.attributeList.forEach((item,key)=>{
-                    item.checked  = true
-                })
-          }else{
-             vm.attributeList.forEach((item,key)=>{
-                item.checked  = false
-            })
-          }
-      },
       value_monomer:function(val){
             var vm = this 
              if(val == 0) {
@@ -2008,6 +2004,20 @@ export default {
       },
   },
   methods:{
+      initAll(){
+          var vm = this
+          if(!vm.checkAll){
+              vm.checkAll = true
+                vm.attributeList.forEach((item,key)=>{
+                    item.checked  = true
+                })
+          }else{
+               vm.checkAll = false
+             vm.attributeList.forEach((item,key)=>{
+                item.checked  = false
+            })
+          }
+      },
       typeChange(val){
         var vm = this
          axios({
@@ -2420,10 +2430,16 @@ export default {
                 }
             })
             vm.ListCheckedNum = num
+            if(num == vm.attributeList.length){
+                vm.checkAll = true
+            }else{
+                vm.checkAll = false
+            }
             if(vm.ListCheckedNum == 1){
                 vm.getDesignAtt()
             }
         }else{
+            vm.checkAll = false
             vm.attributeList.forEach((item,key)=>{
                 if(key == index){
                     vm.$set(item,'checked',true)
@@ -2477,9 +2493,10 @@ export default {
           vm.GCPropertyList.forEach((val,index)=>{
                 c=0
                 num = 0
+                var tempValue='' //将要编辑的扩展属性的内容
                 vm.attributeList.forEach((item,key)=>{
                     if(item.checked){
-                        var tempValue='' //将要编辑的扩展属性的内容
+                     
                         var  valueFrom = vm.initVal(val.id,item.traceId,true)//扩展属性 的 来源
                         var  value = vm.initVal(val.id,item.traceId,false)//扩展属性的内容
                         if (c == 0) {//选则的第一条列表
@@ -2551,23 +2568,39 @@ export default {
         })
         var formData = []//formData只需要projectGcPropertyId和propertyValue
         for(var i=0;i<vm.GCPropertyList.length;i++){
-            if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '@' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
-                vm.$message({
-                    type:'warning',
-                    message:vm.GCPropertyList[i].propertyTitle+' 的值类型为数值，请输入数值!'
-                })
-              return false
-            }
-            if(vm.GCPropertyList[i].valueType == 3 && vm.GCPropertyList[i].timeChecked){//日期 并且 选择了继承
-                formData.push({
-                    projectGcPropertyId:vm.GCPropertyList[i].id,
-                    propertyValue:'@',
-                })
-            }else{
-                formData.push({
-                    projectGcPropertyId:vm.GCPropertyList[i].id,
-                    propertyValue:vm.GCPropertyList[i].extendValue,
-                })
+            if(vm.GCPropertyList[i].valueType == 0 || vm.GCPropertyList[i].valueType == 1){
+                if(vm.GCPropertyList[i].extendValue != '多样'){ //多样时保存原有内容
+                    if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '@' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
+                        vm.$message({
+                            type:'warning',
+                            message:vm.GCPropertyList[i].propertyTitle+' 的值类型为数值，请输入数值!'
+                        })
+                        return false
+                    }
+                     formData.push({
+                        projectGcPropertyId:vm.GCPropertyList[i].id,
+                        propertyValue:vm.GCPropertyList[i].extendValue
+                    })
+                }
+            }else if(vm.GCPropertyList[i].valueType == 2){
+                if(vm.GCPropertyList[i].extendValue != null && vm.GCPropertyList[i].extendValue != ''){ //当多个结果不一样时，为null
+                    formData.push({
+                        projectGcPropertyId:vm.GCPropertyList[i].id,
+                        propertyValue:vm.GCPropertyList[i].extendValue
+                    })
+                }
+            }else if(vm.GCPropertyList[i].valueType == 3){
+                if(vm.GCPropertyList[i].timeChecked){//日期 并且 选择了继承
+                    formData.push({
+                        projectGcPropertyId:vm.GCPropertyList[i].id,
+                        propertyValue:'@',
+                    })
+                }else{
+                    formData.push({
+                        projectGcPropertyId:vm.GCPropertyList[i].id,
+                        propertyValue:vm.GCPropertyList[i].extendValue
+                    })
+                }
             }
         }
         axios({
@@ -2716,14 +2749,27 @@ export default {
                 var gcCode2 = vm.value_type
                 if(level==2){
                     parentClassifyCode= vm.value_professional
+                    vm.value_system = '0'
+                    vm.value_type = '0'
                     vm.options_type = [
                         {
                             id:'0',
                             Name:'无'
                         },
                     ]
+                     vm.options_system = [
+                        {
+                            id:'0',
+                            Name:'无'
+                        },
+                        {
+                            id:'-1',
+                            Name:'全部'
+                        }
+                    ]
                 }else if(level==3){
                     parentClassifyCode = vm.value_system
+                    vm.value_type = '0'
                     if(parentClassifyCode==0){
                         vm.options_type = [
                             {
@@ -2772,18 +2818,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == 0){
                     if(!isPre){
+                      
                         if(response.data.rt != null && response.data.rt.length > 0){
-                            if(level == 2){
-                                vm.options_system = [
-                                    {
-                                        id:'0',
-                                        Name:'无'
-                                    },
-                                    {
-                                        id:'-1',
-                                        Name:'全部'
-                                    }
-                                ]
+                             if(level == 2){
                                 response.data.rt.forEach((item,key)=>{
                                     vm.options_system.push({
                                             id:item.number,
@@ -2791,44 +2828,12 @@ export default {
                                     })//分区列表
                                 })
                             }else if(level == 3){
-                                vm.options_type = [
-                                    {
-                                        id:'0',
-                                        Name:'无'
-                                    },
-                                    {
-                                        id:'-1',
-                                        Name:'全部'
-                                    }
-                                ]
                                 response.data.rt.forEach((item,key)=>{
                                     vm.options_type.push({
                                             id:item.number,
                                             Name:item.title
                                     })//分区列表
                                 })
-                            }
-                        
-                        }else{
-                            if(level == 2){
-                                vm.options_system = [
-                                    {
-                                        id:'0',
-                                        Name:'无'
-                                },
-                                {
-                                        id:'-1',
-                                        Name:'全部'
-                                }]
-                            }else if(level == 3){
-                                vm.options_type = [
-                                    {
-                                        id:'0',
-                                        Name:'无'
-                                },{
-                                        id:'-1',
-                                        Name:'全部'
-                                }]
                             }
                         
                         }
@@ -3225,9 +3230,9 @@ export default {
                 holderType:9,
                 holderId:'all',
                 gcCode:210000,
-                gcCode1:-1,
-                gcCode2:-1,
-                gcNumber:210000,
+                gcCode1:213000,
+                gcCode2:213010,
+                gcNumber:213010,
                 rows:vm.pageDetial.pagePerNum,
                 page:vm.pageDetial.currentPage,
           }
@@ -3237,22 +3242,24 @@ export default {
               headers:{
                   'token':vm.token
               },
-              params:{
-                  projId:vm.projId,
-                  dataVision:vm.dataVision,//数据版本
-                  isChildren:isChildren,
-                  selectBuild:selectBuild,
-                  holderType:holderType,
-                  holderId:holderId,
-                  gcCode:gcCode,
-                  gcCode1:gcCode1,
-                  gcCode2:gcCode2,
-                  gcNumber:gcNumber,
-                  rows:vm.pageDetial.pagePerNum,
-                  page:vm.pageDetial.currentPage,
-              }
+              params:params
+            //   params:{
+            //       projId:vm.projId,
+            //       dataVision:vm.dataVision,//数据版本
+            //       isChildren:isChildren,
+            //       selectBuild:selectBuild,
+            //       holderType:holderType,
+            //       holderId:holderId,
+            //       gcCode:gcCode,
+            //       gcCode1:gcCode1,
+            //       gcCode2:gcCode2,
+            //       gcNumber:gcNumber,
+            //       rows:vm.pageDetial.pagePerNum,
+            //       page:vm.pageDetial.currentPage,
+            //   }
           }).then((response)=>{
               if(response.data.cd == 0){
+                  vm.canSearch = false
                   if(response.data.rt.gridDataJson.rows != null){
                     vm.empty = false
                     vm.attributeList = response.data.rt.gridDataJson.rows

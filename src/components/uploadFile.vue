@@ -31,7 +31,7 @@ export default Vue.component('common-upload',{
         return {
             showErr:'',//错误信息
             imageName:'未选择任何文件',
-            filesList:null,
+            filesList:[],
             QJFileManageSystemURL:'',
             BDMSUrl:'',
             userId:'',
@@ -57,9 +57,14 @@ export default Vue.component('common-upload',{
         fileChanged(file){
             var vm = this
             console.log(file)
-            const list = vm.$refs.file.files
-            vm.imageName = list[0].name
-            vm.filesList = list[0]
+            vm.filesList = vm.$refs.file.files
+            if(vm.filesList.length == 1){
+                 vm.imageName = list[0].name
+            }else if(vm.filesList.length > 1){
+                vm.imageName = vm.filesList.length+'个文件'
+            }else{
+                vm.imageName = '未选择任何文件'
+            }
         },
         upImgCancle(){
             var vm = this

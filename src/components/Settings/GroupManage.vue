@@ -64,7 +64,7 @@
         <ul style="max-height:500px;overflow-y:auto;">
             <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item)">
                 <span class='title-qun' v-text="item.ugName"></span>
-                <span class="icon icon-delect-qun" @click="deleteQR(item.ugId)"></span>
+                <span class="icon icon-delect-qun" @click="deleteQR(item.ugId,item.ugName)"></span>
             </li>
         </ul>
       </div>
@@ -149,8 +149,20 @@ export default {
     },
     watch:{
         'ugEdit.status':function(newval,old){
+            var vm = this
             if(old != '' && newval != ''){
+                if(vm.ugEdit.name == "默认群组"|| vm.ugEdit.name == '质量验收' || vm.ugEdit.name == '质量检查' || vm.ugEdit.name == '安全验收' || vm.ugEdit.name == '安全检查'){
+                    if(newval == "0"){
+                        vm.$message({
+                            type:'warning',
+                            message: vm.ugEdit.name+'不能禁用!'
+                        })
+                        vm.ugEdit.status = "1"
+                        return false
+                    }
+                }else{
                     this.EditStatus()
+                }
             }
         }
     },
@@ -411,31 +423,49 @@ export default {
                     });       
                 });
             },
-            deleteQR(ugId){//删除群组
+            deleteQR(ugId,name){//删除群组
                 var vm = this   
-                axios({
-                    method:'POST',
-                    url:vm.BDMSUrl+'config/userGroup/delGroupNode',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        ugId:ugId
-                    }
-                }).then((response)=>{
-                    if(response.data.cd == 0){
-                        vm.$message({
-                            type:'success',
-                            message: '删除成功'
-                        })
-                    }else if(response.data.cd == -1){
-                        vm.$message({
-                            type:'error',
-                            message: response.data.msg
-                        })
-                    }
-                }).catch((err)=>{
-                    console.log(err)
+                if(name == "默认群组"|| name == '质量验收' || name == '质量检查' || name == '安全验收' || name == '安全检查'){
+                    vm.$message({
+                        type:'warning',
+                        message: name+'不能删除！'
+                    })
+                    return false
+                }
+                vm.$confirm('您要删除所选群组['+ name +']吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method:'POST',
+                        url:vm.BDMSUrl+'config/userGroup/delGroupNode',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            ugId:ugId
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.$message({
+                                type:'success',
+                                message: name+'删除成功'
+                            })
+                        }else if(response.data.cd == -1){
+                            vm.$message({
+                                type:'error',
+                                message: response.data.msg
+                            })
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }).catch(() => {
+                    vm.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    })
                 })
             },
             allowChangeName(){

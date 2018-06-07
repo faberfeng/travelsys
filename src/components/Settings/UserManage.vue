@@ -98,7 +98,7 @@
                 <div style="clear:both;"></div>
             </div>
       </div>
-        <el-dialog :class="[userDetial.show?'':'active','openDialog']" :title="title" :visible.sync="adduser" :before-close="userClose">
+        <el-dialog :title="title" :visible.sync="adduser" :before-close="userClose">
             <div  v-if="userDetial.show">
                 <div class="log-head clearfix">
                     <span class="log-head-title">查找用户:</span>
@@ -628,7 +628,48 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    vm.userDetial.info = response.data.rt
+                    if(response.data.rt != null){
+                        vm.userDetial.info = response.data.rt
+                    }else{
+                           vm.$confirm('没有找到邮箱为['+vm.userDetial.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '无用户邮箱', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                axios({
+                                    method:'GET',
+                                    url:vm.BDMSUrl+'project2/Config/sendNoRegesterEmail',
+                                    headers:{
+                                        'token':vm.token
+                                    },
+                                    params:{
+                                        email:vm.userDetial.posName,
+                                        projId:vm.projId
+                                    }
+                                }).then((response)=>{
+                                    if(Math.ceil(response.data.cd) == 0){
+                                         vm.$notify({
+                                            title: '邀请已发送',
+                                            message: '邮箱为[' + vm.userDetial.posName + ']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的用户',
+                                            type: 'success'
+                                        });
+                                    }else if(response.data.cd == -1){
+                                        vm.$message({
+                                            type:'error',
+                                            message:response.data.msg
+                                        })
+                                    }
+                                }).catch((err)=>{
+                                    console.log(err)
+                                })
+                            }).catch(() => {
+                                vm.$message({
+                                    type: 'info',
+                                    message: '已取消发送邀请。'
+                                })
+                            })
+                    }
+                    
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -717,7 +758,7 @@ export default {
                 if(response.data.cd == '0'){
                     vm.userSearchInfo ='';//搜索完清空
                     vm.userList = response.data.rt.rows;
-                    vm.pageDetial.total = response.data.rt.dgJson.total;
+                    vm.pageDetial.total = response.data.rt.total;
                     vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
@@ -782,23 +823,40 @@ export default {
         userClose(){
             var vm = this
             //清空数据
-            vm.userDetial.posName = '';
-            vm.userDetial.posType = '1';
-            vm.adduser = false;
-            vm.getJobShuXingTu()
+            vm.userDetial.posName = ''
+            vm.userDetial.posType = '1'
+            vm.userDetial.show = true
+            vm.userDetial.info = {}
+            vm.adduser = false
+        //     userDetial:{
+        //     posName: "",
+        //     posType: '1',
+        //     show:true,
+        //     info:{},//具体信息
+        //   },
         },
         PostaddUser(){
              var vm = this
              var posIds = []
              var isAdmin = 1
+             var hasPosition = false
             if(vm.position_default.checkFlg){
                 posIds.push(vm.position_default.id+'')
                 isAdmin = 2
+                hasPosition = true
             }
             for(var i=0;i<vm.position_list.length;i++){
                 if(vm.position_list[i].checkFlg){
                     posIds.push(vm.position_list[i].id+'')
+                    hasPosition = true
                 }
+            }
+            if(!hasPosition){
+                vm.$message({
+                    type:'warning',
+                    message:'该用户至少选择一个岗位！'
+                })
+                return false
             }
             axios({
                 method:'POST',
@@ -817,11 +875,15 @@ export default {
                 }
             }).then((response)=>{
                  if(response.data.cd == 0){
-                    vm.adduser = false;
+                    vm.userClose()
+                    vm.$message({
+                        type:'success',
+                        message:'添加用户成功！'
+                    })
                     vm.getInfo()
                  }else{
                      vm.$message({
-                         type:'warning',
+                         type:'error',
                          message:response.data.msg
                      })
                  }
