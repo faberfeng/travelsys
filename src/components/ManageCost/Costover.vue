@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <p class="select-header clearfix">
-                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
                         <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                         <span class="button-download" @click="downloadFile">下载</span>
                 </p>
@@ -1006,23 +1006,6 @@ export default {
         vm.getInfo()
   },
   watch:{
-      checkAll:function(val){
-          var vm = this
-          console.log(val)
-        //   if(val){
-        //     vm.fileList.forEach((item,key)=>{
-        //         vm.$set(item,'checked',true)
-        //     })
-        //     vm.show.basicAttributes =true
-        //     vm.show.BindingArtifacts =true
-        //     vm.fileCheckedNum = vm.fileList.length
-        //   }else{
-        //     vm.fileList.forEach((item,key)=>{
-        //         vm.$set(item,'checked',false)
-        //     })
-        //     vm.fileCheckedNum = 0
-        //   }
-      },
       'show.basicAttributes':function(val){
           if(val){
             $("#basicAttributes").show(200);
@@ -1043,6 +1026,27 @@ export default {
       }
   },
   methods:{
+       initAll(){
+          var vm = this
+          if(!vm.checkAll){
+                vm.checkAll = true
+                if(vm.fileList.length>0){
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    })   
+                }
+              
+                vm.show.basicAttributes =true
+                vm.show.BindingArtifacts =true
+                vm.fileCheckedNum = vm.fileList.length
+          }else{
+               vm.checkAll = false
+                vm.fileList.forEach((item,key)=>{
+                    vm.$set(item,'checked',false)
+                })
+                vm.fileCheckedNum = 0
+          }
+      },
       parseMStatus(mStatus){
             // 施工现场
             var constructionSite = mStatus.substring(0, 1);

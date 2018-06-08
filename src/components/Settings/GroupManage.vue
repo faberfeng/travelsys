@@ -72,6 +72,7 @@
       <el-dialog
         title="添加群组成员"
         :visible.sync="centerDialogVisible"
+        :before-close="userClose"
         width="550px"
         center>
         <div class="clearfix">
@@ -81,7 +82,7 @@
                      <span  class="el-icon-search" @click="getUserInfo"></span>
                   </span>
                   <ul style="max-height:320px;overflow-y: auto;">
-                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.userName,item.account,item.userPositions)">
+                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.userName,item.account,item.userPositions,key)">
                           <p>
                             <span class="check-name" v-text="item.userName+'-'"></span>
                             <span class="check-title" v-text="item.account"></span>
@@ -89,14 +90,14 @@
                           <p>
                             <span class="check-title" v-text="val.posName" v-for="(val,index) in item.userPositions" :key="index+'position'" ></span>
                           </p>
-                          <span class="icon icon-selectUser"></span>
+                          <span :class="['icon','icon-selectUser',item.checked?'active':'']"></span>
                       </li>
                   </ul>
             </div>
             <div class="diolog-main">
                 <div style="margin:20px 15px 20px 20px;">
                     <span>已选择群组成员</span>
-                    <ul>
+                    <ul style="max-height:270px;overflow-y: auto;">
                       <li class="userList-item" v-for='(item,index) in userDetialAdd' :key="index">
                           <p>
                             <span class="check-name" v-text="item.name+'-'+item.count"></span>
@@ -179,6 +180,15 @@ export default {
         }
     },
     methods:{
+        userClose(){
+            var vm = this
+             vm.centerDialogVisible = false
+            vm.userListAdd = []
+            vm.userDetialAdd = []
+            vm.outsideUserList.forEach((ele,index)=>{
+                vm.$set(ele,'checked',false)
+            })
+        },
         saveUserQR(){
             var vm = this
             if(vm.userListAdd.length>0){
@@ -195,22 +205,29 @@ export default {
                         }
                     }).then((response)=>{
                         if(response.data.cd == 0){
-                            vm.centerDialogVisible = false
+                            vm.$notify({
+                                type: 'success',
+                                message: '添加'+vm.outsideUserList[i].userName+'为群组用户成功',
+                                duration:2000
+                            })
+                        }else{
+                            vm.$notify({
+                                type: 'warning',
+                                message: '添加'+vm.outsideUserList[i].userName+'为群组用户失败!'+response.data.msg,
+                                 duration:0
+                            })
                         }
                     }).catch((err)=>{
                         console.log(err)
                     })
-                    }
-                vm.$message({
-                    type: 'success',
-                    message: '添加群组用户成功'
-                    });
+                }
                 setTimeout(function(){
-                        vm.getQRuser(vm.activeugID)
+                    vm.getQRuser(vm.activeugID)
+                    vm.userClose()
                 },1000)
             }else{
                 vm.$message({
-                    type: 'warming',
+                    type: 'warning',
                     message: '请选择用户'
                 });
             }
@@ -221,10 +238,24 @@ export default {
                 var index = vm.userListAdd.indexOf(val)
                 vm.userListAdd.splice(index,1)
                 vm.userDetialAdd.splice(index,1)
+                vm.outsideUserList.forEach((ele,index)=>{
+                    if(ele.userId == val){
+                        vm.$set(ele,'checked',false)
+                    }
+                })
             }
         },
-        addUser(val,name,count,tag){
+        addUser(val,name,count,tag,key){
             var vm = this
+            for(var k= 0;k<vm.userQunzuList.length;k++){
+                if(vm.userQunzuList[k].userId == val){
+                    vm.$message({
+                        type:'warning',
+                        message: '用户 "'+vm.userQunzuList[k].userName+'" 已在群组中!'
+                    })
+                    return false
+                }
+            }
             if(vm.userListAdd.indexOf(val) == -1){
                 vm.userListAdd.push(val)
                 vm.userDetialAdd.push({
@@ -233,13 +264,18 @@ export default {
                     count:count,
                     userPositions:tag
                 })
+                vm.outsideUserList.forEach((ele,index)=>{
+                    if(key == index){
+                          vm.$set(ele,'checked',true)
+                    }
+                })
             }
         },
         deleteUser(){//删除用户 modified by licongwen
             var vm = this;
             if(vm.userListDEL.length == 0){
                 vm.$message({
-                    type:'warming',
+                    type:'warning',
                     message: '请选择用户!'
                 })
             }else{
@@ -509,7 +545,12 @@ export default {
                         queryParam:vm.userInfo
                     }
                 }).then((response)=>{
-                    vm.outsideUserList = response.data.rt
+                    if(response.data.rt != null){
+                        vm.outsideUserList = response.data.rt
+                        vm.outsideUserList.forEach((ele)=>{
+                            vm.$set(ele,'checked',false)
+                        })
+                    }
                 }).catch((err)=>{
                     console.log(err)
                 })

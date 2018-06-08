@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <p class="select-header clearfix">
-                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
                         <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                         <ul class="operation">
                             <li class="item icon icon-paste"  @click="paste" v-if="hasFileToPaste.is" v-loading.fullscreen.lock="fullscreenLoading">粘贴</li>
@@ -599,14 +599,6 @@ export default {
         vm.checkFilePaste()
   },
   watch:{
-      checkAll:function(val){
-          var vm = this
-          if(val){
-            vm.fileList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-          }
-      },
       'show.basicAttributes':function(val){
           if(val){
             $("#basicAttributes").show(200);
@@ -627,6 +619,20 @@ export default {
       }
   },
   methods:{
+      initAll(){
+          var vm = this
+        if(!vm.checkAll){
+            vm.checkAll = true
+            vm.fileList.forEach((item,key)=>{
+                vm.$set(item,'checked',true)
+            })
+          }else{
+            vm.checkAll = false
+            vm.fileList.forEach((item,key)=>{
+                vm.$set(item,'checked',false)
+            })
+          }
+      },
       paste(){
         var vm = this
         vm.fullscreenLoading = true

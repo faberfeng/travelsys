@@ -11,7 +11,7 @@
                         <option value="2">合作方岗位</option>
                   </select>
                   <i class="icon-sanjiao"></i>
-                  <span @click="addUser" class="btn">添加</span>
+                  <span @click="addUser()" class="btn">添加</span>
              </span>
           </h5>
           <div style="padding:0 20px;box-sizing: border-box;">
@@ -337,11 +337,13 @@ export default {
                 vm.jobDetial.posName = name;
                 vm.jobDetial.posType = ''+type;
                 vm.jobID = parseInt(val)
+                vm.title = '修改岗位'
                 vm.getJobShuXingTu()//获取某val的权限
             }else{
                 vm.jobDetial.posName = '';
                 vm.jobDetial.posType = '1';
                 vm.jobID = 0
+                vm.title = '增加岗位'
                 vm.getJobShuXingTu()//获取某val的权限
             }
         },
@@ -358,13 +360,17 @@ export default {
             var vm = this;
             //var checkCode = [];
             this.checkCode = vm.$refs.tree_job.getCheckedKeys();
-            var flag = this.totalJobList.some(item=>{
-                if(item.posName == this.jobDetial.posName){
-                    return true;
-                }else{
-                    return false;
-                }
-            })
+            if(vm.jobID == 0){
+                var flag = this.totalJobList.some(item=>{
+                    if(item.posName == this.jobDetial.posName){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                })
+            }else{
+                flag = false
+            }
             
             if(flag){
                 alert('岗位不能重复添加!');

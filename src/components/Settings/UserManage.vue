@@ -631,6 +631,8 @@ export default {
                     if(response.data.rt != null){
                         vm.userDetial.info = response.data.rt
                     }else{
+                        vm.userDetial.info = {}
+                        if(vm.userDetial.posType == 1){
                            vm.$confirm('没有找到邮箱为['+vm.userDetial.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '无用户邮箱', {
                                 confirmButtonText: '确定',
                                 cancelButtonText: '取消',
@@ -668,6 +670,12 @@ export default {
                                     message: '已取消发送邀请。'
                                 })
                             })
+                        }else{
+                             vm.$message({
+                                type: 'warning',
+                                message: '未找到[ '+vm.userDetial.posName+' ]用户!'
+                            })
+                        }
                     }
                     
                 }
@@ -850,6 +858,13 @@ export default {
                     posIds.push(vm.position_list[i].id+'')
                     hasPosition = true
                 }
+            }
+            if(!vm.userDetial.info.userId){
+                vm.$message({
+                    type:'warning',
+                    message:'请选择一个用户！'
+                })
+                return false
             }
             if(!hasPosition){
                 vm.$message({

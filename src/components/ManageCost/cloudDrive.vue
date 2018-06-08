@@ -39,7 +39,7 @@
                     <span class="strong" v-for="item in mayiList" :key="item.nodeId+'antLine'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
                 </p>
                 <p class="select-header clearfix">
-                    <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                    <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
                     <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                     <span class="icon icon-upload" v-if="!hasImg && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*')">上传平面图</span>
                     <span class="icon icon-refresh" v-if="hasImg && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground.fgId,'image/*')">更新平面图</span>
@@ -1760,25 +1760,6 @@ export default {
         },1000)
     },
   watch:{
-      checkAll:function(val){
-          var vm = this
-          if(val){
-            if(vm.fileList.length>0){
-                vm.fileList.forEach((item,key)=>{
-                    vm.$set(item,'checked',true)
-                }) 
-            }
-            if(vm.folderList.length>0){
-                vm.folderList.forEach((item,key)=>{
-                    vm.$set(item,'checked',true)
-                })
-            }
-            vm.show.basicAttributes =true
-            vm.show.BindingArtifacts =true
-            vm.checkedFile_Folder.fileCheckedNum = vm.fileList.length
-            vm.checkedFile_Folder.folderCheckedNum = vm.folderList.length
-          }
-      },
       'show.basicAttributes':function(val){
           if(val){
             $("#basicAttributes").show(200);
@@ -1816,6 +1797,42 @@ export default {
       }
   },
   methods:{
+       initAll(){
+          var vm = this
+          if(!vm.checkAll){
+                vm.checkAll = true
+                if(vm.fileList.length>0){
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    }) 
+                }
+                if(vm.folderList.length>0){
+                    vm.folderList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    })
+                }
+                vm.show.basicAttributes =true
+                vm.show.BindingArtifacts =true
+                vm.checkedFile_Folder.fileCheckedNum = vm.fileList.length
+                vm.checkedFile_Folder.folderCheckedNum = vm.folderList.length
+          }else{
+               vm.checkAll = true
+                if(vm.fileList.length>0){
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)
+                    }) 
+                }
+                if(vm.folderList.length>0){
+                    vm.folderList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)
+                    })
+                }
+                vm.show.basicAttributes =false
+                vm.show.BindingArtifacts =false
+                vm.checkedFile_Folder.fileCheckedNum = 0
+                vm.checkedFile_Folder.folderCheckedNum = 0
+          }
+      },
        InitselectUgId(val){
             var vm = this 
             for(var i =0;i<vm.ugList.length;i++){

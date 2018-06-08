@@ -21,8 +21,8 @@
                     
                     <button class="login" @click="Login">登录</button>
                     <div class="loginInfo">
-                        <a class="loginInfoLeft">立即注册</a>
-                        <a class="loginInfoRight">忘记密码</a>
+                        <a class="loginInfoLeft" href="http://10.252.26.240:8080/bdms-usercenter/register/registerIndex" target="blank">立即注册</a>
+                        <a class="loginInfoRight" href="http://10.252.26.240:8080/bdms-usercenter/register/forgetPwd" target="blank">忘记密码</a>
                     </div>
                     <button class="loginWidthYun">云华建账号登陆</button>
                 </div>

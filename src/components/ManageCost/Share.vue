@@ -30,7 +30,7 @@
                     <span class="strong" v-for="item in breadList" :key="item.nodeId+'antLine_3'" @click="IntoDir(item,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
                 </p>
                 <p class="select-header clearfix">
-                    <label   :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" ></label>
+                    <label   :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile"  @click="initAll()"></label>
                     <input  type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
                     <!--
                         文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
@@ -225,7 +225,7 @@
                 </ul>
                 <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]"  v-else>
                     <li class="detial-item clearfix">
-                        <span class="detial-text-name">选择数量</span>
+                        <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
                         <span class="detial-text-value" v-text="fileCheckedNum"></span>
                     </li>
                 </ul>
@@ -1594,23 +1594,6 @@ export default {
         var vm = this 
     },
   watch:{
-      checkAll:function(val){
-          var vm = this
-          if(val){
-            vm.fileList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-             vm.folderList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-              vm.fgList.forEach((item,key)=>{
-                vm.$set(item,'checked',true)
-            })
-            vm.show.basicAttributes =true
-            vm.show.BindingArtifacts =true
-            vm.fileCheckedNum = vm.fileList.length
-          }
-      },
       'show.basicAttributes':function(val){
           if(val){
             $("#basicAttributes").show(200);
@@ -1666,6 +1649,50 @@ export default {
       }
   },
   methods:{
+       initAll(val){
+          var vm = this
+         if(!vm.checkAll){
+                vm.checkAll = true
+                if(vm.fileList.length >0){
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    })
+                }
+                if(vm.folderList.length >0){
+                    vm.folderList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    })
+                }
+                if(vm.fgList.length >0){
+                     vm.fgList.forEach((item,key)=>{
+                        vm.$set(item,'checked',true)
+                    })
+                }
+                vm.show.basicAttributes =true
+                vm.show.BindingArtifacts =true
+                vm.fileCheckedNum = vm.fileList.length
+          }else{
+               vm.checkAll = false
+                if(vm.fileList.length >0){
+                    vm.fileList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)
+                    })
+                }
+                if(vm.folderList.length >0){
+                    vm.folderList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)
+                    })
+                }
+                if(vm.fgList.length >0){
+                     vm.fgList.forEach((item,key)=>{
+                        vm.$set(item,'checked',false)
+                    })
+                }
+                vm.show.basicAttributes =false
+                vm.show.BindingArtifacts =false
+                vm.fileCheckedNum = 0
+          }
+      },
       refreshPage(){
           var vm = this
           var timestamp = Date.parse(new Date());

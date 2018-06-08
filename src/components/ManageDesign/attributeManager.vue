@@ -247,7 +247,7 @@
                 </div>
                  <div id="containerMessage" v-show="!SHOWMain">
                     <p class="header clearfix">
-                        <span class="button-add" @click="preAddEdit.show = true;getGenieClass(2,true)">添加</span>
+                        <span class="button-add" @click="add()">添加</span>
                         <span class="button-back" @click="SHOWMain = true">返回</span>
                     </p>
                     <div class="ForumSelector">
@@ -580,7 +580,7 @@
                                     <select style="width: 140px;" :class="['inputvalue-select','property_value'+index]" v-if="val.valueType == 2" v-model="val.extendValue">
                                         <option value="是">是</option> 
                                         <option value="否">否</option>
-                                        <option value="@">@</option>
+                                        <option value='多样'>多样</option>
                                     </select>
                                     <span  v-if="val.valueType == 3"  :class="['inputvalue-date','property_value'+index]">
                                         <!-- <input class=""  width="40px;" v-model="val.extendValue"/> -->
@@ -677,7 +677,7 @@
                     <div class="editBodytwo clearfix">
                         <label class=" imageBodyText">属性名称 :</label>
                         <span class="item-select" style="width:212px;">
-                            <select class="editSelect" v-model="preAddEdit.object.name" ref="attributeName">
+                            <select class="editSelect" v-model="preAddEdit.object.name" ref="attributeName" @change="nameChange(true)">
                                 <option v-for="(item,index) in options_name" :value="item.propertyNumber"  :key="index">{{item.propertyTitle}}</option>
                             </select>
                             <i class="icon-sanjiao"></i>
@@ -685,25 +685,27 @@
                     </div>
                      <div class="editBodytwo clearfix">
                         <label class=" imageBodyText">取值 :</label>
-                        <input type="text" class="inp" v-model="preAddEdit.object.value" v-if="preAddEdit.object.valueType == 0 || preAddEdit.object.valueType == 1"  placeholder="请输入">
-                         <span class="item-select" style="width:212px;" v-if="preAddEdit.object.valueType == 2">
-                            <select  class="editSelect"   v-model="preAddEdit.object.value">
-                                <option value="是">是</option> 
-                                <option value="否">否</option>
-                            </select>
-                            <i class="icon-sanjiao"></i>
-                        </span>
-                        <span  v-if="preAddEdit.object.valueType == 3"  class="inputvalue-date">
-                            <el-date-picker
-                                v-model="preAddEdit.object.value"
-                                :editable="false"
-                                type="date"
-                                placeholder="选择日期"
-                                format="yyyy 年 MM 月 dd 日"
-                                value-format="yyyy-MM-dd"
-                                >
-                            </el-date-picker>
-                        </span>
+                        <div v-if="preAddEdit.object.name != ''">
+                            <input type="text" class="inp" v-model="preAddEdit.object.value" v-if="preAddEdit.object.valueType == 0 || preAddEdit.object.valueType == 1"  placeholder="请输入">
+                            <span class="item-select" style="width:212px;" v-if="preAddEdit.object.valueType == 2">
+                                <select  class="editSelect"   v-model="preAddEdit.object.value">
+                                    <option value="是">是</option> 
+                                    <option value="否">否</option>
+                                </select>
+                                <i class="icon-sanjiao"></i>
+                            </span>
+                            <span  v-if="preAddEdit.object.valueType == 3"  class="inputvalue-date">
+                                <el-date-picker
+                                    v-model="preAddEdit.object.value"
+                                    :editable="false"
+                                    type="date"
+                                    placeholder="选择日期"
+                                    format="yyyy 年 MM 月 dd 日"
+                                    value-format="yyyy-MM-dd"
+                                    >
+                                </el-date-picker>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -1890,7 +1892,7 @@ export default {
         SHOWMain:true,
         checkedValue:'',
         professionalList:[],//扩展属性列表
-        pretitle:'专业预设添加',
+        pretitle:'专业预设增加',
         preAddEdit:{
             show:false,
             object:{
@@ -2004,6 +2006,16 @@ export default {
       },
   },
   methods:{
+       nameChange(isInit){
+            var vm = this 
+            for(var i=0;i<vm.options_name.length;i++){
+                if(vm.options_name[i].propertyNumber == vm.preAddEdit.object.name){
+                    vm.preAddEdit.object.valueType = vm.options_name[i].valueType
+                    if(isInit)vm.preAddEdit.object.value = ''
+                    break
+                }
+            }
+      },
       initAll(){
           var vm = this
           if(!vm.checkAll){
@@ -2037,7 +2049,8 @@ export default {
                         if(val != null){
                              vm.preAddEdit.object.name = val
                         }else{
-                             vm.preAddEdit.object.name = response.data.rt[0].propertyNumber
+                            vm.preAddEdit.object.name = response.data.rt[0].propertyNumber
+                            nameChange(false)
                         }
                       
                     }else{
@@ -2079,26 +2092,33 @@ export default {
             vm.preAddEdit.object.name = ''
             vm.preAddEdit.object.value = ''
       },
+      add(){
+          var vm = this
+          vm.pretitle = '专业预设增加'
+          vm.preAddEdit.show = true
+          vm.getGenieClass(2,true)
+      },
       edit(val){
             var vm = this 
             vm.preAddEdit.show = true
+            vm.pretitle = '专业预设修改'
             //单体id 列表 
             var monomer_arr = val.holderBuild.split(',')
-            if(monomer_arr.length > 1){
+            if(monomer_arr.length > 0){
                 vm.preAddEdit.object.monomer = monomer_arr
                 //分区id 列表 
                 if(val.holderPartition != ''){
                     vm.getPartitionBySubProjId(true) //加载分区
                     setTimeout(() => {
                         var Partition_arr = val.holderPartition.split(',')
-                        if(Partition_arr.length > 1){
+                        if(Partition_arr.length > 0){
                             vm.preAddEdit.object.partition = Partition_arr
                               //列表id 列表 
                             if(val.holderStorey != ''){
                                 vm.findStorey(true) //加载楼层
                                 setTimeout(() => {
                                     var floor_arr = val.holderStorey.split(',')
-                                    if(floor_arr.length > 1){
+                                    if(floor_arr.length > 0){
                                          vm.preAddEdit.object.floor = floor_arr
                                     }else{
                                          vm.preAddEdit.object.floor = []
@@ -2124,7 +2144,7 @@ export default {
             var Sys_type = val.gcName.split('-')
             vm.preAddEdit.object.system = ''
             vm.preAddEdit.object.type = ''
-            if(Sys_type.length > 1){
+            if(Sys_type.length > 0){
                 vm.getGenieClass(2,true)
                 var timer3 = setInterval(function(){
                     if(vm.options_system_pre.length >0){
@@ -2284,7 +2304,6 @@ export default {
             gcCode = vm.preAddEdit.object.type
         }
 
-        // preAddEdit.object.valueType
         if(vm.preAddEdit.object.valueType == 0 && isNaN(vm.preAddEdit.object.value)){
             vm.$message({
                 type:'warning',
@@ -2517,7 +2536,7 @@ export default {
                             if (tempValue != value) {
                                 tempValue = '多样'
                                 if(val.valueType == 2 || val.valueType == 3){//是否 和 时间
-                                    tempValue = '@'//@ 不会修改任意列表的值
+                                    tempValue = '多样'//@ 不会修改任意列表的值
                                 }
                             }
                         }
@@ -2530,8 +2549,8 @@ export default {
                                 vm.$set(val,'timeChecked_to_submit',false)
                             }
                         }else{//都来自继承  赋值@
-                            vm.$set(val,'extend_to_submit',"@")
-                            vm.$set(val,'extendValue',"@")
+                            vm.$set(val,'extend_to_submit','多样')
+                            vm.$set(val,'extendValue','多样')
                              if(val.valueType == 3){
                                 vm.$set(val,'timeChecked',true)
                                 vm.$set(val,'timeChecked_to_submit',true)
@@ -2570,7 +2589,7 @@ export default {
         for(var i=0;i<vm.GCPropertyList.length;i++){
             if(vm.GCPropertyList[i].valueType == 0 || vm.GCPropertyList[i].valueType == 1){
                 if(vm.GCPropertyList[i].extendValue != '多样'){ //多样时保存原有内容
-                    if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '@' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
+                    if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '多样' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
                         vm.$message({
                             type:'warning',
                             message:vm.GCPropertyList[i].propertyTitle+' 的值类型为数值，请输入数值!'
@@ -2583,7 +2602,7 @@ export default {
                     })
                 }
             }else if(vm.GCPropertyList[i].valueType == 2){
-                if(vm.GCPropertyList[i].extendValue != null && vm.GCPropertyList[i].extendValue != ''){ //当多个结果不一样时，为null
+                if(vm.GCPropertyList[i].extendValue != null && vm.GCPropertyList[i].extendValue != '多样'){ //当多个结果不一样时，为null
                     formData.push({
                         projectGcPropertyId:vm.GCPropertyList[i].id,
                         propertyValue:vm.GCPropertyList[i].extendValue
@@ -2596,10 +2615,12 @@ export default {
                         propertyValue:'@',
                     })
                 }else{
-                    formData.push({
-                        projectGcPropertyId:vm.GCPropertyList[i].id,
-                        propertyValue:vm.GCPropertyList[i].extendValue
-                    })
+                    if(vm.GCPropertyList[i].extendValue != '多样'){
+                         formData.push({
+                            projectGcPropertyId:vm.GCPropertyList[i].id,
+                            propertyValue:vm.GCPropertyList[i].extendValue
+                        })
+                    }
                 }
             }
         }
@@ -3242,21 +3263,20 @@ export default {
               headers:{
                   'token':vm.token
               },
-              params:params
-            //   params:{
-            //       projId:vm.projId,
-            //       dataVision:vm.dataVision,//数据版本
-            //       isChildren:isChildren,
-            //       selectBuild:selectBuild,
-            //       holderType:holderType,
-            //       holderId:holderId,
-            //       gcCode:gcCode,
-            //       gcCode1:gcCode1,
-            //       gcCode2:gcCode2,
-            //       gcNumber:gcNumber,
-            //       rows:vm.pageDetial.pagePerNum,
-            //       page:vm.pageDetial.currentPage,
-            //   }
+              params:{
+                  projId:vm.projId,
+                  dataVision:vm.dataVision,//数据版本
+                  isChildren:isChildren,
+                  selectBuild:selectBuild,
+                  holderType:holderType,
+                  holderId:holderId,
+                  gcCode:gcCode,
+                  gcCode1:gcCode1,
+                  gcCode2:gcCode2,
+                  gcNumber:gcNumber,
+                  rows:vm.pageDetial.pagePerNum,
+                  page:vm.pageDetial.currentPage,
+              }
           }).then((response)=>{
               if(response.data.cd == 0){
                   vm.canSearch = false
