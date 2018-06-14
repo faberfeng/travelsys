@@ -358,6 +358,8 @@
                     line-height: 16px;
                     color: #fc3439;
                     font-weight: bold;
+                     padding-left:30px;
+                    position: relative;
                     .reportS{
                         background: url('./images/listS.png')no-repeat 0 0;
                     } 
@@ -365,10 +367,12 @@
                         background: url('./images/target.png')no-repeat 0 0;
                     } 
                     .icon{
-                        display: inline-block;
+                       display: block;
                         width: 20px;
-                        height: 16px;
-                        margin-right: 10px;
+                        height: 17px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
                     }
                 }
                 .item-btn{

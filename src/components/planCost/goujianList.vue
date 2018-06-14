@@ -1,5 +1,6 @@
 <template>
-    <div  id="goujianList">
+<div id="goujianList">
+    <div  class="topHeader">
         <div id="item-box-file">
             <router-link :to="'/Cost/management'" class="label-item">  
                 成本概览  
@@ -20,7 +21,7 @@
                 成本分析  
             </router-link>
         </div>
-        <div class="project" v-loading="loading">
+        <div class="project"  v-if="!showCommonList && !showCommonData" v-loading="loading">
             <!--以下是实时列表-->
             <div>
                 <p class="header clearfix">
@@ -53,7 +54,7 @@
                              <td v-text="val.updateUser"></td>
                             <td >
                                 <button class="editBtn actionBtn" title="设计"  @click="edit(val)" ></button>
-                                <button class="dataBtn actionBtn" title="数据"  @click="edit(val)" ></button>
+                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rcId,true)" ></button>
                             </td>
                         </tr>
@@ -148,8 +149,8 @@
                             <td v-text="initData(val.createTime)"></td>
                              <td v-text="val.createUser"></td>
                             <td >
-                                <button class="dataBtn actionBtn" title="数据"  @click="edit(val)" ></button>
-                                 <button class="listBtn actionBtn" title="清单"  @click="edit(val)" ></button>
+                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
+                                 <button class="listBtn actionBtn" title="清单"  @click="showDetialList(val)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rcId)" ></button>
                             </td>
                         </tr>
@@ -216,17 +217,25 @@
                 <div style="clear:both;"></div>
             </div>
         </div>
+        <common-list v-on:back="backToH" :mId="checkItem.rssId" v-if="showCommonList"></common-list>
+        <common-data v-if="showCommonData"></common-data>
     </div>
+    <div id="edit">
+
+    </div>
+</div>
 </template>
 <style lang="less" scoped>
     #goujianList{
-        box-sizing: border-box;
-        position: fixed;
-        top: 116px;
-        left: 26px;
-        bottom:0;
-        right: 0;
-        overflow: auto;
+        .topHeader{
+            box-sizing: border-box;
+            position: fixed;
+            top: 116px;
+            left: 26px;
+            bottom:0;
+            right: 0;
+            overflow: auto;
+        }
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
@@ -309,17 +318,21 @@
                     line-height: 16px;
                     color: #fc3439;
                     font-weight: bold;
+                    padding-left:30px;
+                    position: relative;
                     .report{
                         background: url('./images/report.png')no-repeat 0 0;
                     } 
                     .camera{
                         background: url('./images/camera.png')no-repeat 0 0;
                     } 
-                    .icon{
-                        display: inline-block;
+                   .icon{
+                        display: block;
                         width: 20px;
-                        height: 16px;
-                        margin-right: 10px;
+                        height: 17px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
                     }
                 }
                 .right{
@@ -517,9 +530,14 @@
 <script>
 import axios from 'axios';
 // import '../ManageCost/js/jquery-1.8.3.js'
+import commonList from  './qingDan.vue'
+import commonData from  './commonData.vue'
 import '../ManageCost/js/date.js'
 export default {
   name:'DesignVersion',
+    components:{
+        commonList,commonData
+    },
     data(){
         return{
             token:'',
@@ -538,6 +556,10 @@ export default {
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
+            showCommonList:false,
+            showCommonData:false,
+            checkItem:{},
+
         }
     },
     created(){
@@ -566,6 +588,20 @@ export default {
       },
     },
     methods:{
+         backToH(){
+            var vm = this
+            vm.showCommonList = false
+        },
+        showData(val){
+            var vm = this
+            vm.showCommonData = true
+            vm.checkItem = val
+        },
+        showDetialList(val){
+            var vm = this
+            vm.showCommonList = true
+            vm.checkItem = val
+        },
         deleteItem(val,istop){
             var vm = this
             vm.$confirm('您要删除当前所选报表？', '请确认', {

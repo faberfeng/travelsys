@@ -6,7 +6,7 @@
       <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
     </div>
     <div class="clearfix item-proj-box0" v-if="show0">
-      <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired)">
+      <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
           <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
             <span class="item-title">工程名称</span>
             <div :class="[item.projName.length>13?'item-name-box-s':'','item-name-box']">
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="item-proj-box" v-else>
-       <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired)">
+       <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
          <span class="proj-state-box">
            <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
            <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
@@ -416,7 +416,7 @@ export default {
                 console.log(err)
             })
         },
-        selectProject(id,expired){
+        selectProject(id,expired,name){
           if(expired){
                this.$message({
                 message: '项目已过期！',
@@ -424,7 +424,8 @@ export default {
               });
           }else{
             var vm = this;
-            localStorage.setItem('projId',id);
+            localStorage.setItem('projId',id)
+            localStorage.setItem('projName',name)
             vm.$router.push({
               path:`/home/projHome/${id}`,
               query: { firstView: 'Y' }

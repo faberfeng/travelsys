@@ -124,6 +124,14 @@ const router = new Router({
       ]
     },
     {
+      path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
+      name:'getManifestDetailInfoForPage',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/planCost/getManifestDetailInfoForPage'],resolve),
+    },
+    {
       path:'/Drive',
       name:'Drive',
       meta:{

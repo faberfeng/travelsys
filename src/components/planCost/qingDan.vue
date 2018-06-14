@@ -1,5 +1,8 @@
 <template>
 <div id="CommenList" v-loading.fullscreen.lock="fullscreenLoading">
+        <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+            <input type="hidden" name="p" ref="labelContent">
+        </form>
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="center-selection">
@@ -12,143 +15,180 @@
                 </div>
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
+                        <p class="antsLine">
+                            成本管理<i class="icon-sanjiao-right"></i><span class="strong" @click="back()">工程量清单</span><i class="icon-sanjiao-right"></i>
+                            清单详情
+                        </p>
                         <!--以下是列表-->
                         <p class="header clearfix">
-                             <span style="" class="button-back" @click="back()">返回</span>
+                             <span class="left_header">
+                                <i class="list_ icon"></i>清单基本信息
+                            </span>
+                            <a :class="['right_header','right-expend',topExpend.isExpend?'':'right-pack-up']" href="javascript:void(0)"  @click="changeTopExpend()" v-text="topExpend.title"></a>
                         </p>
-                        <div class="clearfix">
-                             <table class="table-list" border="1" width='100%'>
-                                <thead>
-                                    <tr  class="userList-thead">
-                                        <td >生成方式</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.pkId"></td>
-                                        <td >生成方式</td>
-                                        <td style="width: 150px;background: #fff;" v-text="parseMGSource(ManifestInfo.mGSource)"></td>
-                                        <td >创建用户</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.creator"></td>
-                                        <td >创建时间</td>
-                                        <td style="width: 150px;background: #fff;" v-text="initData(ManifestInfo.createTime)"></td>
-                                    </tr>
-                                    <tr  class="userList-thead">
-                                        <td >原始编号</td>
-                                        <td style="width: 150px;background: #fff;" v-text="(ManifestInfo.mOriginalId == 0)?'-':ManifestInfo.mOriginalId"></td>
-                                        <td >业务来源</td>
-                                        <td style="width: 150px;background: #fff;" v-text="parseMBSource(ManifestInfo.mBSource)"></td>
-                                        <td >修改用户</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.updater"></td>
-                                        <td >修改时间</td>
-                                        <td style="width: 150px;background: #fff;" v-text="initData(ManifestInfo.updateTime)"></td>
-                                    </tr>
-                                    <tr  class="userList-thead">
-                                        <td >清单名称</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.mName"></td>
-                                        <td >版本号</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.mVersion"></td>
-                                        <td >业务状态</td>
-                                        <td style="width: 150px;background: #fff;" v-text="parseMStatus(ManifestInfo.mStatus)+'('+ ManifestInfo.mStatus +')'"></td>
-                                        <td >清单类型</td>
-                                        <td style="width: 150px;background: #fff;" v-text="ManifestInfo.mType"></td>
-                                    </tr>
-                                </thead>
-                               </table>
+                        <div v-show="topExpend.isExpend" style="background:#fafafa;position: relative;">
+                               <ul class="left-item-box">
+                                   <li class="item clearfix">
+                                       <span class="left">清单编号</span>
+                                       <span class="right" v-text="ManifestInfo.pkId"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">创建用户</span>
+                                       <span class="right"  v-text="ManifestInfo.creator"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">业务来源</span>
+                                       <span class="right" v-text="parseMBSource(ManifestInfo.mBSource)"></span>
+                                   </li>
+
+                                     <li class="item clearfix">
+                                       <span class="left">原始编号</span>
+                                       <span class="right" v-text="(ManifestInfo.mOriginalId == 0)?'-':ManifestInfo.mOriginalId"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">修改用户</span>
+                                       <span class="right"  v-text="ManifestInfo.updater"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">版本号</span>
+                                       <span class="right" v-text="ManifestInfo.mVersion"></span>
+                                   </li>
+
+                                     <li class="item clearfix">
+                                       <span class="left">清单名称</span>
+                                       <span class="right" v-text="ManifestInfo.mName"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">业务状态</span>
+                                       <span class="right"  v-text="parseMStatus(ManifestInfo.mStatus)+'('+ ManifestInfo.mStatus +')'"></span>
+                                   </li>
+                                     <li class="item clearfix">
+                                       <span class="left">修改时间</span>
+                                       <span class="right" v-text="initData(ManifestInfo.updateTime)"></span>
+                                   </li>
+
+                                     <li class="item clearfix" style="margin-bottom:0;">
+                                       <span class="left">生成方式</span>
+                                       <span class="right" v-text="parseMGSource(ManifestInfo.mGSource)"></span>
+                                   </li>
+                                     <li class="item clearfix" style="margin-bottom:0;">
+                                       <span class="left">创建时间</span>
+                                       <span class="right"  v-text="initData(ManifestInfo.createTime)"></span>
+                                   </li>
+                                     <li class="item clearfix" style="margin-bottom:0;">
+                                       <span class="left">清单类型</span>
+                                       <span class="right" v-text="ManifestInfo.mType"></span>
+                                   </li>
+                               </ul>
                                <div class="right-QRcode">
                                    <img :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(ManifestInfo.pkId, 7) " alt="">
                                </div>
                         </div>
-                        <div style="overflow: auto;margin-top:10px;">
-                            <p>
-                                <button @click="changeShowType(true)">逐个显示</button>
-                                <button @click="changeShowType(false)">合并显示</button>
-                                <button @click="showLabel()">全部标签</button>
-                                <button>显示列</button>
-                            </p>
-                           <el-table  :data="S_quantitiesList"  border style="width: 100%">
-                                <el-table-column
-                                v-for="(item,index) in detailsHead" :key="index"
-                                :prop="item.prop"
-                                :label="item.name"
-                                v-if="item.show"
-                                align="center"
-                                :fixed="index == 0?'left':false"
-                                :width="index == 0?'50':''"
-                                :formatter="testIfIsNull"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                    prop="operate"
-                                    label="操作"
-                                    v-if="showOperate"
-                                    fixed="right"
+                        <p class="header clearfix"  style="overflow: auto;margin-top:30px;">
+                            <span class="left_header">
+                                <i class="detial icon"></i>明细基本信息
+                            </span>
+                            <a :class="['right_header','right-expend',bottomExpend.isExpend?'':'right-pack-up']" href="javascript:void(0)" @click="changeBottomExpend()" v-text="bottomExpend.title"></a>
+                        </p>
+                        <div v-show="bottomExpend.isExpend">
+                            <div style="overflow: auto;">
+                                <p  class="clearfix" style="margin: 7px 0 10px;text-align:left;">
+                                    <span  class="title-list" v-text="'明细总数：'+pageDetial.total"></span>
+                                    <span class="item-btn clearfix">
+                                        <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
+                                        <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label>
+                                        <label class="item-btn-icon icon-2" @click="showLabel()">全部标签</label>
+                                        <label class="item-btn-icon icon-3" @click="showLabelHeader()">显示列</label>
+                                    </span>
+                                </p>
+                            <el-table  :data="S_quantitiesList"  border style="width: 100%" class="detialInfoTable"  @row-click="checkLabel">
+                                    <el-table-column
+                                    v-for="(item,index) in detailsHead" :key="index"
+                                    :prop="item.prop"
+                                    :label="item.name"
+                                    v-if="item.show"
                                     align="center"
+                                    :fixed="index == 0?'left':false"
+                                    :width="index == 0?'50':''"
                                     :formatter="testIfIsNull"
                                     >
-                                     <template slot-scope="scope">
-                                        <button class="editBtn actionBtn" title="明细"  @click="edit(val)" ></button>
-                                        <button class="dataBtn actionBtn" title="清单"  @click="showlist(val)" v-if="showType == 'separate'"></button>
-                                        <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.id,val.relaId,true)" ></button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                            <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                                  无符合当前筛选条件的记录
+                                    </el-table-column>
+                                    <el-table-column
+                                        prop="operate"
+                                        label="操作"
+                                        v-if="showOperate"
+                                        fixed="right"
+                                        align="center"
+                                        :formatter="testIfIsNull"
+                                        >
+                                        <template slot-scope="scope">
+                                            <button class="locationBtn actionBtn" title="定位"  @click="openLocation(scope)" ></button>
+                                            <button class="detialBtn actionBtn" title="详情"  @click="checkLabel(scope)" v-if="showType == 'separate'"></button>
+                                            <button class="labelBtn actionBtn" title="标签"  @click="openLabel(scope)" ></button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
+                                    无符合当前筛选条件的记录
+                                </div>
                             </div>
-                        </div>
-                        <!--以下是page-navigitation-->
-                        <div class="datagrid-pager pagination" v-if="S_quantitiesList.length>0">
-                            <table cellspacing="0" cellpadding="0" border="0" >
-                              <tbody>
-                                  <tr>
-                                      <td>
-                                          <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
-                                                <option value="10">10</option>
-                                                <option value="20">20</option>
-                                                <option value="30">30</option>
-                                                <option value="40">40</option>
-                                                <option value="50">50</option>
-                                          </select>
-                                        </td>
+                            <!--以下是page-navigitation-->
+                            <div class="datagrid-pager pagination" v-if="S_quantitiesList.length>0">
+                                <table cellspacing="0" cellpadding="0" border="0" >
+                                <tbody>
+                                    <tr>
                                         <td>
-                                              <div class="pagination-btn-separator"></div>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
-                                        </td>
-                                        <td>
-                                              <div class="pagination-btn-separator"></div>
-                                        </td>
-                                        <td>
-                                            <span  class="pagination-title" style="padding-left:5px;">第</span>
-                                        </td>
-                                        <td>
-                                              <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
-                                        </td>
-                                        <td>
-                                            <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
-                                        </td>
-                                        <td>
-                                            <div class="pagination-btn-separator"></div>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
-                                        </td>
-                                        <td>
-                                            <div class="pagination-btn-separator"></div>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0)" @click="findManifestDetailList" class="btn-refresh btn-TAB"></a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
-                            <div style="clear:both;"></div>
-                        </div>
+                                            <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
+                                                    <option value="10">10</option>
+                                                    <option value="20">20</option>
+                                                    <option value="30">30</option>
+                                                    <option value="40">40</option>
+                                                    <option value="50">50</option>
+                                            </select>
+                                            </td>
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                                            </td>
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            <td>
+                                                <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                            </td>
+                                            <td>
+                                                <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
+                                            </td>
+                                            <td>
+                                                <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
+                                            </td>
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                                            </td>
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" @click="findManifestDetailList()" class="btn-refresh btn-TAB"></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
+                                <div style="clear:both;"></div>
+                            </div>
+                         </div>
                     </div>
                 </div>
             </div>
@@ -163,60 +203,100 @@
                         </h3>
                         <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">所在空间</span>
-                                <span class="detial-text-value" v-text="checkedItem.holderType"></span>
+                                <span class="detial-text-name">清单及序号</span>
+                                <span class="detial-text-value" v-text="checkedItem.manifestId+'-'+checkedItem.detailId" :title="checkedItem.manifestId+'-'+checkedItem.detailId"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始文件</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalFile"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始ID</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalId"></span>
+                                <span class="detial-text-name">可追溯ID</span>
+                                <span class="detial-text-value" v-text="checkedItem.traceId" :title="checkedItem.traceId"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">构件名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalName"></span>
+                                <span class="detial-text-value" v-text="checkedItem.originalName" :title="checkedItem.originalName"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">脚本名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.name"></span>
+                                <span class="detial-text-name">所在空间</span>
+                                <span class="detial-text-value" v-text="checkedItem.space" :title="checkedItem.space"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">分类编码</span>
-                                <span class="detial-text-value" v-text="checkedItem.gccode"></span>
+                                <span class="detial-text-name">单位</span>
+                                <span class="detial-text-value" v-text="checkedItem.unit" :title="checkedItem.unit"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">构件分类</span>
-                                <span class="detial-text-value" v-text="checkedItem.gccodeName"></span>
-                            </li>
-                        
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">创建程序</span>
-                                <span class="detial-text-value" v-text="checkedItem.creator"></span>
+                                <span class="detial-text-name">数量</span>
+                                <span class="detial-text-value" v-text="checkedItem.count" :title="checkedItem.count"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">更新用户</span>
-                                <span class="detial-text-value" v-text="checkedItem.editor"></span>
+                                <span class="detial-text-name">修改用户</span>
+                                <span class="detial-text-value" v-text="checkedItem.detailUpdateUser" :title="checkedItem.detailUpdateUser"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">更新时间</span>
-                                <span class="detial-text-value" v-text="checkedItem.updateTime"></span>
+                                <span class="detial-text-name">修改时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedItem.detailUpdateTime)" :title="initData(checkedItem.detailUpdateTime)"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">业务状态</span>
+                                <span class="detial-text-value" v-text="parseMStatus(checkedItem.status) + '(' + checkedItem.status + ')'" :title="parseMStatus(checkedItem.status) + '(' + checkedItem.status + ')'"></span>
+                            </li>
+                        </ul>
+                        <h3 class="header-attribute" style="margin-top: 33px;">
+                            <i class="trrangle"></i>
+                            通用设计信息
+                            <i :class="[{'active':show.generalDesignInfo},'icon-dropDown']" @click="show.generalDesignInfo = show.generalDesignInfo?false:true;"></i>
+                        </h3>
+                        <ul id="genealAtt" :class="[{'show':show.generalDesignInfo},'Att']">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">GUID</span>
+                                <span class="detial-text-value" v-text="checkedItem.guid" :title="checkedItem.guid"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始文件</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalFile" :title="checkedItem.originalFile"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始分类</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalCategory" :title="checkedItem.originalCategory"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始ID</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalId" :title="checkedItem.originalId"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">原始名称</span>
+                                <span class="detial-text-value" v-text="checkedItem.originalName" :title="checkedItem.originalName"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">创建工具</span>
+                                <span class="detial-text-value" v-text="checkedItem.creator" :title="checkedItem.creator"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">设计分类</span>
+                                <span class="detial-text-value" v-text="checkedItem.classifyName" :title="checkedItem.classifyName"></span>
+                            </li>
+
+
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">注释</span>
+                                <span class="detial-text-value" v-text="checkedItem.comment" :title="checkedItem.comment"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">标记</span>
-                                <span class="detial-text-value" v-text="checkedItem.tag?checkedItem.tag:'（空）'"></span>
+                                <span class="detial-text-value" v-text="checkedItem.tag" :title="checkedItem.tag"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">注释</span>
-                                <span class="detial-text-value" v-text="checkedItem.comments?checkedItem.comments:'（空）'"></span>
+                                <span class="detial-text-name">更新用户</span>
+                                <span class="detial-text-value" v-text="checkedItem.editor" :title="checkedItem.editor"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedItem.entityUpdateTime)" :title="initData(checkedItem.entityUpdateTime)"></span>
                             </li>
                         </ul>
                 </div>
             </div>
         </div>
         <div v-if="labelListShow"  id="edit" class="dialog">
-                <div class="el-dialog__header">
+            <div class="el-dialog__header">
                     <span class="el-dialog__title">标签信息预览</span>
                 <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="labelListCancle">
                     <i class="el-dialog__close el-icon el-icon-close"></i>
@@ -225,7 +305,7 @@
             <div class="el-dialog__body">
                  <div class="editBody">
                     <ul>
-                        <li v-for="(item,index) in S_quantitiesList" :key="index" class="item-label clearfix">
+                        <li v-for="(item,index) in S_Label_quantitiesList" :key="index" class="item-label clearfix">
                             <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.pkId, 7)" alt="">
                             <div class="right">
                                 <p class="item-list clearfix">
@@ -263,17 +343,48 @@
                             </div>
                         </li>
                     </ul>
+                    <el-pagination
+                    background
+                    v-if="!singleLable"
+                    layout="prev, pager, next"
+                    :current-page.sync="pageLabelList.currentPage"
+                     @current-change="findManifestDetailList(1)" 
+                     @prev-click="findManifestDetailList(1)"
+                      @next-click="findManifestDetailList(1)"
+                    :total="pageLabelList.total">
+                    </el-pagination>
                 </div>
             </div>
             <div class="el-dialog__footer">
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="labelListConfirm">网页预览</button>
-                    <button class="editBtnS" @click="labelListConfirm">打印当前页标签</button>
-                    <button class="editBtnC" @click="labelListCancle">取消</button>
+                    <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
                 </div>
             </div>
         </div>
-        <div id="mask" v-if="labelListShow" @click="labelListCancle"></div>
+        <div v-if="ListHeaderShow"  id="edit" class="dialog">
+            <div class="el-dialog__header">
+                <span class="el-dialog__title">显示列</span>
+                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="headerListCancle">
+                    <i class="el-dialog__close el-icon el-icon-close"></i>
+                </button>
+            </div>
+            <div class="el-dialog__body">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth" v-for="(item,index) in detailsHead_model" :key="index" v-if="index >=2">
+                          <label  :class="[item.showModel?'active':'','checkbox-fileItem']" :for="item.prop+'_header'" v-text="item.name"></label>
+                          <input  type="checkbox" :id="item.prop+'_header'" class="checkbox-arr" v-model="item.showModel">
+                    </span>
+                </div>
+            </div>
+            <div class="el-dialog__footer">
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="headerListConfirm">确定</button>
+                    <button class="editBtnC" @click="headerListCancle">取消</button>
+                </div>
+            </div>
+        </div>
+        <div id="mask" v-if="labelListShow || ListHeaderShow" ></div>
 </div>       
 </template>
 <style  lang='less' >
@@ -281,6 +392,9 @@
         z-index: 0!important;
     }
     #CommenList{
+        #print-qrcode{
+            display: none;
+        }
         .dialog{
             top: 15vh;
             left: 50%;
@@ -290,33 +404,49 @@
             z-index: 3001;
             position: fixed;
             background: #fff;
+            .el-dialog__body{
+                margin-top: 20px;
+            }
             .editBody{
-                margin: 20px;
+                margin: 0 20px;
+                .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
+                    margin: 0 5px;
+                }
             }
             .item-label{
-                border-bottom: 1px solid #cccccc;
+                border-bottom: 1px solid #ebebeb;
                 .img_left{
                     float: left;
-                    width: 150px;
-                    height: 150px;
-                    margin-right: 15px;
+                    width: 90px;
+                    height: 90px;
+                    margin:40px 30px 0 10px;
                 }
                 .right{
                     float: left;
                     width: 450px;
                     .item-list{
+                        margin-bottom: 14px;
                         .text-left{
                             float: left;
+                            font-size: 12px;
+                            line-height: 12px;
                             width: 80px;
+                            color: #999;
                             text-align: left;
                         }
                         .text-right{
-                             float: left;
+                            float: left;
                             width: 300px;
+                             font-size: 12px;
+                            line-height: 12px;
+                            color: #333333;
                             text-align: left;
                             text-overflow: ellipsis;
                             overflow: hidden;
                             white-space: nowrap;
+                        }
+                        &:last-of-type{
+                             margin-bottom: 20px; 
                         }
                     }
                 }
@@ -324,6 +454,47 @@
                     border-bottom: none;
                 }
             }
+             .item-attibuteAuth{
+                 float: left;
+                 width: 33.3%;
+                 padding-left: 78px;
+                 height: 14px;
+                 line-height: 14px;
+                 margin-bottom: 26px;
+                 text-align: left;
+                 .text{
+                    font-size: 14px;
+                    color: #666666;
+                    margin-left: 10px;
+                 }
+                .checkbox-fileItem{
+                    float: left;
+                    position: relative;
+                    padding-left:20px; 
+                    cursor: pointer;
+                    &::before{
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 12px;
+                        height: 12px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        background: #fff;
+                        content: '';
+                    }
+                }
+                .active{
+                     &::before{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                     }
+                }
+                .checkbox-arr{
+                    display: none;
+                }
+             }
         }
         #mask{
             z-index: 3000;
@@ -452,11 +623,12 @@
                     &::after{
                         display: block;
                         position: absolute;
-                        bottom: -9px;
+                        bottom: -7px;
                         width: 24px;
-                        height: 2px;
-                        background: #fafafa;
-                        border-top: 1px solid #cccccc;
+                        height: 16px;
+                        background: #fff;
+                        border-bottom: 1px solid #cccccc;
+                        -webkit-transform: skewY(30deg);
                         transform: skewY(30deg);
                         content: '';
                     }
@@ -542,47 +714,6 @@
                 padding-left:30px; 
                 padding-bottom: 65px;
                 margin-right: 25px;
-                .header{
-                    text-align: left;
-                    margin: 15px 0;
-                    .button-back{  
-                        float: right;
-                        background: #ffffff;
-                        color: #fc3439;
-                        border: 1px solid #fc3439;
-                        font-size: 12px;
-                        height: 26px;
-                        width: 86px;
-                        border-radius: 2px;
-                        line-height: 24px;
-                        cursor: pointer;
-                        text-align: center;
-                    }
-                    .button-add{
-                        float: left;
-                        background: #fc3439;
-                        color: #ffffff;
-                        font-size: 12px;
-                        height: 26px;
-                        border-radius: 2px;
-                        text-align: left;
-                        line-height: 26px;
-                        padding-left: 42px;
-                        padding-right: 16px;    
-                        position: relative;
-                        cursor: pointer;
-                        &::before{
-                            display: block;
-                            position: absolute;
-                            top: 7px;
-                            left: 19px;
-                            width: 12px;
-                            height: 12px;
-                            content: '';
-                            background: url('../ManageDesign/images/whiteJiahao.png') no-repeat 0 0;
-                        }
-                    }
-                }
                 .table-list{
                     float: left;
                     width: 87%;
@@ -602,9 +733,52 @@
                         }
                     }
                 }
+                .left-item-box{
+                    // min-width: 770px;
+                    padding: 18px;
+                    padding-right:0; 
+                    margin-right:200px; 
+                    text-align: left;
+                    .item{
+                        display: inline-block;
+                        width: 32%;
+                        margin-bottom: 20px;
+                        .left{
+                            float: left;
+                            text-align: left;
+                            font-size: 14px;
+                            line-height: 14px;
+                            color: #999999;
+                            font-weight: normal;
+                            margin-right: 11px;
+                        }
+                        .right{
+                            float: left;
+                            text-align: left;
+                            font-size: 14px;
+                            line-height: 14px;
+                            color: #333333;
+                            font-weight: normal;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
+                }
                 .right-QRcode{
-                    float: right;
-                    width: 10%;
+                    display: block;
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    width: 120px;
+                    height: 120px;
+                    padding: 5px;
+                    border: 1px solid #e0e0e0;
+                    background: #ffffff;
+                    img{
+                        width: 109px;
+                        height: 109px;;
+                    }
                 }
                  .actionBtn{
                     width: 16px;
@@ -613,16 +787,40 @@
                     cursor: pointer;
                     margin-right: 10px;
                 }
-                .editBtn{
-                    background: url('../../assets/edit.png') no-repeat;
+                .locationBtn{
+                    background: url('./images/location.png') no-repeat;
                 }
-                .deleteBtn{
-                    background: url('../../assets/delete.png') no-repeat;
+                .detialBtn{
+                    background: url('./images/detial_.png') no-repeat;
                 }
-                .dataBtn{
-                    background: url('./images/data.png') no-repeat;
+                .labelBtn{
+                    background: url('./images/label.png') no-repeat;
                 }
                 .project{
+                    .antsLine{
+                        padding: 10px 10px 15px 0px;
+                        font-size: 12px;
+                        line-height: 12px;
+                        color: #999999;
+                        text-align: left;
+                        .icon-sanjiao-right{
+                            display: inline-block;
+                            width: 7px;
+                            height: 10px;
+                            margin: 2px 7px 0;
+                            background-image:url('../ManageCost/images/sanjiaoright.png');
+                            background-size: 100% 100%;
+                        }
+                        .strong{
+                            cursor: pointer;
+                            color: #333333;
+                            font-weight: bold;
+                            &:last-of-type .icon-sanjiao-right{
+                                display: none;
+                            }
+                        }
+                        
+                    }
                     .UserList{
                         border-collapse: collapse;
                         border: 1px solid #e6e6e6;
@@ -693,6 +891,166 @@
                                 background: #0081c2;
                                 td{
                                    color: #fff!important;
+                                }
+                            }
+                        }
+                    }
+                    .header{
+                        text-align: left;
+                        margin: 15px 0;
+                        .left_header{
+                            float: left;
+                            font-size: 16px;
+                            line-height: 16px;
+                            color: #fc3439;
+                            font-weight: bold;
+                            padding-left:30px;
+                            position: relative;
+                            .list_{
+                                background: url('./images/list_.png')no-repeat 0 0;
+                            } 
+                            .detial{
+                                background: url('./images/detial.png')no-repeat 0 0;
+                            } 
+                            .icon{
+                                display: block;
+                                width: 20px;
+                                height: 17px;
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                            }
+                        }
+                        .right_header{
+                            text-decoration: none;
+                            float: right;
+                            font-size: 14px;
+                            color: #336699;
+                            line-height: 14px;
+                            margin-top:4px; 
+                        }
+                        .right-expend{
+                            position: relative;
+                            transition: all ease .5s;
+                            &::after{
+                                display: block;
+                                position: absolute;
+                                top: 1px;
+                                left: -20px;
+                                width: 12px;
+                                height: 12px;
+                                background: url('./images/expand.png') no-repeat 0 0;
+                                content: '';
+                            }
+                        }
+                        .right-pack-up{
+                            transition: all ease .5s;
+                            &::after{
+                              transform: rotateZ(180deg);
+                            }
+                        }
+                    }
+                    .title-list{
+                        font-size: 14px;
+                        line-height: 14px;
+                        color: #999999;
+                    }
+                    .item-btn{
+                        float: right;
+                        label,.label-item{
+                            float:left;
+                            width:auto;
+                            height:26px;
+                            padding: 0 9px;
+                            padding-left:27px; 
+                            border-top: 1px solid #e6e6e6;
+                            border-bottom: 1px solid #e6e6e6;
+                            text-align:center;
+                            line-height:24px;
+                            font-size:12px;
+                            color:#666666;
+                            cursor: pointer;
+                            border-left: 1px solid #e6e6e6;
+                            &:first-of-type{
+                            border-top-left-radius: 2px;
+                            border-bottom-left-radius: 2px;
+                            }
+                            &:last-of-type{
+                            border-right: 1px solid #e6e6e6;
+                            border-top-right-radius: 2px;
+                            border-bottom-right-radius: 2px;
+                            }
+                        }
+                        .label-item{
+                                border-right: none!important;
+                        }
+                        .item-btn-icon{
+                            position: relative;
+                            &::after{
+                                display: block;
+                                position: absolute;
+                                top: 7px;
+                                left: 11px;
+                                width: 12px;
+                                height: 12px;
+                                background-size:100%; 
+                                content: '';
+                            }
+                        } 
+                        .icon-0{
+                             &::after{
+                                background-image: url('./images/1-0.png');
+                             }
+                        }
+                         .icon-1{
+                             &::after{
+                                background-image: url('./images/1-1.png');
+                             }
+                        }
+                         .icon-2{
+                             &::after{
+                                background-image: url('./images/1-2.png');
+                             }
+                        }
+                         .icon-3{
+                             &::after{
+                                background-image: url('./images/1-3.png');
+                             }
+                        }
+                    }
+                    .detialInfoTable{
+                        border-color: #e0e0e0;  
+                        thead{
+                            tr{
+                                th{
+                                    height: 50px;
+                                    padding-left: 10px;
+                                    background: #f2f2f2;
+                                    font-size: 14px;
+                                    color: #666666;
+                                    text-align: left;
+                                    font-weight: normal;
+                                    border-color: #e0e0e0; 
+                                }
+                            }
+                        }
+                         tbody{
+                            tr{
+                                td{
+                                    height: 50px;
+                                    padding-left: 10px;
+                                    background: #ffffff;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    text-align: left;
+                                    font-weight: normal;
+                                    border-color: #e0e0e0; 
+                                    
+                                }
+                                &:nth-of-type(2n){
+                                     td{
+                                        background: #fafafa;
+                                     }
                                 }
                             }
                         }
@@ -851,7 +1209,6 @@
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
-                border-bottom: 1px solid #e6e6e6;
                 .noTop{
                     top: 12px!important;
                 }
@@ -966,7 +1323,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 
 export default Vue.component('common-list',{
-  props:['mId','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout'],
+  props:['mId'],
   data(){
       return {
          screenLeft:{
@@ -976,12 +1333,15 @@ export default Vue.component('common-list',{
          token:'',
          entId:'',//公司ID
          projId:'',
+         projName:'',
          userId:'',
+         UPID:'',
          defaultSubProjId:'',
          QJFileManageSystemURL:'',
          BDMSUrl:'',
          show:{
              basicAttributes:true,
+            generalDesignInfo:true,
          },
         selectUgId:'',//选中的群组id
         ugList:[],//群组列表
@@ -992,6 +1352,11 @@ export default Vue.component('common-list',{
             pagePerNum:10,//一页几份数据
             currentPage:1,//初始查询页数 第一页
             total:'',//所有数据
+        },
+        pageLabelList:{
+            pagePerNum:10,//一页几份数据
+            currentPage:1,//初始查询页数 第一页
+            total:0,//所有数据
         },
         checkedItem:{},
         fullscreenloading:false,
@@ -1047,10 +1412,22 @@ export default Vue.component('common-list',{
                 prop:'dCount',
             },
         ],
+        detailsHead_model:[],
         showOperate:true,
         S_quantitiesList:[],//明细基本信息
+        S_Label_quantitiesList:[],
         showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
         labelListShow:false,//
+        ListHeaderShow:false,//
+        topExpend:{
+            title:'收起',
+            isExpend:true
+        },
+        bottomExpend:{
+            title:'收起',
+            isExpend:true
+        },
+        singleLable:false,//单个标签展示 不需要分页器
       }
   },
   created(){
@@ -1060,8 +1437,9 @@ export default Vue.component('common-list',{
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
-       
+        vm.projName = localStorage.getItem('projName')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoList()
   }, 
@@ -1077,6 +1455,13 @@ export default Vue.component('common-list',{
             $("#basicAtt").hide(200);
           }
       },
+      'show.generalDesignInfo':function(val){
+          if(val){
+            $("#genealAtt").show(200);
+          }else{
+            $("#genealAtt").hide(200);
+          }
+      },
       'pageDetial.currentPage':function(val,oldval){
           var vm = this
           vm.findManifestDetailList()
@@ -1087,16 +1472,138 @@ export default Vue.component('common-list',{
       },
   },
   methods:{
-      labelListConfirm(){
+      checkLabel(scope){
+          var vm = this
+          vm.screenLeft.show = true
+          if(scope.row){
+               var pkId = scope.row.pkId
+               var tag = 1
+          }else if(scope.pkId){
+               var pkId = scope.pkId
+                var tag = 2
+          }
+        axios({
+            method:'GET',
+            url:vm.BDMSUrl+'show2/getEntityDetailInfo',
+            headers:{
+                token:vm.token
+            },
+            params:{
+                detailId:pkId,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
+                projectId:vm.projId
+            }
+        }).then(response=>{
+            vm.checkedItem = {}
+            if(response.data.cd == 0){
+                if(response.data.rt !=null)vm.checkedItem = response.data.rt
+                if(tag == 1){
+                    vm.$set(vm.checkedItem,'space',scope.row.dStorey ? scope.row.dStorey : (scope.row.dDistrict ? scope.row.dDistrict : (scope.row.dBuild ? scope.row.dBuild : "")))
+                    vm.$set(vm.checkedItem,'unit',scope.row.unit)
+                }else if( tag == 2){
+                    vm.$set(vm.checkedItem,'space',scope.dStorey ? scope.dStorey : (scope.dDistrict ? scope.dDistrict : (scope.dBuild ? scope.dBuild : "")))
+                    vm.$set(vm.checkedItem,'unit',scope.unit)
+                }
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+            vm.fullscreenLoading =false
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      openLabel(scope){
+          var vm = this
+        vm.labelListShow = true
+        vm.singleLable = true
+        vm.pageLabelList.total = 1
+        vm.S_Label_quantitiesList = []
+        vm.S_Label_quantitiesList.push(scope.row)
+      },
+      openLocation(){
 
+      },
+      printLabelList(){
+        var vm = this
+        var datas = '['
+        var tabelTitle = vm.projName + '构件标签'
+        var keyList = '["可追踪ID","构件名称","所在单体","所在区域","所在楼层","构件分类","构件注释","构件标记"]'
+        vm.S_Label_quantitiesList.forEach((item,i)=>{
+            var valueList = '["' + (item.dTraceId ? item.dTraceId : "") + '","'
+                + (item.dName ? item.dName : "") + '","' + (item.dBuild ? item.dBuild : "") + '","'
+                + (item.dDistrict ? item.dDistrict : "") + '","' + (item.dStorey ? item.dStorey : "") + '","' +
+                (item.classifyName ? item.classifyName : "") + '","' + (item.componentComments ? item.componentComments : "") + '","'
+                + (item.componentTag ? item.componentTag : "") + '"]'
+            var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+            datas += data
+            if (i < vm.S_Label_quantitiesList.length - 1) datas += ','
+        })
+        datas += ']'
+        vm.$refs.labelContent.value = datas
+        $('#print-qrcode').on('submit', function(event){
+            event.preventDefault() //阻止form表单默认提交
+        })
+        $('#print-qrcode').submit()
+        vm.$message({
+            type:'success',
+            message:'已向打印机发送请求'
+        })
+      },
+      changeBottomExpend(){
+          var vm = this
+          vm.bottomExpend.isExpend = !vm.bottomExpend.isExpend
+          vm.bottomExpend.title = vm.bottomExpend.isExpend?'收起':'展开'
+      },
+      changeTopExpend(){
+          var vm = this
+          vm.topExpend.isExpend = !vm.topExpend.isExpend
+          vm.topExpend.title = vm.topExpend.isExpend?'收起':'展开'
+      },
+      labelListConfirm(){
+          var vm = this
+          if(vm.singleLable == true){
+               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.mId+'/'+vm.S_Label_quantitiesList[0].pkId)
+          }else{
+               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.mId+'/0')
+          }
       },
       labelListCancle(){
         var vm = this
         vm.labelListShow = false
+         vm.singleLable = false
+      },
+      headerListCancle(){
+        var vm = this
+        vm.ListHeaderShow = false
+        vm.detailsHead_model.forEach((item,index)=>{
+             vm.$set(item,'showModel',item.show)
+         })
+      },
+      headerListConfirm(){
+        var vm = this
+        vm.ListHeaderShow = false
+        vm.detailsHead_model.forEach((item,index)=>{
+             vm.$set(item,'show',item.showModel)
+             vm.$set(vm.detailsHead[index],'show',item.showModel)
+         })
       },
       showLabel(){
           var vm = this
           vm.labelListShow = true
+      },
+      showLabelHeader(){
+         var vm = this
+         vm.ListHeaderShow = true
+         var b = []
+         $.extend(b,vm.detailsHead)
+         vm.detailsHead_model = b
+         vm.detailsHead_model.forEach((item,index)=>{
+             vm.$set(item,'showModel',item.show)
+         })
       },
       testIfIsNull(row, column, cellValue, index){
           if(cellValue == null)return '/'
@@ -1122,7 +1629,7 @@ export default Vue.component('common-list',{
         }).then(response=>{
             if(response.data.cd == 0){
                 vm.getManifestInfoByMId()
-                vm.findManifestDetailList()
+                vm.findManifestDetailList(2)
             }else{
                 vm.$message({
                     type:'error',
@@ -1176,12 +1683,27 @@ export default Vue.component('common-list',{
               vm.findManifestDetailList()
          }
     },
-    findManifestDetailList(){
+    findManifestDetailList(isDialog=0){
             var vm = this
              //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
+             /**
+              * @augments isDialog 判断是否是弹框
+              *   pageLabelList:{
+                    pagePerNum:10,//一页几份数据
+                    currentPage:1,//初始查询页数 第一页
+                    total:0,//所有数据
+                },
+              * **/
             var showType = 1
             if(vm.showType == 'combine'){
                 showType = 2
+            }
+            if(isDialog == 1){
+                var page = vm.pageLabelList.currentPage
+                var rows = vm.pageLabelList.pagePerNum
+            }else{
+                var page = vm.pageDetial.currentPage
+                var rows = vm.pageDetial.pagePerNum
             }
             axios({
                 method:'POST',
@@ -1192,23 +1714,44 @@ export default Vue.component('common-list',{
                 params:{
                     projectId:vm.projId,
                     manifestId:vm.mId,
-                    page:vm.pageDetial.currentPage,
-                    rows:vm.pageDetial.pagePerNum,
+                    page:page,
+                    rows:rows,
                     showType:showType,//显示类型 1 逐个显示 2 合并显示
                     currentColumns:''
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
+                        vm.pageLabelList.total = response.data.rt.total
                         vm.pageDetial.total = response.data.rt.total
-                        if(response.data.rt.rows != null){
-                            vm.S_quantitiesList = response.data.rt.rows
-                            vm.S_quantitiesList.forEach((element,index) => {
-                                vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
-                                vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
-                            });
-                        }else{
-                            vm.S_quantitiesList = []
+                        if(isDialog == 1){
+                            if(response.data.rt.rows != null){
+                                vm.S_Label_quantitiesList = response.data.rt.rows
+                            }else{
+                                vm.S_Label_quantitiesList = []
+                            }
+                        }else if(isDialog == 0){
+                            if(response.data.rt.rows != null){
+                                vm.S_quantitiesList = response.data.rt.rows
+                                vm.S_quantitiesList.forEach((element,index) => {
+                                    vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
+                                    vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                                });
+                            }else{
+                                vm.S_quantitiesList = []
+                            }
+                        }else if(isDialog == 2){
+                             if(response.data.rt.rows != null){
+                                vm.S_Label_quantitiesList = response.data.rt.rows
+                                vm.S_quantitiesList = response.data.rt.rows
+                                vm.S_quantitiesList.forEach((element,index) => {
+                                    vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
+                                    vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                                });
+                            }else{
+                                vm.S_Label_quantitiesList = []
+                                vm.S_quantitiesList = []
+                            }
                         }
                     }
                 }else if(response.data.cd == '-1'){
