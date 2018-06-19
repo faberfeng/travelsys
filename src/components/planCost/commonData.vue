@@ -1,36 +1,219 @@
 <template>
 <div id="CommenDataPage" v-loading.fullscreen.lock="fullscreenLoading">
+     <form id="print-exportToExcel" action="1111" method="post" enctype="multipart/form-data" target="printLabel">
+        <input type="hidden" name="projId" :value="projId">
+        <input type="hidden" name="relaType" value="report">
+        <input type="hidden" name="relaId" :value="rcId">
+    </form>
     <div class="project" v-loading="loading">
         <p class="antsLine">
-            成本管理<i class="icon-sanjiao-right"></i><span class="strong" @click="back()">构件量清单</span><i class="icon-sanjiao-right"></i>
-            xiangmu名称
+            成本管理<i class="icon-sanjiao-right"></i><span @click="back()">构件量清单</span><i class="icon-sanjiao-right"></i>
+            <span class="strong">{{'数据-'+dataName}}</span>
         </p>
-        <p class="header clearfix"  style="overflow: auto;margin-top:30px;">
+        <p class="header clearfix"  style="margin-top:20px;">
             <span class="left_header">
                 <i class="detial icon"></i>明细基本信息
             </span>
-            <a :class="['right_header','right-expend',bottomExpend.isExpend?'':'right-pack-up']" href="javascript:void(0)" @click="changeBottomExpend()" v-text="bottomExpend.title"></a>
-        </p>
-        <p  class="clearfix" style="margin: 7px 0 10px;text-align:left;">
-            <span  class="title-list" v-text="'明细总数：'+pageDetial.total"></span>
-            <span class="item-btn clearfix">
-                <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
-                <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label>
-                <label class="item-btn-icon icon-2" @click="showLabel()">全部标签</label>
-                <label class="item-btn-icon icon-3" @click="showLabelHeader()">显示列</label>
+             <span class="item-btn clearfix">
+                <label class="item-btn-icon icon-0" v-if="!isSnapshot && checkEditAuth">设计</label>
+                <label class="item-btn-icon icon-1" v-if="!isSnapshot" @click="showSnapshotBox()">快照</label>
+                <label class="item-btn-icon icon-2" @click="exportToExcel()">导出EXCEL</label>
+                <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>
         </p>
+        <table class="UserList" border="1" width='100%'>
+            <thead>
+                <tr  class="userList-thead">
+                    <th style="border:none;width:100px;"></th>
+                    <th style="border:none;width:100px;"></th>
+                    <th style="border:none;width:100px;"></th>
+                    <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item"></th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(val,index) in DatatableList" :key="index">
+                        <td ></td>
+                        <td ></td>
+                        <td colspan="1" :rowspan="4">楼层</td>
+                        <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="index_1 < (val.list.length-1)"></td>
+                        <td >
+                            <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
+                        </td>
+                        <!-- <td>数量</td>
+                        <td>111</td> -->
+                </tr>
+            </tbody>
+             <!-- <tbody>
+                <tr v-for="(val,index) in DatatableList" :key="index">
+                        <td colspan="1" :rowspan="DatatableList.length" v-if="index == 0">项目</td>
+                        <td colspan="1" :rowspan="5" v-if="index == 0">分区1</td>
+                        <td colspan="1" :rowspan="DatatableList.length-5" v-if="index == 5">分区2</td>
+                        <td colspan="1" :rowspan="2" v-if="index == 0">楼层</td>
+                        <td colspan="1" :rowspan="3" v-if="index == 2">楼层</td>
+                        <td colspan="1" :rowspan="4" v-if="index == 5">楼层</td>
+                        <td colspan="1" :rowspan="4" v-if="index == 9">楼层</td>
+                        <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="index_1 < (val.list.length-1)"></td>
+                        <td >
+                            <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
+                        </td>
+                </tr>
+            </tbody> -->
+        </table>
     </div>
+      <div v-if="showSnapshot"  id="edit" class="dialog">
+        <div class="el-dialog__header">
+            <span class="el-dialog__title">添加报表快照</span>
+            <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="cancelSnapshot">
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+            </button>
+        </div>
+        <div class="el-dialog__body">
+             <div class="editBody">
+                <div class="editBodytwo imageBody">
+                    <label class=" imageBodyText">快照名称 :</label>
+                    <input type="text" class="inp" v-model="snapShotName">
+                </div>
+             </div>
+        </div>
+        <div class="el-dialog__footer">
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="addSnapshot">确定</button>
+                <button class="editBtnC" @click="cancelSnapshot">取消</button>
+            </div>
+        </div>
+    </div>
+    <div id="mask" v-if="showSnapshot" ></div>
 </div>       
 </template>
-<style  lang='less' >
+<style  lang='less'>
+  .navigation{
+        z-index: 0!important;
+    }
     #CommenDataPage{
-        margin: 5px 20px;
+        margin: 5px 20px!important;
        *{
-           margin: 0;
-           padding: 0;
            box-sizing: border-box;
        }
+       .clearfix{
+           clear: both;
+           overflow: hidden;
+           content: '';
+       }
+       #print-exportToExcel{
+           display: none;
+       }
+        .dialog{
+            top: 15vh;
+            left: 50%;
+            width: 660px;
+            margin-left:-330px;
+            border-radius: 5px;
+            z-index: 3001;
+            position: fixed;
+            background: #fff;
+            .el-dialog__body{
+                margin-top: 20px;
+            }
+            .editBody{
+                margin: 0 20px;
+                .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
+                    margin: 0 5px;
+                }
+            }
+            .item-label{
+                border-bottom: 1px solid #ebebeb;
+                .img_left{
+                    float: left;
+                    width: 90px;
+                    height: 90px;
+                    margin:40px 30px 0 10px;
+                }
+                .right{
+                    float: left;
+                    width: 450px;
+                    .item-list{
+                        margin-bottom: 14px;
+                        .text-left{
+                            float: left;
+                            font-size: 12px;
+                            line-height: 12px;
+                            width: 80px;
+                            color: #999;
+                            text-align: left;
+                        }
+                        .text-right{
+                            float: left;
+                            width: 300px;
+                             font-size: 12px;
+                            line-height: 12px;
+                            color: #333333;
+                            text-align: left;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                        &:last-of-type{
+                             margin-bottom: 20px; 
+                        }
+                    }
+                }
+                &:last-of-type{
+                    border-bottom: none;
+                }
+            }
+             .item-attibuteAuth{
+                 float: left;
+                 width: 33.3%;
+                 padding-left: 78px;
+                 height: 14px;
+                 line-height: 14px;
+                 margin-bottom: 26px;
+                 text-align: left;
+                 .text{
+                    font-size: 14px;
+                    color: #666666;
+                    margin-left: 10px;
+                 }
+                .checkbox-fileItem{
+                    float: left;
+                    position: relative;
+                    padding-left:20px; 
+                    cursor: pointer;
+                    &::before{
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 12px;
+                        height: 12px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        background: #fff;
+                        content: '';
+                    }
+                }
+                .active{
+                     &::before{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                     }
+                }
+                .checkbox-arr{
+                    display: none;
+                }
+             }
+        }
+        #mask{
+            z-index: 3000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+            background: #000;
+        }
        .project{
             .antsLine{
                 padding: 10px 10px 15px 0px;
@@ -59,6 +242,8 @@
             .UserList{
                 border-collapse: collapse;
                 border: 1px solid #e6e6e6;
+                margin: 20px;
+                margin-left: 0;
                 .checkbox-fileItem{
                     float: left;
                     width: 14px;
@@ -115,11 +300,8 @@
                             cursor: pointer;
                             margin-right: 16px;
                         }
-                        .editBtn{
-                            background: url('../../assets/edit.png') no-repeat;
-                        }
-                        .deleteBtn{
-                            background: url('../../assets/delete.png') no-repeat;
+                        .locationBtn{
+                            background: url('./images/location.png') no-repeat;
                         }
                     }
                     .activeTr{
@@ -133,8 +315,9 @@
             .header{
                 text-align: left;
                 margin: 15px 0;
+                border-bottom: 1px solid #e6e6e6;
+                padding-bottom: 9px;
                 .left_header{
-                    float: left;
                     font-size: 16px;
                     line-height: 16px;
                     color: #fc3439;
@@ -192,64 +375,50 @@
             }
             .item-btn{
                 float: right;
-                label,.label-item{
+                label{
                     float:left;
                     width:auto;
-                    height:26px;
-                    padding: 0 9px;
-                    padding-left:27px; 
-                    border-top: 1px solid #e6e6e6;
-                    border-bottom: 1px solid #e6e6e6;
+                    height:16px;
+                    padding-left:30px; 
+                    margin-left: 20px;
                     text-align:center;
-                    line-height:24px;
-                    font-size:12px;
+                    line-height:16px;
+                    font-size:14px;
                     color:#666666;
                     cursor: pointer;
-                    border-left: 1px solid #e6e6e6;
-                    &:first-of-type{
-                    border-top-left-radius: 2px;
-                    border-bottom-left-radius: 2px;
-                    }
-                    &:last-of-type{
-                    border-right: 1px solid #e6e6e6;
-                    border-top-right-radius: 2px;
-                    border-bottom-right-radius: 2px;
-                    }
-                }
-                .label-item{
-                        border-right: none!important;
                 }
                 .item-btn-icon{
                     position: relative;
                     &::after{
                         display: block;
                         position: absolute;
-                        top: 7px;
-                        left: 11px;
-                        width: 12px;
-                        height: 12px;
+                        top: 0px;
+                        left: 0px;
+                        width: 16px;
+                        height: 16px;
                         background-size:100%; 
+                        background-repeat:no-repeat; 
                         content: '';
                     }
                 } 
                 .icon-0{
                         &::after{
-                        background-image: url('./images/1-0.png');
+                         background-image: url('./images/design.png');
                         }
                 }
                     .icon-1{
                         &::after{
-                        background-image: url('./images/1-1.png');
+                        background-image: url('./images/photo.png');
                         }
                 }
                     .icon-2{
                         &::after{
-                        background-image: url('./images/1-2.png');
+                        background-image: url('./images/export1.png');
                         }
                 }
                     .icon-3{
                         &::after{
-                        background-image: url('./images/1-3.png');
+                        background-image: url('./images/export2.png');
                         }
                 }
             }
@@ -385,30 +554,22 @@ import Vue from 'vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
+import JsonData from './js/dataCommonJson.json'
 
 export default Vue.component('common-list',{
-  props:['mId'],
+  props:['rcId','isSnapshot'],
   data(){
       return {
-         screenLeft:{
-             show:false,
-             item:1,
-         },
          token:'',
          entId:'',//公司ID
          projId:'',
          projName:'',
+         projAuth:[],
          userId:'',
          UPID:'',
          defaultSubProjId:'',
          QJFileManageSystemURL:'',
          BDMSUrl:'',
-         show:{
-             basicAttributes:true,
-            generalDesignInfo:true,
-         },
-        selectUgId:'',//选中的群组id
-        ugList:[],//群组列表
         /*以下为后期添加数据*/
         fullscreenLoading:false,
         loading:false,
@@ -425,73 +586,14 @@ export default Vue.component('common-list',{
         checkedItem:{},
         fullscreenloading:false,
         ManifestInfo:{},//清单基本信息
-        detailsHead:[
-             {
-                name:'',
-                show:true,
-                prop:'SerialNumber',
-            },
-            {
-                name:'序号',
-                show:true,
-                prop:'pkId',
-            },
-             {
-                name:'所在单体',
-                show:true,
-                prop:'dBuild',
-            },
-             {
-                name:'所在分区',
-                show:true,
-                prop:'dDistrict',
-            },
-             {
-                name:'所在楼层',
-                show:true,
-                prop:'dStorey',
-            },
-             {
-                name:'类型名称',
-                show:true,
-                prop:'classifyName',
-            },
-             {
-                name:'名称',
-                show:true,
-                prop:'dName',
-            },
-             {
-                name:'业务状态',
-                show:true,
-                prop:'dState_format',
-            }, {
-                name:'单位',
-                show:true,
-                prop:'dUnit',
-            },
-             {
-                name:'数量',
-                show:true,
-                prop:'dCount',
-            },
-        ],
-        detailsHead_model:[],
-        showOperate:true,
-        S_quantitiesList:[],//明细基本信息
-        S_Label_quantitiesList:[],
+        detailsHead:[],
+        groupHead:[],
+        DatatableList:[],//明细基本信息
         showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
-        labelListShow:false,//
-        ListHeaderShow:false,//
-        topExpend:{
-            title:'收起',
-            isExpend:true
-        },
-        bottomExpend:{
-            title:'收起',
-            isExpend:true
-        },
-        singleLable:false,//单个标签展示 不需要分页器
+        dataName:'',//数据列表名称
+        showSnapshot:false,
+        snapShotName:'',
+        relaId:'',//关系ID
       }
   },
   created(){
@@ -502,14 +604,22 @@ export default Vue.component('common-list',{
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         vm.projName = localStorage.getItem('projName')
+        vm.projAuth = localStorage.getItem('projAuth')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        console.log(JsonData)
         vm.getIntoList()
   }, 
   mounted(){
       var vm = this
     //   const table1 = new tableResizable('test');
+  },
+  computed:{
+       checkEditAuth: function () {
+        // `this` 指向 vm 实例
+            return this.projAuth.indexOf("01200303")>0
+        }
   },
   watch:{
       'pageDetial.currentPage':function(val,oldval){
@@ -522,31 +632,47 @@ export default Vue.component('common-list',{
       },
   },
   methods:{
-      testIfIsNull(row, column, cellValue, index){
-          if(cellValue == null)return '/'
-          return cellValue
-      },
-      back(){
-          var vm = this
-          vm.$emit('back')
-      },
-      getIntoList(){
+      exportToExcel(val){
         var vm = this
+        if(val){
+             var printUrl = vm.BDMSUrl + 'project2/report/export/xml?token='+vm.token
+        }else{
+             var printUrl = vm.BDMSUrl + 'project2/report/export?token='+vm.token
+        }
+        $('#print-exportToExcel')[0].action = printUrl
+        $('#print-exportToExcel').on('submit', function(event){
+            // event.preventDefault() //阻止form表单默认提交
+        })
+        $('#print-exportToExcel').submit()
+      },
+      showSnapshotBox(){
+        var vm = this
+        vm.showSnapshot =true
+      },
+      cancelSnapshot(){
+          var vm = this
+          vm.showSnapshot = false
+           vm.snapShotName = ''
+      },
+      addSnapshot(){
+          var vm = this
         vm.fullscreenLoading =true
         axios({
             method:'POST',
-            url:vm.BDMSUrl+'manifest2/showColumns',
+            url:vm.BDMSUrl+'project2/report/'+vm.projId+'/'+vm.rcId+'/snapshot/add',
             headers:{
                 token:vm.token
             },
             params:{
-                type:2,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
-                projId:vm.projId
+                rssName:vm.snapShotName
             }
         }).then(response=>{
             if(response.data.cd == 0){
-                vm.getManifestInfoByMId()
-                vm.findManifestDetailList(2)
+                vm.$message({
+                    type:'success',
+                    message:'快照添加成功!'
+                })
+                vm.cancelSnapshot()
             }else{
                 vm.$message({
                     type:'error',
@@ -558,47 +684,107 @@ export default Vue.component('common-list',{
             console.log(err)
         })
       },
-    getManifestInfoByMId(){
-            var vm = this
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'manifest2/getManifestInfoByMId',
-                headers:{
-                    token:vm.token
-                },
-                params:{
-                    mId:vm.mId,
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    if(response.data.rt != null){
-                       vm.ManifestInfo = response.data.rt  
-                    }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    vm.$router.push({
-                        path:'/login'
+      openLocation(){
+          var vm  = this
+          vm.$message({
+              type:'info',
+              message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+          })
+      },
+      testIfIsNull(row, column, cellValue, index){
+          if(cellValue == null)return '/'
+          return cellValue
+      },
+      back(){
+          var vm = this
+          vm.$emit('back')
+      },
+      previewSnapshot(){
+        var vm = this
+        axios({
+            method:'POST',
+            url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/content',
+            headers:{
+                token:vm.token
+            },
+        }).then(response=>{
+            if(response.data.cd == 0){
+               
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+      },
+      getIntoList(){
+        var vm = this
+        vm.fullscreenLoading =true
+        axios({
+            method:'POST',
+            url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/count',
+            headers:{
+                token:vm.token
+            },
+        }).then(response=>{
+            if(response.data.cd == 0){
+                vm.dataName = response.data.rt.reportName
+                vm.DatatableList = []
+                vm.detailsHead = []
+                vm.groupHead = []
+                var titleLength = 0
+                if(response.data.rt.rowList != null){
+                    // response.data.rt.rowList.forEach((element,index)=>{
+                    //     if(element.rowType == 'ROW_TITLE'){
+                    //         vm.detailsHead = element.infoList
+                    //         titleLength = element.infoList.length
+                    //     }else if(element.rowType == 'ROW_GROUP'){
+                    //         vm.groupHead = element.infoList
+                    //     }else if(element.rowType == 'ROW_CONTENT'){
+                    //          vm.DatatableList.push({
+                    //              'list':element.infoList,
+                    //              'info':vm.parseInfo(element.infoList[titleLength])
+                    //         })
+                    //     }
+                    // })
+                    JsonData.rt.rowList.forEach((element,index)=>{
+                        if(element.rowType == 'ROW_TITLE'){
+                            vm.detailsHead = element.infoList
+                            titleLength = element.infoList.length
+                        }else if(element.rowType == 'ROW_GROUP'){
+                            if(element.groupLevel == 1){//单体
+                            
+                            }else if(element.groupLevel == 2){//分区
+
+                            }else if(element.groupLevel == 3){//楼层
+
+                            }
+                            vm.groupHead = element.infoList
+                        }else if(element.rowType == 'ROW_CONTENT'){
+                             vm.DatatableList.push({
+                                 'list':element.infoList,
+                                 'info':vm.parseInfo(element.infoList[titleLength])
+                            })
+                        }
                     })
                 }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-    //加载明细列表
-    changeShowType(val){
-        var vm = this
-         //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
-         if(val && vm.showType == 'combine'){
-              vm.showType = 'separate'
-              vm.detailsHead[1].show = true //序号列不显示
-              vm.findManifestDetailList()
-         }
-         if(!val && vm.showType == 'separate'){
-              vm.showType = 'combine'
-              vm.detailsHead[1].show = false //序号列不显示
-              vm.findManifestDetailList()
-         }
+
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+            vm.fullscreenLoading =false
+        }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    parseInfo(val){
+        return JSON.stringify(val)
     },
     findManifestDetailList(isDialog=0){
             var vm = this
@@ -847,15 +1033,15 @@ export default Vue.component('common-list',{
                 return '未定义';
         }
     },
-      trim(str){ 
-        /**去掉字符串前后所有空格*/
-        return str.replace(/(^\s*)|(\s*$)/g, ""); 
-      },
-       initData(val){
-            if(!val)return ''
-            var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
-            return tt; 
-        },
+    trim(str){ 
+    /**去掉字符串前后所有空格*/
+    return str.replace(/(^\s*)|(\s*$)/g, ""); 
+    },
+    initData(val){
+        if(!val)return ''
+        var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
+        return tt; 
+    },
   }
 })
 </script>

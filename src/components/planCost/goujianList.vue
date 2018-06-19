@@ -151,7 +151,7 @@
                             <td >
                                 <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
                                  <button class="listBtn actionBtn" title="清单"  @click="showDetialList(val)" ></button>
-                                <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rcId)" ></button>
+                                <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rssId)" ></button>
                             </td>
                         </tr>
                     </tbody>
@@ -218,7 +218,7 @@
             </div>
         </div>
         <common-list v-on:back="backToH" :mId="checkItem.rssId" v-if="showCommonList"></common-list>
-        <common-data v-if="showCommonData"></common-data>
+        <common-data v-if="showCommonData" v-on:back="backToH" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
     </div>
     <div id="edit">
 
@@ -591,6 +591,7 @@ export default {
          backToH(){
             var vm = this
             vm.showCommonList = false
+            vm.showCommonData = false
         },
         showData(val){
             var vm = this
