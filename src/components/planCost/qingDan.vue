@@ -16,7 +16,7 @@
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
                         <p class="antsLine">
-                            成本管理<i class="icon-sanjiao-right"></i><span class="strong" @click="back()">工程量清单</span><i class="icon-sanjiao-right"></i>
+                            成本管理<i class="icon-sanjiao-right"></i><span class="strong" @click="back()" v-text="title"></span><i class="icon-sanjiao-right"></i>
                             清单详情
                         </p>
                         <!--以下是列表-->
@@ -84,7 +84,7 @@
                                    <img :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(ManifestInfo.pkId, 7) " alt="">
                                </div>
                         </div>
-                        <p class="header clearfix"  style="overflow: auto;margin-top:30px;">
+                        <p class="header clearfix"  style="margin-top:30px;">
                             <span class="left_header">
                                 <i class="detial icon"></i>明细基本信息
                             </span>
@@ -898,6 +898,8 @@
                     .header{
                         text-align: left;
                         margin: 15px 0;
+                        border-bottom: 1px solid #e6e6e6;
+                        padding-bottom: 10px;
                         .left_header{
                             float: left;
                             font-size: 16px;
@@ -1323,7 +1325,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 
 export default Vue.component('common-list',{
-  props:['mId'],
+  props:['mId','title'],
   data(){
       return {
          screenLeft:{

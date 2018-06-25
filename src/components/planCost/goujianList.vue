@@ -21,14 +21,14 @@
                 成本分析  
             </router-link>
         </div>
-        <div class="project"  v-if="!showCommonList && !showCommonData" v-loading="loading">
+        <div class="project"  v-if="!showCommonList && !showCommonData && !showCommonEdit" v-loading="loading">
             <!--以下是实时列表-->
             <div>
                 <p class="header clearfix">
                     <span class="left">
                         <i class="camera icon"></i>实时报表
                     </span>
-                    <a class="right" href="javascript:void(0)">+新增</a>
+                    <a class="right" href="javascript:void(0)" @click="showEdit()">+新增</a>
                 </p>
                 <table class="UserList" border="1" width='100%'>
                     <thead>
@@ -217,7 +217,11 @@
                 <div style="clear:both;"></div>
             </div>
         </div>
-        <common-list v-on:back="backToH" :mId="checkItem.rssId" v-if="showCommonList"></common-list>
+        <!--下面是创建编辑报表的编码-->
+        <common-edit v-on:back="backToH" v-if="showCommonEdit"></common-edit>
+        <!--下面是报表清单的编码-->
+        <common-list v-on:back="backToH" :mId="checkItem.rssId" :title="'构件量清单'" v-if="showCommonList"></common-list>
+        <!--下面是报表数据的编码-->
         <common-data v-if="showCommonData" v-on:back="backToH" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
     </div>
     <div id="edit">
@@ -532,11 +536,12 @@ import axios from 'axios';
 // import '../ManageCost/js/jquery-1.8.3.js'
 import commonList from  './qingDan.vue'
 import commonData from  './commonData.vue'
+import commonEdit from  './commonEdit.vue'
 import '../ManageCost/js/date.js'
 export default {
   name:'DesignVersion',
     components:{
-        commonList,commonData
+        commonList,commonData,commonEdit
     },
     data(){
         return{
@@ -556,6 +561,7 @@ export default {
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
+            showCommonEdit:false,
             showCommonList:false,
             showCommonData:false,
             checkItem:{},
@@ -588,8 +594,13 @@ export default {
       },
     },
     methods:{
+        showEdit(){
+            var vm = this
+            vm.showCommonEdit = true
+        },
          backToH(){
             var vm = this
+            vm.showCommonEdit = false
             vm.showCommonList = false
             vm.showCommonData = false
         },

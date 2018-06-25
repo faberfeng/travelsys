@@ -1,0 +1,1636 @@
+<template>
+    <div id="commonEditBox">
+         <div class="project" >
+            <p class="antsLine">
+                成本管理<i class="icon-sanjiao-right"></i><span  @click="back()">构件量清单</span><i class="icon-sanjiao-right"></i>
+                <span class="strong">设计-新增报表</span>
+            </p>
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_1 icon"></i>报表类型
+                </span>
+            </p>
+            <div class="container">
+                <p class="clearfix">
+                    <span class="item-title">数据库</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                </p>
+                 <p class="clearfix">
+                    <span class="item-title">报表名称</span>
+                    <span class="item-container">
+                        <input type="text" class="value-box" v-model="rcName" placeholder="请输入报表名称">
+                    </span>
+                </p>
+            </div>
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_2 icon"></i>查询范围
+                </span>
+            </p>
+            <div class="container container-S">
+                <p class="clearfix">
+                    <span class="item-title">单体</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+
+                    <span class="item-title">分区</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+
+                     <span class="item-title">楼层</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                </p>
+                 <p class="clearfix">
+                    <span class="item-title">专业</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+
+                    <span class="item-title">系统</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box"></select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+
+                     <span class="item-title">类型</span>
+                    <span class="item-container">
+                        <select name="" id="" class="value-box" v-model="value_type" @change="initFiled">
+                            <option v-for="(item,index) in options_type" :key="index" :value="item.tableIndex" v-text="item.tableName"  ></option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                </p>
+            </div>
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_3 icon"></i>报表字段
+                </span>
+            </p>
+             <div style="text-align: left;margin-left:110px;" class="clearfix">
+                <div class="diolog-main">
+                    <p class="clearfix" style="margin-bottom:6px;height:24px;">
+                        <span class="title">可用字段</span>
+                    </p>
+                    <ul class="main-container">
+                        <li :class="['userList-item',item.checked?'checked':'']" v-for="(item,key) in data_left" :key="key" @dbclick="addField()" @click="checkField(key)">
+                            <span class="check-name" v-text="item.fieldName"></span>
+                            <span :class="['icon','icon-selectUser',item.checked?'active':'']"></span>
+                        </li>
+                    </ul>
+                </div>
+                <span class="BTN centerBtn" @click="addField()">添加</span>
+                <div class="diolog-main">
+                    <p class="clearfix"  style="margin-bottom:6px;height:24px;">
+                        <span class="title">报表字段</span>
+                        <span class="BTN" @click="shiftUp()" style="margin-right:11px;">上移</span>
+                        <span class="BTN" @click="shiftDown()">下移</span>
+                    </p>
+                    <ul class="main-container ">
+                        <li :class="['userList-item',item.checked?'active-check':'']" v-for='(item,index) in data_right' :key="index" @click="checkThisF(index)">
+                            <span class="check-title" v-text="item.fieldName" v-if="index != EditIndex"></span>
+                            <input type="text" class="value-field" v-model="item.fieldName" v-if="index == EditIndex">
+                            <span class="icon icon-editfield" @click="editField(index)"></span>
+                            <span class="icon icon-cancleUser" @click="removeField(index)"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_4 icon"></i>过滤条件
+                </span>
+            </p>
+            <div class="container container-F">
+                <p class="clearfix" v-for="(item) in list_filter" :key="item.key" v-show="item.show">
+                    <span class="item-container">
+                        <select name="" v-model="item.build_name" class="value-box">
+                            <option value="nofield">【不使用】</option>
+                            <option :value="val.fieldCode" v-text="val.fieldName" v-for="(val,index) in  data_right" :key="index"></option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                    <span class="item-container">
+                        <select class="value-box" v-model="item.filtertype" name="report-filter-field-filter-type">
+                            <option value="CONTAINS">包含</option>
+                            <option value="NOTCONTAINS">不包含</option>
+                            <option value="EQUALS">等于</option>
+                            <option value="NOTEQUALS">不等于</option>
+                            <option value="STARTIS">开始是</option>
+                            <option value="ENDIS">结束是</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                    <span class="item-container">
+                        <input type="text" class="value-box" v-model="item.filtercontent" placeholder="请输入">
+                    </span>
+                    <span class="item-container" v-if="!item.disabled">
+                        <select name="" v-model="item.val"  class="value-box" @change="changeFL(item.key,5)">
+                            <option value="0">无</option>
+                            <option value="1">并且</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                </p>
+            </div>
+
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_5 icon"></i>排序和分组
+                </span>
+            </p>
+            <div class="container container-F">
+                <p style="    text-align: left;
+    color: #999999;
+    font-size: 14px;">
+                    分组行位置
+                    <el-radio v-model="titlePosition" label="0">表头</el-radio>
+                    <el-radio v-model="titlePosition" label="1">表尾</el-radio>
+                </p>
+                <p class="clearfix" v-for="(item) in list_order" :key="item.key" v-show="item.show">
+                    <span class="item-container">
+                        <select name="" id="" class="value-box" v-model="item.build_name">
+                            <option value="nofield">【不使用】</option>
+                            <option :value="val.fieldCode" v-text="val.fieldName" v-for="(val,index) in  data_right" :key="index"></option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                    <span class="item-container">
+                        <select class="value-box" name="report-filter-field-filter-type" v-model="item.ordertype">
+                            <option value="ACENding">升序排列 </option>
+                            <option value="DESCENDING">降序排列</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                    <span class="item-container">
+                        <select class="value-box" name="report-filter-field-filter-type" v-model="item.grouptype">
+                            <option value="NONE_GROUP">只排序、不分组</option>
+                            <option value="TITLE_GROUPVALUE_QUANTITY">分组显示标题、取值和数量</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                    <span class="item-container" v-if="item.key < 2">
+                        <select name="" v-model="item.val"  class="value-box" @change="changeFL(item.key,3)">
+                            <option value="0">无</option>
+                            <option value="1">其次按</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </span>
+                </p>
+                 <p class="clearfix">
+                   <label   :class="[displayType?'active':'','checkbox-fileItem']" for="displayType"></label>
+                   <input   type="checkbox" id='displayType' class="hideInput"  v-model="displayType">
+                    <label   :class="[displayTotal?'active':'','checkbox-fileItem','right-checkbox']" for="displayTotal"></label>
+                   <input   type="checkbox" id='displayTotal' class="hideInput"  v-model="displayTotal">
+                </p>
+            </div>
+            <p class="header clearfix">
+                <span class="left_header">
+                    <i class="icon_6 icon"></i>外观设置
+                </span>
+                <a :class="['right_header','right-expend',topExpend.isExpend?'':'right-pack-up']" href="javascript:void(0)"  @click="changeTopExpend()" v-text="topExpend.title"></a>
+            </p>
+            <div v-if="topExpend.isExpend" class="container container-F">
+                <div class="box-style">
+                    <p class="title">
+                        标题样式
+                    </p>
+                    <p class="clearfix" style="margin-bottom:0;">
+                        <span class="item-title">标题名称</span>
+                        <span class="item-container">
+                            <input type="text" class="value-box" v-model="titleName" placeholder="请输入标题名称">
+                        </span>
+                        <br>
+                    </p>
+                    <p style="text-align:left;margin-bottom:20px;padding-left:105px;">
+                        <el-radio v-model="titleUseReportName" label="0">使用表名</el-radio>
+                        <el-radio v-model="styleShowTitle" label="1">显示标题</el-radio>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">字体大小</span>
+                        <span class="item-container">
+                            <select name="" id="" v-model="titleFontSize" class="value-box">
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="22">22</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">对齐方式</span>
+                        <span class="item-container">
+                            <select v-model="titleAlign" id="" class="value-box">
+                                <option value="center">居中</option>
+                                <option value="left">左对齐</option>
+                                <option value="right">右对齐</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">标题行高</span>
+                        <span class="item-container">
+                            <select v-model="titleLineHeight" id="" class="value-box">
+                                <option value="32">32</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                                <option value="48">48</option>
+                                <option value="50">50</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">背景颜色</span>
+                        <el-color-picker
+                            v-model="titleBgColor"
+                            show-alpha
+                            :predefine="predefineColors_1">
+                        </el-color-picker>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">外边框</span>
+                        <label   :class="[titleUseBorder?'active':'','checkbox-fileItem','border-checkbox']" for="titleUseBorder"></label>
+                        <input   type="checkbox" id='titleUseBorder' class="hideInput"  v-model="titleUseBorder">
+                    </p>
+                </div>
+                <div class="box-style">
+                    <p class="title">
+                        表格样式
+                    </p>
+                     <p class="clearfix">
+                        <span class="item-title">表格宽度</span>
+                        <span class="item-container" style="width:120px;">
+                            <select name="" id="" v-model="tableWidth" class="value-box">
+                                <option value="100%">自适应</option>
+                                <option value="fixed">固定大小</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                         <span class="item-container" style="width:110px;" v-if="tableWidth == '100%'">
+                            <input type="text" class="value-box" v-model="tableWidthVal" placeholder="请输入">
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">字体大小</span>
+                        <span class="item-container">
+                            <select name="" id="" v-model="tableFontsize" class="value-box">
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">表格行高</span>
+                        <span class="item-container">
+                            <select name="" v-model="tableLineHeight" class="value-box">
+                                <option value="32">32</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                                <option value="48">48</option>
+                                <option value="50">50</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">文字对齐</span>
+                        <span class="item-container">
+                            <select v-model="tableAlign" id="" class="value-box">
+                                <option selected="selected" value="center">居中</option>
+                                <option value="left">左对齐</option>
+                                <option value="right">右对齐</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                     <p class="clearfix">
+                        <span class="item-title">显示网络</span>
+                        <span class="item-container">
+                            <select name="" v-model="showTableNet" class="value-box">
+                                <option selected="selected" value="0">不显示</option>
+                                <option selected="selected" value="1">显示</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </span>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">列名行背景色</span>
+                        <el-color-picker
+                            v-model="tableTitleBgColor"
+                            show-alpha
+                            :predefine="predefineColors_1">
+                        </el-color-picker>
+                    </p>
+                    <p class="clearfix">
+                        <span class="item-title">分组框背景色</span>
+                        <el-color-picker
+                            v-model="tableGroupBgColor"
+                            show-alpha
+                            :predefine="predefineColors_1">
+                        </el-color-picker>
+                    </p>
+                </div>
+            </div>
+            <p>
+                <span class="saveBtn" @click="saveForm()">保存</span>
+                <span class="cancelBtn"  @click="saveForm(true)">数据</span>
+            </p>
+         </div>
+    </div>
+</template>
+<style lang="less" scoped>
+   #commonEditBox{
+       margin: 0 20px 20px;
+       .hideInput{
+           display: none;
+       }
+       .clearfix{
+           overflow: hidden;
+           clear: both;
+           content: '';
+       }
+       *{
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+        select{  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        } 
+        .project{
+            .antsLine{
+                padding: 10px 10px 15px 0px;
+                font-size: 12px;
+                line-height: 12px;
+                color: #999999;
+                text-align: left;
+                .icon-sanjiao-right{
+                    display: inline-block;
+                    width: 7px;
+                    height: 10px;
+                    margin: 2px 7px 0;
+                    background-image:url('../ManageCost/images/sanjiaoright.png');
+                    background-size: 100% 100%;
+                }
+                .strong{
+                    cursor: pointer;
+                    color: #333333;
+                    font-weight: bold;
+                    &:last-of-type .icon-sanjiao-right{
+                        display: none;
+                    }
+                }
+                
+            }
+            .UserList{
+                border-collapse: collapse;
+                border: 1px solid #e6e6e6;
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
+                    cursor: pointer;
+                    position: relative;
+                    margin-left:4px;
+                }
+                .active{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+                }
+                thead{
+                    background: #f2f2f2;
+                    th{
+                        padding-left: 6px;
+                        padding-right: 15px;
+                        height: 55px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        border-right: 1px solid #e6e6e6;
+                        font-size: 12px;
+                        color: #333333;
+                        font-weight: normal;
+                    }
+                }
+                tbody{
+                    tr{
+                        td{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 55px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 12px;
+                            color: #333333;
+                            .location{
+                                display: block;
+                                width: 12px;
+                                height: 16px;
+                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                cursor: pointer;
+                            }
+                        }
+                        .Strong{
+                            font-weight: bold;
+                        }
+                        .actionBtn{
+                            width: 16px;
+                            height: 16px;
+                            border: none;
+                            cursor: pointer;
+                            margin-right: 16px;
+                        }
+                        .editBtn{
+                            background: url('../../assets/edit.png') no-repeat;
+                        }
+                        .deleteBtn{
+                            background: url('../../assets/delete.png') no-repeat;
+                        }
+                    }
+                    .activeTr{
+                        background: #0081c2;
+                        td{
+                            color: #fff!important;
+                        }
+                    }
+                }
+            }
+            .header{
+                text-align: left;
+                margin: 15px 0;
+                border-bottom: 1px solid #e6e6e6;
+                padding-bottom: 10px;
+                .left_header{
+                    float: left;
+                    font-size: 16px;
+                    line-height: 16px;
+                    color: #fc3439;
+                    font-weight: bold;
+                    padding-left:30px;
+                    position: relative;
+                    .icon_1{
+                    background: url('./images/add_1.png')no-repeat 0 0;
+                    } 
+                    .icon_2{
+                    background: url('./images/add_2.png')no-repeat 0 0;
+                    } 
+                    .icon_3{
+                    background: url('./images/add_3.png')no-repeat 0 0;
+                    } 
+                    .icon_4{
+                    background: url('./images/add_4.png')no-repeat 0 0;
+                    } 
+                    .icon_5{
+                    background: url('./images/add_5.png')no-repeat 0 0;
+                    } 
+                    .icon_6{
+                        background: url('./images/add_6.png')no-repeat 0 0;
+                    } 
+                    .detial{
+                        background: url('./images/detial.png')no-repeat 0 0;
+                    } 
+                    .icon{
+                        display: block;
+                        width: 20px;
+                        height: 17px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+                .right_header{
+                    text-decoration: none;
+                    float: right;
+                    font-size: 14px;
+                    color: #336699;
+                    line-height: 14px;
+                    margin-top:4px; 
+                }
+                .right-expend{
+                    position: relative;
+                    transition: all ease .5s;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        top: 1px;
+                        left: -20px;
+                        width: 12px;
+                        height: 12px;
+                        background: url('./images/expand.png') no-repeat 0 0;
+                        content: '';
+                    }
+                }
+                .right-pack-up{
+                    transition: all ease .5s;
+                    &::after{
+                        transform: rotateZ(180deg);
+                    }
+                }
+            }
+            .container{
+                margin-top: 10px;
+                margin-left:60px; 
+                >p,.box-style{
+                    margin-bottom: 20px;
+                    .item-title{
+                        font-size: 14px;
+                        color: #999999;
+                        float: left;
+                        width: 70px;
+                        height: 40px;
+                        line-height: 40px;
+                        margin-left: 30px;
+                        text-align: left;
+                    }
+                    .item-container{
+                        float: left;
+                        width: 240px;
+                        height: 40px;
+                        position: relative;
+                        .value-box{
+                            display: block;
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 2px;
+                            border: 1px solid #dbdbdb;
+                            padding-left: 12px;
+                            color: #333333;
+                        }
+                        input.value-box{
+                           
+                        }
+                        .icon-sanjiao{
+                            display: block;
+                            position: absolute;
+                            width: 12px;
+                            height: 7px;
+                            background-image:url('../Settings/images/sanjiao.png');
+                            background-size: 100% 100%;
+                            content: '';
+                            top: 16px;
+                            right: 11px;
+                        }
+                    }
+                   .checkbox-fileItem{
+                        float: left;
+                        width: 14px;
+                        height: 14px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        margin-right: 5px;
+                        position: relative;
+                        &::after{
+                            font-size:14px;
+                            color:#999999;
+                            display: block;
+                            position: absolute;
+                            right: -135px;
+                            top: 0;
+                            line-height:14px;
+                            content: '数据相同时合并多行';
+                        }
+                    }
+                    .right-checkbox{
+                        margin-left: 160px;
+                         &::after{
+                             right: -65px;
+                             content: '显示总计';
+                         }
+                    }
+                    .border-checkbox{
+                         margin-left: 0px;
+                         margin-top: 12px;
+                         &::after{
+                             right: -80px;
+                             content: '使用外边框';
+                         }
+                    }
+                    .active{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                            border: 1px solid #fc3439;
+                        &::after{
+                            color:#333;
+                        }
+                    }
+                }
+            }
+            .container-S{
+                .item-title{
+                    padding-right: 20px;
+                    text-align: right!important;
+                }   
+            }
+            .container-F{
+                margin-left: 110px;
+                margin-bottom: 50px;
+                .item-container{
+                    margin-right: 10px;
+                }
+            }
+            .box-style{
+                border-bottom: 1px solid #f5f5f5;
+                .item-title{
+                    margin-left: 0!important;
+                    width: 105px!important;
+                }
+                .title{
+                    text-align: left;
+                    font-size: 14px;
+                    line-height: 14px;
+                    color: #666666;
+                    font-weight: bold;
+                    margin: 20px 0px;
+                }
+                >p.clearfix{
+                    margin-bottom: 20px;
+                    text-align: left;
+                }
+            }
+            .saveBtn{
+                display: inline-block;
+               line-height: 36px;
+                background: #fc3439;
+                margin-right: 20px;
+                color: #fff;
+                font-size: 14px;
+                font-weight: normal;
+                width: 111px;
+                height: 36px;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                border-radius: 2px;
+                    &:hover {
+                        background: #ff5257;
+                    }
+            }
+            .cancelBtn{
+                display: inline-block;
+                font-size: 14px;
+               line-height: 36px;
+                color: #666;
+                background: #fff;
+                border: 1px solid #ccc;
+                width: 111px;
+                height: 36px;
+                padding: 0;
+                cursor: pointer;
+                border-radius: 2px;
+            }
+            .diolog-main{
+                float: left;
+                width: 240px;
+                height: auto;
+                .title{
+                    font-size: 12px;
+                    color: #999999;
+                    float: left;
+                    height: 24px;
+                    line-height: 24px;
+                    margin-right: 80px;
+                }
+                .main-container{
+                    height:290px;
+                    border: 1px solid #ebebeb;
+                    overflow-y: auto;
+                }
+                .title-right{
+                    display: block;
+                    margin: 10px 10px 0 0;
+                    height: 28px;
+                    position: relative;
+                    .title-right-icon{
+                        display: block;
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 2px;
+                        border: 1px solid #e6e6e6;
+                        position: relative;
+                        background: #fafafa;
+                        padding-left:10px;
+                        padding-right:40px;
+                        margin-right: 5px;
+                    }
+                    .el-icon-search{
+                            position: absolute;
+                            right: 10px;
+                            top: 8px;
+                            cursor: pointer;
+                    }
+                }
+                .checked{
+                    background: #f5f5f5;
+                }
+                .userList-item{
+                    position: relative;
+                    height: 36px;
+                    line-height: 36px;
+                    padding-left: 10px;
+                    cursor: pointer;
+                    .check-name{
+                        display: inline-block;
+                        font-size: 14px;
+                        line-height: 14px;
+                        color: #333333;
+                    }
+                    .check-title{
+                        display: inline-block;
+                        font-size: 12px;
+                        line-height: 14px;
+                        color: #999999;
+                    }
+                    .icon-selectUser{
+                        display: block;
+                        position: absolute;
+                        top: 11px;
+                        right: 20px;
+                        width: 14px;
+                        height: 14px;
+                        background-image:url('../Settings/images/a-1.png'); 
+                    }
+                    .icon-cancleUser{
+                        display: block;
+                        position: absolute;
+                       top: 11px;
+                        right: 20px;
+                        width: 14px;
+                        height: 14px;
+                        background-image:url('../Settings/images/b-1.png'); 
+                        &:hover{
+                            background-image:url('../Settings/images/b-2.png'); 
+                        } 
+                    }
+                    .value-field{
+                        width: 160px;
+                        height: 100%;
+                        border: none;
+                        background: transparent;
+                        &:focus{
+                            outline:none;
+                        }
+                    }
+                    .icon-editfield{
+                        display: block;
+                        position: absolute;
+                        top: 11px;
+                        right: 54px;
+                        width: 14px;
+                        height: 14px;
+                        background-image:url('../ManageCost/images/edit.png'); 
+                        background-size: 100% 100%;
+                        &:hover{
+                            background-image:url('../ManageCost/images/edit1.png'); 
+                        }
+                    }
+                    &:hover{
+                         .icon-selectUser{
+                            background-image:url('../Settings/images/a-2.png'); 
+                        }
+                       background: #f5f5f5;
+                    } 
+                    .icon-selectUser.active{
+                        background-image:url('../Settings/images/a-2.png'); 
+                    }
+                }
+                .active-check{
+                        background: #f5f5f5;
+                    .icon-cancleUser{
+                        background-image:url('../Settings/images/b-2.png'); 
+                    }
+                        .icon-editfield{
+                        background-image:url('../ManageCost/images/edit1.png'); 
+                    }
+                }
+                /***********设置滚动条************/
+                /* 设置滚动条的样式 */
+                ::-webkit-scrollbar {
+                    width:6px;
+                }
+                /* 滚动槽 */
+                ::-webkit-scrollbar-track {
+                    box-shadow: inset006pxrgba(0,0,0,0.5);
+                    -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+                    border-radius:3px;
+                }
+                /* 滚动条滑块 */
+                ::-webkit-scrollbar-thumb {
+                    border-radius:3px;
+                    background:rgba(0,0,0,0.1);
+                    box-shadow: inset006pxrgba(0,0,0,0.5);
+                    -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+                }
+                ::-webkit-scrollbar-thumb:window-inactive {
+                    background:#dfdfdf;
+                }
+            }
+            .BTN{
+                float: left;
+                cursor: pointer;
+                width: 50px;
+                text-align: center;
+                height: 24px;
+                line-height: 22px;
+                border:1px solid #d9d9d9;
+                border-radius: 2px;
+                color: #999999;
+                font-size: 12px;
+            }
+            .centerBtn{
+                margin: 100px 20px 0;
+            }
+            .title-list{
+                font-size: 14px;
+                line-height: 14px;
+                color: #999999;
+            }
+            .item-btn{
+                float: right;
+                label,.label-item{
+                    float:left;
+                    width:auto;
+                    height:26px;
+                    padding: 0 9px;
+                    padding-left:27px; 
+                    border-top: 1px solid #e6e6e6;
+                    border-bottom: 1px solid #e6e6e6;
+                    text-align:center;
+                    line-height:24px;
+                    font-size:12px;
+                    color:#666666;
+                    cursor: pointer;
+                    border-left: 1px solid #e6e6e6;
+                    &:first-of-type{
+                    border-top-left-radius: 2px;
+                    border-bottom-left-radius: 2px;
+                    }
+                    &:last-of-type{
+                    border-right: 1px solid #e6e6e6;
+                    border-top-right-radius: 2px;
+                    border-bottom-right-radius: 2px;
+                    }
+                }
+                .label-item{
+                        border-right: none!important;
+                }
+                .item-btn-icon{
+                    position: relative;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        top: 7px;
+                        left: 11px;
+                        width: 12px;
+                        height: 12px;
+                        background-size:100%; 
+                        content: '';
+                    }
+                } 
+                .icon-0{
+                        &::after{
+                        background-image: url('./images/1-0.png');
+                        }
+                }
+                    .icon-1{
+                        &::after{
+                        background-image: url('./images/1-1.png');
+                        }
+                }
+                    .icon-2{
+                        &::after{
+                        background-image: url('./images/1-2.png');
+                        }
+                }
+                    .icon-3{
+                        &::after{
+                        background-image: url('./images/1-3.png');
+                        }
+                }
+            }
+            .detialInfoTable{
+                border-color: #e0e0e0;  
+                thead{
+                    tr{
+                        th{
+                            height: 50px;
+                            padding-left: 10px;
+                            background: #f2f2f2;
+                            font-size: 14px;
+                            color: #666666;
+                            text-align: left;
+                            font-weight: normal;
+                            border-color: #e0e0e0; 
+                        }
+                    }
+                }
+                    tbody{
+                    tr{
+                        td{
+                            height: 50px;
+                            padding-left: 10px;
+                            background: #ffffff;
+                            font-size: 14px;
+                            color: #333333;
+                            text-align: left;
+                            font-weight: normal;
+                            border-color: #e0e0e0; 
+                            
+                        }
+                        &:nth-of-type(2n){
+                                td{
+                                background: #fafafa;
+                                }
+                        }
+                    }
+                }
+            }
+                /**********一下是分页器的样式***************/
+            .datagrid-pager {
+                display: block;
+                height: 31px;
+                width: auto;
+                border:1px solid #d4d4d4;
+                // padding: 3px 4px;
+                box-sizing: border-box;
+                background: #f5f5f5;
+            }
+                .pagination{
+                border-top: none;
+            }
+            .pagination table {
+                float: left;
+                height: 30px;
+                th, td {
+                    min-width: 5px;
+                    padding: 0px;
+                    margin: 0px;
+                }
+            }
+            .pagination-page-list {
+                margin: 0px 6px;
+                padding: 1px 2px;
+                width: 43px;
+                height: auto;
+                border-width: 1px;
+                border-style: solid;
+            }
+            .pagination .pagination-num {
+                border-color: #D4D4D4;
+                margin: 0 2px;
+                width: 30px;
+            }
+            .pagination-btn-separator {
+                float: left;
+                height: 24px;
+                border-left: 1px solid #ccc;
+                border-right: 1px solid #fff;
+                margin: 3px 1px;
+            }
+            .btn-TAB{
+                display: block;
+                width:26px;
+                height: 26px;
+                cursor: pointer;
+                position: relative;
+                &:hover{
+                    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+                    border-radius: 5px;
+                }
+                &::after{
+                    display: block;
+                    position: absolute;
+                    content: '';
+                    width: 10px;
+                    height: 10px;
+                    background-size: 100% 100%; 
+                    top: 8px;
+                    left: 8px;
+                }
+            }
+            .btn-left0::after{
+                background-image: url('../../assets/fenye2.png');
+            }
+            .btn-left1::after{
+                background-image: url('../../assets/fenye1.png');
+            }
+            .btn-right0::after{
+                background-image: url('../../assets/fenye4.png');
+            }
+            .btn-right1::after{
+                background-image: url('../../assets/fenye3.png');
+            }
+            .btn-refresh::after{
+                background-image: url('../../assets/fenye5.png');
+            }
+            .pagination-title{
+                font-size: 14px;
+                color: #333333;
+            }
+            .pagination-info{
+                float: right;
+                margin-top: 5px;
+                margin-right: 25px;
+            }
+        }
+   }
+</style>
+<script>
+import Vue from 'vue'
+import axios from 'axios'
+import '../ManageCost/js/jquery-1.8.3.js'
+export default Vue.component('common-edit',{
+    props:[],
+    data(){
+        const filter = (length)=>{
+            const data = [];
+            for (let i = 0; i < length; i++) {
+                data.push({
+                    key: i,
+                    val:0,
+                    build_name:'nofield',
+                    ordertype:'ACENding',
+                    grouptype:'NONE_GROUP',
+                    filtertype:'',
+                    filtercontent:'',
+                    show:i == 0?true:false,
+                    disabled: i >= 4?true:false
+                });
+            }
+            return data;
+        }
+        return {
+            data_left:[],
+            data_right:[],
+            value3:[],
+            token:'',
+            entId:'',//公司ID
+            projId:'',
+            projName:'',
+            userId:'',
+            UPID:'',
+            defaultSubProjId:'',
+            QJFileManageSystemURL:'',
+            BDMSUrl:'',
+            topExpend:{
+                title:'收起',
+                isExpend:true
+            },
+            EditIndex:-1,
+            /*以下为后期添加数据*/
+            rcName:'',
+            rcId:0,
+            options_monomer:[],//单体选项
+            options_monomer_pre:[],
+            options_partition:[],//分区选项
+            options_partition_pre:[],
+            options_floor:[],//楼层选项
+            options_floor_pre:[],
+            option_professional:[],
+            option_professional_preset:[],
+            options_system:[],//系统选项
+            options_system_pre:[],
+            options_type:[],//楼层选项
+            options_type_pre:[],
+            value_monomer: '',//单体 筛选关键词
+            value_partition: '0',//分区 筛选关键词
+            value_floor: '0',//单体 筛选关键词
+            value_professional:'-1',//专业 筛选关键字
+            value_system:'-1',//系统 筛选关键字
+            value_type:'',//类型 筛选关键字
+            list_filter:filter(5),//过滤字段的列表
+            list_order:filter(3),//过滤字段的列表
+
+            titlePosition:'0',
+            displayType:false,
+            displayTotal:false,
+            titleBgColor:'rgba(255,69,0,0.7)',
+            tableTitleBgColor:'rgba(255,69,0,0.7)',
+            tableGroupBgColor:'rgba(255,69,0,0.7)',
+            predefineColors_1:[
+                '#ff4500',
+                '#ff8c00',
+                '#ffd700',
+                '#90ee90',
+                '#00ced1',
+                '#1e90ff',
+                '#c71585',
+                'rgba(255,69,0,0.68)',
+                'rgb(255, 120, 0)',
+                'hsv(51, 100, 98)',
+                'hsva(120, 40, 94, 0.5)',
+                'hsl(181, 100%, 37%)',
+                'hsla(209, 100%, 56%, 0.73)',
+                '#c7158577'
+            ],
+            titleName:'',
+            titleUseReportName:false,
+            styleShowTitle:false,
+            tableWidth:'100%',
+            tableWidthVal:'',
+            titleFontSize:12,
+            titleAlign:'center',
+            titleUseBorder:false,
+            titleLineHeight:32,
+            tableFontsize:12,
+            tableLineHeight:32,
+            tableAlign:'center',
+            showTableNet:0,
+
+        }
+    },
+    created(){
+        var vm = this
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        vm.token = localStorage.getItem('token')
+        vm.projId = localStorage.getItem('projId')
+        vm.userId = localStorage.getItem('userid')
+        vm.entId = localStorage.getItem('entId')
+        vm.projName = localStorage.getItem('projName')
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.UPID = vm.$store.state.UPID
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.getList()
+    },
+    methods:{
+        saveForm(needCount){
+            var vm = this
+            var rcId = 0
+            vm.fullscreenLoading =true
+
+            needCount = needCount || false
+            /***先获取rc 中的值***/
+            const rcName = $.trim(vm.rcName)
+            if (rcName == undefined || rcName == '') {
+                vm.$message({
+                    type:'warning',
+                    message:'报表名称不能为空!'
+                })
+                return
+            }
+            //判断报表名称是否重复
+            var flag = vm.isReportNameRepeat(rcId,rcName)
+            if(flag){
+                 vm.$message({
+                    type:'warning',
+                    message:'名称重复!'
+                })
+                return;
+            }
+            var rc = {
+                reportName: rcName,
+                reportTableName: vm.value_type,   //筛选 - 类型 表名
+                displayType: vm.displayType?0:1,   //数据相同时合并多行
+                displayTotal: vm.displayTotal?1:0,	//显示总计
+                projId: vm.projId,
+                groupPosition: vm.titlePosition   //分组行位置
+            }
+            /****报表字段***/
+            var fieldList = new Array();
+            vm.data_right.forEach(ele=>{
+                fieldList.push({
+                    fieldCode: ele.fieldCode,
+                    fieldAlias: ele.fieldName,
+                    fieldType: ele.fieldType, 
+                    tableType: ele.tableType
+                })
+            })
+            if (fieldList.length == 0) {
+                vm.$message({
+                    type:'warning',
+                    message:'报表使用字段不能为空!'
+                })
+                return
+            }
+
+            /******过滤条件*****/
+            var fieldFilterList = new Array()
+            var fieldType_STRING = "STRING"
+            var fieldType_DATETIME = "DATETIME"
+            var fieldType_NUMBER = "NUMBER"
+            var fieldType_BOOLEAN = "BOOLEAN"
+            var error = ''
+            // 过滤条件
+            /**
+             *   val:0,
+                    build_name:'nofield',
+                    filtertype:'',
+                    filtercontent:'',
+            **/
+            vm.list_filter.forEach((ele,index)=>{
+                if (ele.build_name == 'nofield') return
+                var fieldName = ''
+                var fieldType = ''
+                var tableType = ''
+                vm.data_right.forEach(res=>{
+                    if(res.fieldCode == ele.build_name){
+                        fieldName = res.fieldName
+                        fieldType = res.fieldType
+                        tableType = res.tableType
+                    }
+                })
+                var content = ele.filtercontent
+                if (fieldType == fieldType_DATETIME) {
+                    content = ele.filtercontent //$(this).find('input[class=combo-value][name=report-filter-filter-content]').val();
+                }
+                if (content == undefined || content == '') {
+                    error += '【' + fieldName + '】字段过滤条件不能为空'
+                    return;
+                }
+                if (fieldType == fieldType_DATETIME && vm.isDate(content)) {
+                    error += '【' + fieldName + '】字段过滤条件格式错误，正确格式为：2014-08-08'
+                    return;
+                }
+                if (fieldType == fieldType_NUMBER && vm.isNumber(content)) {
+                    error += '【' + fieldName + '】字段过滤条件格式错误，正确格式为：88或88.88'
+                    return;
+                }
+                if (fieldType == fieldType_BOOLEAN && vm.isBoolean(content)) {
+                    error += '【' + fieldName + '】字段过滤条件格式错误，正确格式为：TRUE或FALSE'
+                    return;
+                }
+                fieldFilterList.push({
+                    fieldCode: ele.build_name, 
+                    fieldSearchType: ele.filtertype,
+                    fieldSearchContent: content,
+                    tableType: tableType
+                })
+            })
+            if (error != '') {
+                 vm.$message({
+                    type:'warning',
+                    message:error
+                })
+                return;
+            }
+            /***排序和分组***/
+            var fieldGroupList = new Array()
+                // val:0,
+                // build_name:'nofield',
+                // ordertype:'ACENding',
+                // grouptype:'NONE_GROUP',
+            vm.list_order.forEach((ele,index)=>{
+                if (ele.build_name == 'nofield') return;
+                var tableType = ''
+                var fieldAlias = ''
+                vm.data_right.forEach(res=>{
+                    if(res.fieldCode == ele.build_name){
+                        fieldAlias = res.fieldName
+                        tableType = res.tableType
+                    }
+                })
+                fieldGroupList.push({
+                    fieldCode: ele.build_name,
+                    fieldOrderType: ele.ordertype, 
+                    fieldGroupType: ele.grouptype,
+                    tableType: tableType, 
+                    fieldAlias:fieldAlias 
+                })
+            })
+            /*****判断 样式 过滤****/
+            // titleUseReportName:false,
+            // styleShowTitle:false,
+            if (vm.titleUseReportName) {
+                vm.titleName = rcName
+            }
+            if (vm.styleShowTitle && $.trim(vm.titleName) == '') {
+                vm.$message({
+                    type:'warning',
+                    message:'标题样式-》显示标题后-标题内容不能为空'
+                })
+                return
+            }
+            var tableWidth = vm.tableWidth
+            if (tableWidth == 'fixed') {
+                tableWidth = vm.tableWidthVal
+                if (tableWidth == '' || !vm.isNumber(tableWidth)) {
+                    vm.$message({
+                        type:'warning',
+                        message:'表格样式-》表格固定宽度后-宽度值格式错误，正确格式为：20,30等'
+                    })
+                    return;
+                }
+            }
+
+             var rcStyle = {
+                showTitle: vm.styleShowTitle?1:0,
+                titleName: $.trim(vm.titleName),
+                titleUseReportName: vm.titleUseReportName?1:0,
+                titleFontSize: vm.titleFontSize,
+                titleAlign: vm.titleAlign,
+                titleUseBorder: vm.titleUseBorder?1:0,
+                titleBorderHeight: vm.titleLineHeight,
+                titleBgColor: vm.titleBgColor,
+                tableFontSize: vm.tableFontsize,
+                tableRowHeight: vm.tableLineHeight,
+                tableWidth: tableWidth,
+                tableAlign: vm.tableAlign,
+                tableBorderWidth: vm.showTableNet,
+                tableTitleBgColor: vm.tableTitleBgColor,
+                tableGroupBgColor: vm.tableGroupBgColor
+            }
+            var url = vm.BDMSUrl + 'project2/report/' + vm.projId + '/rc/' + rcId + '/update'
+            if (rcId == undefined || rcId == 0) {
+                url = vm.BDMSUrl + 'project2/report/' + vm.projId + '/rc/add'
+            }
+            axios({
+                method:'POST',
+                url:url,
+                headers:{
+                    token:vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                },
+                data: {
+                    rc: rc,
+                    fieldList: fieldList,
+                    fieldFilterList: fieldFilterList,
+                    fieldGroupList: fieldGroupList,
+                    rcStyle: rcStyle,
+                    needCount:needCount
+                },
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'创建报表成功！'
+                    })
+                    vm.back()
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                vm.fullscreenLoading =false
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        isReportNameRepeat(rcId,rcName){
+            var vm = this
+            var result = false
+            $.ajax({
+                type: "POST",
+                url:vm.BDMSUrl + 'project2/report/isRepeat',
+                data:{
+                    id: rcId,
+                    name: rcName,
+                    projId:vm.projId
+                },
+                headers:{
+                    token:vm.token
+                },
+                async:false, //同步
+                success:function(response){
+                    if(response.cd == 0){
+                        if(response.msg == 'repeat!'){
+                            result =  true
+                        }
+                    }
+                }
+            });
+            return result
+        },
+
+        initFiled(){
+            var vm = this
+            for(var i=0;i<vm.options_type.length;i++){
+                if(vm.options_type[i].tableIndex == vm.value_type){
+                    vm.data_right = []
+                    vm.data_left = vm.options_type[i].fieldList
+                    vm.data_left.forEach((ele,index)=>{
+                        if(index == 0){
+                            vm.$set(ele,'checked',true)
+                        }else{
+                            vm.$set(ele,'checked',false)
+                        }
+                    })
+                    vm.addField()
+                    break
+                }
+            }
+        },
+        getList(){
+            var vm = this
+            vm.fullscreenLoading =true
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/report/template/list',
+                headers:{
+                    token:vm.token
+                },
+                params:{
+                    type:2,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
+                    projId:vm.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null){
+                        vm.options_type = response.data.rt
+                        vm.value_type = response.data.rt[0].tableIndex
+                        vm.data_left = response.data.rt[0].fieldList
+                        vm.data_left.forEach((ele,index)=>{
+                            if(index == 0){
+                                vm.$set(ele,'checked',true)
+                            }else{
+                                vm.$set(ele,'checked',false)
+                            }
+                        })
+                        vm.addField()
+                    }
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                vm.fullscreenLoading =false
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        changeFL(key,length){
+            var vm = this
+            if(length == 5){
+                if(vm.list_filter[key].val == 1){
+                    vm.list_filter[key+1].show = true
+                }else{
+                    for(var i = key+1;i<length;i++){
+                        vm.list_filter[i].show = false
+                        vm.list_filter[i].val = 0
+                    }
+                }
+            }else if(length == 3){
+                if(vm.list_order[key].val == 1){
+                    vm.list_order[key+1].show = true
+                }else{
+                    for(var i = key+1;i<length;i++){
+                        vm.list_order[i].show = false
+                        vm.list_order[i].val = 0
+                    }
+                }
+            }
+            
+        },
+        back(){
+            var vm = this
+            vm.$emit('back')
+        },
+        changeTopExpend(){
+            var vm = this
+            vm.topExpend.isExpend = !vm.topExpend.isExpend
+            vm.topExpend.title = vm.topExpend.isExpend?'收起':'展开'
+        },
+        checkThisF(key){
+            var vm = this
+            vm
+            vm.data_right.forEach((val,index)=>{
+                if(index == key){
+                    val.checked = true
+                }else{
+                    val.checked = false
+                }
+            })
+        },
+        checkField(key){
+            var vm = this
+            vm.data_left[key].checked = !vm.data_left[key].checked
+        },
+        editField(index){
+            var vm  = this
+            if(vm.EditIndex == index){
+                 vm.EditIndex = -1
+            }else{
+                vm.EditIndex = index
+            }
+        },
+        shiftUp(){
+            var vm = this
+            if(vm.data_right.length <=1){
+                return false
+            }
+            for(var i=0;i<vm.data_right.length;i++){
+              if(vm.data_right[i].checked){
+                if(i<1)return false
+                var obj = {
+                    fieldCode: vm.data_right[i].fieldCode,
+                    fieldName:vm.data_right[i].fieldName,
+                    fieldType:vm.data_right[i].fieldType,
+                    tableType:vm.data_right[i].tableType,
+                    checked: true
+                }
+                vm.data_right.splice(i-1,0,obj)
+                vm.data_right.splice(i+1,1)
+                break
+              }
+            }
+        },
+        shiftDown(){
+            var vm = this
+            for(var i=0;i<vm.data_right.length;i++){
+              if(vm.data_right[i].checked){
+                if(i == vm.data_right.length-1)return false
+                var obj = {
+                    fieldCode: vm.data_right[i].fieldCode,
+                    fieldName:vm.data_right[i].fieldName,
+                    fieldType:vm.data_right[i].fieldType,
+                    tableType:vm.data_right[i].tableType,
+                    checked: true
+                }
+                vm.data_right.splice(i+2,0,obj)
+                vm.data_right.splice(i,1)
+                break
+              }
+            }
+        },
+        addField(){
+            var vm = this
+            var arr = []
+            vm.data_left.forEach((element,index) => {
+              if(element.checked){
+                  vm.data_right.push({
+                    fieldCode: element.fieldCode,
+                    fieldName:element.fieldName,
+                    fieldType:element.fieldType,
+                    tableType:element.tableType,
+                    checked: false
+                })
+              }else{
+                  arr.push(element)
+              }
+            })
+            vm.data_left = arr
+        },
+        removeField(index){
+            var vm = this
+            vm.data_left.push({
+                fieldCode: vm.data_right[index].fieldCode,
+                fieldName:vm.data_right[index].fieldName,
+                fieldType:vm.data_right[index].fieldType,
+                tableType:vm.data_right[index].tableType,
+                checked: false
+            })
+            vm.data_right.splice(index,1)
+        },
+        isNumber(input) {
+            var regInt = new RegExp("^[0-9]*$");
+            if(!/^[0-9]*$/.test(input) && !/^(-?\d+)(\.\d+)?$/.test(input)){  
+               return false;
+            }  
+            return true;
+        },
+        isDate(input) {
+            var result = input.match(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0?[13578])(-)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(0?2)(-)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(-)(0?2)(-)(29)$)|(^([3579][26]00)(-)(0?2)(-)(29)$)|(^([1][89][0][48])(-)(0?2)(-)(29)$)|(^([2-9][0-9][0][48])(-)(0?2)(-)(29)$)|(^([1][89][2468][048])(-)(0?2)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(0?2)(-)(29)$)|(^([1][89][13579][26])(-)(0?2)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(0?2)(-)(29)$))/);
+            if(result==null) {
+                return false;
+            }
+            return true;
+        },
+        isBoolean(input) {
+            if(input.toLocaleUpperCase() != "TRUE" && input.toLocaleUpperCase() != "FALSE") {
+                return false;
+            }
+            return true;
+        },
+    }
+})
+</script>
+
