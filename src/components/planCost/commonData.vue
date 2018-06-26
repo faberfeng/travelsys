@@ -15,7 +15,7 @@
                 <i class="detial icon"></i>明细基本信息
             </span>
              <span class="item-btn clearfix">
-                <label class="item-btn-icon icon-0" v-if="!isSnapshot && checkEditAuth">设计</label>
+                <label class="item-btn-icon icon-0" v-if="!isSnapshot && checkEditAuth" @click="editReport()">设计</label>
                 <label class="item-btn-icon icon-1" v-if="!isSnapshot" @click="showSnapshotBox()">快照</label>
                 <label class="item-btn-icon icon-2" @click="exportToExcel()">导出EXCEL</label>
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
@@ -24,41 +24,29 @@
         <table class="UserList" border="1" width='100%'>
             <thead>
                 <tr  class="userList-thead">
-                    <th style="border:none;width:100px;"></th>
-                    <th style="border:none;width:100px;"></th>
-                    <th style="border:none;width:100px;"></th>
+                    <th style="border:none;width:100px;" v-if="groupHead.monomer.length>0"></th>
+                    <th style="border:none;width:100px;" v-if="groupHead.partition.length>0"></th>
+                    <th style="border:none;width:100px;" v-if="groupHead.floor.length>0"></th>
                     <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item"></th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(val,index) in DatatableList" :key="index">
-                        <td ></td>
-                        <td ></td>
-                        <td colspan="1" :rowspan="4">楼层</td>
+                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
+                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
+                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
+                        <td  style="border-right:none;border-left: none;font-weight: bold;" v-for="(val_2,index_2) in val.level" :key="'kongge'+index_2" v-text="index_2==0?'小计':''"></td>
                         <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="index_1 < (val.list.length-1)"></td>
                         <td >
                             <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
                         </td>
-                        <!-- <td>数量</td>
-                        <td>111</td> -->
+                </tr>
+                <tr>
+                    <td :colspan="Footer.num" rowspan="1" style="font-weight: bold;">总计</td>
+                    <td style="" v-for="(item,index) in Footer.info" :key="index+'footer'" v-text="item"></td>
                 </tr>
             </tbody>
-             <!-- <tbody>
-                <tr v-for="(val,index) in DatatableList" :key="index">
-                        <td colspan="1" :rowspan="DatatableList.length" v-if="index == 0">项目</td>
-                        <td colspan="1" :rowspan="5" v-if="index == 0">分区1</td>
-                        <td colspan="1" :rowspan="DatatableList.length-5" v-if="index == 5">分区2</td>
-                        <td colspan="1" :rowspan="2" v-if="index == 0">楼层</td>
-                        <td colspan="1" :rowspan="3" v-if="index == 2">楼层</td>
-                        <td colspan="1" :rowspan="4" v-if="index == 5">楼层</td>
-                        <td colspan="1" :rowspan="4" v-if="index == 9">楼层</td>
-                        <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="index_1 < (val.list.length-1)"></td>
-                        <td >
-                            <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
-                        </td>
-                </tr>
-            </tbody> -->
         </table>
     </div>
       <div v-if="showSnapshot"  id="edit" class="dialog">
@@ -587,8 +575,16 @@ export default Vue.component('common-list',{
         fullscreenloading:false,
         ManifestInfo:{},//清单基本信息
         detailsHead:[],
-        groupHead:[],
+        groupHead:{
+            monomer:[],//单体
+            partition:[],//分区
+            floor:[]//楼层
+        },
         DatatableList:[],//明细基本信息
+        Footer:{
+            num:0,
+            info:{}
+        },
         showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
         dataName:'',//数据列表名称
         showSnapshot:false,
@@ -608,7 +604,6 @@ export default Vue.component('common-list',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        console.log(JsonData)
         vm.getIntoList()
   }, 
   mounted(){
@@ -632,6 +627,10 @@ export default Vue.component('common-list',{
       },
   },
   methods:{
+      editReport(){
+          var vm = this
+          vm.$emit('toedit')
+      },
       exportToExcel(val){
         var vm = this
         if(val){
@@ -734,44 +733,77 @@ export default Vue.component('common-list',{
                 vm.dataName = response.data.rt.reportName
                 vm.DatatableList = []
                 vm.detailsHead = []
-                vm.groupHead = []
+                vm.groupHead.monomer = []
+                vm.groupHead.partition = []
+                vm.groupHead.floor = []
                 var titleLength = 0
                 if(response.data.rt.rowList != null){
-                    // response.data.rt.rowList.forEach((element,index)=>{
-                    //     if(element.rowType == 'ROW_TITLE'){
-                    //         vm.detailsHead = element.infoList
-                    //         titleLength = element.infoList.length
-                    //     }else if(element.rowType == 'ROW_GROUP'){
-                    //         vm.groupHead = element.infoList
-                    //     }else if(element.rowType == 'ROW_CONTENT'){
-                    //          vm.DatatableList.push({
-                    //              'list':element.infoList,
-                    //              'info':vm.parseInfo(element.infoList[titleLength])
-                    //         })
-                    //     }
-                    // })
+                    var rowLenth = JsonData.rt.rowList.length
+
+                    /**
+                     * 定义 单体小计数组 monomer_summary
+                     * partition_summary
+                     * floor_summary
+                     * **/
+                    var monomer_summary = [],partition_summary = [],floor_summary = []
                     JsonData.rt.rowList.forEach((element,index)=>{
                         if(element.rowType == 'ROW_TITLE'){
                             vm.detailsHead = element.infoList
                             titleLength = element.infoList.length
                         }else if(element.rowType == 'ROW_GROUP'){
+                            var ROW_GROUP_length = vm.findChild(element.id,JsonData.rt.rowList)
+                            console.log(ROW_GROUP_length)
+                            element.length = ROW_GROUP_length
                             if(element.groupLevel == 1){//单体
-                            
+                                 vm.groupHead.monomer.push(element)
                             }else if(element.groupLevel == 2){//分区
-
+                                 vm.groupHead.partition.push(element)
                             }else if(element.groupLevel == 3){//楼层
-
+                                 vm.groupHead.floor.push(element)
                             }
-                            vm.groupHead = element.infoList
                         }else if(element.rowType == 'ROW_CONTENT'){
                              vm.DatatableList.push({
-                                 'list':element.infoList,
-                                 'info':vm.parseInfo(element.infoList[titleLength])
+                                'list':element.infoList,
+                                'level':element.groupLevel
                             })
+                        }else if(element.rowType == 'ROW_SUMMARY'){
+                            if(element.groupLevel == 1){//单体 的 小计
+                                 monomer_summary.push(element)
+                            }else if(element.groupLevel == 2){//分区 的 小计
+                                 partition_summary.push(element)
+                            }else if(element.groupLevel == 3){//楼层 的 小计
+                                 floor_summary.push(element)
+                            }else if(element.groupLevel == 0){ //总计
+                                var totalFooterNum = 1
+                                if(vm.groupHead.floor.length>0){
+                                    totalFooterNum++
+                                }
+                                if(vm.groupHead.partition.length>0){
+                                    totalFooterNum++
+                                }
+                                if(vm.groupHead.monomer.length>0){
+                                    totalFooterNum++
+                                }
+                                vm.Footer.num = totalFooterNum
+                                vm.Footer.info= element.infoList
+                            }
                         }
                     })
-                }
 
+                    /**
+                     * 查看各个小计数组，
+                     * 确定插入总列表的方式
+                     * 并对层级做标记
+                     * ***/
+                    if(floor_summary.length>0)vm.appendSummary(floor_summary)
+                    if(partition_summary.length>0)vm.appendSummary(partition_summary)
+                    if(monomer_summary.length>0)vm.appendSummary(monomer_summary)
+                    //  Foorer:{
+                    //     num:0,
+                    //     info:{}
+                    // },
+                }
+                console.log(vm.groupHead)
             }else{
                 vm.$message({
                     type:'error',
@@ -782,6 +814,54 @@ export default Vue.component('common-list',{
         }).catch((err)=>{
             console.log(err)
         })
+    },
+    /**
+     * 查看各个小计数组，
+     * 确定插入总列表的方式
+     * 并对层级做标记
+     * ***/
+    appendSummary(obj){
+        var vm = this
+        var length = 0
+        obj.forEach((ele,index)=>{
+            length += vm.findChild(ele.parentId,JsonData.rt.rowList,0)
+            vm.DatatableList.splice(length,0,{
+                 'list':ele.infoList,
+                 'level':vm.handelLevel(ele.groupLevel)
+            })
+            length++
+        })      
+        console.log(vm.DatatableList)
+    },
+    handelLevel(level){
+        switch(level){
+            case 1:
+              return 3;
+            case 2:
+              return 2; 
+            case 3:
+              return 1; 
+        }
+    },
+    /***
+     * @param id 父节点的id
+     * @param obj 查询的数组
+     * @returns length 
+     * 
+     * ****/
+    findChild(id,obj,length=0){
+        var vm = this
+        if(obj.length == 0)return 0
+        obj.forEach(ele=>{
+            if(ele.parentId && ele.parentId == id){
+                if(ele.rowType == 'ROW_CONTENT' || ele.rowType == 'ROW_SUMMARY'){
+                     length++
+                }else{
+                    length += vm.findChild(ele.id,obj,length)
+                }
+            }
+        })
+        return length
     },
     parseInfo(val){
         return JSON.stringify(val)

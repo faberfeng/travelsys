@@ -65,7 +65,7 @@
 
                      <span class="item-title">类型</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box" v-model="value_type" @change="initFiled">
+                        <select name="" id="" class="value-box" v-model="value_type" @change="initFiled(true)">
                             <option v-for="(item,index) in options_type" :key="index" :value="item.tableIndex" v-text="item.tableName"  ></option>
                         </select>
                         <i class="icon-sanjiao"></i>
@@ -287,8 +287,8 @@
                             </select>
                             <i class="icon-sanjiao"></i>
                         </span>
-                         <span class="item-container" style="width:110px;" v-if="tableWidth == '100%'">
-                            <input type="text" class="value-box" v-model="tableWidthVal" placeholder="请输入">
+                         <span class="item-container" style="width:110px;" v-if="tableWidth == 'fixed'">
+                            <input type="number" class="value-box" v-model="tableWidthVal" placeholder="请输入">
                         </span>
                     </p>
                     <p class="clearfix">
@@ -1076,7 +1076,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 export default Vue.component('common-edit',{
-    props:[],
+    props:['rcId'],
     data(){
         const filter = (length)=>{
             const data = [];
@@ -1115,7 +1115,7 @@ export default Vue.component('common-edit',{
             EditIndex:-1,
             /*以下为后期添加数据*/
             rcName:'',
-            rcId:0,
+            // rcId:0,
             options_monomer:[],//单体选项
             options_monomer_pre:[],
             options_partition:[],//分区选项
@@ -1189,9 +1189,113 @@ export default Vue.component('common-edit',{
         vm.getList()
     },
     methods:{
+        getReportData(){
+            var vm = this
+            // rc: rc,
+            // fieldList: fieldList,
+            // fieldFilterList: fieldFilterList,
+            // fieldGroupList: fieldGroupList,
+            // rcStyle: rcStyle,
+           
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/report/rc/'+vm.rcId,
+                headers:{
+                    token:vm.token
+                },
+            }).then(response=>{
+                 if(response.data.cd == 0){
+                    if(response.data.rt != null){
+                        vm.rcName = response.data.rt.rcName//报表名称
+                        vm.value_type = response.data.rt.rcTableName//表名 筛选 - 类型
+                        vm.initFiled(false)
+                        vm.displayType = response.data.rt.displayType == 0?true:false//数据相同时合并多行
+                        vm.displayTotal = response.data.rt.displayTotal == 0?true:false//显示总计
+                        vm.titlePosition = response.data.rt.groupPosition+''//报表名称
+
+                        vm.data_right = []
+                        if(response.data.rt.fieldList != null && response.data.rt.fieldList.length>0){
+                            response.data.rt.fieldList.forEach(ele=>{
+                                for(var i=0;i<vm.data_left.length;i++){
+                                    if(ele.fieldCode == vm.data_left[i].fieldCode){
+                                        vm.$set(vm.data_left[i],'checked',true)
+                                        break
+                                    }
+                                }
+                            })
+                            vm.addField()
+                        }
+                       
+                        var length = response.data.rt.filterList.length
+                        if(length>0){
+                            response.data.rt.filterList.forEach((element,index)=>{
+                                vm.list_filter[index].build_name = element.fieldCode
+                                vm.list_filter[index].val = 1
+
+                                vm.list_filter[index].filtercontent = element.fieldSearchContent
+                                vm.list_filter[index].filtertype = element.fieldSearchType
+                                vm.list_filter[index].show = true
+                            })
+                            vm.list_filter[length-1].val = 0
+                        }
+                    //       key: i,
+                    // val:0,
+                    // build_name:'nofield',
+                    // ordertype:'ACENding',
+                    // grouptype:'NONE_GROUP',
+                    // filtertype:'',
+                    // filtercontent:'',
+                    // show:i == 0?true:false,
+                    // disabled: i >= 4?true:false
+
+                        if(response.data.rt.groupList != null && response.data.rt.groupList.length>0){
+                            response.data.rt.groupList.forEach((element,index)=>{
+                                vm.list_order[index].build_name = element.fieldCode
+                                vm.list_order[index].val = 1
+
+                                vm.list_order[index].ordertype = element.fieldOrderType
+                                vm.list_order[index].grouptype = element.fieldGroupType
+                                vm.list_order[index].show = true
+                            })
+                            var length_list_order = response.data.rt.groupList.length
+                            vm.list_order[length_list_order-1].val = 0
+                        }
+                        vm.styleShowTitle = response.data.rt.rcStyle.showTitle == 0?false:true
+                        vm.titleName = response.data.rt.rcStyle.titleName
+                        vm.titleUseReportName = response.data.rt.rcStyle.titleUseReportName == 0?false:true
+                        vm.titleFontSize = response.data.rt.rcStyle.titleFontSize
+                        vm.titleAlign = response.data.rt.rcStyle.titleAlign
+                        vm.titleUseBorder = response.data.rt.rcStyle.titleUseBorder == 0?false:true
+
+                        vm.titleBorderHeight = response.data.rt.rcStyle.titleBorderHeight
+                        vm.titleBgColor = response.data.rt.rcStyle.titleBgColor
+                        vm.tableFontSize = response.data.rt.rcStyle.tableFontSize
+                        vm.tableLineHeight = response.data.rt.rcStyle.tableRowHeight
+                        if(response.data.rt.rcStyle.tableWidth == '100%'){
+                            vm.tableWidth = response.data.rt.rcStyle.tableWidth
+                        }else{
+                             vm.tableWidth = 'fixed'
+                            vm.tableWidthVal = response.data.rt.rcStyle.tableWidth
+                        }
+                        
+                        vm.tableAlign = response.data.rt.rcStyle.tableAlign
+                        vm.showTableNet = response.data.rt.rcStyle.tableBorderWidth
+                        vm.tableTitleBgColor = response.data.rt.rcStyle.tableTitleBgColor
+                        vm.tableGroupBgColor = response.data.rt.rcStyle.tableGroupBgColor
+                    }
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         saveForm(needCount){
             var vm = this
-            var rcId = 0
+            var rcId = vm.rcId
             vm.fullscreenLoading =true
 
             needCount = needCount || false
@@ -1388,11 +1492,28 @@ export default Vue.component('common-edit',{
                 },
             }).then(response=>{
                 if(response.data.cd == 0){
+                     var msg = ''
+                    if(rcId == 0){
+                        msg = '创建报表成功！'
+                    }else{
+                        msg = '修改报表成功！'
+                    }
+                   
                     vm.$message({
                         type:'success',
-                        message:'创建报表成功！'
+                        message:msg
                     })
-                    vm.back()
+                    if(needCount){
+                        var params = {
+                            showData:true,
+                            rcid:response.data.rt
+                        }
+                    }else{
+                         var params = {
+                            showData:false
+                        }
+                    }
+                    vm.$emit('aftersave',params)
                 }else{
                     vm.$message({
                         type:'error',
@@ -1430,7 +1551,7 @@ export default Vue.component('common-edit',{
             return result
         },
 
-        initFiled(){
+        initFiled(isClear){
             var vm = this
             for(var i=0;i<vm.options_type.length;i++){
                 if(vm.options_type[i].tableIndex == vm.value_type){
@@ -1443,7 +1564,9 @@ export default Vue.component('common-edit',{
                             vm.$set(ele,'checked',false)
                         }
                     })
-                    vm.addField()
+                    if(isClear){
+                       vm.addField()
+                    }
                     break
                 }
             }
@@ -1474,7 +1597,11 @@ export default Vue.component('common-edit',{
                                 vm.$set(ele,'checked',false)
                             }
                         })
-                        vm.addField()
+                        if(vm.rcId && vm.rcId != 0){
+                            vm.getReportData()
+                        }else{
+                            vm.addField()
+                        }
                     }
                 }else{
                     vm.$message({

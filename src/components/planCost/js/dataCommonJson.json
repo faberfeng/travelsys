@@ -110,23 +110,69 @@
           "id": 6,
           "rowType": "ROW_SUMMARY",
           "groupType": "",
-          "groupLevel": 0,
+          "groupLevel": 1,
           "entitiesSummary": null,
           "infoList": [
-            "总计 : 273"
+            "小计开始数据",
+            "默认分区",
+            "2F",
+            "梁",
+            "混凝土 - 矩形梁",
+            "300x600",
+            "79"
           ],
-          "parentId": 3
+          "parentId": 1
         },
         {
           "id": 7,
           "rowType": "ROW_SUMMARY",
           "groupType": "",
+          "groupLevel": 2,
+          "entitiesSummary": null,
+          "infoList": [
+            "小计开始数据",
+            "默认分区",
+            "2F",
+            "梁",
+            "混凝土 - 矩形梁",
+            "300x600",
+            "79"
+          ],
+          "parentId": 2
+        },
+        {
+          "id": 8,
+          "rowType": "ROW_SUMMARY",
+          "groupType": "",
+          "groupLevel": 3,
+          "entitiesSummary": null,
+          "infoList": [
+            "小计开始数据",
+            "默认分区",
+            "2F",
+            "梁",
+            "混凝土 - 矩形梁",
+            "300x600",
+            "79"
+          ],
+          "parentId": 3
+        },
+        {
+          "id": 9,
+          "rowType": "ROW_SUMMARY",
+          "groupType": "",
           "groupLevel": 0,
           "entitiesSummary": null,
           "infoList": [
-            "总计 : 273"
+            "总计开始数据",
+            "默认分区",
+            "2F",
+            "梁",
+            "混凝土 - 矩形梁",
+            "300x600",
+            "79"
           ],
-          "parentId": 2
+          "parentId": 0
         }
       ]
     }

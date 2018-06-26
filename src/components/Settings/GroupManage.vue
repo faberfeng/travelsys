@@ -118,7 +118,6 @@
 </template>
 <script>
 import axios from 'axios'
-import index from '../../../node_modules/_vue@2.5.16@vue';
 export default {
   name:'',
     data(){

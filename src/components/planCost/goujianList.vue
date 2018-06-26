@@ -53,7 +53,7 @@
                             <td v-text="initData(val.updateTime)"></td>
                              <td v-text="val.updateUser"></td>
                             <td >
-                                <button class="editBtn actionBtn" title="设计"  @click="edit(val)" ></button>
+                                <button class="editBtn actionBtn" title="设计"  @click="editReport(val)" ></button>
                                 <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rcId,true)" ></button>
                             </td>
@@ -218,11 +218,11 @@
             </div>
         </div>
         <!--下面是创建编辑报表的编码-->
-        <common-edit v-on:back="backToH" v-if="showCommonEdit"></common-edit>
+        <common-edit v-on:back="backToH" v-on:aftersave="refrehPage($event)" v-if="showCommonEdit" :rcId='checkItem.rcId'></common-edit>
         <!--下面是报表清单的编码-->
         <common-list v-on:back="backToH" :mId="checkItem.rssId" :title="'构件量清单'" v-if="showCommonList"></common-list>
         <!--下面是报表数据的编码-->
-        <common-data v-if="showCommonData" v-on:back="backToH" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
+        <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
     </div>
     <div id="edit">
 
@@ -597,12 +597,37 @@ export default {
         showEdit(){
             var vm = this
             vm.showCommonEdit = true
+            vm.checkItem.rcId = 0
         },
-         backToH(){
+        backToH(){
             var vm = this
             vm.showCommonEdit = false
             vm.showCommonList = false
             vm.showCommonData = false
+        },
+        refrehPage(event){
+            var vm = this
+            console.log(event)
+            if(event != null){
+                if(event.showData){
+                    vm.backToH()
+                    if(event.rcid != null)vm.checkItem.rcId = event.rcid
+                    vm.showCommonData = true
+                }else{
+                    vm.backToH()
+                }
+            }
+            vm.getRealTimeList()
+        },
+        editReportFromData(){
+            var vm = this
+            vm.backToH()
+            vm.showCommonEdit = true
+        },
+        editReport(val){
+            var vm = this
+            vm.checkItem = val
+            vm.showCommonEdit = true
         },
         showData(val){
             var vm = this
