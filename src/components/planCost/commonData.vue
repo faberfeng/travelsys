@@ -21,9 +21,12 @@
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>
         </p>
-        <table class="UserList" border="1" width='100%'>
-            <thead>
-                <tr  class="userList-thead">
+        <table :class="['UserList',rcStyle.tableBorderWidth == '0'?'noBorder':'',rcStyle.tableAlign == 'center'?'textCenter':'',]"  border="1" width='100%'>
+            <thead v-show="rcStyle.showTitle != 0" :style="{'backgroundColor':rcStyle.tableTitleBgColor}">
+                 <tr :class="['userList-thead',rcStyle.tableBorderWidth == '0'?'noBorder':'',rcStyle.titleAlign == 'center'?'textCenter':'',]"  :style="{'backgroundColor':rcStyle.titleBgColor,'fontSize':rcStyle.titleFontSize+'px'}">
+                    <th rowspan="1" :colspan="4+detailsHead.length" v-text="rcStyle.titleName"></th>
+                </tr>
+                <tr  class="userList-thead" style="font-size:14px;">
                     <th style="border:none;width:100px;" v-if="groupHead.monomer.length>0"></th>
                     <th style="border:none;width:100px;" v-if="groupHead.partition.length>0"></th>
                     <th style="border:none;width:100px;" v-if="groupHead.floor.length>0"></th>
@@ -31,18 +34,18 @@
                     <th>操作</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody :style="{'fontSize':rcStyle.tableFontSize+'px'}">
                 <tr v-for="(val,index) in DatatableList" :key="index">
-                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
-                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
-                        <td colspan="1" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
+                        <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
+                        <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
+                        <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
                         <td  style="border-right:none;border-left: none;font-weight: bold;" v-for="(val_2,index_2) in val.level" :key="'kongge'+index_2" v-text="index_2==0?'小计':''"></td>
                         <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="index_1 < (val.list.length-1)"></td>
                         <td >
                             <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
                         </td>
                 </tr>
-                <tr>
+                <tr :style="{'backgroundColor':rcStyle.tableTitleBgColor}">
                     <td :colspan="Footer.num" rowspan="1" style="font-weight: bold;">总计</td>
                     <td style="" v-for="(item,index) in Footer.info" :key="index+'footer'" v-text="item"></td>
                 </tr>
@@ -227,6 +230,7 @@
                 }
                 
             }
+         
             .UserList{
                 border-collapse: collapse;
                 border: 1px solid #e6e6e6;
@@ -254,7 +258,6 @@
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
                         color: #333333;
                         font-weight: normal;
                     }
@@ -268,7 +271,6 @@
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
                             color: #333333;
                             .location{
                                 display: block;
@@ -298,6 +300,18 @@
                             color: #fff!important;
                         }
                     }
+                }
+            }
+            .noBorder{
+                border: none!important;
+                th,td{
+                      border: none!important;
+                }
+            }
+            .textCenter{
+                text-align: center!important;
+                th,td{
+                       text-align: center!important;
                 }
             }
             .header{
@@ -590,6 +604,7 @@ export default Vue.component('common-list',{
         showSnapshot:false,
         snapShotName:'',
         relaId:'',//关系ID
+        rcStyle:{},
       }
   },
   created(){
@@ -730,6 +745,7 @@ export default Vue.component('common-list',{
             },
         }).then(response=>{
             if(response.data.cd == 0){
+                vm.rcStyle = response.data.rt.rcStyle
                 vm.dataName = response.data.rt.reportName
                 vm.DatatableList = []
                 vm.detailsHead = []

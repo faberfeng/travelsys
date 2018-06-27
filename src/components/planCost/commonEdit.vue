@@ -334,7 +334,7 @@
                         </span>
                     </p>
                      <p class="clearfix">
-                        <span class="item-title">显示网络</span>
+                        <span class="item-title">显示网格</span>
                         <span class="item-container">
                             <select name="" v-model="showTableNet" class="value-box">
                                 <option selected="selected" value="0">不显示</option>
