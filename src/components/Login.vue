@@ -5,7 +5,7 @@
                 <div class="firstTitle">
                     <span class="firstTitleText">BDMS建筑数据管理系统 </span> 
                     <span class="sendTitle">工程建设全过程项目管理系统</span></div>
-                <button class="registerBtn">注册</button>
+                <!-- <button class="registerBtn">注册</button> -->
             </div>
         </div>
         <div class="loginBody">
@@ -35,86 +35,82 @@ import axios from 'axios';
 import md5 from 'js-md5';
 
 export default {
-  name: 'Login',
-  data(){
-      return {
-          login:{
-              Id:'',
-              Password:''
-          },
-          checked:false,
-          BDMSUrl:'',
-          projectData:{},
-          token:'',
-          isAuto:false
-      }
-  },
-  created(){
-      var vm = this;
-      const token = localStorage.getItem('token') 
-      vm.BDMSUrl = vm.$store.state.BDMSUrl
-      var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
-      if(defaultSubProjId != 'undefined'){
-          localStorage.removeItem('defaultSubProjId')
-      }
-      if(token != 'undefined'){
-          vm.token = token
-          //判断是否登陆
-           this.BeforeLogin()
-      }
-  },
-  methods:{
+    name: 'Login',
+    data(){
+        return {
+            login:{
+                Id:'',
+                Password:''
+            },
+            checked:false,
+            BDMSUrl:'',
+            projectData:{},
+            token:'',
+            isAuto:false
+        }
+    },
+    created(){
+        var vm = this;
+        const token = localStorage.getItem('token') 
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
+        if(defaultSubProjId != 'undefined'){
+            localStorage.removeItem('defaultSubProjId')
+        }
+        if(token != 'undefined'){
+            vm.token = token
+            //判断是否登陆
+            this.BeforeLogin()
+        }
+    },
+    methods:{
         BeforeLogin(){
-          var vm = this
-          axios({
-              method:'Get',
-              url:vm.BDMSUrl+'project2/login',
-              headers:{
-                  'content-type':'application/json;charset=UTF-8',
-                   'token':vm.token
-              },
-          }).then((response)=>{
-             // console.log(response)
-              if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
-                 vm.$router.push({
-                     path:'/showcompany'
-                 })
-              }
-          })
+        var vm = this
+        axios({
+            method:'Get',
+            url:vm.BDMSUrl+'project2/login',
+            headers:{
+                'content-type':'application/json;charset=UTF-8',
+                'token':vm.token
+            },
+        }).then((response)=>{
+            if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
+                    vm.$router.push({
+                        path:'/showcompany'
+                    })
+                }
+            })
         },
-      Login(){
-            
-          this.login.Password = md5(this.login.Password);
-          axios({
-              method:'Post',
-              url:this.BDMSUrl+'project2/login',
-              headers:{
-                  'content-type':'application/json;charset=UTF-8',
+        Login(){
+            this.login.Password = md5(this.login.Password);
+            axios({
+              method: 'Post',
+              url: this.BDMSUrl + 'project2/login',
+              headers: {
+                'content-type': 'application/json;charset=UTF-8',
               },
-              params:{
-                  'account':this.login.Id,
-                  'isRemember':this.isAuto,
-                  'password':this.login.Password
+              params: {
+                'account': this.login.Id.trim(),
+                'isRemember': this.isAuto,
+                'password': this.login.Password.trim()
               }
-          }).then((response)=>{
+            }).then((response) => {
               this.projectData = response.data;
-              if(this.projectData.cd === '10004'){
-                  localStorage.setItem('token',this.projectData.rt.session.onlineInfo.tokenId);
-                  localStorage.setItem('username',this.projectData.rt.session.onlineInfo.userName);
-                  localStorage.setItem('userid',this.projectData.rt.session.onlineInfo.userId);
-                  this.$router.push({
-                      path:'/showcompany'
-                  })
-              }else if(this.projectData.cd === '10003'){
-                  alert(this.projectData.msg)//密码不正确
-              }else if(this.projectData.cd === '10000'){
-                  alert(this.projectData.msg)//账号不存在
+              if (this.projectData.cd === '10004') {
+                localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
+                localStorage.setItem('username', this.projectData.rt.session.onlineInfo.userName);
+                localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
+                this.$router.push({
+                  path: '/showcompany'
+                })
+              } else if (this.projectData.cd === '10003') {
+                alert(this.projectData.msg) //密码不正确
+              } else if (this.projectData.cd === '10000') {
+                alert(this.projectData.msg) //账号不存在
               }
-              console.log(this.projectData);
-          })
-
-      }
-  }
+            })
+        }
+    }
 }
 </script>
 <style lang='less'>
@@ -320,6 +316,7 @@ export default {
             width: 280px;
             margin: 15px auto 0;
             overflow: auto;
+            height: 20px;
         }
         .loginInfo .loginInfoLeft,.loginInfo .loginInfoRight{
             color: #42ace5;
