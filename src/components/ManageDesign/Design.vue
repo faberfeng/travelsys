@@ -253,7 +253,6 @@
                 </ul>
             </div>
             <div id="box-right-1" v-else>
-                333
             </div>
         </div>
       <div id="edit">

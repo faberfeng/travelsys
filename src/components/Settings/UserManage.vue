@@ -18,7 +18,7 @@
                         <th width="15%">名称</th>
                         <th width="20%">账号</th>
                         <th width="10%">工程管理员</th>
-                        <th width="15%;">以被分配到的岗位</th>
+                        <th width="15%;">已被分配到的岗位</th>
                          <th width="16%">添加时间</th>
                         <th width="12%;">添加人</th>
                          <th width="12%">操作</th>
@@ -30,7 +30,7 @@
                         <td v-text="val.account"></td>
                         <td v-text="val.isAdmin ==2?'是':'不是'"></td>
                         <td>
-                            <span v-for="(item,key) in val.userPositions" :key="key" v-text="item.posName"></span>
+                            <span v-for="(item,key) in val.userPositions" :key="key" v-text="item.posName+(key<val.userPositions.length-1?'、':'')"></span>
                         </td>
                          <td v-text="val.addTimeStr"></td>
                         <td v-text="val.addUser"></td>
