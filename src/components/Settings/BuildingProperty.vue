@@ -1083,6 +1083,7 @@ export default {
         font-size: 12px;
         display: inline-block;
         border-radius: 32px;
+        outline: none;
     }
     .pTable{
         display: inline-block;

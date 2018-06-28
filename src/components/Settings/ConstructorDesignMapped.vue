@@ -433,7 +433,7 @@ export default {
                     number = index;
                 }
             })
-            this.getKeyTypeData(this.retiveData[number].revitCategory,this.retiveData[number].id);
+            this.getKeyTypeData(this.retiveData[number].revitCategory);
 
             this.keyTypeVal = this.constructorData[num].keyType;//关键字类型
 
@@ -485,7 +485,7 @@ export default {
                         var totalObject = this.totalConstructorData;
                         totalObject.splice(this.editUserNum,1);
                         var keyword = totalObject.some(item=>{
-                            if(item.chsCategory == this.revitCategory && item.keyType == keyTypeName && item.keyWord.includes(this.keyWord)){
+                            if(item.chsCategory == this.revitCategory || item.keyType == keyTypeName || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
                                 return true;
                             }else{
                                 return false;
@@ -706,7 +706,7 @@ export default {
                                 revitCa = "Planting";
                             }
                             var keyword = this.totalConstructorData.some(item=>{
-                                if(item.chsCategory == this.revitCategory && item.keyType == value && item.keyWord.includes(this.keyWord)){
+                                if(item.chsCategory == this.revitCategory || item.keyType == value || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
                                     return true;
                                 }else{
                                     return false;
@@ -825,7 +825,7 @@ export default {
                     number = index;
                 }
             })
-           this.getKeyTypeData(this.retiveData[number].revitCategory,this.retiveData[number].id);
+           this.getKeyTypeData(this.retiveData[number].revitCategory);
         },
         //根据族 获取关键词类型
         getKeyTypeData(rev,id){
@@ -838,10 +838,9 @@ export default {
                 },
                 params:{
                     revitCategory:rev,
-                    projId:this.projId,
-                    pkId:id
                 }
             }).then((response)=>{
+                console.log(response);
                 var obj = response.data.rt;
                 for(let item of Object.values(obj)){
                     this.keyTypeData.push({

@@ -241,7 +241,7 @@ export default {
             }else{
                 if(reg.test(this.FloorValue)){
                     var flag = this.florData.some(item=>{
-                        if(item.Name == this.FloorName){
+                        if(item.Name == this.FloorName ||item.BottomHeight == this.FloorValue){
                             return true;
                         }else{
                             return false;
@@ -301,8 +301,6 @@ export default {
             }else{
                 this.isDisabled = false;
             }
-            // this.floorScope = scope;
-            console.log(scope)
             if(scope.row.BottomHeight == '最小值'){
                 this.disableShowEdit = true;
             }else{
@@ -502,7 +500,6 @@ export default {
                             index:index
                         })
                     });
-                    console.log(this.florData)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{

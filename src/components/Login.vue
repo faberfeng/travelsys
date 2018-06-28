@@ -83,6 +83,7 @@ export default {
         },
         Login(){
             this.login.Password = md5(this.login.Password);
+            var isHege = false;
             axios({
               method: 'Post',
               url: this.BDMSUrl + 'project2/login',
@@ -92,7 +93,7 @@ export default {
               params: {
                 'account': this.login.Id.trim(),
                 'isRemember': this.isAuto,
-                'password': this.login.Password.trim()
+                'password': this.login.Password
               }
             }).then((response) => {
               this.projectData = response.data;
