@@ -76,7 +76,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="groundSource groundTitle">
+        <div class="groundSource groundTitle" style="margin-bottom:30px;">
            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addSource" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="groundSourceData" style="width:100%">
@@ -96,10 +96,9 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <div class="pagenation">   
+                <!-- <div class="pagenation">   
                     <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
-                </div>
-                
+                </div> -->
             </div>
         </div>
         </div>

@@ -48,7 +48,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="flor">
+        <div class="flor" style="margin-bottom:30px;">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
                 <el-table :data="sourceData" border class="table"  style="width:100%">
@@ -70,14 +70,14 @@
                     </el-table-column>
                 </el-table>
             </div>
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <el-pagination
                 :page-sizes="[10, 20, 30, 40]"
                 :page-size="100"
                  layout="total, sizes, prev, pager, next, jumper"
                 :total="199">
                 </el-pagination>
-            </div>
+            </div> -->
         </div>
         <!--dialog-->
         <div id="edit">

@@ -1813,11 +1813,9 @@ export default {
             }
 
             if(this.showConvenienceType == 10000){
-                this.jiLiangCondition = '';
-                this.jiLiangCondition = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+                this.jiLiangCondition += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }else if(this.showConvenienceType == 20000){
-                this.jiLiangResult = '';
-                this.jiLiangResult = this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+                this.jiLiangResult += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }
             var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
             this.addProjectMappingData.forEach((item,index)=>{

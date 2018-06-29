@@ -1017,9 +1017,7 @@ export default {
                 if(isNaN(this.newCode)){
                     alert(`新建编码必须为数字!`);
                 }else{
-                    console.log(this.editObject)
                     this.getItemNumber(this.constructorData,this.totalCode);
-                    console.log(this.addIsTrue);
                     if(this.addIsTrue && this.totalCode != this.editObject.row.number){
                         alert('编码已经存在,不能添加!');
                         this.addIsTrue = false;
@@ -2925,7 +2923,7 @@ export default {
                             //this.$set(item,'valueType_',this.judgeValueType(item.valueType))
                             //this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
                         })
-                        console.log(this.addProjectMappingData)
+                        //console.log(this.addProjectMappingData)
                     }
                 }else if (response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -3088,7 +3086,6 @@ export default {
         },
         //显示快捷输入面板
         showConvenience(scope){
-            console.log(scope)
             this.showConvenienceObject = scope;
             this.showConvenienceType = scope;
             this.convenientInput = true;
@@ -3096,7 +3093,11 @@ export default {
         },
         saveConvenient(type){
             //jiLiangCondition
+            console.log(this.inputGouJianType)
+            console.log(this.inputGouJianCalculate)
+            console.log(this.inputGouJianFunction)
             if(this.inputGouJianType.length != 0){
+                console.log(this.inputGouJianType)
                 this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
             }else {
                 this.inputGouJianType = '';
@@ -3272,6 +3273,9 @@ export default {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        .zk-table__body-wrapper{
+            overflow: hidden!important;
         }
         .tableInputClass{
             margin: 0 30px;
