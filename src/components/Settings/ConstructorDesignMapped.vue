@@ -460,7 +460,7 @@ export default {
             })
             this.keyWord = this.constructorData[num].keyWord;//包含关键字
             this.goujianType = this.constructorData[num].genieClassName;//构件类别
-             this.editListShow = true;
+            this.editListShow = true;
         },
         //编辑确定
         editListSure(){
@@ -483,16 +483,21 @@ export default {
                     }else{
                         //编辑时，不对自己做检验
                         var totalObject = this.totalConstructorData;
-                        totalObject.splice(this.editUserNum,1);
+                        //var numIndex = this.pageDetial.pagePerNum*(this.pageDetial.currentPage-1)+this.editUserNum;
+                        totalObject.forEach((item,index)=>{
+                            if(item.pkId == this.constructorData[this.editUserNum].pkId){
+                                totalObject.splice(index,1);
+                            }
+                        })
                         var keyword = totalObject.some(item=>{
-                            if(item.chsCategory == this.revitCategory || item.keyType == keyTypeName || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
+                            if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
                                 return true;
                             }else{
                                 return false;
                             }
                         })
                         if(keyword){
-                            alert('关键字已经存在或关键字是已存在关键字的子集，不能添加！');
+                            alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！');
                         }else{
                             axios({
                                 method:'post',
@@ -584,7 +589,7 @@ export default {
                             }
                             else if(this.revitCategory == '场地构件'){
                                 revitCa = "Site";
-                            }else if(this.revitCategory == '橱柜'){
+                            }else if(this.revitCategory == '厨柜'){
                                 revitCa = "Casework";
                             }else if(this.revitCategory == '窗'){
                                 revitCa = "Windows";
@@ -615,9 +620,9 @@ export default {
                             }else if(this.revitCategory == '风管附件'){
                                 revitCa = "DuctAccessory";
                             }else if(this.revitCategory == '风管'){
-                                revitCa = "	DuctCurves";
+                                revitCa = "DuctCurves";
                             }else if(this.revitCategory == '管道'){
-                                revitCa = "DuctTerminal";
+                                revitCa = "PipeCurves";
                             }else if(this.revitCategory == '管件'){
                                 revitCa = "PipeFitting";
                             }else if(this.revitCategory == '管路附件'){
@@ -682,8 +687,6 @@ export default {
                                 revitCa = "Walls";
                             }else if(this.revitCategory == '停车场'){
                                 revitCa = "Parking";
-                            }else if(this.revitCategory == '天花板'){
-                                revitCa = "Walls";
                             }else if(this.revitCategory == '卫浴装置'){
                                 revitCa = "PlumbingFixtures";
                             }else if(this.revitCategory == '通迅设备'){
@@ -706,14 +709,14 @@ export default {
                                 revitCa = "Planting";
                             }
                             var keyword = this.totalConstructorData.some(item=>{
-                                if(item.chsCategory == this.revitCategory || item.keyType == value || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
+                                if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
                                     return true;
                                 }else{
                                     return false;
                                 }
                             })
                             if(keyword){
-                                alert('关键字已经存在或关键字是已存在关键字的子集，不能添加！')
+                                alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！')
                             }else{
                                 axios({
                                     method:'post',
@@ -840,7 +843,6 @@ export default {
                     revitCategory:rev,
                 }
             }).then((response)=>{
-                console.log(response);
                 var obj = response.data.rt;
                 for(let item of Object.values(obj)){
                     this.keyTypeData.push({
