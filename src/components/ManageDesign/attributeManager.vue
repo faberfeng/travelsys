@@ -2050,7 +2050,7 @@ export default {
                              vm.preAddEdit.object.name = val
                         }else{
                             vm.preAddEdit.object.name = response.data.rt[0].propertyNumber
-                            nameChange(false)
+                            vm.nameChange(true)
                         }
                       
                     }else{
@@ -2087,6 +2087,8 @@ export default {
             vm.preAddEdit.object.monomer = []
             vm.preAddEdit.object.partition = []
             vm.preAddEdit.object.floor = []
+            vm.options_name = []
+            vm.preAddEdit.object.valueType = 0
             vm.preAddEdit.object.system = ''
             vm.preAddEdit.object.type = ''
             vm.preAddEdit.object.name = ''
@@ -2763,6 +2765,7 @@ export default {
       },
       getGenieClass(level,isPre){
             var vm = this
+            var pCode = ''
             if(!isPre){
                 var parentClassifyCode='';
                 var gcCode = vm.value_professional
@@ -2798,7 +2801,7 @@ export default {
                                 Name:'无'
                             },
                         ]
-                    }else if(parentClassifyCode==-1){
+                    }else{
                         vm.options_type = [
                             {
                                 id:'0',
@@ -2814,16 +2817,13 @@ export default {
                 if(parentClassifyCode==-1 || parentClassifyCode==0){
                     return false
                 }
-            }
-            var pCode = ''
-            if(isPre){
+                 pCode = parentClassifyCode
+            }else{
                 if(level == 2){
                     pCode = vm.checkedValue
                 }else{
                     pCode = vm.preAddEdit.object.system
                 }
-            }else{
-                pCode = parentClassifyCode
             }
             axios({
                 method:'POST',
@@ -2871,6 +2871,7 @@ export default {
                             }
                         }else{
                             vm.options_type_pre = []
+                            vm.preAddEdit.object.type = ''//清空构件小类的值
                             if(response.data.rt != null && response.data.rt.length > 0){
                                     response.data.rt.forEach((item,key)=>{
                                         vm.options_type_pre.push({

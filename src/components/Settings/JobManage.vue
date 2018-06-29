@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper" id="jobPage">
-      <h4 class="title">岗位11管理</h4>
+      <h4 class="title">岗位管理</h4>
       <div class="usermanage">
-          <h5 class="subtitle">用户列表
+          <h5 class="subtitle">岗位列表
               <span class="subSpan">
                   <select v-model="posType" class="inp-search">
                         <option value="">全部岗位</option>
@@ -98,11 +98,11 @@
         <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
             <div class="log-head clearfix">
                 <span class="log-head-title">岗位名称:</span>
-                <el-radio v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
-                <el-radio v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
+                <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
+                <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
             </div>
             <div  class="JobName">
-                <input type="text" v-model="jobDetial.posName" placeholder="请输入">
+                <input type="text" v-model="jobDetial.posName" placeholder="请输入" :disabled='checkName(jobDetial.posName)'>
             </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">岗位权限:</span>
@@ -136,7 +136,7 @@ export default {
         return {
             title:'增加岗位',
             jobList:[],//岗位列表
-            totalJobList:[],//总体的岗位列表
+            jobList:[],//总体的岗位列表
             posType:'',//岗位类型
             jobTree:[],
             jobTree_checked:[],
@@ -164,7 +164,8 @@ export default {
             },
             token:'',
             BDMSUrl:'',
-            checkCode:[]
+            checkCode:[],
+            isEdit:false,
         }
     },
     watch:{
@@ -188,6 +189,13 @@ export default {
         vm.getJobShuXingTu();
     },
     methods:{
+        checkName(name){
+            var vm = this
+            if(name != '' && name.indexOf('默认岗位') == -1){
+                return false
+            }
+            return 'disabled'
+        },
         changePage(val){//分页 0 -1 1 2
             var vm = this; 
             if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
@@ -300,29 +308,6 @@ export default {
                     })
                 }
                 
-            }).then(()=>{
-                axios({
-                    method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/searchPositionList/'+vm.projId,
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        page: 1,
-                        rows: vm.pageDetial.total,
-                        posType: vm.posType,
-                    }
-                }).then(response=>{
-                    if(response.data.cd == '0'){
-                        this.totalJobList = response.data.rt.gridDataJson.rows;
-                    }else if(response.data.cd == '-1'){
-                        alert(response.data.msg);
-                    }else{
-                        this.$router.push({
-                            path:'/login'
-                        })
-                    }
-                })
             }).catch((err)=>{
                 console.log(err);
             })
@@ -338,12 +323,14 @@ export default {
                 vm.jobDetial.posType = ''+type;
                 vm.jobID = parseInt(val)
                 vm.title = '修改岗位'
+                vm.isEdit = true
                 vm.getJobShuXingTu()//获取某val的权限
             }else{
                 vm.jobDetial.posName = '';
                 vm.jobDetial.posType = '1';
                 vm.jobID = 0
                 vm.title = '增加岗位'
+                vm.isEdit = false
                 vm.getJobShuXingTu()//获取某val的权限
             }
         },
@@ -359,9 +346,11 @@ export default {
         PostaddUser(){
             var vm = this;
             //var checkCode = [];
+            console.log(vm.jobDetial)
+            debugger
             this.checkCode = vm.$refs.tree_job.getCheckedKeys();
             if(vm.jobID == 0){
-                var flag = this.totalJobList.some(item=>{
+                var flag = this.jobList.some(item=>{
                     if(item.posName == this.jobDetial.posName){
                         return true;
                     }else{
@@ -390,7 +379,7 @@ export default {
                             authCodes:this.checkCode,
                             posId: vm.jobID,
                             posName: vm.jobDetial.posName,
-                            posType: vm.jobDetial.posType,
+                            posType: parseInt(vm.jobDetial.posType),
                         }
                     }).then((response)=>{
                         if(response.data.cd == 0){
@@ -436,6 +425,11 @@ export default {
                         // if(this.pageDetial.currentPage > Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum)){
                         //     this.pageDetial.currentPage = Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum);
                         // }
+                    }else{
+                        vm.$message({
+                            type: 'error',
+                            message: response.data.msg
+                        });
                     }
                     }).catch((err)=>{
                         console.log(err)

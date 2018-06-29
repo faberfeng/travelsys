@@ -56,15 +56,19 @@ export default Vue.component('common-upload',{
         },
         fileChanged(file){
             var vm = this
-            console.log(file)
-            vm.filesList = vm.$refs.file.files
-            if(vm.filesList.length == 1){
-                 vm.imageName = list[0].name
-            }else if(vm.filesList.length > 1){
-                vm.imageName = vm.filesList.length+'个文件'
-            }else{
-                vm.imageName = '未选择任何文件'
-            }
+            // var FileLength = vm.$refs.file.files.length
+            vm.filesList = vm.$refs.file.files[0] //[]
+            // for(var i= 0;i<FileLength;i++){
+            //     vm.filesList.push(vm.$refs.file.files[i])
+            // }
+            vm.imageName = vm.filesList.name
+            // if(vm.filesList.length == 1){
+            //      vm.imageName = vm.filesList.name
+            // }else if(vm.filesList.length > 1){
+            //     vm.imageName = vm.filesList.length+'个文件'
+            // }else{
+            //     vm.imageName = '未选择任何文件'
+            // }
         },
         upImgCancle(){
             var vm = this
@@ -119,7 +123,7 @@ export default Vue.component('common-upload',{
             formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 },

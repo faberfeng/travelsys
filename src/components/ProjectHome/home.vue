@@ -27,7 +27,7 @@
                             <img :src="item.userImg?('http://10.252.26.240:8080/qjbim-file/'+item.userImg):require('../../assets/loginimg.png')">
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span><a @click="gotoPath(index)">查看文档<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial" v-html="item.content"></span><a @click="gotoPath(index)">查看文档<i class="el-icon-arrow-right"></i></a></p>
                             <p class="font-color1">{{item.title}}</p>
                             <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
                         </div>
@@ -41,7 +41,7 @@
                             <img :src="baseUrl+'common/css/default/images/notice/'+item.imagePath+'.png'"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span :title="item.subTitle" class="projectList-detial">{{item.subTitle}}</span><a @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span :title="item.subTitle" class="projectList-detial" v-html="item.subTitle"></span><a @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a></p>
                             <p class="font-color1">{{item.message}}</p>
                             <p class="projectBottom">{{item.createDate | toLocalD}}</p>
                         </div>

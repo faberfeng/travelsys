@@ -61,10 +61,16 @@
             <span class="icon icon-Bottom" @click="changeQR_(1)"></span>
             <span class="icon icon-addqun" @click="addQR"></span>
         </h1>
-        <ul style="max-height:500px;overflow-y:auto;">
-            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item)">
+        <ul style="max-height:300px;overflow-y:auto;">
+            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item,false)">
                 <span class='title-qun' v-text="item.ugName"></span>
                 <span class="icon icon-delect-qun" @click="deleteQR(item.ugId,item.ugName)"></span>
+            </li>
+        </ul>
+        <h1 class="icon-title icon-subcomany" v-text="'项目公司【'+subCompanyName+'】的部门及合作单位'"></h1>
+        <ul style="max-height:200px;overflow-y:auto;">
+            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in subCompanyList" :key="key" @click="changeQR(item.ugId,key,item,true)">
+                <span class='title-qun' v-text="item.ugName"></span>
             </li>
         </ul>
       </div>
@@ -118,6 +124,7 @@
 </template>
 <script>
 import axios from 'axios'
+import '../ManageCost/js/jquery-1.8.3.js'
 export default {
   name:'',
     data(){
@@ -145,12 +152,23 @@ export default {
             userListAdd:[],//打算添加的用户id数组
             userDetialAdd:[],//打算添加的用户id详情的数组
             checkedUgList:{},//被选中的工程群组
+            subCompanyName:'',
+            subCompanyList:[],
+            isCompany:false,
         }
     },
     watch:{
         'ugEdit.status':function(newval,old){
             var vm = this
             if(old != '' && newval != ''){
+                 if(vm.isCompany){
+                    vm.$message({
+                        type:'warning',
+                        message: '部门和合作单位不能禁用！'
+                    })
+                    vm.ugEdit.status = "1"
+                    return false
+                }
                 if(vm.ugEdit.name == "默认群组"|| vm.ugEdit.name == '质量验收' || vm.ugEdit.name == '质量检查' || vm.ugEdit.name == '安全验收' || vm.ugEdit.name == '安全检查'){
                     if(newval == "0"){
                         vm.$message({
@@ -190,35 +208,11 @@ export default {
         },
         saveUserQR(){
             var vm = this
+            //userDetialAdd
             if(vm.userListAdd.length>0){
                 for(var i=0;i<vm.userListAdd.length;i++){
-                    axios({
-                        method:'POST',
-                        url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
-                        headers:{
-                            'token':vm.token
-                        },
-                        params:{
-                            userId:vm.userListAdd[i],
-                            ugId:vm.activeugID,//正在查看的群组ID
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == 0){
-                            vm.$notify({
-                                type: 'success',
-                                message: '添加'+vm.outsideUserList[i].userName+'为群组用户成功',
-                                duration:2000
-                            })
-                        }else{
-                            vm.$notify({
-                                type: 'warning',
-                                message: '添加'+vm.outsideUserList[i].userName+'为群组用户失败!'+response.data.msg,
-                                 duration:0
-                            })
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
+                    var userName = vm.outsideUserList[i].userName
+                    vm.addQzUsers(vm.userListAdd[i],userName)
                 }
                 setTimeout(function(){
                     vm.getQRuser(vm.activeugID)
@@ -230,6 +224,36 @@ export default {
                     message: '请选择用户'
                 });
             }
+        },
+        addQzUsers(userId,userName){
+            var vm = this
+            axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userId:userId,
+                        ugId:vm.activeugID,//正在查看的群组ID
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$notify({
+                            type: 'success',
+                            message: '添加'+userName+'为群组用户成功',
+                            duration:4000
+                        })
+                    }else{
+                        vm.$notify({
+                            type: 'warning',
+                            message: '添加'+userName+'为群组用户失败!'+response.data.msg,
+                            duration:0
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
         },
         removeUserAdd(val){
             var vm = this
@@ -278,37 +302,13 @@ export default {
                     message: '请选择用户!'
                 })
             }else{
-                vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    for(var i=0;i<vm.userListDEL.length;i++){
-                        axios({
-                            method:'POST',
-                            url:vm.BDMSUrl+'project2/Config/delUserGroupUser',
-                            headers:{
-                                'token':vm.token
-                            },
-                            params:{
-                                userId:vm.userListDEL[i],
-                                ugId:vm.activeugID,//正在查看的群组ID
-                            }
-                        }).then((response)=>{
-                            if(response.data.cd == '0'){
-                                vm.getQRuser(vm.activeugID)
-                            }else if (response.data.cd == '-1'){
-                                alert(response.data.msg)
-                            }else{
-                                vm.$router.push({
-                                    path:'/login'
-                                })
-                            }
-                        }).catch((err)=>{
-                            console.log(err)
-                        })
-                    }
-                        vm.userListDEL = []
+                    vm.$confirm('此操作将删除选中用户, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        vm.delEntUser()
+                       
                     }).catch(() => {
                         vm.$message({
                             type: 'info',
@@ -316,6 +316,47 @@ export default {
                         });          
                     });
                 }
+            },
+            //删除企业用户信息
+            delEntUser(){
+               var vm = this
+               if(vm.isCompany){//子部门
+                    for(var i=0;i<vm.subCompanyList.length;i++){
+                         if(vm.subCompanyList[i].ugName == '默认部门' && vm.activeugID == vm.subCompanyList[i].ugId) {
+                            vm.$message({
+                                type: 'warning',
+                                message: '不能删除默认部门下的人员'
+                            });  
+                            return;
+                        }
+                    }
+                }
+               for(var i=0;i<vm.userListDEL.length;i++){
+                    axios({
+                        method:'POST',
+                        url:vm.BDMSUrl+'project2/Config/delUserGroupUser',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            userId:vm.userListDEL[i],
+                            ugId:vm.activeugID,//正在查看的群组ID
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == '0'){
+                            vm.getQRuser(vm.activeugID)
+                        }else if (response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            vm.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+                }
+                vm.userListDEL = []
             },
             pushUserID(id){
                 var vm = this
@@ -350,6 +391,7 @@ export default {
                                         message: '修改群组名称成功'
                                     });
                                     vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                                    vm.getQunListOnce()
                                 }
                             }).catch((err)=>{
                                 console.log(err)
@@ -426,37 +468,55 @@ export default {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                 }).then(({ value }) => {
-                    axios({
-                        method:'POST',
-                        url:vm.BDMSUrl+'config/userGroup/add',
-                        headers:{
-                            'token':vm.token
-                        },
-                        data:{
-                            projId:vm.projId,
-                            ugName:value,
-                            ugOrder:11,
-                            ugParId:0,
-                            ugStatus:1,
-                            ugType:0
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == 0){
-                            this.$message({
-                                ype: 'success',
-                                message: '创建成功'
-                            });
-                            vm.getQunList()
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
+                    var qunzuName = ''
+                    qunzuName = $.trim(value)
+                    if(qunzuName == ''){
+                        vm.$message({
+                            type: 'warning',
+                            message: '群组名称不能为空！'
+                        }); 
+                        return false
+                    }
+                    vm.addQunzu(qunzuName)
                 }).catch(() => {
                     vm.$message({
                         type: 'info',
                         message: '取消添加'
                     });       
                 });
+            },
+            addQunzu(value){
+                var vm = this
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'config/userGroup/add',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:{
+                        projId:vm.projId,
+                        ugName:value,
+                        ugOrder:11,
+                        ugParId:0,
+                        ugStatus:1,
+                        ugType:0
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            ype: 'success',
+                            message: '创建成功'
+                        });
+                        vm.getQunList()
+                    }else{
+                        vm.$message({
+                            type: 'warning',
+                            message: response.data.msg
+                        });
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
             },
             deleteQR(ugId,name){//删除群组
                 var vm = this   
@@ -487,6 +547,7 @@ export default {
                                 type:'success',
                                 message: name+'删除成功'
                             })
+                             vm.userListDEL = []
                         }else if(response.data.cd == -1){
                             vm.$message({
                                 type:'error',
@@ -505,6 +566,21 @@ export default {
             },
             allowChangeName(){
                 var vm = this
+                console.log(vm.ugEdit.name.indexOf('默认群组'))
+                if(vm.ugEdit.name.indexOf('默认群组')>=0){
+                     vm.$message({
+                        type: 'warning',
+                        message: '【默认群组】不能重命名！'
+                    })
+	            	return;
+                }
+                if(vm.isCompany){
+                     vm.$message({
+                        type: 'warning',
+                        message: '【默认群组】不能重命名！'
+                    })
+	            	return;
+                }
                 vm.EditName()
             },
             allowChangeLabel(){
@@ -568,17 +644,32 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd == '0'){
+                        vm.subCompanyName = response.data.rt.projCompany
                         if(response.data.rt.ugList){
-                            vm.ugList = response.data.rt.ugList;//工程群组
-                            for(var i=0;i<vm.ugList.length;i++){
-                                if(vm.ugList[i].ugName == '默认群组'){
-                                    vm.activeugID = vm.ugList[i].ugId;
+                            vm.ugList = []
+                            vm.subCompanyList = []
+                            var entDept = [],entCoop=[]
+                            for(var i=0;i<response.data.rt.ugList.length;i++){
+                                if(response.data.rt.ugList[i].ugName == '默认群组'){
+                                    vm.activeugID = response.data.rt.ugList[i].ugId;
                                     vm.activeugIDkey = i;
-                                    vm.changeQR(vm.ugList[i].ugId,i);
-                                    vm.getQRuser(vm.ugList[i].ugId);
-                                    vm.checkedUgList = vm.ugList[i];
+                                    vm.changeQR(response.data.rt.ugList[i].ugId,i);
+                                    vm.getQRuser(response.data.rt.ugList[i].ugId);
+                                    vm.checkedUgList = response.data.rt.ugList[i];
+                                }
+                                if(response.data.rt.ugList[i].ugType == 2){
+                                    vm.ugList.push(response.data.rt.ugList[i])
+                                }else if(response.data.rt.ugList[i].ugName == '质量验收' || response.data.rt.ugList[i].ugName == '质量检查' || response.data.rt.ugList[i].ugName == '安全验收' || response.data.rt.ugList[i].ugName == '安全检查'){
+                                    vm.ugList.push(response.data.rt.ugList[i])
+                                }else if(response.data.rt.ugList[i].ugType == 4){
+                                    entDept.push(response.data.rt.ugList[i])
+                                }else if(response.data.rt.ugList[i].ugType == 5){
+                                    entCoop.push(response.data.rt.ugList[i])
+                                }else{
+                                    vm.ugList.push(response.data.rt.ugList[i])
                                 }
                             }
+                            vm.subCompanyList = entDept.concat(entCoop)
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg);
                         }else{
@@ -680,7 +771,7 @@ export default {
                 
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    if(response.data.rt.ugList){
+                     if(response.data.rt.ugList){
                         vm.ugList = response.data.rt.ugList;//工程群组
                         for(var i=0;i<vm.ugList.length;i++){
                             if(vm.ugList[i].ugName == vm.checkedUgList.ugName){
@@ -704,9 +795,10 @@ export default {
                 console.log(err)
             })
         },
-        changeQR(val,index,item){//切换群组，根据群组ID获取群组信息
+        changeQR(val,index,item,isCompany){//切换群组，根据群组ID获取群组信息
             var vm = this;
             vm.checkedUgList = item;
+            if(isCompany)vm.isCompany = isCompany
             if(val){
                 vm.ugEdit.status = ''
                 axios({
@@ -727,6 +819,7 @@ export default {
                     vm.ugEdit.tag = vm.ugInfo.ugTag
                     vm.ugEdit.status = vm.ugInfo.ugStatus
                     vm.ugEdit.status =  response.data.rt.ugStatus+''
+                    vm.userListDEL = []
                     vm.getQRuser(val)
                 }).catch((err)=>{
                     console.log(err)
@@ -803,22 +896,28 @@ export default {
           padding: 0;
           margin: 0;
     }
-       .title{
+    .title{
+        position: fixed;
+        top: 115px;
+        bottom: 0;
+        left: 218px;
+        right: 0px;
         color: #fc343a;
         font-size: 18px;
         font-weight: bold;
         border-bottom:2px solid #ccc; 
-        height: 50px;
-        line-height: 50px;
-        padding:0px 15px;
-        margin: 10px 0 0 0 ;
+        height: 52px;
+      line-height: 35px;
+        padding:10px 15px 0;
         text-align: left;
+        background: #fff;
+        z-index: 10;
     }
     .container-left{
         display: block;
-        border-right: 1px solid #e6e6e6;
         margin-right: 288px;
         padding: 20px;
+        margin-top: 50px;
         box-sizing: border-box;
     }
     .container-right{
@@ -830,6 +929,8 @@ export default {
         width: 288px;
         min-height: 600px;
         padding-right: 15px;
+        background: #fff;
+        border-left: 1px solid #e6e6e6;
     }   
     .icon-title{
         display: block;
@@ -916,6 +1017,17 @@ export default {
          border-bottom: 1px solid #e6e6e6;
          &::after{
          background: url('./images/liebiao.png')no-repeat 0 0;
+         left: 20px;
+         top: 20px;
+         width: 18px;
+         }
+    }
+    .icon-subcomany{
+        margin: 0;
+         padding: 20px 0 10px 50px;
+         border-bottom: 1px solid #e6e6e6;
+         &::after{
+         background: url('./images/subcompany.png')no-repeat 0 0;
          left: 20px;
          top: 20px;
          width: 18px;
