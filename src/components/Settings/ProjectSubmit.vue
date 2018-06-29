@@ -1806,25 +1806,26 @@ export default {
             }else{
                 this.inputGouJianFunction = '';
             }
-            if(this.convenientInput.length != 0){
-                this.convenientInput = this.convenientInput[0];
+            if(this.inputGouJianValue.length != 0){
+                this.inputGouJianValue = this.inputGouJianValue[0];
             }else{
-                this.convenientInput = '';
+                this.inputGouJianValue = '';
             }
 
             if(this.showConvenienceType == 10000){
                 this.jiLiangCondition += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }else if(this.showConvenienceType == 20000){
                 this.jiLiangResult += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+            }else{
+                var str = this.addProjectMappingData[this.showConvenienceObject].formula_+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
+                this.addProjectMappingData.forEach((item,index)=>{
+                    if(index == this.showConvenienceObject){
+                        item = Object.assign(item,{
+                            formula_:str
+                        })
+                    }
+                })
             }
-            var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
-            this.addProjectMappingData.forEach((item,index)=>{
-                if(index == this.showConvenienceObject){
-                    item = Object.assign(item,{
-                        formula_:str
-                    })
-                }
-            })
             this.inputGouJianType = [];
             this.inputGouJianCalculate = [];
             this.inputGouJianFunction = [];

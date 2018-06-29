@@ -423,14 +423,14 @@
                             <span class="calculateResult">计量条件 : 结果为 <label>是/否</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangCondition"/>
-                                <button class="calculateBtn" @click="showConvenience(1)">...</button>
+                                <button class="calculateBtn" @click="showConvenience(10000)">...</button>
                             </div>
                         </div>
                         <div class="calculateRight" style="overflow:hidden">
                             <span class="calculateResult">计量公式 : 结果为 <label>{{calculateResultFinall}}</label></span>
                             <div>
                                 <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
-                                <button class="calculateBtn" @click="showConvenience(2)">...</button>
+                                <button class="calculateBtn" @click="showConvenience(20000)">...</button>
                             </div>
                         </div>
                     </div>
@@ -2920,10 +2920,7 @@ export default {
                                 valueType_:this.judgeValueType(item.valueType),
                                 formula_:item.formula===null? '@':item.formula
                             })
-                            //this.$set(item,'valueType_',this.judgeValueType(item.valueType))
-                            //this.$set(item,'formula_',item.formula && item.formula.split('@')[1])
                         })
-                        //console.log(this.addProjectMappingData)
                     }
                 }else if (response.data.cd == '-1'){
                     alert(response.data.msg)
@@ -2970,7 +2967,7 @@ export default {
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
-                    formula:item.formula_
+                    formula:$('.TextInput')[index].value
                 })
             })
             if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
@@ -3092,12 +3089,7 @@ export default {
             $('#CInput .el-dialog').draggable();
         },
         saveConvenient(type){
-            //jiLiangCondition
-            console.log(this.inputGouJianType)
-            console.log(this.inputGouJianCalculate)
-            console.log(this.inputGouJianFunction)
             if(this.inputGouJianType.length != 0){
-                console.log(this.inputGouJianType)
                 this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
             }else {
                 this.inputGouJianType = '';
@@ -3112,25 +3104,25 @@ export default {
             }else{
                 this.inputGouJianFunction = '';
             }
-            if(this.convenientInput.length != 0){
-                this.convenientInput = this.convenientInput[0];
+            if(this.inputGouJianValue.length != 0){
+                this.inputGouJianValue = this.inputGouJianValue[0];
             }else{
-                this.convenientInput = '';
+                this.inputGouJianValue = '';
             }
-
             if(this.showConvenienceType == 10000){
                 this.jiLiangCondition += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }else if(this.showConvenienceType == 20000){
                 this.jiLiangResult += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+            }else{
+                var str = this.addProjectMappingData[this.showConvenienceObject].formula_+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
+                this.addProjectMappingData.forEach((item,index)=>{
+                    if(index == this.showConvenienceObject){
+                        item = Object.assign(item,{
+                            formula_:str
+                        })
+                    }
+                })
             }
-            var str = this.addProjectMappingData[this.showConvenienceObject].formula_.split('@')[0]+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue+'@'; 
-            this.addProjectMappingData.forEach((item,index,arr)=>{
-                if(index == this.showConvenienceObject){
-                    item = Object.assign(item,{
-                        formula_:str
-                    })
-                }
-            })
             this.inputGouJianType = [];
             this.inputGouJianCalculate = [];
             this.inputGouJianFunction = [];
