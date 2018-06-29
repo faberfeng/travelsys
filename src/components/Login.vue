@@ -81,6 +81,7 @@ export default {
                 }
             })
         },
+        //
         Login(){
             this.login.Password = md5(this.login.Password);
             var isHege = false;
