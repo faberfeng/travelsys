@@ -801,7 +801,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.secondSelectData = response.data.rt;
-                    this.secondSelectTitle = this.secondSelectData[1].classifyCode;
+                    this.secondSelectData.splice(0,1);
+                    this.secondSelectTitle = this.secondSelectData[0].classifyCode;
                     this.loadThirdSelectData(this.secondSelectTitle.substr(0,4));
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
@@ -830,7 +831,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.thirdSelectData = response.data.rt;
-                    this.thirdSelectTitle = this.thirdSelectData[1].classifyCode;
+                    this.thirdSelectData.splice(0,1);
+                    this.thirdSelectTitle = this.thirdSelectData[0].classifyCode;
                     this.projectNumber = this.thirdSelectTitle;
                     this.getEngineeringInfo();
                     this.getEntityPropertiesForEngineering();
@@ -855,7 +857,9 @@ export default {
         },
         //第三个下拉框改变
         thirdSelectTitleChange(){
-            var code = this.thirdSelectTitle.substr(0,6);
+            // console.log(this.thirdSelectTitle)
+            // var code = this.thirdSelectTitle.substr(0,6);
+            this.projectNumber = this.thirdSelectTitle;
             this.getEngineeringInfo();
         },
         //判断值类型

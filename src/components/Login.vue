@@ -65,16 +65,16 @@ export default {
     },
     methods:{
         BeforeLogin(){
-        var vm = this
-        axios({
-            method:'Get',
-            url:vm.BDMSUrl+'project2/login',
-            headers:{
-                'content-type':'application/json;charset=UTF-8',
-                'token':vm.token
-            },
-        }).then((response)=>{
-            if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
+            var vm = this
+            axios({
+                method:'Get',
+                url:vm.BDMSUrl+'project2/login',
+                headers:{
+                    'content-type':'application/json;charset=UTF-8',
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
                     vm.$router.push({
                         path:'/showcompany'
                     })
@@ -86,30 +86,30 @@ export default {
             this.login.Password = md5(this.login.Password);
             var isHege = false;
             axios({
-              method: 'Post',
-              url: this.BDMSUrl + 'project2/login',
-              headers: {
-                'content-type': 'application/json;charset=UTF-8',
-              },
-              params: {
-                'account': this.login.Id.trim(),
-                'isRemember': this.isAuto,
-                'password': this.login.Password
-              }
+                method: 'Post',
+                url: this.BDMSUrl + 'project2/login',
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8',
+                },
+                params: {
+                    'account': this.login.Id.trim(),
+                    'isRemember': this.isAuto,
+                    'password': this.login.Password
+                }
             }).then((response) => {
-              this.projectData = response.data;
-              if (this.projectData.cd === '10004') {
-                localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
-                localStorage.setItem('username', this.projectData.rt.session.onlineInfo.userName);
-                localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
-                this.$router.push({
-                  path: '/showcompany'
-                })
-              } else if (this.projectData.cd === '10003') {
-                alert(this.projectData.msg) //密码不正确
-              } else if (this.projectData.cd === '10000') {
-                alert(this.projectData.msg) //账号不存在
-              }
+                this.projectData = response.data;
+                if (this.projectData.cd === '10004') {
+                    localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
+                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.userName);
+                    localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
+                    this.$router.push({
+                        path: '/showcompany'
+                    })
+                } else if (this.projectData.cd === '10003') {
+                    alert(this.projectData.msg) //密码不正确
+                } else if (this.projectData.cd === '10000') {
+                    alert(this.projectData.msg) //账号不存在
+                }
             })
         }
     }
