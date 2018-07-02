@@ -25,7 +25,7 @@
                                 <div class="calendarLeft">
                                     <ul class="calendarSelect">
                                         <li :class="[{'calendarBody_active':currentStyle},'calendarHead']"><span>当前日历模板</span><i class="el-icon-plus" @click="addCalendarTemplate()"></i></li>
-                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index"  ><span v-text="item.tempName"></span><span v-text="item.id"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
+                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index"  ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
                                     </ul>
                                 </div>
                                 <div class="calendarRight">
@@ -74,8 +74,8 @@
                                                 <button  v-show="item.cwtType==1" class="detailBtn actionBtn" title="修改"  @click="detailweektime(index)"></button>
                                             </td>
                                             <td v-text="item.cwtName"></td>
-                                            <td  v-text="$options.filters.dataFrm(item.cwtStart)"></td>
-                                            <td v-text="$options.filters.dataFrm(item.cwtEnd)"></td>
+                                            <td><span v-show="item.cwtType==1" v-text="$options.filters.dataFrm(item.cwtStart)"></span></td>
+                                            <td><span v-show="item.cwtType==1" v-text="$options.filters.dataFrm(item.cwtEnd)"></span></td>
                                             <td>
                                                 <button class="editBtn actionBtn" title="修改" v-show="item.cwtType==1" @click="updateweektime(index)"></button>
                                                 <button class="deleteBtn actionBtn" title="删除" v-show="item.cwtType==1"  @click="deleteWeekTime(index)"></button>
@@ -227,7 +227,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(item,index) in taskStatusList"  :key="index">
+                                        <tr v-for="(item,index) in taskStatusList" :key="index">
                                             <td v-text="$options.filters.statusName(item.taskStatus)"></td>
                                             <td v-html="$options.filters.selectColor(parseInt(item.colorValue))"></td>
                                             <td><el-checkbox v-model="view"  @change="checkChange(item.id)"></el-checkbox></td>
@@ -769,10 +769,10 @@
                                 }
                                 .flex>div{
                                     margin:10px;
-                                    padding:10px;
+                                    padding:14px;
                                     position: absolute;
                                     left: -1%;
-                                    top:-5px;
+                                    top:-9px;
                                     // width:25%;
                                     // min-width:300px;
                                     border: 1px solid #eee;
@@ -2549,15 +2549,15 @@ export default{
             })
         },
         //应用表格改变事件(这个还有错误)
-        checkChange(index){
+        // checkChange(index){
            
-            this.taskStatusList.forEach((item)=>{
-                if(item.id==index){
-                    this.id=item.id;
-                }
-            });
-            this.setUseInView();
-        },
+        //     this.taskStatusList.forEach((item)=>{
+        //         if(item.id==index){
+        //             this.id=item.id;
+        //         }
+        //     });
+        //     this.setUseInView();
+        // },
         //应用到表格
         setUseInView(){
             axios({
