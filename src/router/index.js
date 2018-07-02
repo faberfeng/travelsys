@@ -123,6 +123,37 @@ const router = new Router({
         // },
       ]
     },
+    //进度计划路由配置
+    {
+      path:'/Schedule',
+      name:'Schedule',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+           path:'/SchedulePlan/personalCalendar',
+          name:'personalCalendar',
+          component:resolve=>require(['@/components/SchedulePlan/personalCalendar'],resolve)
+        },
+        {
+          path:'/SchedulePlan/resourcePlan',
+          name:'resourcePlan',
+          component:resolve=>require(['@/components/SchedulePlan/resourcePlan'],resolve)
+        },
+        {
+          path:'/SchedulePlan/taskIndex',
+          name:'taskIndex',
+          component:resolve=>require(['@/components/SchedulePlan/taskIndex'],resolve)
+        },
+        {
+          path:'/SchedulePlan/calendarConfig',
+          name:'calendarConfig',
+          component:resolve=>require(['@/components/SchedulePlan/calendarConfig'],resolve)
+        }
+      ]
+    },
     {
       path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
       name:'getManifestDetailInfoForPage',

@@ -20,6 +20,9 @@ export default {
   color: #2c3e50;
   min-width: 1200px;
 }
+.el-date-editor.el-input{
+  width: 435px;
+}
 .dialog-footer{
     text-align: center;
 }
@@ -174,8 +177,8 @@ padding-right: 14px;
   
 }
 #edit .el-input__inner{
-  width: 388px;
-  height: 30px;
+  width: 322px;
+  height: 36px;
 }
 #edit .el-dialog__footer{
   padding: 0;
