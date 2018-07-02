@@ -79,26 +79,27 @@
         <div class="groundSource groundTitle" style="margin-bottom:30px;">
            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addSource" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
-                <el-table class="table" border :data="groundSourceData" style="width:100%">
-                    <el-table-column prop="groundIndex" label="序号"></el-table-column>
-                    <el-table-column prop="groundName" label="资源包名称"></el-table-column>
-                    <el-table-column prop="groundCategroy" label="资源类型"></el-table-column>
-                    <el-table-column prop="groundSourceName" label="资源名称"></el-table-column>
-                    <el-table-column prop="groundSourceSize" label="资源包大小"></el-table-column>
-                    <el-table-column prop="groundVersion" label="版本"></el-table-column>
-                    <el-table-column prop="groundRemark" label="备注"></el-table-column>
-                    <el-table-column prop="groundState" label="当时状态"></el-table-column>
-                    <el-table-column prop="groundAction" label="操作" width='120'>
+                <el-table class="table" border :data="unityData" style="width:100%">
+                    <el-table-column prop="index" label="序号"></el-table-column>
+                    <el-table-column prop="FileName" label="资源包名称"></el-table-column>
+                    <el-table-column prop="ResourceType" label="资源类型"></el-table-column>
+                    <el-table-column prop="ResourceName" label="资源名称"></el-table-column>
+                    <el-table-column prop="FileSize" label="资源包大小"></el-table-column>
+                    <el-table-column prop="UpdateTime" label="上传时间"></el-table-column>
+                    <el-table-column prop="FileVersion" label="版本"></el-table-column>
+                    <el-table-column prop="Comments" label="备注"></el-table-column>
+                    <el-table-column prop="Loaded" label="当前状态"></el-table-column>
+                    <el-table-column prop="groundAction" label="操作">
                         <template slot-scope="scope" >
-                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon" src="../../assets/recircle.png"/></div>
                             <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
                             <div class="iconDiv " @click="deleteTableRow(scope)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
-                <!-- <div class="pagenation">   
+                <div class="pagenation">   
                     <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
-                </div> -->
+                </div>
             </div>
         </div>
         </div>
@@ -131,8 +132,13 @@
             <!--新增资源包弹窗-->
             <el-dialog title="上传文件" :visible.sync="addgroundShow" :before-close="groundClose">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">概要文件 :</label><span class="">企业自用办公楼4.png</span><div style="margin-left:208px;margin-top:11px;"><button class="upImgBtn">选择文件</button></div></div>
-                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择文件</button><span class="upImgText">未选择任何文件</span></div>
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectImg" class="upImgBtn">选择文件</button>
+                            <input class="upInput"  type="file"  @change="fileChanged" ref="file" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{fileName}}</span> 
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addGroundSure">上传</button>
@@ -247,26 +253,6 @@ export default {
                 label: '傍晚'
             }],
             listData:[],
-            groundSourceData:[{
-                groundIndex: '01',
-                groundName: 'yanshichangdi',
-                groundCategroy: '场地',
-                groundSourceName:'yanshichangdi',
-                groundSourceSize:'3.39MB',
-                groundVersion:'239',
-                groundRemark:'2017-10-23 17:40',
-                groundState:'加载'
-
-            }, {
-                groundIndex: '02',
-                groundName: 'banggongqu_skin',
-                groundCategroy: '场地',
-                groundSourceName:'banggongqu_skin',
-                groundSourceSize:'4.67MB',
-                groundVersion:'241',
-                groundRemark:'2017-10-23 17:40',
-                groundState:'加载'
-            }],
             baseUrl:'http://10.252.26.240:8080/',
             token:'',
             projId:'',
@@ -275,18 +261,20 @@ export default {
             groundInfo:{},//场地信息
             SceneEnvironmentList:{},//场景设置
             deleProject:'',
-            deleteListObject:{}
-
+            deleteListObject:{},
+            unityData:[],//场地资源包
+            fileName:'未选择任何文件',
+            filesList:[],
+            fileUpdataPath:''
         }
-
     },
     created(){
+        this.fileUpdataPath = this.$store.state.QJFileManageSystemURL;
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.getGroundInformation();//场地信息
         this.getSceneEnvironment();//场景设置
         this.findSubProject();//获取单体列表 表格
-        this.getUnityBundle();//获取场地资源包 表格
     },
     methods:{
         groundInfoEdit(){
@@ -506,15 +494,6 @@ export default {
                     }
                 }
             }
-            // if(this.addListhigh != '' && !isNaN(this.addListhigh) && this.addListangle != '' &&  !isNaN(this.addListangle) && this.addListname != ''){
-            //     if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
-                    
-            //     }else{
-            //         alert('警告! 轴网基点坐标取基点 X\Y 值被一个空格分隔!')
-            //     }
-            // }else{
-            //     alert('请正确输入表单')
-            // }
         },
         editListClose(){
             this.editListShow = false
@@ -523,30 +502,6 @@ export default {
             this.addListcoordinate='';
             this.addListhigh='';
             this.addListangle='';
-        },
-        groundSourceAdd(){
-            this.addgroundShow = true;
-        },
-        addGroundSure(){
-            this.groundSourceData.push({
-                groundIndex: this.groundIndex,
-                groundName: this.groundName,
-                groundCategroy: this.groundCategroy,
-                groundSourceName:this.groundSourceName,
-                groundSourceSize:this.groundSourceSize,
-                groundVersion:this.groundVersion,
-                groundRemark:this.groundRemark,
-                groundState:this.groundState,
-            });
-            this.groundIndex = '';
-            this.groundName = '';
-            this.groundCategroy='';
-            this.groundSourceName='';
-            this.groundSourceSize='';
-            this.groundVersion='';
-            this.groundRemark='';
-            this.groundState='';
-            this.addgroundShow = false;
         },
         groundTableEdit(index){
             this.groundIndexNumber = index.$index;
@@ -624,7 +579,7 @@ export default {
             })
         },
         deleteTableRow(index, rows) {
-            rows.splice(index, 1);
+            //rows.splice(index, 1);
         },
         getGroundInformation(){
             axios({
@@ -647,6 +602,8 @@ export default {
                         path:'/login'
                     })
                 }
+            }).then(()=>{
+                this.getUnityBundle();//获取场地资源包 表格
             })
         },
         getSceneEnvironment(){
@@ -733,6 +690,25 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
+                    this.unityData = response.data.rt;
+                    this.unityData.forEach((item,index,arr)=>{
+                        arr[index].index = index;
+                        arr[index].FileName=item.FileName.split('.')[0];
+                        if(item.ResourceType == 'utr'){
+                            arr[index].ResourceType = '场地';
+                        }else if(item.ResourceType == 'umr'){
+                            arr[index].ResourceType = '材质';
+                        }else{
+                            arr[index].ResourceType = '构件';
+                        }
+                        arr[index].FileSize = (item.FileSize/1024/1024).toFixed(2)+'MB';
+                        if(item.Loaded) {
+                            arr[index].Loaded = '加载';
+                        }else{
+                            arr[index].Loaded = '卸载';
+                        }
+                    })
+
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -743,6 +719,46 @@ export default {
         //新增资源包
         addSource(){
             this.addgroundShow = true;
+        },
+        //新增场地资源包
+        addGroundSure(){
+            var returnUrl = this.baseUrl+'/h2-bim-project/project2/upload/uploadBunldeDataFile';
+            returnUrl = encodeURIComponent(returnUrl);
+            const formData = new FormData();
+            formData.append('projId',this.projId);
+            formData.append('type','1');
+            formData.append('userId',this.userId);
+            formData.append('modelCode','001');
+            formData.append('returnUrl',returnUrl)
+            formData.append('token',this.token);
+            formData.append('file',this.filesList[0]);
+            axios({
+                method:'post',
+                url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd== '0'){
+                    this.getUnityBundle()
+                    this.addgroundShow = false;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+        selectImg(){
+            this.$refs.file.click();
+        },
+        fileChanged(){
+            const list = this.$refs.file.files;
+            this.fileName = list[0].name;
+            this.filesList = list;
         }
 
     }
@@ -1090,6 +1106,31 @@ export default {
             margin-left: 40px;
 
         }
+    }
+    /* 上传文件按钮 */
+    #edit .imageBody{
+       text-align: left;
+    }
+    .imageBody .imageBodyText{
+        color: #666;
+        font-size: 14px;
+        line-height: 14px;
+        font-weight: normal;
+        display: inline-block;
+        margin-right: 20px;
+        margin-left: 94px;
+        text-align: right;
+   }
+   .updataImageSpan{
+        overflow: hidden;
+        width: 98px;
+    }
+    .updataImageSpan input{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        /* -ms-filter: 'alpha(opacity=0)'; */
     }
     .el-tooltip__popper{
         padding: 1px 7.5px;
