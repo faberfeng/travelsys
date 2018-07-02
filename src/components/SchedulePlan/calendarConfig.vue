@@ -1414,13 +1414,13 @@ export default{
                 // begin:[2018,7,11], //可选开始日期
                 // end:[2018,7,29], //可选结束日期
                 select(value){
-                    console.log(value.toString());
+                   
                 },
                 selectMonth(month,year){
-                    console.log(year,month)
+                    
                 },
                 selectYear(year){
-                    console.log(year)
+                   
                 },
                 timestamp:Date.now()
             },
@@ -2204,8 +2204,8 @@ export default{
             } else if(item.num===1) {
                 this.weektimeList[index].num=0
             }
-            console.log(this.numId+'点击触发日期')
-            // console.log(this.weektimeList)
+           
+           
         },
         checkedItem(num,index){
                 this.isActive=num;
@@ -2216,7 +2216,7 @@ export default{
                 
         //获取日历模板工作周列表、例外日期列表
         getCalendarTemplateInfo(id){
-            console.log("id:"+id);
+           
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendarTemplate/info',
@@ -2256,10 +2256,10 @@ export default{
                     this.calendarIndex=response.data.rt;
                     this.calendarIndex.forEach((item)=>{
                         if(item.tempStatus==1){
-                            console.log(JSON.stringify(item));
+                           
                             this.getCalendarTemplateInfo(item.id);
                             this.numId=item.id;
-                            console.log(this.numId+'初始化numId')
+                           
                             // this.addweektimeMakeSure(item.id)
                         }
 
@@ -2538,7 +2538,7 @@ export default{
                             this.view=false;
                         }
                     })
-                    console.log(this.view+'view')
+                   
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
                 }else{
@@ -2585,7 +2585,7 @@ export default{
                     this.id=item.id;
                     this.taskStatusName=item.taskStatus
                     this.value=item.colorValue;
-                    // console.log(JSON.stringify(this.selectTSColor));
+                   
                 }
             })
         },
@@ -2642,13 +2642,13 @@ export default{
         addweektime(){
             this.addweektimeDialog=true;
             // this.getCalendarTemplateInfo(id);
-            // console.log("id123"+id );
+           
             this.calendarIndex.forEach((item)=>{
                 // var vm=this;
                 if(item.id==this.isActive)
                 {
                     this.numId=item.id;
-                    console.log(this.numId);
+                    
                 }
             })
             
@@ -2676,11 +2676,7 @@ export default{
                 weekNum.push(item.num);
             })
             weekNum = weekNum.join("")
-                console.log(weekNum,"111")
-                console.log(JSON.stringify(this.cwtimeName))
-                console.log(JSON.stringify(this.endweektimeValue))
-                console.log(JSON.stringify(this.startweektimeValue))
-                console.log(this.numId)
+               
             axios({
             method:'post',
             url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/weekTime/add',
@@ -2719,7 +2715,7 @@ export default{
         detailweektime(index){
             this.deatailWeekNum=index;
             this.weekNumList=this.cwtList[ this.deatailWeekNum].cwtContent.split('');
-            console.log(this.weekNumList);
+            
             this.weektimeList.forEach((item,index)=>{
                 item.num=0;
                 if(this.weekNumList[index]==0){
@@ -2741,11 +2737,11 @@ export default{
                 if(item.id==this.isActive)
                 {
                     this.numId=item.id;
-                    console.log(this.numId);
+                   
                 }
             })
             this.weekNumList=this.cwtList[this.weektimeNum].cwtContent.split('');
-            console.log(this.weekNumList);
+           
             this.weektimeList.forEach((item,index)=>{
                 item.num=0;
                 if(this.weekNumList[index]==0){
@@ -2823,7 +2819,7 @@ export default{
                 if(item.id==this.isActive)
                 {
                     this.numId=item.id;
-                    console.log(this.numId);
+                    
                 }
             })
         },
@@ -2869,7 +2865,7 @@ export default{
                 if(item.id==this.isActive)
                 {
                     this.numId=item.id;
-                    console.log(this.numId);
+                   
                 }
             })
         },
@@ -2892,7 +2888,7 @@ export default{
                 if(item.id==this.isActive)
                 {
                     this.numId=item.id;
-                    console.log(this.numId);
+                   
                 }
             })
         },
@@ -2960,13 +2956,12 @@ export default{
             this.editDialog = true;
             this.index = index;
             this.templateName=this.calendarIndex[index].tempName;
-            console.log(this.calendarIndex[this.index].id);
+           
             // this.editMakeSure()
         },
         editMakeSure(){
-            // console.log(JSON.stringify(this.calendarIndex));
-            // console.log(this.index);
-            console.log(this.calendarIndex[this.index].id);
+           
+           
             if(this.templateName=="")
             {alert('请输入模板名称');}
             else{
@@ -3003,9 +2998,7 @@ export default{
                     this.shifouday=item.value
                 }
             })
-            console.log(this.shifouday);
-            // this.shifouday=this.index;
-            // console.log(this.shifouday);
+           
         },
         //重复工作日期改变触发
         cedTypeChange(){
@@ -3015,7 +3008,7 @@ export default{
                     this.repeatway=item.value;
                 }
             })
-            console.log( this.repeatway)
+           
             if(this.repeatway=="4"){
                 this.weekdayshow=false;
                 this.monthshow=false;
@@ -3037,15 +3030,14 @@ export default{
                 this.yearshow=false;
                 this.value=1;
                 this.changemonth();
-                console.log(this.cedContent);
+               
             }
             else if(this.repeatway=="1"){
                 this.weekdayshow=false;
                 this.monthshow=false;
                 this.yearshow=true;
-                // this.item1=1;
-                // this.item2=1;
-                console.log(this.cedContent);
+               
+               
             }
         },
         //
@@ -3064,12 +3056,12 @@ export default{
             });
             weekNum1 = weekNum1.join("");
             //  this.cedContent=weekNum1;
-              console.log( weekNum1+'改变周末')
+             
               this.cedContent=weekNum1; 
         },
         changemonth(){
             this.cedContent=this.value  
-            console.log(this.cedContent+'改变月份');                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
         },
         changeyearshow1(){
             for(let i=1;i<=12;i++){
@@ -3078,7 +3070,7 @@ export default{
                 }
             }
             this.cedContent=this.item1+'-'+this.item2;
-            console.log(this.cedContent)
+           
         },
         changeyearshow2(){
             for(let i=1;i<=31;i++){
@@ -3092,12 +3084,7 @@ export default{
         },
         //添加例外休息日确定
         addCedList(){
-            console.log(this.numId+'numId');
-            console.log(JSON.stringify(this.repeatway)+'重复方式');
-            console.log(JSON.stringify(this.shifouday)+'是否工作日');
-            console.log(JSON.stringify(this.cedContent)+'工作内容');
-            console.log(JSON.stringify(this.startValue)+'开始时间');
-            console.log(JSON.stringify(this.endValue)+'结束时间');
+           
             if(this.cedateName==''){
                 alert('请输入名称')
             }else{
@@ -3284,7 +3271,7 @@ export default{
             return val;
         },
         editGroup(index){
-            // console.log(JSON.stringify(this.taskGroupList));
+          
             this.taskGroupList.forEach((item)=>{
                 if(item.id==index){
                    this.tGroupName=item.tgName;
@@ -3294,8 +3281,7 @@ export default{
                     this.taskGroupColorOne=this.toBeColor(this.selectTGColor);
                 };
                
-                // console.log(JSON.stringify(this.tGroupName));
-                // console.log(JSON.stringify(this.selectTGColor));
+                
             });
        
             this.editTaskGroupDialog=true;
