@@ -155,14 +155,18 @@ export default {
                 projectImg:'',
             }, 
             deleteImageVisiable:false,
-            deleteImageIndex:''
+            deleteImageIndex:'',
+            userId:'',
+            QJFileManageSystemURL:''
         }
     },
     created(){
-        var vm = this
+       // var vm = this;
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
+        this.BDMSUrl = this.$store.state.BDMSUrl+'project2/'
         this.token = localStorage.getItem('token');
+        this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
-        vm.BDMSUrl = vm.$store.state.BDMSUrl+'project2/'
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
@@ -433,15 +437,20 @@ export default {
             this.imageType = 2;
         },
         upImgSure(){
+            var returnUrl = this.BDMSUrl+'/uploadImage?imageType='+this.imageType;
+            returnUrl = encodeURIComponent(returnUrl);
             const formData = new FormData();
-            formData.append('fileData',this.filesList[0]);
             formData.append('projId',this.projId);
-            formData.append('imageType',this.imageType);
+            formData.append('type','1');
+            formData.append('userId',this.userId);
+            formData.append('modelCode','001');
+            formData.append('returnUrl',returnUrl)
+            formData.append('token',this.token);
+            formData.append('file',this.filesList[0]);
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/uploadImage',
+                url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
                 headers:{
-                    'token':this.token,
                     'Content-Type': 'multipart/form-data'
                 },
                 data:formData

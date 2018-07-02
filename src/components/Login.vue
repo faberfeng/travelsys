@@ -14,8 +14,8 @@
                 <div class="loginDialog">
                     <p class="loginBodyText">系统账号登陆</p>
                     <div class="loginInput">
-                        <div id="firstInp"><input placeholder="账号" class="input" v-model="login.Id"/></div>
-                        <div id="secondInp" class="af"><input @keyup.enter="Login" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
+                        <div id="firstInp"><input placeholder="账号" name="id" class="input" v-model="login.Id"/></div>
+                        <div id="secondInp" class="af"><input @keyup.enter="Login" autocomplete="off" name="password" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
                     </div>
                     <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
                     
@@ -84,18 +84,17 @@ export default {
         //
         Login(){
             this.login.Password = md5(this.login.Password);
-            var isHege = false;
+            var formData = new FormData();
+            formData.append('account',this.login.Id.trim());
+            formData.append('isRemember',this.isAuto);
+            formData.append('password',this.login.Password);
             axios({
                 method: 'Post',
                 url: this.BDMSUrl + 'project2/login',
                 headers: {
                     'content-type': 'application/json;charset=UTF-8',
                 },
-                params: {
-                    'account': this.login.Id.trim(),
-                    'isRemember': this.isAuto,
-                    'password': this.login.Password
-                }
+                data:formData
             }).then((response) => {
                 this.projectData = response.data;
                 if (this.projectData.cd === '10004') {
