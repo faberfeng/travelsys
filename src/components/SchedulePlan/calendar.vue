@@ -251,7 +251,7 @@
         </thead>
         <tbody>
         <tr v-for="(day,k1) in days" style="{'animation-delay',(k1*30)+'ms'}">
-            <td v-for="(child,k2) in day" :class="{'selected':child.selected,'disabled':child.disabled}" @click="select(k1,k2,$event)">
+            <td v-for="(child,k2) in day" :class="{'selected':child.selected,'disabled':child.disabled}" >
                 <span :class="{'red':k2==0||k2==6||((child.isLunarFestival||child.isGregorianFestival) && lunar)}">{{child.day}}</span>
                 <div class="text" v-if="child.eventName!=undefined">{{child.eventName}}</div>
                 <div class="text" :class="{'isLunarFestival':child.isLunarFestival,'isGregorianFestival':child.isGregorianFestival}" v-if="lunar">{{child.lunar}}</div>
