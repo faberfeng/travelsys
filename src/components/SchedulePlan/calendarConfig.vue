@@ -230,7 +230,7 @@
                                         <tr v-for="(item,index) in taskStatusList" :key="index">
                                             <td v-text="$options.filters.statusName(item.taskStatus)"></td>
                                             <td v-html="$options.filters.selectColor(parseInt(item.colorValue))"></td>
-                                            <td><el-checkbox v-model="view"  @change="checkChange(item.id)"></el-checkbox></td>
+                                            <td><el-checkbox v-model="item.view"  @change="checkChange(index)"></el-checkbox></td>
                                             <td>
                                                 <button class="changeBtn actionBtn" title="更改" @click="updateTSColor(item.id)"></button>
                                             </td>
@@ -272,6 +272,7 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
                          <el-date-picker
                             v-model="startweektimeValue"
+                            @change="getSTime" format="yyyy-MM-dd" 
                             type="date"
                             placeholder="选择日期时间">
                         </el-date-picker>
@@ -279,6 +280,7 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">结束时间 :</label>
                             <el-date-picker
                             v-model="endweektimeValue"
+                             
                             type="date"
                             placeholder="选择日期时间">
                         </el-date-picker>
@@ -306,6 +308,7 @@
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
                          <el-date-picker
                             v-model="startweektimeValue"
+                            @change="getSTime" format="yyyy-MM-dd" 
                             type="date"
                             placeholder="选择日期时间">
                         </el-date-picker>
@@ -1402,9 +1405,9 @@ export default{
              calendar1:{
                 value:[2018,7,2], //默认日期
                 // lunar:true, //显示农历
-                weeks:['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                weeks:['日', '一', '二', '三', '四', '五', '六'],
                 display:"2018/02/16",
-                months:['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                months:['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
                 events:{
                     // '2017-7-7':'$408',
                     // '2017-7-20':'$408',
@@ -1440,6 +1443,7 @@ export default{
             updateweektimeDialog:false,
             startweektimeValue:'',
             endweektimeValue:'',
+            weekNumList:'',
             cwtimeName:'',
             cwtId:'',
             colorindex:0,
@@ -1487,8 +1491,40 @@ export default{
                 }
             ],//例外休息日(判断是否为工作日)
            checkList:[],
-           item1:'',
-           item2:'',
+           item1:1,
+           item2:1,
+           yearList:'',
+           checkWeekListNum:'',
+           checkWeekNumList:[
+               {
+                text:'周一',
+               num:1
+               },
+               {
+                   text:'周二',
+                   num:1
+               },
+               {
+                   text:'周三',
+                   num:1
+               },
+               {
+                   text:'周四',
+                   num:1
+               },
+               {
+                   text:'周五',
+                   num:1
+               },
+               {
+                   text:'周六',
+                   num:1
+               },
+               {
+                   text:'周日',
+                   num:1
+               }
+           ],
            checkWeekList:[
                {
                 text:'周一',
@@ -2196,6 +2232,14 @@ export default{
 
     },
     methods:{
+        //时间选择器
+            StrToGMT(time){
+                let GMT = new Date(time)
+                return GMT
+            },
+        getSTime(val){
+           console.log(val);
+        },
         //日历
         
         selecttime(item,index){
@@ -2530,13 +2574,14 @@ export default{
                 },
             }).then(response=>{
                 if(response.data.cd=='0'){
-                    this.taskStatusList=response.data.rt;
-                    this.taskStatusList.forEach((item,index,arr)=>{
+                    var rt = response.data.rt;
+                    rt.forEach((item,index,arr)=>{
                         if(item.useInView==1){
-                            this.view=true;
+                            item.view=true;
                         }else{
-                            this.view=false;
+                            item.view=false;
                         }
+                        this.taskStatusList.push(item);
                     })
                    
                 }else if(response.data.cd=='-1'){
@@ -2549,23 +2594,18 @@ export default{
             })
         },
         //应用表格改变事件(这个还有错误)
-        // checkChange(index){
-           
-        //     this.taskStatusList.forEach((item)=>{
-        //         if(item.id==index){
-        //             this.id=item.id;
-        //         }
-        //     });
-        //     this.setUseInView();
-        // },
+        checkChange(index){
+
+            this.setUseInView(index);
+        },
         //应用到表格
-        setUseInView(){
+        setUseInView(index){
             axios({
                 method:'get',
                 url:this.BDMSUrl+'/project2/schedule/setUseInView',
                 params:{
-                    id:this.id,
-                    useInView:this.view
+                    id:this.taskStatusList[index].id,
+                    useInView:this.taskStatusList[index].view?1:0
                 },
             }).then(response=>{
                 if(response.data.cd=='0'){
@@ -2671,6 +2711,8 @@ export default{
         },
         //确认新增工作周
         addweektimeMakeSure(){
+            console.log(this.startweektimeValue);
+            console.log(this.dateChange(this.startweektimeValue));
             let weekNum = [];
             this.weektimeList.forEach((item)=>{
                 weekNum.push(item.num);
@@ -2718,7 +2760,7 @@ export default{
             
             this.weektimeList.forEach((item,index)=>{
                 item.num=0;
-                if(this.weekNumList[index]==0){
+                if(this.weekNumList[index]==1){
                     item.num=1
                 }
             })
@@ -2729,8 +2771,9 @@ export default{
             this.weektimeNum=index;
             this.cwtId=this.cwtList[this.weektimeNum].id;
             this.cwtimeName=this.cwtList[this.weektimeNum].cwtName;
-            this.startweektimeValue=this.dateChange(this.cwtList[this.weektimeNum].cwtStart);
-            this.endweektimeValue=this.dateChange(this.cwtList[this.weektimeNum].cwtEnd);
+            this.startweektimeValue=this.StrToGMT(this.cwtList[this.weektimeNum].cwtStart);
+            console.log(this.startweektimeValue);
+            this.endweektimeValue=this.StrToGMT(this.cwtList[this.weektimeNum].cwtEnd);
 
              this.calendarIndex.forEach((item)=>{
                 var vm=this;
@@ -2741,13 +2784,15 @@ export default{
                 }
             })
             this.weekNumList=this.cwtList[this.weektimeNum].cwtContent.split('');
+            console.log(JSON.stringify(this.weekNumList))
            
             this.weektimeList.forEach((item,index)=>{
                 item.num=0;
-                if(this.weekNumList[index]==0){
+                if(this.weekNumList[index]==1){
                     item.num=1
                 }
             })
+            console.log(JSON.stringify(this.weektimeList))
             this.updateweektimeDialog=true;
         },
         // 时间检查器
@@ -2798,7 +2843,11 @@ export default{
                 this.cwtimeName='';
                 this.startweektimeValue='';
                 this.endweektimeValue='';
-                this.weekNum='';
+                this.weektimeList.forEach((item,index)=>{
+                    if(item.index>4){
+                        item.num=1
+                    }
+                })
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg)   
             }else{
@@ -2871,13 +2920,57 @@ export default{
         },
         //点击编辑例外休息日
         undateExceptionDate(index){
+             this.updateExceptionDateDialog=true;
             this.cedListNum=index;
-            this.updateExceptionDateDialog=true;
+            this.id=this.cedList[this.cedListNum].id;
+            this.cedContent=this.cedList[this.cedListNum].cedContent;
             this.cedateName=this.cedList[this.cedListNum].cedName;
             this.shifouday=this.cedList[this.cedListNum].workDay;
+
             this.repeatway=this.cedList[this.cedListNum].cedType;
-             this.startValue=this.dateChange(this.cedList[this.cedListNum].cedStart);
-            this.endValue=this.dateChange(this.cedList[this.cedListNum].cedEnd);
+             if(this.repeatway=="4"){
+                this.weekdayshow=false;
+                this.monthshow=false;
+                this.yearshow=false;
+            }
+            else if(this.repeatway=="3")
+            {
+                this.weekdayshow=true;
+                this.monthshow=false;
+                this.yearshow=false;
+               this.checkWeekListNum=this.cedList[this.cedListNum].cedContent.split('');
+               console.log(this.checkWeekListNum);
+                console.log(JSON.stringify(this.checkWeekNumList));
+             this.checkWeekNumList.forEach((item,index)=>{
+                  if(item.num==this.checkWeekListNum[index])
+                     {
+                          this.checkList.push(item.text)
+                      }  
+              });
+              this.checkList=Array.from(new Set(this.checkList));
+              console.log(JSON.stringify(this.checkList))
+                //  this.checkList='';
+              
+            }
+            else if(this.repeatway=="2")
+            {
+                this.weekdayshow=false;
+                this.monthshow=true;
+                this.yearshow=false;
+                this.value=this.cedList[this.cedListNum].cedContent;
+               
+            }
+            else if(this.repeatway=="1"){
+                this.weekdayshow=false;
+                this.monthshow=false;
+                this.yearshow=true;
+                this.yearList=this.cedList[this.cedListNum].cedContent.split('-');
+                this.item1= this.yearList[0];
+                this.item2= this.yearList[1];
+                console.log(JSON.stringify(this.yearList))
+            }
+             this.startValue=this.StrToGMT(this.cedList[this.cedListNum].cedStart);
+            this.endValue=this.StrToGMT(this.cedList[this.cedListNum].cedEnd);
         },
         //删除例外休息日
         deleteExceptionDate(num)
@@ -3036,8 +3129,6 @@ export default{
                 this.weekdayshow=false;
                 this.monthshow=false;
                 this.yearshow=true;
-               
-               
             }
         },
         //
@@ -3050,6 +3141,7 @@ export default{
                     }
                 })
             });
+            console.log(this.checkList+'123')
              let weekNum1 = [];
             this.checkWeekList.forEach((item)=>{
                 weekNum1.push(item.num);
@@ -3058,6 +3150,7 @@ export default{
             //  this.cedContent=weekNum1;
              
               this.cedContent=weekNum1; 
+              console.log(this.cedContent)
         },
         changemonth(){
             this.cedContent=this.value  
@@ -3110,8 +3203,14 @@ export default{
                         this.getCalendarIndex();
                         this.shifouday=this.workDayList[0].value;
                         this.repeatway=this.cedTypeList[0].value;
+                        if(this.repeatway='4'){
+                            this.weekdayshow=false;
+                            this.monthshow=false;
+                            this.yearshow=false;
+                        };
                         this.cedateName='';
                         this.cedContent='';
+                        this.checkList=[];
                         this.startValue='';
                         this.endValue='';
                         this.addExceptionDateDialog=false;
@@ -3127,15 +3226,66 @@ export default{
         },
         //编辑例外休息日确定
         updateEDMakeSure(){
-            this.updateExceptionDateDialog=false
+            console.log(this.cedContent);
+            if(this.cedateName==''){
+                alert('请输入名称')
+            }else{
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/exceptionDate/update',
+                    headers:{
+                        'token':this.token
+                    },
+                    data:{
+                        tempId:this.numId,
+                        id:this.id,
+                        cedName:this.cedateName,
+                        cedType:this.repeatway,
+                        workDay:this.shifouday,
+                        cedContent:this.cedContent,
+                        cedStart:this.dateChange(this.startValue),
+                        cedEnd:this.dateChange(this.endValue),
+                    }
+                }).then(response=>{
+                    if(response.data.cd=='0'){
+                        this.getCalendarTemplateInfo(this.numId);
+                        this.getCalendarIndex();
+                        this.shifouday=this.workDayList[0].value;
+                        this.repeatway=this.cedTypeList[0].value;
+                        if(this.repeatway='4'){
+                            this.weekdayshow=false;
+                            this.monthshow=false;
+                            this.yearshow=false;
+                        };
+                        this.cedateName='';
+                        this.cedContent='';
+                        this.checkList=[];
+                        this.startValue='';
+                        this.endValue='';
+                       this.updateExceptionDateDialog=false;
+                    }else if(response.data.cd  == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }
+            
         },
         upadteEDlistClose(){
             this.cedListNum='';
             this.cedateName='';
-            this.shifouday='';
-            this.repeatway='';
-             this.startValue='';
+            this.shifouday=this.workDayList[0].value;
+            this.startValue='';
             this.endValue='';
+            this.repeatway=this.cedTypeList[0].value;
+            if(this.repeatway='4'){
+                this.weekdayshow=false;
+                this.monthshow=false;
+                this.yearshow=false;
+            };
             this.updateExceptionDateDialog=false
         },
         //弹窗关闭
@@ -3149,7 +3299,13 @@ export default{
         },
         listClose(){
             this.addExceptionDateDialog=false;
-            this.cedateName=''
+            this.cedateName='';
+            this.repeatway=this.cedTypeList[0].value;
+            if(this.repeatway='4'){
+                this.weekdayshow=false;
+                this.monthshow=false;
+                this.yearshow=false;
+            };
         },
         //新增任务组别
         addTaskGroup(){
@@ -3306,6 +3462,7 @@ export default{
                     if(response.data.cd=='0'){
                         // this.getLodeTaskCheckConfig();
                         // this.getlodeComponentCheckConfig();
+                        alert('任务核实修改成功')
                     }else if(response.data.cd  == '-1'){
                         alert(response.data.msg)
                     }else{
