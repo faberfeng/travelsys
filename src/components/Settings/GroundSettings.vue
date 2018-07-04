@@ -6,7 +6,7 @@
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-info.png"/>场地信息<span :class="[{'groundEdit-active':!canEdit},'groundEdit']" @click="groundInfoEdit"></span></h5>
             <div :class="[{'groundInfoInp-active':!canEdit},'groundInfoInp']">
                 <ul>
-                    <li><label>城市坐标系名称</label><el-input v-model="groundInfo.siteId" :disabled="canEdit" class="sInp"></el-input></li>
+                    <li><label>城市坐标系名称</label><el-input v-model="groundInfo.pointName" :disabled="canEdit" class="sInp"></el-input></li>
                     <li>
                         <label>场地原点</label>
                         <div>
@@ -91,14 +91,14 @@
                     <el-table-column prop="Loaded" label="当前状态"></el-table-column>
                     <el-table-column prop="groundAction" label="操作">
                         <template slot-scope="scope" >
-                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon" src="../../assets/recircle.png"/></div>
-                            <div class="iconDiv "><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
-                            <div class="iconDiv " @click="deleteTableRow(scope)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv" @click="groundTableUninstall(scope)"><img  :alt="loadState?'加载资源':'卸载资源'" class="iconImg editIcon" src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
+                            <div class="iconDiv" @click="deleteTableRow(scope)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
                 <div class="pagenation">   
-                    <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
+                    <el-pagination background layout="prev, pager, next" :total="unityData.length"></el-pagination>
                 </div>
             </div>
         </div>
@@ -129,6 +129,60 @@
                     <button class="editBtnC" @click="editListClose">取消</button>
                 </div>
             </el-dialog>
+            <!-- 删除资源包 -->
+            <el-dialog title="删除资源" :visible.sync="deleteUnityBundle" :before-close="deleteUnityClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称 :</label><input class="inp" disabled v-model="unityName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">场地 :</label><input class="inp" disabled v-model="unityGround"/></div>
+                    <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" disabled v-model="unityRemark"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="deleteUnitySure">确定</button>
+                    <button class="editBtnC" @click="deleteUnityClose">取消</button>
+                </div>
+            </el-dialog>
+            <!-- 卸载资源包 -->
+            <el-dialog :title="loadState?'加载资源':'卸载资源'" :visible.sync="uninstallUnityBundle" :before-close="deleteUnityClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称 :</label><input class="inp" disabled v-model="unityName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">场地 :</label><input class="inp" disabled v-model="unityGround"/></div>
+                    <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" disabled v-model="unityRemark"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="uninstallUnityBundleSure">卸载</button>
+                    <button class="editBtnC" @click="uninstallUnityBundleClose">取消</button>
+                </div>
+            </el-dialog>
+            <!-- 资源包属性编辑 -->
+            <el-dialog title="资源包属性编辑" :visible.sync="editUnityBundleProperty" :before-close="editUnityBundlePropertyClose">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText">资源包名 :</label><span>{{fileName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{fileName}}</span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
+                        <select  class="editSelect" v-model="platform" >
+                            <option >Web</option>
+                            <option >Android</option>
+                            <option >iOS</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">单体外皮 :</label>
+                        <select  class="editSelect" v-model="bundlesrface" >
+                            <option v-for="(item,index) in editUnityPropertyData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源备注 :</label><input class="inp" v-model="editUnityRemark"/></div>
+                    <div class="editBodytwo"><label class="editInpText"></label><el-checkbox v-model="isLoading">加载</el-checkbox></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editUnityBundlePropertySure">添加</button>
+                    <button class="editBtnC" @click="editUnityBundlePropertyClose">取消</button>
+                </div>
+            </el-dialog>
             <!--新增资源包弹窗-->
             <el-dialog title="上传文件" :visible.sync="addgroundShow" :before-close="groundClose">
                 <div class="editBody">
@@ -145,39 +199,37 @@
                     <button class="editBtnC" @click="groundClose">取消</button>
                 </div>
             </el-dialog>
+            <!-- 修改场地资源包 -->
+            <el-dialog title="修改场地资源包" :visible.sync="editgroundShow" :before-close="editGroundClose">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText">资源包名 :</label><span>{{resourceName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{resourceSize}}</span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
+                        <select  class="editSelect" v-model="platform" >
+                            <option >Web</option>
+                            <option >Android</option>
+                            <option >iOS</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">单体外皮 :</label>
+                        <select  class="editSelect" v-model="bundlesrface" >
+                            <option v-for="(item,index) in editUnityPropertyData" :key="index">{{item}}</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源备注 :</label><input class="inp" v-model="editUnityRemark"/></div>
+                    <div class="editBodytwo"><label class="editInpText"></label><el-checkbox v-model="isLoading">加载</el-checkbox></div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="editGroundSure">确 定</el-button>
+                    <el-button @click="editGroundClose">取 消</el-button>
+                </span>
+            </el-dialog>
         </div>
-        <el-dialog title="修改场地资源包" :visible.sync="editgroundShow" :before-close="groundClose">
-            <el-form label-width="150px" label-position="right">
-                <el-form-item label="序号">
-                    <el-input v-model="groundIndex"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源包名称">
-                    <el-input v-model="groundName" placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源类型">
-                    <el-input v-model="groundCategroy"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源名称">
-                    <el-input v-model="groundSourceName"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="资源包大小">
-                    <el-input v-model="groundSourceSize"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="版本">
-                    <el-input v-model="groundVersion"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="groundRemark"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="当时状态">
-                    <el-input v-model="groundState"  placeholder="请输入"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="editGroundSure">确 定</el-button>
-                <el-button @click="groundClose">取 消</el-button>
-            </span>
-        </el-dialog>
         <!--删除提醒-->
         <div id="inital">
             <el-dialog  :visible.sync="deleteListDialog" width="398px">
@@ -265,11 +317,31 @@ export default {
             unityData:[],//场地资源包
             fileName:'未选择任何文件',
             filesList:[],
-            fileUpdataPath:''
+            fileUpdataPath:'',
+            userId:'',
+            deleteUnityBundle:false,
+            unityGround:'',
+            unityName:'',
+            unityRemark:'',
+            unityBundleSource:{},
+            editUnityBundleProperty:false,//编辑资源包属性
+            bundlesrface:'【不关联任何单体】',
+            editUnityPropertyData:['【不关联任何单体】'],
+            platform:'Web',
+            isLoading:false,
+            editUnityName:'',
+            editUnityRemark:'',
+            uninstallUnityBundle:false,
+            unInstallData:{},
+            loadState:false,
+            resourceSize:'',
+            resourceName:'',
+            editGorundData:{}
         }
     },
     created(){
         this.fileUpdataPath = this.$store.state.QJFileManageSystemURL;
+        this.userId = localStorage.getItem('userid')
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.getGroundInformation();//场地信息
@@ -495,6 +567,80 @@ export default {
                 }
             }
         },
+        //编辑资源包
+        groundTableEdit(scope){
+            this.editGorundData = scope.row;
+            this.editgroundShow = true;
+            console.log(scope.row);
+            this.editUnityPropertyData = ['【不关联任何单体】'];
+            this.listData.forEach(item=>{
+                this.editUnityPropertyData.push(item.Name)
+            })
+            this.editUnityName = scope.row.FileName;
+            if(scope.row.Platform == 0){
+                this.platform = 'Web';
+            }else if(scope.row.Platform == 4){
+                this.platform = 'Android';
+            }else if(scope.row.Platform == 3){
+                this.platform = 'iOS';
+            }
+            this.resourceName = scope.row.FileName
+            this.resourceSize = scope.row.FileSize;
+            
+            this.bundlesrface = '【不关联任何单体】';
+            this.listData.forEach(item=>{
+                if(item.ID == scope.row.ResourceTag.split('=')[1]){
+                    this.bundlesrface = item.Name;
+                }
+            })
+            this.editUnityRemark = scope.row.Comments;
+            if(scope.row.Loaded == '加载'){
+                this.isLoading = true;
+            }else{
+                this.isLoading = false;
+            }
+        },
+        editGroundSure(){
+            
+            var platform = 0;
+            if(this.platform == 'Web'){
+                platform = 0;
+            }else if(this.platform == 'Android'){
+                platform = 4;
+            }else if(this.platform == 'iOS'){
+                platform = 3;
+            }
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/updateUnityBundle',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    holderId:this.groundInfo.siteId
+                },
+                data:{
+                    Comments:this.editUnityRemark,
+                    ID:this.editGorundData.ID,
+                    Loaded:this.isLoading,
+                    Platform:platform,
+                    ResourceName:this.editGorundData.ResourceName,
+                    ResourceTag:this.editGorundData.ResourceTag
+                }
+
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    console.log(response.data);
+                    this.getUnityBundle();
+                    this.editgroundShow = false;
+                }else{
+                    alert(response.data.cd)
+                }
+            })
+        },
+        editGroundClose(){
+            this.editgroundShow = false;
+        },
         editListClose(){
             this.editListShow = false
             this.addListindex = '';
@@ -502,38 +648,6 @@ export default {
             this.addListcoordinate='';
             this.addListhigh='';
             this.addListangle='';
-        },
-        groundTableEdit(index){
-            this.groundIndexNumber = index.$index;
-            this.groundIndex = this.groundSourceData[this.groundIndexNumber].groundIndex,
-            this.groundName = this.groundSourceData[this.groundIndexNumber].groundName;
-            this.groundCategroy = this.groundSourceData[this.groundIndexNumber].groundCategroy,
-            this.groundSourceName = this.groundSourceData[this.groundIndexNumber].groundSourceName;
-            this.groundSourceSize = this.groundSourceData[this.groundIndexNumber].groundSourceSize;
-            this.groundVersion = this.groundSourceData[this.groundIndexNumber].groundVersion;
-            this.groundRemark = this.groundSourceData[this.groundIndexNumber].groundRemark;
-            this.groundState = this.groundSourceData[this.groundIndexNumber].groundState;
-            this.editgroundShow = true;
-        },
-        editGroundSure(){
-            this.editgroundShow = false;
-            this.groundSourceData[this.groundIndexNumber].groundIndex = this.groundIndex,
-            this.groundSourceData[this.groundIndexNumber].groundName = this.groundName ;
-            this.groundSourceData[this.groundIndexNumber].groundCategroy = this.groundCategroy;
-            this.groundSourceData[this.groundIndexNumber].groundSourceName = this.groundSourceName;
-            this.groundSourceData[this.groundIndexNumber].groundSourceSize = this.groundSourceSize;
-            this.groundSourceData[this.groundIndexNumber].groundVersion = this.groundVersion;
-            this.groundSourceData[this.groundIndexNumber].groundRemark = this.groundRemark;
-            this.groundSourceData[this.groundIndexNumber].groundState = this.groundState;
-            //清空数据
-            this.groundIndex = '',
-            this.groundName = '';
-            this.groundCategroy = '';
-            this.groundSourceName = '';
-            this.groundSourceSize = '';
-            this.groundVersion = '';
-            this.groundRemark = '';
-            this.groundState = '';
         },
         groundClose(){
             this.editgroundShow = false;
@@ -578,8 +692,87 @@ export default {
                 }
             })
         },
-        deleteTableRow(index, rows) {
-            //rows.splice(index, 1);
+        //卸载资源包
+        groundTableUninstall(scope){
+            if(scope.row.Loaded == '加载'){
+                this.loadState = false;
+            }else{
+                this.loadState = true;
+            }
+            this.unInstallData = scope.row;
+            this.unityName = scope.row.FileName;
+            this.unityGround = scope.row.ResourceType;
+            this.unityRemark = scope.row.Comments;
+            this.uninstallUnityBundle = true;
+
+        },
+        uninstallUnityBundleSure(){
+            axios({
+                method:'post',
+                url:this.baseUrl+'h2-bim-project/project2/Config/setUnityBundleStatus',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    'bundleId':this.unInstallData.ID,
+                    'bundleStatus':this.loadState
+
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    alert('操作成功!');
+                    this.getUnityBundle()
+                    this.unityName ='';
+                    this.unityGround ='';
+                    this.unityRemark ='';
+                    this.uninstallUnityBundle = false;
+                }else{
+                    alert(response.data.msg)
+                }
+            })
+            
+        },
+        uninstallUnityBundleClose(){
+            this.uninstallUnityBundle = false;
+            this.unityName ='';
+            this.unityGround ='';
+            this.unityRemark ='';
+        },
+        //删除资源包
+        deleteTableRow(scope) {
+            this.unityBundleSource = scope.row;
+            this.deleteUnityBundle = true;
+            this.unityName = scope.row.FileName;
+            this.unityGround = scope.row.ResourceType;
+            this.unityRemark = scope.row.Comments;
+        },
+        //确认删除资源包
+        deleteUnitySure(){
+            axios({
+                method:'get',
+                url:this.baseUrl+'/h2-bim-project/project2/Config/deleteUnityBundle',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    fileId:this.unityBundleSource.ID,
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    alert('删除成功！');
+                    this.getUnityBundle();
+                    this.deleteUnityBundle = false;
+                    this.unityRemark = '';
+                    this.unityName ='';
+                    this.unityRemark ='';
+                }else{
+                    alert(response.data.msg)
+                }
+            })
+        },
+        deleteUnityClose(){
+            this.deleteUnityBundle = false;
         },
         getGroundInformation(){
             axios({
@@ -692,7 +885,7 @@ export default {
                 if(response.data.cd == '0'){
                     this.unityData = response.data.rt;
                     this.unityData.forEach((item,index,arr)=>{
-                        arr[index].index = index;
+                        arr[index].index = index+1;
                         arr[index].FileName=item.FileName.split('.')[0];
                         if(item.ResourceType == 'utr'){
                             arr[index].ResourceType = '场地';
@@ -719,34 +912,49 @@ export default {
         //新增资源包
         addSource(){
             this.addgroundShow = true;
+            this.filesList = [];
         },
         //新增场地资源包
         addGroundSure(){
-            var returnUrl = this.baseUrl+'/h2-bim-project/project2/upload/uploadBunldeDataFile';
+            var _this = this;
+            if(_this.platform == 'Web'){
+                _this.platform = 0;
+            }else if(_this.platform == 'Android'){
+                _this.platform = 4;
+            }else if(_this.platform == 'iOS'){
+                _this.platform = 3;
+            }
+            var editName =0;
+            _this.listData.forEach((item,index)=>{
+                if(item.Name == _this.bundlesrface){
+                    editName = item.ID
+                }
+            })
+            var returnUrl = _this.baseUrl+'/h2-bim-project/project2/upload/uploadBundleDataFile?holderId='+_this.groundInfo.siteId+'&mainAsset='+_this.editUnityName+'&assetComment='+_this.editUnityRemark+'&assetStatus='+_this.isLoading+'&platform'+_this.platform+'&buildSurface'+editName;
             returnUrl = encodeURIComponent(returnUrl);
             const formData = new FormData();
-            formData.append('projId',this.projId);
+            formData.append('projId',_this.projId);
             formData.append('type','1');
-            formData.append('userId',this.userId);
+            formData.append('userId',_this.userId);
             formData.append('modelCode','001');
             formData.append('returnUrl',returnUrl)
-            formData.append('token',this.token);
-            formData.append('file',this.filesList[0]);
+            formData.append('token',_this.token);
+            formData.append('file',_this.filesList[0]);
             axios({
                 method:'post',
-                url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                url:_this.fileUpdataPath + 'uploading/uploadFileInfo',
                 headers:{
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
                 },
                 data:formData
             }).then(response=>{
                 if(response.data.cd== '0'){
-                    this.getUnityBundle()
-                    this.addgroundShow = false;
+                    _this.getUnityBundle()
+                    _this.addgroundShow = false;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
-                    this.$router.push({
+                    _this.$router.push({
                         path:'/login'
                     })
                 }
@@ -759,8 +967,17 @@ export default {
             const list = this.$refs.file.files;
             this.fileName = list[0].name;
             this.filesList = list;
+            this.editUnityBundleProperty = true;
+            this.listData.forEach(item=>{
+                this.editUnityPropertyData.push(item.Name)
+            })
+        },
+        editUnityBundlePropertySure(){
+            this.editUnityBundleProperty = false;
+        },
+        editUnityBundlePropertyClose(){
+            this.editUnityBundleProperty = false;
         }
-
     }
 }
 </script>
@@ -1104,7 +1321,32 @@ export default {
         .editInpText{
             display: inline-block;
             margin-left: 40px;
-
+        }
+        .edit-item{
+            position: relative;
+            .editSelect{
+                float: left;
+                width: 447px;
+                height: 40px;
+                padding: 10px;
+            }
+            .icon-sanjiao{
+                position: relative;
+                left: 580px;
+                z-index: 100;
+            }
+            .editInpText{
+                width: 100px;
+                text-align: right;
+                float: left;
+                height: 40px;
+                line-height: 40px;
+            }
+        }
+        .clearfix{
+            clear: both;
+            overflow: hidden;
+            content: '';
         }
     }
     /* 上传文件按钮 */
