@@ -51,33 +51,28 @@
         <div class="flor" style="margin-bottom:30px;">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
-                <el-table :data="sourceData" border class="table"  style="width:100%">
-                    <el-table-column label="序号" prop="index"></el-table-column>
-                    <el-table-column label="资源包名称" prop="sourceBagName"></el-table-column>
-                    <el-table-column label="资源类型" prop="sourceType"></el-table-column>
-                    <el-table-column label="资源名称" prop="sourceName"></el-table-column>
-                    <el-table-column label="资源大小" prop="sourceSize"></el-table-column>
-                    <el-table-column label="上传时间" prop="updateTime" ></el-table-column>
-                    <el-table-column label="版本" prop="version"></el-table-column>
-                    <el-table-column label="备注" prop="remarks"></el-table-column>
-                    <el-table-column label="当前状态" prop="state" width="120px"></el-table-column>
-                    <el-table-column label="操作" width="120px">
+                <el-table :data="UnityBundle" border class="table"  style="width:100%">
+                    <el-table-column prop="index" label="序号"></el-table-column>
+                    <el-table-column prop="FileName" label="资源包名称"></el-table-column>
+                    <el-table-column prop="ResourceType" label="资源类型"></el-table-column>
+                    <el-table-column prop="ResourceName" label="资源名称"></el-table-column>
+                    <el-table-column prop="FileSize" label="资源包大小"></el-table-column>
+                    <el-table-column prop="UpdateTime" label="上传时间"></el-table-column>
+                    <el-table-column prop="FileVersion" label="版本"></el-table-column>
+                    <el-table-column prop="Comments" label="备注"></el-table-column>
+                    <el-table-column prop="Loaded" label="当前状态"></el-table-column>
+                    <el-table-column label="操作">
                         <template slot-scope="scope" >
-                            <div class="iconDiv iconDiv2" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
-                            <div class="iconDiv iconDiv2" style="width:17px;height:17px;"><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
-                            <div class="iconDiv iconDiv2" @click="deleteRow(scope.$index, sourceData)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv iconDiv2" @click="groundTableUninstall(scope)"><img  class="iconImg editIcon"  src="../../assets/recircle.png"/></div>
+                            <div class="iconDiv iconDiv2" style="width:17px;height:17px;" @click="groundTableEdit(scope)"><img  class="iconImg editIcon"  src="../../assets/info.png"/></div>
+                            <div class="iconDiv iconDiv2" @click="deleteTableRow(scope)"><img  class="iconImg editIcon"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
             </div>
-            <!-- <div class="pagination">
-                <el-pagination
-                :page-sizes="[10, 20, 30, 40]"
-                :page-size="100"
-                 layout="total, sizes, prev, pager, next, jumper"
-                :total="199">
-                </el-pagination>
-            </div> -->
+            <div class="pagenation">   
+                <el-pagination background layout="prev, pager, next" :total="UnityBundle.length"></el-pagination>
+            </div>
         </div>
         <!--dialog-->
         <div id="edit">
@@ -130,14 +125,92 @@
                 </div>
             </el-dialog>
             <!--新增资源包弹窗-->
-            <el-dialog title="上传文件" :visible.sync="addpartitionShow" :before-close="addPartitionCancel">
+            <el-dialog title="上传文件" :visible.sync="addgroundShow" :before-close="groundClose">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">概要文件 :</label><span class="">企业自用办公楼4.png</span><div style="margin-left:208px;margin-top:11px;"><button class="upImgBtn">选择文件</button></div></div>
-                    <div class="editBodytwo"><label class="editInpText">上传图片 :</label><button class="upImgBtn">选择文件</button><span class="upImgText">未选择任何文件</span></div>
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectImg" class="upImgBtn">选择文件</button>
+                            <input class="upInput"  type="file"  @change="fileChanged" ref="file" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{fileName}}</span> 
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="addPartitionSure">上传</button>
-                    <button class="editBtnC" @click="addPartitionCancel">取消</button>
+                    <button class="editBtnS" @click="addGroundSure">上传</button>
+                    <button class="editBtnC" @click="groundClose">取消</button>
+                </div>
+            </el-dialog>
+            <!-- 删除资源包 -->
+            <el-dialog title="删除资源" :visible.sync="deleteUnityBundle" :before-close="deleteUnityClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称 :</label><input class="inp" disabled v-model="unityName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">场地 :</label><input class="inp" disabled v-model="unityGround"/></div>
+                    <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" disabled v-model="unityRemark"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="deleteUnitySure">确定</button>
+                    <button class="editBtnC" @click="deleteUnityClose">取消</button>
+                </div>
+            </el-dialog>
+            <!-- 卸载资源包 -->
+            <el-dialog :title="loadState?'加载资源':'卸载资源'" :visible.sync="uninstallUnityBundle" :before-close="deleteUnityClose">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称 :</label><input class="inp" disabled v-model="unityName"/></div>
+                    <div class="editBodytwo"><label class="editInpText">场地 :</label><input class="inp" disabled v-model="unityGround"/></div>
+                    <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" disabled v-model="unityRemark"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="uninstallUnityBundleSure">卸载</button>
+                    <button class="editBtnC" @click="uninstallUnityBundleClose">取消</button>
+                </div>
+            </el-dialog>
+            <!-- 修改场地资源包 -->
+            <el-dialog title="修改场地资源包" :visible.sync="editgroundShow" :before-close="editGroundClose">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText">资源包名 :</label><span>{{resourceName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{resourceSize}}</span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
+                        <select  class="editSelect" v-model="platform" >
+                            <option >Web</option>
+                            <option >Android</option>
+                            <option >iOS</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源备注 :</label><input class="inp" v-model="editUnityRemark"/></div>
+                    <div class="editBodytwo"><label class="editInpText"></label><el-checkbox v-model="isLoading">加载</el-checkbox><el-checkbox v-model="fenquwaipi">分区外皮</el-checkbox></div>
+                    
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="editGroundSure">确 定</el-button>
+                    <el-button @click="editGroundClose">取 消</el-button>
+                </span>
+            </el-dialog>
+            <!-- 资源包属性编辑 -->
+            <el-dialog title="资源包属性编辑" :visible.sync="editUnityBundleProperty" :before-close="editUnityBundlePropertyClose">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText">资源包名 :</label><span>{{fileName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{fileName}}</span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
+                        <select  class="editSelect" v-model="platform" >
+                            <option >Web</option>
+                            <option >Android</option>
+                            <option >iOS</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">资源备注 :</label><input class="inp" v-model="editUnityRemark"/></div>
+                    <div class="editBodytwo"><label class="editInpText"></label><el-checkbox v-model="isLoading">加载</el-checkbox><el-checkbox v-model="fenquwaipi">分区外皮</el-checkbox></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editUnityBundlePropertySure">添加</button>
+                    <button class="editBtnC" @click="editUnityBundlePropertyClose">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -191,17 +264,6 @@ export default {
         addpartitionShow:false,
         FloorName:'',
         FloorValue:'',
-        sourceData:[{
-            index:'01',
-            sourceBagName:'yanshichangdi',
-            sourceType:'场地',
-            sourceName:'yanshichangdi',
-            sourceSize:'3.39MB',
-            updateTime:'2017-10-23 17:40',
-            version:'239',
-            remarks:'',
-            state:'加载'
-        }],
         floorIndex:'',
         floorScope:{},
         BDMSUrl:'',
@@ -217,12 +279,39 @@ export default {
         deletepartitionContent:'',
         subProjectsIndex:0,
         isDisabled:false,
-        disableShowEdit:''
+        disableShowEdit:'',
+        UnityBundle:[],
+        unityBundleSource:{},
+        deleteUnityBundle:false,
+        unityName:'',
+        unityGround:'',
+        unityRemark:'',
+        addgroundShow:false,
+        fileName:'未选择任何文件',
+        editgroundShow:false,
+        editListShow:false,
+        filesList:[],
+        uninstallUnityBundle:false,
+        unInstallData:{},
+        loadState:false,
+        resourceSize:'',
+        resourceName:'',
+        editGorundData:{},
+        editUnityName:'',
+        editUnityRemark:'',
+        platform:'Web',
+        isLoading:true,
+        fenquwaipi:true,
+        editUnityBundleProperty:false,
+        fileUpdataPath:'',
+        userId:''
 
       }
     },
     created(){
-        var vm = this
+        var vm = this;
+        this.userId = localStorage.getItem('userid');
+        this.fileUpdataPath = this.$store.state.QJFileManageSystemURL;
         vm.token = localStorage.getItem('token');//获取token
         vm.projId = localStorage.getItem('projId');//获取项目projId
         vm.BDMSUrl = vm.$store.state.BDMSUrl
@@ -371,7 +460,6 @@ export default {
         },
         //删除竖向楼层
         deleteFloorRow(scope){
-            
             this.floorIndex = scope.$index;
             this.deleteFloorDialog = true;
         },
@@ -430,7 +518,7 @@ export default {
                     this.subProjectsValue = this.subProjectsName[0].label;
                 }
             }).then(()=>{
-                this.findStore(this.partitionList,0)
+                this.findStore(this.partitionList,0);
             })
         },
         //改变单体名称值 来改变建筑分区的值
@@ -506,6 +594,46 @@ export default {
                     this.$router.push({
                         path:'/login'
                     })
+                }
+            }).then(()=>{
+                this.getUnityBundleByHolderId();
+            })
+        },
+        //获取场地资源包
+        getUnityBundleByHolderId(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/Config/getUnityBundleByHolderId',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    holderId:this.florData[0].ParentID
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    this.UnityBundle = response.data.rt;
+                    if(this.UnityBundle != null){
+                        this.UnityBundle.forEach((item,index,arr)=>{
+                            arr[index].index = index+1;
+                            arr[index].FileName=item.FileName.split('.')[0];
+                            if(item.ResourceType == 'utr'){
+                                arr[index].ResourceType = '场地';
+                            }else if(item.ResourceType == 'umr'){
+                                arr[index].ResourceType = '材质';
+                            }else{
+                                arr[index].ResourceType = '构件';
+                            }
+                            arr[index].FileSize = (item.FileSize/1024/1024).toFixed(2)+'MB';
+                            if(item.Loaded) {
+                                arr[index].Loaded = '加载';
+                            }else{
+                                arr[index].Loaded = '卸载';
+                            }
+                        })
+                    }
+                }else if(response.data.cd =='1'){
+                    alert(response.data.msg)
                 }
             })
         },
@@ -663,20 +791,220 @@ export default {
         },
          //新增分区资源包
         addSource(){
-            this.addpartitionShow = true;
+            this.addgroundShow = true;
+            this.filesList = [];
         },
-        addPartitionSure(){
-            this.addpartitionShow = false;
+        //新增分区资源包
+        addGroundSure(){
+            if(this.platform == 'Web'){
+                this.platform = 0;
+            }else if(this.platform == 'Android'){
+                this.platform = 4;
+            }else if(this.platform == 'iOS'){
+                this.platform = 3;
+            }
+            var holderId = '';
+            this.partitionList.forEach((item,index)=>{
+                if(item.Name == this.partitionListValue || index == this.partitionListValue){
+                    holderId = item.ID
+                }
+            })
+            var returnUrl = this.BDMSUrl+'project2/upload/uploadBundleDataFile?holderId='+holderId+'&mainAsset='+encodeURIComponent(this.editUnityName)+'&assetComment='+encodeURIComponent(this.editUnityRemark)+'&assetStatus='+this.isLoading+'&platform'+this.platform+'&partitionSurface'+this.fenquwaipi;
+            returnUrl = encodeURIComponent(returnUrl);
+            const formData = new FormData();
+            formData.append('projId',this.projId);
+            formData.append('type','1');
+            formData.append('userId',this.userId);
+            formData.append('modelCode','001');
+            formData.append('returnUrl',returnUrl)
+            formData.append('token',this.token);
+            formData.append('file',this.filesList[0]);
+            axios({
+                method:'post',
+                url:this.fileUpdataPath + 'uploading/uploadFileInfo',
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd== '0'){
+                    this.getUnityBundleByHolderId();
+                    this.addgroundShow = false;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
         },
-        addPartitionCancel(){
-            this.addpartitionShow = false;
+        groundClose(){
+            this.addgroundShow = false;
         },
-        groundTableEdit(){
+        //编辑资源包
+        groundTableEdit(scope){
+            this.editGorundData = scope.row;
+            this.editgroundShow = true;
+            console.log(scope.row);
+            this.editUnityName = scope.row.FileName;
+            if(scope.row.Platform == 0){
+                this.platform = 'Web';
+            }else if(scope.row.Platform == 4){
+                this.platform = 'Android';
+            }else if(scope.row.Platform == 3){
+                this.platform = 'iOS';
+            }
+            this.resourceName = scope.row.FileName
+            this.resourceSize = scope.row.FileSize;
+            
+            this.editUnityRemark = scope.row.Comments;
+            if(this.editGorundData.ResourceTag!=null&&this.editGorundData.ResourceTag!=""){
+                this.fenquwaipi = true;
+            }else{
+                this.fenquwaipi = false;
+            }
+            
+            if(scope.row.Loaded == '加载'){
+                this.isLoading = true;
+            }else{
+                this.isLoading = false;
+            }
+        },
+        editGroundSure(){
+            var platform = 0;
+            if(this.platform == 'Web'){
+                platform = 0;
+            }else if(this.platform == 'Android'){
+                platform = 4;
+            }else if(this.platform == 'iOS'){
+                platform = 3;
+            }
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/Config/updateUnityBundle',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    holderId:this.editGorundData.HolderID
+                },
+                data:{
+                    Comments:this.editUnityRemark,
+                    ID:this.editGorundData.ID,
+                    Loaded:this.isLoading,
+                    Platform:platform,
+                    ResourceName:this.editGorundData.ResourceName,
+                    ResourceTag:this.editGorundData.ResourceTag
+                }
+
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    console.log(response.data);
+                    this.getUnityBundleByHolderId();
+                    this.editgroundShow = false;
+                }else{
+                    alert(response.data.cd)
+                }
+            })
+        },
+        editGroundClose(){
+            this.editgroundShow = false;
+        },
+        //卸载资源包
+        groundTableUninstall(scope){
+            if(scope.row.Loaded == '加载'){
+                this.loadState = false;
+            }else{
+                this.loadState = true;
+            }
+            this.unInstallData = scope.row;
+            this.unityName = scope.row.FileName;
+            this.unityGround = scope.row.ResourceType;
+            this.unityRemark = scope.row.Comments;
+            this.uninstallUnityBundle = true;
 
         },
-        deleteRow(){
+        uninstallUnityBundleSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/Config/setUnityBundleStatus',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    'bundleId':this.unInstallData.ID,
+                    'bundleStatus':this.loadState
 
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    alert('操作成功!');
+                    this.getUnityBundleByHolderId()
+                    this.unityName ='';
+                    this.unityGround ='';
+                    this.unityRemark ='';
+                    this.uninstallUnityBundle = false;
+                }else{
+                    alert(response.data.msg)
+                }
+            })
+            
         },
+        uninstallUnityBundleClose(){
+            this.uninstallUnityBundle = false;
+            this.unityName ='';
+            this.unityGround ='';
+            this.unityRemark ='';
+        },
+         //删除资源包
+        deleteTableRow(scope) {
+            console.log(scope)
+            this.unityBundleSource = scope.row;
+            this.deleteUnityBundle = true;
+            this.unityName = scope.row.FileName;
+            this.unityGround = scope.row.ResourceType;
+            this.unityRemark = scope.row.Comments;
+        },
+        //确认删除资源包
+        deleteUnitySure(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/Config/deleteUnityBundle',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    fileId:this.unityBundleSource.ID,
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    alert('删除成功！');
+                    this.getUnityBundleByHolderId();
+                    this.deleteUnityBundle = false;
+                    this.unityRemark = '';
+                    this.unityName ='';
+                    this.unityRemark ='';
+                }else{
+                    alert(response.data.msg)
+                }
+            })
+        },
+        deleteUnityClose(){
+            this.deleteUnityBundle = false;
+        },
+        selectImg(){
+            this.$refs.file.click();
+        },
+        fileChanged(){
+            const list = this.$refs.file.files;
+            this.fileName = list[0].name;
+            this.filesList = list;
+            this.editUnityBundleProperty = true;
+        },
+        editUnityBundlePropertySure(){
+            this.editUnityBundleProperty = false;
+        },
+        editUnityBundlePropertyClose(){
+            this.editUnityBundleProperty = false;
+        }
     }
 }
 </script>
@@ -777,6 +1105,12 @@ export default {
         .flor{
             width: 100%;
             margin: 0 auto;
+            .pagenation{
+                width: 100%;
+                text-align: right;
+                height: 40px;
+                margin-top: 20px;
+            }
         }
         .iconEdit{
             color: #fe731e;
@@ -832,9 +1166,50 @@ export default {
         }
         .editBody{
             margin: 0 30px;
+            
+        }
+        #edit .editSelect{
+            // float: left;
+            width: 447px;
+            height: 42px;
+            padding: 10px;
+            position: relative;
+            left: -5px;
+        }
+        .icon-sanjiao{
+            position: relative;
+            left: 530px;
+            z-index: 100;
+            top: -24px;
+
         }
         .editBodyone,.editBodytwo{
             text-align: left;
+        }
+        /* 上传文件按钮 */
+    #edit .imageBody{
+        text-align: left;
+        }
+        .imageBody .imageBodyText{
+            color: #666;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            display: inline-block;
+            margin-right: 20px;
+            margin-left: 94px;
+            text-align: right;
+    }
+    .updataImageSpan{
+            overflow: hidden;
+            width: 98px;
+        }
+        .updataImageSpan input{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            opacity: 0;
+            /* -ms-filter: 'alpha(opacity=0)'; */
         }
         .editInpText{
             display: inline-block;
@@ -846,6 +1221,7 @@ export default {
             width: 100%;
             text-align: left;
             display: flex;
+            
         }
         .pageTable .table,.sourceTable .table{
             flex: 1;
