@@ -14,7 +14,10 @@ export default new Vuex.Store({
         changePath(state){
           console.log(state.path) ;
           return state.path; 
-        }
+        },
+        getBaseUrl(state){
+            return state.BDMSUrl
+        }   
     },
     mutations:{
         change(state,index){
@@ -22,6 +25,6 @@ export default new Vuex.Store({
             this.getters.changePath;
             console.log(index+'+++++++++');
             console.log(state.path);
-        }
+        },
     }
 })

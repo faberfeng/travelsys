@@ -3171,6 +3171,7 @@ export default {
             console.log(err)
         })
     },
+    //打包
     pointLocationBindClick(){
         var vm = this
         var $rounds = $('#planeDIV').find('.round');

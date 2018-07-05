@@ -125,7 +125,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index,true)">
+                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked},'fileList']" @click="checkItem(index,true)">
                                 <td @click.stop="checkItem(index,true,true)">
                                     <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                     <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
@@ -144,7 +144,7 @@
                                 <td v-text="item.uploadUser"></td>
                                 <td v-text="initData(item.updateTime)"></td>
                             </tr>
-                            <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked}]" @click="checkShareItem(index)"  @dblclick="IntoDir(item)">
+                            <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked},'fgList']" @click="checkShareItem(index)"  @dblclick="IntoDir(item)">
                                 <td @click.stop="checkShareItem(index,true)">
                                     <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                     <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
@@ -159,7 +159,7 @@
                                 <td v-text="item.userName"></td>
                                 <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
                             </tr>
-                            <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
+                            <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked},'folderList']" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
                                 <td @click.stop="checkItem(index,false,true)">
                                     <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
                                     <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">

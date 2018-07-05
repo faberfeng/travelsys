@@ -20,6 +20,7 @@
     "js-md5": "^0.7.3",
     "three": "^0.92.0",
     "vue": "^2.5.2",
+    "vue-full-calendar": "^4.0.0-1",
     "vue-router": "^3.0.1",
     "vue-table-with-tree-grid": "^0.2.4",
     "vuedraggable": "^2.16.0",
