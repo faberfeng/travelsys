@@ -267,7 +267,7 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="importResultSure">导入</button>
+                    <button class="editBtnS" @click="importResultSure">确认</button>
                 </div>
             </el-dialog>
             <el-dialog title="导入标准" :visible.sync="importStandarShow" @close="upImgCancle">
@@ -470,8 +470,10 @@ export default {
         //确认导出
         addMakeSure(){
             var urlP='';
-            this.isModelChecked.forEach(item=>{
-                urlP=urlP+'&items='+item;
+            this.isModelChecked.forEach((item,index)=>{
+                if(item){
+                    urlP=urlP+'&items='+index;
+                }
             })
             this.exportDialog = false;
             var projectName = document.getElementsByClassName('headerText')[0].innerHTML;
@@ -516,6 +518,12 @@ export default {
         importMakeSure(){
             var formData = new FormData();
             formData.append('fileData',this.filesList[0]);
+            var arr = [];
+            this.isModelChecked.forEach((item,index)=>{
+                if(item){
+                    arr.push(index);
+                }
+            })
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/Config/importStandardInfo',
@@ -524,7 +532,7 @@ export default {
                 },
                 params:{
                     projectId:this.projId,
-                    items:this.isModelChecked
+                    items:arr
                 },
                 data:formData
             }).then(response=>{
