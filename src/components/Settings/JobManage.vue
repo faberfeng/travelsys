@@ -96,7 +96,12 @@
             </div>
       </div>
         <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
-            <div class="log-head clearfix">
+            <div class="log-head clearfix" v-if="isEdit">
+                <span class="log-head-title">岗位名称:</span>
+                <el-radio :disabled='isEdit'  v-model="jobDetial.posType" label="3">工程内岗位</el-radio>
+                <el-radio :disabled='isEdit'  v-model="jobDetial.posType" label="4">合作方岗位</el-radio>
+            </div>
+            <div class="log-head clearfix" v-else>
                 <span class="log-head-title">岗位名称:</span>
                 <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
                 <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
@@ -347,7 +352,6 @@ export default {
             var vm = this;
             //var checkCode = [];
             console.log(vm.jobDetial)
-            debugger
             this.checkCode = vm.$refs.tree_job.getCheckedKeys();
             if(vm.jobID == 0){
                 var flag = this.jobList.some(item=>{
