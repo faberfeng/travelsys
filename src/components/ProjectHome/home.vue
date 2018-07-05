@@ -102,7 +102,6 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                //console.log(response.data);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -122,7 +121,6 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                //console.log(response.data);
                 if(response.data.cd === '1'){
                     vm.$router.push({
                         path:'/login'
@@ -141,7 +139,6 @@ export default {
                     'token':this.token
                 }
             }).then((response)=>{
-                //console.log(response.data);
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
@@ -165,7 +162,6 @@ export default {
                     pageSize:100
                 }
             }).then((response)=>{
-                console.log(response.data.rt);
                 if(response.data.cs === '1'){
                     this.$router.push({
                         path:'/login'
@@ -190,7 +186,6 @@ export default {
                     pageSize:100
                 }
             }).then((response)=>{
-                //console.log(response.data.rt.rows);
                 if(response.data.cd === '0'){
                     if(response.data.rt.rows){
                         this.projectNoticeListInfo = response.data.rt.rows;
@@ -227,7 +222,6 @@ export default {
             })
         },
         gotoPath(index){
-            console.log(index);
             if(this.projectNoticeListInfo[index].type=='1'||this.projectNoticeListInfo[index].type=='2'||this.projectNoticeListInfo[index].type=='3'||this.projectNoticeListInfo[index].type=='4'){
                 this.$router.push({
                     path:'/home/design'
