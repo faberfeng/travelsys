@@ -382,13 +382,11 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log(response);
-                console.log(11111111111111111111111111111);
                 //企业为Q3类型，判断用户是否具有企业的“默认岗位，flag为结果
                 if(typeof(response.data.rt.flag) != 'undefined' && response.data.rt.flag == true){
-                    console.log('true')
+                    // console.log('true')
                 }else{
-                    console.log('false')
+                    // console.log('false')
                 }
                 vm.toProjectList()
             }).catch((err)=>{
@@ -407,8 +405,6 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-              console.log(response);
-              console.log('++++++++++++++')
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
                 }
