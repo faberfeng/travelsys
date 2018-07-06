@@ -220,7 +220,7 @@
         <!--下面是创建编辑报表的编码-->
         <common-edit v-on:back="backToH" v-on:aftersave="refrehPage($event)" v-if="showCommonEdit" :rcId='checkItem.rcId'></common-edit>
         <!--下面是报表清单的编码-->
-        <common-list v-on:back="backToH" :mId="checkItem.rssId" :title="'构件量清单'" v-if="showCommonList"></common-list>
+        <common-list v-on:back="backToH" :mId="checkItem.rssId" rType="7" :bId='checkItem.rssId'  :title="'构件量清单'" v-if="showCommonList"></common-list>
         <!--下面是报表数据的编码-->
         <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
     </div>
