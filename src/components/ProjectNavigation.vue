@@ -93,7 +93,7 @@ export default {
                         path:'/login'
                     })
                 }else{
-                    vm.userName = response.data.rt.onlineInfo.userName;
+                    vm.userName = response.data.rt.onlineInfo.realName;
                     vm.userId = response.data.rt.onlineInfo.userId;
                 }
                 

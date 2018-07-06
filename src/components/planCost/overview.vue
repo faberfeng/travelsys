@@ -177,7 +177,23 @@ export default {
                                             shadowOffsetX: 0,
                                             shadowColor: 'rgba(0, 0, 0, 0.5)'
                                         }
-                                    }
+                                    },
+                                    label: {
+                                        normal: {
+                                            show: false
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
+                                    lableLine: {
+                                        normal: {
+                                            show: false
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
                                 }
                             ]
                         })
@@ -334,7 +350,7 @@ export default {
         }
         #Pie{
             display: block;
-            width: 360px;
+            width: 500px;
             height: 400px;
         }
         *{
