@@ -580,7 +580,7 @@
                                     <select style="width: 140px;" :class="['inputvalue-select','property_value'+index]" v-if="val.valueType == 2" v-model="val.extendValue">
                                         <option value="是">是</option> 
                                         <option value="否">否</option>
-                                        <option value='多样'>多样</option>
+                                        <option value='@'>@</option>
                                     </select>
                                     <span  v-if="val.valueType == 3"  :class="['inputvalue-date','property_value'+index]">
                                         <!-- <input class=""  width="40px;" v-model="val.extendValue"/> -->
@@ -2506,6 +2506,7 @@ export default {
           }
           var num = 0
           var c=0
+          var message = ''
           var isInherit=-1;//0：自身 1：来自继承
           /**
            * @param  vm.GCPropertyList 扩展属性
@@ -2516,6 +2517,7 @@ export default {
                 num = 0
                 var tempValue='' //将要编辑的扩展属性的内容
                 vm.attributeList.forEach((item,key)=>{
+                    message = num >0?'多样':'@'
                     if(item.checked){
                      
                         var  valueFrom = vm.initVal(val.id,item.traceId,true)//扩展属性 的 来源
@@ -2536,9 +2538,9 @@ export default {
                                 }
                             }
                             if (tempValue != value) {
-                                tempValue = '多样'
+                                tempValue = message
                                 if(val.valueType == 2 || val.valueType == 3){//是否 和 时间
-                                    tempValue = '多样'//@ 不会修改任意列表的值
+                                    tempValue = message//@ 不会修改任意列表的值
                                 }
                             }
                         }
@@ -2551,8 +2553,8 @@ export default {
                                 vm.$set(val,'timeChecked_to_submit',false)
                             }
                         }else{//都来自继承  赋值@
-                            vm.$set(val,'extend_to_submit','多样')
-                            vm.$set(val,'extendValue','多样')
+                            vm.$set(val,'extend_to_submit',message)
+                            vm.$set(val,'extendValue',message)
                              if(val.valueType == 3){
                                 vm.$set(val,'timeChecked',true)
                                 vm.$set(val,'timeChecked_to_submit',true)

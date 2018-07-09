@@ -122,9 +122,9 @@
                                         :formatter="testIfIsNull"
                                         >
                                         <template slot-scope="scope">
-                                            <button class="locationBtn actionBtn" title="定位"  @click="openLocation(scope)" ></button>
-                                            <button class="detialBtn actionBtn" title="详情"  @click="checkLabel(scope)" v-if="showType == 'separate'"></button>
-                                            <button class="labelBtn actionBtn" title="标签"  @click="openLabel(scope)" ></button>
+                                            <button class="locationBtn actionBtn" title="定位"  @click.stop="openLocation(scope)" ></button>
+                                            <button class="detialBtn actionBtn" title="详情"  @click.stop="checkLabel(scope)" v-if="showType == 'separate'"></button>
+                                            <button class="labelBtn actionBtn" title="标签"  @click.stop="openLabel(scope)" ></button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -1325,7 +1325,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 
 export default Vue.component('common-list',{
-  props:['mId','title'],
+  props:['mId','title','rType','bId','isGongChengLiang'],
   data(){
       return {
          screenLeft:{
@@ -1430,6 +1430,7 @@ export default Vue.component('common-list',{
             isExpend:true
         },
         singleLable:false,//单个标签展示 不需要分页器
+        manifestId:Number,//mid
       }
   },
   created(){
@@ -1443,6 +1444,7 @@ export default Vue.component('common-list',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.manifestId = vm.mId
         vm.getIntoList()
   }, 
   mounted(){
@@ -1572,9 +1574,9 @@ export default Vue.component('common-list',{
       labelListConfirm(){
           var vm = this
           if(vm.singleLable == true){
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.mId+'/'+vm.S_Label_quantitiesList[0].pkId)
+               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/'+vm.S_Label_quantitiesList[0].pkId)
           }else{
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.mId+'/0')
+               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/0')
           }
       },
       labelListCancle(){
@@ -1635,7 +1637,6 @@ export default Vue.component('common-list',{
         }).then(response=>{
             if(response.data.cd == 0){
                 vm.getManifestInfoByMId()
-                vm.findManifestDetailList(2)
             }else{
                 vm.$message({
                     type:'error',
@@ -1649,20 +1650,51 @@ export default Vue.component('common-list',{
       },
     getManifestInfoByMId(){
             var vm = this
+            var url = ''
+            var params = new Object
+            /**
+             * @李从文 
+             * 此处加 工程量清单的代码
+             * 接口为：show2/taskManifestDetail
+             * 所用的参数只有 response.data.rt.main
+             * ***/
+            if(vm.isGongChengLiang){
+                params = {
+                    manifestId:vm.manifestId,
+                    projId:vm.projId,
+                }
+                url = 'show2/taskManifestDetail'//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
+            }else if(vm.bId){
+                params = {
+                    rType:vm.rType,
+                    bId:vm.bId,
+                }
+                url = 'manifest2/getManifestInfo'//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
+            }else{
+                /**
+                 * 默认 -- 指向物料量清单页面
+                 * 
+                 * **/
+                params = {
+                    mId:vm.manifestId,
+                }
+                url = 'manifest2/getManifestInfoByMId'
+            }
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'manifest2/getManifestInfoByMId',
+                url:vm.BDMSUrl+url,
                 headers:{
                     token:vm.token
                 },
-                params:{
-                    mId:vm.mId,
-                }
+                params:params
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
+                      if(vm.bId)vm.manifestId = response.data.rt.pkId
                        vm.ManifestInfo = response.data.rt  
+                       if(vm.isGongChengLiang)vm.ManifestInfo = response.data.rt.main
                     }
+                    vm.findManifestDetailList(2)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -1701,6 +1733,9 @@ export default Vue.component('common-list',{
                 },
               * **/
             var showType = 1
+            /*@李从文
+                这个接口对应 show/getManifestDetailInfo
+            */
             if(vm.showType == 'combine'){
                 showType = 2
             }
@@ -1719,7 +1754,7 @@ export default Vue.component('common-list',{
                 },
                 params:{
                     projectId:vm.projId,
-                    manifestId:vm.mId,
+                    manifestId:vm.manifestId,
                     page:page,
                     rows:rows,
                     showType:showType,//显示类型 1 逐个显示 2 合并显示

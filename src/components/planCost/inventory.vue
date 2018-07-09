@@ -130,7 +130,7 @@
                         <span class="left">
                             <i class="reportS icon"></i>独立物料量清单
                         </span>
-                        <a class="right" href="javascript:void(0)">导入</a>
+                        <a class="right" href="javascript:void(0)" @click="importExcel()">导入</a>
                     </p>
                    
                     <table class="UserList" border="1" width='100%'>
@@ -223,7 +223,7 @@
                     <div style="clear:both;"></div>
                 </div>
             </div>
-             <common-list v-on:back="backToH" :mId="checkItem.id" v-else></common-list>
+             <common-list v-on:back="backToH" :mId="checkItem.id"  :title="'物料量清单'" v-else></common-list>
         </div>
         <div id="edit">
             <el-dialog title="请选择需要出量的单体或场地" :visible="createMonomer.show" @close="createCancle">
@@ -255,6 +255,28 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="createConfirm">确定</button>
                     <button class="editBtnC" @click="createCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="导入独立物料量清单" :visible="uploadshow" @close="upImgCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">文件说明 :</label>
+                        <input type="text" class="inp" v-model="des">
+                    </div>
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectImg">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput"  type="file" accept="application/msexcel" @change="fileChanged($event)" ref="file"  id="fileInfo">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="uploadIMG">上传</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -588,6 +610,11 @@
             margin-top: 5px;
             margin-right: 25px;
         }
+        #edit{
+            #fileInfo{
+                display: none;
+            }
+        }
         .clearfix{
             clear: both;
             overflow: hidden;
@@ -635,6 +662,10 @@ export default {
             MonomerList:[],//单体选选项
             showCommonList:false,
             checkItem:{},
+            uploadshow:false,
+            des:'',
+            imageName:'未选择任何文件',
+            filesList:[],
         }
     },
     created(){
@@ -663,6 +694,61 @@ export default {
       },
     },
     methods:{
+        selectImg(){
+             this.$refs.file.click()
+        },
+        uploadIMG(){
+            var vm = this
+            /*
+            isUploadPoint 0不是全景类型 1是全景类型 
+            dirId 目录ID
+            fgId 
+            fileDesc 描述
+            **/
+           if(vm.filesList == null){
+               vm.$message({
+                   type:'error',
+                   message:'请选择文件！'
+               })
+               return false
+           }
+            axios({
+                method:'POST',
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData,
+            }).then((response)=>{
+                var fileId = []
+                if(response.data.rt){
+                    vm.des = ''
+                    vm.imageName ='未选择任何文件'
+                    vm.filesList = null
+                }
+            }).catch((err)=>{
+                vm.des = ''
+                vm.imageName ='未选择任何文件'
+                vm.$emit('refreshqj')
+                console.log(err)
+            })
+        },
+        upImgCancle(){
+            var vm = this
+             vm.uploadshow  = false
+             vm.imageName = '未选择任何文件'
+             vm.des = ''
+             vm.filesList = null
+        },
+        fileChanged(file){
+            var vm = this
+            vm.filesList = vm.$refs.file.files[0] //[]
+            vm.imageName = vm.filesList.name
+        },
+        importExcel(){
+            var vm  = this
+            vm.uploadshow  =true
+        },
         backToH(){
             var vm = this
             vm.showCommonList = false

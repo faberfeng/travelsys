@@ -226,8 +226,8 @@
                         <br>
                     </p>
                     <p style="text-align:left;margin-bottom:20px;padding-left:105px;">
-                        <el-radio v-model="titleUseReportName" label="0">使用表名</el-radio>
-                        <el-radio v-model="styleShowTitle" label="1">显示标题</el-radio>
+                        <el-checkbox v-model="titleUseReportName" >使用表名</el-checkbox>
+                        <el-checkbox v-model="styleShowTitle">显示标题</el-checkbox>
                     </p>
                     <p class="clearfix">
                         <span class="item-title">字体大小</span>
@@ -406,7 +406,7 @@
 </template>
 <style lang="less">
    #commonEditBox{
-       margin: 0 20px 20px;
+       margin: 0 20px 20px!important;
        .hideInput{
            display: none;
        }
@@ -1775,9 +1775,9 @@ export default Vue.component('common-edit',{
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
                         vm.value_type = response.data.rt.rcTableName//表名 筛选 - 类型
-                        vm.initFiled(false)
+                        vm.initFiled(false) 
                         vm.displayType = response.data.rt.displayType == 0?true:false//数据相同时合并多行
-                        vm.displayTotal = response.data.rt.displayTotal == 0?true:false//显示总计
+                        vm.displayTotal = response.data.rt.displayTotal == 1?true:false//显示总计
                         vm.titlePosition = response.data.rt.groupPosition+''//报表名称
 
                         vm.data_right = []
@@ -1786,6 +1786,7 @@ export default Vue.component('common-edit',{
                                 for(var i=0;i<vm.data_left.length;i++){
                                     if(ele.fieldCode == vm.data_left[i].fieldCode){
                                         vm.$set(vm.data_left[i],'checked',true)
+                                        vm.data_left[i].fieldName = ele.fieldAlias
                                         break
                                     }
                                 }
@@ -1801,6 +1802,7 @@ export default Vue.component('common-edit',{
                         }
                        
                         var length = response.data.rt.filterList.length
+                        
                         if(length>0){
                             response.data.rt.filterList.forEach((element,index)=>{
                                 if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.partition'
@@ -1833,6 +1835,7 @@ export default Vue.component('common-edit',{
                                             break;
                                      }
                                 }else{
+                                    console.log(index)
                                     vm.list_filter[index].build_name = element.fieldCode
                                     vm.list_filter[index].val = 1
 
@@ -1841,18 +1844,8 @@ export default Vue.component('common-edit',{
                                     vm.list_filter[index].show = true
                                 }
                             })
-                            vm.list_filter[length-1].val = 0
+                            vm.list_filter[vm.list_filter.length-1].val = 0
                         }
-                    //       key: i,
-                    // val:0,
-                    // build_name:'nofield',
-                    // ordertype:'ACENding',
-                    // grouptype:'NONE_GROUP',
-                    // filtertype:'',
-                    // filtercontent:'',
-                    // show:i == 0?true:false,
-                    // disabled: i >= 4?true:false
-
                         if(response.data.rt.groupList != null && response.data.rt.groupList.length>0){
                             response.data.rt.groupList.forEach((element,index)=>{
                                 vm.list_order[index].build_name = element.fieldCode
@@ -1865,17 +1858,17 @@ export default Vue.component('common-edit',{
                             var length_list_order = response.data.rt.groupList.length
                             vm.list_order[length_list_order-1].val = 0
                         }
-                        vm.styleShowTitle = response.data.rt.rcStyle.showTitle == 0?false:true
+                        vm.styleShowTitle = response.data.rt.rcStyle.showTitle == 1?true:false
                         vm.titleName = response.data.rt.rcStyle.titleName
-                        vm.titleUseReportName = response.data.rt.rcStyle.titleUseReportName == 0?false:true
-                        vm.titleFontSize = response.data.rt.rcStyle.titleFontSize
+                        vm.titleUseReportName = response.data.rt.rcStyle.titleUseReportName == 1?true:false
+                        vm.titleFontSize = parseInt(response.data.rt.rcStyle.titleFontSize)
                         vm.titleAlign = response.data.rt.rcStyle.titleAlign
-                        vm.titleUseBorder = response.data.rt.rcStyle.titleUseBorder == 0?false:true
+                        vm.titleUseBorder = response.data.rt.rcStyle.titleUseBorder == 1?true:false
 
-                        vm.titleBorderHeight = response.data.rt.rcStyle.titleBorderHeight
+                        vm.titleLineHeight = parseInt(response.data.rt.rcStyle.titleBorderHeight)
                         vm.titleBgColor = response.data.rt.rcStyle.titleBgColor
-                        vm.tableFontSize = response.data.rt.rcStyle.tableFontSize
-                        vm.tableLineHeight = response.data.rt.rcStyle.tableRowHeight
+                        vm.tableFontsize = parseInt(response.data.rt.rcStyle.tableFontSize)
+                        vm.tableLineHeight = parseInt(response.data.rt.rcStyle.tableRowHeight)
                         if(response.data.rt.rcStyle.tableWidth == '100%'){
                             vm.tableWidth = response.data.rt.rcStyle.tableWidth
                         }else{

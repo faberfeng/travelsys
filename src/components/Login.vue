@@ -105,7 +105,7 @@ export default {
                 this.projectData = response.data;
                 if (this.projectData.cd === '10004') {
                     localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
-                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.userName);
+                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.realName);
                     localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
                     this.$router.push({
                         path: '/showcompany'
