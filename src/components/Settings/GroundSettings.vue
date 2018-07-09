@@ -884,24 +884,25 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.unityData = response.data.rt;
-                    this.unityData.forEach((item,index,arr)=>{
-                        arr[index].index = index+1;
-                        arr[index].FileName=item.FileName.split('.')[0];
-                        if(item.ResourceType == 'utr'){
-                            arr[index].ResourceType = '场地';
-                        }else if(item.ResourceType == 'umr'){
-                            arr[index].ResourceType = '材质';
-                        }else{
-                            arr[index].ResourceType = '构件';
-                        }
-                        arr[index].FileSize = (item.FileSize/1024/1024).toFixed(2)+'MB';
-                        if(item.Loaded) {
-                            arr[index].Loaded = '加载';
-                        }else{
-                            arr[index].Loaded = '卸载';
-                        }
-                    })
-
+                    if(this.unityData !== null){
+                        this.unityData.forEach((item,index,arr)=>{
+                            arr[index].index = index+1;
+                            arr[index].FileName=item.FileName.split('.')[0];
+                            if(item.ResourceType == 'utr'){
+                                arr[index].ResourceType = '场地';
+                            }else if(item.ResourceType == 'umr'){
+                                arr[index].ResourceType = '材质';
+                            }else{
+                                arr[index].ResourceType = '构件';
+                            }
+                            arr[index].FileSize = (item.FileSize/1024/1024).toFixed(2)+'MB';
+                            if(item.Loaded) {
+                                arr[index].Loaded = '加载';
+                            }else{
+                                arr[index].Loaded = '卸载';
+                            }
+                        })
+                    }
                 }else{
                     this.$router.push({
                         path:'/login'
