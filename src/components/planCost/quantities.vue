@@ -21,11 +21,11 @@
                     成本分析  
                 </router-link>
             </div>
-            <div class="project" v-loading="loading" v-if='!showDetail'>
+            <div class="project" v-loading="loading" v-if='showMainProject'>
                 <!--以下是实时列表-->
                 <div>
                     <p class="header clearfix">
-                        <span class="left">
+                        <span class="left" style="top:24px;">
                             <i class="target icon"></i>实时可追溯工程量清单
                         </span>
                         <span class="item-btn clearfix">
@@ -136,7 +136,7 @@
                         <span class="left">
                             <i class="reportS icon"></i>独立工程量清单
                         </span>
-                        <a class="right" href="javascript:void(0)">导入Excel</a>
+                        <a class="right" href="javascript:void(0)" @click="importExcel">导入Excel</a>
                     </p>
                     <table class="UserList" border="1" width='100%'>
                         <thead>
@@ -159,7 +159,7 @@
                                 <td v-text="val.createUserName"></td>
                                 <td v-text="initData(val.createTime)"></td>
                                 <td >
-                                    <button class="detailBtn actionBtn" title="明细"  @click="edit(val)" ></button>
+                                    <button class="detailBtn actionBtn" title="明细"  @click="showSnapWorkAmouontDetail(val,2)" ></button>
                                     <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.manifestId,2)" ></button>
                                 </td>
                             </tr>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
                 <!--以下是page-navigitation-->
-                <div class="datagrid-pager pagination" v-if=" D_quantitiesList.length>0">
+                <div class="datagrid-pager pagination" v-if=" D_quantitiesList.length>0" style="margin-bottom:30px">
                     <table cellspacing="0" cellpadding="0" border="0" >
                         <tbody>
                             <tr>
@@ -226,9 +226,6 @@
                     <div style="clear:both;"></div>
                 </div>
             </div>
-            <div>
-
-            </div>
             <div class="worktable project" v-if='showDetail'>
                 <p class="antsLine">
                     <a class="backToProjectBtn" @click="backToProject">工程量清单</a>
@@ -238,20 +235,38 @@
                 <p class="header clearfix">
                     <span class="item-btn clearfix">
                         <label @click="threePrice">三价</label>
-                        <label @click="generateBuildWorkAmount()">导入单价</label>
+                        <label @click="importDanjia">导入单价</label>
                         <label @click="exportExcel">导出Excel</label>
                         <label @click="exportXml">导出xml</label>
                         <label @click="printObject">打印</label>
                     </span>
                 </p>
-                <zk-table 
-                    index-text="序号"
-                    :data="codingList" :columns="columns" :tree-type="props.treeType"
+                <div v-if="codingList != null">
+                    <zk-table 
+                        index-text="序号"
+                        :data="codingList" :columns="columns" :tree-type="props.treeType"
+                        :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                        :border="props.border" empty-text="正在加载...">
+                        <template slot="action" slot-scope="scope">
+                            <button class="detailBtn actionBtn" title="明细" v-if="scope.row.level == 4" @click="viewDetailThing(scope)"></button>
+                            <button class="editBtn actionBtn" title="编辑" v-if="scope.row.level == 5" @click="editDetailPrice(scope)"></button>
+                        </template> 
+                    </zk-table>
+                </div>
+                
+            </div>
+            <!-- 独立工程量清单 -->
+            <div class="project" v-if="duliProject.showProject">
+                <p class="antsLine">
+                    <a class="backToProjectBtn" @click="backToProject">工程量清单</a>
+                    <i class="icon-sanjiao-right"></i>
+                    <span class="strong" @click="back()">{{duliProject.name}}</span>
+                </p>
+                <zk-table index-text="序号" :data="duliProject.data" :columns="columnsDuli" :tree-type="props.treeType"
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                     :border="props.border" empty-text="正在加载...">
                     <template slot="action" slot-scope="scope">
-                        <button title="明细"></button>
-                        <button title="编辑"></button>
+                        <button class="editBtn actionBtn" title="修改" @click="editListBtn(scope)" v-if="scope.row.level == 4"></button>
                     </template> 
                 </zk-table>
             </div>
@@ -412,6 +427,95 @@
                     <button class="editBtnC" @click="sexportExcelShowCancel">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog title="修改综合单价" :visible.sync="duliProject.editPrice" :before-close="duLiEditCancel">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">综合单价 :</label><input class="inp" placeholder="请输入" v-model="duliProject.totalPrice"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="duLiEditSure">确定</button>
+                    <button class="editBtnC" @click="duLiEditCancel">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="修改参考单价" :visible.sync="viewProjectDetail.editPrice" :before-close="detailEditCancel">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">参考单价 :</label><input class="inp" placeholder="请输入" v-model="viewProjectDetail.rePrice"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="detailEditSure">确定</button>
+                    <button class="editBtnC" @click="detailEditCancel">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="导入工程量清单" :visible.sync="duliProject.importExcelShow" :before-close="importExcelCancel">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectfile" class="upImgBtn">选择文件</button>
+                            <input class="upInput"  type="file"  @change="fileChanged" ref="file" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{duliProject.fileName}}</span> 
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">工作表:</label>
+                        <select class="editSelect">
+                            <option>{{duliProject.sheetName}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">编码列:</label>
+                        <select class="editSelect" v-model="duliProject.codeline">
+                            <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">工程量列:</label>
+                        <select class="editSelect" v-model="duliProject.projectline">
+                            <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodyone"><label class="editInpText">清单名称 :</label><input class="inp" v-model="duliProject.listProName"/></div>
+                    <div class="editBodyone"><label class="editInpText">可识别的工程量条目数量 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.distinguished"/></div>
+                    <div class="editBodyone"><label class="editInpText">不可识别的工程量行数 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.enDistinguished"/></div>
+                    <div class="editBodyone"><label class="editInpText">工程量不为零的条目数量 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.workAmountNotZero"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="verifiedData">识别数据</button>
+                    <button class="editBtnS" @click="importExcelSure">导入</button>
+                    <button class="editBtnC" @click="importExcelCancel">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="导入单价" :visible.sync="viewProjectDetail.importPriceShow" :before-close="importPriceCancel">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectimportfile" class="upImgBtn">选择文件</button>
+                            <input class="upInput"  type="file"  @change="selectfileChanged" ref="fileimport" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{viewProjectDetail.fileName}}</span> 
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">工作表:</label>
+                        <select class="editSelect">
+                            <option>{{viewProjectDetail.sheetName}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">项目编码列:</label>
+                        <select class="editSelect" v-model="viewProjectDetail.codeline">
+                            <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText">单价列:</label>
+                        <select class="editSelect" v-model="viewProjectDetail.projectline">
+                            <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="importPriceSure">确定</button>
+                    <button class="editBtnC" @click="importPriceCancel">结束</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -428,6 +532,7 @@ export default {
             BDMSUrl:'',
             loading:false,
             fullscreenloading:false,
+            showMainProject:true,
             S_quantitiesList:[],//构件的实时报表
             D_quantitiesList:[],//快照报表
             pageDetial:{
@@ -464,43 +569,131 @@ export default {
                     label: '项目编码',
                     prop: 'number',
                     width: '185px',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label: '项目名称',
                     prop: 'title',
-                    width: '205px',   
+                    width: '205px',  
+                    align:"center",
+                    headerAlign:"center"  
                 },
                 {
                     label: '项目特征描述',
                     prop: 'characterValues[0].characterName',
-                    width: '115px',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label: '工程量',
                     prop: 'amount',
-                    width: '115px',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label: '计量单位',
                     prop: 'unit',
-                    width: '115px',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label: '内部单价',
                     prop: 'price',
-                    width: '115px',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '导入单价',
+                    prop: 'importPrice',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label: '内部合价',
                     prop: 'totalPrice',
-                    width: '115px',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '参考单价',
+                    prop: 'referencePrice',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '参考合价',
+                    prop: 'referenceTotalPrice',
+                    align:"center",
+                    headerAlign:"center" 
                 },
                 {
                     label:'操作',
                     prop:'operator',
                     type: 'template',
                     template: 'action',
-                    // minWidth:'125px'
+                    minWidth:'125px',
+                    align:"center",
+                    headerAlign:"center" 
+                }
+            ],
+            columnsDuli:[
+                {
+                    label: '序号',
+                    prop: 'no',
+                    minWidth: '260px',
+                    headerAlign:"center"
+                },
+                {
+                    label: '编码',
+                    prop: 'number',
+                    width: '185px',
+                    align:"center",
+                    headerAlign:"center"
+                },
+                {
+                    label: '项目名称',
+                    prop: 'title',
+                    width: '205px',  
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '工程量',
+                    prop: 'amount',
+                    width: '115px',
+                    align:"center",
+                    headerAlign:"center"
+                },
+                {
+                    label: '单位',
+                    prop: 'unit',
+                    width: '115px',
+                    align:"center",
+                    headerAlign:"center"
+                },
+                {
+                    label: '综合价格',
+                    prop: 'price',
+                    width: '115px',
+                    align:"center",
+                    headerAlign:"center"
+                },
+                {
+                    label: '价格',
+                    prop: 'totalPrice',
+                    width: '115px',
+                    align:"center",
+                    headerAlign:"center"
+                },
+                {
+                    label:'操作',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                    Width:'50px',
+                    align:"center",
+                    headerAlign:"center"
                 }
             ],
             props: {
@@ -520,12 +713,41 @@ export default {
                 viewDetailName:'',
                 showThreePrice:false,
                 threePriceArr:[true,false,false],
-                // addNeibuPrice:true,
-                // addDaoruPrice:false,
-                // addCankaoPrice:false,
                 exportExcelShow:false,
+                importPriceShow:false,
+                editPrice:false,
+                rePrice:'',
+                editPriceData:{},
+                fileList:[],
+                fileName:'',
+                sheetName:'',
+                excelInfo:{},
+                sheetTitle:[],
+                filePath:'',
+                codeline:'',//编码列
+                projectline:'',//工程列
             },//工程量明细
             viewDetailObject:{},
+            duliProject:{
+                showProject:false,
+                name:'',
+                data:[],
+                editPrice:false,
+                totalPrice:'',
+                editPriceObject:{},
+                AmouontDetail:{},
+                fileName:'未选择文件',
+                fileList:[],
+                listProName:'',
+                importExcelShow:false,
+                excelInfo:{},
+                sheetName:'',
+                sheetTitle:[],
+                filePath:'',
+                codeline:'',//编码列
+                projectline:'',//工程列
+                verifiedObject:{}
+            }
         }
     },
     created(){
@@ -931,7 +1153,7 @@ export default {
                 console.log(err)
             })
         },
-         //加载快照报表数据
+        //加载独立工程量清单
         getSingleWorkAmountList(){
             var vm = this
             axios({
@@ -963,6 +1185,182 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
+        },
+        //导入堵路工程量清单
+        importExcel(){
+            this.duliProject.importExcelShow = true;
+        },
+        selectfile(){
+            this.$refs.file.click();
+        },
+        fileChanged(){
+            const list = this.$refs.file.files;
+            this.duliProject.fileList = list;
+            if(list.length !== 0){
+                this.duliProject.fileName = list[0].name;
+            }
+            if(this.duliProject.fileName.split('.')[1] != 'xls' && this.duliProject.fileName.split('.')[1] != 'xlsx'){
+                alert("必须上传Excel文件!")
+            }else{
+                var formData =  new FormData();
+                formData.append('filedata',list[0]);
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/uploadExcelFile',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projId:this.projId
+                    },
+                    data:formData
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.duliProject.excelInfo = response.data.rt;
+                        this.duliProject.sheetName = response.data.rt.title[0].sheetName;
+                        this.duliProject.sheetTitle = response.data.rt.title[0].sheetTile;
+                        this.duliProject.codeline = this.duliProject.sheetTitle[0];
+                        this.duliProject.projectline = this.duliProject.sheetTitle[0];
+                        this.duliProject.filePath = response.data.msg;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
+        },
+        //独立工程量清单 识别数据
+        verifiedData(){
+            if(this.duliProject.codeline == this.duliProject.projectline && this.duliProject.fileList.length !== 0){
+                alert('[编码列] 和 [工程量列] 不能重复！');
+            }else if(this.duliProject.fileList.length == 0){
+                alert('请上传有效的Excel文件！');
+            }else{
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/distinguish',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        tempFilePath:this.duliProject.filePath,
+                        sheetName:this.duliProject.sheetName,
+                        codeColumn:this.duliProject.codeline,
+                        workAmountColumn:this.duliProject.projectline,
+                        projId:this.projId
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.duliProject.verifiedObject = response.data.rt;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
+        },
+        //导入
+        importExcelSure(){
+            if(JSON.stringify(this.duliProject.verifiedObject) == '{}' ){
+                alert("请先对Excel中的数据进行识别校验!")
+            }else if(this.duliProject.listProName == ''){
+                alert('请填写清单名称!');
+            }else{
+                var formData = new FormData();
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/importWorkAmountExcel',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        title:this.duliProject.listProName,
+                        projId:this.projId
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getSingleWorkAmountList();
+                        this.importExcelCancel();
+                    }else if(response.data.cd == 10001){
+                        alert(response.data.msg);
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            }
+        },
+        //取消导入
+        importExcelCancel(){
+            this.duliProject.fileList = [];
+            this.duliProject.fileName = '请选择文件';
+            this.duliProject.verifiedObject = {};
+            this.duliProject.codeline = '';
+            this.duliProject.projectline = '';
+            this.duliProject.sheetName = '';
+            this.duliProject.listProName = '';
+            this.duliProject.importExcelShow = false;
+        },
+        //查看独立工程量清单明细
+        showSnapWorkAmouontDetail(val,type){
+            this.duliProject.AmouontDetail = val;
+            if(val.workAmountNum == 0){
+                alert("没有可查看的工程量信息");
+            }else{
+                this.duliProject.name = val.name;
+                this.duliProject.showProject = true;
+                this.showDetail = false;
+                this.showMainProject = false;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/getSnapWorkAmouontDetail',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        id:val.manifestId,
+                        projId:this.projId,
+                        type:type
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.duliProject.data = response.data.rt;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
+        },
+        //编辑独立工程量
+        editListBtn(scope){
+            this.duliProject.editPriceObject = scope.row;
+            this.duliProject.totalPrice = scope.row.price;
+            this.duliProject.editPrice = true;
+        },
+        duLiEditSure(){
+            this.duliProject.editPrice = false;
+            var formData = new FormData();
+            var totalPrice = Number(this.duliProject.totalPrice).toFixed(2);
+            formData.append('mId',this.duliProject.AmouontDetail.manifestId);
+            formData.append('ids',this.duliProject.editPriceObject.detailIds);
+            formData.append('price',totalPrice);
+            formData.append('type',2);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/editEngineerDetailPrice',
+                headers:{
+                    token:this.token
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.showSnapWorkAmouontDetail(this.duliProject.AmouontDetail,2)
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        duLiEditCancel(){
+            this.duliProject.editPrice = false;
         },
         //表格页码改变时重新获取数据
         changePage(val, isTop) { //分页 0 -1 1 2
@@ -1043,7 +1441,7 @@ export default {
             var tt = name.substring(name.indexOf("[") + 1, name.lastIndexOf("]"))
             return tt;
         },
-         initData(val){
+        initData(val){
             if(!val)return ''
             var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
             return tt; 
@@ -1057,36 +1455,118 @@ export default {
         //返回工程量清单
         backToProject(){
             this.showDetail = false;
+            this.duliProject.showProject = false;
+            this.showMainProject = true;
         },
         //查看明细
         viewDetail(val){
-            console.log(val);
             this.viewDetailObject = val;
-            this.showDetail = true;
-            this.viewProjectDetail.viewDetailName = val.name.split('-')[0]+'-'+'工程量明细';
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/getSnapWorkAmouontDetail',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    id:val.manifestId,
-                    projId:this.projId,
-                    type:1
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.codingList = response.data.rt;
-                }else{
-                    alert(response.data.msg)
-                }
-                console.log(response.data);
-            })
+            if(this.viewDetailObject.gifWorkAmount == 0){
+                alert('没有可查看的工程量信息!');
+            }else{
+                this.viewProjectDetail.viewDetailName = val.name.split('-')[0]+'-'+'工程量明细';
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/getSnapWorkAmouontDetail',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        id:val.manifestId,
+                        projId:this.projId,
+                        type:1
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.codingList = response.data.rt;
+
+                        this.showDetail = true;
+                        this.showMainProject = false;
+                        this.duliProject.showProject = false;
+                    }else{
+                        alert(response.data.msg)
+                    }
+                })
+            }
+            
         }, 
         //三价配置
         threePrice(){
             this.viewProjectDetail.showThreePrice = true;
+        },
+        //导入单价
+        importDanjia(){
+            this.viewProjectDetail.importPriceShow = true;
+        },
+        //导入单价
+        selectimportfile(){
+            this.$refs.fileimport.click();
+        },
+        //导入单价改变
+        selectfileChanged(){
+            const list = this.$refs.fileimport.files;
+            this.viewProjectDetail.fileList = list;
+            if(list.length !== 0){
+                this.viewProjectDetail.fileName = list[0].name;
+            }
+             if(this.viewProjectDetail.fileName.split('.')[1] != 'xls' && this.viewProjectDetail.fileName.split('.')[1] != 'xlsx'){
+                alert("必须上传Excel文件!")
+            }else{
+                var formData =  new FormData();
+                formData.append('filedata',list[0]);
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/uploadExcelFile',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projId:this.projId
+                    },
+                    data:formData
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        console.log(response.data)
+                        this.viewProjectDetail.excelInfo = response.data.rt;
+                        this.viewProjectDetail.sheetName = response.data.rt.title[0].sheetName;
+                        this.viewProjectDetail.sheetTitle = response.data.rt.title[0].sheetTile;
+                        this.viewProjectDetail.codeline = this.viewProjectDetail.sheetTitle[0];
+                        this.viewProjectDetail.projectline = this.viewProjectDetail.sheetTitle[0];
+                        this.viewProjectDetail.filePath = response.data.msg;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
+        },
+        //确认导入单价
+        importPriceSure(){
+            if(this.viewProjectDetail.codeline == this.viewProjectDetail.projectline){
+                alert("[项目编码列] 和 [单价列] 不能重复！");
+            }else{
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'project2/report/importPriceDataCheck',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        tempFilePath:this.viewProjectDetail.filePath,
+                        sheetName:this.viewProjectDetail.sheetName,
+                        eCodeColumn:this.viewProjectDetail.codeline,
+                        unitPriceColumn:this.viewProjectDetail.projectline,
+                        projId:this.projId,
+                        mainId:this.viewDetailObject.manifestId
+                    }
+                }).then(response=>{
+                    console.log(response.data)
+                })
+            }
+            this.viewProjectDetail.importPriceShow = false;
+        },
+
+        importPriceCancel(){
+            this.viewProjectDetail.importPriceShow = false;
         },
         showThreePriceCenter(){
             this.viewProjectDetail.showThreePrice = false;
@@ -1133,8 +1613,52 @@ export default {
             var projId = this.projId;
             window.open(this.BDMSUrl+'project2/report/printPreview?token='+this.token+'&mainId='+mainId+'&projId='+projId+'&title='+title);
         },
+        //编辑工程量明细 的参考价格
+        editDetailPrice(val){
+            this.viewProjectDetail.editPrice = true;
+            console.log(val);
+            this.viewProjectDetail.editPriceData = val.row;
+            this.viewProjectDetail.rePrice = val.row.referencePrice;
+
+        },
+        detailEditSure(){
+            if(this.viewProjectDetail.rePrice == ''){
+                alert('请输入修改的金额！')
+            }else{
+                var formData = new FormData();
+                formData.append('type',1);
+                formData.append('price',Number(this.viewProjectDetail.rePrice).toFixed(2));
+                formData.append('mId',this.viewDetailObject.manifestId);
+                formData.append('ids',this.viewProjectDetail.editPriceData.detailIds);
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/editEngineerDetailPrice',
+                    headers:{
+                        token:this.token
+                    },
+                    data:formData
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.viewDetail(this.viewDetailObject);
+                        this.viewProjectDetail.editPrice = false;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+                
+            }
+            
+        },
+        detailEditCancel(){
+            this.viewProjectDetail.editPrice = false;
+        },
+        //查看工程量明细
+        viewDetailThing(val){
+            console.log(val);
+        },
         //查看清单
         viewList(val){
+            console.log(val)
             axios({
                 method:'get',
                 url:this.BDMSUrl+'show2/taskManifestDetail',
@@ -1166,6 +1690,41 @@ export default {
             bottom:0;
             right: 0;
             overflow: auto;
+        }
+        .edit-item{
+            position: relative;
+            .editSelect{
+                float: left;
+                width: 506px;
+                height: 40px;
+                padding: 10px;
+            }
+            .editInpText{
+                text-align: right;
+                float: left;
+                height: 40px;
+                line-height: 40px;
+                width: 100px;
+            }
+        }
+        .editBodyone,.editBodytwo{
+            text-align: left;
+            margin:10px 0;
+        }
+        .editBodyone{
+            .editInpText{
+                text-align: right;
+                width: 100px;
+                height:40px;
+                position: relative;
+                top: 5px;
+            }
+            .inp{
+                width: 506px;
+            }
+        }
+        .imageBody{
+            padding-left: 53px;
         }
         #item-box-file{
             display: block;
@@ -1237,14 +1796,31 @@ export default {
                 left: 180px;
             }
         }
+        .worktable{
+            margin-bottom: 30px;
+        }
         .project{
             margin: 0 20px;
+            .editBtn{
+                background: url('../../assets/edit.png') no-repeat;
+            }
+            .detailBtn{
+                background: url('./images/details.png') no-repeat;
+            }
+            .actionBtn{
+                width: 16px;
+                height: 17px;
+                border: none;
+                cursor: pointer;
+                margin-right: 10px;
+            }
             .antsLine{
                 padding: 10px 10px 15px 0px;
                 font-size: 12px;
                 line-height: 12px;
                 color: #999999;
                 text-align: left;
+                width: 50%;
             .icon-sanjiao-right{
                 display: inline-block;
                 width: 7px;
@@ -1278,8 +1854,9 @@ export default {
                     line-height: 16px;
                     color: #fc3439;
                     font-weight: bold;
-                     padding-left:30px;
+                    padding-left:30px;
                     position: relative;
+                    
                     .reportS{
                         background: url('./images/listS.png')no-repeat 0 0;
                     } 
@@ -1388,16 +1965,6 @@ export default {
                         .Strong{
                             font-weight: bold;
                         }
-                        .actionBtn{
-                            width: 16px;
-                            height: 17px;
-                            border: none;
-                            cursor: pointer;
-                            margin-right: 10px;
-                        }
-                        .editBtn{
-                            background: url('../../assets/edit.png') no-repeat;
-                        }
                         .deleteBtn{
                             background: url('../../assets/delete.png') no-repeat;
                         }
@@ -1407,9 +1974,7 @@ export default {
                         .listBtn{
                             background: url('./images/list.png') no-repeat;
                         }
-                        .detailBtn{
-                              background: url('./images/details.png') no-repeat;
-                        }
+                        
                          .refreshBtn{
                               background: url('./images/refresh.png') no-repeat;
                         }
@@ -1518,6 +2083,17 @@ export default {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        .updataImageSpan{
+            overflow: hidden;
+            width: 98px;
+        }
+        .updataImageSpan input{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            opacity: 0;
+            /* -ms-filter: 'alpha(opacity=0)'; */
         }
     }
 </style>
