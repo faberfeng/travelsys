@@ -25,7 +25,7 @@
                                 <div class="calendarLeft">
                                     <ul class="calendarSelect">
                                         <li :class="[{'calendarBody_active':currentStyle},'calendarHead']"><span>当前日历模板</span><i class="el-icon-plus" @click="addCalendarTemplate()"></i></li>
-                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index"  ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
+                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index" ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
                                     </ul>
                                 </div>
                                 <div class="calendarRight">
