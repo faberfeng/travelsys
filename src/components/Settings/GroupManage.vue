@@ -47,7 +47,7 @@
             </h1>
           <ul>
               <li class="check-item" v-for="(item,index) in userQunzuList" :key="index">
-                <el-checkbox class="hahaha"   @change="pushUserID(item.userId)">
+                <el-checkbox class="hahaha"   @change="pushUserID(item.userId)" v-model="item.checked">
                     <span class="check-name" v-text="item.userName"></span>
                     <span class="check-title" v-text="item.account"></span>
                 </el-checkbox>
@@ -210,8 +210,8 @@ export default {
             var vm = this
             //userDetialAdd
             if(vm.userListAdd.length>0){
-                for(var i=0;i<vm.userListAdd.length;i++){
-                    var userName = vm.outsideUserList[i].userName
+                for(let i=0;i<vm.userListAdd.length;i++){
+                    let userName = vm.outsideUserList[i].userName
                     vm.addQzUsers(vm.userListAdd[i],userName)
                 }
                 setTimeout(function(){
@@ -228,32 +228,32 @@ export default {
         addQzUsers(userId,userName){
             var vm = this
             axios({
-                    method:'POST',
-                    url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        userId:userId,
-                        ugId:vm.activeugID,//正在查看的群组ID
-                    }
-                }).then((response)=>{
-                    if(response.data.cd == 0){
-                        vm.$notify({
-                            type: 'success',
-                            message: '添加'+userName+'为群组用户成功',
-                            duration:4000
-                        })
-                    }else{
-                        vm.$notify({
-                            type: 'warning',
-                            message: '添加'+userName+'为群组用户失败!'+response.data.msg,
-                            duration:0
-                        })
-                    }
-                }).catch((err)=>{
-                    console.log(err)
-                })
+                method:'POST',
+                url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userId:userId,
+                    ugId:vm.activeugID,//正在查看的群组ID
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.$notify({
+                        type: 'success',
+                        message: '添加'+userName+'为群组用户成功',
+                        duration:4000
+                    })
+                }else{
+                    vm.$notify({
+                        type: 'warning',
+                        message: '添加'+userName+'为群组用户失败!'+response.data.msg,
+                        duration:0
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
         },
         removeUserAdd(val){
             var vm = this
@@ -320,6 +320,21 @@ export default {
             //删除企业用户信息
             delEntUser(){
                var vm = this
+               /**判断群组名称是否为 默认群组**/
+               var isDefaultCompany =  vm.ugList.some((item)=>{ 
+                    if(vm.activeugID == item.ugId && item.ugName.indexOf('默认群组') >-1){
+                        return true
+                    }else{
+                        return false
+                    }
+                })
+               if(isDefaultCompany){
+                    vm.$message({
+                        type: 'warning',
+                        message: '不能删除默认群组下的人员'
+                    }); 
+                   return
+               }
                if(vm.isCompany){//子部门
                     for(var i=0;i<vm.subCompanyList.length;i++){
                          if(vm.subCompanyList[i].ugName == '默认部门' && vm.activeugID == vm.subCompanyList[i].ugId) {
@@ -843,6 +858,9 @@ export default {
                     if(response.data.cd == '0'){
                         vm.userQunzuNum = response.data.rt.length//工程用户总数
                         vm.userQunzuList = response.data.rt//工程群组用户列表
+                        vm.userQunzuList.forEach(item=>{
+                            vm.$set(item,'checked',false)
+                        })
                     }else if(response.data.cd == '-1'){
                         // alert(response.data.msg);
                     }else{

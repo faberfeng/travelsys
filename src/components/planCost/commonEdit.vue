@@ -14,7 +14,9 @@
                 <p class="clearfix">
                     <span class="item-title">数据库</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select v-model="database" class="value-box">
+                               <option v-for="(item,index) in dataBaseList" :key="index" :value="item.id" v-text="item.name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
                 </p>
@@ -34,39 +36,49 @@
                 <p class="clearfix">
                     <span class="item-title">单体</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select  class="value-box" v-model="value_monomer" @change="value_monomer_change(false)">
+                            <option v-for="(item,index) in options_monomer" :key="index" :value="item.id" v-text="item.Name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
 
                     <span class="item-title">分区</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select v-model="value_partition" class="value-box" @change="value_partition_change(false)">
+                            <option v-for="(item,index) in options_partition" :key="index" :value="item.id" v-text="item.Name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
 
                      <span class="item-title">楼层</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select  v-model="value_floor" class="value-box">
+                            <option v-for="(item,index) in options_floor" :key="index" :value="item.id" v-text="item.Name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
                 </p>
                  <p class="clearfix">
                     <span class="item-title">专业</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select v-model="value_professional" class="value-box" @change="value_professional_change(false)">
+                            <option v-for="(item,index) in option_professional" :key="index" :value="item.id" v-text="item.Name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
 
                     <span class="item-title">系统</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box"></select>
+                        <select  v-model="value_system" class="value-box" @change="value_system_change(false)">
+                            <option v-for="(item,index) in options_system" :key="index" :value="item.id" v-text="item.Name"  ></option>
+                        </select>
                         <i class="icon-sanjiao"></i>
                     </span>
 
                      <span class="item-title">类型</span>
                     <span class="item-container">
-                        <select name="" id="" class="value-box" v-model="value_type" @change="initFiled(true)">
-                            <option v-for="(item,index) in options_type" :key="index" :value="item.tableIndex" v-text="item.tableName"  ></option>
+                        <select name="" id="" class="value-box" v-model="value_type">
+                            <option v-for="(item,index) in options_type" :key="index" :value="item.id" v-text="item.Name"  ></option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </span>
@@ -95,13 +107,14 @@
                         <span class="title">报表字段</span>
                         <span class="BTN" @click="shiftUp()" style="margin-right:11px;">上移</span>
                         <span class="BTN" @click="shiftDown()">下移</span>
+                        <span class="BTN" @click="showPrivateVariables()"  style="margin-left:11px;">字段设置</span>
                     </p>
                     <ul class="main-container ">
                         <li :class="['userList-item',item.checked?'active-check':'']" v-for='(item,index) in data_right' :key="index" @click="checkThisF(index)">
                             <span class="check-title" v-text="item.fieldName" v-if="index != EditIndex"></span>
                             <input type="text" class="value-field" v-model="item.fieldName" v-if="index == EditIndex">
                             <span class="icon icon-editfield" @click="editField(index)"></span>
-                            <span class="icon icon-cancleUser" @click="removeField(index)"></span>
+                            <span class="icon icon-cancleUser" @click="removeField(index)" v-if="!item.isPrivate"></span>
                         </li>
                     </ul>
                 </div>
@@ -151,8 +164,8 @@
             </p>
             <div class="container container-F">
                 <p style="    text-align: left;
-    color: #999999;
-    font-size: 14px;">
+            color: #999999;
+            font-size: 14px;">
                     分组行位置
                     <el-radio v-model="titlePosition" label="0">表头</el-radio>
                     <el-radio v-model="titlePosition" label="1">表尾</el-radio>
@@ -213,8 +226,8 @@
                         <br>
                     </p>
                     <p style="text-align:left;margin-bottom:20px;padding-left:105px;">
-                        <el-radio v-model="titleUseReportName" label="0">使用表名</el-radio>
-                        <el-radio v-model="styleShowTitle" label="1">显示标题</el-radio>
+                        <el-checkbox v-model="titleUseReportName" >使用表名</el-checkbox>
+                        <el-checkbox v-model="styleShowTitle">显示标题</el-checkbox>
                     </p>
                     <p class="clearfix">
                         <span class="item-title">字体大小</span>
@@ -366,11 +379,34 @@
                 <span class="cancelBtn"  @click="saveForm(true)">数据</span>
             </p>
          </div>
+        <div v-if="privateVariables.show"  id="edit" class="dialog">
+                <div class="el-dialog__header">
+                <span class="el-dialog__title">私有属性字段</span>
+                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="basicCancle">
+                    <i class="el-dialog__close el-icon el-icon-close"></i>
+                </button>
+            </div>
+            <div class="el-dialog__body">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth" v-for="(item,index) in privateVariables.new" :key="index">
+                        <label  :class="[item.checked?'active':'','checkbox-fileItem holderType_Attribute']" :for="item.code+'_Attribute'" v-text="item.name"></label>
+                        <input  type="checkbox" :id="item.code+'_Attribute'" class="checkbox-arr" v-model="item.checked">
+                    </span>
+                </div>
+            </div>
+            <div class="el-dialog__footer">
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="basicConfirm">确定</button>
+                    <button class="editBtnC" @click="basicCancle">取消</button>
+                </div>
+            </div>
+        </div>
+         <div id="mask" v-if="privateVariables.show"  @click="basicCancle"></div>
     </div>
 </template>
-<style lang="less" scoped>
+<style lang="less">
    #commonEditBox{
-       margin: 0 20px 20px;
+       margin: 0 20px 20px!important;
        .hideInput{
            display: none;
        }
@@ -725,7 +761,7 @@
                     float: left;
                     height: 24px;
                     line-height: 24px;
-                    margin-right: 80px;
+                    margin-right: 20px;
                 }
                 .main-container{
                     height:290px;
@@ -1069,12 +1105,128 @@
                 margin-right: 25px;
             }
         }
+        .dialog{
+            top: 15vh;
+            left: 50%;
+            width: 660px;
+            margin-left:-330px;
+            border-radius: 5px;
+            z-index: 3001;
+            position: fixed;
+            background: #fff;
+            .el-dialog__body{
+                margin-top: 20px;
+            }
+            .editBody{
+                margin: 0 20px;
+                .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
+                    margin: 0 5px;
+                }
+            }
+            .item-label{
+                border-bottom: 1px solid #ebebeb;
+                .img_left{
+                    float: left;
+                    width: 90px;
+                    height: 90px;
+                    margin:40px 30px 0 10px;
+                }
+                .right{
+                    float: left;
+                    width: 450px;
+                    .item-list{
+                        margin-bottom: 14px;
+                        .text-left{
+                            float: left;
+                            font-size: 12px;
+                            line-height: 12px;
+                            width: 80px;
+                            color: #999;
+                            text-align: left;
+                        }
+                        .text-right{
+                            float: left;
+                            width: 300px;
+                             font-size: 12px;
+                            line-height: 12px;
+                            color: #333333;
+                            text-align: left;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                        &:last-of-type{
+                             margin-bottom: 20px; 
+                        }
+                    }
+                }
+                &:last-of-type{
+                    border-bottom: none;
+                }
+            }
+             .item-attibuteAuth{
+                 float: left;
+                 width: 33.3%;
+                 padding-left: 78px;
+                 height: 14px;
+                 line-height: 14px;
+                 margin-bottom: 26px;
+                 text-align: left;
+                 .text{
+                    font-size: 14px;
+                    color: #666666;
+                    margin-left: 10px;
+                 }
+                .checkbox-fileItem{
+                    float: left;
+                    position: relative;
+                    padding-left:20px; 
+                    cursor: pointer;
+                    &::before{
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 12px;
+                        height: 12px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        background: #fff;
+                        content: '';
+                    }
+                }
+                .active{
+                     &::before{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                     }
+                }
+                .checkbox-arr{
+                    display: none;
+                }
+             }
+        }
+        #mask{
+            z-index: 3000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+            background: #000;
+        }
    }
+    .navigation{
+        z-index: 0!important;
+    }
 </style>
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+import {dataLeft} from './js/defaultData.js'
 import '../ManageCost/js/jquery-1.8.3.js'
+import data from '../Settings/js/date.js';
 export default Vue.component('common-edit',{
     props:['rcId'],
     data(){
@@ -1096,7 +1248,7 @@ export default Vue.component('common-edit',{
             return data;
         }
         return {
-            data_left:[],
+            data_left:dataLeft,
             data_right:[],
             value3:[],
             token:'',
@@ -1116,24 +1268,6 @@ export default Vue.component('common-edit',{
             /*以下为后期添加数据*/
             rcName:'',
             // rcId:0,
-            options_monomer:[],//单体选项
-            options_monomer_pre:[],
-            options_partition:[],//分区选项
-            options_partition_pre:[],
-            options_floor:[],//楼层选项
-            options_floor_pre:[],
-            option_professional:[],
-            option_professional_preset:[],
-            options_system:[],//系统选项
-            options_system_pre:[],
-            options_type:[],//楼层选项
-            options_type_pre:[],
-            value_monomer: '',//单体 筛选关键词
-            value_partition: '0',//分区 筛选关键词
-            value_floor: '0',//单体 筛选关键词
-            value_professional:'-1',//专业 筛选关键字
-            value_system:'-1',//系统 筛选关键字
-            value_type:'',//类型 筛选关键字
             list_filter:filter(5),//过滤字段的列表
             list_order:filter(3),//过滤字段的列表
 
@@ -1171,9 +1305,59 @@ export default Vue.component('common-edit',{
             tableFontsize:12,
             tableLineHeight:32,
             tableAlign:'center',
+            database:'',
             showTableNet:0,
-
+            dataBaseList:[],//数据库
+            options_monomer:[],//单体选项
+            options_partition:[
+                {
+                    id:'NONE',
+                    Name:'无'
+                },
+                ],//分区选项
+                options_floor:[
+                {
+                    id:'NONE',
+                    Name:'无'
+                },
+            ],//楼层选项
+             option_professional:[],
+            options_system:[
+                {
+                    id:'NONE',
+                    Name:'无'
+                },
+                {
+                    id:'-1',
+                    Name:'全部'
+                },
+            ],//系统选项
+            options_type:[
+                {
+                id:'NONE',
+                Name:'无'
+                },
+                {
+                    id:'-1',
+                    Name:'全部'
+                },
+            ],//楼层选项
+            value_monomer: '',//单体 筛选关键词
+            value_partition: 'NONE',//分区 筛选关键词
+            value_floor: 'NONE',//单体 筛选关键词
+            value_professional:'-1',//专业 筛选关键字
+            value_system:'-1',//系统 筛选关键字
+            value_type:'-1',//类型 筛选关键字
+            privateVariables:{
+                show:false,
+                new:[],
+                old:[],
+            },
+            
         }
+    },
+    watch:{
+        
     },
     created(){
         var vm = this
@@ -1186,9 +1370,392 @@ export default Vue.component('common-edit',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getList()
+        vm.getDataBase()
+        vm.getIntoDesignPage()
+        if(vm.rcId && vm.rcId != 0){
+            vm.getReportData()
+        }else{
+            vm.addField()
+        }
+        vm.getPV()
     },
     methods:{
+          value_monomer_change(inheirt){
+                var vm = this 
+                if(vm.value_monomer == 0) {
+                    vm.options_partition = [
+                        {
+                            id:'NONE',
+                            Name:'无'
+                    }]
+                    vm.options_floor = [
+                        {
+                            id:'NONE',
+                            Name:'无'
+                        }
+                    ]
+                }else {
+                    vm.getPartitionBySubProjId(inheirt) //加载分区
+                }
+        },
+        value_partition_change(inheirt){
+                var vm = this 
+                vm.findStorey(inheirt)
+        },
+        value_professional_change(inheirt){
+                var vm = this 
+                vm.getGenieClass(2,inheirt)
+        },
+        value_system_change(inheirt){
+                var vm = this 
+                vm.getGenieClass(3,inheirt)
+        },
+        basicConfirm(){
+            var vm = this
+            var arr = []
+            // fieldCode: "level_.part_name",
+            // fieldName: "分区",
+            // fieldType: "STRING",
+            // checked:false,
+            // tableType: 8
+            vm.data_right.forEach((item,key)=>{
+                if(!item.isPrivate){
+                    arr.push(item)
+                }
+            })
+            vm.data_right = arr
+            vm.privateVariables.new.forEach(item=>{
+                if(item.checked){
+                    vm.data_right.push({
+                        fieldCode: item.code,
+                        fieldName: item.name,
+                        fieldType: item.type,
+                        checked:false,
+                        isPrivate:true,
+                        tableType: -1
+                    })
+                }
+            })
+            let {new:obj} = vm.privateVariables
+            vm.privateVariables.old = obj
+            vm.privateVariables.show = false
+        },
+        basicCancle(){
+            var vm = this
+            vm.privateVariables.show = false
+            let {old} = vm.privateVariables
+            vm.privateVariables.new = old
+        },
+        showPrivateVariables(){
+            // var 
+            var  vm = this
+            vm.privateVariables.show = true
+        },
+        getPV(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/report/getAdditionalField',
+                headers:{
+                    token:vm.token
+                },
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    vm.privateVariables.old = response.data.rt!=null?response.data.rt:[]
+                    vm.privateVariables.old.forEach(item=>{
+                        vm.$set(item,'checked',false)
+                    })
+                    let {old} = vm.privateVariables
+                    vm.privateVariables.new = old
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+         getGenieClass(level,inheirt){//获取系统数据
+            var vm = this
+            var pCode = ''
+            var parentClassifyCode='';
+            var gcCode = vm.value_professional
+            var gcCode1 = vm.value_system
+            var gcCode2 = vm.value_type
+            if(level==2){
+                parentClassifyCode= vm.value_professional
+                if(!inheirt)vm.value_system = '-1';
+                if(!inheirt)vm.value_type = 'NONE';
+                vm.options_type = [
+                    {
+                        id:'NONE',
+                        Name:'无'
+                    },
+                ]
+                vm.options_system = [
+                    {
+                        id:'NONE',
+                        Name:'无'
+                    },
+                    {
+                        id:'-1',
+                        Name:'全部'
+                    }
+                ]
+            }else if(level==3){
+                parentClassifyCode = vm.value_system
+                if(!inheirt)vm.value_type = 'NONE';
+                if(parentClassifyCode==0){
+                    vm.options_type = [
+                        {
+                            id:'NONE',
+                            Name:'无'
+                        },
+                    ]
+                }else{
+                    if(!inheirt)vm.value_type = '-1';
+                    vm.options_type = [
+                        {
+                            id:'NONE',
+                            Name:'无'
+                        },
+                        {
+                            id:'-1',
+                            Name:'全部'
+                        },
+                    ]
+                }
+            }
+            if(parentClassifyCode==-1 || parentClassifyCode==0){
+                return false
+            }
+            pCode = parentClassifyCode
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/dc/getGenieClass',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    level:level,
+                    parentClassifyCode:pCode
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null && response.data.rt.length > 0){
+                        if(level == 2){
+                            response.data.rt.forEach((item,key)=>{
+                                vm.options_system.push({
+                                        id:item.number,
+                                        Name:item.title
+                                })//分区列表
+                            })
+                        }else if(level == 3){
+                            response.data.rt.forEach((item,key)=>{
+                                vm.options_type.push({
+                                        id:item.number,
+                                        Name:item.title
+                                })//分区列表
+                            })
+                        }
+                    
+                    }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+        findStorey(inheirt){
+            var vm = this
+            if(vm.value_partition==-1){
+                vm.options_floor = [
+                    {
+                        id:'NONE',
+                        Name:'无'
+                    },
+                    {
+                        id:'-1',
+                        Name:'全部'
+                    }
+                ]
+                if(!inheirt)vm.value_floor = '-1';
+                return false
+            }
+            if(vm.value_partition==0){
+                vm.options_floor = [
+                    {
+                        id:'NONE',
+                        Name:'无'
+                    },
+                ]
+                if(!inheirt)vm.value_floor = 'NONE';
+                return false
+            }
+            var url = vm.BDMSUrl+'project2/dc/findStorey/'+vm.value_partition
+            axios({
+                method:'GET',
+                url:url,
+                headers:{
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                     vm.options_floor = [
+                        {
+                            id:'NONE',
+                            Name:'无'
+                        },
+                        {
+                            id:'-1',
+                            Name:'全部'
+                        }
+                    ]
+                    if(!inheirt)vm.value_floor = '-1'
+                    if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
+                        response.data.rt.rows.forEach((item,key)=>{
+                            vm.options_floor.push({
+                                    id:item.ID,
+                                    Name:item.Name
+                            })//分区列表
+                        })
+                    }else{
+                        vm.options_floor = [
+                            {
+                                id:'NONE',
+                                Name:'无'
+                        }]
+                        if(!inheirt)vm.value_floor = 'NONE'
+                    }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+      },
+        getDataBase(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/report/getDatabase',
+                headers:{
+                    token:vm.token
+                },
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    vm.dataBaseList = response.data.rt!=null?response.data.rt:[]
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        getPartitionBySubProjId(inheirt){//加载分区数据
+            var vm = this
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/dc/getPartitionBySubProjId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    subProjId:vm.value_monomer
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                        vm.options_partition = [
+                            {
+                                id:'NONE',
+                                Name:'无'
+                            },
+                            {
+                                id:'-1',
+                                Name:'全部'
+                            }
+                        ]
+                        if(!inheirt){
+                             vm.options_floor = [
+                                {
+                                    id:'NONE',
+                                    Name:'无'
+                                }
+                            ]
+                            vm.value_floor = 'NONE'
+                            vm.value_partition = '-1'
+                        }
+                        if(response.data.rt != null && response.data.rt.length > 0){
+                            response.data.rt.forEach((item,key)=>{
+                                vm.options_partition.push({
+                                        id:item.ID,
+                                        Name:item.Name
+                                })//分区列表
+                            })
+                        }
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }, 
+         getIntoDesignPage(){
+            var vm = this
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/report/getBuild',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    $.extend(vm.options_monomer,response.data.rt)//单体列表
+                    vm.options_monomer.unshift({
+                        id:'OVERALL_FIELD',
+                        Name:'总体场地'
+                    },{
+                        id:'ALL',
+                        Name:'全部单体'
+                    },)
+                    vm.value_monomer = 'ALL'
+                }
+            }).then(
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'project2/report/getProfession',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projectId:vm.projId,
+                        companyId:vm.entId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.option_professional = [{
+                            id:'-1',
+                            Name:'全部',
+                        }]
+                        if(response.data.rt != null){
+                            response.data.rt.forEach((element,index)=>{
+                                vm.option_professional.push({
+                                    id:element.code,
+                                    Name:element.title,
+                                })
+                            })
+                        }
+                    }
+
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            )
+        },
         getReportData(){
             var vm = this
             // rc: rc,
@@ -1208,9 +1775,9 @@ export default Vue.component('common-edit',{
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
                         vm.value_type = response.data.rt.rcTableName//表名 筛选 - 类型
-                        vm.initFiled(false)
+                        vm.initFiled(false) 
                         vm.displayType = response.data.rt.displayType == 0?true:false//数据相同时合并多行
-                        vm.displayTotal = response.data.rt.displayTotal == 0?true:false//显示总计
+                        vm.displayTotal = response.data.rt.displayTotal == 1?true:false//显示总计
                         vm.titlePosition = response.data.rt.groupPosition+''//报表名称
 
                         vm.data_right = []
@@ -1219,35 +1786,66 @@ export default Vue.component('common-edit',{
                                 for(var i=0;i<vm.data_left.length;i++){
                                     if(ele.fieldCode == vm.data_left[i].fieldCode){
                                         vm.$set(vm.data_left[i],'checked',true)
+                                        vm.data_left[i].fieldName = ele.fieldAlias
+                                        break
+                                    }
+                                }
+                                for(var i=0;i<vm.privateVariables.new.length;i++){
+                                    if(ele.fieldCode == vm.privateVariables.new[i].code){
+                                        vm.$set(vm.privateVariables.new[i],'checked',true)
                                         break
                                     }
                                 }
                             })
                             vm.addField()
+                            vm.basicConfirm()
                         }
                        
                         var length = response.data.rt.filterList.length
+                        
                         if(length>0){
                             response.data.rt.filterList.forEach((element,index)=>{
-                                vm.list_filter[index].build_name = element.fieldCode
-                                vm.list_filter[index].val = 1
+                                if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.partition'
+                                 || element.fieldCode == 'range.storey' || element.fieldCode == 'range.profession' || element.fieldCode == 'range.system' || element.fieldCode =='range.type'){
+                                     switch(element.fieldCode){
+                                         case 'range.db':
+                                                vm.database = element.fieldSearchContent
+                                            break;
+                                        case 'range.build':
+                                                vm.value_monomer = element.fieldSearchContent
+                                                vm.value_monomer_change(true)
+                                            break;
+                                        case 'range.partition':
+                                                vm.value_partition = element.fieldSearchContent
+                                                vm.value_partition_change(true)
+                                            break;
+                                        case 'range.storey':
+                                                vm.value_floor = element.fieldSearchContent
+                                            break;
+                                        case 'range.profession':
+                                                vm.value_professional = element.fieldSearchContent
+                                                vm.value_professional_change(true)
+                                            break;
+                                        case 'range.system':
+                                                vm.value_system = element.fieldSearchContent
+                                                vm.value_system_change(true)
+                                            break;
+                                        case 'range.type':
+                                                vm.value_type = element.fieldSearchContent
+                                            break;
+                                     }
+                                }else{
+                                    console.log(index)
+                                    vm.list_filter[index].build_name = element.fieldCode
+                                    vm.list_filter[index].val = 1
 
-                                vm.list_filter[index].filtercontent = element.fieldSearchContent
-                                vm.list_filter[index].filtertype = element.fieldSearchType
-                                vm.list_filter[index].show = true
+                                    vm.list_filter[index].filtercontent = element.fieldSearchContent
+                                    vm.list_filter[index].filtertype = element.fieldSearchType
+                                    vm.list_filter[index].show = true
+                                }
                             })
-                            vm.list_filter[length-1].val = 0
+                            vm.list_filter[vm.list_filter.length-1].val = 0
                         }
-                    //       key: i,
-                    // val:0,
-                    // build_name:'nofield',
-                    // ordertype:'ACENding',
-                    // grouptype:'NONE_GROUP',
-                    // filtertype:'',
-                    // filtercontent:'',
-                    // show:i == 0?true:false,
-                    // disabled: i >= 4?true:false
-
                         if(response.data.rt.groupList != null && response.data.rt.groupList.length>0){
                             response.data.rt.groupList.forEach((element,index)=>{
                                 vm.list_order[index].build_name = element.fieldCode
@@ -1260,17 +1858,17 @@ export default Vue.component('common-edit',{
                             var length_list_order = response.data.rt.groupList.length
                             vm.list_order[length_list_order-1].val = 0
                         }
-                        vm.styleShowTitle = response.data.rt.rcStyle.showTitle == 0?false:true
+                        vm.styleShowTitle = response.data.rt.rcStyle.showTitle == 1?true:false
                         vm.titleName = response.data.rt.rcStyle.titleName
-                        vm.titleUseReportName = response.data.rt.rcStyle.titleUseReportName == 0?false:true
-                        vm.titleFontSize = response.data.rt.rcStyle.titleFontSize
+                        vm.titleUseReportName = response.data.rt.rcStyle.titleUseReportName == 1?true:false
+                        vm.titleFontSize = parseInt(response.data.rt.rcStyle.titleFontSize)
                         vm.titleAlign = response.data.rt.rcStyle.titleAlign
-                        vm.titleUseBorder = response.data.rt.rcStyle.titleUseBorder == 0?false:true
+                        vm.titleUseBorder = response.data.rt.rcStyle.titleUseBorder == 1?true:false
 
-                        vm.titleBorderHeight = response.data.rt.rcStyle.titleBorderHeight
+                        vm.titleLineHeight = parseInt(response.data.rt.rcStyle.titleBorderHeight)
                         vm.titleBgColor = response.data.rt.rcStyle.titleBgColor
-                        vm.tableFontSize = response.data.rt.rcStyle.tableFontSize
-                        vm.tableLineHeight = response.data.rt.rcStyle.tableRowHeight
+                        vm.tableFontsize = parseInt(response.data.rt.rcStyle.tableFontSize)
+                        vm.tableLineHeight = parseInt(response.data.rt.rcStyle.tableRowHeight)
                         if(response.data.rt.rcStyle.tableWidth == '100%'){
                             vm.tableWidth = response.data.rt.rcStyle.tableWidth
                         }else{
@@ -1395,6 +1993,55 @@ export default Vue.component('common-edit',{
                     fieldSearchContent: content,
                     tableType: tableType
                 })
+            })
+            /**数据库**/
+             fieldFilterList.push({
+                fieldCode: 'range.db', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.database,
+                tableType: -1
+            })
+             /**danti**/
+             fieldFilterList.push({
+                fieldCode: 'range.build', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_monomer,
+                tableType: -1
+            })
+             /**分区**/
+             fieldFilterList.push({
+                fieldCode: 'range.partition', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_partition,
+                tableType: -1
+            })
+             /**楼层**/
+             fieldFilterList.push({
+                fieldCode: 'range.storey', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_floor,
+                tableType: -1
+            })
+             /**专业**/
+             fieldFilterList.push({
+                fieldCode: 'range.profession', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_professional,
+                tableType: -1
+            })
+             /**系统**/
+             fieldFilterList.push({
+                fieldCode: 'range.system', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_system,
+                tableType: -1
+            })
+             /**类型**/
+             fieldFilterList.push({
+                fieldCode: 'range.type', 
+                fieldSearchType: 'EQUALS',
+                fieldSearchContent: vm.value_type,
+                tableType: -1
             })
             if (error != '') {
                  vm.$message({
@@ -1553,66 +2200,12 @@ export default Vue.component('common-edit',{
 
         initFiled(isClear){
             var vm = this
-            for(var i=0;i<vm.options_type.length;i++){
-                if(vm.options_type[i].tableIndex == vm.value_type){
-                    vm.data_right = []
-                    vm.data_left = vm.options_type[i].fieldList
-                    vm.data_left.forEach((ele,index)=>{
-                        if(index == 0){
-                            vm.$set(ele,'checked',true)
-                        }else{
-                            vm.$set(ele,'checked',false)
-                        }
-                    })
-                    if(isClear){
-                       vm.addField()
-                    }
-                    break
-                }
+            vm.data_right = []
+            vm.data_left = dataLeft
+            
+            if(isClear){
+                vm.addField()
             }
-        },
-        getList(){
-            var vm = this
-            vm.fullscreenLoading =true
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/report/template/list',
-                headers:{
-                    token:vm.token
-                },
-                params:{
-                    type:2,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
-                    projId:vm.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    if(response.data.rt != null){
-                        vm.options_type = response.data.rt
-                        vm.value_type = response.data.rt[0].tableIndex
-                        vm.data_left = response.data.rt[0].fieldList
-                        vm.data_left.forEach((ele,index)=>{
-                            if(index == 0){
-                                vm.$set(ele,'checked',true)
-                            }else{
-                                vm.$set(ele,'checked',false)
-                            }
-                        })
-                        if(vm.rcId && vm.rcId != 0){
-                            vm.getReportData()
-                        }else{
-                            vm.addField()
-                        }
-                    }
-                }else{
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-                vm.fullscreenLoading =false
-            }).catch((err)=>{
-                console.log(err)
-            })
         },
         changeFL(key,length){
             var vm = this

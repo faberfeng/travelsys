@@ -116,7 +116,7 @@
                         </p>
                     </div>
                     <p class="btn-selection clearfix">
-                       <button :class="['redbtn',{'disabledBtn':!canSearch}]" @click="selectData" :disabled="canSearch?false:'disabled'">筛选</button>
+                       <button :class="['redbtn',{'disabledBtn':!canSearch}]" @click="pageDetial.currentPage = 1;selectData()" :disabled="canSearch?false:'disabled'">筛选</button>
                        <span class="whitebtn" v-if="ShowClassify" @click="ShowClassify = false">更多</span>
                     </p>
                     <div class="project" v-loading="loading">
@@ -306,10 +306,10 @@
                                               <div class="pagination-btn-separator"></div>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,true)"></a>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,true)"></a>
                                         </td>
                                         <td>
                                               <div class="pagination-btn-separator"></div>
@@ -327,10 +327,10 @@
                                             <div class="pagination-btn-separator"></div>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,true)"></a>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,true)"></a>
                                         </td>
                                         <td>
                                             <div class="pagination-btn-separator"></div>
@@ -580,7 +580,7 @@
                                     <select style="width: 140px;" :class="['inputvalue-select','property_value'+index]" v-if="val.valueType == 2" v-model="val.extendValue">
                                         <option value="是">是</option> 
                                         <option value="否">否</option>
-                                        <option value='多样'>多样</option>
+                                        <option value='@'>@</option>
                                     </select>
                                     <span  v-if="val.valueType == 3"  :class="['inputvalue-date','property_value'+index]">
                                         <!-- <input class=""  width="40px;" v-model="val.extendValue"/> -->
@@ -2506,6 +2506,7 @@ export default {
           }
           var num = 0
           var c=0
+          var message = ''
           var isInherit=-1;//0：自身 1：来自继承
           /**
            * @param  vm.GCPropertyList 扩展属性
@@ -2516,6 +2517,7 @@ export default {
                 num = 0
                 var tempValue='' //将要编辑的扩展属性的内容
                 vm.attributeList.forEach((item,key)=>{
+                    message = num >0?'多样':'@'
                     if(item.checked){
                      
                         var  valueFrom = vm.initVal(val.id,item.traceId,true)//扩展属性 的 来源
@@ -2536,9 +2538,9 @@ export default {
                                 }
                             }
                             if (tempValue != value) {
-                                tempValue = '多样'
+                                tempValue = message
                                 if(val.valueType == 2 || val.valueType == 3){//是否 和 时间
-                                    tempValue = '多样'//@ 不会修改任意列表的值
+                                    tempValue = message//@ 不会修改任意列表的值
                                 }
                             }
                         }
@@ -2551,8 +2553,8 @@ export default {
                                 vm.$set(val,'timeChecked_to_submit',false)
                             }
                         }else{//都来自继承  赋值@
-                            vm.$set(val,'extend_to_submit','多样')
-                            vm.$set(val,'extendValue','多样')
+                            vm.$set(val,'extend_to_submit',message)
+                            vm.$set(val,'extendValue',message)
                              if(val.valueType == 3){
                                 vm.$set(val,'timeChecked',true)
                                 vm.$set(val,'timeChecked_to_submit',true)
@@ -2702,29 +2704,54 @@ export default {
             }
         }
       },
-      changePage(val){//分页 0 -1 1 2
+      changePage(val,isZYYS){//分页 0 -1 1 2
             var vm = this; 
-            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
-                vm.$message('这已经是第一页!')
-                return false
-            }
-            if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
-                vm.$message('这已经是最后一页!')
-                return false
-            }
-            switch(val){
-                case 0:
-                    vm.pageDetial.currentPage = 1
-                    break;
-                case -1:
-                    vm.pageDetial.currentPage--
-                    break;
-                case 1:
-                    vm.pageDetial.currentPage++
-                    break;
-                case 2:
-                    vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
-                    break;
+            if(isZYYS){ //pre_pageDetial.currentPage
+                if(vm.pre_pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                    vm.$message('这已经是第一页!')
+                    return false
+                }
+                if(vm.pre_pageDetial.currentPage >= Math.ceil(vm.pre_pageDetial.total/vm.pre_pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                    vm.$message('这已经是最后一页!')
+                    return false
+                }
+                switch(val){
+                    case 0:
+                        vm.pre_pageDetial.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pre_pageDetial.currentPage--
+                        break;
+                    case 1:
+                        vm.pre_pageDetial.currentPage++
+                        break;
+                    case 2:
+                        vm.pre_pageDetial.currentPage = Math.ceil(vm.pre_pageDetial.total/vm.pre_pageDetial.pagePerNum)
+                        break;
+                }
+            }else{
+                if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                    vm.$message('这已经是第一页!')
+                    return false
+                }
+                if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                    vm.$message('这已经是最后一页!')
+                    return false
+                }
+                switch(val){
+                    case 0:
+                        vm.pageDetial.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pageDetial.currentPage--
+                        break;
+                    case 1:
+                        vm.pageDetial.currentPage++
+                        break;
+                    case 2:
+                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                        break;
+                }
             }
       },
       extensionCancle(){
@@ -2972,6 +2999,7 @@ export default {
                             Name:'全部'
                         }
                     ]
+                    vm.value_floor = '-1'
                     return false
                 }
                 if(vm.value_partition==0){
@@ -2981,6 +3009,7 @@ export default {
                             Name:'无'
                         },
                     ]
+                    vm.value_floor = '0'
                     return false
                 }
                 var url = vm.BDMSUrl+'project2/dc/findStorey/'+vm.value_partition
@@ -3002,17 +3031,18 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == 0){
                     if(!isPre){
+                         vm.options_floor = [
+                            {
+                                id:'0',
+                                Name:'无'
+                            },
+                            {
+                                id:'-1',
+                                Name:'全部'
+                            }
+                        ]
+                        vm.value_floor = '-1'
                         if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
-                            vm.options_floor = [
-                                {
-                                    id:'0',
-                                    Name:'无'
-                                },
-                                {
-                                    id:'-1',
-                                    Name:'全部'
-                                }
-                            ]
                             vm.options_floor_pre = []
                             response.data.rt.rows.forEach((item,key)=>{
                                 vm.options_floor.push({
@@ -3243,20 +3273,6 @@ export default {
                       }
                   }
               }
-          }
-          var params = {
-                projId:vm.projId,
-                dataVision:vm.dataVision,//数据版本
-                isChildren:1,
-                selectBuild:2,
-                holderType:9,
-                holderId:'all',
-                gcCode:210000,
-                gcCode1:213000,
-                gcCode2:213010,
-                gcNumber:213010,
-                rows:vm.pageDetial.pagePerNum,
-                page:vm.pageDetial.currentPage,
           }
           axios({
               method:'POST',

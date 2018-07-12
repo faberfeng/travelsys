@@ -13,12 +13,14 @@
                 <div class="loginDialogSide"></div>
                 <div class="loginDialog">
                     <p class="loginBodyText">系统账号登陆</p>
-                    <div class="loginInput">
-                        <div id="firstInp"><input placeholder="账号" name="id" class="input" v-model="login.Id"/></div>
-                        <div id="secondInp" class="af"><input @keyup.enter="Login" autocomplete="off" name="password" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
-                    </div>
-                    <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
-                    
+                    <form onsubmit="return false;" method="post">
+                        <div class="loginInput">
+                            <div id="firstInp"><input placeholder="账号" name="id" class="input" v-model="login.Id"/></div>
+                            <div id="secondInp" class="af"><input @keyup.enter="Login" name="password" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
+                        </div>
+                        <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
+                        <input type="submit" style="display:none;"/>
+                    </form>
                     <button class="login" @click="Login">登录</button>
                     <div class="loginInfo">
                         <a class="loginInfoLeft" href="http://10.252.26.240:8080/bdms-usercenter/register/registerIndex" target="blank">立即注册</a>
@@ -64,6 +66,10 @@ export default {
         }
     },
     methods:{
+        func(event){
+            var event = event || e;
+            event.preventDefault();
+        },
         BeforeLogin(){
             var vm = this
             axios({
@@ -99,7 +105,7 @@ export default {
                 this.projectData = response.data;
                 if (this.projectData.cd === '10004') {
                     localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
-                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.userName);
+                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.realName);
                     localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
                     this.$router.push({
                         path: '/showcompany'

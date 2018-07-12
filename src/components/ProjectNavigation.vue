@@ -87,18 +87,17 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-               // console.log('getUserInfo获取用户的姓名和项目权限')
                 if(response.data.cd === '1'){
                     this.$router.push({
                         path:'/login'
                     })
                 }else{
-                    vm.userName = response.data.rt.onlineInfo.userName;
+                    vm.userName = response.data.rt.onlineInfo.realName;
                     vm.userId = response.data.rt.onlineInfo.userId;
                 }
                 
             }).catch((err)=>{
-                    console.log(err)
+                console.log(err)
             })
         },
         //获取企业列表
@@ -112,12 +111,10 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log(response);
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
-                    console.log(response.data.rt.companyList);
                     vm.companyList = response.data.rt.companyList
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
@@ -169,7 +166,6 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log(response);
                 if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                      vm.$router.push({
                         path:'/login'
@@ -193,7 +189,6 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                console.log(response);
                 if(response.data.cd == "10009"){//跳转项目首页
                     localStorage.setItem('token',response.data.rt.session.onlineInfo.tokenId);
                     vm.token = response.data.rt.session.onlineInfo.tokenId;
@@ -201,7 +196,6 @@ export default {
                         path:'/projectlist'
                     })
                 }else if(response.data.cd === "1"){
-                    console.log(response.data.cd );
                     alert(response.data.msg);
                     setTimeout(()=>{
                          vm.$router.push({

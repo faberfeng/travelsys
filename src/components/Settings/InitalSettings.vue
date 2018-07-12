@@ -281,7 +281,7 @@ export default {
         //上传新logo
         updataNewImage(){
             this.imageType = 1;
-            this.upImg =true;
+            this.upImg = true;
         },
         retract(){
             if(this.retractImg === shouqiImg){

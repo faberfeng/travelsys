@@ -152,6 +152,7 @@
 <script>
 var THREE = require('three');
 import axios from 'axios';
+import '../../utils/init-axios.js';
 import './js/jquery-1.8.3.js'
 import './js/date.js'
 var source= '';
@@ -164,11 +165,9 @@ var isUserInteracting = false,
 export default {
     data(){
       return {
-          token:'',
           projId:'',
           fgId:'',//全景文件ID
           QJFileManageSystemURL:'',
-          BDMSUrl:'',
           QJ:{
               imageBackground:{},
               point:[]
@@ -182,9 +181,7 @@ export default {
     },
     created(){
       var vm = this
-      vm.token = localStorage.getItem('token');
       vm.projId = localStorage.getItem('projId');
-      vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
       vm.fgId = vm.$route.params.id
       var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
@@ -228,10 +225,7 @@ export default {
         var vm = this
          axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/doc/getFileGroupVersionList',
-            headers:{
-                'token':vm.token
-            },
+            url:'project2/doc/getFileGroupVersionList',
             params:{
                 fgId:vm.fgId,
             },

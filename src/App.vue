@@ -11,7 +11,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 #app {
   font-family: '微软雅黑', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -19,6 +19,11 @@ export default {
   text-align: center;
   color: #2c3e50;
   min-width: 1200px;
+}
+.UserList{
+   td,th{
+    border-bottom: 1px solid #e6e6e6;
+   }
 }
 .el-date-editor.el-input{
   width: 435px;
