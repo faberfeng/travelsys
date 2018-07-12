@@ -16,8 +16,8 @@
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
                         <p class="antsLine">
-                            成本管理<i class="icon-sanjiao-right"></i><span class="strong" @click="back()" v-text="title"></span><i class="icon-sanjiao-right"></i>
-                            清单详情
+                            成本管理<i class="icon-sanjiao-right"></i><span style="cursor:pointer"  @click="back()" v-text="title"></span><i class="icon-sanjiao-right"></i>
+                            <span class="strong">清单详情</span>
                         </p>
                         <!--以下是列表-->
                         <p class="header clearfix">
@@ -343,14 +343,10 @@
                             </div>
                         </li>
                     </ul>
-                    <el-pagination
-                    background
-                    v-if="!singleLable"
-                    layout="prev, pager, next"
-                    :current-page.sync="pageLabelList.currentPage"
+                    <el-pagination background v-if="!singleLable" layout="prev, pager, next" :current-page.sync="pageLabelList.currentPage"
                      @current-change="findManifestDetailList(1)" 
                      @prev-click="findManifestDetailList(1)"
-                      @next-click="findManifestDetailList(1)"
+                     @next-click="findManifestDetailList(1)"
                     :total="pageLabelList.total">
                     </el-pagination>
                 </div>
@@ -1325,7 +1321,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 
 export default Vue.component('common-list',{
-  props:['mId','title','rType','bId','isGongChengLiang'],
+  props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne'],
   data(){
       return {
          screenLeft:{
@@ -1445,7 +1441,8 @@ export default Vue.component('common-list',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.manifestId = vm.mId
-        vm.getIntoList()
+        vm.getIntoList();
+        console.log(this.token);
   }, 
   mounted(){
       var vm = this
@@ -1572,12 +1569,18 @@ export default Vue.component('common-list',{
           vm.topExpend.title = vm.topExpend.isExpend?'收起':'展开'
       },
       labelListConfirm(){
-          var vm = this
-          if(vm.singleLable == true){
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/'+vm.S_Label_quantitiesList[0].pkId)
-          }else{
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/0')
-          }
+            var vm = this;
+            var manifestId = '';
+            if(this.isGongChengLiang){
+                manifestId = this.manifestIdOne;
+            }else{
+                manifestId =vm.manifestId;
+            }
+            if(vm.singleLable == true){
+                window.open('/#/Cost/getManifestDetailInfoForPage/'+manifestId+'/'+vm.S_Label_quantitiesList[0].pkId)
+            }else{
+                window.open('/#/Cost/getManifestDetailInfoForPage/'+manifestId+'/0')
+            }
       },
       labelListCancle(){
         var vm = this
@@ -1636,7 +1639,7 @@ export default Vue.component('common-list',{
             }
         }).then(response=>{
             if(response.data.cd == 0){
-                vm.getManifestInfoByMId()
+                vm.getManifestInfoByMId();
             }else{
                 vm.$message({
                     type:'error',
@@ -1647,54 +1650,64 @@ export default Vue.component('common-list',{
         }).catch((err)=>{
             console.log(err)
         })
-      },
+    },
     getManifestInfoByMId(){
-            var vm = this
-            var url = ''
-            var params = new Object
-            /**
-             * @李从文 
-             * 此处加 工程量清单的代码
-             * 接口为：show2/taskManifestDetail
-             * 所用的参数只有 response.data.rt.main
-             * ***/
-            if(vm.isGongChengLiang){
-                params = {
-                    manifestId:vm.manifestId,
-                    projId:vm.projId,
-                }
-                url = 'show2/taskManifestDetail'//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
-            }else if(vm.bId){
-                params = {
-                    rType:vm.rType,
-                    bId:vm.bId,
-                }
-                url = 'manifest2/getManifestInfo'//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
-            }else{
-                /**
-                 * 默认 -- 指向物料量清单页面
-                 * 
-                 * **/
-                params = {
-                    mId:vm.manifestId,
-                }
-                url = 'manifest2/getManifestInfoByMId'
+        var vm = this
+        var url = '';
+        var params = new Object;
+        let ways = '';
+        /**
+        * @李从文 
+        * 此处加 工程量清单的代码
+        * 接口为：show2/taskManifestDetail
+        * 所用的参数只有 response.data.rt.main
+        * ***/
+       
+        if(vm.isGongChengLiang){//工程量清单详情
+            params = {
+                manifestId:vm.manifestIdOne,
+                projId:vm.projId,
             }
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+url,
-                headers:{
-                    token:vm.token
-                },
-                params:params
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    if(response.data.rt != null){
-                      if(vm.bId)vm.manifestId = response.data.rt.pkId
-                       vm.ManifestInfo = response.data.rt  
-                       if(vm.isGongChengLiang)vm.ManifestInfo = response.data.rt.main
+            url = 'show2/taskManifestDetail';//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
+            ways = 'GET';
+        }else if(vm.bId){
+            params = {
+                rType:vm.rType,
+                bId:vm.bId,
+            }
+            url = 'manifest2/getManifestInfo'//关联类型:1:关联文档;2:进度核实;3:工程算量;4:产品选型;5:物资采购;6:讨论主题;7:报表快照
+            ways = 'POST';
+        }else{
+        /**
+        * 默认 -- 指向物料量清单页面
+        * 
+        * **/
+            params = {
+                mId:vm.manifestId,
+            }
+            url = 'manifest2/getManifestInfoByMId';
+            ways = 'POST';
+        }
+        axios({
+            method:ways,
+            url:vm.BDMSUrl+url,
+            headers:{
+                token:vm.token
+            },
+            params:params
+        }).then(response=>{
+            if(response.data.cd == 0){
+                if(response.data.rt != null){
+                    if(vm.bId){
+                        vm.manifestId = response.data.rt.pkId;
                     }
-                    vm.findManifestDetailList(2)
+                    if(vm.isGongChengLiang){
+                        vm.ManifestInfo = response.data.rt.main;
+                    }else{
+                        vm.ManifestInfo = response.data.rt ; 
+                    }
+                }
+                vm.findManifestDetailList(2)
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -1704,8 +1717,8 @@ export default Vue.component('common-list',{
                 }
             }).catch((err)=>{
                 console.log(err)
-            })
-        },
+        })
+    },
     //加载明细列表
     changeShowType(val){
         var vm = this
@@ -1722,91 +1735,97 @@ export default Vue.component('common-list',{
          }
     },
     findManifestDetailList(isDialog=0){
-            var vm = this
-             //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
-             /**
-              * @augments isDialog 判断是否是弹框
-              *   pageLabelList:{
-                    pagePerNum:10,//一页几份数据
-                    currentPage:1,//初始查询页数 第一页
-                    total:0,//所有数据
-                },
-              * **/
-            var showType = 1
-            /*@李从文
+        var vm = this
+        //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
+        /**
+        * @augments isDialog 判断是否是弹框
+        *   pageLabelList:{
+             pagePerNum:10,//一页几份数据
+            currentPage:1,//初始查询页数 第一页
+            total:0,//所有数据
+        },
+        * **/
+        var showType = 1;
+        /*@李从文
                 这个接口对应 show/getManifestDetailInfo
-            */
-            if(vm.showType == 'combine'){
-                showType = 2
+        */
+        if(vm.showType == 'combine'){
+            showType = 2;
+        }
+        if(isDialog == 1){
+            var page = vm.pageLabelList.currentPage;
+            var rows = vm.pageLabelList.pagePerNum;
+        }else{
+            var page = vm.pageDetial.currentPage;
+            var rows = vm.pageDetial.pagePerNum;
+        }
+        var manifestId = '';
+        if(this.isGongChengLiang){
+            manifestId = this.manifestIdOne;
+        }else{
+            manifestId = this.manifestId;
+        }
+        axios({
+            method:'POST',
+            url:vm.BDMSUrl+'manifest2/findManifestDetailList',
+            headers:{
+                token:vm.token
+            },
+            params:{
+                projectId:vm.projId,
+                manifestId:manifestId,
+                page:page,
+                rows:rows,
+                showType:showType,//显示类型 1 逐个显示 2 合并显示
+                currentColumns:'',
             }
-            if(isDialog == 1){
-                var page = vm.pageLabelList.currentPage
-                var rows = vm.pageLabelList.pagePerNum
-            }else{
-                var page = vm.pageDetial.currentPage
-                var rows = vm.pageDetial.pagePerNum
-            }
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'manifest2/findManifestDetailList',
-                headers:{
-                    token:vm.token
-                },
-                params:{
-                    projectId:vm.projId,
-                    manifestId:vm.manifestId,
-                    page:page,
-                    rows:rows,
-                    showType:showType,//显示类型 1 逐个显示 2 合并显示
-                    currentColumns:''
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    if(response.data.rt != null){
-                        vm.pageLabelList.total = response.data.rt.total
-                        vm.pageDetial.total = response.data.rt.total
-                        if(isDialog == 1){
+        }).then(response=>{
+            if(response.data.cd == 0){
+                if(response.data.rt != null){
+                    vm.pageLabelList.total = response.data.rt.total
+                    vm.pageDetial.total = response.data.rt.total
+                    if(isDialog == 1){
+                        if(response.data.rt.rows != null){
+                            vm.S_Label_quantitiesList = response.data.rt.rows
+                        }else{
+                            vm.S_Label_quantitiesList = []
+                        }
+                    }else if(isDialog == 0){
+                        if(response.data.rt.rows != null){
+                            vm.S_quantitiesList = response.data.rt.rows;
+                            vm.S_quantitiesList.forEach((element,index) => {
+                                vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
+                                vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                            });
+                        }else{
+                            vm.S_quantitiesList = [];
+                        }
+                    }else if(isDialog == 2){
                             if(response.data.rt.rows != null){
-                                vm.S_Label_quantitiesList = response.data.rt.rows
-                            }else{
-                                vm.S_Label_quantitiesList = []
-                            }
-                        }else if(isDialog == 0){
-                            if(response.data.rt.rows != null){
-                                vm.S_quantitiesList = response.data.rt.rows
-                                vm.S_quantitiesList.forEach((element,index) => {
-                                    vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
-                                    vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
-                                });
-                            }else{
-                                vm.S_quantitiesList = []
-                            }
-                        }else if(isDialog == 2){
-                             if(response.data.rt.rows != null){
-                                vm.S_Label_quantitiesList = response.data.rt.rows
-                                vm.S_quantitiesList = response.data.rt.rows
-                                vm.S_quantitiesList.forEach((element,index) => {
-                                    vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
-                                    vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
-                                });
-                            }else{
-                                vm.S_Label_quantitiesList = []
-                                vm.S_quantitiesList = []
-                            }
+                            vm.S_Label_quantitiesList = response.data.rt.rows
+                            vm.S_quantitiesList = response.data.rt.rows
+                            vm.S_quantitiesList.forEach((element,index) => {
+                                vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
+                                vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                            });
+                        }else{
+                            vm.S_Label_quantitiesList = []
+                            vm.S_quantitiesList = []
                         }
                     }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    vm.$router.push({
-                        path:'/login'
-                    })
                 }
-            }).catch((err)=>{
-                console.log(err)
-            })
-        },
-      changePage(val){//分页 0 -1 1 2
+            }else if(response.data.cd == '-1'){
+                alert(response.data.msg);
+            }else{
+                vm.$router.push({
+                    path:'/login'
+                })
+            }
+           }).catch((err)=>{
+            console.log(err)
+        })
+    },
+    changePage(val){//分页 0 -1 1 2
             var vm = this; 
             if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
                 vm.$message('这已经是第一页!')

@@ -226,8 +226,11 @@
                     <div style="clear:both;"></div>
                 </div>
             </div>
+
             <div class="worktable project" v-if='showDetail'>
                 <p class="antsLine">
+                    成本管理
+                    <i class="icon-sanjiao-right"></i>
                     <a class="backToProjectBtn" @click="backToProject">工程量清单</a>
                     <i class="icon-sanjiao-right"></i>
                     <span class="strong" @click="back()" v-text="viewProjectDetail.viewDetailName"></span>
@@ -270,7 +273,12 @@
                     </template> 
                 </zk-table>
             </div>
+            <!-- 查看清单列表 -->
+            <div class="project" v-if="listItem.showProject">
+                <common-list @back="backToProject"  :title="'工程量清单'" :isGongChengLiang='true' :manifestIdOne="listItem.viewDetailObj.manifestId"></common-list>
+            </div>
         </div>
+        <!-- dialog弹出框 -->
         <div id="edit">
             <el-dialog title="请选择需要出量的单体或场地" :visible="createMonomer.show" @close="createCancle">
                 <div class="editBody">
@@ -397,7 +405,7 @@
                     <button class="editBtnC" @click="customCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="三价配置" :visible="viewProjectDetail.showThreePrice" @close="createCancle">
+            <el-dialog title="三价配置" :visible="viewProjectDetail.showThreePrice" @close="showThreePriceCancel">
                 <div>
                     <span>显示列</span>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[0]">内部价</el-checkbox>
@@ -415,7 +423,7 @@
                     <button class="editBtnC" @click="showThreePriceCancel">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="请选择导出价" :visible="viewProjectDetail.exportExcelShow" @close="createCancle">
+            <el-dialog title="请选择导出价" :visible="viewProjectDetail.exportExcelShow" @close="sexportExcelShowCancel">
                 <div>
                     <sapn>导出价</sapn>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[0]">内部价</el-checkbox>
@@ -516,6 +524,17 @@
                     <button class="editBtnC" @click="importPriceCancel">结束</button>
                 </div>
             </el-dialog>
+            <el-dialog title="数据校验结果" :visible="viewProjectDetail.datadistinguishShow" @close="datadistinguishCancel">
+                <div class="editBodytwo">
+                    <ul class="distinguishUl"> 
+                        <li v-for="(item,index) in viewProjectDetail.datadistinguishData" :key="index">{{item}}</li>
+                    </ul>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="datadistinguishSure">确定导入</button>
+                    <button class="editBtnC" @click="datadistinguishCancel">取消导入</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -523,8 +542,12 @@
 import axios from 'axios';
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
+import commonList from './qingDan.vue'
 export default {
-  name:'DesignVersion',
+    name:'DesignVersion',
+    components:{
+        commonList
+    },
     data(){
         return{
             token:'',
@@ -719,13 +742,15 @@ export default {
                 rePrice:'',
                 editPriceData:{},
                 fileList:[],
-                fileName:'',
+                fileName:'请选择文件',
                 sheetName:'',
                 excelInfo:{},
                 sheetTitle:[],
                 filePath:'',
                 codeline:'',//编码列
                 projectline:'',//工程列
+                datadistinguishShow:false,//数据校验结果
+                datadistinguishData:[]
             },//工程量明细
             viewDetailObject:{},
             duliProject:{
@@ -736,7 +761,7 @@ export default {
                 totalPrice:'',
                 editPriceObject:{},
                 AmouontDetail:{},
-                fileName:'未选择文件',
+                fileName:'请选择文件',
                 fileList:[],
                 listProName:'',
                 importExcelShow:false,
@@ -747,6 +772,10 @@ export default {
                 codeline:'',//编码列
                 projectline:'',//工程列
                 verifiedObject:{}
+            },
+            listItem:{
+                showProject:false,
+                viewDetailObj:{}
             }
         }
     },
@@ -1194,7 +1223,7 @@ export default {
             this.$refs.file.click();
         },
         fileChanged(){
-            const list = this.$refs.file.files;
+            let list = this.$refs.file.files;
             this.duliProject.fileList = list;
             if(list.length !== 0){
                 this.duliProject.fileName = list[0].name;
@@ -1293,6 +1322,7 @@ export default {
         importExcelCancel(){
             this.duliProject.fileList = [];
             this.duliProject.fileName = '请选择文件';
+            this.duliProject.fileList = [];
             this.duliProject.verifiedObject = {};
             this.duliProject.codeline = '';
             this.duliProject.projectline = '';
@@ -1310,6 +1340,7 @@ export default {
                 this.duliProject.showProject = true;
                 this.showDetail = false;
                 this.showMainProject = false;
+                this.listItem.showProject = false;
                 axios({
                     method:'post',
                     url:this.BDMSUrl+'project2/report/getSnapWorkAmouontDetail',
@@ -1457,6 +1488,7 @@ export default {
             this.showDetail = false;
             this.duliProject.showProject = false;
             this.showMainProject = true;
+            this.listItem.showProject = false;
         },
         //查看明细
         viewDetail(val){
@@ -1479,10 +1511,10 @@ export default {
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.codingList = response.data.rt;
-
                         this.showDetail = true;
                         this.showMainProject = false;
                         this.duliProject.showProject = false;
+                        this.listItem.showProject = false;
                     }else{
                         alert(response.data.msg)
                     }
@@ -1504,7 +1536,7 @@ export default {
         },
         //导入单价改变
         selectfileChanged(){
-            const list = this.$refs.fileimport.files;
+            let list = this.$refs.fileimport.files;
             this.viewProjectDetail.fileList = list;
             if(list.length !== 0){
                 this.viewProjectDetail.fileName = list[0].name;
@@ -1526,7 +1558,6 @@ export default {
                     data:formData
                 }).then(response=>{
                     if(response.data.cd == 0){
-                        console.log(response.data)
                         this.viewProjectDetail.excelInfo = response.data.rt;
                         this.viewProjectDetail.sheetName = response.data.rt.title[0].sheetName;
                         this.viewProjectDetail.sheetTitle = response.data.rt.title[0].sheetTile;
@@ -1539,7 +1570,7 @@ export default {
                 })
             }
         },
-        //确认导入单价
+        //校验导入单价
         importPriceSure(){
             if(this.viewProjectDetail.codeline == this.viewProjectDetail.projectline){
                 alert("[项目编码列] 和 [单价列] 不能重复！");
@@ -1559,13 +1590,48 @@ export default {
                         mainId:this.viewDetailObject.manifestId
                     }
                 }).then(response=>{
-                    console.log(response.data)
+                    if(response.data.cd == 0){
+                        this.viewProjectDetail.datadistinguishShow = true;
+                        this.viewProjectDetail.datadistinguishData = response.data.rt;
+                        this.importPriceCancel();
+                    }else{
+                        alert(response.data.msg);
+                    }
                 })
             }
             this.viewProjectDetail.importPriceShow = false;
         },
-
+        //正式导入单价
+        datadistinguishSure(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/confirmImportPrice',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    mainId:this.viewDetailObject.manifestId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    alert(response.data.msg);
+                    this.viewProjectDetail.datadistinguishShow = false;
+                    this.viewDetail(this.viewDetailObject);
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        datadistinguishCancel(){
+            this.viewProjectDetail.datadistinguishShow = false;
+        },
         importPriceCancel(){
+            this.viewProjectDetail.sheetName ='';
+            this.viewProjectDetail.sheetTitle = [];
+            this.viewProjectDetail.codeline = '';
+            this.viewProjectDetail.projectline = '';
+            this.viewProjectDetail.fileName = '请选择文件';
+            this.viewProjectDetail.fileList = [];
             this.viewProjectDetail.importPriceShow = false;
         },
         showThreePriceCenter(){
@@ -1616,7 +1682,6 @@ export default {
         //编辑工程量明细 的参考价格
         editDetailPrice(val){
             this.viewProjectDetail.editPrice = true;
-            console.log(val);
             this.viewProjectDetail.editPriceData = val.row;
             this.viewProjectDetail.rePrice = val.row.referencePrice;
 
@@ -1647,7 +1712,6 @@ export default {
                 })
                 
             }
-            
         },
         detailEditCancel(){
             this.viewProjectDetail.editPrice = false;
@@ -1656,22 +1720,16 @@ export default {
         viewDetailThing(val){
             console.log(val);
         },
+
         //查看清单
         viewList(val){
-            console.log(val)
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'show2/taskManifestDetail',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    manifestId:val.manifestId,
-                    projId:this.projId
-                }
-            }).then(response=>{
-                console.log(response.data)
-            })
+
+            this.duliProject.showProject = false;
+            this.showDetail = false;
+            this.showMainProject = false;
+            this.listItem.showProject = true;
+            
+            this.listItem.viewDetailObj = val;
         },
        
     }
@@ -1710,6 +1768,13 @@ export default {
         .editBodyone,.editBodytwo{
             text-align: left;
             margin:10px 0;
+        }
+        .distinguishUl{
+            list-style: none;
+            height: 350px;
+            padding-left: 100px;
+            overflow-y: scroll;
+            overflow-x:hidden; 
         }
         .editBodyone{
             .editInpText{
