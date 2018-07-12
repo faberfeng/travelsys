@@ -317,15 +317,15 @@
             </el-dialog>
             <el-dialog title="文件上传" :visible="uploadshow" @close="upImgCancle">
                 <div class="editBody">
-                    <div class="editBodytwo">
-                        <label class=" imageBodyText">上传文件 :</label>
+                    <div class="editBodytwo imageBody">
+                        <label class="imageBodyText">上传文件 :</label>
                         <span class="updataImageSpan">
-                            <!-- <span @click="selectImg">
+                            <span @click="selectImg">
                                 <button class="upImgBtn">选择文件</button>
-                            </span> -->
-                            <input class="upInput" type="file"  @change="fileChanged($event)" >
+                            </span>
+                            <input class="upInput" type="file" ref="file"  @change="fileChanged($event)" multiple="multiple">
                         </span>
-                        <span class="upImgText"></span> 
+                        <span class="upImgText">{{imageName}}</span>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -1361,10 +1361,14 @@
 
                 }
                 .editBodytwo{
-                    
+                     .upInput{
+                        display: none;
+                    }
                     /* 上传文件按钮 */
-    
-                    .imageBodyText{
+                    .imageBody{
+                    text-align: left;
+                    }
+                    .imageBody .imageBodyText{
                             color: #666;
                             font-size: 14px;
                             line-height: 14px;
@@ -1375,14 +1379,15 @@
                             text-align: right;
                     }
                     .updataImageSpan{
-                        
-                        .upImgText{
-                            color: #666;
-                            font-size: 14px;
-                            line-height: 14px;
-                            font-weight: normal;
-                        }   
-                        
+                        overflow: hidden;
+                        width: 98px;
+                    }
+                    .updataImageSpan input{
+                        position: absolute;
+                        left: 0px;
+                        top: 0px;
+                        opacity: 0;
+                        /* -ms-filter: 'alpha(opacity=0)'; */
                     }
                     
 
@@ -1715,7 +1720,7 @@ export default {
                 item:1,
             },
             show:{
-                basicInformation:false,
+                basicInformation:true,
                 appendix:false
             },
             events: [{
@@ -1806,60 +1811,7 @@ export default {
         this.initEvent();
         this.initTask();
     },
-    // computed:{ 
-    //     eventSources(){
-    //         const vm=this;
-    //         return [
-    //             {
-    //                 events(start, end, timezone, callback){
-    //                     axios({
-    //                     method:'post',
-    //                     url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/events',
-    //                     headers:{
-    //                         'token':this.token
-    //                     },
-    //                     params:{
-    //                     start:"2018-06-25 00:00",
-    //                     end:"2018-08-12 00:00"
-    //                     }
-    //                     }).then(response=>{
-    //                         if(response.data.cd == '0'){
-    //                             this.calendarEventList=response.data.rt;
-    //                             var events=[];
-    //                             this.calendarEventList.forEach((item,index)=>{
-    //                                 events.push({
-    //                                     id:item.id,
-    //                                     title:item.eventName,
-    //                                     start:item.eventStart,
-    //                                     end:item.eventEnd
-    //                             })
-    //                             })
-    //                              callback(events); 
-    //                             console.log(JSON.stringify(this.calendarEventList))
-    //                         }else if(response.data.cd = '-1'){
-    //                             alert(response.data.msg)
-    //                         }else{
-    //                             this.$router.push({
-    //                                 path:'/login'
-    //                             })
-    //                         }
-    //                     })
-                        
-    //                 },
-    //                 color: 'yellow',  
-    //                 textColor: 'black'
-    //             },
-    //     ]
-    // },
-    // },
     methods: {
-        // searchChange(){
-        //     this.searchFileList.forEach((item1)=>{
-        //                         if(item1.select==true){
-        //                             this.fileIdLists.push(item1.fileId)
-        //                         }
-        //                     })
-        // },
         chectItem(num){
             this.isActive=num;
             this.eventViewrows.forEach((item,index)=>{
@@ -1902,7 +1854,6 @@ export default {
                 }
             })
             this.startDate=this.beforeToStart(this.beforeToStartValue);
-            console.log(this.startDate);
             this.eventView();
         },
         //之前事件改变器
@@ -1948,7 +1899,6 @@ export default {
                 }
             })
             this.endDate=this.afterToEnd(this.afterValue);
-            console.log(this.endDate);
             this.eventView()
         },
         //之后事件改变器
@@ -2045,8 +1995,6 @@ export default {
                             this.eventViewrows=this.eventViewList.rows;
                             this.eventViewpager=this.eventViewList.pager;
                             this.totalSize=this.eventViewpager.totalSize;
-                            console.log(this.totalSize);
-                            console.log(JSON.stringify(this.eventViewList))
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }
@@ -2084,25 +2032,12 @@ export default {
                         
                 })
                     })
-                    // console.log(JSON.stringify(event));
-                    // this.events=event;
                     this.eventSources.push({events:event,textColor:'black',color:'red',});
-                    console.log(JSON.stringify(this.eventSources));
             
         },
 
     eventSelected(calEvent, jsEvent, view) {
-        // console.log(JSON.stringify(calEvent))
-        //   alert("eventStart:"+calEvent.start);
-        //   alert("eventId:"+calEvent.id);
-        //   alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-        //    alert('View: ' + view.name);
-        //    alert("start:"+moment(view.start).format("YYYY-MM-DD HH:mm"));
-        //    alert("end:"+moment(view.end).format("YYYY-MM-DD HH:mm"));
            this.eventId=calEvent.id;
-        //    this.eventSources.forEach((item)=>{
-        //        item.color="black"
-        //    })
         var str=this.eventSources[0].events;
         str.forEach((item)=>{
             if(item.id==calEvent.id){
@@ -2113,24 +2048,9 @@ export default {
             }
             
         })
-           console.log(JSON.stringify(str));
-        //    console.log(JSON.stringify(calEvent.borderColor))
-        //    calEvent.push({ 
-        //        borderColor:'black'
-        //    })
-        //    let proto=[];
-        //    proto=calEvent.className.__proto__ ;
-        //    proto.push('event-selected1'
-           $('#calendar').addClass('event-selected1');
-           $('#calendar a').removeClass("event-selected1");
            this.informationShow();
-        //    this.changeStyle();
            this.attachList();
     },
-    // changeStyle(){
-        
-    //     this.eventSources.push({events:{borderColor:'red'}})
-    // },
     informationShow(){
         
         axios({
@@ -2142,7 +2062,6 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                             this.eventInformationList=response.data.rt;
-                            console.log(JSON.stringify(this.eventInformationList))
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }else{
@@ -2164,17 +2083,10 @@ export default {
     {
         
     },
-    // eventClick(calEvent, jsEvent, view){
-    //    alert("event:"+calEvent.start);
-    //     alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-    //     alert('View: ' + view.name);
-    // },
         eventCreated(...test) {
             console.log(test);
         },
         initEvent(){
-            // console.log(JSON.stringify(this.start1));
-            // console.log(JSON.stringify(this.end1));
             axios({
                     method:'post',
                     url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/events',
@@ -2188,7 +2100,6 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                             this.calendarEventList=response.data.rt;
-                            console.log(JSON.stringify(this.calendarEventList));
                             this.initCalendar();
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
@@ -2201,8 +2112,6 @@ export default {
                 },
 
         initTask(){
-            // console.log(JSON.stringify(this.start1));
-            // console.log(JSON.stringify(this.end1));
             axios({
                     method:'post',
                     url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/tasks',
@@ -2216,7 +2125,6 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                             this.CalendarTaskList=response.data.rt;
-                            // console.log(JSON.stringify(this.CalendarTaskList))
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }else{
@@ -2262,8 +2170,6 @@ export default {
                 if(Math.ceil(response.data.cd) == 0){
                     vm.FileTree_original = response.data.rt
                     vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-                    // console.log(JSON.stringify(this.FileTree_original))
-                    // console.log(JSON.stringify(this.FileTree))
                     if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){
@@ -2295,8 +2201,6 @@ export default {
             this.searchFileList=[];
         },
         getPersonalCalendar(){
-            console.log(JSON.stringify(this.view))
-            // console.log("start:"+moment(this.view.end).format("YYYY-MM-DD HH:mm"))
             axios({
                     method:'get',
                     url:this.BDMSUrl+'/project2/schedule/personalCalendar',
@@ -2310,8 +2214,6 @@ export default {
                     if(response.data.cd == '0'){
                         this.ugList=response.data.rt;
                         this.selectUgId=this.ugList[0].ugId;
-                        console.log(JSON.stringify(this.ugList))
-                        console.log(JSON.stringify(this.selectUgId))
                     }else if(response.data.cd = '-1'){
                         alert(response.data.msg)
                     }else{
@@ -2344,7 +2246,6 @@ export default {
                 }
             },
         handleNodeClick(obj){
-            console.log(obj.nodeId);
             this.dirId=obj.nodeId;
             this.searchFile()
         },
@@ -2421,54 +2322,11 @@ export default {
                    }
                     }).then(response=>{
                         if(response.data.cd == '0'){
-                            // console.log(JSON.stringify(response.data.rt))
-                                // this.$refs.calendar.$emit('remove-event');
-                                //  this.initEvent();
                                     this.addEventList=response.data.rt;
-                                    console.log(JSON.stringify(this.addEventList))
-                                    // this.$refs.calendar.$emit('remove-event',this.eventSources);
                                     this.eventSources=[];
                                     this.initEvent();
-                                    
-                                     this.addEventTextDialog=false;
-                                    //  window.location.href=this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/events'
-                                    // location.reload(true);
-                                // console.log(JSON.stringify(this.calendarEventList));
-                               
-                            
-                           
-                            // var obj = [];
-                            // obj.push(
-                            //     {
-                            //         id:this.addEventList.id,
-                            //         title:this.addEventList.eventName,
-                            //         start:moment(this.addEventList.eventStart).format("YYYY-MM-DD HH:mm:ss"),
-                            //         end:moment(this.addEventList.eventEnd).format("YYYY-MM-DD HH:mm:ss"),
-                            //         color:this.addEventList.eventColor,
-                            //         allDay:this.addEventList.allDay==1?true:false,
-                            //     }
-                            // );
-                            // this.eventSources.push({events:obj,textColor:'black',color:'red'});
-                           
-
-                            // if(this.addEventList.repeatType==0){
-
-                            // let event=[];
-                            //     event.push({
-                            //         id:this.addEventList.id,
-                            //         title:this.addEventList.eventName,
-                            //         start:moment(this.addEventList.eventStart).format("YYYY-MM-DD HH:mm:ss"),
-                            //         end:moment(this.addEventList.eventEnd).format("YYYY-MM-DD HH:mm:ss"),
-                            //         color:this.addEventList.eventColor,
-                            //         allDay:this.addEventList.allDay==1?true:false,
-                            //     });
-                            //     this.eventSources.push({events:event,textColor:'black'});
-                            //     console.log(JSON.stringify(event));
-                            // this.$refs.calendar.$emit('render-event',this.eventSources);
-                            // }
-                        //    this.calendarEventList.push(response.data.rt);
-                        //    this.initCalendar();
-                            
+                                    this.eventView();
+                                     this.addEventTextDialog=false;    
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }else{
@@ -2572,11 +2430,9 @@ export default {
                    }
                     }).then(response=>{
                         if(response.data.cd == '0'){
-                            console.log(JSON.stringify(response.data.rt))
                             this.eventSources=[],
-                            this.initEvent()
-                        //    this.calendarEventList.push(response.data.rt);
-                        //    this.initCalendar();
+                            this.initEvent();
+                            this.eventView();
                             this.updateEventTextDialog=false;
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
@@ -2624,7 +2480,8 @@ export default {
                         if(response.data.cd == '0'){
                                 this.$refs.calendar.$emit('remove-event',this.eventId);
                                 this.eventSources=[];
-                                this.initEvent()
+                                this.initEvent();
+                                this.eventView();
                                 this.deleteEventTextDialog=false;
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
@@ -2672,9 +2529,7 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                                 this.fileLists=response.data.rt.fileList;
-                                // console.log(JSON.stringify(this.fileLists))
                                 this.attachLists=response.data.rt.attachList;
-                                 console.log(JSON.stringify(this.attachLists))
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }else{
@@ -2756,7 +2611,6 @@ export default {
            
                                 }
              }),
-                console.log(JSON.stringify(this.fileIdLists))
              axios({
                     method:'post',
                     url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/addRelaFile',
@@ -2805,17 +2659,17 @@ export default {
                     data:formData,
                     }).then((response)=>{
                         if(response.data.cd=='0'){
-                            console.log(JSON.stringify(response.data.rt));
                                 this.attachList();
                                 this.uploadshow=false;
                         }
                     })  
         },
+        selectImg(){
+            this.$refs.file.click()
+        },
         fileChanged(e){
            this.uploadfilesList=e.target.files[0];
-           console.log(JSON.stringify(this.uploadfilesList))
            this.imageName=this.uploadfilesList.name;
-           console.log(JSON.stringify(this.imageName))
         },
         searchFile(){
            
@@ -2836,13 +2690,10 @@ export default {
                             this.searchFileList = response.data.rt.rows;
                                 this.searchFileList.forEach((item)=>{
                                     this.$set(item,'select',false)
-                                    // item.select=false;
-                                    // this.searchFileList.push(item);
                                 })
                                 }else{
                                     this.searchFileList=[]
                                 }
-                            // console.log(JSON.stringify(this.searchFileList))
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
                         }else{
