@@ -228,22 +228,28 @@
             </div>
 
             <div class="worktable project" v-if='showDetail'>
-                <p class="antsLine">
-                    成本管理
+                <div class="antsLine">
+                     成本管理
                     <i class="icon-sanjiao-right"></i>
                     <a class="backToProjectBtn" @click="backToProject">工程量清单</a>
                     <i class="icon-sanjiao-right"></i>
                     <span class="strong" @click="back()" v-text="viewProjectDetail.viewDetailName"></span>
-                </p>
-                <p class="header clearfix">
-                    <span class="item-btn clearfix">
-                        <label @click="threePrice">三价</label>
-                        <label @click="importDanjia">导入单价</label>
-                        <label @click="exportExcel">导出Excel</label>
-                        <label @click="exportXml">导出xml</label>
-                        <label @click="printObject">打印</label>
-                    </span>
-                </p>
+                </div>
+                <div class="worktableTitle">
+                    <div class="worktableTitleLeft">
+                        <i class="icon-detail"></i>
+                        工程量明细
+                    </div>
+                    <div class="worktableTitleRight">
+                        <span @click="threePrice">
+                            <img src="./images/sanjia.png"/><label>三价</label>
+                        </span>
+                        <span @click="importDanjia"><img src="./images/exportprice.png"/><label>导入单价</label></span>
+                        <span @click="exportExcel"><img src="./images/exportexcel.png"/><label>导出Excel</label></span>
+                        <span @click="exportXml"><img src="./images/exportxml.png"/><label>导出xml</label></span>
+                        <span @click="printObject"><img src="./images/print.png"/><label>打印</label></span>
+                    </div>
+                </div>
                 <div v-if="codingList != null">
                     <zk-table 
                         index-text="序号"
@@ -259,8 +265,10 @@
                 
             </div>
             <!-- 独立工程量清单 -->
-            <div class="project" v-if="duliProject.showProject">
+            <div class="project worktable" v-if="duliProject.showProject">
                 <p class="antsLine">
+                    成本管理
+                    <i class="icon-sanjiao-right"></i>
                     <a class="backToProjectBtn" @click="backToProject">工程量清单</a>
                     <i class="icon-sanjiao-right"></i>
                     <span class="strong" @click="back()">{{duliProject.name}}</span>
@@ -315,6 +323,7 @@
                         <table border="1" class="UserList" width="100%">
                             <thead>
                                 <tr  class="userList-thead">
+                                    <th>操作</th>
                                     <th>清单类型</th>
                                     <th>清单ID</th>
                                     <th>清单名称</th>
@@ -323,11 +332,13 @@
                                     <th>业务状态</th>
                                     <th>创建时间</th>
                                     <th>创建人</th>
-                                    <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(item,index) in  customData" :key="index">
+                                    <td>
+                                        <input type="checkbox" v-model="item.isChecked"/>
+                                    </td>
                                     <td>{{item.type_c}}</td>
                                     <td>{{item.detailId}}</td>
                                     <td>{{item.detailName}}</td>
@@ -336,9 +347,6 @@
                                     <td></td>
                                     <td>{{new Date(item.createTime).toLocaleString()}}</td>
                                     <td>{{item.createUser}}</td>
-                                    <td>
-                                        <input type="checkbox" v-model="item.isChecked"/>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -454,69 +462,88 @@
                 </div>
             </el-dialog>
             <el-dialog title="导入工程量清单" :visible.sync="duliProject.importExcelShow" :before-close="importExcelCancel">
-                <div class="editBody">
-                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                <div class="importprojectList">
+                    <div class="importFile">
+                        <label class=" imageBodyText">上传文件:</label>
+                        <span class="upImgText">{{duliProject.fileName}}</span> 
                         <span class="updataImageSpan">
-                            <button @click="selectfile" class="upImgBtn">选择文件</button>
+                            <button @click="selectfile" class="upImgBtn">浏览</button>
                             <input class="upInput"  type="file"  @change="fileChanged" ref="file" multiple="multiple">
                         </span>
-                        <span class="upImgText">{{duliProject.fileName}}</span> 
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">工作表:</label>
+                    <div class="worklist">
+                        <label class="worklisttite">工作表:</label>
                         <select class="editSelect">
                             <option>{{duliProject.sheetName}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">编码列:</label>
+                    <div class="worklist">
+                        <label class="worklisttite">编码列:</label>
                         <select class="editSelect" v-model="duliProject.codeline">
                             <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">工程量列:</label>
+                    <div class="projlist">
+                        <label class="worklisttite">工程量列:</label>
                         <select class="editSelect" v-model="duliProject.projectline">
                             <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
-                    <div class="editBodyone"><label class="editInpText">清单名称 :</label><input class="inp" v-model="duliProject.listProName"/></div>
-                    <div class="editBodyone"><label class="editInpText">可识别的工程量条目数量 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.distinguished"/></div>
-                    <div class="editBodyone"><label class="editInpText">不可识别的工程量行数 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.enDistinguished"/></div>
-                    <div class="editBodyone"><label class="editInpText">工程量不为零的条目数量 :</label><input class="inp" disabled v-model="duliProject.verifiedObject.workAmountNotZero"/></div>
+                    <div class="projlistname">
+                        <label class="worklisttite">清单名称:</label>
+                        <input placeholder="请输入文本框" class="editSelect" v-model="duliProject.listProName"/>
+                    </div>
+                    <div class="worklist">
+                        <label  class="worklisttite1">可识别的工程量条目数量 :</label>
+                        <span>{{duliProject.verifiedObject.distinguished || 0}}条</span>
+                    </div>
+                    <div class="worklist">
+                        <label class="worklisttite2">不可识别的工程量行数 :</label>
+                        <span>{{duliProject.verifiedObject.enDistinguished || 0}}条</span>
+                    </div>
+                    <div class="worklist">
+                        <label class="worklisttite3">工程量不为零的条目数量 :</label>
+                        <span>{{duliProject.verifiedObject.workAmountNotZero || 0}}条</span>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="verifiedData">识别数据</button>
-                    <button class="editBtnS" @click="importExcelSure">导入</button>
-                    <button class="editBtnC" @click="importExcelCancel">取消</button>
+                    <button class="editBtnC" @click="importExcelSure">导入</button>
                 </div>
             </el-dialog>
             <el-dialog title="导入单价" :visible.sync="viewProjectDetail.importPriceShow" :before-close="importPriceCancel">
-                <div class="editBody">
-                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                <div class="importprojectList">
+                    <div class="importFile">
+                        <label class=" imageBodyText">上传文件:</label>
+                        <span class="upImgText">{{viewProjectDetail.fileName}}</span>
                         <span class="updataImageSpan">
                             <button @click="selectimportfile" class="upImgBtn">选择文件</button>
                             <input class="upInput"  type="file"  @change="selectfileChanged" ref="fileimport" multiple="multiple">
-                        </span>
-                        <span class="upImgText">{{viewProjectDetail.fileName}}</span> 
+                        </span> 
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">工作表:</label>
+                    <div class="worklist">
+                        <label class="worklisttite">工作表:</label>
                         <select class="editSelect">
                             <option>{{viewProjectDetail.sheetName}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">项目编码列:</label>
+                    <div class="projlist1">
+                        <label class="worklisttite">项目编码列:</label>
                         <select class="editSelect" v-model="viewProjectDetail.codeline">
                             <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
-                    <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText">单价列:</label>
+                    <div class="worklist">
+                        <label class="worklisttite">单价列:</label>
                         <select class="editSelect" v-model="viewProjectDetail.projectline">
                             <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
                         </select>
+                        <i class="downsaniao"></i>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -1001,8 +1028,12 @@ export default {
                     this.lodeSnapWorkAmountList();
                     this.reCalculate(response.data.rt,0);
                     this.editBySelfShow = false;
-                }else{
+                }else if(response.data.cd == -1){
                     alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
                 }
                 
             })
@@ -1720,10 +1751,8 @@ export default {
         viewDetailThing(val){
             console.log(val);
         },
-
         //查看清单
         viewList(val){
-
             this.duliProject.showProject = false;
             this.showDetail = false;
             this.showMainProject = false;
@@ -1737,6 +1766,185 @@ export default {
 </script>
 <style lang="less" >
     #quantitiesList{
+        .worktable{
+            .antsLine{
+                padding: 10px 10px 30px 0px;
+                font-size: 12px;
+                line-height: 12px;
+                color: #999999;
+                text-align: left;
+                .icon-sanjiao-right{
+                    display: inline-block;
+                    width: 7px;
+                    height: 10px;
+                    margin: 2px 7px 0;
+                    background-image:url('../ManageCost/images/sanjiaoright.png');
+                    background-size: 100% 100%;
+                }
+                .strong{
+                    cursor: pointer;
+                    color: #333333;
+                    font-weight: bold;
+                    &:last-of-type .icon-sanjiao-right{
+                            display: none;
+                        }
+                }    
+            }
+            .worktableTitle{
+                padding-bottom: 10px;
+                border-bottom: 1px solid #e6e6e6;
+                margin-bottom: 10px;
+                overflow: hidden;
+                position: relative;
+                .icon-detail{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 15px;
+                    height: 17px;
+                    display: block;
+                    background: url('./images/projDetail.png') no-repeat 0 0;
+                }
+                .worktableTitleLeft{
+                    padding-left: 25px;
+                    float: left;
+                    font-size: 16px;
+                    color: #fc3439;
+                    font-weight: bold;
+                    height:16px;
+                    line-height: 16px;
+                    font-family: 'Microsoft YaHei';
+                    img{
+                        width: 15px;
+                        height: 16px;
+                        margin-right: 10px;
+                        position: relative;
+                        top: 1px;
+                    }
+                }
+                .worktableTitleRight{
+                    float: right;
+                    color: #666;
+                    font-size: 14px;
+                    height: 16px;
+                    line-height: 16px;
+                    span{
+                        display: inline-block;
+                        margin-left: 20px;
+                        cursor: pointer;
+                    }
+                    label{
+                        cursor: pointer;
+                    }
+                    img{
+                        width: 16px;
+                        height: 16px;
+                        margin-right: 10px;
+                        position: relative;
+                        top: 3px;
+                    }
+                }
+            }
+        }
+        //导入工程量清单弹窗样式
+        .el-dialog__body{
+            margin: 20px 30px 30px;
+        }
+        .el-dialog__footer{
+            margin-top: 0;
+        }
+        .importprojectList{
+            overflow: hidden;
+            text-align: left;
+            .updataImageSpan{
+                margin-left: 20px;
+            }
+            .upImgBtn{
+                font-size: 14px;
+                color: #666;
+                font-family: 'Microsoft YaHei';
+                font-weight: normal;
+
+            }
+            .importFile{
+                margin-bottom: 20px;
+                .upImgText{
+                    margin: 0;
+                }
+            }
+            .editSelect{
+                padding-left: 10px;
+            }
+            .downsaniao{
+                position: absolute;
+                background: url('./images/downsanjiao.png');
+                width: 12px;
+                height: 7px;
+                left: 309px;
+                top: 13px;
+
+            }
+            .worklist{
+                position: relative;
+                margin-bottom: 20px;
+                .worklisttite{
+                    margin-right: 33px;
+                }
+                .worklisttite1{
+                    margin-right: 19px;
+                }
+                .worklisttite2{
+                    margin-right: 34px;
+                }
+                .worklisttite3{
+                    margin-right: 20px;
+                }
+                .editSelect{
+                    height: 34px;
+                    width: 246px;
+                }
+                
+            }
+            .projlist{
+                margin-bottom: 20px;
+                position: relative;
+                .worklisttite{
+                    display: inline-block;
+                    margin-right: 19px;
+                }
+                .editSelect{
+                    height: 34px;
+                    width: 246px;
+                }
+            }
+            .projlist1{
+                margin-bottom: 20px;
+                position: relative;
+                .worklisttite{
+                    display: inline-block;
+                    margin-right: 5px;
+                }
+                .editSelect{
+                    height: 34px;
+                    width: 246px;
+                }
+            }
+            .projlistname{
+                margin-bottom: 20px;
+                .worklisttite{
+                    display: inline-block;
+                    margin-right: 19px;
+                }
+                .editSelect{
+                    height: 34px;
+                    width: 440px;
+                    padding-left: 10px;
+                    font-size: 14px;
+                    font-family: "Microsoft YaHei";
+                    color: #ccc;
+                }
+            }
+        }
         .el-dialog{
             margin: 0 auto;
         }
@@ -1753,7 +1961,7 @@ export default {
             position: relative;
             .editSelect{
                 float: left;
-                width: 506px;
+                width: 248px;
                 height: 40px;
                 padding: 10px;
             }
@@ -1767,7 +1975,7 @@ export default {
         }
         .editBodyone,.editBodytwo{
             text-align: left;
-            margin:10px 0;
+            margin:20px 0;
         }
         .distinguishUl{
             list-style: none;
@@ -1789,7 +1997,8 @@ export default {
             }
         }
         .imageBody{
-            padding-left: 53px;
+            margin: 0 30px;
+
         }
         #item-box-file{
             display: block;
@@ -1878,30 +2087,6 @@ export default {
                 border: none;
                 cursor: pointer;
                 margin-right: 10px;
-            }
-            .antsLine{
-                padding: 10px 10px 15px 0px;
-                font-size: 12px;
-                line-height: 12px;
-                color: #999999;
-                text-align: left;
-                width: 50%;
-            .icon-sanjiao-right{
-                display: inline-block;
-                width: 7px;
-                height: 10px;
-                margin: 2px 7px 0;
-                background-image:url('../ManageCost/images/sanjiaoright.png');
-                background-size: 100% 100%;
-            }
-            .strong{
-                cursor: pointer;
-                color: #333333;
-                font-weight: bold;
-                &:last-of-type .icon-sanjiao-right{
-                        display: none;
-                    }
-                }       
             }
             .backToProjectBtn{
                 cursor: pointer;
@@ -2149,16 +2334,23 @@ export default {
             padding: 0;
             box-sizing: border-box;
         }
+        .imageBodyText{
+            margin-right: 19px;
+        }
         .updataImageSpan{
             overflow: hidden;
             width: 98px;
+            .upImgBtn{
+                width: 105px;
+                height: 32px;
+                border-radius: 2px;
+            }
         }
         .updataImageSpan input{
             position: absolute;
             left: 0px;
             top: 0px;
             opacity: 0;
-            /* -ms-filter: 'alpha(opacity=0)'; */
         }
     }
 </style>
