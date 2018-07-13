@@ -44,7 +44,7 @@
                                 </span>
                                 <span  class="item-file-detial">
                                     <h3 v-text="item.fgName"></h3>
-                                    <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                    <p>来自工程【<span class="text-name" v-text="item.fileExtension"></span>】</p>
                                     <p v-text="initData(item.updateTime)"></p>
                                     <p class="operation">
                                         <span v-text="'版本'+item.version"></span>
@@ -63,10 +63,9 @@
                                 <th style="width:55px;"></th>
                                 <th style="min-width:428px;">文件名</th>
                                 <th style="width:70px;"></th>
-                                <th style="width:70px;">更新渠道</th>
                                 <th style="width:50px;">类型</th>
                                 <th style="width:40px;">版本</th>
-                                <th style="min-width:60px;">上传人</th>
+                                <th style="min-width:60px;">来源</th>
                                 <th style="min-width:150px;">更新时间</th>
                             </tr>
                         </thead>
@@ -84,10 +83,9 @@
                                     <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
                                 </td>
-                                <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
                                 <td v-text="splitType(item.icon)"></td>
                                 <td v-text="item.version"></td>
-                                <td v-text="item.uploadUser"></td>
+                                <td v-text="item.fileExtension"></td>
                                 <td v-text="initData(item.updateTime)"></td>
                             </tr>
                         </tbody>

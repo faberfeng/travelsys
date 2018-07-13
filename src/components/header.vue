@@ -6,7 +6,7 @@
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
-                <img class="headerInfoImg" :src="userimg?userimg:require('../assets/loginimg.png')" />
+                <img class="headerInfoImg" :src="userimg?userimg:require('../assets/people.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
                     <p class="p2 p-hover" @click="logout">退出</p>

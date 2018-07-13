@@ -127,7 +127,7 @@
             <div class="container container-F">
                 <p class="clearfix" v-for="(item) in list_filter" :key="item.key" v-show="item.show">
                     <span class="item-container">
-                        <select name="" v-model="item.build_name" class="value-box">
+                        <select name="" v-model="item.build_name" class="value-box" @change="adjustCondition(item.key,item.build_name)">
                             <option value="nofield">【不使用】</option>
                             <option :value="val.fieldCode" v-text="val.fieldName" v-for="(val,index) in  data_right" :key="index"></option>
                         </select>
@@ -135,12 +135,18 @@
                     </span>
                     <span class="item-container">
                         <select class="value-box" v-model="item.filtertype" name="report-filter-field-filter-type">
-                            <option value="CONTAINS">包含</option>
-                            <option value="NOTCONTAINS">不包含</option>
+                            <option value="CONTAINS" v-if="item.type == 'STRING'">包含</option>
+                            <option value="NOTCONTAINS" v-if="item.type == 'STRING'">不包含</option>
                             <option value="EQUALS">等于</option>
-                            <option value="NOTEQUALS">不等于</option>
-                            <option value="STARTIS">开始是</option>
-                            <option value="ENDIS">结束是</option>
+                            <option value="NOTEQUALS"  v-if="item.type == 'STRING' || item.type == 'NUMBER'">不等于</option>
+                            <option value="SMALL"  v-if="item.type == 'NUMBER'">小于</option>
+                            <option value="SMALL_OR_EQUALS" v-if="item.type == 'NUMBER'">小于等于</option>
+                             <option value="GREAT" v-if="item.type == 'NUMBER'">大于</option>
+                            <option value="GREAT_OR_EQUALS" v-if="item.type == 'NUMBER'">大于等于</option>
+                            <option value="STARTIS" v-if="item.type == 'STRING'">开始是</option>
+                            <option value="ENDIS" v-if="item.type == 'STRING'">结束是</option>
+                            <option value="TIME_EARLY_THAN" v-if="item.type == 'DATE'">早于</option>
+                            <option value="TIME_LATER_THAN" v-if="item.type == 'DATE'">晚于</option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </span>
@@ -1241,6 +1247,7 @@ export default Vue.component('common-edit',{
                     grouptype:'NONE_GROUP',
                     filtertype:'',
                     filtercontent:'',
+                    type:'',
                     show:i == 0?true:false,
                     disabled: i >= 4?true:false
                 });
@@ -1305,9 +1312,20 @@ export default Vue.component('common-edit',{
             tableFontsize:12,
             tableLineHeight:32,
             tableAlign:'center',
-            database:'',
+            database:'ALL',
             showTableNet:0,
-            dataBaseList:[],//数据库
+            dataBaseList:[
+                {
+                    name:'城市数据库',
+                    id:'CITY'
+                },{
+                    name:'建筑数据库',
+                    id:'BUILDING'
+                },{
+                    name:'全部',
+                    id:'ALL'
+                }
+            ],//数据库
             options_monomer:[],//单体选项
             options_partition:[
                 {
@@ -1370,7 +1388,7 @@ export default Vue.component('common-edit',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getDataBase()
+        // vm.getDataBase()
         vm.getIntoDesignPage()
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
@@ -1380,6 +1398,19 @@ export default Vue.component('common-edit',{
         vm.getPV()
     },
     methods:{
+        adjustCondition(key,name){
+            var vm = this
+            if(name == 'nofield'){
+                vm.list_filter[key].type = ''
+                return false
+            }
+            for(let i=0;i<vm.data_right.length;i++){
+                if(vm.data_right[i].fieldCode == name){
+                    vm.list_filter[key].type = vm.data_right[i].fieldType
+                    break
+                }
+            }
+        },
           value_monomer_change(inheirt){
                 var vm = this 
                 if(vm.value_monomer == 0) {
@@ -1486,7 +1517,7 @@ export default Vue.component('common-edit',{
             var gcCode2 = vm.value_type
             if(level==2){
                 parentClassifyCode= vm.value_professional
-                if(!inheirt)vm.value_system = '-1';
+                if(!inheirt)vm.value_system = 'NONE';
                 if(!inheirt)vm.value_type = 'NONE';
                 vm.options_type = [
                     {
@@ -1515,7 +1546,7 @@ export default Vue.component('common-edit',{
                         },
                     ]
                 }else{
-                    if(!inheirt)vm.value_type = '-1';
+                    if(!inheirt)vm.value_type = 'NONE';
                     vm.options_type = [
                         {
                             id:'NONE',
@@ -1581,7 +1612,7 @@ export default Vue.component('common-edit',{
                         Name:'全部'
                     }
                 ]
-                if(!inheirt)vm.value_floor = '-1';
+                if(!inheirt)vm.value_floor = 'NONE';
                 return false
             }
             if(vm.value_partition==0){
@@ -1613,7 +1644,7 @@ export default Vue.component('common-edit',{
                             Name:'全部'
                         }
                     ]
-                    if(!inheirt)vm.value_floor = '-1'
+                    if(!inheirt)vm.value_floor = 'NONE'
                     if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
                         response.data.rt.rows.forEach((item,key)=>{
                             vm.options_floor.push({
@@ -1686,7 +1717,7 @@ export default Vue.component('common-edit',{
                                 }
                             ]
                             vm.value_floor = 'NONE'
-                            vm.value_partition = '-1'
+                            vm.value_partition = 'NONE'
                         }
                         if(response.data.rt != null && response.data.rt.length > 0){
                             response.data.rt.forEach((item,key)=>{
@@ -1893,6 +1924,13 @@ export default Vue.component('common-edit',{
         },
         saveForm(needCount){
             var vm = this
+            if(vm.database == ''){
+                vm.$message({
+                    type:'warning',
+                    message:'数据库不能为空!'
+                })
+                return false
+            }
             var rcId = vm.rcId
             vm.fullscreenLoading =true
 
@@ -2023,24 +2061,45 @@ export default Vue.component('common-edit',{
                 tableType: -1
             })
              /**专业**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.profession', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_professional,
+            //     tableType: -1
+            // })
+            //  /**系统**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.system', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_system,
+            //     tableType: -1
+            // })
+            //  /**类型**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.type', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_type,
+            //     tableType: -1
+            // })
+            /***
+             * 更改时间 2018-7-10
+             * 后端更改 数据类型
+             * 三项合并
+             * ****/
+            var combinCode = '000000'
+            if(vm.value_professional != -1){//专业选择 不为全部
+                combinCode = vm.value_professional
+                if(vm.value_system != -1 || vm.value_system != 'NONE'){
+                     combinCode = vm.value_system
+                     if(vm.value_type != -1 || vm.value_type != 'NONE'){
+                           combinCode = vm.value_type
+                     }
+                }
+            }
              fieldFilterList.push({
                 fieldCode: 'range.profession', 
                 fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_professional,
-                tableType: -1
-            })
-             /**系统**/
-             fieldFilterList.push({
-                fieldCode: 'range.system', 
-                fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_system,
-                tableType: -1
-            })
-             /**类型**/
-             fieldFilterList.push({
-                fieldCode: 'range.type', 
-                fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_type,
+                fieldSearchContent: combinCode,
                 tableType: -1
             })
             if (error != '') {

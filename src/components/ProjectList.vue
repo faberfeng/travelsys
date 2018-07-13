@@ -36,7 +36,7 @@
            <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
            <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
          </span>
-         <img :src="item.imgPath" class="line-img" alt="">
+         <img :src="item.imgPath?item.imgPath:require('../assets/bg.png')" class="line-img" alt="">
          <div class="line-detial-box">
             <h1 v-text="item.projName"></h1>
             <div class="line-content-box">

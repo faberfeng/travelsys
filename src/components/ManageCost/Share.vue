@@ -41,7 +41,7 @@
                     <ul class="operation">
                         <li   @click="copyURL" v-if="fgList.length>0 && showLocation" class="item copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput">复制链接</li>
                         <li class="item"   @click="showLink"  v-if="fgList.length>0 && showLocation">地址</li>
-                        <li class="item" @click="cancleShare" v-if='auth.canCancelShare' v-loading.fullscreen.lock="fullscreenLoading">取消分享</li>
+                        <li class="item" @click="cancleShare" v-if='auth.canCancelShare && fgList.length>0' v-loading.fullscreen.lock="fullscreenLoading">取消分享</li>
                     </ul>
                     <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
                     <input type="text" id="copyInput" v-if="fgList.length>0"

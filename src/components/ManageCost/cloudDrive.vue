@@ -2330,6 +2330,13 @@ export default {
       },
       renameIMG(){
         var vm = this
+        if(vm.PointFigure.newname.trim() == ''){
+            vm.$message({
+                type:'error',
+                message:'请输入新文件名！'
+            })
+            return false
+        }
         var fgID = vm.PointFigure.fgID?vm.PointFigure.fgID:vm.checkedRound.ID
         axios({
             method:'POST',

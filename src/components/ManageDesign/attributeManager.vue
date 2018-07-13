@@ -1047,7 +1047,7 @@
             left: 26px;
             bottom: 0;
             right: 225px;
-            z-index: 1001;
+            // z-index: 1001;
             transition:  all ease .5s;
             overflow: auto;
             #center-selection{
@@ -1934,7 +1934,7 @@ export default {
                         id:'0',
                         Name:'无'
                 }]
-                    vm.options_floor = [
+                vm.options_floor = [
                     {
                         id:'0',
                         Name:'无'
@@ -2593,7 +2593,7 @@ export default {
         for(var i=0;i<vm.GCPropertyList.length;i++){
             if(vm.GCPropertyList[i].valueType == 0 || vm.GCPropertyList[i].valueType == 1){
                 if(vm.GCPropertyList[i].extendValue != '多样'){ //多样时保存原有内容
-                    if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '多样' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
+                    if(vm.GCPropertyList[i].valueType == 0 && vm.GCPropertyList[i].extendValue != '@' && isNaN(vm.GCPropertyList[i].extendValue)){//数值
                         vm.$message({
                             type:'warning',
                             message:vm.GCPropertyList[i].propertyTitle+' 的值类型为数值，请输入数值!'
@@ -2956,6 +2956,8 @@ export default {
                             Name:'无'
                         }
                     ]
+                    vm.value_floor = '0'
+                    vm.value_partition = '0'
                     if(response.data.rt != null && response.data.rt.length > 0){
                         response.data.rt.forEach((item,key)=>{
                             vm.options_partition.push({
@@ -2999,7 +3001,7 @@ export default {
                             Name:'全部'
                         }
                     ]
-                    vm.value_floor = '-1'
+                    vm.value_floor = '0'
                     return false
                 }
                 if(vm.value_partition==0){
@@ -3041,7 +3043,7 @@ export default {
                                 Name:'全部'
                             }
                         ]
-                        vm.value_floor = '-1'
+                        vm.value_floor = '0'
                         if(response.data.rt.rows != null && response.data.rt.rows.length > 0){
                             vm.options_floor_pre = []
                             response.data.rt.rows.forEach((item,key)=>{
