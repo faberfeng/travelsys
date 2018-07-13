@@ -118,7 +118,7 @@
             </el-dialog>
             <el-dialog title="导入标准" :visible.sync="importDialog" @close="importCancle">
                 <div class="editBody">
-                    <div class="editBodytwo"><P>请选择需要导出的标准项</P></div>
+                    <div class="editBodytwo"><P>请选择需要导入的标准项</P></div>
                     <div class="editBodytwo">
                         <table cellspacing="0" border cellpadding="0" class="elTable">
                             <thead>

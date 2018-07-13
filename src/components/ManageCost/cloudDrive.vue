@@ -3042,6 +3042,7 @@ export default {
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
+                console.log(JSON.stringify(this.FileTree))
                 if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){

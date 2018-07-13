@@ -25,7 +25,7 @@
                                 <div class="calendarLeft">
                                     <ul class="calendarSelect">
                                         <li :class="[{'calendarBody_active':currentStyle},'calendarHead']"><span>当前日历模板</span><i class="el-icon-plus" @click="addCalendarTemplate()"></i></li>
-                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index"  ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
+                                        <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index" ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
                                     </ul>
                                 </div>
                                 <div class="calendarRight">
@@ -33,6 +33,8 @@
                                         <div>
                                         <calendar
                                             ref="calendar1"
+                                            :multi="calendar1.multi"
+                                            :zero="calendar1.zero"
                                             :events="calendar1.events" 
                                             :lunar="calendar1.lunar" 
                                             :value="calendar1.value" 
@@ -40,9 +42,7 @@
                                             :end="calendar1.end" 
                                             :weeks="calendar1.weeks" 
                                             :months="calendar1.months" 
-                                            @select="calendar1.select"
-                                            @selectMonth="calendar1.selectMonth"
-                                            @selectYear="calendar1.selectYear"></calendar>
+                                            ></calendar>
                                             <!-- <button @click="$refs.calendar1.setToday()">返回今天</button> -->
                                         </div>
                                     </div>
@@ -370,17 +370,20 @@
                         <select @change="changemonth" v-model="value">
                             <option v-for="(item,index) in 31" :key="index">{{item}}</option>
                         </select>
+                        <span>日</span>
                     </div>
-                    <div v-show="yearshow">
+                    <div class="year" v-show="yearshow">
                         <label class="editInpText">日期：</label>
                         <select v-model="item1" @change="changeyearshow1">
                              <!-- @change="changeyearshow" -->
                             <option v-for="(item1,index) in 12" :key="index" >{{item1}}</option>
                         </select>
+                        <span>日</span>
                         <span>-</span>
                         <select v-model="item2" @change="changeyearshow2">
                             <option v-for="(item2,index) in 31" :key="index">{{item2}}</option>
                         </select>
+                        <span>月</span>
                     </div>
                     </div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
@@ -437,17 +440,20 @@
                         <select @change="changemonth" v-model="value">
                             <option v-for="(item,index) in 31" :key="index">{{item}}</option>
                         </select>
+                        <span>日</span>
                     </div>
-                    <div v-show="yearshow">
+                    <div class="year" v-show="yearshow">
                         <label class="editInpText">日期：</label>
                         <select v-model="item1" @change="changeyearshow1">
                              <!-- @change="changeyearshow" -->
                             <option v-for="(item1,index) in 12" :key="index" >{{item1}}</option>
                         </select>
+                        <span>月</span>
                         <span>-</span>
                         <select v-model="item2" @change="changeyearshow2">
                             <option v-for="(item2,index) in 31" :key="index">{{item2}}</option>
                         </select>
+                         <span>日</span>
                     </div>
                     </div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
@@ -465,7 +471,7 @@
                         </el-date-picker>
                     </div>
                 </div>
-                 <div slot="footer" class="dialog-footer">
+                <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="updateEDMakeSure">确定</button>
                     <button class="editBtnC" @click="upadteEDlistClose">取消</button>
                 </div>
@@ -1259,50 +1265,50 @@
             }
         }
         #edit{
-            .editBody{
-               .editBodyone{
-                   .editInpText{
-                    color: #666;
-                    font-size: 14px;
-                    line-height: 14px;
-                    font-weight: normal;
-                    display: inline-block;
-                    margin-right: 20px;
-                    width: 15%;
-                    text-align: right;
-                   }
-                   .editInpText1{
-                       color: #666;
-                    font-size: 14px;
-                    line-height: 14px;
-                    font-weight: normal;
-                    display: inline-block;
-                    margin-right: 20px;
-                   
-                   }
-                   .editworkday{
-                     color: #666;
-                    font-size: 14px;
-                    line-height: 38px;
-                    font-weight: normal;
-                    display: inline-block;
-                    float: left;
-                     width:100px;
-                    margin-left: 30px;
+                .editBody{
+                .editBodyone{
+                    .editInpText{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        font-weight: normal;
+                        display: inline-block;
+                        margin-right: 20px;
+                        width: 15%;
+                        text-align: right;
                     }
-                   .changeTaskText{
-                       color: #666;
-                    font-size: 14px;
-                    line-height: 14px;
-                    font-weight: normal;
-                    display: inline-block;
-                    margin-right: 20px;
-                    width: 28%;
-                    text-align: right;
-                   }
+                    .editInpText1{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        font-weight: normal;
+                        display: inline-block;
+                        margin-right: 20px;
+                    
+                    }
+                    .editworkday{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 38px;
+                        font-weight: normal;
+                        display: inline-block;
+                        float: left;
+                        width:100px;
+                        margin-left: 30px;
+                        }
+                    .changeTaskText{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        font-weight: normal;
+                        display: inline-block;
+                        margin-right: 20px;
+                        width: 28%;
+                        text-align: right;
+                    }
 
-               }
-               .tasktext{
+                }
+                .tasktext{
                         color: #666;
                     font-size: 14px;
                     line-height: 14px;
@@ -1311,45 +1317,45 @@
                     margin-left: 88px;
 
                     }
-            .editBodytwo{
-                .editSelect{
-                    width: 435px;
-                    height: 38px;
-                    color: #333333;
-                    background: #fafafa;
-                    border: 1px solid #d1d1d1;
-                    padding:0px 0px 0px 10px;
-                }
-                .el-date-editor.el-input
-             .el-input__inner{
-                 width: 322px;
-             }
-            .el-date-editor .el-input{
-                    width: 435px;
-                }
-                .icon-sanjiao{
-                    display: block;
-                    position: absolute;
-                    width: 12px;
-                    height: 7px;
-                    background-image:url('./images/sanjiao.png');
-                    background-size: 100% 100%;
-                    content: '';
-                    top: 18px;
-                    right: 62px;
-                }
-                .editworkday{
-                     color: #666;
-                    font-size: 14px;
-                    line-height: 38px;
-                    font-weight: normal;
-                    display: inline-block;
-                    float: left;
-                    margin-left: 30px;
-                }
+                .editBodytwo{
+                    .editSelect{
+                        width: 435px;
+                        height: 38px;
+                        color: #333333;
+                        background: #fafafa;
+                        border: 1px solid #d1d1d1;
+                        padding:0px 0px 0px 10px;
+                    }
+                    .el-date-editor.el-input
+                    .el-input__inner{
+                        width: 322px;
+                    }
+                    .el-date-editor .el-input{
+                            width: 435px;
+                        }
+                    .icon-sanjiao{
+                        display: block;
+                        position: absolute;
+                        width: 12px;
+                        height: 7px;
+                        background-image:url('./images/sanjiao.png');
+                        background-size: 100% 100%;
+                        content: '';
+                        top: 18px;
+                        right: 62px;
+                    }
+                    .editworkday{
+                            color: #666;
+                        font-size: 14px;
+                        line-height: 38px;
+                        font-weight: normal;
+                        display: inline-block;
+                        float: left;
+                        margin-left: 30px;
+                    }
 
-             }
-            .edit-item{position:relative;
+                }
+                .edit-item{position:relative;
                 .displayColor {
                     display: block;
                     width: 30px;
@@ -1385,6 +1391,20 @@
                     }
                 }
             }
+            .weekday{
+                margin-left:18px;
+                margin-top:15px;
+            }
+            .month{
+                width: 47%;
+                float:left;
+                margin-top:15px;
+            }
+            .year{
+                width: 54%;
+                float:left;
+                margin-top:15px;
+            }
             }
         }
         
@@ -1403,7 +1423,9 @@ export default{
         return{
             //日历
              calendar1:{
-                value:[2018,7,2], //默认日期
+                 multi:true,
+                 zero:true,
+                value:[[2018,7,2],[2018,7,3],[2018,7,7],[2018,7,4],[2018,7,9],[2018,7,10],[2018,7,11]], //默认日期
                 // lunar:true, //显示农历
                 weeks:['日', '一', '二', '三', '四', '五', '六'],
                 display:"2018/02/16",
@@ -2908,7 +2930,7 @@ export default{
         //点击新增例外休息日
         addExceptionDate(){
             this.addExceptionDateDialog=true;
-            this.shifouday=this.workDayList[0].value;
+            this.shifouday=this.workDayList[1].value;
             this.repeatway=this.cedTypeList[0].value;
             this.calendarIndex.forEach((item)=>{
                 if(item.id==this.isActive)

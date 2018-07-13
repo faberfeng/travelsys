@@ -1199,8 +1199,8 @@ export default {
             margin-right: 20px;
             margin-left: 94px;
             text-align: right;
-    }
-    .updataImageSpan{
+        }
+        .updataImageSpan{
             overflow: hidden;
             width: 98px;
         }
