@@ -96,15 +96,15 @@
             </div>
       </div>
         <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
-            <div class="log-head clearfix" v-if="isEdit">
+            <div class="log-head clearfix" v-if="idDefault">
                 <span class="log-head-title">岗位名称:</span>
-                <el-radio :disabled='isEdit'  v-model="jobDetial.posType" label="3">工程内岗位</el-radio>
-                <el-radio :disabled='isEdit'  v-model="jobDetial.posType" label="4">合作方岗位</el-radio>
+                <el-radio :disabled='idDefault'  v-model="defaultCode" label="1">工程内岗位</el-radio>
+                <el-radio :disabled='idDefault'  v-model="defaultCode" label="2">合作方岗位</el-radio>
             </div>
             <div class="log-head clearfix" v-else>
                 <span class="log-head-title">岗位名称:</span>
-                <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
-                <el-radio :disabled='isEdit' v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
+                <el-radio  v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
+                <el-radio  v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
             </div>
             <div  class="JobName">
                 <input type="text" v-model="jobDetial.posName" placeholder="请输入" :disabled='checkName(jobDetial.posName)'>
@@ -170,7 +170,8 @@ export default {
             token:'',
             BDMSUrl:'',
             checkCode:[],
-            isEdit:false,
+            idDefault:false,
+            defaultCode:'1',
         }
     },
     watch:{
@@ -328,15 +329,18 @@ export default {
                 vm.jobDetial.posType = ''+type;
                 vm.jobID = parseInt(val)
                 vm.title = '修改岗位'
-                vm.isEdit = true
                 vm.getJobShuXingTu()//获取某val的权限
             }else{
                 vm.jobDetial.posName = '';
                 vm.jobDetial.posType = '1';
                 vm.jobID = 0
                 vm.title = '增加岗位'
-                vm.isEdit = false
                 vm.getJobShuXingTu()//获取某val的权限
+            }
+            if(type == 1 || type == 2){
+                vm.idDefault = false
+            }else if(type == 3 || type == 4){
+                vm.idDefault = true
             }
         },
         userClose(){
