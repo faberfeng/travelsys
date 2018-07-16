@@ -1833,37 +1833,42 @@ export default Vue.component('common-edit',{
                         }
                        
                         var length = response.data.rt.filterList.length
-                        
                         if(length>0){
                             response.data.rt.filterList.forEach((element,index)=>{
-                                if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.partition'
-                                 || element.fieldCode == 'range.storey' || element.fieldCode == 'range.profession' || element.fieldCode == 'range.system' || element.fieldCode =='range.type'){
+                                if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.profession'){
                                      switch(element.fieldCode){
                                          case 'range.db':
                                                 vm.database = element.fieldSearchContent
                                             break;
                                         case 'range.build':
-                                                vm.value_monomer = element.fieldSearchContent
+
+                                                vm.value_monomer = element.fieldSearchContent.split('&&')[0]
+                                                vm.value_partition = element.fieldSearchContent.split('&&')[1]
+                                                vm.value_floor = element.fieldSearchContent.split('&&')[2]
                                                 vm.value_monomer_change(true)
-                                            break;
-                                        case 'range.partition':
-                                                vm.value_partition = element.fieldSearchContent
                                                 vm.value_partition_change(true)
                                             break;
-                                        case 'range.storey':
-                                                vm.value_floor = element.fieldSearchContent
-                                            break;
+                                        // case 'range.partition':
+                                        //         vm.value_partition = element.fieldSearchContent
+                                        //         vm.value_partition_change(true)
+                                        //     break;
+                                        // case 'range.storey':
+                                        //         vm.value_floor = element.fieldSearchContent
+                                        //     break;
                                         case 'range.profession':
-                                                vm.value_professional = element.fieldSearchContent
+                                                vm.value_professional = element.fieldSearchContent.substr(0,2)+'0000'
+                                                vm.value_system = element.fieldSearchContent.substr(0,4)+'00'
+                                                vm.value_type = element.fieldSearchContent
                                                 vm.value_professional_change(true)
-                                            break;
-                                        case 'range.system':
-                                                vm.value_system = element.fieldSearchContent
                                                 vm.value_system_change(true)
                                             break;
-                                        case 'range.type':
-                                                vm.value_type = element.fieldSearchContent
-                                            break;
+                                        // case 'range.system':
+                                        //         vm.value_system = element.fieldSearchContent
+                                        //         vm.value_system_change(true)
+                                        //     break;
+                                        // case 'range.type':
+                                        //         vm.value_type = element.fieldSearchContent
+                                        //     break;
                                      }
                                 }else{
                                     console.log(index)
@@ -2039,25 +2044,37 @@ export default Vue.component('common-edit',{
                 fieldSearchContent: vm.database,
                 tableType: -1
             })
-             /**danti**/
-             fieldFilterList.push({
+            //  /**danti**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.build', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_monomer,
+            //     tableType: -1
+            // })
+            //  /**分区**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.partition', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_partition,
+            //     tableType: -1
+            // })
+            //  /**楼层**/
+            //  fieldFilterList.push({
+            //     fieldCode: 'range.storey', 
+            //     fieldSearchType: 'EQUALS',
+            //     fieldSearchContent: vm.value_floor,
+            //     tableType: -1
+            // })
+              /***
+             * 更改时间 2018-7-16
+             * 后端更改 数据类型
+             * 三项合并
+             * ****/
+            var combinCode_type = vm.value_monomer+'&&'+vm.value_partition+'&&'+vm.value_floor
+            fieldFilterList.push({
                 fieldCode: 'range.build', 
                 fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_monomer,
-                tableType: -1
-            })
-             /**分区**/
-             fieldFilterList.push({
-                fieldCode: 'range.partition', 
-                fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_partition,
-                tableType: -1
-            })
-             /**楼层**/
-             fieldFilterList.push({
-                fieldCode: 'range.storey', 
-                fieldSearchType: 'EQUALS',
-                fieldSearchContent: vm.value_floor,
+                fieldSearchContent: combinCode_type,
                 tableType: -1
             })
              /**专业**/
