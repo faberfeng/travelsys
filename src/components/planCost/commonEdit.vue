@@ -1389,10 +1389,11 @@ export default Vue.component('common-edit',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         // vm.getDataBase()
-        vm.getIntoDesignPage()
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
+            vm.getIntoDesignPage(true)
         }else{
+            vm.getIntoDesignPage(false)
             vm.addField()
         }
         vm.getPV()
@@ -1732,7 +1733,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         }, 
-         getIntoDesignPage(){
+         getIntoDesignPage(isEdit){
             var vm = this
             axios({
                 method:'POST',
@@ -1753,7 +1754,7 @@ export default Vue.component('common-edit',{
                         id:'ALL',
                         Name:'全部单体'
                     },)
-                    vm.value_monomer = 'ALL'
+                    if(!isEdit)vm.value_monomer = 'ALL'
                 }
             }).then(
                 axios({
@@ -1856,9 +1857,14 @@ export default Vue.component('common-edit',{
                                         //         vm.value_floor = element.fieldSearchContent
                                         //     break;
                                         case 'range.profession':
-                                                vm.value_professional = element.fieldSearchContent.substr(0,2)+'0000'
-                                                vm.value_system = element.fieldSearchContent.substr(0,4)+'00'
-                                                vm.value_type = element.fieldSearchContent
+                                        /**
+                                            更改时间：2018-8-16
+                                            因为默认为 000000；
+                                            因此无何全部字段无法区分，默认为全部 -1
+                                        **/
+                                                vm.value_professional = element.fieldSearchContent.substr(0,2) == '00'?'-1':element.fieldSearchContent.substr(0,2)+'0000'
+                                                vm.value_system = element.fieldSearchContent.substr(2,2) == '00'?'-1':element.fieldSearchContent.substr(0,4)+'00'
+                                                vm.value_type = element.fieldSearchContent.substr(4,2) == '00'?'-1':element.fieldSearchContent
                                                 vm.value_professional_change(true)
                                                 vm.value_system_change(true)
                                             break;
@@ -2106,9 +2112,9 @@ export default Vue.component('common-edit',{
             var combinCode = '000000'
             if(vm.value_professional != -1){//专业选择 不为全部
                 combinCode = vm.value_professional
-                if(vm.value_system != -1 || vm.value_system != 'NONE'){
+                if(vm.value_system != -1 && vm.value_system != 'NONE'){
                      combinCode = vm.value_system
-                     if(vm.value_type != -1 || vm.value_type != 'NONE'){
+                     if(vm.value_type != -1 && vm.value_type != 'NONE'){
                            combinCode = vm.value_type
                      }
                 }
