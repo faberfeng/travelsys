@@ -1442,7 +1442,6 @@ export default Vue.component('common-list',{
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.manifestId = vm.mId
         vm.getIntoList();
-        console.log(this.token);
   }, 
   mounted(){
       var vm = this
