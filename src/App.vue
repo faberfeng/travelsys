@@ -363,5 +363,5 @@ padding-right: 14px;
         margin-left: 10px;
         font-weight: normal;
         color: #999;
-    }
+    } 
 </style>

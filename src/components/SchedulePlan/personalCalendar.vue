@@ -336,9 +336,1185 @@
         </div>
     </div> 
 </template>
-<style>
 
-</style>
+<script>
+import moment from 'moment';
+import '../ManageCost/js/jquery-1.8.3.js'
+// import './js/jquery-ui-1.9.2.custom.js'
+// import './js/date.js'
+import data from '../Settings/js/date.js'
+import axios from 'axios'
+import 'fullcalendar/dist/locale/zh-cn'
+export default {
+  name:'personalCalendar',
+    data(){
+        return {
+            //事件视图
+            isActive:'',
+            viewshow:true,
+            curDateList:'',
+            curWeekList:'',
+            beforeToStartValue:'',
+            afterValue:'',
+            beforeToStartList:[
+                {
+                    value:0,
+                    label:'无'
+                },
+                {
+                    value:1,
+                    label:'前一天'
+                },
+                {
+                    value:2,
+                    label:'上周'
+                },
+                {
+                    value:3,
+                    label:'上个月'
+                },
+                {
+                    value:4,
+                    label:'一年以内'
+                }
+            ],
+            after:[{
+                    value:0,
+                    label:'无'
+                },
+                {
+                    value:1,
+                    label:'两天内'
+                },
+                {
+                    value:2,
+                    label:'三天内'
+                },
+                {
+                    value:3,
+                    label:'一周内'
+                },
+                {
+                    value:4,
+                    label:'两周内'
+                },
+                {
+                    value:5,
+                    label:'一个月内'
+                },
+                {
+                    value:6,
+                    label:'两个月内'
+                },
+                {
+                    value:7,
+                    label:'三个月内'
+                },
+                {
+                    value:8,
+                    label:'一年之内'
+                }],
+                startDate:'',
+                endDate:'',
+                eventViewList:[],
+                eventViewrows:[],
+                eventViewpager:'',
+                pageSize:'',
+                totalSize:0,
+                currentPage3:1,
+            //
+            fileIdLists:[],
+            checkedList:[],
+            timeDefaultShow:new Date().toLocaleTimeString(),
+            start1:'',
+            end1:'',
+            calendarEventList:'',
+            addEventList:'',
+            CalendarTaskList:'',
+            eventInformationList:'',
+            eventId:'',
+            ugList:'',
+            eventSources:[],
+            data1: [],
+            //删除事件
+            deleteTypes:'',
+            deleteTypeList:[{
+                value:0,
+                label:'只删除当前的事件'
+            },
+            {
+                value:1,
+                label:'删除所有此重复事件'
+            },
+            {
+                value:2,
+                label:'删除当前事件和之后的此重复事件'
+
+            }],
+
+            updateTypeList:[{
+                value:0,
+                label:'只修改当前的事件'
+            },
+            {
+                value:1,
+                label:'修改所有此重复事件'
+            },
+            {
+                value:2,
+                label:'修改当前事件和之后的此重复事件'
+
+            }],
+            updateTypeValue:'',
+            //文件上传
+            uploadfilesList:[],
+            imageName:'',
+            uploadshow:false,
+            fileLists:'',
+            attachLists:'',
+            filePath:'',
+            FileTree_original:[],//原始文件树形图
+            FileTree:[],//文件夹树形图
+             checkFileDir:{},//选中的文件夹信息
+            defaultProps: {
+                children: 'children',
+                label: 'nodeName'
+            },//指定节点标签和子树为节点对象的某个属性值
+            expandedKeys:[],//默认展开的节点的 key 的数组
+            selectUgId:'',//选中的群组id
+            firstTime:0,
+            dirId:'',
+            searchFileList:[],
+            addWordDialog:false,
+            eventColorList:['lightskyblue','cadetblue','cornflowerblue','darkseagreen','lightblue','lightseagreen','yellow','green','blue','violet'],
+            repeatTypeLabel:'',
+            repeatTypeList:[
+                {
+                        value:0,
+                        label:'不重复'
+                    },
+                    {
+                        value:1,
+                        label:'每周'
+                    },
+                    {
+                        value:2,
+                        label:'每月'
+                    },
+                        {
+                        value:3,
+                        label:'每年'
+                    },
+            ],
+            eventNames:'',
+            eventPositions:'',
+            repeatTypeValue:'',
+            startTimeValue:'',
+            endTimeValue:'',
+            terminate:'',
+            terminates:'',
+            eventContext:'',
+            eventColor:true,
+            eventColorOne:'',
+            eventColorValue:'',
+            addEventTextDialog:false,
+            updateEventTextDialog:false,
+            deleteEventTextDialog:false,
+            checkValue:true,
+            personalCalendarList:[],
+            screenLeft:{
+                show:true,
+                item:1,
+            },
+            show:{
+                basicInformation:true,
+                appendix:false
+            },
+            events: [{
+            start  : new Date().getTime(),
+
+            },
+            ],
+            // eventBorderColor:'black',
+            selected: {},
+            config:{
+                height:850,
+                contentHeight: 600,
+                locale: 'zh-cn',
+                weekNumbers: false,
+                editable: false, // 是否可拖动
+                eventLimit: false, // allow "more" link when too many events
+                selectable: true,
+                firstDay: 0,
+                firstHour: 5,
+                
+                defaultView: 'month',
+                header: {
+                    left: 'month agendaWeek agendaDay',
+                    center: 'prevYear, prev, title, next, nextYear',
+                    right:'today listMonth' 
+                },
+                timeFormat: 'HH:mm',
+                views: {
+                    month: {
+                        titleFormat: 'YYYY' + '年' + 'MM' + '月'
+                    }
+                },
+        //  eventClick: (calEvent, jsEvent, view) => {
+        //      this.selected=calEvent;
+        //   alert("event:"+calEvent.start);
+        //   alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+        //    alert('View: ' + view.name);
+        //    alert("start:"+moment(view.start).format("YYYY-MM-DD HH:mm"));
+        //    alert("end:"+moment(view.end).format("YYYY-MM-DD HH:mm"));
+        // }, 
+            },
+    };
+    },
+    filters:{
+        repeatTypeChanges(val){
+            var str=''
+            if(val==0){
+                str='不重复'
+            }else if(val==1){
+                str="每周"
+            }else if(val==2){
+                str="每月"
+            }else if(val==3){
+                str="每年"
+            }
+            return str;
+        },
+        timeChange(val){
+                return moment(val).format("YYYY-MM-DD HH:mm");
+            },
+    },
+    watch:{
+         checkFileDir:function(val){
+          var vm = this
+          vm.mayiList = []
+          /**
+           * 从头添加目录
+           * **/
+          vm.mayiList.unshift({
+              nodeId:val.nodeId,//目录id
+              nodeName:val.nodeName,//目录名称
+              nodeParId:val.nodeParId
+          })
+          vm.findParent(val.nodeParId)
+         }
+
+    },
+    created(){
+            var vm = this
+            this.token = localStorage.getItem('token');
+            this.projId = localStorage.getItem('projId');
+            vm.userId  = localStorage.getItem('userid')
+            vm.BDMSUrl = vm.$store.state.BDMSUrl;
+            vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+            this.getPersonalCalendar();//进入个人日历页面(获取当前用户所在工程下群组)
+            },
+    mounted(){
+        this.initEvent();
+        this.initTask();
+    },
+    methods: {
+        chectItem(num){
+            this.isActive=num;
+            this.eventViewrows.forEach((item,index)=>{
+                if(item.id==num){
+                    this.eventId=item.id
+                }
+            })
+            this.informationShow()
+        },
+         handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            this.eventView(val)
+            console.log(`当前页: ${val}`);
+        },
+        viewChange(){
+            this.viewshow=!this.viewshow;
+            var myDate = new Date(), str = '';
+            str += myDate.getFullYear() +'年';
+            str += myDate.getMonth() + 1 + '月';
+            str += myDate.getDate() + '日';
+            this.curDateList=str;
+            var today=['星期一','星期二','星期三','星期四','星期五','星期六','星期天'];
+            var week=today[myDate.getDay()];
+           this.curWeekList=week;
+           this.startDate=myDate.getFullYear()+'-'+(myDate.getMonth() + 1)+'-'+myDate.getDate();
+           this.endDate=myDate.getFullYear()+'-'+(myDate.getMonth() + 1)+'-'+myDate.getDate()+ " 23:59:59";
+           this.beforeToStartValue=this.beforeToStartList[0].value;
+           this.afterValue=this.after[0].value;
+           this.eventView();
+        },
+        eventChange(){
+
+        },
+        beforeToStartChange(){
+            this.beforeToStartList.forEach((item)=>{
+                if(this.beforeToStartValue==item.value){
+                    this.beforeToStartValue=item.value
+                }
+            })
+            this.startDate=this.beforeToStart(this.beforeToStartValue);
+            this.eventView();
+        },
+        //之前事件改变器
+        beforeToStart(value){
+                var date = new Date();
+                var daysInMonth = new Array([0], [31], [28], [31], [30], [31], [30], [31], [31], [30], [31], [30], [31]);
+                var strYear = date.getFullYear();
+                var strMonth = date.getMonth() + 1;
+                var strDay = date.getDate();
+                var day = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+                var week = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
+                if (value == 1) {
+                    return day.getFullYear() + '-' + (day.getMonth() + 1) + '-' + day.getDate();
+                } else if (value == 2) {
+                    return week.getFullYear() + '-' + (week.getMonth() + 1) + '-' + week.getDate();
+                } else if (value == 3) {
+                    if (strYear % 4 == 0 && strYear % 100 != 0) {
+                        daysInMonth[2] = 29;
+                    }
+                    if (strMonth - 1 == 0) {
+                        strYear -= 1;
+                        strMonth = 12;
+                    } else {
+                        strMonth -= 1;
+                    }
+                    strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
+                } else if (value == 4) {
+                    strYear = date.getFullYear() - 1;
+                }
+                if (strMonth < 10) {
+                    strMonth = "0" + strMonth;
+                }
+                if (strDay < 10) {
+                    strDay = "0" + strDay;
+                }
+                var datastr = strYear + "-" + strMonth + "-" + strDay;
+                return datastr;
+                },
+        afterToEndChange(){
+            this.after.forEach((item)=>{
+                if(this.afterValue==item.value){
+                    this.afterValue=item.value
+                }
+            })
+            this.endDate=this.afterToEnd(this.afterValue);
+            this.eventView()
+        },
+        //之后事件改变器
+         afterToEnd(value){
+            var date = new Date();
+            var daysInMonth = new Array([0], [31], [28], [31], [30], [31], [30], [31], [31], [30], [31], [30], [31]);
+            var strYear = date.getFullYear();
+            var strMonth = date.getMonth() + 1;
+            var strDay = date.getDate();
+            var twoDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+            var threeDay = new Date(date.getTime() + 2 * 24 * 60 * 60 * 1000);
+            var week = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000);
+            var twoWeek = new Date(date.getTime() + 14 * 24 * 60 * 60 * 1000);
+            if (value == 1) {
+                return twoDay.getFullYear() + '-' + (twoDay.getMonth() + 1) + '-' + twoDay.getDate()+ " 23:59:59";
+            } else if (value == 2) {
+                return threeDay.getFullYear() + '-' + (threeDay.getMonth() + 1) + '-' + threeDay.getDate() + " 23:59:59";
+            } else if (value == 3) {
+                return week.getFullYear() + '-' + (week.getMonth() + 1) + '-' + week.getDate() + " 23:59:59";
+            } else if (value == 4) {
+                return twoWeek.getFullYear() + '-' + (twoWeek.getMonth() + 1) + '-' + twoWeek.getDate() + " 23:59:59";
+            } else if (value == 5) {
+                if (strYear % 4 == 0 && strYear % 100 != 0) {
+                    daysInMonth[2] = 29;
+                }
+                if (strMonth + 1 == 13) {
+                    strYear += 1;
+                    strMonth = 1;
+                } else {
+                    strMonth += 1;
+                }
+                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
+            } else if (value == 6) {
+                if (strYear % 4 == 0 && strYear % 100 != 0) {
+                    daysInMonth[2] = 29;
+                }
+                if (strMonth + 2 == 13) {
+                    strYear += 1;
+                    strMonth = 1;
+                } else if (strMonth + 2 == 14) {
+                    strYear += 1;
+                    strMonth = 2;
+                } else {
+                    strMonth += 2;
+                }
+                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
+            } else if (value == 7) {
+                if (strYear % 4 == 0 && strYear % 100 != 0) {
+                    daysInMonth[2] = 29;
+                }
+                if (strMonth + 3 == 13) {
+                    strYear += 1;
+                    strMonth = 1;
+                } else if (strMonth + 3 == 14) {
+                    strYear += 1;
+                    strMonth = 2;
+                } else if (strMonth + 3 == 15) {
+                    strYear += 1;
+                    strMonth = 3;
+                } else {
+                    strMonth += 3;
+                }
+                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
+            } else if (value == 8) {
+                strYear = date.getFullYear() + 1;
+            }
+            if (strMonth < 10) {
+                strMonth = "0" + strMonth;
+            }
+            if (strDay < 10) {
+                strDay = "0" + strDay;
+            }
+            var datastr = strYear + "-" + strMonth + "-" + strDay + " 23:59:59";
+                return datastr
+            },
+        
+        eventView(pageNo){
+            pageNo = pageNo || 1;
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/events',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        start:this.startDate,
+                        end:this.endDate,
+                        pageNo:pageNo,
+                        pageSize:4
+                    }
+                    }).then(response=>{
+                        if(response.data.result){
+                            this.eventViewList=response.data.obj;
+                            this.eventViewrows=this.eventViewList.rows;
+                            this.eventViewpager=this.eventViewList.pager;
+                            this.totalSize=this.eventViewpager.totalSize;
+                        }else if(response.data.cd = '-1'){
+                            alert(response.data.msg)
+                        }
+                    })
+        },
+        
+        findParent(val){
+          var vm = this
+          if(val == 0)return false
+          for(var i=0;i<vm.FileTree_original.length;i++){
+              if(vm.FileTree_original[i].nodeId == val){
+                   vm.mayiList.unshift({
+                        nodeId:vm.FileTree_original[i].nodeId,//目录id
+                        nodeName:vm.FileTree_original[i].nodeName,//目录名称
+                        nodeParId:vm.FileTree_original[i].nodeParId
+                    })
+                    if(vm.FileTree_original[i].nodeParId != 0){
+                          vm.findParent(vm.FileTree_original[i].nodeParId)
+                    }
+                    break
+              }
+          }
+      },
+        initCalendar(){
+            var event=[];
+            this.calendarEventList.forEach((item,index)=>{
+                    event.push({
+                        id:item.id,
+                        title:item.eventName,
+                        start:moment(item.eventStart).format("YYYY-MM-DD HH:mm"),
+                        end:moment(item.eventEnd).format("YYYY-MM-DD HH:mm"),
+                        color:item.eventColor,
+                        allDay:item.allDay==1?true:false,
+                        borderColor:'white'
+                        
+                })
+                    })
+                    this.eventSources.push({events:event,textColor:'black',color:'red',});
+            
+        },
+
+    eventSelected(calEvent, jsEvent, view) {
+           this.eventId=calEvent.id;
+        var str=this.eventSources[0].events;
+        str.forEach((item)=>{
+            if(item.id==calEvent.id){
+                item.borderColor="black";
+            }
+            else{
+                item.borderColor="white";
+            }
+            
+        })
+           this.informationShow();
+           this.attachList();
+    },
+    informationShow(){
+        
+        axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId,
+                    headers:{
+                        'token':this.token
+                    },
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.eventInformationList=response.data.rt;
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+
+    },
+    eventRender(event, element, view){
+        this.start1=moment(view.start).format("YYYY-MM-DD HH:mm");
+        this.end1=moment(view.end).format("YYYY-MM-DD HH:mm");
+        // alert(JSON.stringify("start:"+moment(view.start).format("YYYY-MM-DD HH:mm")));
+        //    alert(JSON.stringify("end:"+moment(view.end).format("YYYY-MM-DD HH:mm")));
+            
+    },
+    dayClick(date, jsEvent, view)
+    {
+        
+    },
+        eventCreated(...test) {
+            console.log(test);
+        },
+        initEvent(){
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/events',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                    start:this.start1,
+                    end:this.end1
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.calendarEventList=response.data.rt;
+                            this.initCalendar();
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+                },
+
+        initTask(){
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/tasks',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                    start:this.start1,
+                    end:this.end1
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.CalendarTaskList=response.data.rt;
+                        }else if(response.data.cd = '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+            },
+
+        // //初始树形图
+        initTreeFolder(){
+            var vm = this
+            vm.firstTime = 0
+            vm.getFileTree()
+      },
+      //获得文件树形图
+        getFileTree(){
+                      
+            var vm = this;
+            this.addWordDialog=true;
+            var setting = {
+                data: {
+                    key:{
+                        name: "nodeName",
+                        children:'children'
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "nodeId",
+                        pIdKey: "nodeParId",
+                        rootPId: 0
+                    }
+                }
+            };
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/'+this.selectUgId+'/directory',
+                headers:{
+                    'token':this.token
+                },
+            }).then((response)=>{
+                if(Math.ceil(response.data.cd) == 0){
+                    vm.FileTree_original = response.data.rt
+                    vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
+                    if(name){
+                    for(var k=0;k<vm.FileTree.length;k++){
+                        if(vm.FileTree[k].nodeName.replace('_','') == name){
+                            vm.handleNodeClick(vm.FileTree[k])
+                            setTimeout(()=>{
+                                var n = k+1
+                                $('#cloudDirveFileTree .el-tree-node:nth-child('+n+')').addClass('is-current_fistload')
+                            },0)
+                            break
+                        }
+                    }
+                }
+                }
+                
+            }).catch((err)=>{
+            console.log(err)
+        })
+        },
+        addword(){
+             if(!this.eventId){
+                alert('提示：请选择你要添加附件的事件')
+            }else{
+                this.getFileTree()
+                this.addWordDialog=true;
+            }
+        },
+        addWordCancle(){
+            this.addWordDialog=false;
+            this.searchFileList=[];
+        },
+        getPersonalCalendar(){
+            axios({
+                    method:'get',
+                    url:this.BDMSUrl+'/project2/schedule/personalCalendar',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                    projId:this.projId
+                    }
+                }).then(response=>{
+                    if(response.data.cd == '0'){
+                        this.ugList=response.data.rt;
+                        this.selectUgId=this.ugList[0].ugId;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+        },
+        InitselectUgId(){
+            var vm=this
+            for(var i=0;i<this.ugList.length;i++){
+                if(this.ugList[i].ugId==this.selectUgId){
+                    this.expandedKeys=[]
+                    this.getFileTree()
+                    break
+                }
+            }
+        },
+        nodeClick(data,node,self){
+            var vm = this
+            if(vm.expandedKeys.indexOf(data.nodeId) == -1){
+                vm.expandedKeys.push(data.nodeId)
+            }
+        },
+        nodeClickClose(data,node,self){
+                var vm = this
+                if(vm.expandedKeys.indexOf(data.nodeId) != -1){
+                    vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
+                }
+            },
+        handleNodeClick(obj){
+            this.dirId=obj.nodeId;
+            this.searchFile()
+        },
+            //点击新增事件内容
+        addEvent(){
+            this.repeatTypeValue=this.repeatTypeList[0].value;
+            this.checkValue=true;
+            this.eventColorValue="yellow";
+            this.eventColorOne="yellow";
+            this.addEventTextDialog=true;
+        },
+        //新增事件确认
+        addEventTextMakeSure(){
+            if(this.eventNames==''){
+                alert('事件不能为空')
+                return;
+            }else if(this.eventPositions==''){
+                alert('地点不能为空')
+                    return;        
+            }else if(this.startTimeValue>this.endTimeValue){
+                alert('提示：结束时间必须大于开始时间')
+                return;
+            }
+            
+
+            if(this.repeatTypeValue!=0){
+                if(this.repeatTypeValue==1){
+                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/1000 / 60 / 60 / 24 / 7 >= 1){
+                        alert("提示：开始时间与结束时间之差必须小于7天")
+                        return;
+                    }
+                }else if(this.repeatTypeValue==2){
+                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 31 >= 1){
+                        alert("提示：开始时间与结束时间之差必须小于31天")
+                        return;
+                    }
+                }else if(this.repeatTypeValue==3){
+                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 366 >= 1){
+                        alert("提示：开始时间与结束时间之差必须小于366天")
+                        return;
+                    }
+                }
+
+                 if(!this.terminate)
+                {
+                    alert("提示：事件终止日期不能为空")
+                    return;
+                }
+                else if(this.terminate<this.endTimeValue){
+                    alert("提示：事件终止日期不能小于结束时间")
+                    return;
+                }
+                this.terminates=this.dateChange1(this.terminate)  
+            }
+
+            
+             axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/add',
+                    headers:{
+                        'token':this.token
+                    },
+                   data:{
+                       allDay:this.valueChange(this.checkValue),
+                       eventName:this.eventNames,
+                       eventStart:this.dateChange(this.startTimeValue),
+                       eventEnd:this.dateChange(this.endTimeValue),
+                       eventPosition:this.eventPositions,
+                       repeatType:this.repeatTypeValue.toString(),
+                       eventTerminate:this.terminates,
+                       eventColor:this.eventColorValue,
+                       content:this.eventContext,
+                       callType:'0',
+                   }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                    this.addEventList=response.data.rt;
+                                    this.eventSources=[];
+                                    this.initEvent();
+                                    this.eventView();
+                                     this.addEventTextDialog=false;    
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        },
+        refreshEvents() {
+            this.$refs.calendar.$emit('rerender-events')
+            },
+        valueChange(val){
+            return val==true?1:0;
+        },
+        //时间检验器
+         dateChange1(val){
+            return moment(val).format("YYYY-MM-DD");
+        },
+         dateChange(val){
+            return moment(val).format("YYYY-MM-DD HH:mm:ss");
+        },
+        //取消新增事件
+        addETCancle(){
+            this.checkValue='';
+            this.eventNames='';
+            this.startTimeValue='';
+            this.endTimeValue='';
+            this.eventPositions='';
+            this.repeatTypeValue='';
+            this.terminate='';
+            this.eventColorValue='';
+            this.eventContext='';
+            this.addEventTextDialog=false;
+        },
+        //点击修改事件
+        updateEvent(){
+            if(this.eventInformationList){
+                this.updateEventTextDialog=true;
+            }else{
+                alert("请指定需要修改的事件")
+            }
+            this.updateTypeValue=this.updateTypeList[0].value;
+            this.checkValue=this.shifouChange(this.eventInformationList.allDay);
+            this.eventNames=this.eventInformationList.eventName;
+            this.startTimeValue=this.StrToGMT(this.eventInformationList.eventStart);
+            this.endTimeValue=this.StrToGMT(this.eventInformationList.eventEnd);
+            this.eventPositions=this.eventInformationList.eventPosition;
+            this.repeatTypeValue=this.eventInformationList.repeatType;
+            this.repeatTypeList.forEach((item)=>{
+                if(item.value==this.repeatTypeValue){
+                    this.repeatTypeLabel=item.label;
+                }
+            })
+            this.eventColorValue=this.eventInformationList.eventColor;
+            this.eventColorOne=this.toBeColor(this.eventColorValue)
+            this.eventContext=this.eventInformationList.content;
+        },
+        //
+        //时间选择器
+            StrToGMT(time){
+                let GMT = new Date(time)
+                return GMT
+            },
+        // 是否判断器
+        shifouChange(val){
+            return val==1?true:false;
+        },
+        //确认修改事件
+        updateEventTextMakeSure(){
+            if(this.eventNames==''){
+                alert('事件不能为空')
+                return;
+            }else if(this.eventPositions==''){
+                alert('地点不能为空')
+                return;
+            }else if(this.startTimeValue>this.endTimeValue){
+                alert('提示：结束时间必须大于开始时间')
+                return;
+            }
+            
+             axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/update',
+                    headers:{
+                        'token':this.token
+                    },
+                   data:{
+                       event:{
+                            id:this.eventId,
+                            allDay:this.valueChange(this.checkValue),
+                            eventName:this.eventNames,
+                            eventStart:this.dateChange(this.startTimeValue),
+                            eventEnd:this.dateChange(this.endTimeValue),
+                            eventPosition:this.eventPositions,
+                            eventColor:this.eventColorValue,
+                            content:this.eventContext,
+                            callType:'0',
+                       },
+                       updateType:this.deleteTypeValue
+                   }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.eventSources=[],
+                            this.initEvent();
+                            this.eventView();
+                            this.updateEventTextDialog=false;
+                        }else if(response.data.cd = '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        },
+        // 取消修改事件
+        updateETCancle(){
+            this.checkValue='';
+            this.eventNames='';
+            this.startTimeValue='';
+            this.endTimeValue='';
+            this.eventPositions='';
+            this.repeatTypeValue='';
+            this.terminate='';
+            this.eventColorValue='';
+            this.eventContext='';
+            this.updateEventTextDialog=false;
+        },
+        //点击删除事件
+        deleteEvent(){
+            if(!this.eventId){
+                alert('提示：请指定需要删除的事件')
+            }else{
+            this.deleteTypes=this.deleteTypeList[0].value;
+            this.deleteEventTextDialog=true;
+         }
+        },
+        //确认删除事件
+        deleteEventTextMakeSure(){
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId+'/delete',
+                    headers:{
+                        'token':this.token
+                    },
+                   params:{
+                       deleteType:this.deleteTypes
+                   }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                this.$refs.calendar.$emit('remove-event',this.eventId);
+                                this.eventSources=[];
+                                this.initEvent();
+                                this.eventView();
+                                this.deleteEventTextDialog=false;
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })  
+        },
+        //取消删除事件
+        deleteETCancle(){
+            this.deleteEventTextDialog=false;
+        },
+        repeatTypeChange(){
+            //  this.initEvent();
+            // this.initTask();
+            this.repeatTypeList.forEach((item,index)=>{
+                if(this.repeatTypeValue==item.value){
+                    this.repeatTypeValue=item.value
+                }
+            })
+        },
+        updateTypeChange(){
+            this.updateTypeList.forEach((item,index)=>{
+                if(this.updateTypeValue==item.value){
+                    this.updateTypeValue=item.value
+                }
+            })
+        },
+        eventColorChange(){
+            this.eventColorOne=this.toBeColor(this.eventColorValue)
+        },
+        toBeColor(val){
+            return val;
+        },
+        //获取获取个人日历事件附加信息
+        attachList(){
+             axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId+'/attachList',
+                    headers:{
+                        'token':this.token
+                    },
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                this.fileLists=response.data.rt.fileList;
+                                this.attachLists=response.data.rt.attachList;
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        },
+        searchs(filePath){
+            window.open(this.QJFileManageSystemURL+filePath+"/preview");
+        },
+        downLoad(filePath){
+            var vm=this
+            window.open(vm.QJFileManageSystemURL + filePath +'');
+        },
+        deleteword(fileId){
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/deletAttach',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        eventId:this.eventId,
+                        fileId:fileId
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                this.attachList()
+                        }else if(response.data.cd = '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        },
+        deletepic(fileId){
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/deletAttach',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        eventId:this.eventId,
+                        fileId:fileId
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                this.attachList()
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+
+        },
+        addpic(){
+            if(!this.eventId){
+                alert('提示：请选择你要添加附件的事件')
+            }else{
+            this.uploadshow=true;
+            }
+        },
+        upImgCancle(){
+            this.uploadshow=false;
+        },
+
+        addwordMakeSure(){
+             this.searchFileList.forEach((item1)=>{
+                                if(item1.select==true){
+                                    this.fileIdLists.push(item1.fileId)
+           
+                                }
+             }),
+             axios({
+                    method:'post',
+                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/addRelaFile',
+                    headers:{
+                            'token':this.token
+                        },
+                    data:{
+                        eventId:this.eventId,
+                        fileIdList:this.fileIdLists
+
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                                this.attachList();
+                                this.addWordDialog=false;
+                                this.searchFileList=[];
+                                this.fileIdLists=[];
+                        }else if(response.data.cd = '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        },
+        uploadIMG(){
+            var returnUrl=this.BDMSUrl+'/project2/schedule/event/attachmentUpload?id='+this.eventId;
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData= new FormData();
+            formData.append('token',this.token);
+            formData.append('projId',this.projId);
+            // formData.append('id',this.eventId);
+            formData.append('type',1);
+            formData.append('file',this.uploadfilesList);
+            formData.append('userId',this.userId);
+            formData.append('modelCode','005');
+            formData.append('returnUrl',returnUrl);
+            axios({
+                    method:'post',
+                    url:this.QJFileManageSystemURL+'uploading/uploadFileInfo',
+        
+                    headers:{
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    data:formData,
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                                this.attachList();
+                                this.uploadshow=false;
+                        }
+                    })  
+        },
+        selectImg(){
+            this.$refs.file.click()
+        },
+        fileChanged(e){
+           this.uploadfilesList=e.target.files[0];
+           this.imageName=this.uploadfilesList.name;
+        },
+        searchFile(){
+           
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/schedule/searchFile',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{       
+                    dirId:this.dirId,
+                    projId:this.projId,
+                    }
+                    }).then(response=>{
+                        if(response.data.cd == '0'){
+                            this.searchFileList=[]
+                            if(response.data.rt.rows.length>0){
+                            this.searchFileList = response.data.rt.rows;
+                                this.searchFileList.forEach((item)=>{
+                                    this.$set(item,'select',false)
+                                })
+                                }else{
+                                    this.searchFileList=[]
+                                }
+                        }else if(response.data.cd == '-1'){
+                            alert(response.data.msg)
+                        }else{
+                            this.$router.push({
+                                path:'/login'
+                            })
+                        }
+                    })
+        }
+
+  },
+
+}
+</script>
 <style lang="less"  scoped>
 // #calendar{
 //     max-width: 1000px;
@@ -1530,1182 +2706,4 @@
         }
     }
 </style>
-<script>
-import moment from 'moment';
-import '../ManageCost/js/jquery-1.8.3.js'
-// import './js/jquery-ui-1.9.2.custom.js'
-// import './js/date.js'
-import data from '../Settings/js/date.js'
-import axios from 'axios'
-import 'fullcalendar/dist/locale/zh-cn'
-export default {
-  name:'personalCalendar',
-    data(){
-        return {
-            //事件视图
-            isActive:'',
-            viewshow:true,
-            curDateList:'',
-            curWeekList:'',
-            beforeToStartValue:'',
-            afterValue:'',
-            beforeToStartList:[
-                {
-                    value:0,
-                    label:'无'
-                },
-                {
-                    value:1,
-                    label:'前一天'
-                },
-                {
-                    value:2,
-                    label:'上周'
-                },
-                {
-                    value:3,
-                    label:'上个月'
-                },
-                {
-                    value:4,
-                    label:'一年以内'
-                }
-            ],
-            after:[{
-                    value:0,
-                    label:'无'
-                },
-                {
-                    value:1,
-                    label:'两天内'
-                },
-                {
-                    value:2,
-                    label:'三天内'
-                },
-                {
-                    value:3,
-                    label:'一周内'
-                },
-                {
-                    value:4,
-                    label:'两周内'
-                },
-                {
-                    value:5,
-                    label:'一个月内'
-                },
-                {
-                    value:6,
-                    label:'两个月内'
-                },
-                {
-                    value:7,
-                    label:'三个月内'
-                },
-                {
-                    value:8,
-                    label:'一年之内'
-                }],
-                startDate:'',
-                endDate:'',
-                eventViewList:[],
-                eventViewrows:[],
-                eventViewpager:'',
-                pageSize:'',
-                totalSize:0,
-                currentPage3:1,
-            //
-            fileIdLists:[],
-            checkedList:[],
-            timeDefaultShow:new Date().toLocaleTimeString(),
-            start1:'',
-            end1:'',
-            calendarEventList:'',
-            addEventList:'',
-            CalendarTaskList:'',
-            eventInformationList:'',
-            eventId:'',
-            ugList:'',
-            eventSources:[],
-            data1: [],
-            //删除事件
-            deleteTypes:'',
-            deleteTypeList:[{
-                value:0,
-                label:'只删除当前的事件'
-            },
-            {
-                value:1,
-                label:'删除所有此重复事件'
-            },
-            {
-                value:2,
-                label:'删除当前事件和之后的此重复事件'
-
-            }],
-
-            updateTypeList:[{
-                value:0,
-                label:'只修改当前的事件'
-            },
-            {
-                value:1,
-                label:'修改所有此重复事件'
-            },
-            {
-                value:2,
-                label:'修改当前事件和之后的此重复事件'
-
-            }],
-            updateTypeValue:'',
-            //文件上传
-            uploadfilesList:[],
-            imageName:'',
-            uploadshow:false,
-            fileLists:'',
-            attachLists:'',
-            filePath:'',
-            FileTree_original:[],//原始文件树形图
-            FileTree:[],//文件夹树形图
-             checkFileDir:{},//选中的文件夹信息
-            defaultProps: {
-                children: 'children',
-                label: 'nodeName'
-            },//指定节点标签和子树为节点对象的某个属性值
-            expandedKeys:[],//默认展开的节点的 key 的数组
-            selectUgId:'',//选中的群组id
-            firstTime:0,
-            dirId:'',
-            searchFileList:[],
-            addWordDialog:false,
-            eventColorList:['lightskyblue','cadetblue','cornflowerblue','darkseagreen','lightblue','lightseagreen','yellow','green','blue','violet'],
-            repeatTypeLabel:'',
-            repeatTypeList:[
-                {
-                        value:0,
-                        label:'不重复'
-                    },
-                    {
-                        value:1,
-                        label:'每周'
-                    },
-                    {
-                        value:2,
-                        label:'每月'
-                    },
-                        {
-                        value:3,
-                        label:'每年'
-                    },
-            ],
-            eventNames:'',
-            eventPositions:'',
-            repeatTypeValue:'',
-            startTimeValue:'',
-            endTimeValue:'',
-            terminate:'',
-            terminates:'',
-            eventContext:'',
-            eventColor:true,
-            eventColorOne:'',
-            eventColorValue:'',
-            addEventTextDialog:false,
-            updateEventTextDialog:false,
-            deleteEventTextDialog:false,
-            checkValue:true,
-            personalCalendarList:[],
-            screenLeft:{
-                show:true,
-                item:1,
-            },
-            show:{
-                basicInformation:true,
-                appendix:false
-            },
-            events: [{
-            start  : new Date().getTime(),
-
-            },
-            ],
-            // eventBorderColor:'black',
-            selected: {},
-            config:{
-                height:850,
-                contentHeight: 600,
-                locale: 'zh-cn',
-                weekNumbers: false,
-                editable: false, // 是否可拖动
-                eventLimit: false, // allow "more" link when too many events
-                selectable: true,
-                firstDay: 0,
-                firstHour: 5,
-                
-                defaultView: 'month',
-                header: {
-                    left: 'month agendaWeek agendaDay',
-                    center: 'prevYear, prev, title, next, nextYear',
-                    right:'today listMonth' 
-                },
-                timeFormat: 'HH:mm',
-                views: {
-                    month: {
-                        titleFormat: 'YYYY' + '年' + 'MM' + '月'
-                    }
-                },
-        //  eventClick: (calEvent, jsEvent, view) => {
-        //      this.selected=calEvent;
-        //   alert("event:"+calEvent.start);
-        //   alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-        //    alert('View: ' + view.name);
-        //    alert("start:"+moment(view.start).format("YYYY-MM-DD HH:mm"));
-        //    alert("end:"+moment(view.end).format("YYYY-MM-DD HH:mm"));
-        // }, 
-            },
-    };
-    },
-    filters:{
-        repeatTypeChanges(val){
-            var str=''
-            if(val==0){
-                str='不重复'
-            }else if(val==1){
-                str="每周"
-            }else if(val==2){
-                str="每月"
-            }else if(val==3){
-                str="每年"
-            }
-            return str;
-        },
-        timeChange(val){
-                return moment(val).format("YYYY-MM-DD HH:mm");
-            },
-    },
-    watch:{
-         checkFileDir:function(val){
-          var vm = this
-          vm.mayiList = []
-          /**
-           * 从头添加目录
-           * **/
-          vm.mayiList.unshift({
-              nodeId:val.nodeId,//目录id
-              nodeName:val.nodeName,//目录名称
-              nodeParId:val.nodeParId
-          })
-          vm.findParent(val.nodeParId)
-         }
-
-    },
-    created(){
-            var vm = this
-            this.token = localStorage.getItem('token');
-            this.projId = localStorage.getItem('projId');
-            vm.userId  = localStorage.getItem('userid')
-            vm.BDMSUrl = vm.$store.state.BDMSUrl;
-            vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-            this.getPersonalCalendar();//进入个人日历页面(获取当前用户所在工程下群组)
-            },
-    mounted(){
-        this.initEvent();
-        this.initTask();
-    },
-    methods: {
-        chectItem(num){
-            this.isActive=num;
-            this.eventViewrows.forEach((item,index)=>{
-                if(item.id==num){
-                    this.eventId=item.id
-                }
-            })
-            this.informationShow()
-        },
-         handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-        },
-        handleCurrentChange(val) {
-            this.eventView(val)
-            console.log(`当前页: ${val}`);
-        },
-        viewChange(){
-            this.viewshow=!this.viewshow;
-            var myDate = new Date(), str = '';
-            str += myDate.getFullYear() +'年';
-            str += myDate.getMonth() + 1 + '月';
-            str += myDate.getDate() + '日';
-            this.curDateList=str;
-            var today=['星期一','星期二','星期三','星期四','星期五','星期六','星期天'];
-            var week=today[myDate.getDay()];
-           this.curWeekList=week;
-           this.startDate=myDate.getFullYear()+'-'+(myDate.getMonth() + 1)+'-'+myDate.getDate();
-           this.endDate=myDate.getFullYear()+'-'+(myDate.getMonth() + 1)+'-'+myDate.getDate()+ " 23:59:59";
-           this.beforeToStartValue=this.beforeToStartList[0].value;
-           this.afterValue=this.after[0].value;
-           this.eventView();
-        },
-        eventChange(){
-
-        },
-        beforeToStartChange(){
-            this.beforeToStartList.forEach((item)=>{
-                if(this.beforeToStartValue==item.value){
-                    this.beforeToStartValue=item.value
-                }
-            })
-            this.startDate=this.beforeToStart(this.beforeToStartValue);
-            this.eventView();
-        },
-        //之前事件改变器
-        beforeToStart(value){
-                var date = new Date();
-                var daysInMonth = new Array([0], [31], [28], [31], [30], [31], [30], [31], [31], [30], [31], [30], [31]);
-                var strYear = date.getFullYear();
-                var strMonth = date.getMonth() + 1;
-                var strDay = date.getDate();
-                var day = new Date(date.getTime() - 24 * 60 * 60 * 1000);
-                var week = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
-                if (value == 1) {
-                    return day.getFullYear() + '-' + (day.getMonth() + 1) + '-' + day.getDate();
-                } else if (value == 2) {
-                    return week.getFullYear() + '-' + (week.getMonth() + 1) + '-' + week.getDate();
-                } else if (value == 3) {
-                    if (strYear % 4 == 0 && strYear % 100 != 0) {
-                        daysInMonth[2] = 29;
-                    }
-                    if (strMonth - 1 == 0) {
-                        strYear -= 1;
-                        strMonth = 12;
-                    } else {
-                        strMonth -= 1;
-                    }
-                    strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
-                } else if (value == 4) {
-                    strYear = date.getFullYear() - 1;
-                }
-                if (strMonth < 10) {
-                    strMonth = "0" + strMonth;
-                }
-                if (strDay < 10) {
-                    strDay = "0" + strDay;
-                }
-                var datastr = strYear + "-" + strMonth + "-" + strDay;
-                return datastr;
-                },
-        afterToEndChange(){
-            this.after.forEach((item)=>{
-                if(this.afterValue==item.value){
-                    this.afterValue=item.value
-                }
-            })
-            this.endDate=this.afterToEnd(this.afterValue);
-            this.eventView()
-        },
-        //之后事件改变器
-         afterToEnd(value){
-            var date = new Date();
-            var daysInMonth = new Array([0], [31], [28], [31], [30], [31], [30], [31], [31], [30], [31], [30], [31]);
-            var strYear = date.getFullYear();
-            var strMonth = date.getMonth() + 1;
-            var strDay = date.getDate();
-            var twoDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-            var threeDay = new Date(date.getTime() + 2 * 24 * 60 * 60 * 1000);
-            var week = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000);
-            var twoWeek = new Date(date.getTime() + 14 * 24 * 60 * 60 * 1000);
-            if (value == 1) {
-                return twoDay.getFullYear() + '-' + (twoDay.getMonth() + 1) + '-' + twoDay.getDate()+ " 23:59:59";
-            } else if (value == 2) {
-                return threeDay.getFullYear() + '-' + (threeDay.getMonth() + 1) + '-' + threeDay.getDate() + " 23:59:59";
-            } else if (value == 3) {
-                return week.getFullYear() + '-' + (week.getMonth() + 1) + '-' + week.getDate() + " 23:59:59";
-            } else if (value == 4) {
-                return twoWeek.getFullYear() + '-' + (twoWeek.getMonth() + 1) + '-' + twoWeek.getDate() + " 23:59:59";
-            } else if (value == 5) {
-                if (strYear % 4 == 0 && strYear % 100 != 0) {
-                    daysInMonth[2] = 29;
-                }
-                if (strMonth + 1 == 13) {
-                    strYear += 1;
-                    strMonth = 1;
-                } else {
-                    strMonth += 1;
-                }
-                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
-            } else if (value == 6) {
-                if (strYear % 4 == 0 && strYear % 100 != 0) {
-                    daysInMonth[2] = 29;
-                }
-                if (strMonth + 2 == 13) {
-                    strYear += 1;
-                    strMonth = 1;
-                } else if (strMonth + 2 == 14) {
-                    strYear += 1;
-                    strMonth = 2;
-                } else {
-                    strMonth += 2;
-                }
-                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
-            } else if (value == 7) {
-                if (strYear % 4 == 0 && strYear % 100 != 0) {
-                    daysInMonth[2] = 29;
-                }
-                if (strMonth + 3 == 13) {
-                    strYear += 1;
-                    strMonth = 1;
-                } else if (strMonth + 3 == 14) {
-                    strYear += 1;
-                    strMonth = 2;
-                } else if (strMonth + 3 == 15) {
-                    strYear += 1;
-                    strMonth = 3;
-                } else {
-                    strMonth += 3;
-                }
-                strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
-            } else if (value == 8) {
-                strYear = date.getFullYear() + 1;
-            }
-            if (strMonth < 10) {
-                strMonth = "0" + strMonth;
-            }
-            if (strDay < 10) {
-                strDay = "0" + strDay;
-            }
-            var datastr = strYear + "-" + strMonth + "-" + strDay + " 23:59:59";
-                return datastr
-            },
-        
-        eventView(pageNo){
-            pageNo = pageNo || 1;
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/events',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                        start:this.startDate,
-                        end:this.endDate,
-                        pageNo:pageNo,
-                        pageSize:4
-                    }
-                    }).then(response=>{
-                        if(response.data.result){
-                            this.eventViewList=response.data.obj;
-                            this.eventViewrows=this.eventViewList.rows;
-                            this.eventViewpager=this.eventViewList.pager;
-                            this.totalSize=this.eventViewpager.totalSize;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }
-                    })
-        },
-        
-        findParent(val){
-          var vm = this
-          if(val == 0)return false
-          for(var i=0;i<vm.FileTree_original.length;i++){
-              if(vm.FileTree_original[i].nodeId == val){
-                   vm.mayiList.unshift({
-                        nodeId:vm.FileTree_original[i].nodeId,//目录id
-                        nodeName:vm.FileTree_original[i].nodeName,//目录名称
-                        nodeParId:vm.FileTree_original[i].nodeParId
-                    })
-                    if(vm.FileTree_original[i].nodeParId != 0){
-                          vm.findParent(vm.FileTree_original[i].nodeParId)
-                    }
-                    break
-              }
-          }
-      },
-        initCalendar(){
-            var event=[];
-            this.calendarEventList.forEach((item,index)=>{
-                    event.push({
-                        id:item.id,
-                        title:item.eventName,
-                        start:moment(item.eventStart).format("YYYY-MM-DD HH:mm"),
-                        end:moment(item.eventEnd).format("YYYY-MM-DD HH:mm"),
-                        color:item.eventColor,
-                        allDay:item.allDay==1?true:false,
-                        borderColor:'white'
-                        
-                })
-                    })
-                    this.eventSources.push({events:event,textColor:'black',color:'red',});
-            
-        },
-
-    eventSelected(calEvent, jsEvent, view) {
-           this.eventId=calEvent.id;
-        var str=this.eventSources[0].events;
-        str.forEach((item)=>{
-            if(item.id==calEvent.id){
-                item.borderColor="black";
-            }
-            else{
-                item.borderColor="white";
-            }
-            
-        })
-           this.informationShow();
-           this.attachList();
-    },
-    informationShow(){
-        
-        axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId,
-                    headers:{
-                        'token':this.token
-                    },
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                            this.eventInformationList=response.data.rt;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-
-    },
-    eventRender(event, element, view){
-        this.start1=moment(view.start).format("YYYY-MM-DD HH:mm");
-        this.end1=moment(view.end).format("YYYY-MM-DD HH:mm");
-        // alert(JSON.stringify("start:"+moment(view.start).format("YYYY-MM-DD HH:mm")));
-        //    alert(JSON.stringify("end:"+moment(view.end).format("YYYY-MM-DD HH:mm")));
-            
-    },
-    dayClick(date, jsEvent, view)
-    {
-        
-    },
-        eventCreated(...test) {
-            console.log(test);
-        },
-        initEvent(){
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/events',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                    start:this.start1,
-                    end:this.end1
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                            this.calendarEventList=response.data.rt;
-                            this.initCalendar();
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-                },
-
-        initTask(){
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/tasks',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                    start:this.start1,
-                    end:this.end1
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                            this.CalendarTaskList=response.data.rt;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-            },
-
-        // //初始树形图
-        initTreeFolder(){
-            var vm = this
-            vm.firstTime = 0
-            vm.getFileTree()
-      },
-      //获得文件树形图
-        getFileTree(){
-                      
-            var vm = this;
-            this.addWordDialog=true;
-            var setting = {
-                data: {
-                    key:{
-                        name: "nodeName",
-                        children:'children'
-                    },
-                    simpleData: {
-                        enable: true,
-                        idKey: "nodeId",
-                        pIdKey: "nodeParId",
-                        rootPId: 0
-                    }
-                }
-            };
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/'+this.selectUgId+'/directory',
-                headers:{
-                    'token':this.token
-                },
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    vm.FileTree_original = response.data.rt
-                    vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-                    if(name){
-                    for(var k=0;k<vm.FileTree.length;k++){
-                        if(vm.FileTree[k].nodeName.replace('_','') == name){
-                            vm.handleNodeClick(vm.FileTree[k])
-                            setTimeout(()=>{
-                                var n = k+1
-                                $('#cloudDirveFileTree .el-tree-node:nth-child('+n+')').addClass('is-current_fistload')
-                            },0)
-                            break
-                        }
-                    }
-                }
-                }
-                
-            }).catch((err)=>{
-            console.log(err)
-        })
-        },
-        addword(){
-             if(!this.eventId){
-                alert('提示：请选择你要添加附件的事件')
-            }else{
-                this.getFileTree()
-                this.addWordDialog=true;
-            }
-        },
-        addWordCancle(){
-            this.addWordDialog=false;
-            this.searchFileList=[];
-        },
-        getPersonalCalendar(){
-            axios({
-                    method:'get',
-                    url:this.BDMSUrl+'/project2/schedule/personalCalendar',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                    projId:this.projId
-                    }
-                }).then(response=>{
-                    if(response.data.cd == '0'){
-                        this.ugList=response.data.rt;
-                        this.selectUgId=this.ugList[0].ugId;
-                    }else if(response.data.cd = '-1'){
-                        alert(response.data.msg)
-                    }else{
-                        this.$router.push({
-                            path:'/login'
-                        })
-                    }
-                })
-        },
-        InitselectUgId(){
-            var vm=this
-            for(var i=0;i<this.ugList.length;i++){
-                if(this.ugList[i].ugId==this.selectUgId){
-                    this.expandedKeys=[]
-                    this.getFileTree()
-                    break
-                }
-            }
-        },
-        nodeClick(data,node,self){
-            var vm = this
-            if(vm.expandedKeys.indexOf(data.nodeId) == -1){
-                vm.expandedKeys.push(data.nodeId)
-            }
-        },
-        nodeClickClose(data,node,self){
-                var vm = this
-                if(vm.expandedKeys.indexOf(data.nodeId) != -1){
-                    vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
-                }
-            },
-        handleNodeClick(obj){
-            this.dirId=obj.nodeId;
-            this.searchFile()
-        },
-            //点击新增事件内容
-        addEvent(){
-            this.repeatTypeValue=this.repeatTypeList[0].value;
-            this.checkValue=true;
-            this.eventColorValue="yellow";
-            this.eventColorOne="yellow";
-            this.addEventTextDialog=true;
-        },
-        //新增事件确认
-        addEventTextMakeSure(){
-            if(this.eventNames==''){
-                alert('事件不能为空')
-                return;
-            }else if(this.eventPositions==''){
-                alert('地点不能为空')
-                    return;        
-            }else if(this.startTimeValue>this.endTimeValue){
-                alert('提示：结束时间必须大于开始时间')
-                return;
-            }
-            
-
-            if(this.repeatTypeValue!=0){
-                if(this.repeatTypeValue==1){
-                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/1000 / 60 / 60 / 24 / 7 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于7天")
-                        return;
-                    }
-                }else if(this.repeatTypeValue==2){
-                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 31 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于31天")
-                        return;
-                    }
-                }else if(this.repeatTypeValue==3){
-                    if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 366 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于366天")
-                        return;
-                    }
-                }
-
-                 if(!this.terminate)
-                {
-                    alert("提示：事件终止日期不能为空")
-                    return;
-                }
-                else if(this.terminate<this.endTimeValue){
-                    alert("提示：事件终止日期不能小于结束时间")
-                    return;
-                }
-                this.terminates=this.dateChange1(this.terminate)  
-            }
-
-            
-             axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendar/add',
-                    headers:{
-                        'token':this.token
-                    },
-                   data:{
-                       allDay:this.valueChange(this.checkValue),
-                       eventName:this.eventNames,
-                       eventStart:this.dateChange(this.startTimeValue),
-                       eventEnd:this.dateChange(this.endTimeValue),
-                       eventPosition:this.eventPositions,
-                       repeatType:this.repeatTypeValue.toString(),
-                       eventTerminate:this.terminates,
-                       eventColor:this.eventColorValue,
-                       content:this.eventContext,
-                       callType:'0',
-                   }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                    this.addEventList=response.data.rt;
-                                    this.eventSources=[];
-                                    this.initEvent();
-                                    this.eventView();
-                                     this.addEventTextDialog=false;    
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        },
-        refreshEvents() {
-            this.$refs.calendar.$emit('rerender-events')
-            },
-        valueChange(val){
-            return val==true?1:0;
-        },
-        //时间检验器
-         dateChange1(val){
-            return moment(val).format("YYYY-MM-DD");
-        },
-         dateChange(val){
-            return moment(val).format("YYYY-MM-DD HH:mm:ss");
-        },
-        //取消新增事件
-        addETCancle(){
-            this.checkValue='';
-            this.eventNames='';
-            this.startTimeValue='';
-            this.endTimeValue='';
-            this.eventPositions='';
-            this.repeatTypeValue='';
-            this.terminate='';
-            this.eventColorValue='';
-            this.eventContext='';
-            this.addEventTextDialog=false;
-        },
-        //点击修改事件
-        updateEvent(){
-            if(this.eventInformationList){
-                this.updateEventTextDialog=true;
-            }else{
-                alert("请指定需要修改的事件")
-            }
-            this.updateTypeValue=this.updateTypeList[0].value;
-            this.checkValue=this.shifouChange(this.eventInformationList.allDay);
-            this.eventNames=this.eventInformationList.eventName;
-            this.startTimeValue=this.StrToGMT(this.eventInformationList.eventStart);
-            this.endTimeValue=this.StrToGMT(this.eventInformationList.eventEnd);
-            this.eventPositions=this.eventInformationList.eventPosition;
-            this.repeatTypeValue=this.eventInformationList.repeatType;
-            this.repeatTypeList.forEach((item)=>{
-                if(item.value==this.repeatTypeValue){
-                    this.repeatTypeLabel=item.label;
-                }
-            })
-            this.eventColorValue=this.eventInformationList.eventColor;
-            this.eventColorOne=this.toBeColor(this.eventColorValue)
-            this.eventContext=this.eventInformationList.content;
-        },
-        //
-        //时间选择器
-            StrToGMT(time){
-                let GMT = new Date(time)
-                return GMT
-            },
-        // 是否判断器
-        shifouChange(val){
-            return val==1?true:false;
-        },
-        //确认修改事件
-        updateEventTextMakeSure(){
-            if(this.eventNames==''){
-                alert('事件不能为空')
-                return;
-            }else if(this.eventPositions==''){
-                alert('地点不能为空')
-                return;
-            }else if(this.startTimeValue>this.endTimeValue){
-                alert('提示：结束时间必须大于开始时间')
-                return;
-            }
-            
-             axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/update',
-                    headers:{
-                        'token':this.token
-                    },
-                   data:{
-                       event:{
-                            id:this.eventId,
-                            allDay:this.valueChange(this.checkValue),
-                            eventName:this.eventNames,
-                            eventStart:this.dateChange(this.startTimeValue),
-                            eventEnd:this.dateChange(this.endTimeValue),
-                            eventPosition:this.eventPositions,
-                            eventColor:this.eventColorValue,
-                            content:this.eventContext,
-                            callType:'0',
-                       },
-                       updateType:this.deleteTypeValue
-                   }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                            this.eventSources=[],
-                            this.initEvent();
-                            this.eventView();
-                            this.updateEventTextDialog=false;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        },
-        // 取消修改事件
-        updateETCancle(){
-            this.checkValue='';
-            this.eventNames='';
-            this.startTimeValue='';
-            this.endTimeValue='';
-            this.eventPositions='';
-            this.repeatTypeValue='';
-            this.terminate='';
-            this.eventColorValue='';
-            this.eventContext='';
-            this.updateEventTextDialog=false;
-        },
-        //点击删除事件
-        deleteEvent(){
-            if(!this.eventId){
-                alert('提示：请指定需要删除的事件')
-            }else{
-            this.deleteTypes=this.deleteTypeList[0].value;
-            this.deleteEventTextDialog=true;
-         }
-        },
-        //确认删除事件
-        deleteEventTextMakeSure(){
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId+'/delete',
-                    headers:{
-                        'token':this.token
-                    },
-                   params:{
-                       deleteType:this.deleteTypes
-                   }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                this.$refs.calendar.$emit('remove-event',this.eventId);
-                                this.eventSources=[];
-                                this.initEvent();
-                                this.eventView();
-                                this.deleteEventTextDialog=false;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })  
-        },
-        //取消删除事件
-        deleteETCancle(){
-            this.deleteEventTextDialog=false;
-        },
-        repeatTypeChange(){
-            //  this.initEvent();
-            // this.initTask();
-            this.repeatTypeList.forEach((item,index)=>{
-                if(this.repeatTypeValue==item.value){
-                    this.repeatTypeValue=item.value
-                }
-            })
-        },
-        updateTypeChange(){
-            this.updateTypeList.forEach((item,index)=>{
-                if(this.updateTypeValue==item.value){
-                    this.updateTypeValue=item.value
-                }
-            })
-        },
-        eventColorChange(){
-            this.eventColorOne=this.toBeColor(this.eventColorValue)
-        },
-        toBeColor(val){
-            return val;
-        },
-        //获取获取个人日历事件附加信息
-        attachList(){
-             axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId+'/attachList',
-                    headers:{
-                        'token':this.token
-                    },
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                this.fileLists=response.data.rt.fileList;
-                                this.attachLists=response.data.rt.attachList;
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        },
-        searchs(filePath){
-            window.open(this.QJFileManageSystemURL+filePath+"/preview");
-        },
-        downLoad(filePath){
-            var vm=this
-            window.open(vm.QJFileManageSystemURL + filePath +'');
-        },
-        deleteword(fileId){
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/deletAttach',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                        eventId:this.eventId,
-                        fileId:fileId
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                this.attachList()
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        },
-        deletepic(fileId){
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/deletAttach',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{
-                        eventId:this.eventId,
-                        fileId:fileId
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                this.attachList()
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-
-        },
-        addpic(){
-            if(!this.eventId){
-                alert('提示：请选择你要添加附件的事件')
-            }else{
-            this.uploadshow=true;
-            }
-        },
-        upImgCancle(){
-            this.uploadshow=false;
-        },
-
-        addwordMakeSure(){
-             this.searchFileList.forEach((item1)=>{
-                                if(item1.select==true){
-                                    this.fileIdLists.push(item1.fileId)
-           
-                                }
-             }),
-             axios({
-                    method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/addRelaFile',
-                    headers:{
-                            'token':this.token
-                        },
-                    data:{
-                        eventId:this.eventId,
-                        fileIdList:this.fileIdLists
-
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                                this.attachList();
-                                this.addWordDialog=false;
-                                this.searchFileList=[];
-                                this.fileIdLists=[];
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        },
-        uploadIMG(){
-            var returnUrl=this.BDMSUrl+'/project2/schedule/event/attachmentUpload?id='+this.eventId;
-            returnUrl = encodeURIComponent(returnUrl);
-            var formData= new FormData();
-            formData.append('token',this.token);
-            formData.append('projId',this.projId);
-            // formData.append('id',this.eventId);
-            formData.append('type',1);
-            formData.append('file',this.uploadfilesList);
-            formData.append('userId',this.userId);
-            formData.append('modelCode','005');
-            formData.append('returnUrl',returnUrl);
-            axios({
-                    method:'post',
-                    url:this.QJFileManageSystemURL+'uploading/uploadFileInfo',
-        
-                    headers:{
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    data:formData,
-                    }).then((response)=>{
-                        if(response.data.cd=='0'){
-                                this.attachList();
-                                this.uploadshow=false;
-                        }
-                    })  
-        },
-        selectImg(){
-            this.$refs.file.click()
-        },
-        fileChanged(e){
-           this.uploadfilesList=e.target.files[0];
-           this.imageName=this.uploadfilesList.name;
-        },
-        searchFile(){
-           
-            axios({
-                    method:'post',
-                    url:this.BDMSUrl+'project2/schedule/searchFile',
-                    headers:{
-                        'token':this.token
-                    },
-                    params:{       
-                    dirId:this.dirId,
-                    projId:this.projId,
-                    }
-                    }).then(response=>{
-                        if(response.data.cd == '0'){
-                            this.searchFileList=[]
-                            if(response.data.rt.rows.length>0){
-                            this.searchFileList = response.data.rt.rows;
-                                this.searchFileList.forEach((item)=>{
-                                    this.$set(item,'select',false)
-                                })
-                                }else{
-                                    this.searchFileList=[]
-                                }
-                        }else if(response.data.cd = '-1'){
-                            alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    })
-        }
-
-  },
-
-}
-</script>
 
