@@ -503,7 +503,7 @@
                 </div>
             </el-dialog>
             <!-- 新增任务组别 -->
-            <el-dialog title="新增事件内容" :visible.sync="addTaskGroupDialog" @close="editGroupCancelBtn">
+            <el-dialog title="修改任务组别" :visible.sync="addTaskGroupDialog" @close="editGroupCancelBtn">
                 <div class="editBody">
                     <div class="editBodyone edit-item clearfix"><label class="editInpText">组别名称 :</label><input class="inp" placeholder="请输入模板名称" v-model="tGroupName"></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">标记色 :</label>
@@ -541,7 +541,7 @@
             <el-dialog title="添加资源类别" :visible.sync="addResourceTypeDialog" @close="addRTCancelBtn">
                 <div class="editBody">
                     <div class="editBodyone edit-item clearfix"><label class="editInpText">名称 :</label><input class="inp" placeholder="请输入" v-model="rTypeName"></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">资源类别 :</label>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">GC总表 :</label>
                     <select class="editSelect" v-model="tnvalue"  @change="tnvalueChange">
                         <option v-for="(item,index) in tableNoList" :value="item.val"  :key="index">{{item.text}}</option>
                     </select>
@@ -2604,7 +2604,9 @@ export default{
                             item.view=false;
                         }
                         this.taskStatusList.push(item);
+                    console.log('这是什么鬼东西'+JSON.stringify(this.taskStatusList))
                     })
+                    
                    
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
@@ -2625,13 +2627,16 @@ export default{
             axios({
                 method:'get',
                 url:this.BDMSUrl+'/project2/schedule/setUseInView',
+                headers:{
+                    'token':this.token
+                },
                 params:{
                     id:this.taskStatusList[index].id,
                     useInView:this.taskStatusList[index].view?1:0
                 },
             }).then(response=>{
                 if(response.data.cd=='0'){
-                    this.getTaskStatusList();
+                    // this.getTaskStatusList();
                     this.id='';
                     this.view='';
                 }else if(response.data.cd=='-1'){
