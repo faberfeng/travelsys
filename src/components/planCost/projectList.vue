@@ -8,10 +8,10 @@
                         <i class="icon-right"></i>
                     </div>
                     <div @click="showProperty = !showProperty" :class="{active:showProperty}">
-                        <span class="item-property1" @click="screenLeft.item = 1">构<br>件</span>
+                        <span class="item-property1">构<br>件</span>
                     </div>
                     <div @click="showProperty = !showProperty" :class="{active:!showProperty}">
-                        <span class="item-property" @click="screenLeft.item = 1">规<br>则</span>
+                        <span class="item-property">规<br>则</span>
                     </div>
                 </div>
                 <div id="containerMessage">
@@ -1087,7 +1087,6 @@ export default Vue.component('project-list',{
     }
 
     /**********一下是分页器的样式***************/
-
     .datagrid-pager{
         display: block;
         margin: 0 20px;
@@ -1102,6 +1101,84 @@ export default Vue.component('project-list',{
             background: #f5f5f5!important;
         }
     }
+    .pagination{
+            border-top: none;
+        }
+    .pagination table {
+        float: left;
+        height: 30px;
+        th, td {
+            min-width: 5px;
+            padding: 0px;
+            margin: 0px;
+        }
+    }
+    .pagination-page-list {
+        margin: 0px 6px;
+        padding: 1px 2px;
+        width: 43px;
+        height: auto;
+        border-width: 1px;
+        border-style: solid;
+    }
+    .pagination .pagination-num {
+        border-color: #D4D4D4;
+        margin: 0 2px;
+        width: 30px;
+    }
+    .pagination-btn-separator {
+        float: left;
+        height: 24px;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #fff;
+        margin: 3px 1px;
+    }
+    .btn-TAB{
+        display: block;
+        width:26px;
+        height: 26px;
+        cursor: pointer;
+        position: relative;
+        &:hover{
+            box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+        &::after{
+            display: block;
+            position: absolute;
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-size: 100% 100%; 
+            top: 8px;
+            left: 8px;
+        }
+    }
+    .btn-left0::after{
+        background-image: url('../../assets/fenye2.png');
+    }
+    .btn-left1::after{
+        background-image: url('../../assets/fenye1.png');
+    }
+    .btn-right0::after{
+        background-image: url('../../assets/fenye4.png');
+    }
+    .btn-right1::after{
+        background-image: url('../../assets/fenye3.png');
+    }
+    .btn-refresh::after{
+        background-image: url('../../assets/fenye5.png');
+    }
+    .pagination-title{
+        font-size: 14px;
+        color: #333333;
+    }
+    .pagination-info{
+        float: right;
+        margin-top: 5px;
+        margin-right: 25px;
+    }
+
 
     .actionBtn{
         width: 16px;
@@ -1157,9 +1234,6 @@ export default Vue.component('project-list',{
                     transform: rotateZ(0deg);
                 }
             }
-            .active{
-                color: #fc3439;
-            }
             .item-property1{
                 display: block;
                 width: 25px;
@@ -1179,7 +1253,7 @@ export default Vue.component('project-list',{
                     width: 24px;
                     height: 1px;
                     z-index: 1000;
-                    background: #fff;
+                    background: #fafafa;
                     border-bottom: 1px solid #cccccc;
                     -webkit-transform: skewY(30deg);
                     transform: skewY(30deg);
@@ -1204,7 +1278,7 @@ export default Vue.component('project-list',{
                     bottom: -7px;
                     width: 24px;
                     height: 16px;
-                    background: #fff;
+                    background: #fafafa;
                     border-bottom: 1px solid #cccccc;
                     -webkit-transform: skewY(30deg);
                     transform: skewY(30deg);
@@ -1268,16 +1342,13 @@ export default Vue.component('project-list',{
                         background: #fff;
                     }
                 }
-                // .item-property::after{//目录
-                //     background: #fff;
-                // }
                 .item-version-3{//版本
                     z-index: 10;
                 }
             }
             .active{//上边 目录 高显
-                .item-property{
-                    background: #fff;
+                .item-property,.item-property1{
+                    // background: #fff;
                     color: #fc3439;
                 }
                 .item-version{
