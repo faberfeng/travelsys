@@ -12,11 +12,7 @@ export default {
 </script>
 
 <style lang="less">
-.v-modal{
-  position: relative!important;
-}
 #app {
-
   font-family: '微软雅黑', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -418,10 +418,10 @@
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[1]">导入价</el-checkbox>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[2]">参考价</el-checkbox>
                 </div>
-                <div>
+                <div class="threeP">
                     <button>将内部价复制到参考价</button>
                 </div>
-                <div>
+                <div class="threeP">
                     <button>将导入价复制到参考价</button>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -1785,6 +1785,17 @@ export default {
 </script>
 <style lang="less" >
     #quantitiesList{
+        .threeP{
+            button{
+                width: 200px;
+                height: 40px;
+                border: none;
+                border-radius: 2px;
+                margin-top: 10px;
+                cursor: pointer;
+                color: #606266;
+            }
+        }
         .worktable{
             .antsLine{
                 padding: 10px 10px 30px 0px;
