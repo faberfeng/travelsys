@@ -27,7 +27,7 @@
                                 <i class="list_ icon"></i>构件明细
                             </span>
                         </p>
-                        <div>
+                        <div class="project">
                             <el-table  :data="projObjArr" style="width:100%" border @expand-change="showRowInfo">
                                 <el-table-column type="expand">
                                     <template slot-scope="props" >
@@ -73,7 +73,7 @@
                                                             </select>
                                                         </td>
                                                         <td>
-                                                                <div class="pagination-btn-separator"></div>
+                                                            <div class="pagination-btn-separator"></div>
                                                         </td>
                                                         <td>
                                                             <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
@@ -953,6 +953,7 @@ export default Vue.component('project-list',{
     z-index: 0!important;
 }
 #projectList{
+    /**********model弹窗样式***************/
     #edit{ 
         .el-dialog{
             margin: 0 auto;
@@ -1086,93 +1087,21 @@ export default Vue.component('project-list',{
     }
 
     /**********一下是分页器的样式***************/
+
     .datagrid-pager{
+        display: block;
+        margin: 0 20px;
+        height: 31px;
+        width: auto;
+        box-sizing: border-box;
+        background: #f5f5f5;
         margin: 0 10px 10px 10px;
         width: 98%;
+        overflow: hidden;
+        tbody,tr{
+            background: #f5f5f5!important;
+        }
     }
-    // .datagrid-pager {
-    //     display: block;
-    //     margin: 0 20px;
-    //     height: 31px;
-    //     width: auto;
-    //     box-sizing: border-box;
-    //     background: #f5f5f5;
-    //     margin: 0 10px 10px 10px;
-    //     width: 98%;
-    // }
-    // .pagination table {
-    //     float: left;
-    //     height: 30px;
-    //     th, td {
-    //         min-width: 5px;
-    //         padding: 0px;
-    //         margin: 0px;
-    //     }
-    // }
-    // .pagination-page-list {
-    //     margin: 0px 6px;
-    //     padding: 1px 2px;
-    //     width: 43px;
-    //     height: auto;
-    //     border-width: 1px;
-    //     border-style: solid;
-    // }
-    // .pagination .pagination-num {
-    //     border-color: #D4D4D4;
-    //     margin: 0 2px;
-    //     width: 30px;
-    // }
-    // .pagination-btn-separator {
-    //     float: left;
-    //     height: 24px;
-    //     border-left: 1px solid #ccc;
-    //     border-right: 1px solid #fff;
-    //     margin: 3px 1px;
-    // }
-    // .btn-TAB{
-    //     display: block;
-    //     width:26px;
-    //     height: 26px;
-    //     cursor: pointer;
-    //     position: relative;
-    //     &:hover{
-    //         box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-    //         border-radius: 5px;
-    //     }
-    //     &::after{
-    //         display: block;
-    //         position: absolute;
-    //         content: '';
-    //         width: 10px;
-    //         height: 10px;
-    //         background-size: 100% 100%; 
-    //         top: 8px;
-    //         left: 8px;
-    //     }
-    // }
-    // .btn-left0::after{
-    //     background-image: url('../../assets/fenye2.png');
-    // }
-    // .btn-left1::after{
-    //     background-image: url('../../assets/fenye1.png');
-    // }
-    // .btn-right0::after{
-    //     background-image: url('../../assets/fenye4.png');
-    // }
-    // .btn-right1::after{
-    //     background-image: url('../../assets/fenye3.png');
-    // }
-    // .btn-refresh::after{
-    //     background-image: url('../../assets/fenye5.png');
-    // }
-    // .pagination-title{
-    //     font-size: 14px;
-    //     color: #333333;
-    // }
-    // .pagination-info{
-    //     margin-top: 5px;
-    // }
-
 
     .actionBtn{
         width: 16px;
@@ -1554,7 +1483,7 @@ export default Vue.component('project-list',{
         transition: all ease .5s;
         border-left: 1px solid #cccccc;
     }
-    .UserList {
+    .UserList{
         border-collapse: collapse;
         margin:10px 10px 0 10px;
         width: 98%;
@@ -1665,7 +1594,6 @@ export default Vue.component('project-list',{
     .has-gutter{
         tr{
             height: 51px;
-            // background: #ccc!important;
         }
         th{
             background: rgba(242,242,242,1);
