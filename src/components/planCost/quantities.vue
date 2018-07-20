@@ -285,7 +285,12 @@
             <div class="project" v-if="listItem.showProject">
                 <common-list @back="backToProject"  :title="'工程量清单'" :isGongChengLiang='true' :manifestIdOne="listItem.viewDetailObj.manifestId"></common-list>
             </div>
+            <!--工程量明细-->
+            <div class="project" v-if="projList.showProject">
+                <project-list @back="backToProject" :baseObj="projList.baseObj" :mId="viewDetailObject.manifestId"></project-list>
+            </div>
         </div>
+
         <!-- dialog弹出框 -->
         <div id="edit">
             <el-dialog title="请选择需要出量的单体或场地" :visible="createMonomer.show" @close="createCancle">
@@ -294,17 +299,10 @@
                         <label class=" imageBodyText">单体或场地 :</label>
                         <span>
                              <el-select v-model="createMonomer.holderId" placeholder="请选择">
-                                <el-option :label="SitesList.name+'(场地)'" :id="SitesList.id+'_id'"
-                                data-type="1"
-                                :data-name="SitesList.name"
+                                <el-option :label="SitesList.name+'(场地)'" :id="SitesList.id+'_id'" data-type="1" :data-name="SitesList.name"
                                 :value="SitesList.id">
                                 </el-option>
-                                <el-option
-                                    v-for="item in MonomerList"
-                                    :key="item.value"
-                                    :id="item.ID+'_id'"
-                                    data-type="2"
-                                    :data-name="item.Name"
+                                <el-option v-for="item in MonomerList" :key="item.value" :id="item.ID+'_id'" data-type="2" :data-name="item.Name"
                                     :label="item.Name+'(单体)'"
                                     :value="item.ID">
                                 </el-option>
@@ -433,7 +431,7 @@
             </el-dialog>
             <el-dialog title="请选择导出价" :visible="viewProjectDetail.exportExcelShow" @close="sexportExcelShowCancel">
                 <div>
-                    <sapn>导出价</sapn>
+                    <span>导出价</span>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[0]">内部价</el-checkbox>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[1]">导入价</el-checkbox>
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[2]">参考价</el-checkbox>
@@ -454,7 +452,7 @@
             </el-dialog>
             <el-dialog title="修改参考单价" :visible.sync="viewProjectDetail.editPrice" :before-close="detailEditCancel">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">参考单价 :</label><input class="inp" placeholder="请输入" v-model="viewProjectDetail.rePrice"/></div>
+                    <div class="editBodyone"><label class="editInpText">参考单价 :</label><input class="inp danjia" placeholder="请输入" v-model="viewProjectDetail.rePrice"/></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="detailEditSure">确定</button>
@@ -474,6 +472,7 @@
                     <div class="worklist">
                         <label class="worklisttite">工作表:</label>
                         <select class="editSelect">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option>{{duliProject.sheetName}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -481,6 +480,7 @@
                     <div class="worklist">
                         <label class="worklisttite">编码列:</label>
                         <select class="editSelect" v-model="duliProject.codeline">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -488,6 +488,7 @@
                     <div class="projlist">
                         <label class="worklisttite">工程量列:</label>
                         <select class="editSelect" v-model="duliProject.projectline">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option v-for="(item,index) in duliProject.sheetTitle" :key="index">{{item}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -527,6 +528,7 @@
                     <div class="worklist">
                         <label class="worklisttite">工作表:</label>
                         <select class="editSelect">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option>{{viewProjectDetail.sheetName}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -534,6 +536,7 @@
                     <div class="projlist1">
                         <label class="worklisttite">项目编码列:</label>
                         <select class="editSelect" v-model="viewProjectDetail.codeline">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -541,6 +544,7 @@
                     <div class="worklist">
                         <label class="worklisttite">单价列:</label>
                         <select class="editSelect" v-model="viewProjectDetail.projectline">
+                            <option value="" disabled selected hidden>请选择</option>
                             <option v-for="(item,index) in viewProjectDetail.sheetTitle" :key="index">{{item}}</option>
                         </select>
                         <i class="downsaniao"></i>
@@ -570,10 +574,11 @@ import axios from 'axios';
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 import commonList from './qingDan.vue'
+import projectList from './projectList.vue'
 export default {
     name:'DesignVersion',
     components:{
-        commonList
+        commonList,projectList
     },
     data(){
         return{
@@ -803,11 +808,15 @@ export default {
             listItem:{
                 showProject:false,
                 viewDetailObj:{}
+            },
+            projList:{
+                showProject:false,
+                baseObj:{}
             }
         }
     },
     created(){
-        var vm = this
+        var vm = this;
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
@@ -1370,6 +1379,7 @@ export default {
                 this.duliProject.name = val.name;
                 this.duliProject.showProject = true;
                 this.showDetail = false;
+                this.projList.showProject = false;
                 this.showMainProject = false;
                 this.listItem.showProject = false;
                 axios({
@@ -1520,6 +1530,7 @@ export default {
             this.duliProject.showProject = false;
             this.showMainProject = true;
             this.listItem.showProject = false;
+            this.projList.showProject = false;
         },
         //查看明细
         viewDetail(val){
@@ -1543,6 +1554,7 @@ export default {
                     if(response.data.cd == 0){
                         this.codingList = response.data.rt;
                         this.showDetail = true;
+                        this.projList.showProject = false;
                         this.showMainProject = false;
                         this.duliProject.showProject = false;
                         this.listItem.showProject = false;
@@ -1749,13 +1761,20 @@ export default {
         },
         //查看工程量明细
         viewDetailThing(val){
-            console.log(val);
+            //console.log(val);
+            this.projList.baseObj = val.row;
+            this.projList.showProject = true;
+            this.duliProject.showProject = false;
+            this.showDetail = false;
+            this.showMainProject = false;
+            this.listItem.showProject = false;
         },
         //查看清单
         viewList(val){
             this.duliProject.showProject = false;
             this.showDetail = false;
             this.showMainProject = false;
+            this.projList.showProject = false;
             this.listItem.showProject = true;
             
             this.listItem.viewDetailObj = val;
@@ -1887,6 +1906,7 @@ export default {
             .worklist{
                 position: relative;
                 margin-bottom: 20px;
+                
                 .worklisttite{
                     margin-right: 33px;
                 }
@@ -1992,9 +2012,9 @@ export default {
                 position: relative;
                 top: 5px;
             }
-            .inp{
-                width: 506px;
-            }
+            // .inp{
+            //     width: 506px;
+            // }
         }
         .imageBody{
             margin: 0 30px;
@@ -2081,6 +2101,7 @@ export default {
             .detailBtn{
                 background: url('./images/details.png') no-repeat;
             }
+           
             .actionBtn{
                 width: 16px;
                 height: 17px;
@@ -2238,6 +2259,9 @@ export default {
                 }
             }
         }
+        .danjia{
+            width: 406px!important;
+        }
         /**********一下是分页器的样式***************/
         .datagrid-pager {
             display: block;
@@ -2351,6 +2375,49 @@ export default {
             left: 0px;
             top: 0px;
             opacity: 0;
+        }
+        .zk-table{
+            color: #333333;
+        }
+        .zk-table--tree-icon{
+            position: relative;
+            width: 40px;
+            display: inline-block;
+            z-index: 10;
+            background: #ffffff;
+        }
+        .zk-table--row-hover .zk-table--tree-icon{
+            background: #ebf7ff;
+        }
+        .zk-table--tree-icon::after {
+            display: block;
+            position: absolute;
+            top: 6px;
+            left: 20px;
+            width: 15px;
+            height: 12px;
+            background:url('./images/folder_1.png')no-repeat 0 0; 
+            content: '';
+        }
+        .zk-icon-minus-square-o::after{
+            background:url('./images/folder.png')no-repeat 0 0; 
+        }
+        .zk-table__body-row>td:first-of-type{
+            width: 45px;
+        }
+        .zk-table--level-4-cell,.zk-table--level-3-cell,.zk-table--level-2-cell,.zk-table--level-1-cell,.zk-table--level-5-cell{
+            position: relative;
+        }
+        .zk-table--level-4-cell::before,.zk-table--level-3-cell::before,.zk-table--level-2-cell::before,.zk-table--level-1-cell::before,.zk-table--level-5-cell::before{
+            display: block;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 14px;
+            background:url('./images/file.png')no-repeat 0 0; 
+            content: '';
+            z-index: 1;
         }
     }
 </style>
