@@ -822,6 +822,9 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.getInentityDetail();
     },
+    beforeDestroy(){
+        $('.navigation').css('z-index','1000');
+    },
     watch:{
         'pageDetial.currentPage':function(val,oldval){
             var vm = this

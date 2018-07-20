@@ -533,7 +533,7 @@ export default {
         left: 26px;
         right: 0;
         background: #fff;
-        z-index: 1000;
+        z-index: 1000!important;
     }
     
     /* 工程列表 */

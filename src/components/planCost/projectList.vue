@@ -949,11 +949,11 @@ export default Vue.component('project-list',{
 })
 </script>
 <style lang="less">
-
+.navigation{
+        z-index: 0!important;
+    }
 #projectList{
-    // .navigation{
-//     z-index: 0!important;
-// }
+    
     /**********model弹窗样式***************/
     #edit{ 
         .el-dialog{

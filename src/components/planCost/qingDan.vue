@@ -383,8 +383,8 @@
         <div id="mask" v-if="labelListShow || ListHeaderShow" ></div>
 </div>       
 </template>
-<style  lang='less' >
-     .navigation{
+<style  lang='less'>
+    .navigation{
         z-index: 0!important;
     }
     #CommenList{
