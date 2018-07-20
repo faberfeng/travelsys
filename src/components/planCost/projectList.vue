@@ -807,7 +807,6 @@ export default Vue.component('project-list',{
         },
         //修改单个构件特征描述
         seeProperty(item){
-            console.log(item);
             this.editSingleProperty.show = true;
             this.editSingleProperty.Data = item;
             if(this.editSingleProperty.Data.characterValues.length!=0){
@@ -842,7 +841,6 @@ export default Vue.component('project-list',{
                     }]
                 
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.getComponentDetailsByCharacterDesc('single');
                     this.editSingleProperty.showWaring = false;
@@ -859,7 +857,6 @@ export default Vue.component('project-list',{
         //修改全部构件特征描述
         editProperty(scope){
             this.editAllProperty.Data = scope.row;
-            console.log(this.editAllProperty.Data)
             this.editAllProperty.show = true;
             if(this.editAllProperty.Data.characterValues.length!=0){
                 this.editAllProperty.propertyDescription = this.editAllProperty.Data.characterValues[0].characterName;
@@ -934,7 +931,6 @@ export default Vue.component('project-list',{
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.projObjArr = response.data.rt;
                     this.projObjArr.forEach(item=>{
@@ -969,211 +965,215 @@ export default Vue.component('project-list',{
         z-index: 3003;
     }
     .dialog{
-            top: 15vh;
-            left: 50%;
-            width: 660px;
-            margin-left:-330px;
-            border-radius: 5px;
-            
-            position: fixed;
-            background: #fff;
-            .el-dialog__body{
-                margin-top: 20px;
+        top: 15vh;
+        left: 50%;
+        width: 660px;
+        margin-left:-330px;
+         border-radius: 5px;
+        position: fixed;
+        background: #fff;
+        .el-dialog__body{
+            margin-top: 20px;
+        }
+        .editBody{
+            margin: 0 20px;
+            .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
+                margin: 0 5px;
             }
-            .editBody{
-                margin: 0 20px;
-                .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
-                    margin: 0 5px;
-                }
+        }
+        .item-label{
+            border-bottom: 1px solid #ebebeb;
+            .img_left{
+                float: left;
+                width: 90px;
+                height: 90px;
+                margin:40px 30px 0 10px;
             }
-            .item-label{
-                border-bottom: 1px solid #ebebeb;
-                .img_left{
-                    float: left;
-                    width: 90px;
-                    height: 90px;
-                    margin:40px 30px 0 10px;
-                }
-                .right{
-                    float: left;
-                    width: 450px;
-                    .item-list{
-                        margin-bottom: 14px;
-                        .text-left{
-                            float: left;
-                            font-size: 12px;
-                            line-height: 12px;
-                            width: 80px;
-                            color: #999;
-                            text-align: left;
-                        }
-                        .text-right{
-                            float: left;
-                            width: 300px;
-                             font-size: 12px;
-                            line-height: 12px;
-                            color: #333333;
-                            text-align: left;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                            white-space: nowrap;
-                        }
-                        &:last-of-type{
-                             margin-bottom: 20px; 
-                        }
+            .right{
+                float: left;
+                width: 450px;
+                .item-list{
+                    margin-bottom: 14px;
+                    .text-left{
+                        float: left;
+                        font-size: 12px;
+                        line-height: 12px;
+                        width: 80px;
+                        color: #999;
+                        text-align: left;
+                    }
+                    .text-right{
+                        float: left;
+                        width: 300px;
+                        font-size: 12px;
+                        line-height: 12px;
+                        color: #333333;
+                        text-align: left;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
+                    &:last-of-type{
+                        margin-bottom: 20px; 
                     }
                 }
-                &:last-of-type{
-                    border-bottom: none;
-                }
             }
-             .item-attibuteAuth{
-                 float: left;
-                 width: 33.3%;
-                 padding-left: 78px;
-                 height: 14px;
-                 line-height: 14px;
-                 margin-bottom: 26px;
-                 text-align: left;
-                 .text{
-                    font-size: 14px;
-                    color: #666666;
-                    margin-left: 10px;
-                 }
-                .checkbox-fileItem{
-                    float: left;
-                    position: relative;
-                    padding-left:20px; 
+            &:last-of-type{
+                border-bottom: none;
+            }
+        }
+        .item-attibuteAuth{
+            float: left;
+            width: 33.3%;
+            padding-left: 78px;
+            height: 14px;
+            line-height: 14px;
+            margin-bottom: 26px;
+            text-align: left;
+            .text{
+                font-size: 14px;
+                color: #666666;
+                margin-left: 10px;
+            }
+            .checkbox-fileItem{
+                float: left;
+                position: relative;
+                padding-left:20px; 
+                cursor: pointer;
+                &::before{
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 12px;
+                    height: 12px;
+                    border: 1px solid #cccccc;
                     cursor: pointer;
-                    &::before{
-                        display: block;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 12px;
-                        height: 12px;
-                        border: 1px solid #cccccc;
-                        cursor: pointer;
-                        background: #fff;
-                        content: '';
+                    background: #fff;
+                    content: '';
+                }
+            }
+            .active{
+                &::before{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
                     }
-                }
-                .active{
-                     &::before{
-                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                        border: 1px solid #fc3439;
-                     }
-                }
-                .checkbox-arr{
-                    display: none;
-                }
-             }
+            }
+            .checkbox-arr{
+                display: none;
+            }
         }
-        #mask{
-            z-index: 3000;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: .5;
-            background: #000;
-        }
-        #mask1{
-            z-index: 3002;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: .5;
-            background: #000;
-        }
-
+    }
+    #mask{
+        z-index: 3000;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: .5;
+        background: #000;
+    }
+    #mask1{
+        z-index: 3002;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: .5;
+        background: #000;
+    }
 
     /**********一下是分页器的样式***************/
-    .datagrid-pager {
-        display: block;
-        margin: 0 20px;
-        height: 31px;
-        width: auto;
-        box-sizing: border-box;
-        background: #f5f5f5;
+    .datagrid-pager{
         margin: 0 10px 10px 10px;
         width: 98%;
     }
-    .pagination table {
-        float: left;
-        height: 30px;
-        th, td {
-            min-width: 5px;
-            padding: 0px;
-            margin: 0px;
-        }
-    }
-    .pagination-page-list {
-        margin: 0px 6px;
-        padding: 1px 2px;
-        width: 43px;
-        height: auto;
-        border-width: 1px;
-        border-style: solid;
-    }
-    .pagination .pagination-num {
-        border-color: #D4D4D4;
-        margin: 0 2px;
-        width: 30px;
-    }
-    .pagination-btn-separator {
-        float: left;
-        height: 24px;
-        border-left: 1px solid #ccc;
-        border-right: 1px solid #fff;
-        margin: 3px 1px;
-    }
-    .btn-TAB{
-        display: block;
-        width:26px;
-        height: 26px;
-        cursor: pointer;
-        position: relative;
-        &:hover{
-            box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-            border-radius: 5px;
-        }
-        &::after{
-            display: block;
-            position: absolute;
-            content: '';
-            width: 10px;
-            height: 10px;
-            background-size: 100% 100%; 
-            top: 8px;
-            left: 8px;
-        }
-    }
-    .btn-left0::after{
-        background-image: url('../../assets/fenye2.png');
-    }
-    .btn-left1::after{
-        background-image: url('../../assets/fenye1.png');
-    }
-    .btn-right0::after{
-        background-image: url('../../assets/fenye4.png');
-    }
-    .btn-right1::after{
-        background-image: url('../../assets/fenye3.png');
-    }
-    .btn-refresh::after{
-        background-image: url('../../assets/fenye5.png');
-    }
-    .pagination-title{
-        font-size: 14px;
-        color: #333333;
-    }
-    .pagination-info{
-        margin-top: 5px;
-    }
+    // .datagrid-pager {
+    //     display: block;
+    //     margin: 0 20px;
+    //     height: 31px;
+    //     width: auto;
+    //     box-sizing: border-box;
+    //     background: #f5f5f5;
+    //     margin: 0 10px 10px 10px;
+    //     width: 98%;
+    // }
+    // .pagination table {
+    //     float: left;
+    //     height: 30px;
+    //     th, td {
+    //         min-width: 5px;
+    //         padding: 0px;
+    //         margin: 0px;
+    //     }
+    // }
+    // .pagination-page-list {
+    //     margin: 0px 6px;
+    //     padding: 1px 2px;
+    //     width: 43px;
+    //     height: auto;
+    //     border-width: 1px;
+    //     border-style: solid;
+    // }
+    // .pagination .pagination-num {
+    //     border-color: #D4D4D4;
+    //     margin: 0 2px;
+    //     width: 30px;
+    // }
+    // .pagination-btn-separator {
+    //     float: left;
+    //     height: 24px;
+    //     border-left: 1px solid #ccc;
+    //     border-right: 1px solid #fff;
+    //     margin: 3px 1px;
+    // }
+    // .btn-TAB{
+    //     display: block;
+    //     width:26px;
+    //     height: 26px;
+    //     cursor: pointer;
+    //     position: relative;
+    //     &:hover{
+    //         box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+    //         border-radius: 5px;
+    //     }
+    //     &::after{
+    //         display: block;
+    //         position: absolute;
+    //         content: '';
+    //         width: 10px;
+    //         height: 10px;
+    //         background-size: 100% 100%; 
+    //         top: 8px;
+    //         left: 8px;
+    //     }
+    // }
+    // .btn-left0::after{
+    //     background-image: url('../../assets/fenye2.png');
+    // }
+    // .btn-left1::after{
+    //     background-image: url('../../assets/fenye1.png');
+    // }
+    // .btn-right0::after{
+    //     background-image: url('../../assets/fenye4.png');
+    // }
+    // .btn-right1::after{
+    //     background-image: url('../../assets/fenye3.png');
+    // }
+    // .btn-refresh::after{
+    //     background-image: url('../../assets/fenye5.png');
+    // }
+    // .pagination-title{
+    //     font-size: 14px;
+    //     color: #333333;
+    // }
+    // .pagination-info{
+    //     margin-top: 5px;
+    // }
+
+
     .actionBtn{
         width: 16px;
          height: 17px;
@@ -1190,6 +1190,7 @@ export default Vue.component('project-list',{
     .location{
         background: url('./images/location.png') no-repeat;
     }        
+
     .box-left-container{
         display: block;
         position: fixed;

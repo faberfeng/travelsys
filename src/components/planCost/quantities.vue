@@ -419,10 +419,10 @@
                     <el-checkbox v-model="viewProjectDetail.threePriceArr[2]">参考价</el-checkbox>
                 </div>
                 <div class="threeP">
-                    <button>将内部价复制到参考价</button>
+                    <button @click="copyInnerPriceToReferencePrice">将内部价复制到参考价</button>
                 </div>
                 <div class="threeP">
-                    <button>将导入价复制到参考价</button>
+                    <button @click="copyImportPriceToReferencePrice">将导入价复制到参考价</button>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="showThreePriceCenter">确定</button>
@@ -623,22 +623,22 @@ export default {
                 {
                     label: '项目编码',
                     prop: 'number',
-                    width: '185px',
                     align:"center",
                     headerAlign:"center" 
                 },
                 {
                     label: '项目名称',
                     prop: 'title',
-                    width: '205px',  
+                     
                     align:"center",
                     headerAlign:"center"  
                 },
                 {
                     label: '项目特征描述',
-                    prop: 'characterValues[0].characterName',
+                    prop: 'description',
                     align:"center",
-                    headerAlign:"center" 
+                    headerAlign:"center" ,
+                    width: '205px', 
                 },
                 {
                     label: '工程量',
@@ -1553,6 +1553,7 @@ export default {
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.codingList = response.data.rt;
+                        this.dealWithCondingList(this.codingList);
                         this.showDetail = true;
                         this.projList.showProject = false;
                         this.showMainProject = false;
@@ -1563,11 +1564,64 @@ export default {
                     }
                 })
             }
-            
         }, 
+        //递归处理工程量明细信息的数据
+        dealWithCondingList(obj){
+            obj.forEach(item=>{
+                if(item.children.length!=0){
+                    this.dealWithCondingList(item.children);
+                }else{
+                    if(item.characterValues!=null && item.characterValues.length!=0){
+                        Object.assign(item,{
+                            'description':item.characterValues[0].characterName+':'+item.characterValues[0].currCharacterValue
+                        })
+                    }
+                }
+            })
+        },
         //三价配置
         threePrice(){
             this.viewProjectDetail.showThreePrice = true;
+        },
+        //将内部价拷贝到参考价
+        copyInnerPriceToReferencePrice(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/copyInnerPriceToReferencePrice',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    mainId:this.viewDetailObject.manifestId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    alert("参考价设置成功!");
+                    this.viewProjectDetail.showThreePrice = false;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //将导入价复制到参考价
+        copyImportPriceToReferencePrice(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/copyImportPriceToReferencePrice',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    mainId:this.viewDetailObject.manifestId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    alert("导入价设置成功!");
+                    this.viewProjectDetail.showThreePrice = false;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
         },
         //导入单价
         importDanjia(){
@@ -1761,7 +1815,6 @@ export default {
         },
         //查看工程量明细
         viewDetailThing(val){
-            //console.log(val);
             this.projList.baseObj = val.row;
             this.projList.showProject = true;
             this.duliProject.showProject = false;
