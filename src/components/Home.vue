@@ -95,10 +95,11 @@ export default {
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
             header:{
-                 userName:'',
-                 userId:'', 
-                 projectName:'华建Q系列工程协同应用系统',
-                 projectImg:'',
+                userName:'',
+                userId:'', 
+                //projectName:'华建Q系列工程协同应用系统',
+                projectName:'',
+                projectImg:'',
             },          
             navigationPath:'projectPage',
             activeIndex:'1',

@@ -158,7 +158,7 @@
                 <div class="editBody">
                     <div class="editBodytwo">
                         <label class="editInpText">资源包名 :</label><span>{{fileName}}</span>
-                        <label class="editInpText">资源大小 :</label><span>{{fileName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{fileSize}}</span>
                     </div>
                     <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
@@ -316,6 +316,7 @@ export default {
             deleteListObject:{},
             unityData:[],//场地资源包
             fileName:'未选择任何文件',
+            fileSize:'',
             filesList:[],
             fileUpdataPath:'',
             userId:'',
@@ -918,48 +919,52 @@ export default {
         //新增场地资源包
         addGroundSure(){
             var _this = this;
-            if(_this.platform == 'Web'){
-                _this.platform = 0;
-            }else if(_this.platform == 'Android'){
-                _this.platform = 4;
-            }else if(_this.platform == 'iOS'){
-                _this.platform = 3;
-            }
-            var editName =0;
-            _this.listData.forEach((item,index)=>{
-                if(item.Name == _this.bundlesrface){
-                    editName = item.ID
+            if(_this.filesList.length == 0){
+                alert("请选择上传的文件！");
+            }else{
+                if(_this.platform == 'Web'){
+                    _this.platform = 0;
+                }else if(_this.platform == 'Android'){
+                    _this.platform = 4;
+                }else if(_this.platform == 'iOS'){
+                    _this.platform = 3;
                 }
-            })
-            var returnUrl = _this.baseUrl+'/h2-bim-project/project2/upload/uploadBundleDataFile?holderId='+_this.groundInfo.siteId+'&mainAsset='+_this.editUnityName+'&assetComment='+_this.editUnityRemark+'&assetStatus='+_this.isLoading+'&platform'+_this.platform+'&buildSurface'+editName;
-            returnUrl = encodeURIComponent(returnUrl);
-            const formData = new FormData();
-            formData.append('projId',_this.projId);
-            formData.append('type','1');
-            formData.append('userId',_this.userId);
-            formData.append('modelCode','001');
-            formData.append('returnUrl',returnUrl)
-            formData.append('token',_this.token);
-            formData.append('file',_this.filesList[0]);
-            axios({
-                method:'post',
-                url:_this.fileUpdataPath + 'uploading/uploadFileInfo',
-                headers:{
-                    'Content-Type': 'multipart/form-data',
-                },
-                data:formData
-            }).then(response=>{
-                if(response.data.cd== '0'){
-                    _this.getUnityBundle()
-                    _this.addgroundShow = false;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    _this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
+                var editName =0;
+                _this.listData.forEach((item,index)=>{
+                    if(item.Name == _this.bundlesrface){
+                        editName = item.ID
+                    }
+                })
+                var returnUrl = _this.baseUrl+'/h2-bim-project/project2/upload/uploadBundleDataFile?holderId='+_this.groundInfo.siteId+'&mainAsset='+_this.editUnityName+'&assetComment='+_this.editUnityRemark+'&assetStatus='+_this.isLoading+'&platform'+_this.platform+'&buildSurface'+editName;
+                returnUrl = encodeURIComponent(returnUrl);
+                const formData = new FormData();
+                formData.append('projId',_this.projId);
+                formData.append('type','1');
+                formData.append('userId',_this.userId);
+                formData.append('modelCode','001');
+                formData.append('returnUrl',returnUrl)
+                formData.append('token',_this.token);
+                formData.append('file',_this.filesList[0]);
+                axios({
+                    method:'post',
+                    url:_this.fileUpdataPath + 'uploading/uploadFileInfo',
+                    headers:{
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    data:formData
+                }).then(response=>{
+                    if(response.data.cd== '0'){
+                        _this.getUnityBundle()
+                        _this.addgroundShow = false;
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        _this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                })
+            } 
         },
         selectImg(){
             this.$refs.file.click();
@@ -967,6 +972,7 @@ export default {
         fileChanged(){
             const list = this.$refs.file.files;
             this.fileName = list[0].name;
+            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
             this.filesList = list;
             this.editUnityBundleProperty = true;
             this.listData.forEach(item=>{
@@ -974,7 +980,11 @@ export default {
             })
         },
         editUnityBundlePropertySure(){
-            this.editUnityBundleProperty = false;
+            if(this.editUnityName == ''){
+                alert("资源名称不能为空！");
+            }else{  
+                this.editUnityBundleProperty = false;
+            }
         },
         editUnityBundlePropertyClose(){
             this.editUnityBundleProperty = false;

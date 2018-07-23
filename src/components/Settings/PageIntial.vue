@@ -194,7 +194,7 @@
                 <div class="editBody">
                     <div class="editBodytwo">
                         <label class="editInpText">资源包名 :</label><span>{{fileName}}</span>
-                        <label class="editInpText">资源大小 :</label><span>{{fileName}}</span>
+                        <label class="editInpText">资源大小 :</label><span>{{fileSize}}</span>
                     </div>
                     <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
@@ -288,6 +288,7 @@ export default {
         unityRemark:'',
         addgroundShow:false,
         fileName:'未选择任何文件',
+        fileSize:'',
         editgroundShow:false,
         editListShow:false,
         filesList:[],
@@ -796,44 +797,49 @@ export default {
         },
         //新增分区资源包
         addGroundSure(){
-            if(this.platform == 'Web'){
-                this.platform = 0;
-            }else if(this.platform == 'Android'){
-                this.platform = 4;
-            }else if(this.platform == 'iOS'){
-                this.platform = 3;
+            if(this.filesList.length == 0){
+                alert("请选择上传的文件!")
+            }else{
+                if(this.platform == 'Web'){
+                    this.platform = 0;
+                }else if(this.platform == 'Android'){
+                    this.platform = 4;
+                }else if(this.platform == 'iOS'){
+                    this.platform = 3;
+                }
+                var holderId = '';
+                this.partitionList.forEach((item,index)=>{
+                    if(item.Name == this.partitionListValue || index == this.partitionListValue){
+                        holderId = item.ID
+                    }
+                })
+                var returnUrl = this.BDMSUrl+'project2/upload/uploadBundleDataFile?holderId='+holderId+'&mainAsset='+encodeURIComponent(this.editUnityName)+'&assetComment='+encodeURIComponent(this.editUnityRemark)+'&assetStatus='+this.isLoading+'&platform'+this.platform+'&partitionSurface'+this.fenquwaipi;
+                returnUrl = encodeURIComponent(returnUrl);
+                const formData = new FormData();
+                formData.append('projId',this.projId);
+                formData.append('type','1');
+                formData.append('userId',this.userId);
+                formData.append('modelCode','001');
+                formData.append('returnUrl',returnUrl)
+                formData.append('token',this.token);
+                formData.append('file',this.filesList[0]);
+                axios({
+                    method:'post',
+                    url:this.fileUpdataPath + 'uploading/uploadFileInfo',
+                    headers:{
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    data:formData
+                }).then(response=>{
+                    if(response.data.cd== '0'){
+                        this.getUnityBundleByHolderId();
+                        this.addgroundShow = false;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
             }
-            var holderId = '';
-            this.partitionList.forEach((item,index)=>{
-                if(item.Name == this.partitionListValue || index == this.partitionListValue){
-                    holderId = item.ID
-                }
-            })
-            var returnUrl = this.BDMSUrl+'project2/upload/uploadBundleDataFile?holderId='+holderId+'&mainAsset='+encodeURIComponent(this.editUnityName)+'&assetComment='+encodeURIComponent(this.editUnityRemark)+'&assetStatus='+this.isLoading+'&platform'+this.platform+'&partitionSurface'+this.fenquwaipi;
-            returnUrl = encodeURIComponent(returnUrl);
-            const formData = new FormData();
-            formData.append('projId',this.projId);
-            formData.append('type','1');
-            formData.append('userId',this.userId);
-            formData.append('modelCode','001');
-            formData.append('returnUrl',returnUrl)
-            formData.append('token',this.token);
-            formData.append('file',this.filesList[0]);
-            axios({
-                method:'post',
-                url:this.fileUpdataPath + 'uploading/uploadFileInfo',
-                headers:{
-                    'Content-Type': 'multipart/form-data',
-                },
-                data:formData
-            }).then(response=>{
-                if(response.data.cd== '0'){
-                    this.getUnityBundleByHolderId();
-                    this.addgroundShow = false;
-                }else{
-                    alert(response.data.msg);
-                }
-            })
+            
         },
         groundClose(){
             this.addgroundShow = false;
@@ -996,6 +1002,7 @@ export default {
         fileChanged(){
             const list = this.$refs.file.files;
             this.fileName = list[0].name;
+            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
             this.filesList = list;
             this.editUnityBundleProperty = true;
         },

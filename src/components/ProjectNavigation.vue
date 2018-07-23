@@ -11,7 +11,7 @@
         <div class="conpanyContainer">
             <h1  class="h1-companybox">企业导航</h1>
             <ul class="companyBox">
-                <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId)" >
+                <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId,index)" >
                     <input type="hidden" name="companyId" :value="item.companyId">
                     <input type="hidden" name="type" :value="item.type">
                     <span class="companyImage">
@@ -53,7 +53,7 @@ export default {
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getProjectList();
-        vm.getUserInfo()
+        vm.getUserInfo();
     },
     methods:{
         logout(){
@@ -115,7 +115,7 @@ export default {
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
-                    vm.companyList = response.data.rt.companyList
+                    vm.companyList = response.data.rt.companyList;
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
                     var index = 0
@@ -171,7 +171,8 @@ export default {
                         path:'/login'
                     })
                 }
-                vm.companyList = response.data.rt
+                vm.companyList = response.data.rt;
+                
             }).catch(function(error){
                 vm.$router.push({
                   path:'/login'
@@ -210,10 +211,11 @@ export default {
                 })
             })
         },
-        redirect(key){
-           var vm = this
+        redirect(key,index){
+            var vm = this;
+            localStorage.setItem('projectName',this.companyList[index].companyName);
             vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+key
-            vm.initCompany()
+            vm.initCompany();
         }
     }
 }

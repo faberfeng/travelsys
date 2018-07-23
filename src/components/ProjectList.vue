@@ -1,6 +1,6 @@
 <template>
 <div class="wrapper">
-    <headerCommon :username="userName"></headerCommon>
+    <headerCommon :username="userName" :proname="titleName"></headerCommon>
     <div class="header-bar">
       <span class="bar-title">工程导航</span>
       <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
@@ -344,7 +344,8 @@ export default {
         userName:'',
         userId:'',
         styleTitle:'条形风格',
-        BDMSUrl:''
+        BDMSUrl:'',
+        titleName:'',
       }
   },
   components: {
@@ -360,6 +361,9 @@ export default {
       }
       vm.viewFlag()
       vm.getUserInfo()
+  },
+  created(){
+    this.titleName = localStorage.getItem('projectName');
   },
   methods:{
       changeStyle(){
