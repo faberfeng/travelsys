@@ -2604,7 +2604,6 @@ export default{
                             item.view=false;
                         }
                         this.taskStatusList.push(item);
-                    console.log('这是什么鬼东西'+JSON.stringify(this.taskStatusList))
                     })
                     
                    
@@ -2692,6 +2691,7 @@ export default{
                 if(response.data.cd=='0'){
                     this.getTaskStatusList();
                     this.updateTaskStatusColorDialog=false;
+                    this.taskStatusList=[];
                     this.value='';
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
