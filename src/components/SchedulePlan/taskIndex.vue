@@ -179,6 +179,7 @@
                             <i class="trrangle"></i>
                             关联清单
                             <i :class="[{'active':show.associationList},'icon-dropDown']" @click="show.associationList = show.associationList?false:true;"></i>
+                            <i class="el-icon-plus icon-dropDown1" @click="associationList()"></i>
                     </h3>
                     <ul id="associationList" :class="[{'show':show.associationList}]">
                         <li class="goujian-item" v-for="(item,index) in relaList" :key="index">
@@ -244,6 +245,30 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+            <div id="box-right1" v-if="screenLeft.item == 3" >
+                <div class="addResourceType"><i class="el-icon-plus action" @click="addResourceTask">增加</i></div>
+                <div class="resourceList" v-show="taskId">
+                    <table border="0" width='100%'>
+                        <thead>
+                            <tr>
+                                <th width="25%">类型</th>
+                                <th width="25%">单位</th>
+                                <th width="35%">总数量</th>
+                                <th width="15%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in taskResourceTaskList" :key="index">
+                                <td v-text="item.resourceTypeName"></td>
+                                <td v-text="item.unit"></td>
+                                <td v-text="item.amount"></td>
+                                <td><button class="deleteBtn actionBtn1"></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
         <div id="edit">
@@ -612,11 +637,11 @@
                 <div class="editBody">
                     <div class="verifySilder">
                         <label class="verifySilderText">核实比例:</label>
-                        <el-slider class="slider" v-model="value1"></el-slider>
+                        <el-slider class="slider" v-model="tvValue"></el-slider>
                     </div>
                     <div class="verifyTime">
                         <label class="verifySilderText">核实日期:</label>
-                        <el-date-picker v-model="verifyStartTime" type="date" placeholder="选择日期">
+                        <el-date-picker v-model="verifyStartTime" type="date"  placeholder="选择日期">
                         </el-date-picker>
                     </div>
                 </div>
@@ -625,6 +650,140 @@
                         <button class="editBtnC" @click="addVerifyTaskCancle" >取消</button>
                 </div>
             </el-dialog>
+            <el-dialog title="选择关联清单" :visible="addAssociationListDialog" @close="addAssociationListCancle">
+                <div class="editBody">
+                    <div class="bindListHead">
+                        <div class="bindListHeadLeft">
+                            <div>
+                                <label class="listText">清单名称关键字：</label>
+                            </div>
+                            <div>
+                                <input type="text" class="listInp" />
+                            </div>
+
+                        </div>
+                        <div class="bindListHeadRight">
+                            <div>
+                                <label class="listText">创建时间：</label>
+                            </div>
+                            <div>
+                                <el-date-picker type="date" >
+                                </el-date-picker>
+                                <!-- <el-date-picker class="time" type="date">
+                                </el-date-picker> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bindListHead">
+                        <div class="bindListHeadLeft">
+                            <label class="listText1">业务来源：</label>
+                            <select class="relaType" v-model="relaTypeValue">
+                                <option v-for="(item,index) in relaTypeList" :key="index" :value="item.value" v-text="item.label"></option>
+                            </select>
+                        </div>
+                        <div class="bindListHeadRight">
+                            <label class="listText1">业务状态：</label>
+                            <select class="serviceState" v-model="serviceStateValue">
+                                <option v-for="(item,index) in serviceStateList" :key="index" :value="item.value" v-text="item.label"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bindListsearchBtn">
+                        <button class="searchBtn">查询</button>
+                    </div>
+                    <div class="bindListTab">
+                        <label class="searchResultText">查询结果</label>
+                        <div class="searchTab">
+                            <table border="1" width='100%'>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>清单类型</th>
+                                        <th>清单ID</th>
+                                        <th>清单名称</th>
+                                        <th>明细数量</th>
+                                        <th>业务来源</th>
+                                        <th>业务状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in loadManifestList" :key="index">
+                                        <td><el-checkbox></el-checkbox></td>
+                                        <td v-text="parseType(item.type)"></td>
+                                        <td v-text="item.detailId"></td>
+                                        <td v-text="item.detailName"></td>
+                                        <td v-text="item.componentCount"></td>
+                                        <td v-text="parseMBSource(item.relaType)"></td>
+                                        <td v-text="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'" :title="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="datagrid-pager pagination" v-if="loadManifestList.length>0">
+                             <table cellspacing="0" cellpadding="0" border="0" >
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <select class="pagination-page-list" v-model="pageDetial_1.pagePerNum">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                                        </td>
+                                        <td>
+                                                <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                        </td>
+                                        <td>
+                                                <input class="pagination-num" type="text" v-model="pageDetial_1.currentPage">
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial_1.total/pageDetial_1.pagePerNum)}}页</span>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" @click="getLoadManifest()" class="btn-refresh btn-TAB"></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                             </table>
+                              <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial_1.pagePerNum+',共'+pageDetial_1.total+'记录'"></div>
+                                <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS">确定</button>
+                        <button class="editBtnC">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="添加资源类别" :visible="addResourceTaskDialog" @close="addResourceTaskCancle">
+            </el-dialog>
+
         </div>
         <div id="edit1">
             <el-dialog title="群组权限" :visible.sync="userGroupTaskDialog" @close="userGroupTaskCancle">
@@ -695,7 +854,7 @@ export default {
   name:'taskIndex',
   data(){
       return {
-        value1:0,//silder初始值
+        tvValue:0,//silder初始值
         radio:1, 
         token:'',
         projId:'',
@@ -719,6 +878,13 @@ export default {
         attachList:[],//绑定清单信息
         verifyList:[],//核实记录
         fileList:[],//文件关联
+        loadManifestList:[],//加载列表清单
+        taskResourceTaskList:[],//获取任务资源列表
+        pageDetial_1:{
+                pagePerNum:10,//一页几份数据
+                currentPage:1,//初始查询页数 第一页
+                total:'',//所有数据
+            },
         linkList:[],
         selectRowList:[],//获取选择列表信息
         taskId:'',
@@ -750,6 +916,71 @@ export default {
         //文件上传
         uploadFileDialog:false,//上传文件
         addVerifyTaskDialog:false,//增加核实任务
+        addAssociationListDialog:false,//选择关联清单
+        addResourceTaskDialog:false,//添加资源类别
+        relaTypeValue:"",
+        relaTypeList:[
+            {
+                value:0,
+                label:"全部"
+            },
+            {
+                value:2,
+                label:"文档管理-关联构件"
+            },
+            {
+                value:3,
+                label:"成本管理-报表快照"
+            },
+            {
+                value:4,
+                label:"成本管理-工程量"
+            },
+            {
+                value:5,
+                label:"成本管理-物料量"
+            },
+            {
+                value:6,
+                label:"物资采购-订货管理"
+            }
+        ],//业务来源
+        serviceStateValue:"",
+        serviceStateList:[
+            {
+                value:0,
+                label:"全部"
+            },
+            {
+                value:1,
+                label:"构件量核对完成"
+            },
+            {
+                value:3,
+                label:"工程量核对完成"
+            },
+            {
+                value:5,
+                label:"物料量核对完成"
+            },
+            {
+                value:4,
+                label:"已选型"
+            },
+            {
+                value:6,
+                label:"已订货"
+            },
+            {
+                value:7,
+                label:"已发货"
+            },
+            {
+                value:8,
+                label:"已签收"
+            }
+        ],//业务状态
+
         verifyStartTime:'',//核实任务开始时间
         uploadfilesList:[],//文件上传列表
         imageName:'',//上传文件名字
@@ -1030,6 +1261,14 @@ export default {
             var vm = this 
            this.getTaskList();
       },
+      'pageDetial_1.currentPage':function(val,oldval){
+          var vm = this
+          vm.getLoadManifest()
+      },
+      'pageDetial_1.pagePerNum':function(val,oldval){
+          var vm = this
+          vm.getLoadManifest()
+      },
 
   },
   computed:{
@@ -1057,6 +1296,41 @@ export default {
 
   },
   methods:{
+      //清单类型
+      parseType(val){
+          switch(val){
+              case 1:
+                return "构件量清单";
+              case 2:
+                return "工程量清单";
+              case 3:
+                return "物料量清单"
+              default:
+                return "";
+          }
+          
+      },
+      //业务来源
+       parseMBSource(mBSource) {
+        switch (mBSource) {
+            case 1:
+                return "文档管理-关联构件";
+            case 2:
+                return "进度计划-任务核实";
+            case 3:
+                return "成本管理-工程量";
+            case 4:
+                return "成本管理-物料量";
+            case 5:
+                return "物资采购-订货管理";
+            case 6:
+                return "讨论主题";
+            case 7:
+                return "成本管理-报表快照";
+            default:
+                return "";
+        }
+    },
         parseMStatus(mStatus){
                 // 施工现场
                 var constructionSite = mStatus.substring(0, 1);
@@ -1266,6 +1540,7 @@ export default {
             this.getTask();
             this.getVerifyList();
             this.getEntityRelation();
+            this.getTaskResourceTaskList();
       },
       //鼠标单击树形icon
       treeIconClick(row,rowIndex){
@@ -1280,7 +1555,27 @@ export default {
             })
             //  console.log(this.tableCollapse)
       },
-
+   
+      //获取任务资源列表
+      getTaskResourceTaskList(){
+          axios({
+              method:"post",
+              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/getTaskResourceTask',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                  taskId:this.taskId
+              }
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                  this.taskResourceTaskList=response.data.rt;
+                  console.log(this.taskResourceTaskList);
+              }else if(response.data.cd=="-1"){
+                  alert(resposne.data.msg)
+              }
+          })
+      },
       //获得新增/修改任务页面的负责群组
       getTaskUserGroupList(){
           if(this.taskId==''){
@@ -1370,6 +1665,30 @@ export default {
               }
           })
 
+      },
+      //加载清单列表
+      getLoadManifest(){
+          axios({
+              method:'post',
+              url:this.BDMSUrl+'/project2/schedule/loadManifest',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                  projectId:this.projId,
+                  page:this.pageDetial_1.currentPage,
+                  rows:this.pageDetial_1.pagePerNum,
+                  type:4
+              }
+          }).then(response=>{
+              if(response.data.cd=='0'){
+                  this.pageDetial_1.total=response.data.rt.total;
+                  this.loadManifestList=response.data.rt.rows;
+                  console.log(JSON.stringify(this.loadManifestList))
+              }else if(response.data.cd=='-1'){
+                  alert(response.dara.msg);
+              }
+          })
       },
       //获取绑定实体关系分组、绑定bim关系
       getEntityRelation(){
@@ -1874,15 +2193,48 @@ export default {
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addVerify',
+                headers:{
+                    'token':this.token
+                },
                 data:{
-                    
-
+                    taskVerify:{
+                        taskId:this.taskId,
+                        tvDate:moment(this.verifyStartTime).format("YYYY-MM-DD"),
+                        tvRate:this.tvValue
+                    }
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                this.getVerifyList();
+                this.tvValue=0;
+                // this.verifyStartTime="";
+                this.addVerifyTaskDialog=false;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
                 }
             })
-
         },
         addVerifyTaskCancle(){
+            this.verifyStartTime=0;
             this.addVerifyTaskDialog=false;
+        },
+        //点击关联清单
+        associationList(){
+            this.addAssociationListDialog=true;
+            this.relaTypeValue=this.relaTypeList[0].value;
+            this.serviceStateValue=this.serviceStateList[0].value;
+            this.getLoadManifest();
+        },
+        //取消关联清单
+        addAssociationListCancle(){
+            this.addAssociationListDialog=false;
+        },
+        //添加资源类别
+        addResourceTask(){
+            this.addResourceTaskDialog=true;
+        },
+        addResourceTaskCancle(){
+            this.addResourceTaskDialog=false;
         },
         //上传文件
         uploadFile(){
@@ -1959,6 +2311,56 @@ export default {
             this.deleteFileDialog=false;
             this.fileId='';
         },
+        changePage(val,isTop){//分页 0 -1 1 2
+                var vm = this; 
+                if(isTop){
+                    if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                        vm.$message('这已经是第一页!')
+                        return false
+                    }
+                    if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                        vm.$message('这已经是最后一页!')
+                        return false
+                    }
+                    switch(val){
+                        case 0:
+                            vm.pageDetial.currentPage = 1
+                            break;
+                        case -1:
+                            vm.pageDetial.currentPage--
+                            break;
+                        case 1:
+                            vm.pageDetial.currentPage++
+                            break;
+                        case 2:
+                            vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                            break;
+                    }
+                }else{
+                      if(vm.pageDetial_1.currentPage == 1 && (val == 0 || val == -1)){
+                        vm.$message('这已经是第一页!')
+                        return false
+                        }
+                        if(vm.pageDetial_1.currentPage >= Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum) && (val == 1 || val == 2)){
+                            vm.$message('这已经是最后一页!')
+                            return false
+                        }
+                        switch(val){
+                            case 0:
+                                vm.pageDetial_1.currentPage = 1
+                                break;
+                            case -1:
+                                vm.pageDetial_1.currentPage--
+                                break;
+                            case 1:
+                                vm.pageDetial_1.currentPage++
+                                break;
+                            case 2:
+                                vm.pageDetial_1.currentPage = Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum)
+                                break;
+                        }
+                }
+        },
         //删除任务关联文件(文件/图片)
         deleteFileMakeSure(){
             axios({
@@ -1982,6 +2384,7 @@ export default {
             })
 
         }
+        
 
   },
 }
@@ -2554,8 +2957,7 @@ export default {
                                 }
                             }
 
-                    }
-                   
+                    }  
                     .detial-item{
                         font-size: 12px;
                         line-height: 12px;
@@ -2598,115 +3000,179 @@ export default {
                         //     color:#333333;
                         // }
                     }
-                        .goujian-item{
-                                font-size: 12px;
-                                line-height: 12px;
-                                margin-top: 10px;
-                                padding: 10px;
-                                text-align: left;
-                                box-shadow: 0px 0px 8px rgba(93,94,94,.16);
-                                border-radius: 6px;
-                                .icon-goujian{
-                                    float: left;
-                                    width: 16px;
-                                    height: 16px;
-                                    margin-right: 10px;
-                                    cursor: pointer;
-                                }
-                                .icon-add{
-                                    background: url('../ManageCost/images/add.png')no-repeat 0 0;
-                                    margin-right: 75px;
-                                    &:hover{
-                                        background: url('../ManageCost/images/add1.png')no-repeat 0 0;
-                                    }
-                                }
-                                .icon-detial{
-                                    background: url('../ManageCost/images/detial.png')no-repeat 0 0;
-                                    &:hover{
-                                        background: url('../ManageCost/images/detial1.png')no-repeat 0 0;
-                                    } 
-                                }
-                                .icon-QRcode{
-                                    background: url('../ManageCost/images/qrcode.png')no-repeat 0 0;
-                                    &:hover{
-                                        background: url('../ManageCost/images/qrcode1.png')no-repeat 0 0;
-                                    } 
-                                }
-                                .icon-location{
-                                    background: url('../ManageCost/images/location.png')no-repeat 0 0;
-                                    width: 12px;
-                                    &:hover{
-                                        background: url('../ManageCost/images/location1.png')no-repeat 0 0;
-                                    } 
-                                }
-                                .icon-delete{
-                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
-                                    margin-right: 0;
-                                    &:hover{
-                                        background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
-                                    } 
-                                }
-                                .clearfix{
-                                    clear: both;
-                                    overflow: hidden;
-                                    content: "";
-                                    // margin-top:5px;
-                                }
-                                .detial-text-name{
-                                    color: #999999;
-                                    width: 65px;
-                                    display: inline-block;
-                                }
-                                .detial-text-value{
-                                    color: #333333;
-                                    max-width: 130px;
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                    white-space: nowrap;
-                                }
-                                .item-detial{
-                                    margin-top: 16px;
-                                    &:first-of-type{
-                                        margin-top: 10px;
-                                    }
-                                }
-                                &:first-of-type{
-                                    padding-top: 14px;
-                                }
-                        }
-                        #associationList{
-                            display: none;
-                        }
-                        .verifyList{
-                            .detial-item{
+                    .goujian-item{
                             font-size: 12px;
                             line-height: 12px;
-                            margin-top: 16px;
+                            margin-top: 10px;
+                            padding: 10px;
                             text-align: left;
-                            .detial-text-value1{
-                            // float: left;
-                            display: inline-block;
-                                color: #333333;
-                                width: 50px;
-                                // overflow-x: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                margin-left:20px;
-                                }
-                                .detial-text-value2{
-                                    display: inline-block;
-                            // float: left;
-                                color: #333333;
-                                // overflow-x: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                margin-left:40px;
-                                width: 85px;
+                            box-shadow: 0px 0px 8px rgba(93,94,94,.16);
+                            border-radius: 6px;
+                            .icon-goujian{
+                                float: left;
+                                width: 16px;
+                                height: 16px;
+                                margin-right: 10px;
+                                cursor: pointer;
+                            }
+                            .icon-add{
+                                background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 75px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
                                 }
                             }
-
-                        }
+                            .icon-detial{
+                                background: url('../ManageCost/images/detial.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('../ManageCost/images/detial1.png')no-repeat 0 0;
+                                } 
+                            }
+                            .icon-QRcode{
+                                background: url('../ManageCost/images/qrcode.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('../ManageCost/images/qrcode1.png')no-repeat 0 0;
+                                } 
+                            }
+                            .icon-location{
+                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                width: 12px;
+                                &:hover{
+                                    background: url('../ManageCost/images/location1.png')no-repeat 0 0;
+                                } 
+                            }
+                            .icon-delete{
+                                background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                margin-right: 0;
+                                &:hover{
+                                    background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                } 
+                            }
+                            .clearfix{
+                                clear: both;
+                                overflow: hidden;
+                                content: "";
+                                // margin-top:5px;
+                            }
+                            .detial-text-name{
+                                color: #999999;
+                                width: 65px;
+                                display: inline-block;
+                            }
+                            .detial-text-value{
+                                color: #333333;
+                                max-width: 130px;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+                            .item-detial{
+                                margin-top: 16px;
+                                &:first-of-type{
+                                    margin-top: 10px;
+                                }
+                            }
+                            &:first-of-type{
+                                padding-top: 14px;
+                            }
                     }
+                    #associationList{
+                        display: none;
+                    }
+                    .verifyList{
+                        .detial-item{
+                        font-size: 12px;
+                        line-height: 12px;
+                        margin-top: 16px;
+                        text-align: left;
+                        .detial-text-value1{
+                        // float: left;
+                        display: inline-block;
+                            color: #333333;
+                            width: 50px;
+                            // overflow-x: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            margin-left:20px;
+                            }
+                            .detial-text-value2{
+                                display: inline-block;
+                        // float: left;
+                            color: #333333;
+                            // overflow-x: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            margin-left:40px;
+                            width: 85px;
+                            }
+                        }
+
+                    }
+                }
+                #box-right1{
+                    .addResourceType{
+                        .action{
+                            color:#78a0f8;
+                            margin-left:-153px;
+                            cursor: pointer;
+                            font-size:12px;
+                            line-height: 12px;
+                            margin-top:10px;
+                            margin-bottom: 10px;
+                        }
+
+                            height: 30px;
+                            border-bottom: 1px solid #e6e6e6;
+                        }
+                    .resourceList{
+                        width: 100%;
+                        table{
+                            margin: 0 auto;
+                            width: 100%;
+                            border-collapse:collapse;
+                            // border-top: 1px solid #e6e6e6;
+                            border-bottom: 1px solid #e6e6e6;
+                            thead{
+                                background:#f2f2f2;
+                                tr{
+                                    th{
+                                        padding-left:10px;
+                                        height: 30px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        border-left: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #666666;
+
+                                    }
+                                }
+                            }
+                            tbody{
+                                background:#fff;
+                                tr{
+                                    td{
+                                        padding-left:10px;
+                                        height: 30px;
+                                        text-align: left;
+                                        font-size: 12px;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        border-left: 1px solid #e6e6e6;
+                                        color: #666666;
+                                        border-bottom: 1px solid #e6e6e6;
+                                        max-width: 80px;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+                }
         }
         .box-right-active{
             right: 0;
@@ -3052,10 +3518,178 @@ export default {
                                 font-size:14px;
                                 line-height:36px;
                             }
+                    }
+                    .bindListHead{
+                        margin-top:-5px;
+                        position: relative;
+                        .bindListHeadLeft{
+                            height: 80px;
+                            // border:1px solid red;
+                            width: 50%;
+                            background:#fff;
+                            .listText{
+                                font-size:14px;
+                                line-height: 14px;
+                                color:#666;
+                                display: inline-block;
+                                margin-left:-155px;
+                            }
+                            .listInp{
+                                width: 270px;
+                                 height: 34px;
+                                border: 1px solid #d1d1d1;
+                                border-radius: 4px;
+                                background: #fff;
+                                padding-left: 10px;
+                                margin-top:5px;
+                            }
+                            .relaType{
+                                width: 270px;
+                                height: 36px;
+                                position: relative;
+                                color: #333333;
+                                background-color: #fff;
+                                background-image: none;
+                                border: 1px solid #d1d1d1;
+                                border-radius: 4px;
+                                padding-left: 10px;
+                                padding-right: 20px;
+                                -webkit-box-sizing: border-box;
+                                box-sizing: border-box;
+                                font-size: 14px;
+                                outline: none;
+                                margin-top:10px;
+                                margin-left:5px;
+                            }
+                            .listText1{
+                                font-size:14px;
+                                line-height: 14px;
+                                color:#666;
+                                display: block;
+                                margin-left:-189px;
+                            }
                         }
-                         
+                        .bindListHeadRight{
+                            height: 80px;
+                            // border:1px solid red;
+                            width: 50%;
+                            background:#fff;
+                            position:absolute;
+                            top:0px;
+                            right: 0px;
+                            .listText{
+                                font-size:14px;
+                                line-height: 14px;
+                                color:#666;
+                                display: inline-block;
+                                margin-left:-155px;
+                            }
+                            .listText1{
+                                 font-size:14px;
+                                line-height: 14px;
+                                color:#666;
+                                display: block;
+                                margin-left:-208px;
+                            }
+                            .serviceState{
+                                width: 270px;
+                                height: 36px;
+                                position: relative;
+                                color: #333333;
+                                background-color: #fff;
+                                background-image: none;
+                                border: 1px solid #d1d1d1;
+                                border-radius: 4px;
+                                padding-left: 10px;
+                                padding-right: 20px;
+                                -webkit-box-sizing: border-box;
+                                box-sizing: border-box;
+                                font-size: 14px;
+                                outline: none;
+                                margin-top:10px;
+                                margin-left:-15px;
+                            }
+                        }
+                    }
+                    .bindListsearchBtn{
+                        height: 40px;
+                        margin-top:10px;
+                        .searchBtn{
+                            // float: left;
+                            margin-left: -480px;
+                            background: #fc3439;
+                            color: #fff;
+                            font-size: 14px;
+                            font-weight: normal;
+                            width: 111px;
+                            height: 36px;
+                            border: none;
+                            padding: 0;
+                            cursor: pointer;
+                            border-radius: 2px;
+                        }
+                    }
+                    .bindListTab{
+                        margin-top:20px;
+                        .searchResultText{
+                            display: block;
+                            font-size:14px;
+                            line-height:14px;
+                            color:#666666;
+                            margin-left:-534px;
+                        }
+                        .searchTab{
+                            width: 600px;
+                            height: 300px;
+                            overflow-y: auto;
+                            margin:10px auto 0px;
+                            table{
+                                border-collapse: collapse;
+                                border: 1px solid #e6e6e6;
+                                thead{
+                                    //  width: 600px;
+                                    //  position: fixed;
+                                    background: #f2f2f2;
+                                    th{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 31px;
+                                        text-align: left;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        font-weight: normal;
+                                        //  position: fixed;
+                                        td{
+
+                                        }
+                                    }
+                                }
+                                tbody{
+                                    tr{
+                                        td{
+                                            padding-left: 6px;
+                                            padding-right: 15px;
+                                            height: 31px;
+                                            text-align: left;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #e6e6e6;
+                                            font-size: 12px;
+                                            color: #333333;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }     
                 }
             }
+        }
+        #edit .el-input__inner{
+            width: 100px;
+            height:36px;
         }
          #inital{
             .deleteDialogImg{
@@ -3091,6 +3725,99 @@ export default {
     li{
         list-style: none;
     }
+     /**********一下是分页器的样式***************/
+        .datagrid-pager {
+            display: block;
+            height: 31px;
+            margin:0 auto;
+            width: 600px;
+            border:1px solid #d4d4d4;
+            // padding: 3px 4px;
+            box-sizing: border-box;
+            background: #f5f5f5;
+        }
+        .pagination{
+            border-top: none;
+        }
+        .pagination table {
+            float: left;
+            height: 30px;
+            th, td {
+                min-width: 5px;
+                padding: 0px;
+                margin: 0px;
+            }
+        }
+        .pagination-page-list {
+            margin: 0px 6px;
+            padding: 1px 2px;
+            width: 43px;
+            height: auto;
+            border-width: 1px;
+            border-style: solid;
+        }
+        .pagination .pagination-num {
+            border-color: #D4D4D4;
+            margin: 0 2px;
+            width: 30px;
+        }
+        .pagination-btn-separator {
+            float: left;
+            height: 24px;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #fff;
+            margin: 3px 1px;
+        }
+        .btn-TAB{
+            display: block;
+            width:26px;
+            height: 26px;
+            cursor: pointer;
+            position: relative;
+            &:hover{
+                box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+                border-radius: 5px;
+            }
+            &::after{
+                display: block;
+                position: absolute;
+                content: '';
+                width: 10px;
+                height: 10px;
+                background-size: 100% 100%; 
+                top: 8px;
+                left: 8px;
+            }
+        }
+        .btn-left0::after{
+            background-image: url('../../assets/fenye2.png');
+        }
+        .btn-left1::after{
+            background-image: url('../../assets/fenye1.png');
+        }
+        .btn-right0::after{
+            background-image: url('../../assets/fenye4.png');
+        }
+        .btn-right1::after{
+            background-image: url('../../assets/fenye3.png');
+        }
+        .btn-refresh::after{
+            background-image: url('../../assets/fenye5.png');
+        }
+        .pagination-title{
+            font-size: 14px;
+            color: #333333;
+        }
+        .pagination-info{
+            float: right;
+            margin-top: 5px;
+            margin-right: 25px;
+        }
+        .clearfix{
+            clear: both;
+            overflow: hidden;
+            content: '';
+        }
 //群组权限弹窗框
 #edit1 .el-dialog__header {
     height: 68px;
