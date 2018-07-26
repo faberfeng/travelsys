@@ -155,7 +155,7 @@
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
-                            <span class="detial-text-value" v-text="item.main.pkId"></span>
+                                <span class="detial-text-value" v-text="item.main.pkId"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">状态 :</span>

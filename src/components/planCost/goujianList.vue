@@ -126,7 +126,6 @@
                     <span class="left">
                         <i class="report icon"></i>快照报表
                     </span>
-                  
                 </p>
                 <table class="UserList" border="1" width='100%'>
                     <thead>

@@ -1367,7 +1367,7 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                                 this.attachList()
-                        }else if(response.data.cd = '-1'){
+                        }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
                         }else{
                             this.$router.push({
@@ -2368,6 +2368,7 @@ export default {
                         width: 460px;
                         height: 500px;
                         border-left:1px solid #e6e6e6;
+                        overflow-y: auto;
                         top:70px;
                         right: 0px;
                          table{
@@ -2542,8 +2543,8 @@ export default {
                     }
                     /* 上传文件按钮 */
                     .imageBody{
-                    text-align: left;
-                    }
+                        text-align: left;
+                        }
                     .imageBody .imageBodyText{
                             color: #666;
                             font-size: 14px;
