@@ -337,7 +337,7 @@
             </div>
             <div class="el-dialog__body">
                 <div class="clearfix" >
-                    <span class="item-attibuteAuth" v-for="(item,index) in showExpandTable" :key="index" v-if="index >=2">
+                    <span class="item-attibuteAuth" v-for="(item,index) in showExpandTable" :key="index">
                         <el-checkbox v-model="item.showModel">{{item.name}}</el-checkbox>
                     </span>
                 </div>
@@ -630,6 +630,7 @@ export default Vue.component('mapping-project',{
             this.ListHeaderShow = true;
             
         },
+        //确认显示扩展属性
         headerListConfirm(){
             this.showExpandTable.forEach((item,index)=>{
                 this.tableHeadData[index].showModel = item.showModel;
