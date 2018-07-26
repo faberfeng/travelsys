@@ -75,6 +75,7 @@
                 </div>
             </div>
         </div>
+        <!-- 测试提交 -->
         <div :class="[{'box-right-active':screenLeft.show},'box-right-container']">
             <div id="center-selection">
                     <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
