@@ -636,9 +636,9 @@
                             padding-left: 12px;
                             color: #333333;
                         }
-                        input.value-box{
+                        // input .value-box{
                            
-                        }
+                        // }
                         .icon-sanjiao{
                             display: block;
                             position: absolute;

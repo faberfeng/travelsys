@@ -29,7 +29,7 @@
                             <i class="target icon"></i>实时可追溯工程量清单
                         </span>
                         <span class="item-btn clearfix">
-                            <label @click="SHOWMain = false">配置映射</label>
+                            <label @click="configMapping">配置映射</label>
                             <label @click="generateBuildWorkAmount()">新建单体清单</label>
                             <label @click="showExtension()">新建自定义清单</label>
                         </span>
@@ -850,6 +850,12 @@ export default {
       
     },
     methods:{
+        //配置映射
+        configMapping(){
+            this.$router.push({
+                path:'/Cost/configmapping'
+            })
+        },
         //确认添加单体清单
         createConfirm(){
             var vm = this;
@@ -2309,8 +2315,7 @@ export default {
                         .listBtn{
                             background: url('./images/list.png') no-repeat;
                         }
-                        
-                         .refreshBtn{
+                        .refreshBtn{
                               background: url('./images/refresh.png') no-repeat;
                         }
                     }

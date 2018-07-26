@@ -3090,7 +3090,7 @@ export default {
             this.convenientInput = true;
             $('#CInput .el-dialog').draggable();
         },
-        saveConvenient(type){
+        saveConvenient(){
             if(this.inputGouJianType.length != 0){
                 this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
             }else {

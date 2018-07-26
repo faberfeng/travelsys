@@ -186,9 +186,9 @@ export default {
                         path:'/login'
                     })
                 }else{
-                    vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
-                    vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
-                    vm.getUserInfo()
+                    vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
+                    vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
+                    vm.getUserInfo();
                 }
             }).catch((err)=>{
                 console.log(err)

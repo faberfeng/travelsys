@@ -1,5 +1,5 @@
 <template>
-    <div id="projectList">
+    <div id="mappingproject">
         <!--左侧-->
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;overflow-y:auto;">
@@ -20,7 +20,7 @@
                             成本管理<i class="icon-sanjiao-right"></i>
                             <span style="cursor:pointer"  @click="back()">工程量清单</span>
                             <i class="icon-sanjiao-right"></i>
-                            <span class="strong">{{projObj.title}}【{{projObj.number}}】构件名称</span>
+                            <span class="strong">{{projObj.engineerName}}【{{projObj.classifyCode.split('-')[1]}}】构件名称</span>
                         </p>
                         <p class="header clearfix">
                              <span class="left_header">
@@ -30,36 +30,41 @@
                         <div class="project">
                             <el-table  :data="projObjArr" style="width:100%" border @expand-change="showRowInfo">
                                 <el-table-column type="expand">
-                                    <template slot-scope="props" >
-                                        <table class="UserList">
-                                            <thead>
-                                                <th>所在空间</th>
-                                                <th>原始文档</th>
-                                                <th>原始ID</th>
-                                                <th>构件名称</th>
-                                                <th>工程量</th>
-                                                <th>计量单位</th>
-                                                <th>综合单价</th>
-                                                <th>价格</th>
-                                                <th>操作</th>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index)">
-                                                    <td>{{item.inSpace}}</td>
-                                                    <td>{{item.originalFile}}</td>
-                                                    <td>{{item.originalId}}</td>
-                                                    <td>{{item.originalName}}</td>
-                                                    <td>{{item.dCount}}</td>
-                                                    <td>{{item.dUnit}}</td>
-                                                    <td>{{item.totalPrice}}</td>
-                                                    <td>{{item.colligatePrice}}</td>
-                                                    <td>
-                                                        <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
-                                                        <button class="listBtn actionBtn" title="特征" @click="seeProperty(item)"></button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <template slot-scope="props">
+                                        <div class="doubleTable">
+                                            <table  :class="[expandPrperty.length!=0?'UserListtwoLeft':'UserListtwoLeftone']">
+                                                <thead>
+                                                    <th>所在空间</th>
+                                                    <th>原始文档</th>
+                                                    <th>原始ID</th>
+                                                    <th>构件名称</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index,1)">
+                                                        <td>{{item.inSpace}}</td>
+                                                        <td>{{item.originalFile}}</td>
+                                                        <td>{{item.originalId}}</td>
+                                                        <td>{{item.originalName}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="UserListtwoRight" v-if="expandPrperty.length!=0">
+                                                <thead>
+                                                    <th v-for="(item,index) in tableHeadData" :key="index">{{item}}</th>
+                                                    <th>操作</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(item,index) in expandPrperty" :key="index" @click="clickDetailInfo(item,index,2)">
+                                                        <td v-for="(iteml,indexl) in item" :key="indexl">  
+                                                            <span >{{iteml[1]}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                         <div class="datagrid-pager pagination" >
                                             <table cellspacing="0" cellpadding="0" border="0" >
                                                 <tbody>
@@ -106,7 +111,7 @@
                                                             <div class="pagination-btn-separator"></div>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" @click="getComponentDetails(getComponentDetailsObj.detailIds)" class="btn-refresh btn-TAB"></a>
+                                                            <a href="javascript:void(0)" @click="loadMappingEntityInfo(getComponentDetailsObj.uuid)" class="btn-refresh btn-TAB"></a>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -134,31 +139,9 @@
                                    >
                                 </el-table-column>
                                 <el-table-column
-                                    label="工程量"
-                                    prop="amount"
-                                    align="center">
-                                </el-table-column>
-                                <el-table-column
                                     label="计量单位"
-                                    prop="amount"
+                                    prop="unit"
                                     align="center">
-                                </el-table-column>
-                                <el-table-column
-                                    label="综合单价"
-                                    prop="totalPrice"
-                                    align="center">
-                                </el-table-column>
-                                <el-table-column
-                                    label="价格"
-                                    prop="price"
-                                    align="center">
-                                </el-table-column>
-                                <el-table-column
-                                    label="操作"
-                                    align="center">
-                                    <template slot-scope="scope">
-                                        <button class="listBtn actionBtn" title="特征" @click="editProperty(scope)"></button>
-                                    </template>
                                 </el-table-column>
                             </el-table>
                         </div>
@@ -236,7 +219,7 @@
                             <span class="detial-text-value" :title="item[1]">{{item[1]}}</span>
                         </li>
                     </ul>
-                    <h3 class="header-attribute" style="margin-top: 33px;">
+                     <h3 class="header-attribute" style="margin-top: 33px;">
                         <i class="trrangle"></i>
                         关联文档
                         <i :class="[{'active':show.reactDocument},'icon-dropDown']" @click="show.reactDocument = show.reactDocument?false:true;"></i>
@@ -337,129 +320,37 @@
                             <span class="detial-text-name">是否修改</span>
                             <span class="detial-text-value">{{rowInfo.characterModifyTag?'是':'否'}}</span>
                         </li>
-                    </ul>
+                    </ul> 
                 </div>
             </div>
         </div>
-        <div v-if="editAllProperty.show"  id="edit" class="dialog dialog1">
-            <div class="el-dialog__header">
-                <span class="el-dialog__title">修改全部构件特征描述</span>
-                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="editOneAllPropertyCancel">
-                    <i class="el-dialog__close el-icon el-icon-close"></i>
-                </button>
-            </div>
-            <div class="el-dialog__body">
-                <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">特征描述 :</label><input class="inp danjia" disabled v-model="editAllProperty.propertyDescription"/></div>
-                    <div class="editBodyone"><label class="editInpText">原始描述 :</label><input class="inp danjia" disabled v-model="editAllProperty.orignDescription"/></div>
-                    <div class="editBodyone"><label class="editInpText">当前描述 :</label><input class="inp danjia" placeholder="请输入" v-model="editAllProperty.currentDescription"/></div>
-                </div>
-            </div>
-            <div class="el-dialog__footer">
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="bacAllkToOrign">全部恢复默认值</button>
-                    <button class="editBtnS" @click="editOneAllPropertySure">确定</button>
-                    <button class="editBtnC" @click="editOneAllPropertyCancel">取消</button>
-                </div>
-            </div>
-        </div>
-        <div v-if="editAllProperty.showWaring"  id="edit" class="dialog dialog2">
-            <div class="el-dialog__header">
-                <span class="el-dialog__title">请确认</span>
-                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="editAllPropertyCancel">
-                    <i class="el-dialog__close el-icon el-icon-close"></i>
-                </button>
-            </div>
-            <div class="el-dialog__body">
-                <div class="editBody">
-                    <p>该特征描述分组下所有构件的特征描述都将被修改！确定要继续吗？</p>
-                </div>
-            </div>
-            <div class="el-dialog__footer">
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="editAllPropertySure">确定</button>
-                    <button class="editBtnC" @click="editAllPropertyCancel">取消</button>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="editSingleProperty.show"  id="edit" class="dialog dialog1">
-            <div class="el-dialog__header">
-                <span class="el-dialog__title">修改构件特征描述</span>
-                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="editPropertyCancel">
-                    <i class="el-dialog__close el-icon el-icon-close"></i>
-                </button>
-            </div>
-            <div class="el-dialog__body">
-                <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">特征描述 :</label><input class="inp danjia" disabled v-model="editSingleProperty.propertyDescription"/></div>
-                    <div class="editBodyone"><label class="editInpText">原始描述 :</label><input class="inp danjia" disabled v-model="editSingleProperty.orignDescription"/></div>
-                    <div class="editBodyone"><label class="editInpText">当前描述 :</label><input class="inp danjia" placeholder="请输入" v-model="editSingleProperty.currentDescription"/></div>
-                </div>
-            </div>
-            <div class="el-dialog__footer">
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="backToOrign">全部恢复默认值</button>
-                    <button class="editBtnS" @click="editPropertySure">确定</button>
-                    <button class="editBtnC" @click="editPropertyCancel">取消</button>
-                </div>
-            </div>
-        </div>
-        <div v-if="editSingleProperty.showWaring"  id="edit" class="dialog dialog2">
-            <div class="el-dialog__header">
-                <span class="el-dialog__title">请确认</span>
-                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="showWaringCancel">
-                    <i class="el-dialog__close el-icon el-icon-close"></i>
-                </button>
-            </div>
-            <div class="el-dialog__body">
-                <div class="editBody">
-                    <p>
-                        <span style="color:red">提示1:</span> 当前构件的特征描述修改后，构件条目将会被移动到其他工程量条目组别或新的工程量条目组别中。
-                    </p>
-                    <p> 
-                        <span style="color:red">提示2:</span> 如果当前修改的构件为当前特征描述分组中最后一个构件，则当前特征分组将随之被删除。
-                    </p> 
-                </div>
-            </div>
-            <div class="el-dialog__footer">
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="showWaringSure">确认关闭</button>
-                    <button class="editBtnC" @click="showWaringCancel">取消</button>
-                </div>
-            </div>
-        </div>
-        <div id="mask" v-if="editAllProperty.show || editSingleProperty.show" ></div>
-        <div id="mask1" v-if="editAllProperty.showWaring || editSingleProperty.showWaring" ></div>
     </div>
 </template>
 <script>
 import Vue from 'vue';
 import axios from 'axios';
-import '../ManageCost/js/jquery-1.8.3.js'
-export default Vue.component('project-list',{
+
+export default Vue.component('mapping-project',{
     props:{
-        baseObj:Object,
-        mId:Number,
+        projData:Object,
+        entityNumber:String | Number,
     },
     data(){
-        return {
-            BDMSUrl:'',
-            token:'',
-            projId:'',
-            projObj:{},
-            mainifistId:'',
-            projObjArr:[],
+        return{
             screenLeft:{
                 show:false
             },
-            detailInfoObj:[],
+            showProperty:true,
+            projObj:{},
+            BDMSUrl:'',
+            token:'',
+            projId:'',
+            projObjArr:[],
             pageDetial:{
                 pagePerNum:20,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
-            getComponentDetailsObj:{},
             show:{
                 basicAttributes:true,
                 generalDesignInfo:true,
@@ -470,37 +361,23 @@ export default Vue.component('project-list',{
                 tezhengYingshe:true,
                 tezhengMiaosu:true,
             },
-            detailTableInfo:{},//右侧基本属性信息
+            detailInfoObj:[],//详细构件信息
+            expandPrperty:[],//扩展属性
+            tableHeadData:[],//扩展属性表头
+            detailTableInfo:{},
             mapInfo:{},
             ruleObject:{},//右侧规则信息
             entityClassify:[],
             extAttrs:[],
-            showProperty:true,
             rowInfo:{},
-            editAllProperty:{
-                show:false,
-                showWaring:false,
-                Data:[],
-                propertyDescription:'',
-                orignDescription:'',
-                currentDescription:'',
-            },
-            editSingleProperty:{
-                show:false,
-                showWaring:false,
-                Data:[],
-                propertyDescription:'',
-                orignDescription:'',
-                currentDescription:'',
-            }
         }
     },
     watch:{
         'pageDetial.currentPage':function(val,oldval){
-            this.getComponentDetails(this.getComponentDetailsObj.detailIds);
+            this.loadMappingEntityInfo(this.getComponentDetailsObj.uuid);
         },
         'pageDetial.pagePerNum':function(val,oldval){
-            this.getComponentDetails(this.getComponentDetailsObj.detailIds);
+            this.loadMappingEntityInfo(this.getComponentDetailsObj.uuid);
         },
         'show.basicAttributes':function(val){
             if(val){
@@ -560,55 +437,150 @@ export default Vue.component('project-list',{
         },
     },
     created(){
-        this.projObj = this.baseObj;
+        this.projObj = this.projData;
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
-        this.mainifistId = this.mId;
-        this.projObjArr = this.baseObj.children;
-        this.projObjArr.forEach(item=>{
-            if(item.characterValues.length!=0){
-                Object.assign(item,{
-                    description:item.characterValues[0].characterName+':'+item.characterValues[0].currCharacterValue
-                })
-            }
-        })
-        this.BDMSUrl = this.$store.state.BDMSUrl;  
+        this.BDMSUrl = this.$store.state.BDMSUrl; 
+        this.showEntityList();
     },
     methods:{
-        //返回
         back(){
             this.$emit('back');
-        },
-        //获取工程量分组后的构件明细信息
-        getComponentDetails(detailIds){
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/getComponentDetails',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    detailIds:detailIds,
-                    projId:this.projId,
-                    detailType:1,
-                    page:this.pageDetial.currentPage,
-                    rows:this.pageDetial.pagePerNum
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.detailInfoObj = response.data.rt.rows;
-                    this.pageDetial.total=response.data.rt.total;
-                }else{
-                    alert(response.data.msg)
-                }
-            })
         },
         showRowInfo(row, expandedRows){
             if(expandedRows.length>1){
                 expandedRows.shift();
             }
             this.getComponentDetailsObj = row;
-            this.getComponentDetails(row.detailIds);
+            this.loadMappingEntityInfo(row.uuid);
+        },
+        //获取映射的构件信息
+        loadMappingEntityInfo(currCacheId){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/loadMappingEntityInfo',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    page:this.pageDetial.currentPage,
+                    rows:this.pageDetial.pagePerNum,
+                    cacheId:currCacheId,
+                    genieclass:this.entityNumber,
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.detailInfoObj = response.data.rt;
+                    this.tableHeadData = [];
+                    this.expandPrperty = [];
+                    this.detailInfoObj[0].extendAttributes.forEach(item=>{
+                       this.tableHeadData.push(item[2]);
+                    })
+                    this.detailInfoObj.forEach((item,index)=>{
+                        this.expandPrperty.push(item.extendAttributes);
+                    });
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //显示指定工程量映射的构件列表
+        showEntityList(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/showEntityList',
+                headers:{
+                    token:this.token
+                },
+                data:{
+                    eCode:this.projObj.classifyCode.split('-')[1],
+                    cacheId:this.projObj.uuid,
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.projObjArr = response.data.rt;
+                    if(this.projObjArr!=null && this.projObjArr.length!=0){
+                        var str = '';
+                        this.projObjArr.forEach(item=>{
+                            if(item.characterValues.length!=0){
+                                item.characterValues.forEach(num=>{
+                                    str+=num.characterName+':'+num.currCharacterValue+';  ';
+                                })
+                            };
+                            Object.assign(item,{
+                                description:str,
+                            })
+                        })
+                    }
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //右侧属性面板
+        clickDetailInfo(item,index,num){
+            console.log(item);
+            this.screenLeft.show = true;
+            let tranceid = '';
+            let dGCCode = '';
+            let engineeringCodeParam = '';
+            if(num == 1){
+                tranceid = item.dTraceId;
+                dGCCode = item.dGCCode;
+                engineeringCodeParam = item.engineeringCode;
+                this.rowInfo = item;
+            }else if(num ==2){
+                tranceid = this.detailInfoObj[index].dTraceId;
+                dGCCode = this.detailInfoObj[index].dGCCode;
+                engineeringCodeParam = this.detailInfoObj[index].engineeringCode;
+                this.rowInfo = this.detailInfoObj[index];
+            }
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/getComponentInfoList',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    traceId:tranceid
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.detailTableInfo = response.data.rt;
+                    this.mapInfo = response.data.rt.mapInfo;
+
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/getWorkComponentInfoList',
+                headers:{
+                    token:this.token,
+                },
+                params:{
+                    projId:this.projId,
+                    engineeringCode:engineeringCodeParam,
+                    gcCode:dGCCode,
+                }
+            }).then(response=>{
+                console.log(response.data);
+                if(response.data.cd == 0){
+                    this.ruleObject = response.data.rt;
+                    this.entityClassify = response.data.rt.entityClassify;
+                    this.extAttrs = response.data.rt.extAttrs;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //定位
+        goToLocation(){
+            alert("请打开左侧面板!");
         },
         //表格页码改变时重新获取数据
         changePage(val, isTop) { //分页 0 -1 1 2
@@ -684,194 +656,6 @@ export default Vue.component('project-list',{
                 }
             }
         },
-        //点击表格中的详细信息
-        clickDetailInfo(item,index){
-            this.rowInfo = item;
-            this.screenLeft.show = true;
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/getWorkComponentInfoList',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    gcCode:item.dGCCode,
-                    engineeringCode:item.engineeringCode,
-                    projId:this.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.ruleObject = response.data.rt;
-                    this.entityClassify = response.data.rt.entityClassify;
-                    this.extAttrs = response.data.rt.extAttrs;
-                }else{
-                    alert(response.data.msg)
-                }
-            });
-
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/report/getComponentInfoList',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    traceId:item.dTraceId,
-                    projectId:this.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.detailTableInfo = response.data.rt;
-                    this.mapInfo = response.data.rt.mapInfo;
-                }else{
-                    alert(response.data.msg);
-                }
-            })
-        },
-        //定位
-        goToLocation(){
-            alert("请打开左侧面板!");
-        },
-        //修改单个构件特征描述
-        seeProperty(item){
-            this.editSingleProperty.show = true;
-            this.editSingleProperty.Data = item;
-            if(this.editSingleProperty.Data.characterValues.length!=0){
-                this.editSingleProperty.propertyDescription = this.editSingleProperty.Data.characterValues[0].characterName;
-                this.editSingleProperty.orignDescription = this.editSingleProperty.Data.characterValues[0].origCharacterValue;
-                this.editSingleProperty.currentDescription = this.editSingleProperty.Data.characterValues[0].currCharacterValue;
-            }
-        },
-        backToOrign(){
-                this.editSingleProperty.propertyDescription = '';
-                this.editSingleProperty.orignDescription = '';
-                this.editSingleProperty.currentDescription = '';
-        },
-        editPropertySure(){
-            this.editSingleProperty.showWaring = true;
-        },
-        editPropertyCancel(){
-            this.editSingleProperty.show = false;
-        },
-        //确认修改单个特征
-        showWaringSure(){
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/updateEntityCharacterValues',
-                headers:{
-                    token:this.token
-                },
-                data:[{
-                        id: this.editSingleProperty.Data.characterValues[0].id, 
-                        currCharacterValue: this.editSingleProperty.currentDescription,
-                        detailId:this.editSingleProperty.Data.characterValues[0].detailId
-                    }]
-                
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getComponentDetailsByCharacterDesc('single');
-                    this.editSingleProperty.showWaring = false;
-                    this.editSingleProperty.show = false;
-                }else{
-                    alert(response.data.msg);
-                }
-            })
-        },
-        //取消修改单个特征
-        showWaringCancel(){
-            this.editSingleProperty.showWaring = false;
-        },
-        //修改全部构件特征描述
-        editProperty(scope){
-            this.editAllProperty.Data = scope.row;
-            this.editAllProperty.show = true;
-            if(this.editAllProperty.Data.characterValues.length!=0){
-                this.editAllProperty.propertyDescription = this.editAllProperty.Data.characterValues[0].characterName;
-                this.editAllProperty.orignDescription = this.editAllProperty.Data.characterValues[0].origCharacterValue;
-                this.editAllProperty.currentDescription = this.editAllProperty.Data.characterValues[0].currCharacterValue;
-            }
-        },
-        //全部恢复默认值
-        bacAllkToOrign(){
-            this.editAllProperty.propertyDescription = this.editAllProperty.Data.characterValues[0].characterName;
-            this.editAllProperty.orignDescription = this.editAllProperty.Data.characterValues[0].origCharacterValue;
-            this.editAllProperty.currentDescription = this.editAllProperty.Data.characterValues[0].currCharacterValue;
-        },
-
-        editOneAllPropertySure(){
-            this.editAllProperty.showWaring = true;
-        },
-        editOneAllPropertyCancel(){
-            this.editAllProperty.show = false;
-        },
-        //确定修改全部特征
-        editAllPropertySure(){
-            var arr = this.editAllProperty.Data.detailIds.split(',');
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/batchUpdateEntityCharacterValues',
-                headers:{
-                    token:this.token,
-                },
-                data:{
-                    character:[{
-                            characterId: this.editAllProperty.Data.characterValues[0].characterId, 
-                            currCharacterValue: this.editAllProperty.currentDescription
-                        }],
-                    detailIds:arr
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getComponentDetailsByCharacterDesc('all');
-                    this.editAllProperty.show = false;
-                    this.editAllProperty.showWaring = false;
-                    this.editAllProperty.propertyDescription = '';
-                    this.editAllProperty.orignDescription = '';
-                    this.editAllProperty.currentDescription = '';  
-                }else{
-                    alert(response.data.msg);
-                }
-            })
-        },
-        //取消修改全部特征
-        editAllPropertyCancel(){
-            this.editAllProperty.showWaring = false;
-        },
-        //根据构件的特性描述获取指定的构件分组
-        getComponentDetailsByCharacterDesc(model){
-            var engineeringCode = '';
-            if(model == 'all'){
-                engineeringCode = this.editAllProperty.Data.number.substr(0,9);
-            }else if(model == 'single'){
-                engineeringCode = this.editSingleProperty.Data.engineeringCode;
-            }
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/report/getComponentDetailsByCharacterDesc',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    engineeringCode:engineeringCode,
-                    characterDesc:this.editAllProperty.propertyDescription+':'+this.editAllProperty.currentDescription,
-                    mId:this.mainifistId,
-                    projId:this.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.projObjArr = response.data.rt;
-                    this.projObjArr.forEach(item=>{
-                        if(item.characterValues.length!=0){
-                            Object.assign(item,{
-                                description:item.characterValues[0].characterName+':'+item.characterValues[0].currCharacterValue
-                            })
-                        }
-                    })
-                }else{
-                    alert(response.data.msg)
-                }
-            })
-        }
     }
 })
 </script>
@@ -879,9 +663,11 @@ export default Vue.component('project-list',{
 .navigation{
         z-index: 0!important;
     }
-#projectList{
-    
+#mappingproject{
     /**********model弹窗样式***************/
+    .project{
+        margin:0;
+    }
     #edit{ 
         .el-dialog{
             margin: 0 auto;
@@ -1017,13 +803,11 @@ export default Vue.component('project-list',{
     /**********一下是分页器的样式***************/
     .datagrid-pager{
         display: block;
-        margin: 0 20px;
         height: 31px;
         width: auto;
         box-sizing: border-box;
         background: #f5f5f5;
         margin: 0 10px 10px 10px;
-        width: 98%;
         overflow: hidden;
         tbody,tr{
             background: #f5f5f5!important;
@@ -1315,6 +1099,7 @@ export default Vue.component('project-list',{
             margin: 15px 0;
             border-bottom: 1px solid #e6e6e6;
             padding-bottom: 10px;
+            height: 27px;
             .left_header {
                 float: left;
                 font-size: 16px;
@@ -1445,6 +1230,7 @@ export default Vue.component('project-list',{
                     line-height: 12px;
                     margin-top: 16px;
                     text-align: left;
+                    list-style:none;
                 }
                 .detial-text-name{
                     color: #999999;
@@ -1482,6 +1268,106 @@ export default Vue.component('project-list',{
         transition: all ease .5s;
         border-left: 1px solid #cccccc;
     }
+    .doubleTable{
+        margin:10px 10px 0 10px;
+       display: flex;
+    }
+    .UserListtwoLeft{
+        width: 30%;
+        max-width: 40%;
+    }
+    .UserListtwoLeftone{
+        width: 100%;
+    }
+    .UserListtwoRight{
+        flex: 1;
+    }
+    .UserListtwoLeft,.UserListtwoRight,.UserListtwoLeftone{
+        border-collapse: collapse;
+        float: left;
+        .checkbox-att {
+            display: none;
+        }
+        th{
+            background: rgba(242, 242, 242, 1); 
+        }
+        .checkbox-fileItem {
+            float: left;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            position: relative;
+            margin-left: 4px;
+        }
+        .active {
+            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+            border: 1px solid #fc3439;
+        }
+        thead {
+            background: #f2f2f2;
+            th {
+                padding-left: 6px;
+                padding-right: 15px;
+                height: 55px;
+                text-align: left;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #333333;
+                font-weight: normal;
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding-left: 6px;
+                    padding-right: 15px;
+                    height: 55px;
+                    text-align: left;
+                    box-sizing: border-box;
+                    border-right: 1px solid #e6e6e6;
+                    font-size: 12px;
+                    color: #333333;
+                    .location {
+                        display: block;
+                        width: 12px;
+                        height: 16px;
+                        background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                        cursor: pointer;
+                    }
+                }
+                .Strong {
+                    font-weight: bold;
+                }
+                .deleteBtn {
+                    background: url('../../assets/delete.png') no-repeat;
+                }
+                .dataBtn {
+                    background: url('./images/data.png') no-repeat;
+                }
+                .listBtn {
+                    background: url('./images/list.png') no-repeat;
+                }
+                .refreshBtn {
+                    background: url('./images/refresh.png') no-repeat;
+                }
+                .location {
+                    display: block;
+                    width: 12px;
+                    height: 16px;
+                    background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                    cursor: pointer;
+                }
+            }
+            .activeTr {
+                background: #0081c2;
+                td {
+                    color: #fff !important;
+                }
+            }
+        }
+    }   
     .UserList{
         border-collapse: collapse;
         margin:10px 10px 0 10px;

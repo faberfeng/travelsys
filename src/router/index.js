@@ -110,11 +110,11 @@ const router = new Router({
           name:'inventory',
           component:resolve=>require(['@/components/planCost/inventory'],resolve)
         },
-        // {
-        //   path:'/Design/designversion',
-        //   name:'DesignVersion',
-        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
-        // },
+        {
+          path:'/Cost/configmapping',
+          name:'ConfigMapping',
+          component:resolve=>require(['@/components/planCost/ConfigMapping'],resolve)
+        },
         // {
         //   path:'/Design/designversion',
         //   name:'DesignVersion',
