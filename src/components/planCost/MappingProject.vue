@@ -23,8 +23,11 @@
                             <span class="strong">{{projObj.engineerName}}【{{projObj.classifyCode.split('-')[1]}}】构件名称</span>
                         </p>
                         <p class="header clearfix">
-                             <span class="left_header">
+                            <span class="left_header">
                                 <i class="list_ icon"></i>构件明细
+                            </span>
+                            <span class="left_headerRight" @click="expandPropertyFun">
+                                <i class="list_icon_right"></i>扩展属性
                             </span>
                         </p>
                         <div class="project">
@@ -50,12 +53,12 @@
                                             </table>
                                             <table class="UserListtwoRight" v-if="expandPrperty.length!=0">
                                                 <thead>
-                                                    <th v-for="(item,index) in tableHeadData" :key="index">{{item}}</th>
+                                                    <th v-for="(item,index) in tableHeadData" v-if="item.showModel" :key="index">{{item.name}}</th>
                                                     <th>操作</th>
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="(item,index) in expandPrperty" :key="index" @click="clickDetailInfo(item,index,2)">
-                                                        <td v-for="(iteml,indexl) in item" :key="indexl">  
+                                                        <td v-for="(iteml,indexl) in item" :key="indexl" v-if="iteml[3]">  
                                                             <span >{{iteml[1]}}</span>
                                                         </td>
                                                         <td>
@@ -324,6 +327,29 @@
                 </div>
             </div>
         </div>
+        <!--弹窗-->
+        <div v-if="ListHeaderShow"  id="edit" class="dialog">
+            <div class="el-dialog__header">
+                <span class="el-dialog__title">显示列</span>
+                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="headerListCancle">
+                    <i class="el-dialog__close el-icon el-icon-close"></i>
+                </button>
+            </div>
+            <div class="el-dialog__body">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth" v-for="(item,index) in showExpandTable" :key="index" v-if="index >=2">
+                        <el-checkbox v-model="item.showModel">{{item.name}}</el-checkbox>
+                    </span>
+                </div>
+            </div>
+            <div class="el-dialog__footer">
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="headerListConfirm">确定</button>
+                    <button class="editBtnC" @click="headerListCancle">取消</button>
+                </div>
+            </div>
+        </div>
+        <div id="mask" v-if="ListHeaderShow" ></div>
     </div>
 </template>
 <script>
@@ -370,6 +396,8 @@ export default Vue.component('mapping-project',{
             entityClassify:[],
             extAttrs:[],
             rowInfo:{},
+            ListHeaderShow:false,
+            showExpandTable:[],
         }
     },
     watch:{
@@ -473,13 +501,30 @@ export default Vue.component('mapping-project',{
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt;
                     this.tableHeadData = [];
+                    this.showExpandTable = [];
                     this.expandPrperty = [];
                     this.detailInfoObj[0].extendAttributes.forEach(item=>{
-                       this.tableHeadData.push(item[2]);
+                       this.tableHeadData.push({
+                           name:item[2],
+                           showModel:true,
+                       })
                     })
+
+                    this.detailInfoObj[0].extendAttributes.forEach(item=>{
+                       this.showExpandTable.push({
+                           name:item[2],
+                           showModel:true,
+                       })
+                    })
+
                     this.detailInfoObj.forEach((item,index)=>{
                         this.expandPrperty.push(item.extendAttributes);
                     });
+                    this.expandPrperty.forEach(item=>{
+                        item.forEach(itemone=>{
+                            itemone[3] = true;
+                        })
+                    })
                 }else{
                     alert(response.data.msg);
                 }
@@ -521,7 +566,6 @@ export default Vue.component('mapping-project',{
         },
         //右侧属性面板
         clickDetailInfo(item,index,num){
-            console.log(item);
             this.screenLeft.show = true;
             let tranceid = '';
             let dGCCode = '';
@@ -568,7 +612,6 @@ export default Vue.component('mapping-project',{
                     gcCode:dGCCode,
                 }
             }).then(response=>{
-                console.log(response.data);
                 if(response.data.cd == 0){
                     this.ruleObject = response.data.rt;
                     this.entityClassify = response.data.rt.entityClassify;
@@ -581,6 +624,27 @@ export default Vue.component('mapping-project',{
         //定位
         goToLocation(){
             alert("请打开左侧面板!");
+        },
+        //扩展属性
+        expandPropertyFun(){
+            this.ListHeaderShow = true;
+            
+        },
+        headerListConfirm(){
+            this.showExpandTable.forEach((item,index)=>{
+                this.tableHeadData[index].showModel = item.showModel;
+                this.expandPrperty.forEach(item1=>{
+                    item1.forEach((item2,index)=>{
+                        if(item2[2] == item.name){
+                            item2[3] = item.showModel;
+                        }
+                    })
+                })
+            })
+            this.ListHeaderShow = false;
+        },
+        headerListCancle(){
+            this.ListHeaderShow = false;
         },
         //表格页码改变时重新获取数据
         changePage(val, isTop) { //分页 0 -1 1 2
@@ -668,20 +732,10 @@ export default Vue.component('mapping-project',{
     .project{
         margin:0;
     }
-    #edit{ 
-        .el-dialog{
-            margin: 0 auto;
-        }
-    }
-    .dialog1{
-        z-index: 3001;
-    }
-    .dialog2{
-        z-index: 3003;
-    }
     .dialog{
         top: 15vh;
         left: 50%;
+        z-index: 3001;
         width: 660px;
         margin-left:-330px;
          border-radius: 5px;
@@ -755,25 +809,25 @@ export default Vue.component('mapping-project',{
                 position: relative;
                 padding-left:20px; 
                 cursor: pointer;
-                &::before{
-                    display: block;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 12px;
-                    height: 12px;
-                    border: 1px solid #cccccc;
-                    cursor: pointer;
-                    background: #fff;
-                    content: '';
-                }
+                // &::before{
+                //     display: block;
+                //     position: absolute;
+                //     top: 0;
+                //     left: 0;
+                //     width: 12px;
+                //     height: 12px;
+                //     border: 1px solid #cccccc;
+                //     cursor: pointer;
+                //     background: #fff;
+                //     content: '';
+                // }
             }
-            .active{
-                &::before{
-                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                    border: 1px solid #fc3439;
-                    }
-            }
+            // .active{
+            //     &::before{
+            //         background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+            //         border: 1px solid #fc3439;
+            //         }
+            // }
             .checkbox-arr{
                 display: none;
             }
@@ -789,17 +843,6 @@ export default Vue.component('mapping-project',{
         opacity: .5;
         background: #000;
     }
-    #mask1{
-        z-index: 3002;
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        opacity: .5;
-        background: #000;
-    }
-
     /**********一下是分页器的样式***************/
     .datagrid-pager{
         display: block;
@@ -1109,15 +1152,31 @@ export default Vue.component('mapping-project',{
                 padding-left: 30px;
                 position: relative;
                 .list_ {
-                background: url('./images/goujiandetail.png')no-repeat 0 0;
+                    background: url('./images/goujiandetail.png')no-repeat 0 0;
                 }
                 .icon {
-                display: block;
-                width: 20px;
-                height: 17px;
-                position: absolute;
-                top: 0;
-                left: 0;
+                    display: block;
+                    width: 20px;
+                    height: 17px;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                }
+            }
+            .left_headerRight{
+                float: right;
+                font-size: 14px;
+                line-height: 14px;
+                color: #666;
+                cursor: pointer;
+                .list_icon_right{
+                    background: url('./images/expandProperty.png') no-repeat;
+                    display: inline-block;
+                    width: 20px;
+                    height: 17px;
+                    position: relative;
+                    top: 4px;
+                    right: 10px;
                 }
             }
             .right_header {

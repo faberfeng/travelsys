@@ -1114,18 +1114,14 @@ export default {
         *未被映射
         */
         unmappingEntityList(scope){
-            
-            console.log(scope.row);
             if(scope.row.unmappingEntity == 0){
                 alert('当前分类编码下的所有构件都已成功映射');
             }else{
-                this.showMain = false;
+                // this.showMain = false;
             }
         },
         backToMappingConfig(){
-            this.$router.push({
-                path:'/Cost/configmapping'
-            })
+            this.showMain = true;
         }
     }
 }
