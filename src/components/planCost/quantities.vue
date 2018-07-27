@@ -316,8 +316,53 @@
                 </div>
             </el-dialog>
             <el-dialog title="新建可追溯工程量清单" :visible="editBySelfShow" @close="customCancle">
-                <div class="project">
-                    <div>
+                <div class="project1 project">
+                    <div class="projectTitle">
+                        <div class="projectTitleLeft">
+                            <el-radio>清单名称关键字：</el-radio>
+                            <div class="titleDiv">
+                                <input class="projectTitleLeftinp" v-model="newList.detailName"/>
+                            </div>
+                            <span class="yewulaiyuan">业务来源：</span>
+                            <div class="titleDiv">
+                                <select class="projectTitleLeftinp" v-model="newList.soureFrom">
+                                    <option value="0">全部</option>
+                                    <option value="1">进度计划-任务核实</option>
+                                    <option value="2">文档管理-关联构件</option>
+                                    <option value="3">成本管理-报表快照</option>
+                                </select>
+                                <i class="downAngle"></i>
+                            </div>
+                        </div>
+                        <div class="projectTitleRight">
+                            <el-radio>创建时间：</el-radio>
+                            <div class="titleDiv">
+                                <el-date-picker
+                                    class="projectTitleLeftinp"
+                                    v-model="newList.dataRange"
+                                    type="daterange"
+                                    range-separator="至"
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期">
+                                </el-date-picker>
+                            </div>
+                            <span class="yewulaiyuan">业务状态：</span>
+                            <div class="titleDiv">
+                                <select class="projectTitleLeftinp" v-model="newList.sourceSate">
+                                    <option value="0">全部</option>
+                                    <option value="1">构件量核对完成</option>
+                                    <option value="2">已计划</option>
+                                </select>
+                                <i class="downAngle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:hidden;">
+                        <button class="chaxun" @click="searchResult(true)">查询</button>
+                    </div>
+                    <div style="overflow:hidden;">
+                        <span class="searchresult">查询结果</span>
+                        <button class="selectsence" @click="selectScence">场景选择</button>
                         <table border="1" class="UserList" width="100%">
                             <thead>
                                 <tr  class="userList-thead">
@@ -329,7 +374,6 @@
                                     <th>业务来源</th>
                                     <th>业务状态</th>
                                     <th>创建时间</th>
-                                    <th>创建人</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -344,7 +388,6 @@
                                     <td>{{item.relaType_c}}</td>
                                     <td></td>
                                     <td>{{new Date(item.createTime).toLocaleString()}}</td>
-                                    <td>{{item.createUser}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -406,7 +449,6 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="selectScence">场景选择</button>
                     <button class="editBtnS" @click="customConfirm">确认</button>
                     <button class="editBtnC" @click="customCancle">取消</button>
                 </div>
@@ -812,7 +854,14 @@ export default {
             projList:{
                 showProject:false,
                 baseObj:{}
+            },
+            newList:{
+                dataRange:[],//日期区间
+                detailName:'',//关键字
+                soureFrom:'0',//业务来源
+                sourceSate:'0',//业务状态
             }
+            
         }
     },
     created(){
@@ -959,55 +1008,10 @@ export default {
                 console.log(err)
             })
         },
-        
         //新建自定义清单
         showExtension(){
             this.editBySelfShow = true;
-            var formData = new FormData();
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/loadManifest',
-                headers:{
-                    token:this.token,
-                },
-                params:{
-                    projectId:this.projId,
-                    type:1,
-                    page:this.customPageDetial.currentPage,
-                    rows:this.customPageDetial.pagePerNum
-                },
-                data:formData
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.customData = response.data.rt.rows;
-                    this.customPageDetial.total = response.data.rt.total;
-                    var type_c = '';
-                    var relaType_c ='';
-                    this.customData.forEach((item,index)=>{
-                        if(item.type == 1){
-                            type_c = '构件量清单';
-                        }else if(item.type == 2){
-                            type_c = '工程量清单';
-                        }else if(item.type == 3){
-                            type_c = '物料量清单';
-                        }
-                        if(item.relaType == 2){
-                            relaType_c = '进度计划-任务核实';
-                        }else if(item.relaType == 1){
-                            relaType_c = "文档管理-关联构件" ;
-                        }else if(item.relaType == 7){
-                            relaType_c = "成本管理-报表快照" ;
-                        }
-                        Object.assign(item,{
-                            type_c:type_c,
-                            relaType_c:relaType_c,
-                            isChecked:false
-                        })
-                    });
-                }else{
-                    alert(response.data.msg);
-                }
-            })
+            this.searchResult(false);
         },
         //确认
         customConfirm(){
@@ -1838,7 +1842,67 @@ export default {
             
             this.listItem.viewDetailObj = val;
         },
-       
+        //新建自定义清单查询
+        searchResult(flag){
+            let rangeData = [];
+            this.newList.dataRange.forEach(item=>{
+                rangeData.push(new Date(item).toLocaleString().split(' ')[0]);
+            });
+            if(flag){
+                this.customPageDetial.currentPage =1;
+            }
+            let formData = new FormData();
+            formData.append('detailName',this.newList.detailName|| '');
+            formData.append('startDate',rangeData[0] || '');
+            formData.append('endDate',rangeData[1] || '');
+            formData.append('serviceState',this.newList.sourceSate);
+            formData.append('relaType',this.newList.soureFrom);
+            formData.append('page',this.customPageDetial.currentPage);
+            formData.append('rows',this.customPageDetial.pagePerNum);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/loadManifest',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    type:1
+                },
+                data:formData
+            }).then(response=>{
+                console.log(response.data);
+                if(response.data.cd == 0){
+                    this.customData = response.data.rt.rows;
+                    this.customPageDetial.total = response.data.rt.total;
+                    var type_c = '';
+                    var relaType_c ='';
+                    this.customData.forEach((item,index)=>{
+                        if(item.type == 1){
+                            type_c = '构件量清单';
+                        }else if(item.type == 2){
+                            type_c = '工程量清单';
+                        }else if(item.type == 3){
+                            type_c = '物料量清单';
+                        }
+                        if(item.relaType == 2){
+                            relaType_c = '进度计划-任务核实';
+                        }else if(item.relaType == 1){
+                            relaType_c = "文档管理-关联构件" ;
+                        }else if(item.relaType == 7){
+                            relaType_c = "成本管理-报表快照" ;
+                        }
+                        Object.assign(item,{
+                            type_c:type_c,
+                            relaType_c:relaType_c,
+                            isChecked:false
+                        })
+                    });
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        }
     }
 }
 </script>
@@ -2163,8 +2227,87 @@ export default {
         .worktable{
             margin-bottom: 30px;
         }
+        .project1{
+            margin: 0 !important;
+            .projectTitle{
+                display: flex;
+                .projectTitleLeft,.projectTitleRight{
+                    width: 50%;
+                    overflow: hidden;
+                    .el-radio{
+                        float: left;
+                        margin-bottom: 5px;
+                    }
+                    .titleDiv,.yewulaiyuan{
+                        float: left;
+                    }
+                    .titleDiv{
+                        position: relative;
+                    }
+                    .downAngle{
+                        background: url('./images/sanjiao.png');
+                        width: 12px;
+                        height: 7px;
+                        display: block;
+                        position: absolute;
+                        top: 13px;
+                        left: 262px;
+                    }
+                    .yewulaiyuan{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        display: block;
+                        margin: 10px 0 5px 0;
+                    }
+                    .projectTitleLeftinp{
+                        width: 288px;
+                        height: 36px;
+                        padding-left: 10px;
+                        border:1px solid #d1d1d1;
+                    }
+                }
+                .projectTitleRight{
+                    width: 50%;
+                }
+            }
+            .chaxun{
+                width: 145px;
+                height: 35px;
+                background: #fc3439;
+                color: #fff;
+                border: none;
+                outline: none;
+                float: left;
+                margin:13px 0 0 0;
+                border-radius: 2px;
+                cursor: pointer;
+            }
+        }
         .project{
             margin: 0 20px;
+            .searchresult{
+                font-size: 12px;
+                line-height: 12px;
+                color: #999;
+                display: block;
+                float: left;
+                margin: 27px 0 13px 0;
+            }
+            .selectsence{
+                float: right;
+                width: 68px;
+                height: 24px;
+                background: #fff;
+                border:none;
+                outline: none;
+                margin: 20px 0 6px 0;
+                border: 1px solid #ccc;
+                border-radius: 1px;
+                font-size: 12px;
+                color: #666;
+                cursor: pointer;
+            }
             .editBtn{
                 background: url('../../assets/edit.png') no-repeat;
             }
