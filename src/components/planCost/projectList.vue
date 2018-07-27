@@ -242,7 +242,11 @@
                         <i :class="[{'active':show.reactDocument},'icon-dropDown']" @click="show.reactDocument = show.reactDocument?false:true;"></i>
                     </h3>
                     <ul id="reactDoc" :class="[{'show':show.reactDocument},'Att']">
-
+                        <li class="detial-item clearfix fileSection" v-for="(item,index) in fgList" :key="index">
+                            <i class="reactDocFileIcon"></i>
+                            <span class="detial-text-value fileIcon" :title="item.fgName">{{item.fgName}}</span>
+                            <i class="reactDocFileIconAfter" @click="preViewFile(item,index)"></i>
+                        </li>
                     </ul>
                 </div>
                 <div v-else>
@@ -492,7 +496,8 @@ export default Vue.component('project-list',{
                 propertyDescription:'',
                 orignDescription:'',
                 currentDescription:'',
-            }
+            },
+            fgList:[],//文件数组
         }
     },
     watch:{
@@ -723,6 +728,10 @@ export default Vue.component('project-list',{
                 if(response.data.cd == 0){
                     this.detailTableInfo = response.data.rt;
                     this.mapInfo = response.data.rt.mapInfo;
+                    //获取文件
+                    if(response.data.rt.fgList){
+                        this.fgList = response.data.rt.fgList;
+                    }
                 }else{
                     alert(response.data.msg);
                 }
@@ -871,6 +880,10 @@ export default Vue.component('project-list',{
                     alert(response.data.msg)
                 }
             })
+        },
+        //预览文件
+        preViewFile(item,index){
+            window.open('http://10.252.26.240:8080/qjbim-file'+item.filePath+'/preview?token='+this.token);
         }
     }
 })
@@ -1445,6 +1458,38 @@ export default Vue.component('project-list',{
                     line-height: 12px;
                     margin-top: 16px;
                     text-align: left;
+                }
+                //文件图标
+                .reactDocFileIcon{
+                    display: inline-block;
+                    width: 17px;
+                    height: 18px;
+                    background: url('./images/fileIcon.png') no-repeat;
+                    position: relative;
+                    top: 4px;
+                }
+                .fileIcon{
+                    margin: 0 5px;
+                }
+                .fileSection{
+                  padding-bottom: 0!important;
+                  margin-bottom: 7px;  
+                  cursor: pointer;
+                }
+                .fileSection:hover{
+                    background: rgba(243, 243, 243, 1);
+                }
+                .fileSection:hover .reactDocFileIconAfter{
+                    background: url('./images/fileIconHover.png') no-repeat;
+                }
+                .reactDocFileIconAfter{
+                    display: inline-block;
+                    width: 17px;
+                    height: 18px;
+                    background: url('./images/flieIconfter.png') no-repeat;
+                    position: relative;
+                    top: 4px;
+                    left: 10px;
                 }
                 .detial-text-name{
                     color: #999999;

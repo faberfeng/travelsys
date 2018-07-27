@@ -31,7 +31,7 @@
                             </span>
                         </p>
                         <div class="project">
-                            <el-table  :data="projObjArr" style="width:100%" border @expand-change="showRowInfo">
+                            <el-table  :data="projObjArr" style="width:100%" border @expand-change="showRowInfo" v-if="isMapped">
                                 <el-table-column type="expand">
                                     <template slot-scope="props">
                                         <div class="doubleTable">
@@ -147,6 +147,96 @@
                                     align="center">
                                 </el-table-column>
                             </el-table>
+                            <div v-if="!isMapped">
+                                <div class="doubleTable">
+                                    <table  :class="[expandPrperty.length!=0?'UserListtwoLeft':'UserListtwoLeftone']">
+                                        <thead>
+                                            <th>所在空间</th>
+                                            <th>原始文档</th>
+                                            <th>原始ID</th>
+                                            <th>构件名称</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index,1)">
+                                                <td>{{item.inSpace}}</td>
+                                                <td>{{item.originalFile}}</td>
+                                                <td>{{item.originalId}}</td>
+                                                <td>{{item.originalName}}</td>
+                                            </tr>
+                                        </tbody>
+                                        </table>
+                                        <table class="UserListtwoRight" v-if="expandPrperty.length!=0">
+                                            <thead>
+                                                <th v-for="(item,index) in tableHeadData" v-if="item.showModel" :key="index">{{item.name}}</th>
+                                                <th>操作</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(item,index) in expandPrperty" :key="index" @click="clickDetailInfo(item,index,1)">
+                                                    <td v-for="(iteml,indexl) in item" :key="indexl" v-if="iteml[3]">  
+                                                        <span >{{iteml[1]}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="datagrid-pager pagination" >
+                                        <table cellspacing="0" cellpadding="0" border="0" >
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
+                                                            <option value="20">20</option>
+                                                            <option value="30">30</option>
+                                                            <option value="40">40</option>
+                                                            <option value="50">50</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                                    </td>
+                                                    <td>
+                                                        <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
+                                                    </td>
+                                                    <td>
+                                                        <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" @click="loadMappingEntityInfo(getComponentDetailsObj.uuid)" class="btn-refresh btn-TAB"></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
+                                    <div style="clear:both;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,7 +318,11 @@
                         <i :class="[{'active':show.reactDocument},'icon-dropDown']" @click="show.reactDocument = show.reactDocument?false:true;"></i>
                     </h3>
                     <ul id="reactDoc" :class="[{'show':show.reactDocument},'Att']">
-
+                        <li class="detial-item clearfix fileSection" v-for="(item,index) in fgList" :key="index">
+                            <i class="reactDocFileIcon"></i>
+                            <span class="detial-text-value fileIcon" :title="item.fgName">{{item.fgName}}</span>
+                            <i class="reactDocFileIconAfter" @click="preViewFile(item,index)"></i>
+                        </li>
                     </ul>
                 </div>
                 <div v-else>
@@ -360,6 +454,7 @@ export default Vue.component('mapping-project',{
     props:{
         projData:Object,
         entityNumber:String | Number,
+        isMapped:Boolean,
     },
     data(){
         return{
@@ -398,6 +493,7 @@ export default Vue.component('mapping-project',{
             rowInfo:{},
             ListHeaderShow:false,
             showExpandTable:[],
+            fgList:[],//文件数组
         }
     },
     watch:{
@@ -469,7 +565,11 @@ export default Vue.component('mapping-project',{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 
-        this.showEntityList();
+        if(this.isMapped){
+            this.showEntityList();//构件列表时触发
+        }else{
+            this.loadUnMappingEntityInfo(this.projObj.unmappingUuid);//未被映射构件
+        }
     },
     methods:{
         back(){
@@ -481,6 +581,54 @@ export default Vue.component('mapping-project',{
             }
             this.getComponentDetailsObj = row;
             this.loadMappingEntityInfo(row.uuid);
+        },
+        //获取未被映射的构件信息
+        loadUnMappingEntityInfo(currCacheId){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/loadMappingEntityInfo',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    page:this.pageDetial.currentPage,
+                    rows:this.pageDetial.pagePerNum,
+                    cacheId:currCacheId,
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.detailInfoObj = response.data.rt.rows;
+                    this.pageDetial.total = response.data.rt.total;
+                    this.tableHeadData = [];
+                    this.showExpandTable = [];
+                    this.expandPrperty = [];
+                    if(this.detailInfoObj[0].extendAttributes != null && this.detailInfoObj[0].extendAttributes.length!=0){
+                        this.detailInfoObj[0].extendAttributes.forEach(item=>{
+                            this.tableHeadData.push({
+                                name:item[2],
+                                showModel:true,
+                            })
+                        })
+                        this.detailInfoObj[0].extendAttributes.forEach(item=>{
+                            this.showExpandTable.push({
+                                name:item[2],
+                                showModel:true,
+                            })
+                        })
+                        this.detailInfoObj.forEach((item,index)=>{
+                            this.expandPrperty.push(item.extendAttributes);
+                        });
+                    }
+                    this.expandPrperty.forEach(item=>{
+                        item.forEach(itemone=>{
+                            itemone[3] = true;
+                        })
+                    });
+                    
+                }else{
+                    alert(response.data.msg);
+                }
+            })
         },
         //获取映射的构件信息
         loadMappingEntityInfo(currCacheId){
@@ -499,7 +647,8 @@ export default Vue.component('mapping-project',{
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    this.detailInfoObj = response.data.rt;
+                    this.detailInfoObj = response.data.rt.rows;
+                    this.pageDetial.total = response.data.rt.total;
                     this.tableHeadData = [];
                     this.showExpandTable = [];
                     this.expandPrperty = [];
@@ -595,7 +744,10 @@ export default Vue.component('mapping-project',{
                 if(response.data.cd == 0){
                     this.detailTableInfo = response.data.rt;
                     this.mapInfo = response.data.rt.mapInfo;
-
+                    //获取文件
+                    if(response.data.rt.fgList){
+                        this.fgList = response.data.rt.fgList;
+                    }
                 }else{
                     alert(response.data.msg);
                 }
@@ -628,7 +780,6 @@ export default Vue.component('mapping-project',{
         //扩展属性
         expandPropertyFun(){
             this.ListHeaderShow = true;
-            
         },
         //确认显示扩展属性
         headerListConfirm(){
@@ -646,6 +797,10 @@ export default Vue.component('mapping-project',{
         },
         headerListCancle(){
             this.ListHeaderShow = false;
+        },
+        //预览文件
+        preViewFile(item,index){
+            window.open('http://10.252.26.240:8080/qjbim-file'+item.filePath+'/preview?token='+this.token);
         },
         //表格页码改变时重新获取数据
         changePage(val, isTop) { //分页 0 -1 1 2
@@ -810,25 +965,7 @@ export default Vue.component('mapping-project',{
                 position: relative;
                 padding-left:20px; 
                 cursor: pointer;
-                // &::before{
-                //     display: block;
-                //     position: absolute;
-                //     top: 0;
-                //     left: 0;
-                //     width: 12px;
-                //     height: 12px;
-                //     border: 1px solid #cccccc;
-                //     cursor: pointer;
-                //     background: #fff;
-                //     content: '';
-                // }
             }
-            // .active{
-            //     &::before{
-            //         background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-            //         border: 1px solid #fc3439;
-            //         }
-            // }
             .checkbox-arr{
                 display: none;
             }
@@ -1291,6 +1428,38 @@ export default Vue.component('mapping-project',{
                     margin-top: 16px;
                     text-align: left;
                     list-style:none;
+                }
+                //文件图标
+                .reactDocFileIcon{
+                    display: inline-block;
+                    width: 17px;
+                    height: 18px;
+                    background: url('./images/fileIcon.png') no-repeat;
+                    position: relative;
+                    top: 4px;
+                }
+                .fileIcon{
+                    margin: 0 5px;
+                }
+                .fileSection{
+                  padding-bottom: 0!important;
+                  margin-bottom: 7px;  
+                  cursor: pointer;
+                }
+                .fileSection:hover{
+                    background: rgba(243, 243, 243, 1);
+                }
+                .fileSection:hover .reactDocFileIconAfter{
+                    background: url('./images/fileIconHover.png') no-repeat;
+                }
+                .reactDocFileIconAfter{
+                    display: inline-block;
+                    width: 17px;
+                    height: 18px;
+                    background: url('./images/flieIconfter.png') no-repeat;
+                    position: relative;
+                    top: 4px;
+                    left: 10px;
                 }
                 .detial-text-name{
                     color: #999999;

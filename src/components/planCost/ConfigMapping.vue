@@ -80,7 +80,7 @@
             
             <!--构件列表-->
             <div v-if="!showMain">
-                <mapping-project :projData='entityObj' :entityNumber='entityNumber' @back="backToMappingConfig"></mapping-project>
+                <mapping-project :projData='entityObj' :entityNumber='entityNumber' :isMapped="isMapping" @back="backToMappingConfig"></mapping-project>
             </div>
         </div>
         <div id="ProjectTotalNumber">
@@ -451,7 +451,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    if(response.data.rt.rows.length != 0){
+                    if(response.data.rt.rows!=null && response.data.rt.rows.length != 0){
                         response.data.rt.rows.forEach(item=>{
                             this.singleData.push({
                                 value:item.ID,
@@ -544,7 +544,6 @@ export default {
                     no:rowData.no
                 }
             }).then(response=>{
-                console.log(response.data);
                 if(response.data.cd == 0){
                     this.refreshGouJian();
                 }else{
@@ -556,7 +555,6 @@ export default {
         */
         addMapping(scope){
             this.addMappingData = scope.row;
-            console.log(this.addMappingData);
             this.addProjectMapped.show = true;
             this.loadFirstSelectData();
         },
@@ -1100,10 +1098,9 @@ export default {
         *构件列表
         */
         entityList(scope){
-            console.log(scope.row);
             this.getEntityNumber(this.mappingData,scope.row.level);
             this.entityObj = scope.row;
-            
+            this.isMapping = true;
             if(scope.row.entityNum == 0){
                 alert('当前工程量分类下没有符合计量条件的构件数据');
             }else{
@@ -1114,12 +1111,16 @@ export default {
         *未被映射
         */
         unmappingEntityList(scope){
+            this.getEntityNumber(this.mappingData,scope.row.level);
+            this.entityObj = scope.row;
+            this.isMapping = false;
             if(scope.row.unmappingEntity == 0){
                 alert('当前分类编码下的所有构件都已成功映射');
             }else{
-                // this.showMain = false;
+                this.showMain = false;
             }
         },
+        //子组件触发的函数
         backToMappingConfig(){
             this.showMain = true;
         }
