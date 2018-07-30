@@ -1269,33 +1269,42 @@ export default {
         },
         //确认新增
         customConfirm(){
+            let num = 0;
+            this.selcetedItem ={};
             this.customData.forEach(item=>{
                 if(item.isChecked == true){
+                    num+=1;
                     this.selcetedItem = item;
-                    let formData = new FormData();
-                    formData.append('detailId',item.detailId);
-                    formData.append('relaType',item.relaType);
-                    formData.append('projectId',this.projId);
-                    formData.append('componentCount',item.componentCount);
-                    axios({
-                        method:'post',
-                        url:this.BDMSUrl+'project2/report/verifyAddMaterialDetail',
-                        headers:{
-                            token:this.token
-                        },
-                        data:formData
-                    }).then(response=>{
-                        this.shureToImportshow = true;
-                        this.editBySelfShow = false;
-                        this.checkedResults = response.data.rt.dataProfiling;
-                        if(JSON.stringify(response.data.rt.checkResults)=='{}'){
-                            this.jiapyanResult = '所有数据校验通过!';
-                        }else{
-                            this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
-                        }
-                    })
                 }
             })
+            if(num == 1){
+                let formData = new FormData();
+                formData.append('detailId',this.selcetedItem.detailId);
+                formData.append('relaType',this.selcetedItem.relaType);
+                formData.append('projectId',this.projId);
+                formData.append('componentCount',this.selcetedItem.componentCount);
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/verifyAddMaterialDetail',
+                    headers:{
+                        token:this.token
+                    },
+                    data:formData
+                }).then(response=>{
+                    this.shureToImportshow = true;
+                    this.editBySelfShow = false;
+                    this.checkedResults = response.data.rt.dataProfiling;
+                    if(JSON.stringify(response.data.rt.checkResults)=='{}'){
+                        this.jiapyanResult = '所有数据校验通过!';
+                    }else{
+                        this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
+                    }
+                })
+            }else if(num == 0){
+                alert('请选择要导入的清单！');
+            }else{
+                alert('只能选择一个导入的清单！');
+            }
         },
         //确认导入
         sureToImport(){

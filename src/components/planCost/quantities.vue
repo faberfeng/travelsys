@@ -860,7 +860,8 @@ export default {
                 detailName:'',//关键字
                 soureFrom:'0',//业务来源
                 sourceSate:'0',//业务状态
-            }
+            },
+            selectedItem:{}
             
         }
     },
@@ -1015,11 +1016,21 @@ export default {
         },
         //确认
         customConfirm(){
+            let num =0 ;
+            this.selectedItem ={};
             this.customData.forEach((item,index)=>{
                 if(item.isChecked == true){
-                    this.fromComponentListToEngineeringList(item.detailId, 3, item.relaType);
+                    num+= 1; 
+                    this.selectedItem = item;
                 }
             })
+            if(num == 1){
+                this.fromComponentListToEngineeringList(this.selectedItem.detailId, 3, this.selectedItem.relaType);
+            }else if(num == 0){
+                alert('请选择要导入的清单！');
+            }else{
+                alert('只能选择一个导入的清单！');
+            }
         },
         //取消
         customCancle(){
