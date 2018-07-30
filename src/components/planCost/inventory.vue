@@ -29,7 +29,7 @@
                         <span class="left">
                             <i class="target icon"></i>可追溯物料量清单
                         </span>
-                        <a class="right" href="javascript:void(0)">+新增</a>
+                        <a class="right" @click="addNewWuliao">+新增</a>
                     </p>
                     <table class="UserList" border="1" width='100%'>
                         <thead>
@@ -87,10 +87,10 @@
                                         <div class="pagination-btn-separator"></div>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,true)"></a>
+                                    <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,true)"></a>
+                                    <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
                                 </td>
                                 <td>
                                         <div class="pagination-btn-separator"></div>
@@ -108,10 +108,10 @@
                                     <div class="pagination-btn-separator"></div>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,true)"></a>
+                                    <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,true)"></a>
+                                    <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
                                 </td>
                                 <td>
                                     <div class="pagination-btn-separator"></div>
@@ -133,7 +133,6 @@
                         </span>
                         <a class="right" href="javascript:void(0)" @click="importExcel()">导入</a>
                     </p>
-                   
                     <table class="UserList" border="1" width='100%'>
                         <thead>
                             <tr  class="userList-thead">
@@ -157,7 +156,7 @@
                                 <td v-text="val.createUserName"></td>
                                 <td v-text="initData(val.createDate)"></td>
                                 <td >
-                                    <button class="detailBtn actionBtn" title="明细"  @click="edit(val)" ></button>
+                                    <button class="detailBtn actionBtn" title="明细"  @click="viewDetail(val)" ></button>
                                     <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.id,0)" ></button>
                                 </td>
                             </tr>
@@ -185,10 +184,10 @@
                                         <div class="pagination-btn-separator"></div>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0)"></a>
+                                    <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1)"></a>
+                                    <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
                                 </td>
                                 <td>
                                         <div class="pagination-btn-separator"></div>
@@ -206,10 +205,10 @@
                                     <div class="pagination-btn-separator"></div>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1)"></a>
+                                    <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2)"></a>
+                                    <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
                                 </td>
                                 <td>
                                     <div class="pagination-btn-separator"></div>
@@ -326,7 +325,7 @@
                     <button class="editBtnC" @click="setColumnCancle">取消</button>
                 </div>
             </el-dialog>
-             <el-dialog title="数据概况" :visible="showColumn" @close="importCancle">
+            <el-dialog title="数据概况" :visible="showColumn" @close="importCancle">
                 <div class="editBody">
                     <div class="editBodytwo imageBody">
                         <label class=" imageBodyText">可识别的物料量条目数 :</label>
@@ -362,486 +361,170 @@
                     <button class="editBtnC" @click="importCancle">取消</button>
                 </div>
             </el-dialog>
+            <!--由李从文增加-->
+            <el-dialog title="新建可追溯物料量清单" :visible="editBySelfShow" @close="customCancle">
+                <div class="project1 project">
+                    <div class="projectTitle">
+                        <div class="projectTitleLeft">
+                            <el-radio>清单名称关键字：</el-radio>
+                            <div class="titleDiv">
+                                <input class="projectTitleLeftinp" v-model="newList.detailName"/>
+                            </div>
+                            <span class="yewulaiyuan">业务来源：</span>
+                            <div class="titleDiv">
+                                <select class="projectTitleLeftinp" v-model="newList.sourceFrom">
+                                    <option value="0">全部</option>
+                                    <option value="1">进度计划-任务核实</option>
+                                    <option value="2">文档管理-关联构件</option>
+                                    <option value="3">成本管理-报表快照</option>
+                                </select>
+                                <i class="downAngle"></i>
+                            </div>
+                        </div>
+                        <div class="projectTitleRight">
+                            <el-radio>创建时间：</el-radio>
+                            <div class="titleDiv">
+                                <el-date-picker
+                                    class="projectTitleLeftinp"
+                                    v-model="newList.dataRange"
+                                    type="daterange"
+                                    range-separator="至"
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期">
+                                </el-date-picker>
+                            </div>
+                            <span class="yewulaiyuan">业务状态：</span>
+                            <div class="titleDiv">
+                                <select class="projectTitleLeftinp" v-model="newList.sourceState">
+                                    <option value="0">全部</option>
+                                    <option value="1">构件量核对完成</option>
+                                    <option value="2">已计划</option>
+                                </select>
+                                <i class="downAngle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:hidden;">
+                        <button class="chaxun" @click="searchResult(true)">查询</button>
+                    </div>
+                    <div style="overflow:hidden;">
+                        <span class="searchresult">查询结果</span>
+                        <button class="selectsence" @click="selectScence">场景选择</button>
+                        <table border="1" class="UserList" width="100%">
+                            <thead>
+                                <tr  class="userList-thead">
+                                    <th>操作</th>
+                                    <th>清单类型</th>
+                                    <th>清单ID</th>
+                                    <th>清单名称</th>
+                                    <th>明细数量</th>
+                                    <th>业务来源</th>
+                                    <th>业务状态</th>
+                                    <th>创建时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in  customData" :key="index">
+                                    <td>
+                                        <input type="checkbox" v-model="item.isChecked"/>
+                                    </td>
+                                    <td>{{item.type_c}}</td>
+                                    <td>{{item.detailId}}</td>
+                                    <td>{{item.detailName}}</td>
+                                    <td>{{item.componentCount}}</td>
+                                    <td>{{item.relaType_c}}</td>
+                                    <td></td>
+                                    <td>{{new Date(item.createTime).toLocaleString()}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div  class="datagrid-pager pagination">
+                            <table cellspacing="0" cellpadding="0" border="0" >
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <select class="pagination-page-list" v-model="customPageDetial.pagePerNum">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'3')"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'3')"></a>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                        </td>
+                                        <td>
+                                            <input class="pagination-num" type="text" v-model="customPageDetial.currentPage">
+                                        </td>
+                                        <td>
+                                            <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(customPageDetial.total/customPageDetial.pagePerNum)}}页</span>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'3')"></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'3')"></a>
+                                        </td>
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" @click="reSearchResult" class="btn-refresh btn-TAB"></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-info pagination-title" v-text="'显示1到'+customPageDetial.pagePerNum+',共'+customPageDetial.total+'记录'"></div>
+                            <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="customConfirm">确认</button>
+                    <button class="editBtnC" @click="customCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="校验结果" :visible="shureToImportshow" @close="createCancle">
+                <div class="editBody">
+                    <p>{{jiapyanResult}}</p>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="sureToImport">确定导入</button>
+                    <button class="editBtnC" @click="notSureToImport">取消导入</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="数据概况" :visible="shujugaikuangshow" @close="shujuNotSure" class="shuju">
+                <div class="editBody shujugaikuang">
+                    <p><label>新建创建可追溯的物料量清单结果统计:</label><span></span></p>
+                    <p><label>待导入的构件的总数:</label><span>{{checkedResults.hasOut}}</span></p>
+                    <p><label>可出物料量的构件数:</label><span>{{checkedResults.totalCount}}</span></p>
+                    <p><label>可出物料量条目数:</label><span>{{checkedResults.itemsCount}}</span></p>
+                    <p><label>可出物料量总价:</label><span>{{checkedResults.totalPrice}}</span></p>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="shujuSure">确定导入</button>
+                    <button class="editBtnC" @click="shujuNotSure">取消导入</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
-<style lang="less" >
-    #inventory{
-        .el-dialog{
-            margin: 0 auto;
-        }
-        .topHeader{
-            box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
-            overflow: auto;
-        }
-        #item-box-file{
-            display: block;
-            border-bottom: 1px solid #e6e6e6;
-            height: 49px;
-            padding-top: 16px;
-            padding-left:20px; 
-            background: #fafbfc;
-            position: relative;
-              .label-item{
-                    float: left;
-                    height: 34px;
-                    font-size: 14px;
-                    width:106px;
-                    text-align: center;
-                    line-height: 30px;
-                    cursor: pointer;
-                    border-top: 3px solid #fafbfc;
-                    color: #999999;
-                    text-decoration: none;
-                }
-                .label-item-active{
-                    color: #fc3439;
-                    font-weight: bold;
-                    border-top: 3px solid #fc3439;
-                    border-left: 1px solid #e6e6e6;
-                    border-right: 1px solid #e6e6e6;
-                    border-bottom: 1px solid #fff;
-                    background: #ffffff;
-                }
-                .header{
-                    position: absolute;
-                    display: block;
-                    top: 13px;
-                    right: 50px;
-                    overflow: hidden;
-                    .singelOne{
-                        float: left;
-                        color: #999;
-                        font-size: 12px;
-                        height: 30px;
-                        line-height: 30px;
-                        margin-right: 10px;
-                    }
-                }
-        }
-        .selectOption{
-            position: relative;
-            width: 212px;
-            float: left;
-            select{
-                height: 28px;
-                width: 212px;
-                border-radius: 28px;
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                padding-left: 10px;
-                border: 1px solid #ccc;
-            }
-            .icon-sanjiaoone{
-                display: block;
-                position: absolute;
-                width: 12px;
-                height: 7px;
-                background-image:url('../ManageDesign/images/sanjiao.png');
-                background-size: 100% 100%;
-                content: '';
-                top: 13px;
-                left: 180px;
-            }
-        }
-         .project{
-             margin: 0 20px;
-            .header{
-                border-bottom: 2px solid #e6e6e6;
-                margin: 20px 0;
-                padding-bottom: 10px;
-                .left{
-                    float: left;
-                    font-size: 16px;
-                    line-height: 16px;
-                    color: #fc3439;
-                    font-weight: bold;
-                    padding-left:30px;
-                    position: relative;
-                    .reportS{
-                        background: url('./images/listS.png')no-repeat 0 0;
-                    } 
-                    .target{
-                        background: url('./images/target.png')no-repeat 0 0;
-                    } 
-                    .icon{
-                       display: block;
-                        width: 20px;
-                        height: 17px;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                    }
-                }
-                .item-btn{
-                    float: right;
-                    label,.label-item{
-                        float:left;
-                        width:auto;
-                        height:26px;
-                        padding: 0 9px;
-                        border-top: 1px solid #e6e6e6;
-                        border-bottom: 1px solid #e6e6e6;
-                        text-align:center;
-                        line-height:24px;
-                        font-size:12px;
-                        color:#666666;
-                        cursor: pointer;
-                        border-left: 1px solid #e6e6e6;
-                        &:first-of-type{
-                        border-top-left-radius: 2px;
-                        border-bottom-left-radius: 2px;
-                        }
-                        &:last-of-type{
-                        border-right: 1px solid #e6e6e6;
-                        border-top-right-radius: 2px;
-                        border-bottom-right-radius: 2px;
-                        }
-                    }
-                    .label-item{
-                            border-right: none!important;
-                    }
-                }
-                .right{
-                    text-decoration: none;
-                    float: right;
-                    font-size: 14px;
-                    color: #336699;
-                    line-height: 14px;
-                    margin-top:4px; 
-                }
-            }
-            .UserList{
-                border-collapse: collapse;
-                border: 1px solid #e6e6e6;
-                .checkbox-att{
-                    display:none;
-                }
-                .checkbox-fileItem{
-                    float: left;
-                    width: 14px;
-                    height: 14px;
-                    border: 1px solid #cccccc;
-                    cursor: pointer;
-                    position: relative;
-                    margin-left:4px;
-                }
-                .active{
-                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                    border: 1px solid #fc3439;
-                }
-                thead{
-                    background: #f2f2f2;
-                    th{
-                        padding-left: 6px;
-                        padding-right: 15px;
-                        height: 55px;
-                        text-align: left;
-                        box-sizing: border-box;
-                        border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
-                        color: #333333;
-                        font-weight: normal;
-                    }
-                }
-                tbody{
-                    tr{
-                        td{
-                            padding-left: 6px;
-                            padding-right: 15px;
-                            height: 55px;
-                            text-align: left;
-                            box-sizing: border-box;
-                            border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
-                            color: #333333;
-                            .location{
-                                display: block;
-                                width: 12px;
-                                height: 16px;
-                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
-                                cursor: pointer;
-                            }
-                        }
-                        .Strong{
-                            font-weight: bold;
-                        }
-                        .actionBtn{
-                            width: 16px;
-                            height: 17px;
-                            border: none;
-                            cursor: pointer;
-                            margin-right: 10px;
-                        }
-                        .editBtn{
-                            background: url('../../assets/edit.png') no-repeat;
-                        }
-                        .deleteBtn{
-                            background: url('../../assets/delete.png') no-repeat;
-                        }
-                        .dataBtn{
-                            background: url('./images/data.png') no-repeat;
-                        }
-                        .listBtn{
-                            background: url('./images/list.png') no-repeat;
-                        }
-                        .detailBtn{
-                              background: url('./images/details.png') no-repeat;
-                        }
-                         .refreshBtn{
-                              background: url('./images/refresh.png') no-repeat;
-                        }
-                    }
-                    .activeTr{
-                        background: #0081c2;
-                        td{
-                            color: #fff!important;
-                        }
-                    }
-                }
-            }
-        }
-        /**********一下是分页器的样式***************/
-        .datagrid-pager {
-            display: block;
-            height: 31px;
-            width: auto;
-            border:1px solid #d4d4d4;
-            // padding: 3px 4px;
-            box-sizing: border-box;
-            background: #f5f5f5;
-        }
-        .pagination{
-            border-top: none;
-        }
-        .pagination table {
-            float: left;
-            height: 30px;
-            th, td {
-                min-width: 5px;
-                padding: 0px;
-                margin: 0px;
-            }
-        }
-        .pagination-page-list {
-            margin: 0px 6px;
-            padding: 1px 2px;
-            width: 43px;
-            height: auto;
-            border-width: 1px;
-            border-style: solid;
-        }
-        .pagination .pagination-num {
-            border-color: #D4D4D4;
-            margin: 0 2px;
-            width: 30px;
-        }
-        .pagination-btn-separator {
-            float: left;
-            height: 24px;
-            border-left: 1px solid #ccc;
-            border-right: 1px solid #fff;
-            margin: 3px 1px;
-        }
-        .btn-TAB{
-            display: block;
-            width:26px;
-            height: 26px;
-            cursor: pointer;
-            position: relative;
-            &:hover{
-                box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-                border-radius: 5px;
-            }
-            &::after{
-                display: block;
-                position: absolute;
-                content: '';
-                width: 10px;
-                height: 10px;
-                background-size: 100% 100%; 
-                top: 8px;
-                left: 8px;
-            }
-        }
-        .btn-left0::after{
-            background-image: url('../../assets/fenye2.png');
-        }
-        .btn-left1::after{
-            background-image: url('../../assets/fenye1.png');
-        }
-        .btn-right0::after{
-            background-image: url('../../assets/fenye4.png');
-        }
-        .btn-right1::after{
-            background-image: url('../../assets/fenye3.png');
-        }
-        .btn-refresh::after{
-            background-image: url('../../assets/fenye5.png');
-        }
-        .pagination-title{
-            font-size: 14px;
-            color: #333333;
-        }
-        .pagination-info{
-            float: right;
-            margin-top: 5px;
-            margin-right: 25px;
-        }
-        #edit{
-            .el-dialog{
-                width: 586px!important;
-            }
-            #fileInfo{
-                display: none;
-            }
-            .imageBody {
-                text-align: left;
-            }
-            .imageBodyText {
-                color: #666;
-                font-size: 14px;
-                line-height: 14px;
-                font-weight: normal;
-                display: inline-block;
-                margin-right: 20px;
-                margin-left: 94px;
-                text-align: right;
-            }
-             .edit-item{
-                position: relative;
-                .inp{
-                    float: left;
-                }
-                .imageBodyText{
-                    float: left;
-                    width: 140px;
-                    text-align: right;
-                    padding-right: 20px;
-                    height: 38px;
-                    line-height: 38px;
-                }
-                .editSelect{
-                    float: left;
-                    width: 436px;
-                    height: 40px;
-                    padding: 10px;
-                }
-                .editInpText{
-                    width: 100px;
-                    text-align: right;
-                    float: left;
-                    height: 40px;
-                    line-height: 40px;
-                }
-                .edit-item-biaoti{
-                    display: block;
-                    font-size: 12px;
-                    color: #999999;
-                    float: left;
-                    line-height: 12px;
-                    margin-left: 120px;
-                    margin-top: 5px;
-                    max-width: 300px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-            }
-             .UserList{
-                max-height: 402px;
-                overflow-y: auto;
-                border-collapse: collapse;
-                border: 1px solid #e1e1e1;
-                thead{
-                    border-bottom: 1px solid #e1e1e1;
-                    background: #f3f3f3;
-                    th{
-                        height: 50px;
-                        text-align: left;
-                        font-size: 12px;
-                        color: #999999;
-                        font-weight: normal;
-                        border-right: 1px solid #e1e1e1;
-                        padding-left:10px!important; 
-                    }
-                }
-                tbody{
-                    tr{
-                        td{
-                            height: 50px;
-                            text-align: left;
-                            box-sizing: border-box;
-                            font-size: 14px;
-                            color: #333333;
-                            border-bottom: 1px solid #e1e1e1;
-                            border-right: 1px solid #e1e1e1;
-                            padding-left:10px!important; 
-                            .checkbox-fileItem{
-                                display:block;
-                                width: 14px;
-                                height: 14px;
-                                border: 1px solid #cccccc;
-                                cursor: pointer;
-                                margin-left: 20px;
-                            }
-                            .active{
-                                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                                border: 1px solid #fc3439;
-                            }
-                            img{
-                                height: 18px;
-                                float: left;
-                                margin-right: 7px;
-                            }
-                        .deleteBtn{
-                            display: block;
-                            width: 16px;
-                                height: 16px;
-                                border: none;
-                                cursor: pointer;
-                                margin-right: 16px;
-                                background: url('../../assets/delete.png') no-repeat;
-                            }
-                        }
-                        &:hover{
-                            background: #fafafa;
-                            .icon-goujian{
-                                display: inline-block;
-                            }
-                        }
-                    }
-                    tr:nth-child(2n){
-                        td{
-                            background: #f3f3f3;
-                        }
-                    }
-                    .active{
-                        border: none!important;
-                        td{
-                            background: #0081c2!important;
-                        }
-                    }
-                }
-            }
-        }
-        .clearfix{
-            clear: both;
-            overflow: hidden;
-            content: '';
-        }
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-    }
-</style>
 <script>
 import axios from 'axios';
 import '../ManageCost/js/jquery-1.8.3.js'
@@ -936,6 +619,24 @@ export default {
             totalPrice:'',
             listName:'',
             showCommonDetial:false,//显示隐藏 公共明细 页面
+            editBySelfShow:false,
+            newList:{
+                detailName:'',
+                sourceFrom:'0',
+                dataRange:[],
+                sourceState:'0',
+            },
+            customData:[],
+            customPageDetial:{
+                pagePerNum:10,//一页几份数据
+                currentPage:1,//初始查询页数 第一页
+                total:'',//所有数据
+            },
+            jiapyanResult:'',
+            shureToImportshow:false,
+            checkedResults:{},
+            shujugaikuangshow:false,
+            selcetedItem:{},
         }
     },
     created(){
@@ -949,22 +650,30 @@ export default {
         var vm = this
     },
     watch:{
-      'pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.getSnapWorkAmountList()
-      },
-      'pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getSnapWorkAmountList()
-      },
-       'pageDetial_1.currentPage':function(val,oldval){
-          var vm = this
-          vm.getSingleWorkAmountList()
-      },
-      'pageDetial_1.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getSingleWorkAmountList()
-      },
+        'pageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.getSnapWorkAmountList()
+        },
+        'pageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.getSnapWorkAmountList()
+        },
+        'pageDetial_1.currentPage':function(val,oldval){
+            var vm = this
+            vm.getSingleWorkAmountList()
+        },
+        'pageDetial_1.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.getSingleWorkAmountList()
+        },
+        'customPageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.addNewWuliao()
+        },
+        'customPageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.addNewWuliao()
+        },
     },
     methods:{
         selectImg(){
@@ -1037,7 +746,6 @@ export default {
                     arr.push(element.selectVal)
                 }
             })  
-            console.log(form)
             if (vm.isRepeat(form)) {
                  vm.$message({
                     type:'warning',
@@ -1207,7 +915,6 @@ export default {
                 })
                 return false
             }else{
-                console.log($('#'+vm.createMonomer.holderId+'_id'))
                 var buildName = $('#'+vm.createMonomer.holderId+'_id')[0].dataset.name
                 var cType = $('#'+vm.createMonomer.holderId+'_id')[0].dataset.type
             }
@@ -1419,7 +1126,7 @@ export default {
                 console.log(err)
             })
         },
-         //加载快照报表数据
+        //加载快照报表数据
         getSingleWorkAmountList(){
             var vm = this
             axios({
@@ -1455,55 +1162,78 @@ export default {
                 console.log(err)
             })
         },
-          changePage(val,isTop){//分页 0 -1 1 2
-                var vm = this; 
-                if(isTop){
-                    if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
-                        vm.$message('这已经是第一页!')
-                        return false
-                    }
-                    if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
-                        vm.$message('这已经是最后一页!')
-                        return false
-                    }
-                    switch(val){
-                        case 0:
-                            vm.pageDetial.currentPage = 1
-                            break;
-                        case -1:
-                            vm.pageDetial.currentPage--
-                            break;
-                        case 1:
-                            vm.pageDetial.currentPage++
-                            break;
-                        case 2:
-                            vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
-                            break;
-                    }
-                }else{
-                      if(vm.pageDetial_1.currentPage == 1 && (val == 0 || val == -1)){
-                        vm.$message('这已经是第一页!')
-                        return false
-                        }
-                        if(vm.pageDetial_1.currentPage >= Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum) && (val == 1 || val == 2)){
-                            vm.$message('这已经是最后一页!')
-                            return false
-                        }
-                        switch(val){
-                            case 0:
-                                vm.pageDetial_1.currentPage = 1
-                                break;
-                            case -1:
-                                vm.pageDetial_1.currentPage--
-                                break;
-                            case 1:
-                                vm.pageDetial_1.currentPage++
-                                break;
-                            case 2:
-                                vm.pageDetial_1.currentPage = Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum)
-                                break;
-                        }
+        changePage(val,isTop){//分页 0 -1 1 2
+            var vm = this; 
+            if(isTop == 1){
+                if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                    vm.$message('这已经是第一页!')
+                    return false
                 }
+                if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                    vm.$message('这已经是最后一页!')
+                    return false
+                }
+                switch(val){
+                    case 0:
+                        vm.pageDetial.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pageDetial.currentPage--
+                        break;
+                    case 1:
+                        vm.pageDetial.currentPage++
+                        break;
+                    case 2:
+                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                        break;
+                }
+            }else if(isTop == 2){
+                if(vm.pageDetial_1.currentPage == 1 && (val == 0 || val == -1)){
+                    vm.$message('这已经是第一页!')
+                    return false
+                }
+                if(vm.pageDetial_1.currentPage >= Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum) && (val == 1 || val == 2)){
+                    vm.$message('这已经是最后一页!')
+                        return false
+                }
+                switch(val){
+                    case 0:
+                        vm.pageDetial_1.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pageDetial_1.currentPage--
+                        break;
+                    case 1:
+                        vm.pageDetial_1.currentPage++
+                        break;
+                    case 2:
+                        vm.pageDetial_1.currentPage = Math.ceil(vm.pageDetial_1.total/vm.pageDetial_1.pagePerNum)
+                    break;
+                }
+            }else if(isTop == 3){
+                if (vm.customPageDetial.currentPage == 1 && (val == 0 || val == -1)) {
+                vm.$message('这已经是第一页!')
+                return false
+                }
+                if (vm.customPageDetial.currentPage >= Math.ceil(vm.customPageDetial.total / vm.customPageDetial.pagePerNum) && (val == 1 || val == 2)) {
+                vm.$message('这已经是最后一页!')
+                return false
+                }
+                switch (val) {
+                case 0:
+                    vm.customPageDetial.currentPage = 1
+                    break;
+                case -1:
+                    vm.customPageDetial.currentPage--
+                    break;
+                case 1:
+                    vm.customPageDetial.currentPage++
+                    break;
+                case 2:
+                    vm.customPageDetial.currentPage = Math.ceil(vm.customPageDetial.total / vm.customPageDetial.pagePerNum)
+                    break;
+                }
+            }
         },
         initName(name){
             if(!name)return ''
@@ -1529,9 +1259,908 @@ export default {
             }
             return false;
         },
+        /*
+        *下面的代码由李从文增加，上面的代码本来又付伟超写的。
+        */
+        //新增可追溯物料量清单
+        addNewWuliao(){            
+            this.reSearchResult(false);
+            this.editBySelfShow = true;
+        },
+        //确认新增
+        customConfirm(){
+            this.customData.forEach(item=>{
+                if(item.isChecked == true){
+                    this.selcetedItem = item;
+                    let formData = new FormData();
+                    formData.append('detailId',item.detailId);
+                    formData.append('relaType',item.relaType);
+                    formData.append('projectId',this.projId);
+                    formData.append('componentCount',item.componentCount);
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'project2/report/verifyAddMaterialDetail',
+                        headers:{
+                            token:this.token
+                        },
+                        data:formData
+                    }).then(response=>{
+                        this.shureToImportshow = true;
+                        this.editBySelfShow = false;
+                        this.checkedResults = response.data.rt.dataProfiling;
+                        if(JSON.stringify(response.data.rt.checkResults)=='{}'){
+                            this.jiapyanResult = '所有数据校验通过!';
+                        }else{
+                            this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
+                        }
+                    })
+                }
+            })
+        },
+        //确认导入
+        sureToImport(){
+            this.shureToImportshow = false;
+            this.shujugaikuangshow = true;
+        },
+        //取消导入
+        notSureToImport(){
+            this.shureToImportshow = false;
+            this.addNewWuliao();
+        },
+        shujuSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/addMaterialDetail',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    detailId:this.selcetedItem.detailId,
+                    relaType:this.selcetedItem.relaType,
+                    projectId:this.projId,
+                    componentCount:this.selcetedItem.componentCount
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getSnapWorkAmountList();
+                    this.shujugaikuangshow = false;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        shujuNotSure(){
+            this.shujugaikuangshow = false;
+        },
+        //取消新增
+        customCancle(){
+            this.editBySelfShow = false;
+        },
+        reSearchResult(flag){
+            let rangeData = [];
+            this.newList.dataRange.forEach(item=>{
+                rangeData.push(new Date(item).toLocaleString().split(' ')[0]);
+            });
+            if(flag){
+                this.customPageDetial.currentPage =1;
+            }
+            let formData = new FormData();
+            formData.append('detailName',this.newList.detailName|| '');
+            formData.append('startDate',rangeData[0] || '');
+            formData.append('endDate',rangeData[1] || '');
+            formData.append('serviceState',this.newList.sourceState);
+            formData.append('relaType',this.newList.sourceFrom);
+            formData.append('page',this.customPageDetial.currentPage);
+            formData.append('rows',this.customPageDetial.pagePerNum);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/loadManifest',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    type:1
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.customData = response.data.rt.rows;
+                    this.customPageDetial.total = response.data.rt.total;
+                    var type_c = '';
+                    var relaType_c ='';
+                    if(this.customData!=null && this.customData.length!=0){
+                        this.customData.forEach((item,index)=>{
+                            if(item.type == 1){
+                                type_c = '构件量清单';
+                            }else if(item.type == 2){
+                                type_c = '工程量清单';
+                            }else if(item.type == 3){
+                                type_c = '物料量清单';
+                            }
+                            if(item.relaType == 2){
+                                relaType_c = '进度计划-任务核实';
+                            }else if(item.relaType == 1){
+                                relaType_c = "文档管理-关联构件" ;
+                            }else if(item.relaType == 7){
+                                relaType_c = "成本管理-报表快照" ;
+                            }
+                            Object.assign(item,{
+                                type_c:type_c,
+                                relaType_c:relaType_c,
+                                isChecked:false
+                            })
+                        });
+                    }
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //查询
+        searchResult(){
+            this.reSearchResult(true);
+        },
+        //场景选择
+        selectScence(){
+            alert("请打开右侧面板!");
+        },
+        //查看独立物料量清单详情
+        viewDetail(val){
+            console.log(val);
+        }
     }
 }
 </script>
+<style lang="less">
+    #inventory{
+        .el-dialog{
+            margin: 0 auto;
+        }
+        .topHeader{
+            box-sizing: border-box;
+            position: fixed;
+            top: 116px;
+            left: 26px;
+            bottom:0;
+            right: 0;
+            overflow: auto;
+        }
+        #item-box-file{
+            display: block;
+            border-bottom: 1px solid #e6e6e6;
+            height: 49px;
+            padding-top: 16px;
+            padding-left:20px; 
+            background: #fafbfc;
+            position: relative;
+              .label-item{
+                    float: left;
+                    height: 34px;
+                    font-size: 14px;
+                    width:106px;
+                    text-align: center;
+                    line-height: 30px;
+                    cursor: pointer;
+                    border-top: 3px solid #fafbfc;
+                    color: #999999;
+                    text-decoration: none;
+                }
+                .label-item-active{
+                    color: #fc3439;
+                    font-weight: bold;
+                    border-top: 3px solid #fc3439;
+                    border-left: 1px solid #e6e6e6;
+                    border-right: 1px solid #e6e6e6;
+                    border-bottom: 1px solid #fff;
+                    background: #ffffff;
+                }
+                .header{
+                    position: absolute;
+                    display: block;
+                    top: 13px;
+                    right: 50px;
+                    overflow: hidden;
+                    .singelOne{
+                        float: left;
+                        color: #999;
+                        font-size: 12px;
+                        height: 30px;
+                        line-height: 30px;
+                        margin-right: 10px;
+                    }
+                }
+        }
+        .selectOption{
+            position: relative;
+            width: 212px;
+            float: left;
+            select{
+                height: 28px;
+                width: 212px;
+                border-radius: 28px;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                padding-left: 10px;
+                border: 1px solid #ccc;
+            }
+            .icon-sanjiaoone{
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image:url('../ManageDesign/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 13px;
+                left: 180px;
+            }
+        }
+         .project{
+            margin: 25px 20px 0 20px;
+            .header{
+                border-bottom: 2px solid #e6e6e6;
+                margin: 20px 0;
+                padding-bottom: 10px;
+                .left{
+                    float: left;
+                    font-size: 16px;
+                    line-height: 16px;
+                    color: #fc3439;
+                    font-weight: bold;
+                    padding-left:30px;
+                    position: relative;
+                    .reportS{
+                        background: url('./images/listS.png')no-repeat 0 0;
+                    } 
+                    .target{
+                        background: url('./images/target.png')no-repeat 0 0;
+                    } 
+                    .icon{
+                       display: block;
+                        width: 20px;
+                        height: 17px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+                .item-btn{
+                    float: right;
+                    label,.label-item{
+                        float:left;
+                        width:auto;
+                        height:26px;
+                        padding: 0 9px;
+                        border-top: 1px solid #e6e6e6;
+                        border-bottom: 1px solid #e6e6e6;
+                        text-align:center;
+                        line-height:24px;
+                        font-size:12px;
+                        color:#666666;
+                        cursor: pointer;
+                        border-left: 1px solid #e6e6e6;
+                        &:first-of-type{
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+                        }
+                        &:last-of-type{
+                        border-right: 1px solid #e6e6e6;
+                        border-top-right-radius: 2px;
+                        border-bottom-right-radius: 2px;
+                        }
+                    }
+                    .label-item{
+                            border-right: none!important;
+                    }
+                }
+                .right{
+                    text-decoration: none;
+                    float: right;
+                    font-size: 14px;
+                    color: #336699;
+                    line-height: 14px;
+                    margin-top:4px; 
+                    cursor: pointer;
+                }
+            }
+            .UserList{
+                border-collapse: collapse;
+                border: 1px solid #e6e6e6;
+                .checkbox-att{
+                    display:none;
+                }
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
+                    cursor: pointer;
+                    position: relative;
+                    margin-left:4px;
+                }
+                .active{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+                }
+                thead{
+                    background: #f2f2f2;
+                    th{
+                        padding-left: 6px;
+                        padding-right: 15px;
+                        height: 55px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        border-right: 1px solid #e6e6e6;
+                        font-size: 12px;
+                        color: #333333;
+                        font-weight: normal;
+                    }
+                }
+                tbody{
+                    tr{
+                        td{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 55px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 12px;
+                            color: #333333;
+                            .location{
+                                display: block;
+                                width: 12px;
+                                height: 16px;
+                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                cursor: pointer;
+                            }
+                        }
+                        .Strong{
+                            font-weight: bold;
+                        }
+                        .actionBtn{
+                            width: 16px;
+                            height: 17px;
+                            border: none;
+                            cursor: pointer;
+                            margin-right: 10px;
+                        }
+                        .editBtn{
+                            background: url('../../assets/edit.png') no-repeat;
+                        }
+                        .deleteBtn{
+                            background: url('../../assets/delete.png') no-repeat;
+                        }
+                        .dataBtn{
+                            background: url('./images/data.png') no-repeat;
+                        }
+                        .listBtn{
+                            background: url('./images/list.png') no-repeat;
+                        }
+                        .detailBtn{
+                              background: url('./images/details.png') no-repeat;
+                        }
+                         .refreshBtn{
+                              background: url('./images/refresh.png') no-repeat;
+                        }
+                    }
+                    .activeTr{
+                        background: #0081c2;
+                        td{
+                            color: #fff!important;
+                        }
+                    }
+                }
+            }
+        }
+        /**********一下是分页器的样式***************/
+        .datagrid-pager {
+            display: block;
+            height: 31px;
+            width: auto;
+            border:1px solid #d4d4d4;
+            // padding: 3px 4px;
+            box-sizing: border-box;
+            background: #f5f5f5;
+        }
+        .pagination{
+            border-top: none;
+        }
+        .pagination table {
+            float: left;
+            height: 30px;
+            th, td {
+                min-width: 5px;
+                padding: 0px;
+                margin: 0px;
+            }
+        }
+        .pagination-page-list {
+            margin: 0px 6px;
+            padding: 1px 2px;
+            width: 43px;
+            height: auto;
+            border-width: 1px;
+            border-style: solid;
+        }
+        .pagination .pagination-num {
+            border-color: #D4D4D4;
+            margin: 0 2px;
+            width: 30px;
+        }
+        .pagination-btn-separator {
+            float: left;
+            height: 24px;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #fff;
+            margin: 3px 1px;
+        }
+        .btn-TAB{
+            display: block;
+            width:26px;
+            height: 26px;
+            cursor: pointer;
+            position: relative;
+            &:hover{
+                box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+                border-radius: 5px;
+            }
+            &::after{
+                display: block;
+                position: absolute;
+                content: '';
+                width: 10px;
+                height: 10px;
+                background-size: 100% 100%; 
+                top: 8px;
+                left: 8px;
+            }
+        }
+        .btn-left0::after{
+            background-image: url('../../assets/fenye2.png');
+        }
+        .btn-left1::after{
+            background-image: url('../../assets/fenye1.png');
+        }
+        .btn-right0::after{
+            background-image: url('../../assets/fenye4.png');
+        }
+        .btn-right1::after{
+            background-image: url('../../assets/fenye3.png');
+        }
+        .btn-refresh::after{
+            background-image: url('../../assets/fenye5.png');
+        }
+        .pagination-title{
+            font-size: 14px;
+            color: #333333;
+        }
+        .pagination-info{
+            float: right;
+            margin-top: 5px;
+            margin-right: 25px;
+        }
+        #edit{
+            // .el-dialog{
+            //     width: 586px!important;
+            // }
+            #fileInfo{
+                display: none;
+            }
+            .imageBody {
+                text-align: left;
+            }
+            .imageBodyText {
+                color: #666;
+                font-size: 14px;
+                line-height: 14px;
+                font-weight: normal;
+                display: inline-block;
+                margin-right: 20px;
+                margin-left: 94px;
+                text-align: right;
+            }
+             .edit-item{
+                position: relative;
+                .inp{
+                    float: left;
+                }
+                .imageBodyText{
+                    float: left;
+                    width: 140px;
+                    text-align: right;
+                    padding-right: 20px;
+                    height: 38px;
+                    line-height: 38px;
+                }
+                .editSelect{
+                    float: left;
+                    width: 436px;
+                    height: 40px;
+                    padding: 10px;
+                }
+                .editInpText{
+                    width: 100px;
+                    text-align: right;
+                    float: left;
+                    height: 40px;
+                    line-height: 40px;
+                }
+                .edit-item-biaoti{
+                    display: block;
+                    font-size: 12px;
+                    color: #999999;
+                    float: left;
+                    line-height: 12px;
+                    margin-left: 120px;
+                    margin-top: 5px;
+                    max-width: 300px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+             .UserList{
+                max-height: 402px;
+                overflow-y: auto;
+                border-collapse: collapse;
+                border: 1px solid #e1e1e1;
+                thead{
+                    border-bottom: 1px solid #e1e1e1;
+                    background: #f3f3f3;
+                    th{
+                        height: 50px;
+                        text-align: left;
+                        font-size: 12px;
+                        color: #999999;
+                        font-weight: normal;
+                        border-right: 1px solid #e1e1e1;
+                        padding-left:10px!important; 
+                    }
+                }
+                tbody{
+                    tr{
+                        td{
+                            height: 50px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            font-size: 14px;
+                            color: #333333;
+                            border-bottom: 1px solid #e1e1e1;
+                            border-right: 1px solid #e1e1e1;
+                            padding-left:10px!important; 
+                            .checkbox-fileItem{
+                                display:block;
+                                width: 14px;
+                                height: 14px;
+                                border: 1px solid #cccccc;
+                                cursor: pointer;
+                                margin-left: 20px;
+                            }
+                            .active{
+                                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                                border: 1px solid #fc3439;
+                            }
+                            img{
+                                height: 18px;
+                                float: left;
+                                margin-right: 7px;
+                            }
+                        .deleteBtn{
+                            display: block;
+                            width: 16px;
+                                height: 16px;
+                                border: none;
+                                cursor: pointer;
+                                margin-right: 16px;
+                                background: url('../../assets/delete.png') no-repeat;
+                            }
+                        }
+                        &:hover{
+                            background: #fafafa;
+                            .icon-goujian{
+                                display: inline-block;
+                            }
+                        }
+                    }
+                    tr:nth-child(2n){
+                        td{
+                            background: #f3f3f3;
+                        }
+                    }
+                    .active{
+                        border: none!important;
+                        td{
+                            background: #0081c2!important;
+                        }
+                    }
+                }
+            }
+            .shuju{
+                .el-dialog{
+                    width: 398px;
+                }
+            }
+            .shujugaikuang{
+                margin: 0 32px;
+                p{
+                    margin-bottom: 24px;
+                    
+                }
+                label{
+                    color: #999;
+                    display: inline-block;
+                    width: 50%;
+                    text-align: right;
+                }
+                span{
+                    color: #333;
+                    display: inline-block;
+                    width: 47%;
+                    text-align: left;
+                    margin-left: 7px;
+                }
+            }
+        }
+        .clearfix{
+            clear: both;
+            overflow: hidden;
+            content: '';
+        }
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        #edit{
+            .project1{
+                margin: 20px 30px 30px 30px;
+                .projectTitle{
+                    display: flex;
+                    .projectTitleLeft,.projectTitleRight{
+                        width: 50%;
+                        overflow: hidden;
+                        .el-radio{
+                            float: left;
+                            margin-bottom: 5px;
+                        }
+                        .titleDiv,.yewulaiyuan{
+                            float: left;
+                        }
+                        .titleDiv{
+                            position: relative;
+                        }
+                        .downAngle{
+                            background: url('./images/sanjiao.png');
+                            width: 12px;
+                            height: 7px;
+                            display: block;
+                            position: absolute;
+                            top: 13px;
+                            left: 262px;
+                        }
+                        .yewulaiyuan{
+                            color: #666;
+                            font-size: 14px;
+                            line-height: 14px;
+                            display: block;
+                            margin: 10px 0 5px 0;
+                        }
+                        .projectTitleLeftinp{
+                            width: 288px;
+                            height: 36px;
+                            padding-left: 10px;
+                            border:1px solid #d1d1d1;
+                        }
+                    }
+                    .projectTitleRight{
+                        width: 50%;
+                    }
+                }
+                .chaxun{
+                    width: 145px;
+                    height: 35px;
+                    background: #fc3439;
+                    color: #fff;
+                    border: none;
+                    outline: none;
+                    float: left;
+                    margin:13px 0 0 0;
+                    border-radius: 2px;
+                    cursor: pointer;
+                }
+            }
+            .project{
+                // margin: 0 20px;
+                .searchresult{
+                    font-size: 12px;
+                    line-height: 12px;
+                    color: #999;
+                    display: block;
+                    float: left;
+                    margin: 27px 0 13px 0;
+                }
+                .selectsence{
+                    float: right;
+                    width: 68px;
+                    height: 24px;
+                    background: #fff;
+                    border:none;
+                    outline: none;
+                    margin: 20px 0 6px 0;
+                    border: 1px solid #ccc;
+                    border-radius: 1px;
+                    font-size: 12px;
+                    color: #666;
+                    cursor: pointer;
+                }
+                .editBtn{
+                    background: url('../../assets/edit.png') no-repeat;
+                }
+                .detailBtn{
+                    background: url('./images/details.png') no-repeat;
+                }
+            
+                .actionBtn{
+                    width: 16px;
+                    height: 17px;
+                    border: none;
+                    cursor: pointer;
+                    margin-right: 10px;
+                }
+                .backToProjectBtn{
+                    cursor: pointer;
+                }
+                .backToProjectBtn:hover{
+                    color:#fc3439;
+                }
+                .header{
+                    border-bottom: 2px solid #e6e6e6;
+                    margin: 20px 0;
+                    padding-bottom: 10px;
+                    .left{
+                        float: left;
+                        font-size: 16px;
+                        line-height: 16px;
+                        color: #fc3439;
+                        font-weight: bold;
+                        padding-left:30px;
+                        position: relative;
+                        
+                        .reportS{
+                            background: url('./images/listS.png')no-repeat 0 0;
+                        } 
+                        .target{
+                            background: url('./images/target.png')no-repeat 0 0;
+                        } 
+                        .icon{
+                        display: block;
+                            width: 20px;
+                            height: 17px;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                        }
+                    }
+                    .item-btn{
+                        float: right;
+                        label,.label-item{
+                            float:left;
+                            width:auto;
+                            height:26px;
+                            padding: 0 9px;
+                            border-top: 1px solid #e6e6e6;
+                            border-bottom: 1px solid #e6e6e6;
+                            text-align:center;
+                            line-height:24px;
+                            font-size:12px;
+                            color:#666666;
+                            cursor: pointer;
+                            border-left: 1px solid #e6e6e6;
+                            &:first-of-type{
+                            border-top-left-radius: 2px;
+                            border-bottom-left-radius: 2px;
+                            }
+                            &:last-of-type{
+                            border-right: 1px solid #e6e6e6;
+                            border-top-right-radius: 2px;
+                            border-bottom-right-radius: 2px;
+                            }
+                        }
+                        .label-item{
+                                border-right: none!important;
+                        }
+                    }
+                    .right{
+                        text-decoration: none;
+                        float: right;
+                        font-size: 14px;
+                        color: #336699;
+                        line-height: 14px;
+                        margin-top:4px; 
+                    }
+                }
+                .UserList{
+                    border-collapse: collapse;
+                    border: 1px solid #e6e6e6;
+                    .checkbox-att{
+                        display:none;
+                    }
+                    .checkbox-fileItem{
+                        float: left;
+                        width: 14px;
+                        height: 14px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        position: relative;
+                        margin-left:4px;
+                    }
+                    .active{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                    }
+                    thead{
+                        background: #f2f2f2;
+                        th{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 55px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 12px;
+                            color: #333333;
+                            font-weight: normal;
+                        }
+                    }
+                    tbody{
+                        tr{
+                            td{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 55px;
+                                text-align: left;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 12px;
+                                color: #333333;
+                                .location{
+                                    display: block;
+                                    width: 12px;
+                                    height: 16px;
+                                    background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                }
+                            }
+                            .Strong{
+                                font-weight: bold;
+                            }
+                            .deleteBtn{
+                                background: url('../../assets/delete.png') no-repeat;
+                            }
+                            .dataBtn{
+                                background: url('./images/data.png') no-repeat;
+                            }
+                            .listBtn{
+                                background: url('./images/list.png') no-repeat;
+                            }
+                            .refreshBtn{
+                                background: url('./images/refresh.png') no-repeat;
+                            }
+                        }
+                        .activeTr{
+                            background: #0081c2;
+                            td{
+                                color: #fff!important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+</style>
 
 
 

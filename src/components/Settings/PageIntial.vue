@@ -793,12 +793,14 @@ export default {
          //新增分区资源包
         addSource(){
             this.addgroundShow = true;
-            this.filesList = [];
+            //this.$refs.file.files = [];
         },
         //新增分区资源包
         addGroundSure(){
             if(this.filesList.length == 0){
                 alert("请选择上传的文件!")
+            }else if(this.fileName.split('.')[1] != 'utr' && this.fileName.split('.')[1] != 'uer'){
+                alert('请上传utr或者uer文件！');
             }else{
                 if(this.platform == 'Web'){
                     this.platform = 0;
@@ -839,16 +841,16 @@ export default {
                     }
                 })
             }
-            
         },
         groundClose(){
             this.addgroundShow = false;
+            this.$refs.file.files = {};
+            this.fileName = '';
         },
         //编辑资源包
         groundTableEdit(scope){
             this.editGorundData = scope.row;
             this.editgroundShow = true;
-            console.log(scope.row);
             this.editUnityName = scope.row.FileName;
             if(scope.row.Platform == 0){
                 this.platform = 'Web';
@@ -925,7 +927,6 @@ export default {
             this.unityGround = scope.row.ResourceType;
             this.unityRemark = scope.row.Comments;
             this.uninstallUnityBundle = true;
-
         },
         uninstallUnityBundleSure(){
             axios({
@@ -937,7 +938,6 @@ export default {
                 params:{
                     'bundleId':this.unInstallData.ID,
                     'bundleStatus':this.loadState
-
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
@@ -951,7 +951,6 @@ export default {
                     alert(response.data.msg)
                 }
             })
-            
         },
         uninstallUnityBundleClose(){
             this.uninstallUnityBundle = false;
@@ -959,7 +958,7 @@ export default {
             this.unityGround ='';
             this.unityRemark ='';
         },
-         //删除资源包
+        //删除资源包
         deleteTableRow(scope) {
             console.log(scope)
             this.unityBundleSource = scope.row;
@@ -1000,11 +999,17 @@ export default {
             this.$refs.file.click();
         },
         fileChanged(){
-            const list = this.$refs.file.files;
+            let list = [];
+            list = this.$refs.file.files;
             this.fileName = list[0].name;
             this.fileSize = (list[0].size/1024).toFixed(2)+'M';
             this.filesList = list;
-            this.editUnityBundleProperty = true;
+            if(this.fileName.split('.')[1] == 'utr' || this.fileName.split('.')[1] == 'uer'){
+                this.editUnityBundleProperty = true;
+            }else{
+                alert("请上传utr或者uer文件！")
+            }
+            
         },
         editUnityBundlePropertySure(){
             this.editUnityBundleProperty = false;
