@@ -98,7 +98,7 @@
                     </el-table-column>
                 </el-table>
                 <div class="pagenation">   
-                    <el-pagination background layout="prev, pager, next" :total="unityData.length"></el-pagination>
+                    <el-pagination background layout="prev, pager, next" v-if="unityData!=null" :total="unityData.length"></el-pagination>
                 </div>
             </div>
         </div>
@@ -375,13 +375,14 @@ export default {
                 if(response.data.cd === '0'){
                     this.getGroundInformation();
                     this.canEdit = true;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg);
                 }
+                // else{
+                //     this.$router.push({
+                //         path:'/login'
+                //     })
+                // }
             })
         },
          groundInfoEditCJ(){
@@ -433,12 +434,8 @@ export default {
                     this.canEditCj = true;
                     this.sureToGroundSettings = true;
                     this.getSceneEnvironment()
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg)
                 }
             })
         },
@@ -791,11 +788,12 @@ export default {
                     this.groundInfo.siteId = response.data.rt.siteId;
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
+                // else{
+                //     this.$router.push({
+                //         path:'/login'
+                //     })
+                // }
             }).then(()=>{
                 this.getUnityBundle();//获取场地资源包 表格
             })
@@ -857,17 +855,20 @@ export default {
             }).then((response)=>{
                 
                 if(response.data.cd == '0'){
-                    this.listData = response.data.rt.rows;
-                    this.listData.forEach((item,index,arr)=>{
-                        arr[index].index = index;
-                    })
+                    if(response.data.rt != null){
+                        this.listData = response.data.rt.rows;
+                        this.listData.forEach((item,index,arr)=>{
+                            arr[index].index = index;
+                        })
+                    }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
+                // else{
+                //     this.$router.push({
+                //         path:'/login'
+                //     })
+                // }
                 
             })
         },

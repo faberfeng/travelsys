@@ -71,7 +71,7 @@
                 </el-table>
             </div>
             <div class="pagenation">   
-                <el-pagination background layout="prev, pager, next" :total="UnityBundle.length"></el-pagination>
+                <el-pagination background layout="prev, pager, next" v-if="UnityBundle!=null" :total="UnityBundle.length"></el-pagination>
             </div>
         </div>
         <!--dialog-->
@@ -500,23 +500,25 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.subProjects= response.data.rt.subProjects;//单体信息
-                    this.partitionList = response.data.rt.partitionList;//建筑分区
-                    this.partitionList.forEach((item,index)=>{
-                        this.partitionListName.push({
-                            label:item.name,
-                            value:index
+                    if(response.data.rt!=null){
+                        this.subProjects= response.data.rt.subProjects;//单体信息
+                        this.partitionList = response.data.rt.partitionList;//建筑分区
+                        this.partitionList.forEach((item,index)=>{
+                            this.partitionListName.push({
+                                label:item.name,
+                                value:index
+                            })
                         })
-                    })
-                    this.subProjects.forEach((item,index)=>{
-                        this.subProjectsName.push({
-                            label:item.name,
-                            value:index
+                        this.subProjects.forEach((item,index)=>{
+                            this.subProjectsName.push({
+                                label:item.name,
+                                value:index
+                            })
                         })
-                    })
-                    //初始化 单体名称 和 建筑分区的初始值
-                    this.partitionListValue = this.partitionListName[0].label;
-                    this.subProjectsValue = this.subProjectsName[0].label;
+                        //初始化 单体名称 和 建筑分区的初始值
+                        this.partitionListValue = this.partitionListName[0].label;
+                        this.subProjectsValue = this.subProjectsName[0].label;
+                    }
                 }
             }).then(()=>{
                 this.findStore(this.partitionList,0);
