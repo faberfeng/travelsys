@@ -21,7 +21,7 @@
                     成本分析  
                 </router-link>
             </div>
-            <div class="project" v-if="!showCommonList && !showCommonDetial" v-loading="loading">
+            <div class="project" v-if="!showCommonList && !showCommonDetial &&!duliWuliaoObj.show" v-loading="loading">
                 <!--以下是实时列表-->
                 <div ref="hhhh"></div>
                 <div>
@@ -223,8 +223,85 @@
                     <div style="clear:both;"></div>
                 </div>
             </div>
-             <common-list v-on:back="backToH" :mId="checkItem.id"  :title="'物料量清单'"  v-if="showCommonList"></common-list>
-             <common-detial v-if="showCommonDetial" :detailId="checkItem.id" :title="'物料量清单'" v-on:back="backToH"></common-detial>
+            <common-list v-on:back="backToH" :mId="checkItem.id"  :title="'物料量清单'"  v-if="showCommonList"></common-list>
+            <common-detial v-if="showCommonDetial" :detailId="checkItem.id" :title="'物料量清单'" v-on:back="backToH"></common-detial>
+            <!--由李从文增加-->
+            <div class="duliWuliao" v-if="duliWuliaoObj.show"> 
+                <p class="antsLine">
+                    成本管理<i class="icon-sanjiao-right">
+                    </i><span style="cursor:pointer"  @click="backToOrign()">物料量清单</span>
+                    <i class="icon-sanjiao-right"></i>
+                    <span class="strong">【{{wuliaoDetailName}}】物料量清单明细</span>
+                </p>
+                <div>
+                    <zk-table 
+                        index-text="序号"
+                        :data="mappingData" :columns="tableColumns" :tree-type="props.treeType"
+                        :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                        :border="props.border" empty-text="正在加载...">
+                        <template slot="action" slot-scope="scope">
+                            <div v-if="scope.row.relaId != 0 && scope.row.relaId != null && scope.row.mStatus.substring(2, 1) < 3">
+                                <button class="changeProducticon"  @click="selcetNewModel(scope)"></button>
+                            </div>
+                        </template> 
+                    </zk-table>
+                    <div class="datagrid-pager pagination" v-if=" S_quantitiesList.length>0">
+                        <table cellspacing="0" cellpadding="0" border="0" >
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="pagination-page-list" v-model="wuliaoData.pagePerNum">
+                                            <option value="5">5</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                            <option value="50">50</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                            <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
+                                    </td>
+                                    <td>
+                                            <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                    </td>
+                                    <td>
+                                            <input class="pagination-num" type="text" v-model="wuliaoData.currentPage">
+                                    </td>
+                                    <td>
+                                        <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(wuliaoData.total/wuliaoData.pagePerNum)}}页</span>
+                                    </td>
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
+                                    </td>
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" @click="viewDetail(this.selectedmanifestId)" class="btn-refresh btn-TAB"></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination-info pagination-title" v-text="'显示1到'+wuliaoData.pagePerNum+',共'+wuliaoData.total+'记录'"></div>
+                        <div style="clear:both;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="edit">
             <el-dialog title="请选择需要出量的单体或场地" :visible="createMonomer.show" @close="createCancle">
@@ -309,7 +386,7 @@
                                     <span v-text="item.name"></span>
                                 </td>
                                 <td style="    position: relative;">
-                                    <select  class="editSelect" v-model="item.selectVal" style="    width: 322px;">
+                                    <select  class="editSelect" v-model="item.selectVal" style="width: 395px;">
                                         <option value="不导入">不导入</option>
                                         <option  v-for="(val,key) in  DefaultColumns" :key="key" :value="val.name" v-text="val.name"></option>
                                     </select>
@@ -522,6 +599,71 @@
                     <button class="editBtnC" @click="shujuNotSure">取消导入</button>
                 </div>
             </el-dialog>
+            <el-dialog title="产品类型和实例选型" :visible="productShow" @close="productShowCancel">
+                <div class="editBody productList">
+                    <table class="UserList" border="1" width="100%">
+                        <thead>
+                            <tr class="userList-thead">
+                                <th>品牌</th>
+                                <th>名称</th>
+                                <th>规格</th>
+                                <th>价格</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr >
+                                <td v-text="selcetNewModelObj.brand"></td>
+                                <td v-text="selcetNewModelObj.productName"></td>
+                                <td v-text="selcetNewModelObj.specificationParameter"></td>
+                                <td v-text="selcetNewModelObj.referencePrice"></td>
+                                <td >
+                                    <button class="changeProducticon" title="更换产品"  @click="changeProduct()" ></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="productShowSure">确定</button>
+                    <button class="editBtnC" @click="productShowCancel">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="更换产品实例" :visible="changeproductShow" @close="changeproductShowCancel">
+                <div class="editBody productList">
+                    <table class="UserList" border="1" width="100%">
+                        <thead>
+                            <tr class="userList-thead">
+                                <th>默认</th>
+                                <th>品牌</th>
+                                <th>名称</th>
+                                <th>规格</th>
+                                <th>价格</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in changeProductData" :key="index">
+                                <td>
+                                    <input type="radio" name="selectProductRadio" :value="item.productId" :checked="item._isDefault"/>
+                                </td>
+                                <td v-text="item.brand"></td>
+                                <td v-text="item.productName"></td>
+                                <td v-text="item.specificationParameter"></td>
+                                <td v-text="item.referencePrice"></td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="changedatabottom">
+                        <el-checkbox v-model="changeAll">更新相同产品类型的全部实例</el-checkbox>
+                    </p>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="changeproductShowSure">确定</button>
+                    <button class="editBtnC" @click="changeproductShowCancel">取消</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -549,6 +691,11 @@ export default {
                 total:'',//所有数据
             },
             pageDetial_1:{
+                pagePerNum:5,//一页几份数据
+                currentPage:1,//初始查询页数 第一页
+                total:'',//所有数据
+            },
+            wuliaoData:{
                 pagePerNum:5,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
@@ -637,17 +784,105 @@ export default {
             checkedResults:{},
             shujugaikuangshow:false,
             selcetedItem:{},
+            duliWuliaoObj:{
+                show:false,
+            },
+            tableColumns: [
+                {
+                    label: '产品类型',
+                    prop: 'productType',
+                    minWidth: '260px',
+                },
+                {
+                    label: '产品ID',
+                    prop: 'entityName',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '产品名称',
+                    prop: 'productName',
+                    align:"center",
+                    headerAlign:"center"  
+                },
+                {
+                    label: '品牌',
+                    prop: 'brand',
+                    align:"center",
+                    headerAlign:"center" ,
+                    width: '205px', 
+                },
+                {
+                    label: '规格参数',
+                    prop: 'specificationParameter',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '数量',
+                    prop: 'totalCount',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '单位',
+                    prop: 'unit',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '单价',
+                    prop: 'referencePrice',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label: '总价',
+                    prop: '_totalProce',
+                    align:"center",
+                    headerAlign:"center" 
+                },
+                {
+                    label:'操作',
+                    prop:'operator',
+                    type: 'template',
+                    template: 'action',
+                    minWidth:'125px',
+                    align:"center",
+                    headerAlign:"center" 
+                }
+            ],
+            props: {
+                stripe: true,
+                border: true,
+                showHeader: true,
+                showSummary: false,
+                showRowHover: true,
+                showIndex: false,
+                treeType: true,
+                isFold: true,
+                expandType: false,
+                selectionType: false,
+            }, 
+            mappingData:[],
+            wuliaoDetailName:'',
+            productShow:false,
+            selcetNewModelObj:{},
+            changeproductShow:false,
+            changeProductData:[],
+            changeAll:false,
+            selectedmanifestId:{},
         }
     },
     created(){
-        var vm = this
-        vm.token = localStorage.getItem('token')
-        vm.projId = localStorage.getItem('projId')
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getinventoryDetail()
+        var vm = this;
+        vm.token = localStorage.getItem('token');
+        vm.projId = localStorage.getItem('projId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        vm.getinventoryDetail();
     },
     mounted(){
-        var vm = this
+        var vm = this;
     },
     watch:{
         'pageDetial.currentPage':function(val,oldval){
@@ -674,6 +909,12 @@ export default {
             var vm = this
             vm.addNewWuliao()
         },
+        'wuliaoData.currentPage':function(val,oldval){
+            this.viewDetail(this.selectedmanifestId);
+        },
+        'wuliaoData.pagePerNum':function(val,oldval){
+           this.viewDetail(this.selectedmanifestId);
+        }
     },
     methods:{
         selectImg(){
@@ -721,8 +962,9 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    vm.upImgCancle()
-                    vm.importCancle()
+                    vm.upImgCancle();
+                    vm.importCancle();
+                    this.getSingleWorkAmountList();
                 }else{
                     vm.$message({
                         type:'warning',
@@ -879,28 +1121,6 @@ export default {
             vm.showCommonList = true
             vm.checkItem = val
         },
-        /**========================分         割         线==================
-         *                             _ooOoo_
-         *                            o8888888o
-         *                            88" . "88
-         *                            (| -_- |)
-         *                            O\  =  /O
-         *                         ____/`---'\____
-         *                       .'  \\|     |//  `.
-         *                      /  \\|||  :  |||//  \
-         *                     /  _||||| -:- |||||-  \
-         *                     |   | \\\  -  /// |   |
-         *                     | \_|  ''\---/''  |   |
-         *                     \  .-\__  `-`  ___/-. /
-         *                   ___`. .'  /--.--\  `. . __
-         *                ."" '<  `.___\_<|>_/___.'  >'"".
-         *               | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-         *               \  \ `-.   \_ __\ /__ _/   .-` /  /
-         *          ======`-.____`-.___\_____/___.-`____.-'======
-         *                             `=---='
-         *          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         *                          膜拜 尤雨溪 
-        */
         showDetial(val){
             var vm = this
             vm.showCommonDetial = true
@@ -1416,8 +1636,134 @@ export default {
         },
         //查看独立物料量清单详情
         viewDetail(val){
-            console.log(val);
-        }
+            this.duliWuliaoObj.show = true;
+            this.showCommonDetial = false;
+            this.showCommonList = false;
+            this.wuliaoDetailName = val.detailName;
+            this.selectedmanifestId = val;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/listMaterialComponent',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    detailId:val.id,
+                    page:this.wuliaoData.currentPage,
+                    rows:this.wuliaoData.pagePerNum
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.mappingData = response.data.rt.rows;
+                    this.wuliaoData.total = response.data.rt.total;
+                    let parentArr = [];
+                    let childrenArr = [];
+                    if(this.mappingData !=null && this.mappingData.length!=0){
+                        this.mappingData.forEach(item=>{
+                            Object.assign(item,{
+                                _totalProce:item.totalCount*item.referencePrice,
+                            })
+                            if(item._parentId == 0){
+                                parentArr.push(item);
+                            }else{
+                                childrenArr.push(item);
+                            }
+                        })
+                    }
+                    parentArr.forEach(item=>{
+                        Object.assign(item,{
+                            children:[],
+                        })
+                    })
+                    for(let i = 0;i<parentArr.length;i++){
+                        for(let j = 0 ;j<childrenArr.length;j++){
+                            if(childrenArr[j]._parentId === parentArr[i]._id){
+                                parentArr[i].children.push(childrenArr[j]);
+                            }   
+                        }
+                    }
+                    this.mappingData = parentArr;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        backToOrign(){
+            this.duliWuliaoObj.show = false;
+        },
+        //重新选型
+        selcetNewModel(scope){
+            this.selcetNewModelObj = scope.row;
+            this.productShow = true;
+        },
+        productShowSure(){
+            this.productShow = false;
+        },
+        productShowCancel(){
+            this.productShow = false;
+        },
+        //更换产品
+        changeProduct(){
+            this.changeproductShow = true;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/getProductsByProductType',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    productType:this.selcetNewModelObj.materialClassifyCode
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.changeProductData = response.data.rt;
+                    this.changeProductData.forEach(item=>{
+                        if(item.productId == this.selcetNewModelObj.relaId){
+                            Object.assign(item,{
+                                _isDefault:true,
+                            })
+                        }else{
+                            Object.assign(item,{
+                                _isDefault:false,
+                            })
+                        }
+                    })
+                }else{
+                    alert('response.data.msg');
+                }
+            })
+        },
+        changeproductShowSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/changeProduct',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    whetherSelectAll:this.changeAll,
+                    detailId:this.selcetNewModelObj.id,
+                    productId:this.selcetNewModelObj.relaId,
+                    manifestId:this.selectedmanifestId.id,
+                    projectId:this.projId,
+                    productTypeCode:this.selcetNewModelObj.productTypeCode,
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.viewDetail(this.selectedmanifestId);
+                    this.changeproductShow = false;
+                    this.productShow = false;
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+            
+        },
+        changeproductShowCancel(){
+            this.changeproductShow = false;
+        },
     }
 }
 </script>
@@ -1425,6 +1771,47 @@ export default {
     #inventory{
         .el-dialog{
             margin: 0 auto;
+        }
+        .actionBtn{
+            width: 16px;
+            height: 17px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .changeProducticon{
+            background: url('./images/changeproduct.png') no-repeat;
+            width: 15px;
+            height: 12px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .duliWuliao{
+            margin: 0 20px;
+            .antsLine {
+                padding: 10px 10px 15px 0px;
+                font-size: 12px;
+                line-height: 12px;
+                color: #999999;
+                text-align: left;
+                .icon-sanjiao-right {
+                    display: inline-block;
+                    width: 7px;
+                    height: 10px;
+                    margin: 2px 7px 0;
+                    background-image: url('../ManageCost/images/sanjiaoright.png');
+                    background-size: 100% 100%;
+                }
+                .strong {
+                    cursor: pointer;
+                    color: #333333;
+                    font-weight: bold;
+                    &:last-of-type .icon-sanjiao-right {
+                    display: none;
+                    }
+                }
+            }
         }
         .topHeader{
             box-sizing: border-box;
@@ -1628,13 +2015,6 @@ export default {
                         .Strong{
                             font-weight: bold;
                         }
-                        .actionBtn{
-                            width: 16px;
-                            height: 17px;
-                            border: none;
-                            cursor: pointer;
-                            margin-right: 10px;
-                        }
                         .editBtn{
                             background: url('../../assets/edit.png') no-repeat;
                         }
@@ -1751,14 +2131,21 @@ export default {
             margin-right: 25px;
         }
         #edit{
-            // .el-dialog{
-            //     width: 586px!important;
-            // }
             #fileInfo{
                 display: none;
             }
             .imageBody {
                 text-align: left;
+            }
+            .changedatabottom{
+                text-align: left;
+                color: #999;
+                font-size: 14px;
+                line-height: 14px;
+                margin-top: 10px;
+                .el-checkbox__label{
+                    margin-left: 8px;
+                }
             }
             .imageBodyText {
                 color: #666;
@@ -1774,6 +2161,7 @@ export default {
                 position: relative;
                 .inp{
                     float: left;
+                    width: 505px;
                 }
                 .imageBodyText{
                     float: left;
@@ -1785,7 +2173,7 @@ export default {
                 }
                 .editSelect{
                     float: left;
-                    width: 436px;
+                    width: 506px;
                     height: 40px;
                     padding: 10px;
                 }
@@ -1923,6 +2311,9 @@ export default {
             box-sizing: border-box;
         }
         #edit{
+            .productList{
+                padding: 0 30px;
+            }
             .project1{
                 margin: 20px 30px 30px 30px;
                 .projectTitle{
@@ -2009,14 +2400,6 @@ export default {
                 }
                 .detailBtn{
                     background: url('./images/details.png') no-repeat;
-                }
-            
-                .actionBtn{
-                    width: 16px;
-                    height: 17px;
-                    border: none;
-                    cursor: pointer;
-                    margin-right: 10px;
                 }
                 .backToProjectBtn{
                     cursor: pointer;
@@ -2167,6 +2550,50 @@ export default {
                     }
                 }
             }
+        }
+        //zk-table组件样式
+        .zk-table{
+            color: #333333;
+        }
+        .zk-table--tree-icon{
+            position: relative;
+            width: 40px;
+            display: inline-block;
+            z-index: 10;
+            background: #ffffff;
+        }
+        .zk-table--row-hover .zk-table--tree-icon{
+            background: #ebf7ff;
+        }
+        .zk-table--tree-icon::after {
+            display: block;
+            position: absolute;
+            top: 6px;
+            left: 20px;
+            width: 15px;
+            height: 12px;
+            background:url('./images/folder_1.png')no-repeat 0 0; 
+            content: '';
+        }
+        .zk-icon-minus-square-o::after{
+            background:url('./images/folder.png')no-repeat 0 0; 
+        }
+        .zk-table__body-row>td:first-of-type{
+            width: 45px;
+        }
+        .zk-table--level-4-cell,.zk-table--level-3-cell,.zk-table--level-2-cell,.zk-table--level-1-cell,.zk-table--level-5-cell{
+            position: relative;
+        }
+        .zk-table--level-4-cell::before,.zk-table--level-3-cell::before,.zk-table--level-2-cell::before,.zk-table--level-1-cell::before,.zk-table--level-5-cell::before{
+            display: block;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 14px;
+            background:url('./images/file.png')no-repeat 0 0; 
+            content: '';
+            z-index: 1;
         }
     }
 </style>
