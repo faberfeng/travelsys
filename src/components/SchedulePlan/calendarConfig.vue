@@ -24,7 +24,7 @@
                             <div class="calendarBox">
                                 <div class="calendarLeft">
                                     <ul class="calendarSelect">
-                                        <li :class="[{'calendarBody_active':currentStyle},'calendarHead']"><span>当前日历模板</span><i class="el-icon-plus" @click="addCalendarTemplate()"></i></li>
+                                        <li :class="[{'calendarBody_active':currentStyle},'calendarHead']"><span>当前日历模板</span><i class=" poniter el-icon-plus" @click="addCalendarTemplate()"></i></li>
                                         <li :class="[{'calendarBody_active':item.id==isActive},'calendarBody']"   @click="checkedItem(item.id,index)"  v-for="(item,index) in calendarIndex"   :key="index" ><span v-text="item.tempName"></span><div class="editBtn" @click="edit(index)" title="修改"></div></li>
                                     </ul>
                                 </div>
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="work">
-                            <h2 class="workdaySet"><span>工作周休息日设定</span><span id="add" @click="addweektime" ><i class="el-icon-plus" ></i>增加</span></h2>
+                            <h2 class="workdaySet"><span>工作周休息日设定</span><span id="add" @click="addweektime" ><i class=" poniter el-icon-plus" ></i>增加</span></h2>
                             <div class="tableBox">
                                 <table class="workTable" border="1" width="100%">
                                     <thead class="head">
@@ -98,7 +98,7 @@
                             </div>                                
                         </div> 
                             <div class="work">
-                            <h2 class="workdaySet"><span>例外休息日设定</span><span id="add" @click="addExceptionDate"><i class="el-icon-plus"></i>增加</span></h2>
+                            <h2 class="workdaySet"><span>例外休息日设定</span><span id="add" @click="addExceptionDate"><i class=" poniter el-icon-plus"></i>增加</span></h2>
                             <div class="tableBox">
                                 <table class="workTable" border="1" width="100%">
                                     <thead class="head">
@@ -137,14 +137,14 @@
                                 <table  border="1" width="100%">
                                     <tbody>
                                         <tr>
-                                            <td v-for="(item,index) in priorityIndex" :class="{'Active':index<tpType}"  @click="changePriority(index)" :key="index" v-text="item.Index"></td>
+                                            <td v-for="(item,index) in priorityIndex" :class="{'Active':item.tptype<=tpType}"  @click="changePriority(item.tptype)" :value="item.tptype" :key="index" v-text="item.Index"></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div> 
                         <div class="taskGroup">
-                            <h2><span>任务组别设置</span><span id="add" @click="addTaskGroup"><i class="el-icon-plus"></i>增加</span></h2>
+                            <h2><span>任务组别设置</span><span id="add" @click="addTaskGroup"><i class=" poniter el-icon-plus"></i>增加</span></h2>
                             <div class="groupTab">
                                 <table  border="1" width="100%">
                                     <thead class="head">
@@ -168,7 +168,7 @@
                             </div>
                         </div>
                         <div class="taskGroup">
-                            <h2><span>资源类别设置</span><span id="add" @click="addResourceType"><i class="el-icon-plus" ></i>增加</span></h2>
+                            <h2><span>资源类别设置</span><span id="add" @click="addResourceType"><i class=" poniter el-icon-plus" ></i>增加</span></h2>
                             <div class="groupTab">
                                 <table  border="1" width="100%">
                                     <thead class="head">
@@ -503,13 +503,13 @@
                 </div>
             </el-dialog>
             <!-- 新增任务组别 -->
-            <el-dialog title="修改任务组别" :visible.sync="addTaskGroupDialog" @close="editGroupCancelBtn">
+            <el-dialog title="新增任务组别" :visible.sync="addTaskGroupDialog" @close="editGroupCancelBtn">
                 <div class="editBody">
                     <div class="editBodyone edit-item clearfix"><label class="editInpText">组别名称 :</label><input class="inp" placeholder="请输入模板名称" v-model="tGroupName"></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">标记色 :</label>
                     <!-- 目前先用简单的方法-下拉框的方法，后面第二轮升级再调整 -->
                     <select class="editSelect" v-model="selectTGColor" @change="taskGroupColorChange">
-                        <option v-for="(item,index) in taskGroupColor" :key="index">{{item}}</option>
+                        <option v-for="(item,index) in taskGroupColor" :value="item.value" :key="index">{{item.label}}</option>
                     </select>
                     <span v-if="showtaskGroupColor" class="displayColor" :style="{'background-color':taskGroupColorOne}"></span>
                         <i class="icon-sanjiao"></i>
@@ -521,12 +521,12 @@
                 </div>
             </el-dialog>
             <!-- 编辑任务组别 -->
-            <el-dialog title="新增事件内容" :visible.sync="editTaskGroupDialog" @close="addGroupCancelBtn">
+            <el-dialog title="修改任务组别" :visible.sync="editTaskGroupDialog" @close="addGroupCancelBtn">
                 <div class="editBody">
                     <div class="editBodyone edit-item clearfix"><label class="editInpText">组别名称 :</label><input class="inp" placeholder="请输入模板名称" v-model="tGroupName"></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">标记色 :</label>
                     <select class="editSelect" v-model="selectTGColor"  @change="taskGroupColorChange">
-                        <option v-for="(item,index) in taskGroupColor" :key="index">{{item}}</option>
+                        <option v-for="(item,index) in taskGroupColor" :value="item.value" :key="index">{{item.label}}</option>
                     </select>
                     <span v-if="showtaskGroupColor" class="displayColor" :style="{'background-color':taskGroupColorOne}"></span>
                         <i class="icon-sanjiao"></i>
@@ -1060,6 +1060,7 @@
                                         text-align: center;
                                         font-size: 12px;
                                         color: #d3d3d3;
+                                        cursor: pointer;
                                     }
                                      .Active{
                                             color:red;
@@ -1410,7 +1411,11 @@
         
     }
 </style>
+<style lang="less">
+ .poniter{cursor: pointer;}
+</style>
 <script>
+
 import axios from 'axios';
 import moment from 'moment';
 import calendar from './calendar.vue'
@@ -1611,6 +1616,7 @@ export default{
             repeatway:'',
             repeatwayValue:'',
             tpType:'',
+            tpType1:'',
             tempId:'',
             currentStyle:true,//目前样式
             isActive:-1,
@@ -1642,13 +1648,32 @@ export default{
             //优先级值
             priorityIndex:
                 [
-                    {Index:'1级'},
-                    {Index:'2级'},
-                    {Index:'3级'},
-                    {Index:'4级'},
-                    {Index:'5级'},
-                    {Index:'6级'},
-                    {Index:'7级'},
+                    {
+                        tptype:'1',
+                        Index:'1级'},
+                    {
+                        tptype:'2',
+                        Index:'2级'},
+                    {
+                        tptype:'3',
+                        Index:'3级'
+                    },
+                    {
+                        tptype:'4',
+                        Index:'4级'
+                    },
+                    {
+                        tptype:'5',
+                        Index:'5级'
+                    },
+                    {
+                        tptype:'6',
+                        Index:'6级'
+                    },
+                    {
+                        tptype:'7',
+                        Index:'7级'
+                    },
                 ],
             updateTaskPriorityDialog:false,
             //弹出框
@@ -1684,7 +1709,30 @@ export default{
             tGroupName:'',//任务组别名称
             addTaskGroupDialog:false,
             editTaskGroupDialog:false,
-            taskGroupColor:['lightskyblue','cadetblue','cornflowerblue','darkseagreen','lightblue','lightseagreen','yellow','green','blue','violet'],
+            taskGroupColor:[
+                {value:'lightskyblue',
+            label:'天蓝色'},
+            {value:'cadetblue',
+            label:'军色蓝'},
+            {value:'cornflowerblue',
+            label:'亮蓝色'},
+            {value:'darkseagreen',
+            label:'深绿色'},
+            {value:'lightblue',
+            label:'浅蓝色'},
+            {value:'lightseagreen',
+            label:'浅海绿色'},
+            {value:'yellow',
+            label:'黄色'},
+            {value:'green',
+            label:'绿色'},
+            {
+                value:'blue',
+                label:'蓝色'
+            },{
+                value:'violet',
+                label:'蓝紫色'
+            }],
             selectTGColor:'',
             showtaskGroupColor:false,
             taskGroupColorOne:'',
@@ -1698,7 +1746,7 @@ export default{
             value:'',
             taskStatusColorOne:'', 
             taskStatusName:'',
-            showTaskStatusColor:false,
+            showTaskStatusColor:true,
             taskStatusColor:[		
                 {
                     val:'',
@@ -1966,10 +2014,10 @@ export default{
                     text='正常完成';
                     break;
                 case 11:
-                    text='实际提前';
+                    text='拖延完成';
                     break;
                 case 12:
-                    text='实际提前';
+                    text='提前完成';
                     break;
             }
             if(val=='1000')
@@ -2362,7 +2410,7 @@ export default{
         //修改工程任务优先级
         changePriority(index){
             this.updateTaskPriorityDialog=true;
-            this.tpType=index+1;
+            this.tpType1=index;
         },
         updateTPListSure(){
             axios({
@@ -2372,7 +2420,7 @@ export default{
                     'token':this.token
                 },
                 params:{
-                    type:this.tpType
+                    type:this.tpType1
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
@@ -2482,6 +2530,9 @@ export default{
         },
         //确认增加资源类别
         addResourceTypeSure(){
+            if(this.rTypeName==''){
+                alert('资源类别名称不能为空')
+            }
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/addResouceType',
@@ -2553,8 +2604,8 @@ export default{
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.taskCheckValue=response.data.rt;
-                       if(this.taskCheckValue.confVal==this.taskCheckName.value)
-                               {this.taskCheckValue=this.taskCheckName.value} 
+                    //    if(this.taskCheckValue.confVal==this.taskCheckName.value)
+                    this.taskCheckValue=this.taskCheckValue.confVal
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
                 }else{
@@ -2575,8 +2626,8 @@ export default{
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.componentCheckValue=response.data.rt;
-                       if(this.componentCheckValue.confVal==this.componentCheckName.value)
-                               {this.componentCheckValue=this.componentCheckName.value} 
+                    //    if(this.componentCheckValue.confVal==this.componentCheckName.value)
+                    this.componentCheckValue=this.componentCheckValue.confVal
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
                 }else{
@@ -2651,7 +2702,7 @@ export default{
                     this.id=item.id;
                     this.taskStatusName=item.taskStatus
                     this.value=item.colorValue;
-                   
+                   this.taskStatusColorOne=this.TSColor(this.value);
                 }
             })
         },
@@ -2693,6 +2744,7 @@ export default{
                     this.updateTaskStatusColorDialog=false;
                     this.taskStatusList=[];
                     this.value='';
+                    // alert('更改图例成功');
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg)
                 }else{
@@ -3337,7 +3389,7 @@ export default{
         //新增任务组别
         addTaskGroup(){
             this.addTaskGroupDialog=true;
-            this.selectTGColor='lightskyblue';
+            this.selectTGColor=this.taskGroupColor[0].value;
             this.showtaskGroupColor=true;
             this.taskGroupColorOne=this.toBeColor(this.selectTGColor);
         },
@@ -3446,6 +3498,11 @@ export default{
             this.selectTGColor='';
         },
         taskGroupColorChange(){
+            this.taskGroupColor.forEach((item)=>{
+                if(this.selectTGColor==item.value){
+                    this.selectTGColor=item.value
+                }
+            })
                 this.showtaskGroupColor=true;
                 this.taskGroupColorOne=this.toBeColor(this.selectTGColor);
         },

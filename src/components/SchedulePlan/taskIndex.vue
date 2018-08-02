@@ -22,61 +22,84 @@
                     <router-link :to="'/SchedulePlan/calendarConfig'" class="label-item">  
                     更多配置  
                     </router-link>
-                    <div class="item-search">
+                    <div v-if="!showCommonList" class="item-search">
                         <span class="title-right">
                                 <input type="text"  placeholder="请输入文件名称" v-model="searchTaskName"  class="title-right-icon" @keyup.enter="getTaskList">
                                 <span  class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                         </span>
-                        <span class="icon-type"></span>
+                        <span class="icon-type" @click="getGanttList"></span>
                     </div>
                 </div>
-                <div class="taskWarp">
-                    <div class="taskHead">
-                        <div class="taskHeadLeft" @click="addTask">
-                            <i class="el-icon-plus" style="width:20px;"></i>新增任务
+                <div v-if="!showCommonList">
+                    <div v-show="hiddenGanttList" class="taskWarp">
+                        <div class="taskHead">
+                            <div class="taskHeadLeft" @click="addTask">
+                                <i class="el-icon-plus" style="width:20px;"></i>新增任务
+                            </div>
+                            <div class="taskHeadRight">
+                                <span class="btn-operate" @click="progressSearch()">进度查询</span>
+                                <span class="btn-operate" @click="valueSearch()">产值查询</span>
+                                <span class="btn-operate" @click="userGroupTask()">群组权限</span>
+                                <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
+                                <span class="btn-operate" @click="showColumnConfig()">显示列</span>
+                            </div>
                         </div>
-                        <div class="taskHeadRight">
-                            <span class="btn-operate" @click="progressSearch()">进度查询</span>
-                            <span class="btn-operate" @click="valueSearch()">产值查询</span>
-                            <span class="btn-operate" @click="userGroupTask()">群组权限</span>
-                            <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
-                            <span class="btn-operate" @click="showColumnConfig()">显示列</span>
+                        <div class="taskBody">
+                            <zk-table 
+                                index-text="序号"
+                                :data="taskIndexData" :columns="columns" :max-height="props.height"  :tree-type="props.treeType"
+                                :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                                :border="props.border" :is-fold="props.isFold" empty-text="正在加载..." @row-click="rowClick" @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick"  >
+                                <template slot="action" slot-scope="scope">
+                                    <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
+                                    <button class="deleteBtn actionBtn" title="删除" @click="deleteTab(scope)"></button>
+                                    <button class="sortBtn actionBtn" title="排序" @click="sort(scope)"></button>
+                                </template>
+                                <template slot="taskStart" slot-scope="scope">
+                                    {{scope.row.taskStart | timeChange()}}
+                                </template>
+                                <template slot="taskEnd" slot-scope="scope">
+                                    {{scope.row.taskEnd | timeChange()}}
+                                </template>
+                                <template slot="realTaskStart" slot-scope="scope">
+                                    {{scope.row.realTaskStart | timeChange()}}
+                                </template>
+                                <template slot="realTaskEnd" slot-scope="scope">
+                                    {{scope.row.realTaskEnd |timeChange()}}
+                                </template>
+                                <template slot="taskDuration" slot-scope="scope">
+                                    {{scope.row.taskDuration+'天'}}
+                                </template>
+                            </zk-table>
                         </div>
                     </div>
-                    <div class="taskBody">
-                        <zk-table 
-                            index-text="序号"
-                            :data="taskIndexData" :columns="columns"  :tree-type="props.treeType"
-                            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                            :border="props.border" empty-text="正在加载..." @row-click="rowClick" @tree-icon-click="treeIconClick" >
-                            <template slot="action" slot-scope="scope">
-                                <!-- {{scope.row.taskName}} -->
-                                <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                                <button class="deleteBtn actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                                <button class="sortBtn actionBtn" title="排序" @click="sort(scope)"></button>
-                            </template>
-                            <template slot="taskStart" slot-scope="scope">
-                                {{scope.row.taskStart | timeChange()}}
-                            </template>
-                            <template slot="taskEnd" slot-scope="scope">
-                                {{scope.row.taskEnd | timeChange()}}
-                            </template>
-                            <template slot="realTaskStart" slot-scope="scope">
-                                {{scope.row.realTaskStart | timeChange()}}
-                            </template>
-                            <template slot="realTaskEnd" slot-scope="scope">
-                                {{scope.row.realTaskEnd |timeChange()}}
-                            </template>
-                            <template slot="taskDuration" slot-scope="scope">
-                                {{scope.row.taskDuration+'天'}}
-                            </template>
-                        </zk-table>
+                    <div v-show="!hiddenGanttList" class="taskWarp">
+                        <div class="taskHead">
+                            <div class="taskHeadLeft" @click="addTask">
+                                <i class="el-icon-plus" style="width:20px;"></i>新增任务
+                            </div>
+                            <div class="taskHeadRight">
+                                <span class="btn-operate">修改</span>
+                                <span class="btn-operate" @click="upgrade()">升级</span>
+                                <span class="btn-operate" @click="degrade()">降级</span>
+                                <span class="btn-operate" @click="swap()">上移</span>
+                                <span class="btn-operate" @click="swap()">下移</span>
+                                <span class="btn-operate">移动</span>
+                                <span class="btn-operate">删除</span>
+                                <span class="btn-operate" @click="userGroupTask()">群组权限</span>
+                                <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
+                            </div>
+                        </div>
+                        <div class="taskBody">
+                            <div id="workSpace" style="padding:0px; overflow-y:auto; overflow-x:hidden;border:1px solid #e5e5e5;position:relative;margin:0 5px">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- 测试提交 -->
-        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']">
+        
+        <div  :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-if="!showCommonList">
             <div id="center-selection">
                     <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                         <i class="icon-right"></i>
@@ -186,10 +209,10 @@
                         <li class="goujian-item" v-for="(item,index) in relaList" :key="index">
                             <p class="clearfix">
                                 <i class="icon-goujian icon-add"></i>
-                                <i class="icon-goujian icon-detial"></i>
-                                <i class="icon-goujian icon-QRcode"></i>
-                                <i class="icon-goujian icon-location"></i>
-                                <i class="icon-goujian icon-delete"></i>
+                                <i class="icon-goujian icon-detial" @click="showDetialList(item.main)"></i>
+                                <i class="icon-goujian icon-QRcode" @click="qrcode(item.main.pkId)"></i>
+                                <i class="icon-goujian icon-location" @click="location()"></i>
+                                <i class="icon-goujian icon-delete" @click="deleteAssociationList(item.main.pkId)"></i>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
@@ -229,7 +252,7 @@
                     </ul>
                 </div>
                 <div class="bindPic">
-                    <h3 class="header-attribute" style="margin-top:25px;">
+                    <h3 class="header-attribute" style="margin-top:15px;">
                             <i class="trrangle"></i>
                             附加图片
                             <i :class="[{'active':show.bindPic},'icon-dropDown']" @click="show.bindPic = show.bindPic?false:true;"></i>
@@ -264,7 +287,7 @@
                                 <td v-text="item.resourceTypeName"></td>
                                 <td v-text="item.unit"></td>
                                 <td v-text="item.amount"></td>
-                                <td><button class="deleteBtn actionBtn1"></button></td>
+                                <td><button class="deleteBtn actionBtn1" @click="deleteTaskResource(item.id)"></button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -272,8 +295,88 @@
 
             </div>
         </div>
+        <div v-if="labelListShow"  id="edit" class="dialog">
+            <div class="el-dialog__header">
+                    <span class="el-dialog__title">标签信息预览</span>
+                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="labelListCancle">
+                    <i class="el-dialog__close el-icon el-icon-close"></i>
+                </button>
+            </div>
+            <div class="el-dialog__body">
+                 <div class="editBody">
+                    <ul>
+                        <li v-for="(item,index) in relaList" :key="index" class="item-label clearfix">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.main.pkId, 7)" alt="">
+                            <div class="right">
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单ID：</span>
+                                    <span class="text-right" v-text="item.main.pkId"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单名称：</span>
+                                   <span class="text-right" v-text="item.main.mName"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">生成方式：</span>
+                                   <span class="text-right" v-text="parseMGSource(item.main.mGSource)"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">业务来源：</span>
+                                     <span class="text-right" v-text="parseMBSource(item.main.mBSource)"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建用户：</span>
+                                     <span class="text-right" v-text="item.main.creator"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建时间：</span>
+                                     <span class="text-right">{{item.main.createTime|timeChange}}</span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单版本：</span>
+                                     <span class="text-right" v-text="item.main.mVersion"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">明细数量：</span>
+                                     <span class="text-right" v-text="item.details.length"></span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="el-dialog__footer">
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" >网页预览</button>
+                    <button class="editBtnC">打印当前页标签</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="ListHeaderShow"  id="edit" class="dialog">
+            <div class="el-dialog__header">
+                <span class="el-dialog__title">显示列</span>
+                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="headerListCancle">
+                    <i class="el-dialog__close el-icon el-icon-close"></i>
+                </button>
+            </div>
+            <div class="el-dialog__body">
+                <div class="clearfix" >
+                    <span class="item-attibuteAuth" v-for="(item,index) in detailsHead_model" :key="index" v-if="index >=2">
+                          <label  :class="[item.showModel?'active':'','checkbox-fileItem']" :for="item.prop+'_header'" v-text="item.label"></label>
+                          <input  type="checkbox" :id="item.prop+'_header'" class="checkbox-arr" v-model="item.showModel">
+                    </span>
+                </div>
+            </div>
+            <div class="el-dialog__footer">
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS">确定</button>
+                    <button class="editBtnC">取消</button>
+                </div>
+            </div>
+        </div>
+         <div id="mask" v-if="labelListShow||ListHeaderShow"></div>
         <div id="edit">
-            <el-dialog title="编辑工程任务" :visible.sync="addTaskDialog" @close="addTaskCancle">
+            <el-dialog title="编辑工程任务"  :visible.sync="addTaskDialog" @close="addTaskCancle">
                 <div class="editBody">
                     <div class="editBodyone">
                         <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
@@ -407,7 +510,7 @@
             </el-dialog>
             <el-dialog title="添加前置任务" :visible.sync="addLinkDialog" @close="addLinkCancle">
                 <div class="editBody">
-                    <div class="editBodytwo2">
+                    <div class="editBodytwo3">
                         <zk-table :data="taskIndexData" :columns="columns1"  :tree-type="props.treeType"
                             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                             :border="props.border" empty-text="正在加载..." @row-click="linkTypeRowClick">
@@ -426,7 +529,7 @@
                         <button class="editBtnC" @click="addLinkCancle" >取消</button>
                 </div>
             </el-dialog>
-             <el-dialog title="进度查询" :visible.sync="progressSearchDialog" @close="progressSearchCancle">
+            <el-dialog title="进度查询" width="530px"  :visible.sync="progressSearchDialog" @close="progressSearchCancle">
                 <div class="editBody">
                     <div class="progressSearchBody">
                         <label class="searchWayText">查询方式:</label>
@@ -458,6 +561,7 @@
                     </div>
                     <div class="progressSearchList">
                         <label class="textSearch">查询结果</label>
+                        
                         <div class="tableList">
                             <table v-show="selectType==1">
                                 <thead>
@@ -560,7 +664,7 @@
                         <button class="editBtnC" @click="progressSearchCancle" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="产值查询" :visible.sync="valueSearchDialog" @close="valueSearchCancle">
+            <el-dialog title="产值查询" width="530px" :visible.sync="valueSearchDialog" @close="valueSearchCancle">
                 <div class="editBody">
                     <div class="progressSearchBody">
                         <label class="searchWayText">查询方式:</label>
@@ -592,6 +696,7 @@
                     </div>
                     <div class="progressSearchList">
                         <label class="textSearch">查询结果</label>
+                        
                         <div class="tableList">
                             <table>
                                 <thead>
@@ -616,7 +721,7 @@
                         <button class="editBtnC" @click="valueSearchCancle" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="上传文件" :visible="uploadFileDialog" @close="uploadFileCancle">
+            <el-dialog title="上传文件" width="586px" :visible.sync="uploadFileDialog" @close="uploadFileCancle">
                 <div class="editBody">
                     <div class="editBodytwo imageBody">
                         <label class="imageBodyText">上传文件 :</label>
@@ -634,7 +739,43 @@
                     <button class="editBtnC" @click="uploadFileCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="添加核实任务" :visible="addVerifyTaskDialog" @close="addVerifyTaskCancle">
+            <el-dialog title="上传图片" width="580px" :visible.sync="uploadPicDialog" @close="uploadPicCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class="imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectFile">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput" type="file" ref="file"  @change="imgChanged($event)" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="uploadPicMakeSure">上传</button>
+                    <button class="editBtnC" @click="uploadPicCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="导入project文件" width="580px" :visible.sync="exportProjectDialog" @close="exportProjectCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class="imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectFile">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput" type="file" ref="file"  @change="exportProjectFileChanged($event)" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{MppName}}</span>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="exportProjectMakeSure">上传</button>
+                    <button class="editBtnC" @click="exportProjectCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="添加核实任务" :visible.sync="addVerifyTaskDialog" @close="addVerifyTaskCancle">
                 <div class="editBody">
                     <div class="verifySilder">
                         <label class="verifySilderText">核实比例:</label>
@@ -651,15 +792,15 @@
                         <button class="editBtnC" @click="addVerifyTaskCancle" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="选择关联清单" :visible="addAssociationListDialog" @close="addAssociationListCancle">
+            <el-dialog title="选择关联清单" :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
                 <div class="editBody">
                     <div class="bindListHead">
                         <div class="bindListHeadLeft">
                             <div>
-                                <label class="listText">清单名称关键字：</label>
+                                <label class="listText" >清单名称关键字：</label>
                             </div>
                             <div>
-                                <input type="text" class="listInp" />
+                                <input type="text" v-model="detailName" class="listInp" />
                             </div>
 
                         </div>
@@ -667,11 +808,11 @@
                             <div>
                                 <label class="listText">创建时间：</label>
                             </div>
-                            <div>
-                                <el-date-picker type="date" >
+                            <div class="searchTime">
+                                <el-date-picker v-model="startDate" class="time1"  type="date" >
                                 </el-date-picker>
-                                <!-- <el-date-picker class="time" type="date">
-                                </el-date-picker> -->
+                                <el-date-picker v-model="endDate" class="time" type="date">
+                                </el-date-picker>
                             </div>
                         </div>
                     </div>
@@ -690,10 +831,11 @@
                         </div>
                     </div>
                     <div class="bindListsearchBtn">
-                        <button class="searchBtn">查询</button>
+                        <button class="searchBtn" @click="loadManifestSearch">查询</button>
                     </div>
                     <div class="bindListTab">
                         <label class="searchResultText">查询结果</label>
+                        <div class="siteSearch" @click="siteSearch()">场景选择</div>
                         <div class="searchTab">
                             <table border="1" width='100%'>
                                 <thead>
@@ -708,8 +850,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item,index) in loadManifestList" :key="index">
-                                        <td><el-checkbox></el-checkbox></td>
+                                    <tr v-for="(item,index) in loadManifestList" :key="index" :class="[{'active':item.checked}]" @click="checkItem(index)">
+                                        <td><el-checkbox v-model="item.checked"></el-checkbox></td>
                                         <td v-text="parseType(item.type)"></td>
                                         <td v-text="item.detailId"></td>
                                         <td v-text="item.detailName"></td>
@@ -778,13 +920,54 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS">确定</button>
-                        <button class="editBtnC">取消</button>
+                        <button class="editBtnS" @click="addAssociationListMakeSure">确定</button>
+                        <button class="editBtnC" @click="addAssociationListCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="添加资源类别" :visible="addResourceTaskDialog" @close="addResourceTaskCancle">
+            <el-dialog  title="添加资源类别" width="580px" :visible.sync="addResourceTaskDialog" @close="addResourceTaskCancle">
+                <div class="editBody">
+                    <div class="resourceText1">
+                        <label>资源类别名称：</label>
+                        <select class="resourceSelect1" v-model="resourceTypeValue" @change="resourceTypeChange">
+                            <option value="0">全部</option>
+                            <option v-for="(item,index) in resourceTypeList" :key="index" :value="item.id" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="resourceText2">
+                        <label>资源类型名称：</label>
+                        <select class="resourceSelect2" v-model="taskResourceTaskValue" @change="taskResourceChange" >
+                            <option v-for="(item,index) in taskResourceTypeList" :key="index" :value="item.id" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="resourceText3">
+                        <label class="text1">模式：</label>
+                        <select class="resourceSelect3" v-model="patternValue">
+                            <option value="0">每日</option>
+                            <option value="1">总数平均分配</option>
+                        </select>
+                        <label class="text2">数量：</label>
+                        <input type="text" v-model="amount" class="resourceInp"/>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addResourceTaskMakeSure">确定</button>
+                        <button class="editBtnC" @click="addResourceTaskCancle">取消</button>
+                </div>
+            </el-dialog >
+            <el-dialog title="移动任务" :visible.sync="removeTaskDialog" @close="removeTaskCancle">
+                <div class="editBody">
+                    <div class="editBodytwo3">
+                        <zk-table :data="taskIndexData" :columns="columns1"  :tree-type="props.treeType"
+                            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                            :border="props.border" empty-text="正在加载..." @row-click="removeTaskRowClick">
+                        </zk-table>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="removeTaskMakeSure" >确定</button>
+                        <button class="editBtnC" @click="removeTaskCancle" >取消</button>
+                </div>
             </el-dialog>
-
         </div>
         <div id="edit1">
             <el-dialog title="群组权限" :visible.sync="userGroupTaskDialog" @close="userGroupTaskCancle">
@@ -823,7 +1006,6 @@
                     <button class="cancelBtn" @click="deleteTaskClose">取消</button>
                 </div>
             </el-dialog>
-
             <el-dialog  :visible.sync="deleteLinkTaskDialog" width="398px" @close="deleteLinkTaskClose">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <p class="deleteDialogWarning">你要删除当前所选的前置任务？</p>
@@ -833,7 +1015,6 @@
                     <button class="cancelBtn" @click="deleteLinkTaskClose">取消</button>
                 </div>
             </el-dialog>
-
             <el-dialog  :visible.sync="deleteFileDialog" width="398px" @close="deleteFileClose">
                 <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
                 <!-- <p class="deleteDialogWarning"></p> -->
@@ -843,28 +1024,80 @@
                     <button class="cancelBtn" @click="deleteFileClose">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog :visible.sync="deleteTaskResourceDialog" width="398px" @close="deleteTaskResourceClose">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <!-- <p class="deleteDialogWarning"></p> -->
+                <p class="deleteDialogText">确定要删除该任务下的资源分配？</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteTaskResourceMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteTaskResourceClose">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog :visible.sync="deleteAssociationListDialog" width="398px" @close="deleteAssociationListClose">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <!-- <p class="deleteDialogWarning"></p> -->
+                <p class="deleteDialogText">确定要将清单与当前任务解除关联关系吗？</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteAssociationListMakeSure">确定</button>
+                    <button class="cancelBtn" @click="deleteAssociationListClose">取消</button>
+                </div>
+            </el-dialog>
         </div>
+        <!--下面是报表清单的编码-->
+        <common-list v-on:back="backToH" :mId="checkList.pkId" rType="7" :bId='checkItem.pkId'  :title="'构件量清单'" v-if="showCommonList"></common-list>
     </div> 
 </template>
+
 <script>
 import moment from 'moment';
 import axios from 'axios';
-import './js/jquery-1.4.4.min.js';
-import data from './js/date.js';
+import $ from 'jquery';
+//引入gantt图
+// import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
+// import './jQueryGantt/libs/jquery/jquery.timers.js'
+// import './jQueryGantt/libs/utilities.js'
+// import './jQueryGantt/libs/forms.js'
+// // import './jQueryGantt/libs/date.js'
+// import './jQueryGantt/libs/dialogs.js'
+// import './jQueryGantt/libs/layout.js'
+// import './jQueryGantt/libs/i18nJs.js'
+// import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
+// // import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
+// import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
+// import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+// import './jQueryGantt/ganttUtilities.js'
+// import './jQueryGantt/ganttTask.js'
+// import './jQueryGantt/ganttDrawerSVG.js'
+// // import './jQueryGantt/ganttZoom.js'
+// import {GridEditor} from './jQueryGantt/ganttGridEditor.js'
+// import {GanttMaster} from './jQueryGantt/ganttMaster.js'
+
+import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
+import commonList from  './qingdan.vue'
+import '../ManageCost/js/jquery-1.8.3.js'
+import '../ManageCost/js/date.js'
 export default {
   name:'taskIndex',
   data(){
       return {
+        showCommonList:false,//显示清单
+        checkList:'',
+        labelListShow:false,//二维码显示
+        ListHeaderShow:false,//列表头
         tvValue:0,//silder初始值
         radio:1, 
         token:'',
         projId:'',
         BDMSUrl:'',
         selectUgId:'',//所选择群组id
+        taskNameStr:'',
         ugList:'',//群组列表
         ugList1:[],//群组列表1
         entityRelationList:[],//获取绑定实体关系分组
         relaList:[],
+        mId:'',
+        bId:'',
+        bType:'',
         groupFlag:false,
         checkFlg:false,
         tgList:'',
@@ -880,7 +1113,25 @@ export default {
         verifyList:[],//核实记录
         fileList:[],//文件关联
         loadManifestList:[],//加载列表清单
+        checkedItem:{},//选中的file
         taskResourceTaskList:[],//获取任务资源列表
+        taskResourceTypeList:[],//任务资源列表
+        resourceTypeName:'',//任务资源名称
+        taskResourceTaskValue:'',//任务资源值
+        patternList:[
+            {
+            value:0,
+            label:'每日'
+            },
+            {
+                value:1,
+                label:'总数平均分配'
+            }
+        ],
+        patternValue:'',
+        amount:'',
+        resourceTypeList:[],//获取资源类别
+        resourceTypeValue:'',//资源类别值
         pageDetial_1:{
                 pagePerNum:10,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
@@ -889,6 +1140,7 @@ export default {
         linkList:[],
         selectRowList:[],//获取选择列表信息
         taskId:'',
+        curUgId:'',//移动任务所选id
         Type:null,
         linkId:'',//前置任务ID
         taskParId:'',
@@ -916,9 +1168,15 @@ export default {
         userGroupTaskDialog:false,//群组权限
         //文件上传
         uploadFileDialog:false,//上传文件
+        uploadPicDialog:false,//上传图片
+        exportProjectDialog:false,//导入Project文件
         addVerifyTaskDialog:false,//增加核实任务
         addAssociationListDialog:false,//选择关联清单
         addResourceTaskDialog:false,//添加资源类别
+        removeTaskDialog:false,//移动任务
+        detailName:'',//清单名关键字
+        startDate:'',//查询开始时间
+        endDate:'',//查询结束时间
         relaTypeValue:"",
         relaTypeList:[
             {
@@ -984,7 +1242,8 @@ export default {
 
         verifyStartTime:'',//核实任务开始时间
         uploadfilesList:[],//文件上传列表
-        imageName:'',//上传文件名字
+        imageName:'未选择任何文件',//上传文件名字
+        MppName:'未选择任何文件',//上传MPP文件名字
         taskProgressStart:'',
         taskProgressEnd:'',
         valueSearchStart:'',
@@ -1039,10 +1298,14 @@ export default {
         taskEnd:'',//任务结束时间
         taskParId:'',
         linkTaskId:'',//前置任务Id
+        removeTaskId:'',//移动任务Id
         disable:false,//是否禁止日期选择
         deleteLinkTaskDialog:false,//删除前置任务弹出框
         deleteTaskDialog:false,//删除任务
         deleteFileDialog:false,//删除文件
+        deleteTaskResourceDialog:false,//删除任务资源
+        deleteAssociationListDialog:false,//删除关联清单
+        selectId:'',//删除ID
         showText:false,//删除任务显示文字
         showText1:false,
         relaType:'',
@@ -1108,7 +1371,8 @@ export default {
                 isFold: false,
                 expandType: false,
                 selectionType: false,
-                 rowStyle:[Function],
+                height:'10px'
+                //  rowStyle:[Function],
             },
         // rowStyle:[Function],
         columns1:[
@@ -1132,126 +1396,137 @@ export default {
                 {
                     label:'名称',
                     prop:'taskName',
-                    hidden:true,
+                    show:true,
                     type: 'template',
                     template:'action',
-                    width:'300px',
+                    minWidth:'280px'
                      
                 },
                 {
                     label: '组别',
                     prop: 'taskGroupName',
-                    hidden:false,
-                     
+                    show:true,
+                     minWidth:'60px'
                 },
                 {
                     label: '序号',
                     prop: 'taskId',
-                    hidden:true,
+                    show:true,
+                     minWidth:'60px'
                      
                 },
                 {
                     label: '编号',
                     prop: 'completeTaskCode',
-                    hidden:true,
+                    show:true,
                      
                 },
                 {
                     label:'优先级',
                     prop:'taskPriority',
-                    hidden:true,
+                    show:true,
                      
                 },
                 {
                     label:'里程碑',
                     prop:'taskType',
-                    hidden:true,
+                    show:true,
                 },
                 {
                     label:'计划开始',
                     prop:'taskStart',
-                    hidden:true,
+                    show:true,
                     type: 'template',
                     template: 'taskStart',
+                    minWidth:'100px'
                      
                 },
                 {
                     label:'计划结束',
                     prop:'taskEnd',
-                    hidden:true,
+                    show:true,
                      type: 'template',
                     template: 'taskEnd',
+                    minWidth:'100px'
                 },
                 {
                     label:'实际开始',
                     prop:'realTaskStart',
-                    hidden:true,
+                    show:true,
                      type: 'template',
                     template: 'realTaskStart',
+                    minWidth:'90px'
                 },
                 {
                     label:'实际结束',
                     prop:'realTaskEnd',
-                    hidden:true,
+                    show:true,
                     type: 'template',
                     template: 'realTaskEnd',
-                     
+                    minWidth:'90px'
                 },
                  {
                     label:'工作日',
                     prop:'taskDuration',
-                    hidden:true,
+                    show:true,
                     type: 'template',
                     template: 'taskDuration',   
                 },
                  {
                     label:'计划状态',
                     prop:'taskStatusStr',
-                    hidden:true,
+                    show:true,
                      
                 },
                  {
                     label:'实际状态',
                     prop:'actualStatusStr',
-                    hidden:true,    
+                    show:true,    
                 },
                  {
                     label:'比对状态',
                     prop:'verifyStatusStr',
-                    hidden:true,
+                    show:true,
                 },
                 {
                     label:'负责群组',
                     prop:'taskUserGroupName',
-                    hidden:true,
+                    show:true,
                 },
                 {
                     label:'负责人',
                     prop:'dutyUserName',
-                    hidden:true,
+                    show:true,
                 },
                 {
                     label:'计划人',
                     prop:'createUserName',
-                    hidden:true,
+                    show:true,
                 },
-                    {
+                {
                         label:'操作',
                         prop:'operator',
                         type: 'template',
+                        show:true,
                         template: 'action',
                         width:'150px'
                 }
                 ],
+                //以下为甘特图数据
+                hiddenGanttList:true,
+                xmlDoc:'',
+                a:[],
          }
   },
   created(){
         var vm = this
         this.projId = localStorage.getItem('projId');
         this.token  = localStorage.getItem('token');
+        vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getTaskIndex();
+        
         // this.getTaskList();
   },
   mounted(){
@@ -1297,6 +1572,31 @@ export default {
 
   },
   methods:{
+      //场景选择
+      siteSearch(){
+          alert("虚拟场景面板未打开，请打开左侧虚拟场景面板。")
+      },
+       // 补零
+    addZero(num,size){
+        var len = ('' + num).length;
+        return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
+    },
+    parseMGSource(mGSource){
+        switch (mGSource) {
+            case 1:
+                return "选择集";
+            case 2:
+                return "报表快照";
+            case 3:
+                return "构件量生成";
+            case 4:
+                return "外部导入";
+            case 5:
+                return "构件量生成";
+            default:
+                return "";
+        }
+     },
       //清单类型
       parseType(val){
           switch(val){
@@ -1451,7 +1751,7 @@ export default {
 
       //获取工程列表
       getTaskList(){
-          console.log(this.selectUgId);
+        //   console.log(this.selectUgId);
           axios({
               method:'post',
               url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/list',
@@ -1464,15 +1764,12 @@ export default {
               }
           }).then(response=>{
               if(response.data.cd=="0"){
-                  if(response.data.rt.length>0){
-                      if(this.searchTaskName!=''){
-                          this.taskIndexData=response.data.rt
-                      }else{
-                           this.taskIndexData=response.data.rt;
-                      }
-                  }
-                  console.log(JSON.stringify(this.taskIndexData));
-              }else if(response.data.cd=="-1"){
+                          this.taskIndexData=response.data.rt;
+                          if(this.taskIndexData==null){
+                              this.taskIndexData=[];
+                          }
+                          console.log(this.taskIndexData);
+                }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
           })
@@ -1529,23 +1826,47 @@ export default {
       //点击zk-tree获取id
       rowClick(row,rowIndex){
         //   console.log(row);
+        //   console.log(rowIndex);
             this.selectRowList=rowIndex;
-            this.selectRowList.forEach((item)=>{
+            this.selectRowList.forEach((item,index)=>{
+                // console.log(index);
                 if(item._isHover==true){
                     this.taskId=item.taskId
                     this.taskParId=item.taskParId
                 }
             })
-            console.log(this.taskId);
-            console.log(this.taskParId);
+            // console.log(this.taskId);
+            // console.log(this.taskParId);
             this.getTask();
             this.getVerifyList();
             this.getEntityRelation();
             this.getTaskResourceTaskList();
+            
       },
+      rowKey(row,rowIndex){
+          console.log(row);
+          console.log(rowIndex);
+      },
+      rowStyle(row,rowIndex){
+        //   console.log((rowIndex));
+        //   console.log((row));
+         if(row.children==null){
+             return 'background:#ccc'
+         }
+        //  else {
+        //      return ''
+        //  }
+        //  if(row._isHover==true){
+        //      return 'background:pink'
+
+        //  }
+      },
+      rowClassName(row,rowIndex){
+        //   console.log(row);
+         },
       //鼠标单击树形icon
       treeIconClick(row,rowIndex){
-            console.log(JSON.stringify(rowIndex));
+            // console.log(JSON.stringify(rowIndex));
           this.selectRowList=rowIndex;
             this.selectRowList.forEach((item)=>{
                 if(item._isHover==true){
@@ -1556,7 +1877,62 @@ export default {
             })
             //  console.log(this.tableCollapse)
       },
-   
+     
+      //获取资源类别
+      getResourceTypeList(){
+           axios({
+              method:"post",
+              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/getResouceType',
+              headers:{
+                  'token':this.token
+              }
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                  this.resourceTypeList=response.data.rt;
+                //   console.log(JSON.stringify(this.resourceTypeList));
+              }else if(response.data.cd=="-1"){
+                  alert(resposne.data.msg)
+              }
+          })
+      },
+      //改变资源类别触发
+       resourceTypeChange(){
+           this.reId=this.resourceTypeValue;
+           this.getTaskResouceType();
+      },
+      taskResourceChange(){
+          this.taskResourceTypeList.forEach((item)=>{
+              if(this.taskResourceTaskValue==item,id){
+                  this.resourceTypeName=item.name;
+              }
+          })
+      },
+      //获取资源类型名称
+      getTaskResouceType(){
+           axios({
+              method:"post",
+              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/getResouceType',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                    reId:this.reId
+              }
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                  this.taskResourceTypeList=response.data.rt;
+                  if(this.taskResourceTypeList){
+                        this.taskResourceTaskValue=this.taskResourceTypeList[0].id;
+                        this.resourceTypeName=this.taskResourceTypeList[0].name;
+                  }else{
+                      return;
+                  }
+                //   console.log(this.taskresourceTypeList);
+              }else if(response.data.cd=="-1"){
+                  alert(resposne.data.msg)
+              }
+          })
+      },
       //获取任务资源列表
       getTaskResourceTaskList(){
           axios({
@@ -1571,7 +1947,7 @@ export default {
           }).then(response=>{
               if(response.data.cd=="0"){
                   this.taskResourceTaskList=response.data.rt;
-                  console.log(this.taskResourceTaskList);
+                //   console.log(this.taskResourceTaskList);
               }else if(response.data.cd=="-1"){
                   alert(resposne.data.msg)
               }
@@ -1622,7 +1998,7 @@ export default {
               if(response.data.cd=="0"){
                   this.editTaskUserGroupList=response.data.rt;
                   this.ugList1=this.editTaskUserGroupList.ugList;
-                  console.log(JSON.stringify(this.ugList1));
+                //   console.log(JSON.stringify(this.ugList1));
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -1667,6 +2043,60 @@ export default {
           })
 
       },
+     
+      //查询清单列表
+      loadManifestSearch(){
+          if(this.startDate){
+              this.startDate=moment(this.startDate).format("YYYY-MM-DD")
+          }else{
+              this.startDate='';
+          }
+          if(this.endDate){
+              this.endDate=moment(this.endDate).format("YYYY-MM-DD")
+          }else{
+              this.endDate=''
+          }
+          var formData = new FormData();
+          formData.append('relaType',this.relaTypeValue);
+          formData.append('serviceState',this.serviceStateValue);
+          formData.append('detailName',this.detailName);
+          formData.append('startDate',this.startDate);
+          formData.append('endDate',this.endDate);
+          axios({
+              method:'post',
+              url:this.BDMSUrl+'/project2/report/loadManifest',
+              headers:{
+                //   'content-type': 'application/json;charset=UTF-8',
+                  'token':this.token
+              },
+              params:{
+                  projectId:this.projId,
+                  page:this.pageDetial_1.currentPage,
+                  rows:this.pageDetial_1.pagePerNum,
+                  type:4,
+              },
+              data:formData
+          }).then(response=>{
+              if(response.data.cd=='0'){
+                  this.pageDetial_1.total=response.data.rt.total;
+                  this.loadManifestList=response.data.rt.rows;
+                //   console.log(JSON.stringify(this.loadManifestList))
+              }else if(response.data.cd=='-1'){
+                  alert(response.dara.msg);
+              }
+          })
+      },
+       //选择文件
+      checkItem(val){
+            var vm=this;
+            var fileCheckList = [];
+            for(var i=0;i<vm.loadManifestList.length;i++){
+                vm.$set(vm.loadManifestList[i],'checked',false)
+            }
+            vm.$set(vm.loadManifestList[val],'checked',true)
+            vm.checkedItem = vm.loadManifestList[val]
+            // console.log(JSON.stringify(vm.checkedItem))
+      },
       //加载清单列表
       getLoadManifest(){
           axios({
@@ -1685,7 +2115,7 @@ export default {
               if(response.data.cd=='0'){
                   this.pageDetial_1.total=response.data.rt.total;
                   this.loadManifestList=response.data.rt.rows;
-                  console.log(JSON.stringify(this.loadManifestList))
+                //   console.log(JSON.stringify(this.loadManifestList))
               }else if(response.data.cd=='-1'){
                   alert(response.dara.msg);
               }
@@ -1707,7 +2137,7 @@ export default {
               if(response.data.cd=="0"){
                   this.entityRelationList=response.data.rt;
                   this.relaList=this.entityRelationList.relaList;
-                  console.log(JSON.stringify(this.relaList));
+                //   console.log(JSON.stringify(this.relaList)+'bim');
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -1725,7 +2155,7 @@ export default {
               if(response.data.cd=="0"){
                   this.taskInformationList=response.data.rt
                   this.linkList=this.taskInformationList.linkList
-                  console.log(JSON.stringify( this.taskInformationList))
+                //   console.log(JSON.stringify( this.taskInformationList))
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -1807,7 +2237,18 @@ export default {
             this.selectRowList.forEach((item)=>{
                 if(item._isHover==true){
                     this.linkTaskId=item.taskId
-                    console.log(this.linkTaskId)
+                    // console.log(this.linkTaskId)
+                }
+            })
+      },
+      removeTaskRowClick(row,rowIndex){
+          this.selectRowList=rowIndex;
+        //   console.log(JSON.stringify(this.selectRowList))
+            this.selectRowList.forEach((item)=>{
+                if(item._isHover==true){
+                    this.curUgId=item.taskUserGroup
+                    this.removeTaskId=item.taskId
+                    // console.log(this.removeTaskId)
                 }
             })
       },
@@ -1878,7 +2319,7 @@ export default {
       },
       edit(scope){
           this.editObject=scope;
-          console.log(this.editObject);
+        //   console.log(this.editObject);
           this.editTaskDialog=true;
           this.taskName=this.editObject.row.taskName;
           this.dutyUserId=this.editObject.row.dutyUserId;
@@ -1961,7 +2402,7 @@ export default {
       deleteTab(scope){
           this.deleteTaskDialog=true;
         this.deleteTabObject=scope;
-        console.log(this.deleteTabObject);
+        // console.log(this.deleteTabObject);
         this.taskId=this.deleteTabObject.row.taskId;
         if(this.deleteTabObject.row.children){
             this.showText=true;
@@ -1987,7 +2428,7 @@ export default {
                     this.Type=null;
                     this.showText=false;
                     this.showText1=false;
-                    this.deleteLinkTaskDialog=false;
+                   this.deleteTaskDialog=false;
               }else if(response.data.cd=='-1'){
                   alert(response.data.msg)
               }
@@ -2000,7 +2441,43 @@ export default {
           this.showText1=false;
       },
       sort(scope){
-
+          this.removeTaskDialog=true;
+          this.sortObject=scope;
+          this.taskId=this.sortObject.row.taskId;
+        // if(this.deleteTabObject.row.children){
+        //     this.showText=true;
+        // }else{
+        //     this.showText1=true;
+        // }
+      },
+      removeTaskCancle(){
+          this.removeTaskDialog=false;
+      },
+      removeTaskMakeSure(){
+          if(this.taskId==this.removeTaskId){
+              alert('移动任务不能是当前任务本身')
+              return;
+          }
+          axios({
+              method:'post',
+              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/degrade',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                  prevTaskId:this.taskId,
+                  taskId:this.removeTaskId,
+                  curUgId:this.curUgId
+              }
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                  this.removeTaskDialog=false;
+                  this.getTaskList();
+                  this.removeTaskId='';
+              }else if(response.data.cd=="-1"){
+                  alert(response.data.msg)
+              }
+          })
       },
         //进度查询
         progressSearch(){
@@ -2028,7 +2505,7 @@ export default {
         },
         //查询功能
         taskProgressSearch(){
-            console.log(this.selectUgId)
+            // console.log(this.selectUgId)
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/taskProgressSearch',
@@ -2179,11 +2656,62 @@ export default {
         },
         //导入文件
         exportProject(){
+            this.exportProjectDialog=true;
 
+        },
+        exportProjectMakeSure(){
+            if(this.taskId==''){
+                this.taskId=0
+            }
+            var formData=new FormData();
+            formData.append('exportProject',this.uploadfilesList);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'/project2/schedule/addTaskByMpp',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    currtUgId:this.selectUgId,
+                    taskId:this.taskId
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.getTaskList();
+                    this.exportProjectDialog=false;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+        },
+        exportProjectCancle(){
+            this.exportProjectDialog=false;
+
+        },
+        deleteColumns(){
+            this.columns.splice(0,5);
+            this.getTaskList();
         },
         //显示列
         showColumnConfig(){
-
+            var vm=this;
+            this.ListHeaderShow=true;
+            var str=[];
+            $.extend(str,vm.columns);
+            this.detailsHead_model = str;
+            this.detailsHead_model.forEach((item,index)=>{
+             this.$set(item,'showModel',item.show)
+         })
+        // this.deleteColumns();
+        },
+        headerListCancle(){
+            var vm = this
+            vm.ListHeaderShow = false
+            vm.detailsHead_model.forEach((item,index)=>{
+                vm.$set(item,'showModel',item.show)
+            })
         },
         //点击添加核实任务
         addVerifyRecord(){
@@ -2228,14 +2756,177 @@ export default {
         },
         //取消关联清单
         addAssociationListCancle(){
+            this.serviceStateValue='';
+            this.detailName='';
+            this.startDate='';
+            this.endDate='';
+            this.relaTypeValue='';
+             this.checkedItem={};
+             this.loadManifestList=[];
             this.addAssociationListDialog=false;
+        },
+        //添加关联清单确认
+        addAssociationListMakeSure(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'/manifest2/businessBindManifestAndUpdateStatus',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    bId:this.taskId,
+                    bType:this.checkedItem.type,
+                    mId:this.checkedItem.detailId,
+                    currState:this.checkedItem.serviceState,
+                    currOperate:41,
+                    projId:this.projId
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.addAssociationListDialog=false;
+                    this.getLoadManifest();
+                    this.checkedItem={};
+                    this.loadManifestList=[];
+                    alert(response.data.msg);
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+
+        },
+        showDetialList(item){
+            this.showCommonList=true;
+            this.checkList=item;
+        },
+        backToH(){
+            var vm = this
+            vm.showCommonList = false
+        },
+        //显示二维码
+        qrcode(val){
+            this.labelListShow=true;
+            this.relaList.forEach((item)=>{
+                if(item.main.pkId==val){
+                    this.relaList=[];
+                    this.relaList.push(item);
+                }
+            })
+        },
+        labelListCancle(){
+        var vm = this
+        vm.labelListShow = false
+      },
+        //关联清单列单的定位
+        location(){
+            alert("虚拟场景面板未打开，请打开左侧虚拟场景面板。")
+        },
+        //将清单与任务解除关联关系
+        deleteAssociationList(num){
+            this.deleteAssociationListDialog=true;
+            this.relaList.forEach((item)=>{
+                if(item.main.pkId==num){
+                    this.mId=item.main.pkId
+                }
+            })
+        },
+        deleteAssociationListMakeSure(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'/project2/schedule/deleteMBRelation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    // projId:this.projId,
+                    mId:this.mId,
+                    bId:this.taskId,
+                    bType:2 //业务类型
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.getEntityRelation()
+                    this.deleteAssociationListDialog=false;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg)
+                }
+            })
+        },
+        deleteAssociationListClose(){
+            this.deleteAssociationListDialog=false;
         },
         //添加资源类别
         addResourceTask(){
+            this.resourceTypeValue=0;
+            this.reId=this.resourceTypeValue;
+            this.patternValue=0;
+            this.getTaskResouceType();
+            this.getResourceTypeList();
             this.addResourceTaskDialog=true;
+        },
+        deleteTaskResource(num){
+            this.deleteTaskResourceDialog=true;
+            this.selectId=num;
+        },
+        deleteTaskResourceMakeSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/deleteResouceTask',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.selectId
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.getTaskResourceTaskList();
+                   this.deleteTaskResourceDialog=false;
+                    this.selectId='';
+                }
+            })
+            
+        },
+        deleteTaskResourceClose(){
+            this.deleteTaskResourceDialog=false;
+            this.selectId='';
+        },
+        addResourceTaskMakeSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addResouceTask',
+                headers:{
+                    'token':this.token
+                },
+                data:{
+                    amount:this.amount,
+                    pattern:this.patternValue,
+                    reId:this.resourceTypeValue,
+                    resourceName:this.resourceName,
+                    rtId:this.taskResourceTaskValue,
+                    taskId:this.taskId
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.getTaskResourceTaskList();
+                    this.addResourceTaskDialog=false;
+                    this.amount='',
+                    this.patternValue='',
+                    this.resourceTypeValue='',
+                    this.resourceTypeName='',
+                    this.taskResourceTaskValue=''
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg)
+                }
+            })
+
         },
         addResourceTaskCancle(){
             this.addResourceTaskDialog=false;
+            this.amount='',
+            this.patternValue='',
+            this.resourceTypeValue='',
+            this.resourceTypeName='',
+            this.taskResourceTaskValue=''
         },
         //上传文件
         uploadFile(){
@@ -2246,15 +2937,16 @@ export default {
             this.uploadfilesList=[];
         },
          uploadFileMakeSure(){
-            var returnUrl=this.BDMSUrl+'/project2/schedule/task/fileUpload';
+            var returnUrl=this.BDMSUrl+'/project2/schedule/task/fileUpload?ugId='+this.selectUgId+'&id='+this.taskId;
             returnUrl = encodeURIComponent(returnUrl);
             var formData= new FormData();
             formData.append('token',this.token);
             formData.append('projId',this.projId);
-            formData.append('id',this.taskId);
+            formData.append('userId',this.userId);
+            // formData.append('id',this.taskId);
             formData.append('type',1);
             formData.append('file',this.uploadfilesList);
-            formData.append('ugId',this.selectUgId);
+            // formData.append('ugId',);
             formData.append('modelCode','005');
             formData.append('returnUrl',returnUrl);
             axios({
@@ -2280,9 +2972,66 @@ export default {
            this.uploadfilesList=e.target.files[0];
            this.imageName=this.uploadfilesList.name;
         },
+        imgChanged(e){
+            this.uploadfilesList=e.target.files[0];
+           this.imageName=this.uploadfilesList.name;
+           this.imageName = this.imageName.substring(this.imageName.lastIndexOf("\\") + 1);
+            var extStart = this.imageName.lastIndexOf(".");
+            var ext = this.imageName.substring(extStart, this.imageName.length).toUpperCase();
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {
+                alert("提示:图片限于png,gif,jpeg,jpg格式");
+               this.uploadfilesList=[];
+               this.imageName='';
+            }
+        },
+        exportProjectFileChanged(e){
+            this.uploadfilesList=e.target.files[0];
+           this.MppName=this.uploadfilesList.name;
+            var extName = this.MppName.substring(this.MppName.lastIndexOf(".") + 1).trim().toLowerCase();
+            console.log(extName);
+            if (extName != "mpp" ) {
+                alert("提示:文件只限于mmp格式");
+               this.uploadfilesList=[];
+               this.MppName='未选择任何文件';
+            }
+           
+        },
         //绑定图片
         bindPic(){
+            this.uploadPicDialog=true;
+        },
+        //上传图片取消
+        uploadPicCancle(){
+            this.uploadPicDialog=false;
+        },
+        uploadPicMakeSure(){
+            var returnUrl=this.BDMSUrl+'/project2/schedule/task/attachmentUpload?id='+this.taskId;
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData= new FormData();
+            formData.append('token',this.token);
+            formData.append('projId',this.projId);
+            // formData.append('id',this.taskId);
+            formData.append('type',1);
+            formData.append('userId',this.userId);
+            formData.append('file',this.uploadfilesList);
+            // formData.append('ugId',this.selectUgId);
+            formData.append('modelCode','005');
+            formData.append('returnUrl',returnUrl);
+            axios({
+                    method:'post',
+                    url:this.QJFileManageSystemURL+'uploading/uploadFileInfo',
+        
+                    headers:{
+                        'Content-Type': 'multipart/form-data'
 
+                    },
+                    data:formData,
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                                this.getVerifyList();
+                                 this.uploadPicDialog=false;
+                        }
+                    })
         },
         //查看
         searchs(filePath){
@@ -2384,8 +3133,45 @@ export default {
                 }
             })
 
-        }
+        },
+        //以下为甘特图代码
         
+        //获得甘特图列表
+        getGanttList(){
+            this.hiddenGanttList=!this.hiddenGanttList;
+            this.updateGanttCollapse();
+            // this.initGantt();
+        },
+        initGantt(){
+            var ge = new GanttMaster();
+            ge.init($("#workSpace"));
+        },
+        upgrade(){
+
+        },
+        degrade(){
+
+        },
+        swap(){
+
+        },
+        updateGanttCollapse(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'/project2/schedule/updateGanttCollapse/'+this.projId,
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    taskId:7067,
+                    ganttCollapse:0
+                }
+            }).then(response=>{
+                
+            })
+
+        }
+
 
   },
 }
@@ -2404,6 +3190,117 @@ export default {
     }
     #taskIndex{
 
+        .dialog{
+            top: 15vh;
+            left: 50%;
+            width: 660px;
+            margin-left:-330px;
+            border-radius: 5px;
+            z-index: 3001;
+            position: fixed;
+            background: #fff;
+            .el-dialog__body{
+                margin-top: 20px;
+            }
+            .editBody{
+                margin: 0 20px;
+                .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
+                    margin: 0 5px;
+                }
+            }
+            .item-label{
+                border-bottom: 1px solid #ebebeb;
+                .img_left{
+                    float: left;
+                    width: 90px;
+                    height: 90px;
+                    margin:40px 30px 0 10px;
+                }
+                .right{
+                    float: left;
+                    width: 450px;
+                    .item-list{
+                        margin-bottom: 14px;
+                        .text-left{
+                            float: left;
+                            font-size: 12px;
+                            line-height: 12px;
+                            width: 80px;
+                            color: #999;
+                            text-align: left;
+                        }
+                        .text-right{
+                            float: left;
+                            width: 300px;
+                             font-size: 12px;
+                            line-height: 12px;
+                            color: #333333;
+                            text-align: left;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                        &:last-of-type{
+                             margin-bottom: 20px; 
+                        }
+                    }
+                }
+                &:last-of-type{
+                    border-bottom: none;
+                }
+            }
+             .item-attibuteAuth{
+                 float: left;
+                 width: 33.3%;
+                 padding-left: 78px;
+                 height: 14px;
+                 line-height: 14px;
+                 margin-bottom: 26px;
+                 text-align: left;
+                 .text{
+                    font-size: 14px;
+                    color: #666666;
+                    margin-left: 10px;
+                 }
+                .checkbox-fileItem{
+                    float: left;
+                    position: relative;
+                    padding-left:20px; 
+                    cursor: pointer;
+                    &::before{
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 12px;
+                        height: 12px;
+                        border: 1px solid #cccccc;
+                        cursor: pointer;
+                        background: #fff;
+                        content: '';
+                    }
+                }
+                .active{
+                     &::before{
+                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                     }
+                }
+                .checkbox-arr{
+                    display: none;
+                }
+             }
+        }
+        #mask{
+            z-index: 3000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+            background: #000;
+        }
         #GroupSelect{
             display: block;
             width: 168px;
@@ -2815,13 +3712,13 @@ export default {
                             }
                     }
                     .header-attribute:nth-last-of-type(2){
-                        margin-top: 25px;
+                        margin-top: 20px;
                     }
                     .header-attribute:nth-last-of-type(3){
-                        margin-top: 25px;
+                        margin-top: 20px;
                     }
                      .header-attribute:nth-last-of-type(1){
-                        margin-top: 25px;
+                        margin-top: 20px;
                     }
                     .uploadFileUl{
                         display: none;
@@ -3018,7 +3915,7 @@ export default {
                             }
                             .icon-add{
                                 background: url('../ManageCost/images/add.png')no-repeat 0 0;
-                                margin-right: 75px;
+                                margin-right: 56px;
                                 &:hover{
                                     background: url('../ManageCost/images/add1.png')no-repeat 0 0;
                                 }
@@ -3061,6 +3958,7 @@ export default {
                                 display: inline-block;
                             }
                             .detial-text-value{
+                                // display: inline-block;
                                 color: #333333;
                                 max-width: 130px;
                                 overflow: hidden;
@@ -3069,6 +3967,7 @@ export default {
                             }
                             .item-detial{
                                 margin-top: 16px;
+                                width: 195px;
                                 &:first-of-type{
                                     margin-top: 10px;
                                 }
@@ -3353,6 +4252,16 @@ export default {
                             outline: none;
                         }
                     }
+                    .editBodytwo3{
+                         margin-top:20px;
+                        // padding:0px 20px 20px 20px;
+                        margin:0 auto;
+                        width: 640px;
+                        margin-bottom:20px;
+                        box-sizing: border-box;
+                        height: 260px;
+                        overflow-y: auto;
+                    }
                     .progressSearchBody{
                         margin-top:20px;
                         .searchWayText{
@@ -3402,12 +4311,12 @@ export default {
                         height: 20px;
                         float: left;
                         .Text{
-                           margin-left: 30px;
+                           margin-left: 46px;
                             font-size: 14px;
                         }
                         .selectGroup{
-                            margin-left:25px;
-                                width: 243px;
+                            margin-left:2px;
+                                width: 322px;
                                 height: 36px;
                                 position: relative;
                                 color: #333333;
@@ -3449,6 +4358,7 @@ export default {
                             margin-left:30px;
                             margin-bottom: 15px;
                         }
+                         
                         .tableList{ 
                             margin-top:20px;
                             // border-left:1px solid #e6e6e6;
@@ -3533,7 +4443,7 @@ export default {
                                 line-height: 14px;
                                 color:#666;
                                 display: inline-block;
-                                margin-left:-155px;
+                                margin-left:-151px;
                             }
                             .listInp{
                                 width: 270px;
@@ -3583,7 +4493,21 @@ export default {
                                 line-height: 14px;
                                 color:#666;
                                 display: inline-block;
-                                margin-left:-155px;
+                                margin-left:-214px;
+                            }
+                            .searchTime{
+                                // float: left;
+                                .time1{
+                                     position: absolute;
+                                    top:28px;
+                                    right: -129px;
+                                }
+                                .time{
+                                    position: absolute;
+                                    top:27px;
+                                    right: -267px;
+                                }
+
                             }
                             .listText1{
                                  font-size:14px;
@@ -3633,11 +4557,24 @@ export default {
                     .bindListTab{
                         margin-top:20px;
                         .searchResultText{
-                            display: block;
+                            // display: block;
                             font-size:14px;
                             line-height:14px;
                             color:#666666;
-                            margin-left:-534px;
+                            margin-left:-432px;
+                        }
+                        .siteSearch{
+                            width: 70px;
+                            height: 25px;
+                            border:1px solid #ccc;
+                            border-radius: 2px;
+                            background: #fff;
+                            font-size:12px;
+                            line-height: 25px;
+                            box-sizing: border-box;
+                            float:right;
+                            margin-right:30px;
+                            cursor: pointer;
                         }
                         .searchTab{
                             width: 600px;
@@ -3680,19 +4617,104 @@ export default {
                                             color: #333333;
                                         }
                                     }
+                                .active{
+                                    td{
+                                        background: #fafafa;
+                                    }
                                 }
+                                }
+                                
                             }
 
                         }
-                    }     
+                    }
+                    .resourceText1{
+                       margin-left:-70px;
+                        .resourceSelect1{
+                            width: 360px;
+                            height: 36px;
+                            position: relative;
+                            color: #333333;
+                            background-color: #fff;
+                            background-image: none;
+                            border: 1px solid #d1d1d1;
+                            border-radius: 4px;
+                            padding-left: 10px;
+                            padding-right: 20px;
+                            -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            font-size: 14px;
+                            outline: none;
+                            margin-top:10px;
+                            margin-left:5px;
+                        }
+                    }
+                    .resourceText2{
+                        margin-top:10px;
+                        margin-left:-70px;
+                        .resourceSelect2{
+                            width: 360px;
+                            height: 36px;
+                            position: relative;
+                            color: #333333;
+                            background-color: #fff;
+                            background-image: none;
+                            border: 1px solid #d1d1d1;
+                            border-radius: 4px;
+                            padding-left: 10px;
+                            padding-right: 20px;
+                            -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            font-size: 14px;
+                            outline: none;
+                            margin-top:10px;
+                            margin-left:5px;
+
+                        }
+
+                    }
+                    .resourceText3{
+                        margin-left:-26px;
+                        margin-top:10px;
+                        .resourceSelect3{
+                            width: 150px;
+                            height: 36px;
+                            position: relative;
+                            color: #333333;
+                            background-color: #fff;
+                            background-image: none;
+                            border: 1px solid #d1d1d1;
+                            border-radius: 4px;
+                            padding-left: 10px;
+                            padding-right: 20px;
+                            -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            font-size: 14px;
+                            outline: none;
+                            margin-top:10px;
+                            margin-left:5px;
+                        }
+                        .resourceInp{
+                            width: 150px;
+                            height: 36px;
+                             -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            border: 1px solid #d1d1d1;
+                            border-radius: 4px;
+                            background: #fff;
+                            padding-left: 10px;
+                            margin-top:5px;
+                        }
+                        .text2{
+                            display: inline-block;
+                            margin-left:15px;
+                        }
+
+                    }        
                 }
             }
         }
-        #edit .el-input__inner{
-            width: 100px;
-            height:36px;
-        }
-         #inital{
+        #inital{
             .deleteDialogImg{
                 height: 50px;
                 }
@@ -3717,12 +4739,41 @@ export default {
 </style>
 
 <style lang="less">
+// @import './jQueryGantt/platform.css';
+// @import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css';
+// @import './jQueryGantt/gantt.css';
+// @import './jQueryGantt/ganttPrint.css';
 *{
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         font-size:12px;
 }
+
+// .resEdit {
+//     padding: 15px;
+//   }
+//   .resLine {
+//     width: 95%;
+//     padding: 3px;
+//     margin: 5px;
+//     border: 1px solid #d0d0d0;
+//   }
+// //   body {
+// //     overflow: hidden;
+// //   }
+//   .ganttButtonBar h1{
+//     color: #000000;
+//     font-weight: bold;
+//     font-size: 28px;
+//     margin-left: 10px;
+//   }
+
+#edit .bindListHead .bindListHeadRight .el-input__inner{
+    width: 130px;
+    height: 36px;
+}
+
     li{
         list-style: none;
     }
@@ -3961,7 +5012,7 @@ export default {
         left: 2px;
     width: 16px;
     height: 15px;
-    background:url('./images/file.jpg')no-repeat 0 0; 
+    background:url('./images/file1.png')no-repeat 0 0; 
     content: '';
     z-index: 1;
     }
