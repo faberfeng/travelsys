@@ -3861,6 +3861,8 @@ export default {
                         line-height: 12px;
                         margin-top: 16px;
                         text-align: left;
+                        // width: 200px;
+                        // height: 15px;
                         .detial-text-name{
                             color: #999999;
                             width: 65px;
@@ -3870,7 +3872,7 @@ export default {
                         // float: left;
                             color: #333333;
                             max-width: 130px;
-                            overflow-x: hidden;
+                            overflow: hidden;
                             text-overflow: ellipsis;
                             white-space: nowrap;
                         }
