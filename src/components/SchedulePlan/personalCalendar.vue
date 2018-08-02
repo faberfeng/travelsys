@@ -65,8 +65,8 @@
                                         <div class="title">{{item.eventName}}</div>
                                         <div class="body"><span class="time">时间：{{item.eventStart}}~{{item.eventEnd}}</span><span class="position">地点：{{item.eventPosition}}</span><span class="repeat">重复方式：{{item.repeatType | repeatTypeChanges}}</span></div>
                                         <div class="foot">内容：{{item.content}}<span></span></div>
-                                        <div :class="{'updateEventView':item.id==isActive}"   @click="updateEvent"></div>
-                                        <div :class="{'deleteEventView':item.id==isActive}"   @click="deleteEvent"></div>
+                                        <div :class="{'updateEventView':item.id==isActive}"   @click="updateCalendarEvent"></div>
+                                        <div :class="{'deleteEventView':item.id==isActive}"   @click="deleteCalendarEvent"></div>
                                     </li>
                                 </ul>
                             </div>
