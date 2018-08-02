@@ -22,7 +22,7 @@
             <div class="calendarContext" v-show="viewshow" >
                 <div class="calendarHead">
                     <h5 class="calendarHeadLeft"><img class=imgIcon src="./images/worklist.png">个人日历</h5>
-                    <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateEvent">修改事件</span></div>
+                    <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteCalendarEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateCalendarEvent">修改事件</span></div>
                 </div>
                 <div class="calendarBody" >
                     <!-- <button @click="refreshEvents">Refresh</button>
@@ -65,8 +65,8 @@
                                         <div class="title">{{item.eventName}}</div>
                                         <div class="body"><span class="time">时间：{{item.eventStart}}~{{item.eventEnd}}</span><span class="position">地点：{{item.eventPosition}}</span><span class="repeat">重复方式：{{item.repeatType | repeatTypeChanges}}</span></div>
                                         <div class="foot">内容：{{item.content}}<span></span></div>
-                                        <div class="updateEventView" @click="updateEvent"></div>
-                                        <div class="deleteEventView" @click="deleteEvent"></div>
+                                        <div :class="{'updateEventView':item.id==isActive}"   @click="updateEvent"></div>
+                                        <div :class="{'deleteEventView':item.id==isActive}"   @click="deleteEvent"></div>
                                     </li>
                                 </ul>
                             </div>
@@ -136,8 +136,8 @@
                             <span class="detial-text-value" v-text="$options.filters.repeatTypeChanges(eventInformationList.repeatType)"></span>
                         </li>
                         <li class="detial-item clearfix">
-                            <span class="detial-text-name">内容</span>
-                            <span class="detial-text-value" v-text="eventInformationList.content"></span>
+                            <span class="detial-content-name">内容</span>
+                            <span class="detial-content-value" v-text="eventInformationList.content"></span>
                         </li>
                     </ul>
             </div>
@@ -171,8 +171,10 @@
         <div id="edit">
             <el-dialog title="新增事件内容" :visible.sync="addEventTextDialog" @close="addETCancle">
                 <div class="editBody">
-                    <div class="editBodyone edit-item clearfix"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入事件" v-model="eventNames"></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">地点 :</label><input class="inp" placeholder="请输入地点" v-model="eventPositions"></div>
+                    <div class="editBodyone edit-item clearfix"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入事件" v-model="eventNames" @blur="checkStringLength(eventNames)" ></div>
+                    <div v-show="showText" style="color:red;margin-left:-160px;">警告：文本长度不得超过64</div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">地点 :</label><input class="inp" placeholder="请输入地点" v-model="eventPositions" @blur="checkStringLength1(eventPositions)"></div>
+                    <div v-show="showText1" style="color:red;margin-left:-160px;">警告：文本长度不得超过64</div>
                     <div class="editBodytwo editCheckBox"><el-checkbox v-model="checkValue" label="全天"></el-checkbox></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
                          <el-date-picker
@@ -211,8 +213,9 @@
 
                     <div class=" editBodytwo editArea">内容：</div>
                     <div class="edit-item clearfix editTextArea" >
-                        <textarea rows="6" cols="80" v-model="eventContext"></textarea>
+                        <textarea rows="6" cols="80" v-model="eventContext" @blur="checkStringContentLength(eventContext)"></textarea>
                     </div>
+                    <div v-show="showContentText" style="color:red;margin-left:-300px;">警告：文本长度不得超过512</div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addEventTextMakeSure">确定</button>
@@ -221,8 +224,10 @@
             </el-dialog>
             <el-dialog title="修改事件内容" :visible.sync="updateEventTextDialog" @close="updateETCancle">
                 <div class="editBody">
-                    <div class="editBodyone edit-item clearfix"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入事件" v-model="eventNames"></div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">地点 :</label><input class="inp" placeholder="请输入地点" v-model="eventPositions"></div>
+                    <div class="editBodyone edit-item clearfix"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入事件" v-model="eventNames" @blur="checkStringLength(eventNames)"></div>
+                    <div v-show="showText" style="color:red;margin-left:-160px;">警告：文本长度不得超过64</div>
+                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">地点 :</label><input class="inp" placeholder="请输入地点" v-model="eventPositions" @blur="checkStringLength1(eventPositions)"></div>
+                    <div v-show="showText1" style="color:red;margin-left:-160px;">警告：文本长度不得超过64</div>
                     <div class="editBodytwo editCheckBox"><el-checkbox v-model="checkValue" label="全天"></el-checkbox></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">开始时间 :</label>
                          <el-date-picker
@@ -259,19 +264,25 @@
 
                     <div class=" editBodytwo editArea">内容：</div>
                     <div class="edit-item clearfix editTextArea" >
-                        <textarea rows="6" cols="80" v-model="eventContext"></textarea>
+                        <textarea rows="6" cols="80" v-model="eventContext" @blur="checkStringContentLength(eventContext)"></textarea>
                     </div>
+                    <div v-show="showContentText" style="color:red;margin-left:-300px;">警告：文本长度不得超过512</div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="updateEventTextMakeSure">确定</button>
                     <button class="editBtnC" @click="updateETCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="删除事件内容" :visible.sync="deleteEventTextDialog" @close="deleteETCancle">
+            <el-dialog title="删除事件内容"  width="500px" :visible.sync="deleteEventTextDialog" @close="deleteETCancle">
                 <div class="editBody">
-                    <ul class="editBodyone editUl">
+                    <ul class="editBodyone editUl" v-show="!showRepeatType">
                         <li class="editLi" v-for="(item,index) in deleteTypeList" :key="index" ><input type="radio" v-model="deleteTypes" :value="item.value"><label>{{item.label}}</label></li>
                     </ul>
+                    <div id="inital" v-show="showRepeatType">
+                        <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                        <p class="deleteDialogWarning">删除提醒</p>
+                        <p class="deleteDialogText">您要删除当前所选事件?</p>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="deleteEventTextMakeSure">确定删除</button>
@@ -315,7 +326,7 @@
                     <button class="editBtnC" @click="addWordCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="文件上传" :visible="uploadshow" @close="upImgCancle">
+            <el-dialog title="图片上传" :visible="uploadshow" @close="upImgCancle">
                 <div class="editBody">
                     <div class="editBodytwo imageBody">
                         <label class="imageBodyText">上传文件 :</label>
@@ -518,8 +529,12 @@ export default {
             eventColorOne:'',
             eventColorValue:'',
             addEventTextDialog:false,
+            showText:false,//显示警告
+            showText1:false,
+            showContentText:false,//显示文本内容
             updateEventTextDialog:false,
             deleteEventTextDialog:false,
+            showRepeatType:true,
             checkValue:true,
             personalCalendarList:[],
             screenLeft:{
@@ -552,7 +567,7 @@ export default {
                 header: {
                     left: 'month agendaWeek agendaDay',
                     center: 'prevYear, prev, title, next, nextYear',
-                    right:'today listMonth' 
+                    right:'today' 
                 },
                 timeFormat: 'HH:mm',
                 views: {
@@ -1072,7 +1087,14 @@ export default {
             }else if(this.eventPositions==''){
                 alert('地点不能为空')
                     return;        
-            }else if(this.startTimeValue>this.endTimeValue){
+            }else if(this.startTimeValue==''){
+                alert('未选择开始时间')
+                return; 
+            }else if(this.endTimeValue==''){
+                alert('未选择结束时间')
+                return; 
+            }
+            else if(this.startTimeValue>=this.endTimeValue){
                 alert('提示：结束时间必须大于开始时间')
                 return;
             }
@@ -1170,7 +1192,7 @@ export default {
             this.addEventTextDialog=false;
         },
         //点击修改事件
-        updateEvent(){
+        updateCalendarEvent(){
             if(this.eventInformationList){
                 this.updateEventTextDialog=true;
             }else{
@@ -1198,6 +1220,31 @@ export default {
                 let GMT = new Date(time)
                 return GMT
             },
+
+        //自动校验字符长度
+        checkStringLength(value){
+            if(value.length>64){
+                this.showText=true;
+            }else{
+                this.showText=false;
+
+            }
+        },
+        checkStringLength1(value){
+            if(value.length>64){
+                this.showText1=true;
+            }else{
+                this.showText1=false;
+
+            }
+        },
+        checkStringContentLength(value){
+            if(value.length>512){
+                this.showContentText=true;
+            }else{
+                this.showContentText=false;
+            }
+        },
         // 是否判断器
         shifouChange(val){
             return val==1?true:false;
@@ -1240,6 +1287,7 @@ export default {
                             this.eventSources=[],
                             this.initEvent();
                             this.eventView();
+                            this.informationShow();
                             this.updateEventTextDialog=false;
                         }else if(response.data.cd = '-1'){
                             alert(response.data.msg)
@@ -1264,13 +1312,19 @@ export default {
             this.updateEventTextDialog=false;
         },
         //点击删除事件
-        deleteEvent(){
+        deleteCalendarEvent(){
             if(!this.eventId){
                 alert('提示：请指定需要删除的事件')
-            }else{
-            this.deleteTypes=this.deleteTypeList[0].value;
-            this.deleteEventTextDialog=true;
-         }
+            }else if(this.eventInformationList.repeatType==0){
+                    this.deleteEventTextDialog=true;
+                    this.showRepeatType=true;
+                    this.deleteTypes=0;
+                }else{
+                    this.deleteEventTextDialog=true;
+                    this.showRepeatType=false;
+                    this.deleteTypes=this.deleteTypeList[0].value;
+                }
+            
         },
         //确认删除事件
         deleteEventTextMakeSure(){
@@ -1409,6 +1463,8 @@ export default {
         },
         upImgCancle(){
             this.uploadshow=false;
+            this.uploadfilesList=[];
+            this.imageName='';
         },
 
         addwordMakeSure(){
@@ -1445,6 +1501,7 @@ export default {
                     })
         },
         uploadIMG(){
+            
             var returnUrl=this.BDMSUrl+'/project2/schedule/event/attachmentUpload?id='+this.eventId;
             returnUrl = encodeURIComponent(returnUrl);
             var formData= new FormData();
@@ -1468,6 +1525,8 @@ export default {
                         if(response.data.cd=='0'){
                                 this.attachList();
                                 this.uploadshow=false;
+                                this.uploadfilesList=[];
+                                this.imageName='';
                         }
                     })  
         },
@@ -1477,6 +1536,14 @@ export default {
         fileChanged(e){
            this.uploadfilesList=e.target.files[0];
            this.imageName=this.uploadfilesList.name;
+           this.imageName = this.imageName.substring(this.imageName.lastIndexOf("\\") + 1);
+            var extStart = this.imageName.lastIndexOf(".");
+            var ext = this.imageName.substring(extStart, this.imageName.length).toUpperCase();
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {
+                alert("提示:图片限于png,gif,jpeg,jpg格式");
+               this.uploadfilesList=[];
+               this.imageName='';
+            }
         },
         searchFile(){
            
@@ -1775,7 +1842,6 @@ export default {
                    
                     .eventViewBodyUl{
                         overflow: hidden;
-                         :hover{
                                 // background-color: #f2f2f2;
                                  .updateEventView{
                                 background: url(./images/edit1.png) no-repeat 0 0;
@@ -1795,7 +1861,7 @@ export default {
                                     right: 30px;
                                     cursor: pointer;
                                 }
-                            }
+                            
                              .active{
                         background-color: #f2f2f2;
                     }
@@ -2019,28 +2085,44 @@ export default {
                         padding-bottom: 7px;
                     }
                     .detial-item{
-                    font-size: 12px;
-                    line-height: 12px;
-                    height:16px;
-                    margin-top: 16px;
-                    margin-left:8px;
-                    text-align: left;
-                    .detial-text-name{
-                        color: #999999;
-                        width: 65px;
+                        font-size: 12px;
+                        line-height: 12px;
+                        height:16px;
+                        margin-top: 16px;
+                        margin-left:8px;
+                        text-align: left;
+                        .detial-text-name{
+                            color: #999999;
+                            width: 65px;
+                            float: left;
+                        }
+                        .detial-text-value{
                         float: left;
-                    }
-                    .detial-text-value{
-                    float: left;
-                    color: #333333;
-                        max-width: 120px;
-                        // overflow-x: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-                    &:first-of-type{
-                        margin-top: 18px;
-                    }
+                        color: #333333;
+                            max-width: 120px;
+                            // overflow-x: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                        .detial-content-name{
+                            color: #999999;
+                            width: 65px;
+                            float: left;
+                        }
+                        .detial-content-value{
+                            margin-top:10px;
+                            display: inline-block;
+                            line-height: 25px;
+                            color: #333333;
+                            width: 230px;
+                            // overflow-x: hidden;
+                            
+                            
+                        }
+
+                        &:first-of-type{
+                            margin-top: 18px;
+                        }
                 }
             }
  
@@ -2434,9 +2516,36 @@ export default {
                 }
             }
                 .editBody{
+                    //删除不重复事件样式
+                    #inital{
+                        .deleteDialogImg{
+                            height: 50px;
+                            }
+                        .deleteDialogWarning{
+                        font-size: 18px;
+                        line-height: 18px;
+                        font-family: 'MicrosoftYahei';
+                        color: #fc3439;
+                        font-weight: bold;
+                        margin:20px 0 0 0;
+                        }
+                        .deleteDialogText{
+                            color: #333333;
+                            font-size: 14px;
+                            line-height: 14px;
+                            font-family: 'MicrosoftYahei';
+                            font-weight: normal;
+                            margin: 16px 5px 0px 5px;
+                        }
+                     }
                     .editUl{
                         margin-bottom: 20px;
                     }
+                    // .warnText{
+                    //     font-size: 14px;
+                    //     line-height: 14px;
+                    //     color:#fc3439 !important;
+                    // }
                     .editBodyone{
 
                         .editLi{
@@ -2522,8 +2631,7 @@ export default {
                         margin-bottom:20px;
                     }
                 .editTextArea{
-                    float:left;
-                    margin-left:106px;
+                    margin-left:52px;
                     margin-bottom:20px;
                 }
                 .editArea{

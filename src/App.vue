@@ -6,8 +6,13 @@
 </template>
 
 <script>
+import $ from 'jquery'
 export default {
-  name: 'App'
+  name: 'App',
+   created() {
+    /* eslint-disable*/
+    console.log($)
+  }
 }
 </script>
 

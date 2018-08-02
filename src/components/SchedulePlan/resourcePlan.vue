@@ -132,8 +132,8 @@
                     <div class="head">
                         <span class="text">资源类别名称:</span>
                         <div class=editSelect1>
-                            <select v-model="resourceTypeName" @change="resourceTypeChange">
-                                <option v-for="(item,index) in resourceTypeList" :key="index">{{item.name}}</option>
+                            <select v-model="resourceTypeNameValue" @change="resourceTypeChange">
+                                <option v-for="(item,index) in resourceTypeList" :key="index" :value="item.id">{{item.name}}</option>
                             </select>
                              <i class="icon-sanjiao"></i>
                         </div>
@@ -221,8 +221,9 @@ export default{
             isShowPlan:'',//是否显示计划
             isShowAssign:'',//是否制定计划
             resourceTypeList:'',//加载资源类型
+            resourceTypeNameValue:'',
             typeId:'',
-            resourceTypeName:'',//资源类型名
+            resourceTypeNameValue:'',//资源类型名
             resourceTypeTreeList:'', //加载资源类型树
             resourceTypeData:[],//类型树数据
             defaultProps:{
@@ -293,8 +294,22 @@ export default{
                     series: {
                         allowPointSelect: true,
                         cursor: 'pointer',
-                        point: {}
-                    }
+                        point: {
+                            events: {
+                                click: function (e) {
+                                    var html=this.title;
+                                    // var str = html.charAt(html.length - 1);
+                                    // console.log('大笨蛋急急急急急急');
+                                        console.log(e.point.category);
+                                        this.nowTime=e.point.category;
+                                        console.log(this.nowTime);
+                                        this.getResouceTypeByParams();
+                                    // this.getResouceTypeByParams();
+                                }
+                            }
+                        }
+                    },
+
                 },
                 series:[],
             },       
@@ -495,19 +510,29 @@ export default{
                     isShowPlan: 0,
                 }
             }).then(response=>{
+
                 if(response.data.cd=='0'){
                     this.getResouceTypeByParams();
                     this.unitName='',
                     this.resouceTypeByParamsList=[];
                     this.addResourceTypeDialog=false;
-                } 
+                }else if(response.data.cd=='10002'){
+                    alert(response.data.rt);
+                }else if(response.data.cd=='-1'){
+                     alert(response.data.msg);
+                }
             })
         },
         addResourceCancle(){
             this.addResourceTypeDialog=false;
         },
         resourceTypeChange(){
-
+            this.resourceTypeList.forEach((item,index)=>{
+                if(this.resourceTypeNameValue==item.id){
+                    this.resourceTypeNameValue=item.id;
+                }
+            });
+            this.getResourceTypeTree();
         },
         //获取资源类别
         getResouceType(){
@@ -520,14 +545,14 @@ export default{
             }).then(response=>{
                 if(response.data.cd='0'){
                     this.resourceTypeList=response.data.rt
-                    this.resourceTypeName=this.resourceTypeList[0].name
-                    this.typeId=this.resourceTypeList[0].id
+                    this.resourceTypeNameValue=this.resourceTypeList[0].id
+                    // this.typeId=this.resourceTypeList[0].id
                 }
             })
         },
         //添加资源类别树形结构
         getResourceTypeTree(){
-            console.log(this.typeId);
+            // console.log(this.typeId);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourcePlanTree',
@@ -535,17 +560,21 @@ export default{
                     'token':this.token
                 },
                 params:{
-                    id:this.typeId
+                    id:this.resourceTypeNameValue
                 }
             }).then(response=>{
                 this.resourceTypeTreeList=response.data.rt
                 this.resourceTypeData=response.data.rt
             })
         },
+        // this.$refs.lineCharts.on('click', function(params){}),
          load(){
            
             let lineCharts = this.$refs.lineCharts;
             lineCharts.delegateMethod('showLoading', 'Loading...');
+            // lineCharts.on('click', function(params){
+            //     console.log(params)
+            // })
             setTimeout(() => {
                 
                 if(this.planType==1){
@@ -830,6 +859,11 @@ export default{
                         this.resouceTypeByParamsThreeYearList=[];
                         this.LineDataOfThreeYearList=[];
                     }
+                }else if(response.data.cd=='10001'){
+                    this.deleteResourcePlanDialog=false;
+                    alert(response.data.msg)
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg)
                 }
                 this.deleteResourcePlanDialog=false;
             })
