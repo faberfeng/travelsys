@@ -114,10 +114,48 @@
                               </li>
                           </ul>
                         </p>
+                        <p class="selectBar clearfix" v-if="!ShowModel">
+                          <span class="name">模板筛选</span>
+                          <ul>
+                              <li class="selectItem">
+                                  <span class="title">类别</span>
+                                  <el-select v-model="value_leibie" @change="canSearch = true" ref="professional" placeholder="请选择">
+                                      <el-option
+                                      v-for="item in model_leibie"
+                                      :key="item.key"
+                                      :label="item.name"
+                                      :value="item.id">
+                                      </el-option>
+                                  </el-select>
+                              </li>
+                              <li class="selectItem">
+                                  <span class="title">模板</span>
+                                  <el-select v-model="value_model" @change="canSearch = true" ref="system" placeholder="请选择">
+                                      <el-option
+                                      v-for="item in option_model"
+                                      :key="item.id"
+                                      :label="item.name"
+                                      :value="item.id">
+                                      </el-option>
+                                  </el-select>
+                              </li>
+                              <li class="selectItem">
+                                  <span class="title">类型</span>
+                                  <el-select v-model="value_typeC" @change="canSearch = true" ref="type" placeholder="请选择">
+                                      <el-option
+                                      v-for="item in option_typeC"
+                                      :key="item.id"
+                                      :label="item.name"
+                                      :value="item.id">
+                                      </el-option>
+                                  </el-select>
+                              </li>
+                          </ul>
+                        </p>
                     </div>
                     <p class="btn-selection clearfix">
                        <button :class="['redbtn',{'disabledBtn':!canSearch}]" @click="pageDetial.currentPage = 1;selectData()" :disabled="canSearch?false:'disabled'">筛选</button>
-                       <span class="whitebtn" v-if="ShowClassify" @click="ShowClassify = false">更多</span>
+                       <span class="whitebtn" v-if="ShowModel" @click="showMore">更多</span>
                     </p>
                     <div class="project" v-loading="loading">
                         <!--以下是列表-->
@@ -917,7 +955,7 @@
                                     }
                                     .checkbox-fileItem{
                                         display: inline-block;
-                                        float: initial;
+                                        //float: initial;
                                         margin-right: 10px;
                                         position: relative;
                                         &::after{
@@ -1024,7 +1062,7 @@
                     }
                     .checkbox-fileItem{
                         display: inline-block;
-                        float: initial;
+                        //float: initial;
                         margin-right: 10px;
                         position: relative;
                         &::after{
@@ -1832,6 +1870,7 @@ export default {
         GenieclassTitle:[],//类型信息列表
         checkAll:false,//全选所有
         ShowClassify:true,//显示分类筛选项
+        ShowModel:true,//显示模板筛选选项
         basicAttributes_auth:{
             show:false,
             new:{
@@ -1909,9 +1948,19 @@ export default {
         },
         options_name:[],//属性名称的列表
         canSearch:true,
+        shownum:0,
+        value_leibie:'',
+        model_leibie:[],
+        value_model:'',
+        option_model:[],
+        copyOption_model:[],
+        value_typeC:'',
+        option_typeC:[],
+        globalCode:'',
+        globalBUildinInfo:''
       }
   },
-  created(){
+    created(){
         var vm = this
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
@@ -1923,12 +1972,12 @@ export default {
        
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.getIntoDesignPage()
+        vm.getIntoDesignPage();
     },
-  watch:{
-      value_monomer:function(val){
+    watch:{
+        value_monomer:function(val){
             var vm = this 
-             if(val == 0) {
+            if(val == 0) {
                 vm.options_partition = [
                     {
                         id:'0',
@@ -1942,69 +1991,109 @@ export default {
                 ]
             }else {
                 vm.getPartitionBySubProjId(false) //加载分区
+                this.getParams();
+                this.getModelSelection(this.globalCode,this.globalBUildinInfo);
             }
-      },
-       value_partition:function(val){
-            var vm = this 
-            vm.findStorey(false)
-      },
-      value_professional:function(val){
-            var vm = this 
-            vm.getGenieClass(2,false)
-      },
-      value_system:function(val){
-            var vm = this 
-            vm.getGenieClass(3,false)
-      },
-      'show.basicAttributes':function(val){
-          if(val){
-            $("#basicAtt").show(200);
-          }else{
-            $("#basicAtt").hide(200);
-          }
-      },
-     'show.designAttributes':function(val){
-          if(val){
-            $("#designAtt").show(200);
-          }else{
-            $("#designAtt").hide(200);
-          }
-      },
-      'show.extensionAttributes':function(val){
-          if(val){
-            $("#extensionAtt").show(200);
-          }else{
-            $("#extensionAtt").hide(200);
-          }
-      },
-     'show.relevantDoc':function(val){
-          if(val){
-            $("#relevantDoc").show(200);
-          }else{
-            $("#relevantDoc").hide(200);
-          }
-      },
-      'pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.selectData()
-      },
-      'pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.selectData()
-      },
-    'pre_pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.getPrevData()
-      },
-      'pre_pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getPrevData()
-      },
-      checkedValue:function(val){
-          var vm = this
-          vm.getPrevData()
-      },
-  },
+        },
+        value_partition:function(val){
+                var vm = this 
+                vm.findStorey(false);
+                this.getParams();
+                this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        },
+        value_professional:function(val){
+                var vm = this 
+                vm.getGenieClass(2,false)
+                this.getParams();
+                this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        },
+        value_system:function(val){
+                var vm = this 
+                vm.getGenieClass(3,false)
+                this.getParams();
+                this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        },
+        'show.basicAttributes':function(val){
+            if(val){
+                $("#basicAtt").show(200);
+            }else{
+                $("#basicAtt").hide(200);
+            }
+        },
+        'show.designAttributes':function(val){
+            if(val){
+                $("#designAtt").show(200);
+            }else{
+                $("#designAtt").hide(200);
+            }
+        },
+        'show.extensionAttributes':function(val){
+            if(val){
+                $("#extensionAtt").show(200);
+            }else{
+                $("#extensionAtt").hide(200);
+            }
+        },
+        'show.relevantDoc':function(val){
+            if(val){
+                $("#relevantDoc").show(200);
+            }else{
+                $("#relevantDoc").hide(200);
+            }
+        },
+        'pageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.selectData()
+        },
+        'pageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.selectData()
+        },
+        'pre_pageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.getPrevData()
+        },
+        'pre_pageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.getPrevData()
+        },
+        checkedValue:function(val){
+            var vm = this
+            vm.getPrevData()
+        },
+        "value_type":function(){
+            this.getParams();
+            this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        },
+        "value_floor":function(){
+            this.getParams();
+            this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        },
+        "value_leibie":function(val,oldVal){
+            // console.log(val);
+
+            // let twoArr = [];
+            // if(val == 'ALL'){
+            //     this.option_model = this.copyOption_model;
+            //     console.log(this.option_model);
+            //     // this.value_model = this.option_model[0].name;
+            // }
+            // else{
+            //     this.copyOption_model.forEach(item=>{
+            //         if(val == item.parentID){
+            //             twoArr.push(item);
+            //         }
+            //     });
+            //     this.option_model = twoArr;
+            //     this.option_model.unshift({
+            //         name:'全部',
+            //         id:'ALL'
+            //     })
+            //     this.value_model = this.option_model[0].id;
+            // }
+            // console.log(twoArr);
+        }
+    },
   methods:{
        nameChange(isInit){
             var vm = this 
@@ -2915,7 +3004,7 @@ export default {
             })
       },
       getPartitionBySubProjId(ispre){
-          var vm = this
+          var vm = this;
           if(ispre){
               var subProjId = ''
               if(vm.preAddEdit.object.monomer.length>1 || vm.preAddEdit.object.monomer.length == 0){
@@ -3194,156 +3283,325 @@ export default {
             })
         )
     },
-    selectData(){
-          var vm = this
-          if(isNaN(vm.dataVision) || vm.dataVision <=0 || vm.dataVision>vm.holderMaxVersion){
-            vm.$message({
-              type:'warning',
-              message:'数据版本只能是1到'+vm.holderMaxVersion+'的正整数！'
+        //筛选
+        selectData(){
+            this.getParams();
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/dc/searchPropertyData',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    gcCode:this.globalCode,
+                    gcNumber:this.globalCode,
+                    projId:this.projId,
+                    dataVision:this.dataVision,
+                    rows:this.pageDetial.pagePerNum,
+                    page:this.pageDetial.currentPage,
+                    templateId:this.value_leibie+'__'+this.value_model+'__'+this.value_typeC,
+                    buildInfo:this.globalBUildinInfo,
+                }
+            }).then(response=>{
+                console.log(response.data)
+                // if(response.data.cd == 0){
+                //     this.canSearch = false
+                //     if(response.data.rt.gridDataJson.rows != null){
+                //         this.empty = false
+                //         this.attributeList = response.data.rt.gridDataJson.rows
+                //         if(response.data.rt.gcproperty != null){
+                //             this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
+                //             var b = []
+                //             $.extend(b,this.GCPropertyList)
+                //             this.GCPropertyList_to_select = b//扩展属性头部
+                //             this.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+                //             if(this.GCPropertyList != null){
+                //                 this.GCPropertyList.forEach(element => {
+                //                     this.$set(element,'checked',true)
+                //                 })
+                //             }
+                //             if(this.GCPropertyList_to_select != null){
+                //                 this.GCPropertyList_to_select.forEach(element => {
+                //                     this.$set(element,'extension_checked',true)
+                //                 })
+                //             }
+                //         }
+                //         this.pageDetial.total = response.data.rt.gridDataJson.total
+                //         if(this.attributeList != null){
+                //             this.attributeList.forEach(element => {
+                //                 this.$set(element,'checked',false)
+                //             })
+                //         }
+                //     }else{
+                //         this.empty = true
+                //         this.pageDetial.total = 0
+                //         this.attributeList = []
+                //         this.GCPropertyList = []//扩展属性头部
+                //         this.GCPropertyList_to_select = []
+                //         this.GCPropertyValueList = []//扩展属性查询的值 库
+                //     }
+                //     if(response.data.rt.genieclassTitle != null){
+                //         this.GenieclassTitle = response.data.rt.genieclassTitle
+                //     }else{
+                //         this.GenieclassTitle = []
+                //     }
+                // }
+                // this.fullscreenLoading = false
             })
-            return false
-          }
-          vm.fullscreenLoading = true
-          /**
-           * 下面是判断单体和单体类型
-           * **/
-          var holderId=''
-          var isChildren=1
-          var selectBuild=3//单体选择 1：选择了总体场地，2：全部单体，3：单个单体
-          var holderType=7//6:场地，7：单体，8：分区，9：楼层
-          if(vm.value_monomer == 0) {
-              selectBuild = 1
-              holderType=6
-          }else if(vm.value_monomer == 'all'){
-              selectBuild=2
-              holderType=7
-          }else{
-              selectBuild=3
-          }
 
-          if(vm.value_monomer != -1){
-              holderId = vm.value_monomer
-              if(vm.value_partition!=-1){
-                  if(vm.value_partition==0){//分区选择了（无）
-                      isChildren=0
-                  }else {
-                      holderType=8
-                      holderId = vm.value_partition
-                      if (vm.value_floor != -1) {
-                          isChildren=0
-                          if(vm.value_floor==0){//楼层选择了（无）
-                              //isChildren=0;
-                          }else {
-                              holderType=9
-                              holderId = vm.value_floor
-                          }
-                      }else{
-                          holderType = 9
-                      }
-                  }
-              }else{
-                      holderType = 8
-                      if (vm.value_floor != 0) {
-                          holderType = 9
-                      }
-              }
-          }
-          /**
-           * 以下是第二行筛选的值
-           * @param   value_professional:'-1',//专业 筛选关键字
-            @param        value_system:'-1',//系统 筛选关键字
-            @param        value_type:'-1',//类型 筛选关键字
-           * **/
-          
-          var gcCode = vm.value_professional
-          var gcCode1 = vm.value_system
-          var gcCode2 = vm.value_type
-          var gcNumber=''
-          if(vm.value_professional!=-1){ //专业
-              if(vm.value_system ==0){
-                  gcNumber = vm.value_professional
-              }else {
-                  gcNumber = vm.value_professional
-                  if (vm.value_system  != -1) { //系统
-                      if (vm.value_type == 0) {
-                          gcNumber = vm.value_system 
-                      } else {
-                          gcNumber = vm.value_system 
-                          if (vm.value_type != -1) {//类型
-                              gcNumber = vm.value_type
-                          }
-                      }
-                  }
-              }
-          }
-          axios({
-              method:'POST',
-              url:vm.BDMSUrl+'project2/dc/searchPropertyData',
-              headers:{
-                  'token':vm.token
-              },
-              params:{
-                  projId:vm.projId,
-                  dataVision:vm.dataVision,//数据版本
-                  isChildren:isChildren,
-                  selectBuild:selectBuild,
-                  holderType:holderType,
-                  holderId:holderId,
-                  gcCode:gcCode,
-                  gcCode1:gcCode1,
-                  gcCode2:gcCode2,
-                  gcNumber:gcNumber,
-                  rows:vm.pageDetial.pagePerNum,
-                  page:vm.pageDetial.currentPage,
-              }
-          }).then((response)=>{
-              if(response.data.cd == 0){
-                  vm.canSearch = false
-                  if(response.data.rt.gridDataJson.rows != null){
-                    vm.empty = false
-                    vm.attributeList = response.data.rt.gridDataJson.rows
-                    if(response.data.rt.gcproperty != null){
-                        vm.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
-                        var b = []
-                        $.extend(b,vm.GCPropertyList)
-                        vm.GCPropertyList_to_select = b//扩展属性头部
-                        vm.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
-                         if(vm.GCPropertyList != null){
-                            vm.GCPropertyList.forEach(element => {
-                                vm.$set(element,'checked',true)
-                            })
-                        }
-                        if(vm.GCPropertyList_to_select != null){
-                            vm.GCPropertyList_to_select.forEach(element => {
-                                vm.$set(element,'extension_checked',true)
-                            })
-                        }
-                    }
-                    vm.pageDetial.total = response.data.rt.gridDataJson.total
-                    if(vm.attributeList != null){
-                        vm.attributeList.forEach(element => {
-                            vm.$set(element,'checked',false)
+            // var vm = this
+            // if(isNaN(vm.dataVision) || vm.dataVision <=0 || vm.dataVision>vm.holderMaxVersion){
+            //     vm.$message({
+            //     type:'warning',
+            //     message:'数据版本只能是1到'+vm.holderMaxVersion+'的正整数！'
+            //     })
+            //     return false
+            // }
+            // vm.fullscreenLoading = true
+            // /**
+            //  * 下面是判断单体和单体类型
+            //  * **/
+            // var holderId=''
+            // var isChildren=1
+            // var selectBuild=3//单体选择 1：选择了总体场地，2：全部单体，3：单个单体
+            // var holderType=7//6:场地，7：单体，8：分区，9：楼层
+            // if(vm.value_monomer == 0) {
+            //     selectBuild = 1
+            //     holderType=6
+            // }else if(vm.value_monomer == 'all'){
+            //     selectBuild=2
+            //     holderType=7
+            // }else{
+            //     selectBuild=3
+            // }
+
+            // if(vm.value_monomer != -1){
+            //     holderId = vm.value_monomer
+            //     if(vm.value_partition!=-1){
+            //         if(vm.value_partition==0){//分区选择了（无）
+            //             isChildren=0
+            //         }else {
+            //             holderType=8
+            //             holderId = vm.value_partition
+            //             if (vm.value_floor != -1) {
+            //                 isChildren=0
+            //                 if(vm.value_floor==0){//楼层选择了（无）
+            //                     //isChildren=0;
+            //                 }else {
+            //                     holderType=9
+            //                     holderId = vm.value_floor
+            //                 }
+            //             }else{
+            //                 holderType = 9
+            //             }
+            //         }
+            //     }else{
+            //             holderType = 8
+            //             if (vm.value_floor != 0) {
+            //                 holderType = 9
+            //             }
+            //     }
+            // }
+            // /**
+            //  * 以下是第二行筛选的值
+            //  * @param   value_professional:'-1',//专业 筛选关键字
+            //     @param        value_system:'-1',//系统 筛选关键字
+            //     @param        value_type:'-1',//类型 筛选关键字
+            // * **/
+            
+            // var gcCode = vm.value_professional
+            // var gcCode1 = vm.value_system
+            // var gcCode2 = vm.value_type
+            // var gcNumber=''
+            // if(vm.value_professional!=-1){ //专业
+            //     if(vm.value_system ==0){
+            //         gcNumber = vm.value_professional
+            //     }else {
+            //         gcNumber = vm.value_professional
+            //         if (vm.value_system  != -1) { //系统
+            //             if (vm.value_type == 0) {
+            //                 gcNumber = vm.value_system 
+            //             } else {
+            //                 gcNumber = vm.value_system 
+            //                 if (vm.value_type != -1) {//类型
+            //                     gcNumber = vm.value_type
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            // axios({
+            //     method:'POST',
+            //     url:vm.BDMSUrl+'project2/dc/searchPropertyData',
+            //     headers:{
+            //         'token':vm.token
+            //     },
+            //     params:{
+            //         projId:vm.projId,
+            //         dataVision:vm.dataVision,//数据版本
+            //         isChildren:isChildren,
+            //         selectBuild:selectBuild,
+            //         holderType:holderType,
+            //         holderId:holderId,
+            //         gcCode:gcCode,
+            //         gcCode1:gcCode1,
+            //         gcCode2:gcCode2,
+            //         gcNumber:gcNumber,
+            //         rows:vm.pageDetial.pagePerNum,
+            //         page:vm.pageDetial.currentPage,
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd == 0){
+            //         vm.canSearch = false
+            //         if(response.data.rt.gridDataJson.rows != null){
+            //             vm.empty = false
+            //             vm.attributeList = response.data.rt.gridDataJson.rows
+            //             if(response.data.rt.gcproperty != null){
+            //                 vm.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
+            //                 var b = []
+            //                 $.extend(b,vm.GCPropertyList)
+            //                 vm.GCPropertyList_to_select = b//扩展属性头部
+            //                 vm.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+            //                 if(vm.GCPropertyList != null){
+            //                     vm.GCPropertyList.forEach(element => {
+            //                         vm.$set(element,'checked',true)
+            //                     })
+            //                 }
+            //                 if(vm.GCPropertyList_to_select != null){
+            //                     vm.GCPropertyList_to_select.forEach(element => {
+            //                         vm.$set(element,'extension_checked',true)
+            //                     })
+            //                 }
+            //             }
+            //             vm.pageDetial.total = response.data.rt.gridDataJson.total
+            //             if(vm.attributeList != null){
+            //                 vm.attributeList.forEach(element => {
+            //                     vm.$set(element,'checked',false)
+            //                 })
+            //             }
+            //         }else{
+            //             vm.empty = true
+            //             vm.pageDetial.total = 0
+            //             vm.attributeList = []
+            //             vm.GCPropertyList = []//扩展属性头部
+            //             vm.GCPropertyList_to_select = []
+            //             vm.GCPropertyValueList = []//扩展属性查询的值 库
+            //         }
+            //         if(response.data.rt.genieclassTitle != null){
+            //             vm.GenieclassTitle = response.data.rt.genieclassTitle
+            //         }else{
+            //             vm.GenieclassTitle = []
+            //         }
+            //     }
+            //     vm.fullscreenLoading = false
+            // }).catch((err)=>{
+            //     console.log(err)
+            // })
+        },
+        getParams(){
+            if(this.value_professional == -1 && this.value_system == -1 && this.value_type ==-1 || this.value_professional == -1 && this.value_system == 0 && this.value_type ==0){
+                this.globalCode = '000000';
+            }else if(this.value_type != -1 && this.value_type!=0){
+                this.globalCode = this.value_type;
+            }else if(this.value_system != -1 && this.value_system != 0 && (this.value_type == -1 || this.value_type == 0)){
+                this.globalCode = this.value_system;
+            }else if(this.value_professional !== -1 &&(this.value_system == -1 || this.value_system == 0) && (this.value_type == -1 || this.value_type == 0)){
+                this.globalCode = this.value_professional;
+            }
+            let oneParam = '',
+                twoParam = '',
+                threeParam = '';
+            if(this.value_monomer == 0){
+                oneParam = 'OVERALL_FIELD';
+            }else if(this.value_monomer == 'all'){
+                oneParam = 'ALL';
+            }else{
+                oneParam = this.value_monomer;
+            }
+
+            if(this.value_partition == 0){
+                twoParam = 'NONE';
+            }else{
+                twoParam = this.value_partition;
+            }
+            if(this.value_floor == 0){
+                threeParam = 'NONE';
+            }else{
+                threeParam = this.value_floor;
+            }
+            this.globalBUildinInfo = oneParam+'__'+twoParam+'__'+threeParam;
+        },
+        //显示更多筛选框
+        showMore(){
+            this.shownum+=1;
+            if(this.shownum == 1){
+                this.ShowClassify = false;
+            }
+            if(this.shownum == 2){
+                this.ShowModel  =false;
+                this.getParams();
+                this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+            }
+        },
+        //获取第三栏的参数选项
+        getModelSelection(codeparam,buildInfoparam){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/dc/getModelSelection',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    code:codeparam,
+                    buildInfo:buildInfoparam,
+                }
+            }).then(response=>{
+                console.log(response.data);
+                if(response.data.cd == 0){
+                    if(response.data.rt!=null){
+                        this.model_leibie = response.data.rt.templateInfos0;
+                        this.model_leibie.unshift({
+                            name:'全部',
+                            id:'ALL',
                         })
-                    }
-                  }else{
-                    vm.empty = true
-                    vm.pageDetial.total = 0
-                    vm.attributeList = []
-                    vm.GCPropertyList = []//扩展属性头部
-                    vm.GCPropertyList_to_select = []
-                    vm.GCPropertyValueList = []//扩展属性查询的值 库
-                  }
-                  if(response.data.rt.genieclassTitle != null){
-                    vm.GenieclassTitle = response.data.rt.genieclassTitle
-                  }else{
-                    vm.GenieclassTitle = []
-                  }
-              }
-              vm.fullscreenLoading = false
-          }).catch((err)=>{
-              console.log(err)
-          })
-      },
-  }
+                        this.copyOption_model = this.option_model;
+                        this.value_leibie = this.model_leibie[0].id;
+                        this.option_model = response.data.rt.templateInfos1;
+                        this.option_model.unshift({
+                            name:'全部',
+                            id:'ALL',
+                        })
+                        this.value_model = this.option_model[0].id;
+                        this.option_typeC = response.data.rt.templateInfos2;
+                        this.option_typeC.unshift({
+                            name:'全部',
+                            id:'ALL',
+                        })
+                        this.value_typeC = this.option_typeC[0].id;
+                    }else{
+                        this.model_leibie = [{
+                            name:'全部',
+                            id:'ALL',
+                        }];
+                        this.value_leibie = this.model_leibie[0].id;
+                        this.option_model = [{
+                            name:'全部',
+                            id:'ALL',
+                        }];
+                        this.value_model = this.option_model[0].id;
+                        this.option_typeC = [{
+                            name:'全部',
+                            id:'ALL',
+                        }];
+                        this.value_typeC = this.option_typeC[0].id;
+                    }   
+                }else{
+                    alert(response.data.msg)
+                }
+            })
+        },
+
+    }
 }
 </script>
