@@ -225,6 +225,7 @@ export default {
             border: 1px solid #ccc;
             padding: 0 35px;
             color: #333;
+            box-sizing: content-box;
         }
         .input:-webkit-autofill { 
             // background-color: #FAFFBD; 
@@ -246,6 +247,7 @@ export default {
     
         #firstInp,#secondInp{
             height: 42px;
+            width: 280px;
         }
         #firstInp:after{
             content: url('../assets/login-person.png');
