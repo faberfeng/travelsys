@@ -171,7 +171,6 @@
 <script>
 import axios from 'axios'
 import VueHighcharts from 'vue2-highcharts'
-// import Drilldown from '../node_modules/highcharts/modules/Drilldown.js'
 import Highcharts from 'highcharts'
 export default{
     name:'resourcePlan',
