@@ -22,7 +22,7 @@
             <div class="calendarContext" v-show="viewshow" >
                 <div class="calendarHead">
                     <h5 class="calendarHeadLeft"><img class=imgIcon src="./images/worklist.png">个人日历</h5>
-                    <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteCalendarEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateCalendarEvent">修改事件</span></div>
+                    <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteCalendarEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateCalendarEvent" v-show="!showTaskCalendar">修改事件</span></div>
                 </div>
                 <div class="calendarBody" >
                     <!-- <button @click="refreshEvents">Refresh</button>
@@ -94,7 +94,8 @@
                 </el-col>
             </el-row> -->
         </div>
-        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']">
+        <!-- 个人事件模块 -->
+        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-show="!showTaskCalendar">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -168,6 +169,90 @@
                 
             </div>
         </div>
+        <!-- task模块与工程任务绑定 -->
+        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-show="showTaskCalendar">
+            <div id="center-selection">
+                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                    <i class="icon-right"></i>
+                </div>
+                <div :class="[screenLeft.item == 1?'active':'active-version']">
+                    <span class="item-event " @click="screenLeft.item = 1;">任<br>务</span>
+                </div>
+            </div>
+            <div id="box-right" v-if="screenLeft.item == 1">
+                <h3 class="header-information" style="margin-top:0;">
+                    <i class="trrangle"></i>
+                    基本信息
+                    <i :class="[{'active':show.basicInformation},'icon-dropDown']" @click="show.basicInformation = show.basicInformation?false:true;"></i>
+                </h3>
+                    <ul id="basicInformation" :class="[{'show':show.basicInformation}]">
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">序号</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskIndex"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">编号</span>
+                            <span class="detial-text-value" v-text="taskInformationList.completeTaskCode"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">组别</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskGroupName"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">名称</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskName"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">优先级</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskPriority"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">里程碑</span>
+                            <span class="detial-text-value">{{taskInformationList.taskType==1?'是':'否'}}</span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">计划开始</span>
+                            <span class="detial-text-value">{{taskInformationList.taskStart|timeChange()}}</span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">计划结束</span>
+                            <span class="detial-text-value">{{taskInformationList.taskEnd|timeChange()}}</span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">工作日数</span>
+                            <span class="detial-text-value">{{taskInformationList.taskDuration+'天'}}</span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">计划状态</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskStatusStr"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">负责群组</span>
+                            <span class="detial-text-value" v-text="taskInformationList.taskUserGroupName"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">负责人</span>
+                            <span class="detial-text-value">{{taskInformationList.dutyUserName}}</span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name">计划人</span>
+                            <span class="detial-text-value" v-text="taskInformationList.createUserName"></span>
+                        </li>
+                    </ul>
+                <!-- <h3 class="header-attribute" style="margin-top: 10px;">
+                    <i class="trrangle"></i>
+                    前置任务
+                </h3>
+                <ul id="preTask" v-for="(item,index) in linkList" :key="index">
+                    <li class="detial-item clearfix">
+                        <span class="detail-text" v-text="item.linkTaskName"></span>
+                        <span class="detail-text">{{item.linkType|linkType()}}</span>
+                        <button class="deleteBtn actionBtn1" @click="deleteLinkType(item.linkTaskId)"></button>
+                    </li>
+                </ul> -->
+            </div>
+        </div>
+
         <div id="edit">
             <el-dialog title="新增事件内容" :visible.sync="addEventTextDialog" @close="addETCancle">
                 <div class="editBody">
@@ -360,6 +445,8 @@ export default {
   name:'personalCalendar',
     data(){
         return {
+            // 显示任务事件(与工程任务板块绑定)
+            showTaskCalendar:false,
             //事件视图
             isActive:'',
             viewshow:true,
@@ -441,8 +528,11 @@ export default {
             end1:'',
             calendarEventList:'',
             addEventList:'',
-            CalendarTaskList:'',
+            calendarTaskList:'',
+            event:[],
             eventInformationList:'',
+            taskInformationList:'',
+            linkList:'',
             eventId:'',
             ugList:'',
             eventSources:[],
@@ -600,9 +690,27 @@ export default {
             }
             return str;
         },
+        // timeChange(val){
+        //         return moment(val).format("YYYY-MM-DD HH:mm");
+        //     },
         timeChange(val){
-                return moment(val).format("YYYY-MM-DD HH:mm");
-            },
+           if(val==null){
+               return;
+           }else{
+                return moment(val).format("YYYY-MM-DD");
+            }
+       },
+       linkType(val){
+           if(val=="SS"){
+               return "开始-开始"
+           }else if(val=="SF"){
+               return "开始-结束"
+           }else if(val=="FS"){
+               return "结束-开始"
+           }else if(val=="FF"){
+               return "结束-结束"
+           }
+       }
     },
     watch:{
          checkFileDir:function(val){
@@ -841,9 +949,9 @@ export default {
           }
       },
         initCalendar(){
-            var event=[];
+            // var event=[];
             this.calendarEventList.forEach((item,index)=>{
-                    event.push({
+                    this.event.push({
                         id:item.id,
                         title:item.eventName,
                         start:moment(item.eventStart).format("YYYY-MM-DD HH:mm"),
@@ -854,25 +962,64 @@ export default {
                         
                 })
                     })
-                    this.eventSources.push({events:event,textColor:'black',color:'red',});
-            
+                    this.eventSources.push({events:this.event,textColor:'black',color:'red',});
+        },
+        initCalendar1(){
+            //  var event=[];
+            this.calendarTaskList.forEach((item,index)=>{
+                    this.event.push({
+                        id:item.taskId,
+                        title:item.taskName,
+                        start:moment(item.taskStart).format("YYYY-MM-DD HH:mm"),
+                        end:moment(item.taskEnd).format("YYYY-MM-DD HH:mm"),
+                        color:'#3a87ad',
+                        allDay:true,
+                        borderColor:'white'      
+                })
+                    })
+                    // this.eventSources.push({events:this.event,textColor:'black',color:'red',});
         },
 
-    eventSelected(calEvent, jsEvent, view) {
-           this.eventId=calEvent.id;
-        var str=this.eventSources[0].events;
-        str.forEach((item)=>{
-            if(item.id==calEvent.id){
-                item.borderColor="black";
+        eventSelected(calEvent, jsEvent, view) {
+            //此处只能通过color来获取是否为task的事件
+            if(calEvent.color=="#3a87ad"){
+                this.showTaskCalendar=true;
+                this.taskId=calEvent.id;
+                var str=this.eventSources[0].events;
+                console.log(JSON.stringify(str));
+                str.forEach((item)=>{
+                if(item.id==calEvent.id){
+                    item.borderColor="black";
+                }
+                else{
+                    item.borderColor="white";
+                } 
+                })
+                this.getTask();
+                // this.initEvent();
+                // this.initTask();
+                // this.eventSources=[];
+            }else {
+                this.showTaskCalendar=false;
+                console.log(calEvent);
+                this.eventId=calEvent.id;
+                var str=this.eventSources[0].events;
+                console.log(JSON.stringify(str));
+                str.forEach((item)=>{
+                    if(item.id==calEvent.id){
+                        item.borderColor="black";
+                    }
+                    else{
+                        item.borderColor="white";
+                    } 
+                })
+                this.informationShow();
+                this.attachList();
+                // this.initEvent();
+                // this.initTask();
+                // this.eventSources=[];
             }
-            else{
-                item.borderColor="white";
-            }
-            
-        })
-           this.informationShow();
-           this.attachList();
-    },
+        },
     informationShow(){
         axios({
                     method:'post',
@@ -893,6 +1040,24 @@ export default {
                     })
 
     },
+    //获取工程任务详细信息
+      getTask(){
+          axios({
+              method:'post',
+              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/'+this.taskId,
+              headers:{
+                  'token':this.token
+              },
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                  this.taskInformationList=response.data.rt
+                  this.linkList=this.taskInformationList.linkList
+                //   console.log(JSON.stringify( this.taskInformationList))
+              }else if(response.data.cd=="-1"){
+                  alert(response.data.msg)
+              }
+          })
+      },
     eventRender(event, element, view){
         this.start1=moment(view.start).format("YYYY-MM-DD HH:mm");
         this.end1=moment(view.end).format("YYYY-MM-DD HH:mm");
@@ -921,6 +1086,7 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                             this.calendarEventList=response.data.rt;
+                            console.log(JSON.stringify(this.calendarEventList));
                             this.initCalendar();
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
@@ -945,8 +1111,12 @@ export default {
                     }
                     }).then(response=>{
                         if(response.data.cd == '0'){
-                            this.CalendarTaskList=response.data.rt;
-                        }else if(response.data.cd = '-1'){
+                            // this.calendarEventList=response.data.rt;
+                            // console.log(JSON.stringify(this.calendarEventList));
+                            // this.initCalendar();
+                            this.calendarTaskList=response.data.rt;
+                            this.initCalendar1();
+                        }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
                         }else{
                             this.$router.push({
@@ -1844,10 +2014,12 @@ export default {
                 .eventViewBody{
                     margin-top:40px;
                     width: 100%;
+                    // height: 200px;
                    
                     .eventViewBodyUl{
-                        overflow: hidden;
+                        overflow: auto;
                                 // background-color: #f2f2f2;
+                                height: 500px;
                                  .updateEventView{
                                 background: url(./images/edit1.png) no-repeat 0 0;
                                 width: 16px;
@@ -1920,10 +2092,10 @@ export default {
                     }
                 }
                 .eventViewFooter{
-                    position: absolute;
-                    bottom: 0px;
+                    position: fixed;
+                    bottom: 12px;
                     margin-top:20px;
-                    right: 0px;
+                    right: 80px;
                 }
 
             }
