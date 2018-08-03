@@ -874,7 +874,6 @@ export default {
            this.attachList();
     },
     informationShow(){
-        
         axios({
                     method:'post',
                     url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/event/'+this.eventId,
@@ -1198,11 +1197,16 @@ export default {
             }else{
                 alert("请指定需要修改的事件")
             }
+            
             this.updateTypeValue=this.updateTypeList[0].value;
             this.checkValue=this.shifouChange(this.eventInformationList.allDay);
             this.eventNames=this.eventInformationList.eventName;
             this.startTimeValue=this.StrToGMT(this.eventInformationList.eventStart);
             this.endTimeValue=this.StrToGMT(this.eventInformationList.eventEnd);
+            console.log(this.startTimeValue);
+            console.log(this.endTimeValue);
+            console.log(this.dateChange(this.startTimeValue));
+            console.log(this.dateChange(this.endTimeValue));
             this.eventPositions=this.eventInformationList.eventPosition;
             this.repeatTypeValue=this.eventInformationList.repeatType;
             this.repeatTypeList.forEach((item)=>{
@@ -1261,6 +1265,7 @@ export default {
                 alert('提示：结束时间必须大于开始时间')
                 return;
             }
+            console.log()
             
              axios({
                     method:'post',
@@ -2087,6 +2092,7 @@ export default {
                     .detial-item{
                         font-size: 12px;
                         line-height: 12px;
+                        
                         height:16px;
                         margin-top: 16px;
                         margin-left:8px;
@@ -2099,10 +2105,11 @@ export default {
                         .detial-text-value{
                         float: left;
                         color: #333333;
-                            max-width: 120px;
+                            max-width: 130px;
+                           
                             // overflow-x: hidden;
                             text-overflow: ellipsis;
-                            white-space: nowrap;
+                            // white-space: nowrap;
                         }
                         .detial-content-name{
                             color: #999999;

@@ -2531,7 +2531,8 @@ export default{
         //确认增加资源类别
         addResourceTypeSure(){
             if(this.rTypeName==''){
-                alert('资源类别名称不能为空')
+                alert('资源类别名称不能为空');
+                return;
             }
             axios({
                 method:'post',
