@@ -445,7 +445,7 @@
                                 <span class="detial-text-value" v-text="checkedItem.comments?checkedItem.comments:'（空）'" :title="checkedItem.comments?checkedItem.comments:'（空）'"></span>
                             </li>
                         </ul>
-                        <div v-if="mapInfo.length>0" style="margin-top:13px;">
+                        <div v-if="mapInfo!=null && mapInfo.length>0" style="margin-top:13px;">
                             <h3 class="header-attribute" style="margin-top: 0px;">
                                 <i class="trrangle"></i>
                                 设计属性
@@ -458,7 +458,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div v-if="GCPropertyList.length>0" style="margin-top:13px;">
+                        <div v-if="GCPropertyList!= null && GCPropertyList.length>0" style="margin-top:13px;">
                             <h3 class="header-attribute" style="margin-top: 0px;">
                                 <i class="trrangle"></i>
                                 扩展属性
@@ -477,7 +477,7 @@
                                 关联文档
                                 <i :class="[{'active':show.relevantDoc},'icon-dropDown']" @click="show.relevantDoc = show.relevantDoc?false:true;"></i>
                             </h3>
-                            <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" v-if="fgList.length>0">
+                            <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" v-if="fgList!=null && fgList.length>0">
                                 <li class="detial-item clearfix" v-for="(item,index) in fgList" :key="index">
                                     <span class="detial-text-name" v-text="item.fgName" style="max-width: 120px;width: auto;float: left;"></span>
                                     <span class="icon-goujian icon-search" @click="view(item.filePath)"></span>
@@ -513,7 +513,39 @@
                 </div>
             </div>
              <div v-if="screenLeft.item == 2" class="screenRight_1">
-               模板
+                 <h3 class="header-attribute" style="margin-top: 0px;">
+                    <i class="trrangle"></i>
+                    族
+                    <i :class="[{'active':show.extensionAttributes},'icon-dropDown']" @click="show.extensionAttributes = show.extensionAttributes?false:true;"></i>
+                </h3>
+                <ul id="extensionAtt" :class="[{'show':show.extensionAttributes},'Att']" >
+                    <li class="detial-item clearfix" v-for="(item,index) in templateInfos0Data" :key="index">
+                        <span class="detial-text-name">{{item.key}}:</span>
+                        <span class="detial-text-value">{{item.value}}</span>
+                    </li>
+                </ul>
+                <h3 class="header-attribute" style="margin-top: 0px;">
+                    <i class="trrangle"></i>
+                    族类别
+                    <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                </h3>
+                <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']" >
+                    <li class="detial-item clearfix" v-for="(item,index) in templateInfos1Data" :key="index">
+                        <span class="detial-text-name">{{item.key}}:</span>
+                        <span class="detial-text-value">{{item.value}}</span>
+                    </li>
+                </ul>
+                <h3 class="header-attribute" style="margin-top: 0px;">
+                    <i class="trrangle"></i>
+                    族类型
+                    <i :class="[{'active':show.relevantDoc},'icon-dropDown']" @click="show.relevantDoc = show.relevantDoc?false:true;"></i>
+                </h3>
+                <ul id="relevantDoc" :class="[{'show':show.relevantDoc},'Att']" >
+                    <li class="detial-item clearfix" v-for="(item,index) in templateInfos2Data" :key="index">
+                       <span class="detial-text-name">{{item.key}}:</span>
+                        <span class="detial-text-value">{{item.value}}</span>
+                    </li>
+                </ul>
             </div>
         </div>
         <div id="edit">
@@ -1383,7 +1415,7 @@
                                 .el-select{
                                     .el-input__inner{
                                         border:none;
-                                        width: 100px;
+                                        width: 200px;
                                         color:#333333;
                                         height: 38px;
                                     }
@@ -1700,6 +1732,7 @@
                     padding-bottom:4px;
                     border-bottom: 1px solid #e6e6e6;
                     text-align: left; 
+                    margin-bottom: 5px;
                     .trrangle{
                         display: inline-block;
                         width: 0px;
@@ -1776,6 +1809,9 @@
         }
         ::-webkit-scrollbar-thumb:window-inactive {
         background:rgba(255,0,0,0.4);
+        }
+        #extensionAtt{
+            margin-bottom: 10px;
         }
     }
 </style>
@@ -1956,8 +1992,12 @@ export default {
         copyOption_model:[],
         value_typeC:'',
         option_typeC:[],
+        copyoption_typeC:[],
         globalCode:'',
-        globalBUildinInfo:''
+        globalBUildinInfo:'',
+        templateInfos0Data:[],
+        templateInfos1Data:[],
+        templateInfos2Data:[],
       }
   },
     created(){
@@ -1973,6 +2013,9 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoDesignPage();
+        //获取第三行参数
+        this.getParams();
+        this.getModelSelection(this.globalCode,this.globalBUildinInfo);
     },
     watch:{
         value_monomer:function(val){
@@ -2070,28 +2113,46 @@ export default {
             this.getModelSelection(this.globalCode,this.globalBUildinInfo);
         },
         "value_leibie":function(val,oldVal){
-            // console.log(val);
-
-            // let twoArr = [];
-            // if(val == 'ALL'){
-            //     this.option_model = this.copyOption_model;
-            //     console.log(this.option_model);
-            //     // this.value_model = this.option_model[0].name;
-            // }
-            // else{
-            //     this.copyOption_model.forEach(item=>{
-            //         if(val == item.parentID){
-            //             twoArr.push(item);
-            //         }
-            //     });
-            //     this.option_model = twoArr;
-            //     this.option_model.unshift({
-            //         name:'全部',
-            //         id:'ALL'
-            //     })
-            //     this.value_model = this.option_model[0].id;
-            // }
-            // console.log(twoArr);
+            let twoArr = [];
+            if(val == 'ALL'){
+                this.option_model = this.copyOption_model;
+                if(this.option_model.length!=0){
+                    this.value_model = this.option_model[0].id;
+                }
+            }else{
+                this.copyOption_model.forEach(item=>{
+                    if(val == item.parentID){
+                        twoArr.push(item);
+                    }
+                });
+                this.option_model = twoArr;
+                this.option_model.unshift({
+                    name:'全部',
+                    id:'ALL'
+                })
+                this.value_model = this.option_model[0].id;
+            }
+        },
+        "value_model":function(val,oldVal){
+            let twoArr = [];
+            if(val == 'ALL'){
+                this.option_typeC = this.copyoption_typeC;
+                if(this.option_typeC!=0){
+                    this.value_typeC = this.option_typeC[0].id;
+                }   
+            }else{
+                this.copyoption_typeC.forEach(item=>{
+                    if(val == item.parentID){
+                        twoArr.push(item);
+                    }
+                });
+                this.option_typeC = twoArr;
+                this.option_typeC.unshift({
+                    name:'全部',
+                    id:'ALL'
+                })
+                this.value_typeC = this.option_typeC[0].id;
+            }
         }
     },
   methods:{
@@ -2522,46 +2583,103 @@ export default {
             var vm = this
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         },
-      checkLabel(index,ismultiSelect){
-        var vm = this
-        vm.mapInfo = []
-        if(ismultiSelect){
-             vm.attributeList[index].checked = !vm.attributeList[index].checked
-             var num = 0
-             vm.checkedItem = {}
-             vm.attributeList.forEach((item,key)=>{
-                if(item.checked){
-                    if(num == 0){
-                        vm.checkedItem = item
-                    }else{
-                         vm.checkedItem = {}
+        checkLabel(index,ismultiSelect){
+            var vm = this;
+            vm.mapInfo = [];
+            if(ismultiSelect){
+                vm.attributeList[index].checked = !vm.attributeList[index].checked
+                var num = 0
+                vm.checkedItem = {}
+                vm.attributeList.forEach((item,key)=>{
+                    if(item.checked){
+                        if(num == 0){
+                            vm.checkedItem = item
+                        }else{
+                            vm.checkedItem = {}
+                        }
+                        num++
                     }
-                    num++
+                })
+                vm.ListCheckedNum = num
+                if(num == vm.attributeList.length){
+                    vm.checkAll = true
+                }else{
+                    vm.checkAll = false
                 }
-            })
-            vm.ListCheckedNum = num
-            if(num == vm.attributeList.length){
-                vm.checkAll = true
+                if(vm.ListCheckedNum == 1){
+                    vm.getDesignAtt()
+                }
             }else{
                 vm.checkAll = false
+                vm.attributeList.forEach((item,key)=>{
+                    if(key == index){
+                        vm.$set(item,'checked',true)
+                        vm.checkedItem = item
+                    }else{
+                        vm.$set(item,'checked',false)
+                    }
+                })
+                vm.ListCheckedNum = 1
+                vm.getDesignAtt();
+                this.getModelData(vm.attributeList[index].templateId)
             }
-            if(vm.ListCheckedNum == 1){
-                vm.getDesignAtt()
-            }
-        }else{
-            vm.checkAll = false
-            vm.attributeList.forEach((item,key)=>{
-                if(key == index){
-                    vm.$set(item,'checked',true)
-                    vm.checkedItem = item
+        },
+        getModelData(tempId){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/dc/getTemplateInfo',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    templateId:tempId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    console.log(response.data);
+                    if(response.data.rt != null){
+                        let templateInfos0 = response.data.rt.templateInfos0[0].attributes;
+                        let templateInfos1 = response.data.rt.templateInfos1[0].attributes;
+                        let templateInfos2 = response.data.rt.templateInfos2[0].attributes;
+                        this.templateInfos0Data = [];
+                        this.templateInfos1Data = [];
+                        this.templateInfos2Data = [];
+                        templateInfos0.forEach(val=>{
+                            val.items.forEach(item=>{
+                                if(val.items!=null){
+                                    this.templateInfos0Data.push({
+                                        key:item.split('#')[1].split('[')[1].split(']')[0],
+                                        value:item.split('#')[2].split('[')[1].split(']')[0]
+                                    })
+                                }
+                            })
+                        })
+                        templateInfos1.forEach(val=>{
+                            if(val.items!=null){
+                                val.items.forEach(item=>{
+                                    this.templateInfos1Data.push({
+                                        key:item.split('#')[1].split('[')[1].split(']')[0],
+                                        value:item.split('#')[2].split('[')[1].split(']')[0]
+                                    })
+                                })  
+                            }
+                        })
+                        templateInfos2.forEach(val=>{
+                            if(val.items!=null){
+                                val.items.forEach(item=>{
+                                    this.templateInfos2Data.push({
+                                        key:item.split('#')[1].split('[')[1].split(']')[0],
+                                        value:item.split('#')[2].split('[')[1].split(']')[0]
+                                    })
+                                })
+                            }
+                        })
+                    }
                 }else{
-                    vm.$set(item,'checked',false)
+                    alert(resposne.data.msg);
                 }
             })
-             vm.ListCheckedNum = 1
-              vm.getDesignAtt()
-        }
-      },
+        },
       getDesignAtt(){
         var vm = this
         axios({
@@ -3286,6 +3404,7 @@ export default {
         //筛选
         selectData(){
             this.getParams();
+            this.fullscreenLoading = true;
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/dc/searchPropertyData',
@@ -3304,49 +3423,51 @@ export default {
                 }
             }).then(response=>{
                 console.log(response.data)
-                // if(response.data.cd == 0){
-                //     this.canSearch = false
-                //     if(response.data.rt.gridDataJson.rows != null){
-                //         this.empty = false
-                //         this.attributeList = response.data.rt.gridDataJson.rows
-                //         if(response.data.rt.gcproperty != null){
-                //             this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
-                //             var b = []
-                //             $.extend(b,this.GCPropertyList)
-                //             this.GCPropertyList_to_select = b//扩展属性头部
-                //             this.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
-                //             if(this.GCPropertyList != null){
-                //                 this.GCPropertyList.forEach(element => {
-                //                     this.$set(element,'checked',true)
-                //                 })
-                //             }
-                //             if(this.GCPropertyList_to_select != null){
-                //                 this.GCPropertyList_to_select.forEach(element => {
-                //                     this.$set(element,'extension_checked',true)
-                //                 })
-                //             }
-                //         }
-                //         this.pageDetial.total = response.data.rt.gridDataJson.total
-                //         if(this.attributeList != null){
-                //             this.attributeList.forEach(element => {
-                //                 this.$set(element,'checked',false)
-                //             })
-                //         }
-                //     }else{
-                //         this.empty = true
-                //         this.pageDetial.total = 0
-                //         this.attributeList = []
-                //         this.GCPropertyList = []//扩展属性头部
-                //         this.GCPropertyList_to_select = []
-                //         this.GCPropertyValueList = []//扩展属性查询的值 库
-                //     }
-                //     if(response.data.rt.genieclassTitle != null){
-                //         this.GenieclassTitle = response.data.rt.genieclassTitle
-                //     }else{
-                //         this.GenieclassTitle = []
-                //     }
-                // }
-                // this.fullscreenLoading = false
+                if(response.data.cd == 0){
+                    this.canSearch = false;
+                    if(response.data.rt.gridDataJson.rows != null){
+                        this.empty = false
+                        this.attributeList = response.data.rt.gridDataJson.rows
+                        if(response.data.rt.gcproperty != null){
+                            this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
+                            var b = []
+                            $.extend(b,this.GCPropertyList)
+                            this.GCPropertyList_to_select = b//扩展属性头部
+                            this.GCPropertyValueList = response.data.rt.gcpropertyValue//扩展属性查询的值 库
+                            if(this.GCPropertyList != null){
+                                this.GCPropertyList.forEach(element => {
+                                    this.$set(element,'checked',true)
+                                })
+                            }
+                            if(this.GCPropertyList_to_select != null){
+                                this.GCPropertyList_to_select.forEach(element => {
+                                    this.$set(element,'extension_checked',true)
+                                })
+                            }
+                        }
+                        this.pageDetial.total = response.data.rt.gridDataJson.total
+                        if(this.attributeList != null){
+                            this.attributeList.forEach(element => {
+                                this.$set(element,'checked',false)
+                            })
+                        }
+                    }else{
+                        this.empty = true
+                        this.pageDetial.total = 0
+                        this.attributeList = []
+                        this.GCPropertyList = []//扩展属性头部
+                        this.GCPropertyList_to_select = []
+                        this.GCPropertyValueList = []//扩展属性查询的值 库
+                    }
+                    if(response.data.rt.genieclassTitle != null){
+                        this.GenieclassTitle = response.data.rt.genieclassTitle
+                    }else{
+                        this.GenieclassTitle = []
+                    }
+                }else{
+                    alert(response.data.msg);
+                }
+                this.fullscreenLoading = false;
             })
 
             // var vm = this
@@ -3565,19 +3686,22 @@ export default {
                             name:'全部',
                             id:'ALL',
                         })
-                        this.copyOption_model = this.option_model;
                         this.value_leibie = this.model_leibie[0].id;
+
                         this.option_model = response.data.rt.templateInfos1;
                         this.option_model.unshift({
                             name:'全部',
                             id:'ALL',
                         })
+                        this.copyOption_model = this.option_model;
                         this.value_model = this.option_model[0].id;
+
                         this.option_typeC = response.data.rt.templateInfos2;
                         this.option_typeC.unshift({
                             name:'全部',
                             id:'ALL',
                         })
+                        this.copyoption_typeC = this.option_typeC;
                         this.value_typeC = this.option_typeC[0].id;
                     }else{
                         this.model_leibie = [{
