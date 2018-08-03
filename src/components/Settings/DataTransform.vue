@@ -15,7 +15,7 @@
               </div>
           </div>
           <div class="dataTransAnalysis">
-              <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform2.png"/>工程概况</h5>
+              <h5 class="accountTitle"><img class="imgicon" src="../../assets/dataTransform2.png"/>数据传递分析</h5>
               <div class="dataTransAnalysisImg">
                 <div class="pro"><el-progress type="circle" :percentage="100"></el-progress>
                 <p>构件总量<span style="margin-left:15px;color:#666666;">{{component.elementCount}}</span></p>
@@ -581,6 +581,10 @@ export default {
             padding:10px;
         }
     }
+    .el-table th{
+        background-color: #f2f2f2!important;
+        height: 55px;
+    }
     .updataImageSpan{
         overflow: hidden;
         width: 98px;
@@ -627,6 +631,8 @@ export default {
     }
     .sTitle span{
         margin-left: 20px;
+        font-size: 18px;
+        line-height: 18px;
     }
     .accountTitle{
         width: 100%;

@@ -49,11 +49,14 @@
                         <td>合计</td>
                         <td>{{tfooter.componentCount}}</td>
                         <td>{{tfooter.designIdentity}}</td>
-                        <td>{{Math.round(100*tfooter.designIdentity/tfooter.componentCount)+'%'}}</td>
+                        <td v-if="!tfooter.componentCount">0%</td>
+                        <td v-else>{{Math.round(100*tfooter.designIdentity/tfooter.componentCount)}}%</td>
                         <td>{{tfooter.outputTotal}}</td>
-                        <td>{{Math.round(100*tfooter.outputTotal/tfooter.componentCount)+'%'}}</td>
+                        <td v-if="!tfooter.componentCount">0%</td>
+                        <td v-else>{{Math.round(100*tfooter.outputTotal/tfooter.componentCount)}}%</td>
                         <td>{{tfooter.dischargeTotal}}</td>
-                        <td>{{Math.round(100*tfooter.dischargeTotal/tfooter.componentCount)+'%'}}</td>
+                        <td v-if="!tfooter.componentCount">0%</td>
+                        <td v-else>{{Math.round(100*tfooter.dischargeTotal/tfooter.componentCount)}}%</td>
                     </tr>
                 </tbody>
             </table>
@@ -131,7 +134,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
-                        vm.costOverviewData = response.data.rt
+                        vm.costOverviewData = response.data.rt;
+                       
                         var data = []
                         var dataName = []
                         vm.costOverviewData.forEach(info=>{
@@ -139,11 +143,12 @@ export default {
                                 name:info.holderName, 
                                 value:info.elementCount
                             })
-                            dataName.push(info.holderName)
+                            dataName.push(info.holderName);
                             vm.tfooter.componentCount += info.elementCount
                             vm.tfooter.designIdentity += info.designIdentity
                             vm.tfooter.outputTotal += info.outputTotal
                             vm.tfooter.dischargeTotal += info.dischargeTotal
+                            console.log(vm.tfooter)
                         })
                         // 基于准备好的dom，初始化echarts实例
                         var myChart = echarts.init(document.getElementById('Pie'))

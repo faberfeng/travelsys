@@ -150,7 +150,7 @@
                             <td >
                                 <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
                                  <button class="listBtn actionBtn" title="清单"  @click="showDetialList(val)" ></button>
-                                <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rssId)" ></button>
+                                <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rssId,false)" ></button>
                             </td>
                         </tr>
                     </tbody>
@@ -645,11 +645,11 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                var url = 'project2/report/snapshot/' 
-                if(istop)url = '/project2/report/rc/'
+                var urlc = 'project2/report/snapshot/' 
+                if(istop)urlc = '/project2/report/rc/'
                 axios({
                     method:'GET',
-                    url:vm.BDMSUrl+url+val+'/delete',
+                    url:vm.BDMSUrl+urlc+val+'/delete',
                     headers:{
                         token:vm.token
                     },
@@ -660,15 +660,16 @@ export default {
                             message:response.data.msg
                         })
                     }else{
+                        if(istop){
+                            vm.getRealTimeList();
+                        }else{
+                            vm.getSnapShootList();
+                        }
                         vm.$message({
                             type:'success',
                             message:'删除报表成功！'
                         })
-                        if(istop){
-                            vm.getRealTimeList()
-                        }else{
-                            vm.getSnapShootList()
-                        }
+                        
                     }
                 }).catch((err)=>{
                     console.log(err)
@@ -679,7 +680,6 @@ export default {
                     message: '已取消删除'
                 });          
             });
-            
         },
         //进入设计版本页面
         getInentityDetail(){
