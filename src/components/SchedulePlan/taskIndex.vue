@@ -1516,6 +1516,8 @@ export default {
                 hiddenGanttList:true,
                 xmlDoc:'',
                 a:[],
+                colorValueList:[],
+                colorValueList1:[],
          }
   },
   created(){
@@ -1768,7 +1770,7 @@ export default {
                           if(this.taskIndexData==null){
                               this.taskIndexData=[];
                           }
-                          console.log(this.taskIndexData);
+                          console.log(JSON.stringify(this.taskIndexData));
                 }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -1825,8 +1827,16 @@ export default {
       },
       //点击zk-tree获取id
       rowClick(row,rowIndex){
-        //   console.log(row);
-        //   console.log(rowIndex);
+          console.log(row);
+          console.log(rowIndex);
+        //   if(row.isTrusted==true){
+        //       console.log("选中")
+        //   }
+        // if(row.path)
+        if(row.isTrusted==true){
+            row.path[2].bgColor='red';
+        }
+        // console.log(row.path[2]);
             this.selectRowList=rowIndex;
             this.selectRowList.forEach((item,index)=>{
                 // console.log(index);
@@ -1835,8 +1845,6 @@ export default {
                     this.taskParId=item.taskParId
                 }
             })
-            // console.log(this.taskId);
-            // console.log(this.taskParId);
             this.getTask();
             this.getVerifyList();
             this.getEntityRelation();
@@ -1848,19 +1856,220 @@ export default {
           console.log(rowIndex);
       },
       rowStyle(row,rowIndex){
-        //   console.log((rowIndex));
-        //   console.log((row));
+        var vm=this;
          if(row.children==null){
-             return 'background:#ccc'
+            //  console.log(row.colorValue);
+            //  console.log("****:"+(row.colorValue));
+            var color=vm.selectColor(parseInt(row.colorValue));
+            return 'background:'+color;
          }
-        //  else {
-        //      return ''
-        //  }
-        //  if(row._isHover==true){
-        //      return 'background:pink'
-
-        //  }
       },
+        //根据工程获取状态颜色
+        getProjectStatusColor(){
+
+            axios({
+              method:'post',
+              url:this.BDMSUrl+'/project2/schedule/getProjectStatusColor',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                 projectId:this.projId
+              }
+          }).then(response=>{
+              if(response.data.cd=="0"){
+                this.ProjectStatusColorList=response.data.rt;
+              }else if(response.data.cd=="-1"){
+                  alert(response.data.msg)
+              }
+          })
+        },
+       selectColor(val) {
+            var color = "";
+            var text = "";
+            switch (val) {
+                case 12001:
+                    color = "RGBA(127,127,127,255)";
+                  return color; break;
+                  
+                case 12002:
+                    color = "RGBA(159,159,159,255)";
+                   return color; break;
+                case 12003:
+                    color = "RGBA(191,191,191,255)";
+                   return color; break;
+                case 12004:
+                    color = "RGBA(223,223,223,255)";
+                   return color; break;
+                case 12005:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 12006:
+                    color = "RGBA(255,255,191,255)";
+                   return color; break;
+                case 12007:
+                    color = "RGBA(255,240,191,255)";
+                   return color; break;
+                case 12008:
+                    color = "RGBA(255,232,139,255)";
+                   return color; break;
+                case 12009:
+                    color = "RGBA(255,214,238,255)";
+                   return color; break;
+                case 12010:
+                    color = "RGBA(255,152,201,255)";
+                   return color; break;
+                case 12011:
+                    color = "RGBA(255,62,160,255)";
+                   return color; break;
+                case 12012:
+                    color = "RGBA(255,105,105,255)";
+                   return color; break;
+                case 12013:
+                    color = "RGBA(255,62,62,255)";
+                  return color; break;
+                case 12014:
+                    color = "RGBA(255,0,0,255)";
+                   return color; break;
+                case 12015:
+                    color = "RGBA(255,186,116,255)";
+                   return color; break;
+                case 12016:
+                    color = "RGBA(255,127,0,255)";
+                   return color; break;
+                case 12017:
+                    color = "RGBA(99,255,99,255)";
+                   return color; break;
+                case 12018:
+                    color = "RGBA(0,171,0,255)";
+                  return color; break;
+                case 12019:
+                    color = "RGBA(173,173,255,255)";
+                   return color; break;
+                case 12020:
+                    color = "RGBA(68,199,255,255)";
+                   return color; break;
+
+                case 13001:
+                    color = "RGBA(255,0,0,255)";
+                   return color; break;
+                case 13002:
+                    color = "RGBA(255,255,0,255)";
+                  return color; break;
+                case 13003:
+                    color = "RGBA(0,255,0,255)";
+                  return color; break;
+                case 13004:
+                    color = "RGBA(0,255,255,255)";
+                   return color; break;
+                case 13005:
+                    color = "RGBA(0,0,255,255)";
+                   return color; break;
+                case 13006:
+                    color = "RGBA(255,0,255,255)";
+                   return color; break;
+                case 13007:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 13008:
+                    color = "RGBA(167,167,167,255)";
+                   return color; break;
+                case 13009:
+                    color = "RGBA(214,214,214,255)";
+                   return color; break;
+                case 13010:
+                    color = "RGBA(255,128,0,255)";
+                   return color; break;
+                case 13011:
+                    color = "RGBA(128,255,0,255)";
+                   return color; break;
+                case 13012:
+                    color = "RGBA(0,255,128,255)";
+                  return color; break;
+                case 13013:
+                    color = "RGBA(0,128,255,255)";
+                  return color; break;
+                case 13014:
+                    color = "RGBA(128,0,255,155)";
+                   return color; break;
+                case 13015:
+                    color = "RGBA(255,0,128,255)";
+                   return color; break;
+                case 13016:
+                    color = "RGBA(128,64,0,255)";
+                   return color; break;
+                case 13017:
+                    color = "RGBA(75,38,0,255)";
+                   return color; break;
+                case 13018:
+                    color = "RGBA(91,91,91,255)";
+                   return color; break;
+                case 13019:
+                    color = "RGBA(63,63,63,255)";
+                  return color; break;
+                case 13020:
+                    color = "RGBA(0,0,0,255)";
+                  return color; break;
+
+                case 23001:
+                    color = "RGBA(127,191,255,40)";
+                   return color; break;
+                case 23002:
+                    color = "RGBA(0,63,127,63)";
+                   return color; break;
+                case 23003:
+                    color = "RGBA(127,255,192,63)";
+                   return color; break;
+                case 23004:
+                    color = "RGBA(0,192,0,63)";
+                  return color; break;
+                case 23005:
+                    color = "RGBA(75,75,75,128)";
+                 return color; break;
+                case 23006:
+                    color = "RGBA(54,54,54,128)";
+                  return color; break;
+                case 23007:
+                    color = "RGBA(0,63,127,40)";
+                  return color; break;
+                case 23008:
+                    color = "RGBA(0,189,0,40)";
+                   return color; break;
+                case 23009:
+                    color = "RGBA(56,56,56,40)";
+                   return color; break;
+                case 23010:
+                    color = "RGBA(0,128,255,255)";
+                   return color; break;
+                case 91001:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91002:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91003:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91004:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91005:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91006:
+                    color = "RGBA(255,255,255,255)";
+                  return color; break;
+                case 91007:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+                case 91008:
+                    color = "RGBA(255,255,255,255)";
+                   return color; break;
+            }
+            if(val == "10000"){
+                return "";
+            }
+        },
       rowClassName(row,rowIndex){
         //   console.log(row);
          },

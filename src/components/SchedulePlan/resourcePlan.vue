@@ -172,6 +172,7 @@
 import axios from 'axios'
 import VueHighcharts from 'vue2-highcharts'
 import Highcharts from 'highcharts'
+//
 export default{
     name:'resourcePlan',
     components: {
@@ -214,6 +215,18 @@ export default{
             lineCalendarTime4:[],
             lineName4:'',
             lineAmount4:'',
+            lineCalendarTime5:[],
+            lineName5:'',
+            lineAmount5:'',
+            lineCalendarTime6:[],
+            lineName6:'',
+            lineAmount6:'',
+            lineCalendarTime7:[],
+            lineName7:'',
+            lineAmount7:'',
+            lineCalendarTime8:[],
+            lineName8:'',
+            lineAmount8:'',
             isShowMonth:false,
             showInput:true,
             id:'',
@@ -607,6 +620,48 @@ export default{
                             lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
                             lineCharts.hideLoading();
                             lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime4});
+                        }else if(num==5){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime5});
+                        }else if(num==6){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                             lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime6});
+                        }else if(num==7){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime7});
+                        }else if(num==8){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.addSeries({name:this.lineName8,data:this.lineAmount8});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime8});
                         }
                 }else if(this.planType==2){
                 var num=this.LineDataOfHalfYearList.length;
@@ -639,6 +694,48 @@ export default{
                             lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
                             lineCharts.hideLoading();
                             lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime4});
+                        }else if(num==5){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime5});
+                        }else if(num==6){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                             lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime6});
+                        }else if(num==7){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime7});
+                        }else if(num==8){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.addSeries({name:this.lineName8,data:this.lineAmount8});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime8});
                         }
                 }else if(this.planType==3){
                 var num=this.LineDataOfThreeYearList.length;
@@ -671,6 +768,48 @@ export default{
                             lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
                             lineCharts.hideLoading();
                             lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime4});
+                        }else if(num==5){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime5});
+                        }else if(num==6){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                             lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                             lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime6});
+                        }else if(num==7){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime7});
+                        }else if(num==8){
+                            lineCharts.removeSeries();
+                            lineCharts.addSeries({name:this.lineName1,data:this.lineAmount1});
+                            lineCharts.addSeries({name:this.lineName2,data:this.lineAmount2});
+                            lineCharts.addSeries({name:this.lineName3,data:this.lineAmount3});
+                            lineCharts.addSeries({name:this.lineName4,data:this.lineAmount4});
+                            lineCharts.addSeries({name:this.lineName5,data:this.lineAmount5});
+                            lineCharts.addSeries({name:this.lineName6,data:this.lineAmount6});
+                            lineCharts.addSeries({name:this.lineName7,data:this.lineAmount7});
+                            lineCharts.addSeries({name:this.lineName8,data:this.lineAmount8});
+                            lineCharts.hideLoading();
+                            lineCharts.getChart().xAxis[0].update({categories:this.lineCalendarTime8});
                         }
                 }
 
@@ -1024,7 +1163,8 @@ export default{
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.lineDataOfMonthList=response.data.rt;
-                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[];
+                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[],caTime5=[],caName5=[],amount5=[],
+                    caTime6=[],caName6=[],amount6=[],caTime7=[],caName7=[],amount7=[],caTime8=[],caName8=[],amount8=[];
                     var num;
                     var obj;
                     obj=this.lineDataOfMonthList;
@@ -1118,6 +1258,222 @@ export default{
                                     this.lineName4=caName4;
                                     this.lineAmount4=amount4;
                             })
+                    }else if(num==5){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                    }else if(num==6){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                    }else if(num==7){
+                            obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                    }else if(num==8){
+                         obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                            obj[7].forEach((item8)=>{
+                                caTime8.push(item8.calendarTime);
+                                    caName8=item8.name;
+                                    amount8.push(item8.amount);
+                                    this.lineCalendarTime8=caTime8;
+                                    this.lineName8=caName8;
+                                    this.lineAmount8=amount8;
+                            })
                     }
                     this.load();
                     // var obj = this.lineDataOfMonthList;
@@ -1176,7 +1532,8 @@ export default{
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.LineDataOfHalfYearList=response.data.rt
-                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[];
+                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[],caTime5=[],caName5=[],amount5=[],
+                    caTime6=[],caName6=[],amount6=[],caTime7=[],caName7=[],amount7=[],caTime8=[],caName8=[],amount8=[];
                     var num;
                     var obj;
                     obj=this.LineDataOfHalfYearList;
@@ -1271,6 +1628,222 @@ export default{
                                     this.lineName4=caName4;
                                     this.lineAmount4=amount4;
                             })
+                    }else if(num==5){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                    }else if(num==6){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                    }else if(num==7){
+                            obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                    }else if(num==8){
+                         obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                            obj[7].forEach((item8)=>{
+                                caTime8.push(item8.calendarTime);
+                                    caName8=item8.name;
+                                    amount8.push(item8.amount);
+                                    this.lineCalendarTime8=caTime8;
+                                    this.lineName8=caName8;
+                                    this.lineAmount8=amount8;
+                            })
                     }
                     this.load();
             // var categories = "[";
@@ -1324,7 +1897,8 @@ export default{
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.LineDataOfThreeYearList=response.data.rt
-                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[];
+                    let caTime1=[],caName1=[],amount1=[],caTime2=[],caName2=[],amount2=[],caTime3=[],caName3=[],amount3=[],caTime4=[],caName4=[],amount4=[],caTime5=[],caName5=[],amount5=[],
+                    caTime6=[],caName6=[],amount6=[],caTime7=[],caName7=[],amount7=[],caTime8=[],caName8=[],amount8=[];
                     var num;
                     var obj;
                     obj=this.LineDataOfThreeYearList;
@@ -1418,6 +1992,222 @@ export default{
                                     this.lineCalendarTime4=caTime4;
                                     this.lineName4=caName4;
                                     this.lineAmount4=amount4;
+                            })
+                    }else if(num==5){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                    }else if(num==6){
+                        obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                    }else if(num==7){
+                            obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                    }else if(num==8){
+                         obj[0].forEach((item1)=>{
+                                    caTime1.push(item1.calendarTime);
+                                    caName1=item1.name;
+                                    amount1.push(item1.amount);
+                                    this.lineCalendarTime1=caTime1;
+                                    this.lineName1=caName1;
+                                    this.lineAmount1=amount1;
+                                    
+                                })
+                            obj[1].forEach((item2)=>{
+                                caTime2.push(item2.calendarTime);
+                                    caName2=item2.name;
+                                    amount2.push(item2.amount);
+                                    this.lineCalendarTime2=caTime2;
+                                    this.lineName2=caName2;
+                                    this.lineAmount2=amount2;
+                            })
+                            obj[2].forEach((item3)=>{
+                                caTime3.push(item3.calendarTime);
+                                    caName3=item3.name;
+                                    amount3.push(item3.amount);
+                                    this.lineCalendarTime3=caTime3;
+                                    this.lineName3=caName3;
+                                    this.lineAmount3=amount3;
+                            })
+                            obj[3].forEach((item4)=>{
+                                caTime4.push(item4.calendarTime);
+                                    caName4=item4.name;
+                                    amount4.push(item4.amount);
+                                    this.lineCalendarTime4=caTime4;
+                                    this.lineName4=caName4;
+                                    this.lineAmount4=amount4;
+                            })
+                            obj[4].forEach((item5)=>{
+                                caTime5.push(item5.calendarTime);
+                                    caName5=item5.name;
+                                    amount5.push(item5.amount);
+                                    this.lineCalendarTime5=caTime5;
+                                    this.lineName5=caName5;
+                                    this.lineAmount5=amount5;
+                            })
+                            obj[5].forEach((item6)=>{
+                                caTime6.push(item6.calendarTime);
+                                    caName6=item6.name;
+                                    amount6.push(item6.amount);
+                                    this.lineCalendarTime6=caTime6;
+                                    this.lineName6=caName6;
+                                    this.lineAmount6=amount6;
+                            })
+                             obj[6].forEach((item7)=>{
+                                caTime7.push(item7.calendarTime);
+                                    caName7=item7.name;
+                                    amount7.push(item7.amount);
+                                    this.lineCalendarTime7=caTime7;
+                                    this.lineName7=caName7;
+                                    this.lineAmount7=amount7;
+                            })
+                            obj[7].forEach((item8)=>{
+                                caTime8.push(item8.calendarTime);
+                                    caName8=item8.name;
+                                    amount8.push(item8.amount);
+                                    this.lineCalendarTime8=caTime8;
+                                    this.lineName8=caName8;
+                                    this.lineAmount8=amount8;
                             })
                     }
                     this.load();
