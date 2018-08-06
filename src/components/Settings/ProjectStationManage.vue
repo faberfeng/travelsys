@@ -52,118 +52,120 @@
 import axios from 'axios';
 
 export default {
-  name:'ProjectStationManage',
-  data(){
-      return{
-        loggerDate:'',
-        BDMSUrl:'',
-        token:'',
-        projId:'',
-        projectStationList:[],
-        isAuthorization:false,
-        totalInfoNumber:0,
-        pageNo:0,
-        pageSize:10,
-        startDay:'',
-        endDay:''
-      }
-  },
-  created(){
-      var vm = this
+    name:'ProjectStationManage',
+    data(){
+        return{
+            loggerDate:'',
+            BDMSUrl:'',
+            token:'',
+            projId:'',
+            projectStationList:[],
+            isAuthorization:false,
+            totalInfoNumber:0,
+            pageNo:0,
+            pageSize:10,
+            startDay:'',
+            endDay:''
+        }
+    },
+    created(){
+        var vm = this
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        this.token = localStorage.getItem('token');
-        this.projId = localStorage.getItem('projId');
-        this.getAuthorization();
+            this.token = localStorage.getItem('token');
+            this.projId = localStorage.getItem('projId');
+            this.getAuthorization();
 
-  },
-  filters:{
-      toLocalD(val){
-          return new Date(val).toLocaleString();
-      }
-  },
-  methods:{
-      //工程动态页面权限判断
-    getAuthorization(){
-        axios({
-            method:'get',
-            url:this.BDMSUrl+'project2/dynamic/'+this.projId+'/index',
-            headers:{
-                'token':this.token
-            }
-        }).then(response=>{
-            if(response.data.cd == '0'){
-                this.isAuthorization = true;
-            }else if(response.data.cd == '-1'){
-                alert(response.data.msg)
-            }else{
-                this.$router.push({
-                    path:'/login'
-                })
-            }
-        }).then(()=>{
-            this.getUserInfoList(this.pageNo,this.pageSize);
-        })
     },
-    //获取用户动态信息列表
-    getUserInfoList(index,number,start,end){
-        axios({
-            method:'post',
-            url:this.BDMSUrl+'project2/dynamic/project/'+this.projId+'/list',
-            headers:{
-                token:this.token
-            },
-            data:{
-                pageNo:index,
-                pageSize:number,
-                start:start,
-                end:end
-            }
-        }).then(response=>{
-            if(response.data.cd == '0'){
-                this.projectStationList = response.data.rt.rows;
-                this.totalInfoNumber =  response.data.rt.pager.totalSize;
-            }else if(response.data.cd == '-1'){
-                alert(response.data.msg)
-            }else{
-                this.$router.push({
-                    path:'/login'
-                })
-            }
-            
-        })
-    },
-    //每页条数改变时
-    pageSizeChange(val){
-        this.pageSize = val;
-        this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-    },
-    //当前页改变时
-    currentPageChange(val){
-        this.pageNo=val;
-        this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-    },
-    //按日期查询
-    queryProjectStation(){
-        this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-    },
-    //日期选择
-    dateChange1(){
-        if(this.startDay){
-            this.startDay = new Date(this.startDay).toLocaleString().split(' ')[0].split('/').join('-'); 
-        }else{
-            this.startDay = '';
+    filters:{
+        toLocalD(val){
+            return new Date(val).toLocaleString();
         }
-        console.log(this.startDay);
-      },
-      dateChange2(){
-        if(this.endDay){
-            this.endDay = new Date(this.endDay ).toLocaleString().split(' ')[0].split('/').join('-');
-        }else{
-            this.endDay = '';
-        }
-        console.log(this.endDay);
-      },
-  }
+    },
+    methods:{
+        //工程动态页面权限判断
+        getAuthorization(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/dynamic/'+this.projId+'/index',
+                headers:{
+                    'token':this.token
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    this.isAuthorization = true;
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            }).then(()=>{
+                this.getUserInfoList(this.pageNo,this.pageSize);
+            })
+        },
+        //获取用户动态信息列表
+        getUserInfoList(index,number,start,end){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/dynamic/project/'+this.projId+'/list',
+                headers:{
+                    token:this.token
+                },
+                data:{
+                    pageNo:index,
+                    pageSize:number,
+                    start:start,
+                    end:end
+                }
+            }).then(response=>{
+                if(response.data.cd == '0'){
+                    if(response.data.rt.rows != null){
+                        this.projectStationList = response.data.rt.rows;
+                        this.totalInfoNumber =  response.data.rt.pager.totalSize;
+                    }
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
+            })
+        },
+        //每页条数改变时
+        pageSizeChange(val){
+            this.pageSize = val;
+            this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+        },
+        //当前页改变时
+        currentPageChange(val){
+            this.pageNo=val;
+            this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+        },
+        //按日期查询
+        queryProjectStation(){
+            this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+        },
+        //日期选择
+        dateChange1(){
+            if(this.startDay){
+                this.startDay = new Date(this.startDay).toLocaleString().split(' ')[0].split('/').join('-'); 
+            }else{
+                this.startDay = '';
+            }
+            console.log(this.startDay);
+        },
+        dateChange2(){
+            if(this.endDay){
+                this.endDay = new Date(this.endDay ).toLocaleString().split(' ')[0].split('/').join('-');
+            }else{
+                this.endDay = '';
+            }
+            console.log(this.endDay);
+        },
+    }
 }
 </script>
 <style lang="less">

@@ -59,83 +59,85 @@ export default {
       this.getEnterpriseAuthorization();
   },
   methods:{
-      //企业日志权限判断
-      getEnterpriseAuthorization(){
-          axios({
-              method:'get',
-              url:this.BDMSUrl+'project2/log/'+this.projId+'/index',
-              headers:{
-                  'token':this.token
-              }
-          }).then(response=>{
-              if(response.data.cd == '0'){
-                  this.getLoggerList(this.pageNo,this.pageSize);
-              }else if(response.data.cd == '-1'){
-                  alert(response.data.msg)
-              }else{
-                  this.$router.push({
-                      path:'/login'
-                  })
-              }
-          })
-      },
-      //获取日志列表
-      getLoggerList(index,number,start,end){
-          axios({
-              method:'post',
-              url:this.BDMSUrl+'project2/log/'+this.projId+'/list',
-              headers:{
-                  'token':this.token
-              },
-              data:{
+    //企业日志权限判断
+    getEnterpriseAuthorization(){
+        axios({
+            method:'get',
+            url:this.BDMSUrl+'project2/log/'+this.projId+'/index',
+            headers:{
+                'token':this.token
+            }
+        }).then(response=>{
+            if(response.data.cd == '0'){
+                this.getLoggerList(this.pageNo,this.pageSize);
+            }else if(response.data.cd == '-1'){
+                alert(response.data.msg)
+            }else{
+                this.$router.push({
+                    path:'/login'
+                })
+            }
+        })
+    },
+    //获取日志列表
+    getLoggerList(index,number,start,end){
+        axios({
+            method:'post',
+            url:this.BDMSUrl+'project2/log/'+this.projId+'/list',
+            headers:{
+                'token':this.token
+            },
+            data:{
                 pageNo:index,
                 pageSize:number,
                 start:start,
                 end:end
-              }
-          }).then(response=>{
-              if(response.data.cd == '0'){
-                this.enterpriseLoggerData = response.data.rt.rows;
-                this.enterpriseLoggerData.forEach((item,index,arr)=>{
-                    arr[index].operateTime = new Date(item.operateTime).toLocaleString();
-                });
-                this.totalLoggerNumber = response.data.rt.pager.totalSize;
-              }else if(response.data.cd == '-1'){
-                  alert(response.data.cd)
-              }else{
-                  this.$router.push({
-                      path:'/login'
-                  })
-              }
-          })
-      },
+            }
+        }).then(response=>{
+            if(response.data.cd == '0'){
+                if(response.data.rt.rows!=null){
+                    this.enterpriseLoggerData = response.data.rt.rows;
+                    this.enterpriseLoggerData.forEach((item,index,arr)=>{
+                        arr[index].operateTime = new Date(item.operateTime).toLocaleString();
+                    });
+                    this.totalLoggerNumber = response.data.rt.pager.totalSize;
+                }
+            }else if(response.data.cd == '-1'){
+                alert(response.data.cd)
+            }else{
+                this.$router.push({
+                    path:'/login'
+                })
+            }
+        })
+    },
       //分页改动加载数据
-      pageSizeChange(val){
-          this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-      },
-      currentPageChange(val){
-          this.pageNo = val;
-          this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-      },
-      //日期选择
-      dateChange1(){
-            if(this.startDay){
-                this.startDay = new Date(this.startDay).toLocaleString().split(' ')[0].split('/').join('-'); 
-            }else{
-                this.startDay = '';
-            }
-      },
-      dateChange2(){
-            if(this.endDay){
-                this.endDay = new Date(this.endDay ).toLocaleString().split(' ')[0].split('/').join('-');
-            }else{
-                this.endDay = '';
-            }
-      },
-      //查询 可复用getLoggerList（）函数
-      queryLogger(){
+    pageSizeChange(val){
         this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-      }
+    },
+    currentPageChange(val){
+        this.pageNo = val;
+        this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+    },
+    //日期选择
+    dateChange1(){
+        if(this.startDay){
+            this.startDay = new Date(this.startDay).toLocaleString().split(' ')[0].split('/').join('-'); 
+        }else{
+            this.startDay = '';
+        }
+    },
+    dateChange2(){
+        if(this.endDay){
+            this.endDay = new Date(this.endDay ).toLocaleString().split(' ')[0].split('/').join('-');
+        }else{
+            this.endDay = '';
+        }
+    },
+    //查询 可复用getLoggerList（）函数
+    queryLogger(){
+        this.getLoggerList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+    }
   }
 }
 </script>
@@ -212,6 +214,9 @@ export default {
         border-bottom: 1px solid #333;
         position: relative;
         top: -3px;
+    }
+    .el-table th{
+        background: #ccc;
     }
     /*日期选择器*/
     .el-date-editor{

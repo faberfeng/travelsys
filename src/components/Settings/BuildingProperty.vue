@@ -1084,6 +1084,7 @@ export default {
         display: inline-block;
         border-radius: 32px;
         outline: none;
+        padding-left: 10px;
     }
     .pTable{
         display: inline-block;
