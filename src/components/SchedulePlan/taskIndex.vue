@@ -660,7 +660,7 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="addLinkMakeSure" >着色状态</button>
+                        <button class="editBtnS" @click="addColorStatus" >着色状态</button>
                         <button class="editBtnC" @click="progressSearchCancle" >取消</button>
                 </div>
             </el-dialog>
@@ -2207,20 +2207,25 @@ export default {
               if(response.data.cd=="0"){
                   this.editTaskUserGroupList=response.data.rt;
                   this.ugList1=this.editTaskUserGroupList.ugList;
-                //   console.log(JSON.stringify(this.ugList1));
+                  var num=this.ugList1[0].ugId;
+                  this.groupIds.push(num.toString());
+                  console.log(JSON.stringify(this.editTaskUserGroupList));
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
           })
       },
       checkFlgChange(index){
-           var groupIdList=[];
-          this.groupIds=groupIdList.push(this.ugList1[index].ugId);
+        //    var groupIdList=[];
+        var str=this.ugList1[index].ugId
+          this.groupIds.push(str.toString());
+          console.log(this.groupIds);
       },
       userGroupTaskMakeSure(){
           this.taskId=this.editTaskUserGroupList.taskId;
           this.taskName=this.editTaskUserGroupList.taskName;
-          this.taskParId=this.editTaskUserGroupList.taskParId;
+          this.taskParId=this.taskInformationList.taskParId;
+          console.log(this.editTaskUserGroupList);
           axios({
               method:'post',
               url:this.BDMSUrl+'/project2/schedule/saveTaskUserGroup',
@@ -2235,7 +2240,7 @@ export default {
                     groupIds:this.groupIds,
                     taskId:this.taskId,
                     taskName:this.taskName,
-                    taskParId: this.taskParId
+                    taskParId:this.taskParId
               }
           }).then(response=>{
               if(response.data.cd=="0"){
@@ -2460,6 +2465,9 @@ export default {
                     // console.log(this.removeTaskId)
                 }
             })
+      },
+      addColorStatus(){
+          alert('虚拟场景面板未打开，请打开左侧虚拟场景面板。')
       },
       addLinkMakeSure(){
           if(this.taskId==this.linkTaskId){
@@ -2778,32 +2786,32 @@ export default {
                     }
 
                      if(this.ProgressList.taskCount1){
-                        this.taskCount1=this.ProgressList.compCount1;
+                        this.taskCount1=this.ProgressList.taskCount1;
                     }else{
                         this.taskCount1=0;
                     }
                     if(this.ProgressList.taskCount2){
-                        this.taskCount2=this.ProgressList.compCount2;
+                        this.taskCount2=this.ProgressList.taskCount2;
                     }else{
                         this.taskCount2=0;
                     }
                     if(this.ProgressList.taskCount3){
-                        this.taskCount3=this.ProgressList.compCount3;
+                        this.taskCount3=this.ProgressList.taskCount3;
                     }else{
                         this.taskCount3=0;
                     }
                     if(this.ProgressList.taskCount4){
-                        this.taskCount4=this.ProgressList.compCount4;
+                        this.taskCount4=this.ProgressList.taskCount4;
                     }else{
                         this.taskCount4=0;
                     }
                     if(this.ProgressList.taskCount5){
-                        this.taskCount5=this.ProgressList.compCount5;
+                        this.taskCount5=this.ProgressList.taskCount5;
                     }else{
                         this.taskCount5=0;
                     }
                     if(this.ProgressList.taskCount6){
-                        this.taskCount6=this.ProgressList.compCount6;
+                        this.taskCount6=this.ProgressList.taskCount6;
                     }else{
                         this.taskCount6=0;
                     }
@@ -2852,7 +2860,8 @@ export default {
         userGroupTask(){
             if(this.taskInformationList.taskId){
                  this.userGroupTaskDialog=true;
-                this.editTaskUserGroup()
+                this.editTaskUserGroup();
+                // this.rowClick(row,rowIndex);
                 // this.ugList1.forEach((item)=>{
 
                 // })
@@ -2862,6 +2871,7 @@ export default {
         },
         userGroupTaskCancle(){
             this.userGroupTaskDialog=false;
+            
         },
         //导入文件
         exportProject(){
