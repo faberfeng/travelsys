@@ -2116,6 +2116,7 @@ export default {
               }
           })
       },
+      //
       //获取资源类型名称
       getTaskResouceType(){
            axios({
