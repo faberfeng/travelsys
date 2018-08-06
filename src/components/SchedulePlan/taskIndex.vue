@@ -512,7 +512,7 @@
                 <div class="editBody">
                     <div class="editBodytwo3">
                         <zk-table :data="taskIndexData" :columns="columns1"  :tree-type="props.treeType"
-                            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                            :expand-type="props.expandType" :is-fold="props.isFold" :show-index="props.showIndex" :selection-type="props.selectionType" 
                             :border="props.border" empty-text="正在加载..." @row-click="linkTypeRowClick">
                         </zk-table>
                     </div>
@@ -958,7 +958,7 @@
                 <div class="editBody">
                     <div class="editBodytwo3">
                         <zk-table :data="taskIndexData" :columns="columns1"  :tree-type="props.treeType"
-                            :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                            :expand-type="props.expandType" :is-fold="props.isFold" :show-index="props.showIndex" :selection-type="props.selectionType" 
                             :border="props.border" empty-text="正在加载..." @row-click="removeTaskRowClick">
                         </zk-table>
                     </div>
@@ -1833,9 +1833,9 @@ export default {
         //       console.log("选中")
         //   }
         // if(row.path)
-        if(row.isTrusted==true){
-            row.path[2].bgColor='red';
-        }
+        // if(row.isTrusted==true){
+        //     row.path[2].bgColor='red';
+        // }
         // console.log(row.path[2]);
             this.selectRowList=rowIndex;
             this.selectRowList.forEach((item,index)=>{
