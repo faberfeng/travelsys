@@ -962,7 +962,6 @@ export default {
                         
                 })
                     })
-                    this.eventSources.push({events:this.event,textColor:'black',color:'red',});
         },
         initCalendar1(){
             //  var event=[];
@@ -1088,6 +1087,7 @@ export default {
                             this.calendarEventList=response.data.rt;
                             console.log(JSON.stringify(this.calendarEventList));
                             this.initCalendar();
+                            this.eventSources.push({events:this.event,textColor:'black',color:'red',});
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
                         }else{
@@ -1322,7 +1322,9 @@ export default {
                         if(response.data.cd == '0'){
                                     this.addEventList=response.data.rt;
                                     this.eventSources=[];
+                                    this.event=[];
                                     this.initEvent();
+                                    this.initTask();
                                     this.eventView();
                                      this.addEventTextDialog=false;    
                         }else if(response.data.cd == '-1'){
@@ -1459,8 +1461,10 @@ export default {
                    }
                     }).then(response=>{
                         if(response.data.cd == '0'){
-                            this.eventSources=[],
+                            this.eventSources=[];
+                            this.event=[];
                             this.initEvent();
+                            this.initTask()
                             this.eventView();
                             this.informationShow();
                             this.updateEventTextDialog=false;
@@ -1488,7 +1492,7 @@ export default {
         },
         //点击删除事件
         deleteCalendarEvent(){
-            if(!this.eventId){
+           if(!this.eventId){
                 alert('提示：请指定需要删除的事件')
             }else if(this.eventInformationList.repeatType==0){
                     this.deleteEventTextDialog=true;
@@ -1499,6 +1503,7 @@ export default {
                     this.showRepeatType=false;
                     this.deleteTypes=this.deleteTypeList[0].value;
                 }
+            
             
         },
         //确认删除事件
@@ -1516,7 +1521,10 @@ export default {
                         if(response.data.cd == '0'){
                                 this.$refs.calendar.$emit('remove-event',this.eventId);
                                 this.eventSources=[];
+                                this.event=[];
                                 this.initEvent();
+                                this.initTask();
+                                initTask();
                                 this.eventView();
                                 this.deleteEventTextDialog=false;
                         }else if(response.data.cd == '-1'){
