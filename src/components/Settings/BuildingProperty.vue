@@ -1079,12 +1079,11 @@ export default {
         background: #fafafa;
         -webkit-appearance: none !important;
         -moz-appearance:textfield;
-        padding-left: 10px;
+        padding-left: 10px !important;
         font-size: 12px;
         display: inline-block;
         border-radius: 32px;
         outline: none;
-        padding-left: 10px;
     }
     .pTable{
         display: inline-block;
