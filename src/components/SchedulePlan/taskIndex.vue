@@ -70,6 +70,9 @@
                                 <template slot="taskDuration" slot-scope="scope">
                                     {{scope.row.taskDuration+'天'}}
                                 </template>
+                                <template slot="taskType" slot-scope="scope">
+                                    {{scope.row.taskType==1?'是':'否'}}
+                                </template>
                             </zk-table>
                         </div>
                     </div>
@@ -119,19 +122,19 @@
                 <ul id="taskInformation" :class="[{'show':show.taskInformation}]" v-if="this.taskId">
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">序号</span>
-                        <span class="detial-text-value" v-text="taskInformationList.taskIndex"></span>
+                        <span class="detial-text-value" :title="taskInformationList.taskIndex" v-text="taskInformationList.taskIndex"></span>
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">编号</span>
-                        <span class="detial-text-value" v-text="taskInformationList.completeTaskCode"></span>
+                        <span class="detial-text-value" :title="taskInformationList.completeTaskCode" v-text="taskInformationList.completeTaskCode"></span>
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">组别</span>
-                        <span class="detial-text-value" v-text="taskInformationList.taskGroupName"></span>
+                        <span class="detial-text-value" :title="taskInformationList.taskGroupName"  v-text="taskInformationList.taskGroupName"></span>
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">名称</span>
-                        <span class="detial-text-value" v-text="taskInformationList.taskName"></span>
+                        <span class="detial-text-value" :title="taskInformationList.taskName" v-text="taskInformationList.taskName"></span>
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">优先级</span>
@@ -155,19 +158,19 @@
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">计划状态</span>
-                        <span class="detial-text-value" v-text="taskInformationList.taskStatusStr"></span>
+                        <span class="detial-text-value" :title="taskInformationList.taskStatusStr"  v-text="taskInformationList.taskStatusStr"></span>
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">负责群组</span>
-                        <span class="detial-text-value" v-text="taskInformationList.taskUserGroupName"></span>
+                        <span class="detial-text-value" :title="taskInformationList.taskUserGroupName"  v-text="taskInformationList.taskUserGroupName"></span>
                     </li>
                      <li class="detial-item clearfix">
                         <span class="detial-text-name">负责人</span>
-                        <span class="detial-text-value">{{taskInformationList.dutyUserName}}</span>
+                        <span class="detial-text-value" :title="taskInformationList.dutyUserName">{{taskInformationList.dutyUserName}}</span>
                     </li>
                      <li class="detial-item clearfix">
                         <span class="detial-text-name">计划人</span>
-                        <span class="detial-text-value" v-text="taskInformationList.createUserName"></span>
+                        <span class="detial-text-value" :title="taskInformationList.createUserName"  v-text="taskInformationList.createUserName"></span>
                     </li>
 
                 </ul>
@@ -184,7 +187,7 @@
                     </li>
                 </ul>
             </div>
-            <div id="box-right" v-show="taskId"  v-if="screenLeft.item == 2" >
+            <div id="box-right" v-show="childrenList==null"  v-if="screenLeft.item == 2" >
                 <div class="verify">
                     <h3 class="header-attribute" style="margin-top: 0px;">
                         <i class="trrangle"></i>
@@ -228,7 +231,7 @@
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name" >名称 :</span>
-                                <span class="detial-text-value" v-text="item.main.mName" ></span>
+                                <span class="detial-text-value" :title="item.main.mName" v-text="item.main.mName" ></span>
                             </p>
                         </li>
                     </ul>
@@ -1139,6 +1142,7 @@ export default {
             },
         linkList:[],
         selectRowList:[],//获取选择列表信息
+        childrenList:[],
         taskId:'',
         curUgId:'',//移动任务所选id
         Type:null,
@@ -1431,6 +1435,8 @@ export default {
                     label:'里程碑',
                     prop:'taskType',
                     show:true,
+                    type:'template',
+                    template:'taskType'
                 },
                 {
                     label:'计划开始',
@@ -1833,18 +1839,29 @@ export default {
         //       console.log("选中")
         //   }
         // if(row.path)
-        // if(row.isTrusted==true){
-        //     row.path[2].bgColor='red';
-        // }
+        
         // console.log(row.path[2]);
+        //  if(row.isTrusted==true){
+        //                 row.path[2].bgColor='red';
+        //          }else{
+        //              row.path[2].bgColor='black';
+        //          }
             this.selectRowList=rowIndex;
             this.selectRowList.forEach((item,index)=>{
+                // if(item.children==null){
+                //     this.childrenList=item.taskId;
+                //      console.log(this.childrenList);
+                // }
                 // console.log(index);
                 if(item._isHover==true){
-                    this.taskId=item.taskId
-                    this.taskParId=item.taskParId
+                   
+                    this.taskId=item.taskId;
+                    this.taskParId=item.taskParId;
+                    this.childrenList=item.children;
+                    // console.log(this.taskId);
                 }
             })
+            this.getTaskList();
             this.getTask();
             this.getVerifyList();
             this.getEntityRelation();
@@ -2939,6 +2956,13 @@ export default {
         },
         //确认添加核实任务
         addVerifyTaskMakeSure(){
+            console.log(this.verifyStartTime);
+            var myDate = new Date();
+            if(this.verifyStartTime>myDate){
+                alert('核实日期不能超过当前日期!')
+                return;
+            }
+            
             axios({
                 method:'post',
                 url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addVerify',
@@ -2956,7 +2980,7 @@ export default {
                 if(response.data.cd=='0'){
                 this.getVerifyList();
                 this.tvValue=0;
-                // this.verifyStartTime="";
+                this.verifyStartTime='';
                 this.addVerifyTaskDialog=false;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
@@ -2964,7 +2988,7 @@ export default {
             })
         },
         addVerifyTaskCancle(){
-            this.verifyStartTime=0;
+           this.verifyStartTime='';
             this.addVerifyTaskDialog=false;
         },
         //点击关联清单
@@ -2989,7 +3013,7 @@ export default {
         addAssociationListMakeSure(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'/manifest2/businessBindManifestAndUpdateStatus',
+                url:this.BDMSUrl+'manifest2/businessBindManifestAndUpdateStatus',
                 headers:{
                     'token':this.token
                 },
@@ -3003,8 +3027,10 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
+                    
                     this.addAssociationListDialog=false;
                     this.getLoadManifest();
+                    this.getEntityRelation();
                     this.checkedItem={};
                     this.loadManifestList=[];
                     alert(response.data.msg);
@@ -3962,7 +3988,7 @@ export default {
                                 }
                                 }
                             .uploadFileText{
-                                max-width: 160px;
+                                max-width: 130px;
                                 float: left;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
@@ -4030,7 +4056,7 @@ export default {
                                 }
                                 }
                             .bindPicText{
-                                max-width: 160px;
+                                max-width: 130px;
                                 float: left;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
@@ -4089,10 +4115,12 @@ export default {
                             float: left;
                         }
                         .detial-text-value{
-                        // float: left;
+                            float: left;
                             color: #333333;
                             max-width: 130px;
+                            cursor: pointer;
                             overflow: hidden;
+                            // overflow-x: hidden;
                             text-overflow: ellipsis;
                             white-space: nowrap;
                         }
@@ -4177,18 +4205,25 @@ export default {
                             .detial-text-name{
                                 color: #999999;
                                 width: 65px;
-                                display: inline-block;
+                                // display: inline-block;
+                                //  float: left;
                             }
                             .detial-text-value{
-                                // display: inline-block;
+                                // float: left;
+                                // margin-left:-100px;
                                 color: #333333;
-                                max-width: 130px;
+                                width: 130px;
+                                cursor: pointer;
                                 overflow: hidden;
+                                // overflow-x: hidden;
                                 text-overflow: ellipsis;
-                                white-space: nowrap;
+                                // white-space: nowrap;
                             }
                             .item-detial{
                                 margin-top: 16px;
+                                 font-size: 12px;
+                                line-height: 12px;
+                                text-align: left;
                                 width: 195px;
                                 &:first-of-type{
                                     margin-top: 10px;
@@ -4211,7 +4246,7 @@ export default {
                         // float: left;
                         display: inline-block;
                             color: #333333;
-                            width: 50px;
+                            width: 35px;
                             // overflow-x: hidden;
                             text-overflow: ellipsis;
                             white-space: nowrap;
@@ -5161,12 +5196,14 @@ export default {
 
                 }
                 .userGroupText1{
-                    margin-left:-196px;
-                //     font-size:14px;
-                //    line-height:14px;
-                //    color: #333333;
-                //     font-family: 'MicrosoftYahei';
-                //     font-weight: normal;
+                    margin-left:34px;
+                    text-align:left;
+                    width:397px;
+                    font-size:14px;
+                   line-height:14px;
+                   color: #333333;
+                    font-family: 'MicrosoftYahei';
+                    font-weight: normal;
                 }
                 .userGroupTab{
                     margin:3px auto;
