@@ -520,6 +520,7 @@ export default {
                 if(response.data.cd == 0){
                     this.loading = false;
                     this.mappingData = response.data.rt;
+                    console.log(this.mappingData);
                 }else{
                     alert(response.data.msg);
                 }

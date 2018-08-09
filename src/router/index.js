@@ -115,11 +115,11 @@ const router = new Router({
           name:'ConfigMapping',
           component:resolve=>require(['@/components/planCost/ConfigMapping'],resolve)
         },
-        // {
-        //   path:'/Design/designversion',
-        //   name:'DesignVersion',
-        //   component:resolve=>require(['@/components/planCost/DesignVersion'],resolve)
-        // },
+        {
+          path:'/Cost/configmappingtwo',
+          name:'ConfigMappingTwo',
+          component:resolve=>require(['@/components/planCost/ConfigMappingTwo'],resolve)
+        },
       ]
     },
     //进度计划路由配置

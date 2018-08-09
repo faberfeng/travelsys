@@ -30,8 +30,7 @@
                         </span>
                         <span class="item-btn clearfix">
                             <label @click="configMapping">配置映射</label>
-                            <label @click="generateBuildWorkAmount()">新建单体清单</label>
-                            <label @click="showExtension()">新建自定义清单</label>
+                            <label @click="createList">创建清单</label>
                         </span>
                     </p>
                     <table class="UserList" border="1" width='100%'>
@@ -184,7 +183,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                        <div class="pagination-btn-separator"></div>
+                                    <div class="pagination-btn-separator"></div>
                                 </td>
                                 <td>
                                     <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'2')"></a>
@@ -298,7 +297,7 @@
                     <div class="editBodytwo imageBody">
                         <label class=" imageBodyText">单体或场地 :</label>
                         <span>
-                             <el-select v-model="createMonomer.holderId" placeholder="请选择">
+                             <el-select v-model="createMonomer.holderId" placeholder="请选择" >
                                 <el-option :label="SitesList.name+'(场地)'" :id="SitesList.id+'_id'" data-type="1" :data-name="SitesList.name"
                                 :value="SitesList.id">
                                 </el-option>
@@ -308,6 +307,20 @@
                                 </el-option>
                             </el-select>
                         </span>
+                        <div class="treeAll">
+                            <div class="treeLeft">
+                                <p class="treeTitle">空间范围:</p>
+                                <div style="border:1px solid #e0e0e0;padding:10px">
+                                    <el-tree ref="kongjiantree" show-checkbox :data="workToolData" :props="treeProps2"></el-tree>
+                                </div>
+                            </div>
+                            <div class="treeRight">
+                                <p class="treeTitle">工程量范围:</p>
+                                <div style="border:1px solid #e0e0e0;padding:10px;">
+                                    <el-tree ref="gongchengliangtree" show-checkbox :data="rightTreeData" :props="treeProps"></el-tree>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -608,6 +621,40 @@
                     <button class="editBtnC" @click="datadistinguishCancel">取消导入</button>
                 </div>
             </el-dialog>
+            <el-dialog title="选择创建和映射方式" :visible="createShow" @close="createShowClose">
+                <div class="editBodytwo">
+                    <p class="ptitle">选择生成工程量清单的选择方式:</p>
+                    <select class="pselect" v-model="projMethodData">
+                        <option value ="1">通过空间和类别范围创建</option>
+                        <option value ="2">通过已有构件量创建</option>
+                    </select>
+                    <i class="icon-down"></i>
+                    <p class="ptitle2">通过生成工程量清单的映射方式:</p>
+                    <select class="pselect" v-model="yinsheMethodData">
+                        <option value ="1">通过设计分类进行映射</option>
+                        <option value ="2">通过构件模板进行映射</option>
+                    </select>
+                    <i class="icon-down"></i>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="createShowSure">创建</button>
+                    <button class="editBtnC" @click="createShowClose">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="选择创建和映射方式" :visible="mappingShow" @close="mappingShowClose">
+                <div class="editBodytwo">
+                    <p class="ptitle">选择需要配置映射的方式:</p>
+                    <select class="pselect" v-model="mappingmethods">
+                        <option value ="1">通过设计分类进行映射</option>
+                        <option value ="2">通过构件模板进行映射</option>
+                    </select>
+                    <i class="icon-down"></i>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="mappingShowSure">创建</button>
+                    <button class="editBtnC" @click="mappingShowClose">取消</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -617,6 +664,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 import commonList from './qingDan.vue'
 import projectList from './projectList.vue'
+import dataJs from '../Settings/js/date.js'
 export default {
     name:'DesignVersion',
     components:{
@@ -861,7 +909,23 @@ export default {
                 soureFrom:'0',//业务来源
                 sourceSate:'0',//业务状态
             },
-            selectedItem:{}
+            selectedItem:{},
+            createShow:false,
+            projMethodData:'1',
+            yinsheMethodData:'1',
+            mappingmethods:'1',
+            mappingShow:false,
+            rightTreeData:[],
+            treeProps:{
+                children: 'children',
+                label: 'title'
+            },
+            treeProps2:{
+                children: 'children',
+                label: 'name'
+            },
+            workToolData:[],
+            builduname:'',
             
         }
     },
@@ -897,76 +961,189 @@ export default {
             var vm = this
             vm.showExtension()
         },
-      
+        'createMonomer.holderId':function(val,oldval){
+            this.builduname = '';
+            if(this.MonomerList.length != 0){
+                this.MonomerList.forEach(item=>{
+                    if(val == item.ID){
+                        this.builduname  = item.Name;
+                    }
+                })
+            }else{
+                this.builduname  = this.SitesList.name;
+            }
+            if(this.builduname == ''){
+                this.builduname  = this.SitesList.name;
+            }
+            this.getLeftHoderTree(val,this.builduname);
+        }
     },
     methods:{
         //配置映射
         configMapping(){
-            this.$router.push({
-                path:'/Cost/configmapping'
+            
+            this.mappingShow = true;
+
+        },
+        mappingShowSure(){
+            if(this.mappingmethods == '1'){
+                this.$router.push({
+                    path:'/Cost/configmapping'
+                });
+            }else if(this.mappingmethods == '2'){
+                this.$router.push({
+                    path:'/Cost/configmappingtwo'
+                });
+            }
+            this.mappingShow = false;
+        },
+        mappingShowClose(){
+            this.mappingShow = false;
+        },
+        //创建清单
+        createList(){
+            this.createShow = true;
+        },
+        createShowClose(){
+            this.createShow = false;
+        },
+        createShowSure(){
+            this.createShow = false;
+            if(this.projMethodData == '2'){
+                this.editBySelfShow = true;
+                this.showExtension();
+            }else if(this.projMethodData == '1'){
+                this.createMonomer.show = true;
+                this.generateBuildWorkAmount();
+                this.getRightHolderTree();
+            }
+        },
+        //获取左侧容器树
+        getLeftHoderTree(id,name){
+            let setting = {
+                data: {
+                    key:{
+                        name: "authName",
+                        children:'children'
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "holderId",
+                        pIdKey: "parentId",
+                        rootPId: 0
+                    }
+                }
+            };
+            this.workToolData = [];
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/report/getHolderTree',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    holderId:id,
+                    holderName:name
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    let responseData = response.data.rt;
+                    let newData = {};
+                    Object.assign(newData,{
+                        name:name,
+                        parentId:'',
+                        holderId:id,
+                        children:[]
+                    });
+                    responseData.push(newData);
+                    this.workToolData = dataJs.transformTozTreeFormat(setting,responseData);              
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //获取右侧工程量分类树
+        getRightHolderTree(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'config2/component/getProjectGenieClass',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    tableName:'t32',
+                    type:2
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.rightTreeData = response.data.rt;
+                }else{
+                    alert(response.data.msg)
+                }
             })
         },
         //确认添加单体清单
         createConfirm(){
-            var vm = this;
-            if(vm.createMonomer.holderId == ''){
-                vm.$message({
-                    type:'warning',
-                    message:'请选择一个场地或单体!'
-                })
-                return false;
-            }else{
-                var buildName = $('#'+vm.createMonomer.holderId+'_id')[0].dataset.name;
-                var cType = $('#'+vm.createMonomer.holderId+'_id')[0].dataset.type;
-            }
-            vm.fullscreenloading =true;
-            axios({
-                method:'GET',
-                url:vm.BDMSUrl+'project2/report/generateBuildWorkAmount',
-                headers:{
-                    token:vm.token
-                },
-                params:{
-                    holderId:vm.createMonomer.holderId,
-                    buildName:buildName,
-                    cType:cType,//1：场地； 2：单体
-                    projId:vm.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    var resData = response.data.rt;
-                    axios({
-                        method:'get',
-                        url:vm.BDMSUrl+'project2/report/fromComponentListToEngineeringList',
-                        headers:{
-                            token:vm.token
-                        },
-                        params:{
-                            mId:resData.pkId,
-                            gsource:resData.mGSource,
-                            bsource:resData.mBSource,
-                            projId:vm.projId
-                        }
-                    }).then(response=>{
-                        if(response.data.cd == 0){
-                            vm.getSnapWorkAmountList();
-                            vm.createCancle();
-                            vm.fullscreenloading =false;
-                        }else{
-                            alert(response.data.msg);
-                        }
-                    })
-                    
-                }else{
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-                
-            }).catch((err)=>{
-                console.log(err)
+
+            let selectedLeft = this.$refs.kongjiantree.getCheckedNodes();
+            let selectedRight = this.$refs.gongchengliangtree.getCheckedNodes();
+
+            let holderIdCopy = [];
+            let componentCodesCopy = [];
+
+            selectedLeft.forEach(item=>{
+                holderIdCopy.push(item.holderId);
             })
+
+            selectedRight.forEach(item=>{
+                componentCodesCopy.push(item.number);
+            })
+
+            if(this.yinsheMethodData == 1){
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpace',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId,
+                        buildName:this.builduname,
+                        holderIds:JSON.stringify(holderIdCopy),
+                        componentCodes:JSON.stringify(componentCodesCopy)
+                    },
+                }).then(response=>{
+                    console.log(response.data);
+                    if(response.data.cd == 0){
+
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }else if(this.yinsheMethodData == 2){
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpaceTemplate',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId,
+                        holderIds:JSON.stringify(holderIdCopy),
+                        componentCodes:JSON.stringify(componentCodesCopy),
+                        buildName:this.builduname
+                    }
+                }).then(response=>{
+                    console.log(response.data);
+                    if(response.data.cd == 0){
+
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
         },
         //取消添加单体清单
         createCancle(){
@@ -990,6 +1167,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     vm.SitesList = response.data.rt;
+                    this.createMonomer.holderId = vm.SitesList.id;
                 }
             }).then(response=>{
                 axios({
@@ -1024,12 +1202,39 @@ export default {
                     this.selectedItem = item;
                 }
             })
-            if(num == 1){
-                this.fromComponentListToEngineeringList(this.selectedItem.detailId, 3, this.selectedItem.relaType);
-            }else if(num == 0){
-                alert('请选择要导入的清单！');
-            }else{
-                alert('只能选择一个导入的清单！');
+            if(this.yinsheMethodData == 1){
+                if(num == 1){
+                    this.fromComponentListToEngineeringList(this.selectedItem.detailId, 3, this.selectedItem.relaType);
+                }else if(num == 0){
+                    alert('请选择要导入的清单！');
+                }else{
+                    alert('只能选择一个导入的清单！');
+                }
+            }else if(this.yinsheMethodData == 2){
+                if(num == 1){
+                    axios({
+                        method:'get',
+                        url:this.BDMSUrl+'project2/report/createWorkAmountManifestByEntityManifest',
+                        headers:{
+                            token:this.token
+                        },
+                        params:{
+                            projectId:this.projId,
+                            mId:this.selectedItem.detailId
+                        }
+                    }).then(response=>{
+                        if(response.data.cd == 0){
+                            this.getSnapWorkAmountList();
+                            this.editBySelfShow = false;
+                        }else{
+                            alert(response.data.msg);
+                        }
+                    })
+                }else if(num == 0){
+                    alert('请选择要导入的清单！');
+                }else{
+                    alert('只能选择一个导入的清单！');
+                }
             }
         },
         //取消
@@ -1227,7 +1432,7 @@ export default {
                                 if(Element.bId != null){
                                     vm.$set(Element,'HasbId',true)
                                 }else{
-                                     vm.reCalculate(Element.manifestId,index)
+                                    vm.reCalculate(Element.manifestId,index)
                                 }
                             });
                         }
@@ -1882,7 +2087,6 @@ export default {
                 },
                 data:formData
             }).then(response=>{
-                console.log(response.data);
                 if(response.data.cd == 0){
                     this.customData = response.data.rt.rows;
                     this.customPageDetial.total = response.data.rt.total;
@@ -1929,6 +2133,33 @@ export default {
                 cursor: pointer;
                 color: #606266;
             }
+        }
+        .ptitle,.ptitle2{
+            line-height: 14px;
+            height: 14px;
+            font-size: 14px;
+            margin-bottom: 14px;
+            color: #333;
+        }
+        .pselect{
+            width: 525px;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            padding-left: 10px;
+            position: relative;
+        }
+        .icon-down{
+            background: url('./images/downsanjiao.png') no-repeat;
+            width: 12px;
+            height: 7px;
+            position: relative;
+            display: block;
+            left: 500px;
+            top: -22px;
+        }
+        .ptitle2{
+            margin-top: 21px;
         }
         .worktable{
             .antsLine{
@@ -2641,6 +2872,80 @@ export default {
             background:url('./images/file.png')no-repeat 0 0; 
             content: '';
             z-index: 1;
+        }
+        #edit .el-input__inner{
+            padding-left: 10px;
+        }
+        #edit{
+            .treeAll{
+                display: flex;
+                width: 100%;
+                margin-top: 21px;
+            }
+            .treeTitle{
+                color: #666;
+                font-size: 14px;
+                line-height: 14px;
+                margin-bottom: 10px;
+            }
+            .treeLeft,.treeRight{
+                flex: 1;
+                width:50%;
+            }
+            .treeLeft{
+                margin-right: 10px;
+            }
+        }
+        /*
+            修改eleUI树形组件
+        */
+        
+        .el-tree-node:focus .el-tree-node__content{
+            background-color: transparent;
+        }
+        .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+                background-color: #dfdfdf;
+        }
+        .el-tree-node__label{
+            font-size: 12px;
+            color: #666666;
+            padding-left: 22px; 
+            position: relative;
+        }
+        .el-icon-caret-right:before{
+            content: "\E604";
+            color: #999999;
+            font-weight: bold;
+        }
+      
+        .is-leaf:before{
+            content: ""!important;
+            color: #999999;
+            font-weight: bold;
+        }
+        .el-tree-node__label::before{
+            display: block;
+            position: absolute;
+            top: 6px;
+            left: 4px;
+            width: 14px;
+            height: 13px;
+            background: url('../ManageCost/images/file.png')no-repeat 0 0;
+            content: '';
+        }
+        .fileIcon::before{
+            width: 16px;
+            height: 16px;
+             top: 0px;
+            background-image: url('../ManageDesign/images/zTreeStandard.png');
+            background-position: -110px -32px;
+        }
+        .el-tree-node__content{
+                height: 30px;
+        }
+        .is-current .el-tree-node__content{
+            color: #333333;
+            font-weight: bold;
         }
     }
 </style>

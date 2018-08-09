@@ -596,6 +596,7 @@ export default Vue.component('mapping-project',{
                     cacheId:currCacheId,
                 }
             }).then(response=>{
+                console.log(response.data)
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
@@ -646,6 +647,7 @@ export default Vue.component('mapping-project',{
                     projId:this.projId
                 }
             }).then(response=>{
+                console.log(response.data)
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
