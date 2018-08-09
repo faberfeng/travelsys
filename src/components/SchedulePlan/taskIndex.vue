@@ -1339,23 +1339,23 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-  import './jQueryGantt/platform.css'
-  import './jQueryGantt/gantt.css'
-  import './jQueryGantt/ganttPrint.css'
-  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
-  import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
-  import './jQueryGantt/libs/jquery/jquery.timers.js'
-  import './jQueryGantt/libs/utilities.js'
-  import './jQueryGantt/libs/forms.js'
-   import './jQueryGantt/libs/date.js'
-  import './jQueryGantt/libs/dialogs.js'
+  // import './jQueryGantt/platform.css'
+  // import './jQueryGantt/gantt.css'
+  // import './jQueryGantt/ganttPrint.css'
+  // import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
+  // import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
+  // import './jQueryGantt/libs/jquery/jquery.timers.js'
+  // import './jQueryGantt/libs/utilities.js'
+  // import './jQueryGantt/libs/forms.js'
+  //  import './jQueryGantt/libs/date.js'
+  // import './jQueryGantt/libs/dialogs.js'
 //  import './jQueryGantt/libs/layout.js'
   // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
-  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
+  // import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
 //  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
-  import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
-  import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
-  import {GanttMaster} from './jQueryGantt/ganttMaster.js'
+  // import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
+  // import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+  // import {GanttMaster} from './jQueryGantt/ganttMaster.js'
 
   //import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
   import commonList from './qingdan.vue'
@@ -5585,6 +5585,7 @@
       }
     }
   }
+  }
 </style>
 
 <style lang="less">
@@ -5929,4 +5930,5 @@
   .sortBtn {
     background: url('./images/sort.png') no-repeat 0 0;
   }
+
 </style>
