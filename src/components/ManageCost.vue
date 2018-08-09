@@ -19,7 +19,7 @@
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
-                                <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction">施工现场</el-tab-pane>
+                                <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
                                 </el-tab-pane>
@@ -257,7 +257,7 @@ export default {
                         })
                     }else if(vm.auth.constructionSite){
                         vm.$router.push({
-                            path:'/Drive/costover'//施工现场
+                            path:'/constructionSite/fieldConnection'//施工现场
                         })
                     }else if(vm.auth.docManagement){
                         vm.$router.push({
@@ -314,6 +314,9 @@ export default {
                 sessionStorage.setItem('navigationPath',this.navigationPath)
 
             }else if(tab.label === '施工现场'){
+                 this.$router.push({
+                    path:'/constructionSite/fieldConnection'
+                })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
 

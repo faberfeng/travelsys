@@ -114,15 +114,15 @@
                     <ul id="basicInformation" :class="[{'show':show.basicInformation}]">
                         <li class="detial-item ">
                             <span class="detial-text-name">名称</span>
-                            <span class="detial-text-value" v-text="eventInformationList.eventName"></span>
+                            <span class="detial-text-value" :title="eventInformationList.eventName" v-text="eventInformationList.eventName"></span>
                         </li>
                         <li class="detial-item ">
                             <span class="detial-text-name">地点</span>
-                            <span class="detial-text-value" v-text="eventInformationList.eventPosition"></span>
+                            <span class="detial-text-value" :title="eventInformationList.eventPosition" v-text="eventInformationList.eventPosition"></span>
                         </li>
                         <li class="detial-item">
                             <span class="detial-text-name">开始</span>
-                            <span class="detial-text-value" v-text="$options.filters.timeChange(eventInformationList.eventStart)"></span>
+                            <span class="detial-text-value"  v-text="$options.filters.timeChange(eventInformationList.eventStart)"></span>
                         </li>
                         <li class="detial-item clearfix">
                             <span class="detial-text-name">结束</span>
@@ -136,7 +136,7 @@
                             <span class="detial-text-name">重复</span>
                             <span class="detial-text-value" v-text="$options.filters.repeatTypeChanges(eventInformationList.repeatType)"></span>
                         </li>
-                        <li class="detial-item clearfix">
+                        <li class="detial-item1 clearfix">
                             <span class="detial-content-name">内容</span>
                             <span class="detial-content-value" v-text="eventInformationList.content"></span>
                         </li>
@@ -962,7 +962,6 @@ export default {
                         
                 })
                     })
-                    this.eventSources.push({events:this.event,textColor:'black',color:'red',});
         },
         initCalendar1(){
             //  var event=[];
@@ -1088,6 +1087,7 @@ export default {
                             this.calendarEventList=response.data.rt;
                             console.log(JSON.stringify(this.calendarEventList));
                             this.initCalendar();
+                            this.eventSources.push({events:this.event,textColor:'black',color:'red',});
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
                         }else{
@@ -1322,7 +1322,9 @@ export default {
                         if(response.data.cd == '0'){
                                     this.addEventList=response.data.rt;
                                     this.eventSources=[];
+                                    this.event=[];
                                     this.initEvent();
+                                    this.initTask();
                                     this.eventView();
                                      this.addEventTextDialog=false;    
                         }else if(response.data.cd == '-1'){
@@ -1459,8 +1461,10 @@ export default {
                    }
                     }).then(response=>{
                         if(response.data.cd == '0'){
-                            this.eventSources=[],
+                            this.eventSources=[];
+                            this.event=[];
                             this.initEvent();
+                            this.initTask()
                             this.eventView();
                             this.informationShow();
                             this.updateEventTextDialog=false;
@@ -1488,7 +1492,7 @@ export default {
         },
         //点击删除事件
         deleteCalendarEvent(){
-            if(!this.eventId){
+           if(!this.eventId){
                 alert('提示：请指定需要删除的事件')
             }else if(this.eventInformationList.repeatType==0){
                     this.deleteEventTextDialog=true;
@@ -1499,6 +1503,7 @@ export default {
                     this.showRepeatType=false;
                     this.deleteTypes=this.deleteTypeList[0].value;
                 }
+            
             
         },
         //确认删除事件
@@ -1516,7 +1521,10 @@ export default {
                         if(response.data.cd == '0'){
                                 this.$refs.calendar.$emit('remove-event',this.eventId);
                                 this.eventSources=[];
+                                this.event=[];
                                 this.initEvent();
+                                this.initTask();
+                                initTask();
                                 this.eventView();
                                 this.deleteEventTextDialog=false;
                         }else if(response.data.cd == '-1'){
@@ -2092,10 +2100,7 @@ export default {
                     }
                 }
                 .eventViewFooter{
-                    position: fixed;
-                    bottom: 12px;
-                    margin-top:20px;
-                    right: 80px;
+                    margin-top:30px;
                 }
 
             }
@@ -2264,7 +2269,6 @@ export default {
                     .detial-item{
                         font-size: 12px;
                         line-height: 12px;
-                        
                         height:16px;
                         margin-top: 16px;
                         margin-left:8px;
@@ -2278,31 +2282,42 @@ export default {
                         float: left;
                         color: #333333;
                             max-width: 130px;
-                           
+                            cursor: pointer;
+                            overflow: hidden;
                             // overflow-x: hidden;
                             text-overflow: ellipsis;
-                            // white-space: nowrap;
+                            white-space: nowrap;
                         }
-                        .detial-content-name{
+                         &:first-of-type{
+                            margin-top: 18px;
+                        }
+                        }
+                        .detial-item1{
+                            font-size: 12px;
+                            line-height: 12px;
+                            margin-top: 16px;
+                            margin-left:8px;
+                            text-align: left;
+                            .detial-content-name{
                             color: #999999;
                             width: 65px;
                             float: left;
-                        }
-                        .detial-content-value{
-                            margin-top:10px;
-                            display: inline-block;
-                            line-height: 25px;
-                            color: #333333;
-                            width: 230px;
-                            // overflow-x: hidden;
-                            
-                            
-                        }
-
-                        &:first-of-type{
+                            }
+                            .detial-content-value{
+                                margin-top:10px;
+                                display: inline-block;
+                                line-height: 25px;
+                                color: #333333;
+                                width: 230px;
+                                // overflow-x: hidden;
+                                }
+                                &:first-of-type{
                             margin-top: 18px;
                         }
-                }
+                        }
+                        
+                       
+                
             }
  
         }

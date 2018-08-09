@@ -516,7 +516,7 @@ export default{
                 },
                 data:{
                     name:this.newId,
-                    reId:this.typeId,
+                    reId:this.resourceTypeNameValue,
                     unit:this.unitName,
                     isShowAssign: 0,
                     isShowPlan: 0,
@@ -577,6 +577,7 @@ export default{
             }).then(response=>{
                 this.resourceTypeTreeList=response.data.rt
                 this.resourceTypeData=response.data.rt
+                console.log(this.resourceTypeData);
             })
         },
         // this.$refs.lineCharts.on('click', function(params){}),

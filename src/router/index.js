@@ -153,6 +153,37 @@ const router = new Router({
         }
       ]
     },
+    //施工现场路由配置
+    {
+      path:'/constructionSite',
+      name:'constructionSite',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+          path:'/constructionSite/fieldConnection',
+          name:'fieldConnection',
+          component:resolve=>require(['@/components/constructionSite/fieldConnection'],resolve)
+        },
+        {
+          path:'/constructionSite/fieldMessage',
+          name:'fieldMessage',
+          component:resolve=>require(['@/components/constructionSite/fieldMessage'],resolve)
+        },
+        {
+          path:'/constructionSite/qualityChecking',
+          name:'qualityChecking',
+          component:resolve=>require(['@/components/constructionSite/qualityChecking'],resolve)
+        },
+        {
+          path:'/constructionSite/safetyChecking',
+          name:'safetyChecking',
+          component:resolve=>require(['@/components/constructionSite/safetyChecking'],resolve)
+        }
+      ]
+    },
     {
       path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
       name:'getManifestDetailInfoForPage',
