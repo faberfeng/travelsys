@@ -3,7 +3,7 @@
          <div class="project" >
             <p class="antsLine">
                 成本管理<i class="icon-sanjiao-right"></i><span  @click="back()">构件量清单</span><i class="icon-sanjiao-right"></i>
-                <span class="strong">设计-新增报表</span>
+                <span class="strong">设计-{{rcName}}</span>
             </p>
             <p class="header clearfix">
                 <span class="left_header">
@@ -429,7 +429,7 @@
         select{  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
             /*很关键：将默认的select选择框样式清除*/  
-            appearance:none;  
+            //appearance:none;  
             -moz-appearance:none;  
             -webkit-appearance:none;  
             /*在选择框的最右侧中间显示小箭头图片*/  
@@ -1479,7 +1479,6 @@ export default Vue.component('common-edit',{
             vm.privateVariables.new = old
         },
         showPrivateVariables(){
-            // var 
             var  vm = this
             vm.privateVariables.show = true
         },
@@ -1964,9 +1963,16 @@ export default Vue.component('common-edit',{
                 })
                 return;
             }
+        let rtName = '';
+        this.options_type.forEach(item=>{
+            if(item.id == vm.value_type){
+                rtName = item.Name;
+            }
+        })
+        
             var rc = {
                 reportName: rcName,
-                reportTableName: vm.value_type,   //筛选 - 类型 表名
+                reportTableName: rtName,   //筛选 - 类型 表名
                 displayType: vm.displayType?0:1,   //数据相同时合并多行
                 displayTotal: vm.displayTotal?1:0,	//显示总计
                 projId: vm.projId,
@@ -2180,8 +2186,9 @@ export default Vue.component('common-edit',{
                     return;
                 }
             }
-
-             var rcStyle = {
+            console.log(this.titleAlign);
+            console.log(this.tableAlign)
+            var rcStyle = {
                 showTitle: vm.styleShowTitle?1:0,
                 titleName: $.trim(vm.titleName),
                 titleUseReportName: vm.titleUseReportName?1:0,

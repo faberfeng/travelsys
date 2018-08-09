@@ -575,22 +575,22 @@ export default {
         vm.getInentityDetail();
     },
     watch:{
-      'pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.getRealTimeList()
-      },
-      'pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getRealTimeList()
-      },
-       'pageDetial_1.currentPage':function(val,oldval){
-          var vm = this
-          vm.getSnapShootList()
-      },
-      'pageDetial_1.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getSnapShootList()
-      },
+        'pageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.getRealTimeList()
+        },
+        'pageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.getRealTimeList()
+        },
+        'pageDetial_1.currentPage':function(val,oldval){
+            var vm = this
+            vm.getSnapShootList()
+        },
+        'pageDetial_1.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.getSnapShootList()
+        },
     },
     methods:{
         showEdit(){
@@ -625,7 +625,7 @@ export default {
         },
         editReport(val){
             var vm = this
-            vm.checkItem = val
+            vm.checkItem = val;
             vm.showCommonEdit = true
         },
         showData(val){
