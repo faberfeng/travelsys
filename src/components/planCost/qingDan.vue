@@ -77,7 +77,7 @@
                                    </li>
                                      <li class="item clearfix" style="margin-bottom:0;">
                                        <span class="left">清单类型</span>
-                                       <span class="right" v-text="ManifestInfo.mType"></span>
+                                       <span class="right" v-text="ManifestInfo._mType"></span>
                                    </li>
                                </ul>
                                <div class="right-QRcode">
@@ -1704,6 +1704,19 @@ export default Vue.component('common-list',{
                         vm.ManifestInfo = response.data.rt.main;
                     }else{
                         vm.ManifestInfo = response.data.rt ; 
+                    }
+                    if(vm.ManifestInfo.mType == 2){
+                        Object.assign(vm.ManifestInfo,{
+                            _mType:'工程量清单'
+                        })
+                    }else if(vm.ManifestInfo.mType == 1){
+                        Object.assign(vm.ManifestInfo,{
+                            _mType:'构件量清单'
+                        })
+                    }else if(vm.ManifestInfo.mType == 2){
+                        Object.assign(vm.ManifestInfo,{
+                             _mType:'物料量清单'
+                        })
                     }
                 }
                 vm.findManifestDetailList(2)
