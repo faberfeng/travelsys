@@ -540,53 +540,55 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.loading = false;
-                    let componentList = response.data.rt.componentList;
-                    let templateList0 = response.data.rt.templateList0;
-                    let templateList1 = response.data.rt.templateList1;
-                    let templateList2 = response.data.rt.templateList2;
-                    componentList.forEach(item=>{
-                        Object.assign(item,{
-                            _level:4
+                    if(response.data.rt !=null){
+                        let componentList = response.data.rt.componentList;
+                        let templateList0 = response.data.rt.templateList0;
+                        let templateList1 = response.data.rt.templateList1;
+                        let templateList2 = response.data.rt.templateList2;
+                        componentList.forEach(item=>{
+                            Object.assign(item,{
+                                _level:4
+                            })
                         })
-                    })
-                    let aData = [...templateList0,...templateList1,...templateList2];
-                    for (var i = 0; i < templateList2.length;i++){
-                        for (var j = 0; j < componentList.length; j++) {
-                            if (templateList2[i].id == componentList[j].templateId) {
-                                if (typeof (templateList2[i].children) == "undefined") {
-                                    var array = new Array();
-                                    templateList2[i].children = array;
+                        let aData = [...templateList0,...templateList1,...templateList2];
+                        for (var i = 0; i < templateList2.length;i++){
+                            for (var j = 0; j < componentList.length; j++) {
+                                if (templateList2[i].id == componentList[j].templateId) {
+                                    if (typeof (templateList2[i].children) == "undefined") {
+                                        var array = new Array();
+                                        templateList2[i].children = array;
 
+                                    }
+                                    templateList2[i].children.push(componentList[j]);
                                 }
-                                templateList2[i].children.push(componentList[j]);
                             }
                         }
-                    }
-                    for (var i = 0; i < templateList1.length; i++) {
-                        for (var j = 0; j < templateList2.length; j++) {
-                            if (templateList1[i].id == templateList2[j].parentID) {
-                                if (typeof (templateList1[i].children) == "undefined") {
-                                    var array = new Array();
-                                    templateList1[i].children = array;
+                        for (var i = 0; i < templateList1.length; i++) {
+                            for (var j = 0; j < templateList2.length; j++) {
+                                if (templateList1[i].id == templateList2[j].parentID) {
+                                    if (typeof (templateList1[i].children) == "undefined") {
+                                        var array = new Array();
+                                        templateList1[i].children = array;
 
+                                    }
+                                    templateList1[i].children.push(templateList2[j]);
                                 }
-                                templateList1[i].children.push(templateList2[j]);
                             }
                         }
-                    }
-                    for (var i = 0; i < templateList0.length; i++) {
-                        for (var j = 0; j < templateList1.length; j++) {
-                            if (templateList0[i].id == templateList1[j].parentID) {
-                                if (typeof (templateList0[i].children) == "undefined") {
-                                    var array = new Array();
-                                    templateList0[i].children = array;
+                        for (var i = 0; i < templateList0.length; i++) {
+                            for (var j = 0; j < templateList1.length; j++) {
+                                if (templateList0[i].id == templateList1[j].parentID) {
+                                    if (typeof (templateList0[i].children) == "undefined") {
+                                        var array = new Array();
+                                        templateList0[i].children = array;
 
+                                    }
+                                    templateList0[i].children.push(templateList1[j]);
                                 }
-                                templateList0[i].children.push(templateList1[j]);
                             }
                         }
+                        this.mappingData = templateList0;
                     }
-                    this.mappingData = templateList0;
                 }else{
                     alert(response.data.msg);
                 }
@@ -830,7 +832,9 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd  == '0'){
-                    this.calculateResultFinall = response.data.rt.other;
+                    if(response.data.rt!=null){
+                        this.calculateResultFinall = response.data.rt.other;
+                    }
                 }else if (response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -967,7 +971,7 @@ export default {
             this.editMappingData = scope.row;
             this.jiLiangCondition = scope.row.calCondition;
             this.jiLiangResult = scope.row.formula;
-            this.projectNumber = scope.row.componentNumber;
+            this.projectNumber = scope.row.componentNumber.split('-')[1];
             this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.componentName;
             axios({
                 method:'get',
@@ -1006,7 +1010,7 @@ export default {
                     token:this.token
                 },
                 params:{
-                    obscureCode:scope.row.componentNumber.substr(0,2)+'__00',
+                    obscureCode:this.projectNumber.substr(0,2)+'__00',
                     codeLength:6,
                     tableNo:'t32',
                     projId:this.projId,
@@ -1036,7 +1040,7 @@ export default {
                     token:this.token
                 },
                 params:{
-                    obscureCode:scope.row.componentNumber.substr(0,4)+'__',
+                    obscureCode:this.projectNumber.substr(0,4)+'__',
                     codeLength:6,
                     tableNo:'t32',
                     projId:this.projId,
@@ -1073,6 +1077,7 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
+                    console.log(response.data)
                     this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
                             item = Object.assign(item,{
@@ -1183,25 +1188,10 @@ export default {
         unmappingEntityList(scope){
             this.entityObj = scope.row;
             this.isMapping = false;
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/report/getUnMappingEntityList',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId,
-                    templateId:encodeURIComponent(scope.row.id),
-                    pageNo:1,
-                    rowNum:10
-                }
-            }).then(response=>{
-                console.log(response.data);
-            })
             if(scope.row.unmappingEntity == 0){
                 alert('当前分类编码下的所有构件都已成功映射');
             }else{
-                //this.showMain = false;
+                this.showMain = false;
             }
         },
         //子组件触发的函数

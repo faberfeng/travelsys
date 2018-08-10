@@ -1412,23 +1412,23 @@ export default Vue.component('common-edit',{
                 }
             }
         },
-          value_monomer_change(inheirt){
-                var vm = this 
-                if(vm.value_monomer == 0) {
-                    vm.options_partition = [
-                        {
-                            id:'NONE',
-                            Name:'无'
+        value_monomer_change(inheirt){
+            var vm = this 
+            if(vm.value_monomer == 0) {
+                vm.options_partition = [
+                    {
+                        id:'NONE',
+                        Name:'无'
                     }]
-                    vm.options_floor = [
-                        {
-                            id:'NONE',
-                            Name:'无'
-                        }
-                    ]
-                }else {
-                    vm.getPartitionBySubProjId(inheirt) //加载分区
-                }
+                vm.options_floor = [
+                    {
+                        id:'NONE',
+                        Name:'无'
+                    }
+                ]
+            }else {
+                vm.getPartitionBySubProjId(inheirt) //加载分区
+            }
         },
         value_partition_change(inheirt){
                 var vm = this 
@@ -1463,7 +1463,7 @@ export default Vue.component('common-edit',{
                         fieldName: item.name,
                         fieldType: item.type,
                         checked:false,
-                        isPrivate:true,
+                        isPrivate:false,
                         tableType: -1
                     })
                 }
@@ -1788,7 +1788,7 @@ export default Vue.component('common-edit',{
             )
         },
         getReportData(){
-            var vm = this
+            var vm = this;
             // rc: rc,
             // fieldList: fieldList,
             // fieldFilterList: fieldFilterList,
@@ -1802,6 +1802,7 @@ export default Vue.component('common-edit',{
                     token:vm.token
                 },
             }).then(response=>{
+                console.log(response.data);
                  if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称

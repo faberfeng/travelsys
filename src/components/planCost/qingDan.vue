@@ -1441,6 +1441,7 @@ export default Vue.component('common-list',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.manifestId = vm.mId
+        console.log(this.token);
         vm.getIntoList();
   }, 
   mounted(){
@@ -1705,6 +1706,7 @@ export default Vue.component('common-list',{
                     }else{
                         vm.ManifestInfo = response.data.rt ; 
                     }
+
                     if(vm.ManifestInfo.mType == 2){
                         Object.assign(vm.ManifestInfo,{
                             _mType:'工程量清单'
@@ -1718,6 +1720,7 @@ export default Vue.component('common-list',{
                              _mType:'物料量清单'
                         })
                     }
+                    console.log(this.ManifestInfo);
                 }
                 vm.findManifestDetailList(2)
                 }else if(response.data.cd == '-1'){
