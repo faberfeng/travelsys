@@ -169,9 +169,7 @@
                 </span>
             </p>
             <div class="container container-F">
-                <p style="    text-align: left;
-            color: #999999;
-            font-size: 14px;">
+                <p style="text-align: left;color: #999999;font-size: 14px;display:none">
                     分组行位置
                     <el-radio v-model="titlePosition" label="0">表头</el-radio>
                     <el-radio v-model="titlePosition" label="1">表尾</el-radio>
@@ -1371,6 +1369,8 @@ export default Vue.component('common-edit',{
                 new:[],
                 old:[],
             },
+            pageDetialTtotal:'',
+            goujianList:[],
             
         }
     },
@@ -1396,7 +1396,7 @@ export default Vue.component('common-edit',{
             vm.getIntoDesignPage(false)
             vm.addField()
         }
-        vm.getPV()
+        vm.getPV();
     },
     methods:{
         adjustCondition(key,name){
@@ -1802,7 +1802,6 @@ export default Vue.component('common-edit',{
                     token:vm.token
                 },
             }).then(response=>{
-                console.log(response.data);
                  if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
@@ -1877,7 +1876,6 @@ export default Vue.component('common-edit',{
                                         //     break;
                                      }
                                 }else{
-                                    console.log(index)
                                     vm.list_filter[index].build_name = element.fieldCode
                                     vm.list_filter[index].val = 1
 
@@ -1956,7 +1954,8 @@ export default Vue.component('common-edit',{
                 return
             }
             //判断报表名称是否重复
-            var flag = vm.isReportNameRepeat(rcId,rcName)
+            let flag = vm.isReportNameRepeat(rcId,rcName);
+            console.log(flag)
             if(flag){
                  vm.$message({
                     type:'warning',
@@ -2187,8 +2186,6 @@ export default Vue.component('common-edit',{
                     return;
                 }
             }
-            console.log(this.titleAlign);
-            console.log(this.tableAlign)
             var rcStyle = {
                 showTitle: vm.styleShowTitle?1:0,
                 titleName: $.trim(vm.titleName),
@@ -2264,7 +2261,6 @@ export default Vue.component('common-edit',{
         },
         isReportNameRepeat(rcId,rcName){
             var vm = this
-            var result = false
             $.ajax({
                 type: "POST",
                 url:vm.BDMSUrl + 'project2/report/isRepeat',
@@ -2279,15 +2275,15 @@ export default Vue.component('common-edit',{
                 async:false, //同步
                 success:function(response){
                     if(response.cd == 0){
-                        if(response.msg == 'repeat!'){
-                            result =  true
+                        if(response.msg == 'ok!'){
+                            return false;
                         }
+                    }else if(response.msg == 'repeat!'){
+                        return  true;
                     }
                 }
             });
-            return result
         },
-
         initFiled(isClear){
             var vm = this
             vm.data_right = []
@@ -2298,7 +2294,7 @@ export default Vue.component('common-edit',{
             }
         },
         changeFL(key,length){
-            var vm = this
+            var vm = this;
             if(length == 5){
                 if(vm.list_filter[key].val == 1){
                     vm.list_filter[key+1].show = true
@@ -2310,11 +2306,14 @@ export default Vue.component('common-edit',{
                 }
             }else if(length == 3){
                 if(vm.list_order[key].val == 1){
-                    vm.list_order[key+1].show = true
+                    vm.list_order[key+1].show = true;
                 }else{
-                    for(var i = key+1;i<length;i++){
-                        vm.list_order[i].show = false
-                        vm.list_order[i].val = 0
+                    for(let i = key+1;i<length;i++){
+                        vm.list_order[i].show = false;
+                        vm.list_order[i].val = 0;
+                        vm.list_order[i].build_name = 'nofield';
+                        vm.list_order[i].ordertype = 'ACENding';
+                        vm.list_order[i].grouptype = 'NONE_GROUP';
                     }
                 }
             }
