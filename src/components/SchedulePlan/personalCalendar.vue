@@ -1791,16 +1791,16 @@ export default {
             position: relative;
             width: 100%;
               .label-item{
-                    float: left;
-                    height: 34px;
-                    font-size: 14px;
-                    width:106px;
-                    text-align: center;
-                    line-height: 30px;
-                    cursor: pointer;
-                    border-top: 3px solid #fafbfc;
-                    color: #999999;
-                    text-decoration: none;
+                float: left;
+                height: 34px;
+                font-size: 14px;
+                width:106px;
+                text-align: center;
+                line-height: 30px;
+                cursor: pointer;
+                border-top: 3px solid #fafbfc;
+                color: #999999;
+                text-decoration: none;
                 }
                 .label-item-active{
                     color: #fc3439;
@@ -1821,7 +1821,6 @@ export default {
                     height: 17px;
                     
                 }
-
         }
         .box-left-container{
             display: block;
@@ -1841,7 +1840,7 @@ export default {
                 transform: rotateZ(180deg)!important;
                 transition: all ease .5s;
             }
-            }
+        }
         .el-container{margin-right: 10px;}
         .calendarContext{
             padding:20px;
