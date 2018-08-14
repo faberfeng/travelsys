@@ -269,11 +269,11 @@ export default {
                     },
                     {
                         label: '计量单位',
-                        prop: 'type_',
+                        prop: '_unit',
                     },
                     {
                         label: '构件量映射',
-                        prop: 'type_',
+                        prop: 'componentMap',
                     },
                     {
                         label: '来源',
@@ -420,11 +420,13 @@ export default {
                 }
             })
             this.edittwoData = this.edittwoDataArray[0];
-            this.edittwoDataArray.forEach((item,index)=>{
+            if(this.unicodeData.componentMap!=null){
+                this.edittwoDataArray.forEach((item,index)=>{
                 if(item.split('-')[0] == this.unicodeData.componentMap.substr(2,2)){
                     this.edittwoData = this.edittwoDataArray[index];
-                }
-            })
+                        }
+                })
+            }
         },
         'edittwoData':function(val,oldVal){
             let num = this.editoneData.split('-')[0];
@@ -441,7 +443,13 @@ export default {
                 }
             })
             this.editthreeData = this.editthreeDataArray[0];
-           
+                        if(this.unicodeData.componentMap!=null){
+                            this.editthreeDataArray.forEach((item,index)=>{
+                                if(item.split('-')[0] == this.unicodeData.componentMap.substr(4,2)){
+                                    this.editthreeData = this.editthreeDataArray[index];
+                                }
+                            })
+                        }
         },
         'editthreeData':function(val){
             this.encodeYingshe = '31-'+this.editoneData.split('-')[0]+' '+this.edittwoData.split('-')[0]+' '+this.editthreeData.split('-')[0];
@@ -495,10 +503,29 @@ export default {
 
                         tempData.forEach(item=>{
                             Object.assign(item,{
-                                _state:this.formatterStatus(item.value,item),
-                                _source:this.formatterType(item.value)
+                                _state:this.formatterStatus(item.status,item),
+                                _source:this.formatterType(item.type)
                             })
-                        })   
+                        })  
+                        tempData.forEach(item=>{
+                            if(item.unit == '1'){
+                                Object.assign(item,{
+                                    _unit:'个'
+                                })
+                            }else if(item.unit == '2'){
+                                Object.assign(item,{
+                                    _unit:'米'
+                                })
+                            }else if(item.unit == '3'){
+                                Object.assign(item,{
+                                    _unit:'平方米'
+                                })
+                            }else if(item.unit == '4'){
+                                Object.assign(item,{
+                                    _unit:'立方米'
+                                })
+                            }
+                        }) 
                         this.goodsData = dataJs.transformTozTreeFormat(setting, tempData);
                         this.addListData.firstTitle = this.addListData.firstTitleData[0];
                     }
@@ -511,9 +538,18 @@ export default {
                 }
             })
         },
-        //格式状态
-        formatterStatus(value,row) {
-            if (row.type == 0) {
+        formatterType(value){
+            if (value == 0) {
+                return "行业标准";
+            }else if (value == 1) {
+                return "企业标准";
+            } else {
+                return "工程标准";
+            }
+        },
+        //格式化状态
+        formatterStatus(value, row, index) {
+            if (row.type == 0 || row.type == 1) {
                 return '正常使用';
             } else {
                 if (value == 0) {
@@ -525,16 +561,6 @@ export default {
                 } else {
                     return "正常使用 ";
                 }
-            }
-        },
-        //格式化来源
-        formatterType(value) {
-            if (value == 0) {
-                return "行业标准";
-            } else if(value == 1){
-                return "企业标准";
-            } else {
-                return "工程标准";
             }
         },
         //新增
@@ -604,6 +630,48 @@ export default {
                             this.editoneDataArray.push(item.number.substr(0,2)+'-'+item.title);
                         })
                         this.editoneData = this.editoneDataArray[0];
+                        if(this.unicodeData.componentMap!=null){
+                            this.editoneDataArray.forEach((item,index)=>{
+                                if(item.split('-')[0] == this.unicodeData.componentMap.substr(0,2)){
+                                    this.editoneData = this.editoneDataArray[index];
+                                }
+                            })
+                        }
+                        this.unicodeResponseData.forEach(item=>{
+                            if(item.number.substr(0,2) == this.editoneData.split('-')[0] && item.children!=null){
+                                item.children.forEach(item2=>{
+                                    this.edittwoDataArray.push(item2.number.substr(2,2)+'-'+item2.title);
+                                })
+                            }
+                        });
+                        this.edittwoData = this.edittwoDataArray[0];
+                        if(this.unicodeData.componentMap!=null){
+                            this.edittwoDataArray.forEach((item,index)=>{
+                                if(item.split('-')[0] == this.unicodeData.componentMap.substr(2,2)){
+                                    this.edittwoData = this.edittwoDataArray[index];
+                                }
+                            })
+                        }
+                        this.unicodeResponseData.forEach(item=>{
+                            if(item.number.substr(0,2) == this.editoneData.split('-')[0] && item.children!=null){
+                                item.children.forEach(item2=>{
+                                    if(item2.number.substr(2,2) == this.edittwoData.split('-')[0] && item2.children!=null){
+                                        item2.children.forEach(item3=>{
+                                            this.editthreeDataArray.push(item3.number.substr(4,2)+'-'+item3.title);
+                                        })
+                                    }
+                                })
+                            }
+                        });
+                        this.editthreeData = this.editthreeDataArray[0];
+                        if(this.unicodeData.componentMap!=null){
+                            this.editthreeDataArray.forEach((item,index)=>{
+                                if(item.split('-')[0] == this.unicodeData.componentMap.substr(4,2)){
+                                    this.editthreeData = this.editthreeDataArray[index];
+                                }
+                            })
+                        }
+                        
                     }
                     
                 }else if(response.data.cd == '1'){
@@ -678,6 +746,7 @@ export default {
         confirmBtn(scope){
             this.confirmObject = scope.row;
             var parentNum = scope.row.parNumber;
+            console.log(scope.row)
             var type = '';
             var status = '';
             if(parentNum){
