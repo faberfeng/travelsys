@@ -452,7 +452,7 @@ export default {
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
                     }else{
-                        this.push({
+                        this.$router.push({
                             path:'/login'
                         })
                     }
@@ -593,7 +593,7 @@ export default {
                             }else if(response.data.cd == '-1'){
                                 alert(response.data.msg)
                             }else{
-                                this.push({
+                                this.$router.push({
                                     path:'/login'
                                 })
                             }
@@ -786,12 +786,12 @@ export default {
                 if(response.data.cd == '0'){
                    this.confirmVisible = false;
                     this.getWorkCode();
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.push({
+                }else if(response.data.cd == '1'){
+                    this.$router.push({
                         path:'/login'
                     })
+                }else {
+                    alert(response.data.msg);
                 }
             })
             
@@ -844,7 +844,7 @@ export default {
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
-                    this.push({
+                    this.$router.push({
                         path:'/login'
                     })
                 }
@@ -883,7 +883,7 @@ export default {
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
-                    this.push({
+                    this.$router.push.push({
                         path:'/login'
                     })
                 }
@@ -1162,8 +1162,8 @@ export default {
         margin-right: 16px;
     }
     .zk-table__cell-inner {
-    padding: 6px 12px;
-}   
+        padding: 6px 12px;
+    }   
     .editBtn{
         background: url('../../assets/edit.png') no-repeat;
     }
@@ -1176,7 +1176,7 @@ export default {
     .passBtn{
         background: url('./images/pass.png') no-repeat;
     }
-     .backBtn{
+    .backBtn{
         background: url('./images/back.png') no-repeat;
     }
     .el-tree-node__content{

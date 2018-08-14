@@ -11,11 +11,11 @@
             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
             :border="props.border" empty-text="正在加载...">
                 <template slot="action" slot-scope="scope">
-                   <button class="TiqingBtn actionBtn" title="提请"  v-if="scope.row.status == 0" @click="request(scope)"></button>
+                    <button class="TiqingBtn actionBtn" title="提请"  v-if="scope.row.status == 0" @click="request(scope)"></button>
                     <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
-                     <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
-                   <button class="editBtn actionBtn" title="修改"  @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
-                   <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                    <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
+                    <button class="editBtn actionBtn" title="修改"  @click="edit(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                    <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
                 </template> 
             </zk-table>
         </div>
