@@ -5,8 +5,43 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>BDMS</title>
   </head>
-  <body style="margin:0">
+  <body >
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script type="text/javascript">
+    var APP;
+  
+    function init(){
+  
+      let url = location.search;
+  
+      try{
+  
+        url = url.split("?")[1];
+        url = url.split("=")[1];
+        url = decodeURIComponent(url);
+  
+      }catch(e){
+        console.log(e);
+        url = "Duct-矩形.gmd";
+      }
+  
+      // APP = new app(url);
+      // APP = new app("http://10.252.26.240:8080/qjbim-mongo-instance","5b1f664042709f0becee3b84");
+      // APP = new app("http://10.252.26.240:8080/qjbim-mongo-instance","5b5fbc2858411f3c5c993885");
+      // APP = new app("http://10.252.26.240:8080/qjbim-mongo-instance","5b627e5158411f3c5c76687b");
+      APP = new app("http://10.252.26.240:8080/qjbim-mongo-instance","5b629e1d58411f3c5c766964",(Message,OBJ)=>{CB(Message,OBJ);});
+      document.body.appendChild(APP.create_app());
+  
+      var json = {name: "zhangsan", age: 23, email: "chentging@aliyun.com"};
+      var jsonStr = JSON.stringify(json);
+  
+      APP.SendMessage({},"AcceptFuntion",jsonStr);
+    }
+  
+    function CB(Message,OBJ){
+      console.log(Message,OBJ);
+    }
+  </script>
 </html>

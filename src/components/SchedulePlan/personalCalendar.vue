@@ -2119,103 +2119,103 @@ export default {
             z-index: 10;
             overflow-y: auto;
                 #center-selection{
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                width: 25px;
-                border-right: 1px solid #cccccc;
-                .SH_right{
-                    width: 100%;
-                    height: 48px;
-                    border-left: 1px solid #cccccc;
-                    border-bottom: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    .icon-right{
-                        display: block;
-                        position: absolute;
-                        top: 19px;
-                        left: 6px;
-                        width: 14px;
-                        height: 14px;
-                        background: url('./images/right.png')no-repeat 0 0;
-                        transition: all ease .5s;
-                        transform: rotateZ(0deg);
-                    }
-                }
-                .item-event{
-                    display: block;
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
                     width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:15px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
                     border-right: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom: -9px;
-                        width: 23px;
-                        height: 15px;
-                        background: #fafafa;
-                        border-top: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                } 
-                    .item-file{
-                    display: block;
-                    width: 25px;
-                    height: 56px;
-                    background: #fafafa;
-                    padding-top:12px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    border-right: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 23px;
-                        height: 13px;
-                        background: #fafafa;
+                    .SH_right{
+                        width: 100%;
+                        height: 48px;
+                        border-left: 1px solid #cccccc;
                         border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                    .active-version{
-                    .item-file{
-                        background: #fff;
-                        color: #fc3439;
-                        width: 25px;
-                        &::after{
-                            background: #fff;
-                            // border-right: 1px solid #ffffff;
+                        position: relative;
+                        cursor: pointer;
+                        .icon-right{
+                            display: block;
+                            position: absolute;
+                            top: 19px;
+                            left: 6px;
+                            width: 14px;
+                            height: 14px;
+                            background: url('./images/right.png')no-repeat 0 0;
+                            transition: all ease .5s;
+                            transform: rotateZ(0deg);
                         }
                     }
-                    .item-event::after{
-                        background: #fff;
+                    .item-event{
+                        display: block;
+                        width: 25px;
+                        height: 68px;
+                        background: #fafafa;
+                        padding-top:15px;
+                        font-size: 12px;
+                        color: #666666; 
+                        text-align: center;
+                        border-left: 1px solid #cccccc;
+                        border-right: 1px solid #cccccc;
+                        position: relative;
+                        cursor: pointer;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            bottom: -9px;
+                            width: 23px;
+                            height: 15px;
+                            background: #fafafa;
+                            border-top: 1px solid #cccccc;
+                            transform: skewY(30deg);
+                            content: '';
+                        }
+                    } 
+                        .item-file{
+                        display: block;
+                        width: 25px;
+                        height: 56px;
+                        background: #fafafa;
+                        padding-top:12px;
+                        font-size: 12px;
+                        color: #666666; 
+                        text-align: center;
+                        border-left: 1px solid #cccccc;
+                        border-right: 1px solid #cccccc;
+                        position: relative;
+                        cursor: pointer;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            bottom:-7px;
+                            width: 23px;
+                            height: 13px;
+                            background: #fafafa;
+                            border-bottom: 1px solid #cccccc;
+                            transform: skewY(30deg);
+                            content: '';
+                        }
                     }
-                }
-                .active{
-                .item-event{
-                      background: #fff;
-                      color: #fc3439;
-                }
-                .item-event{
-                   width: 25px;
-                }
+                        .active-version{
+                        .item-file{
+                            background: #fff;
+                            color: #fc3439;
+                            width: 25px;
+                            &::after{
+                                background: #fff;
+                                // border-right: 1px solid #ffffff;
+                            }
+                        }
+                        .item-event::after{
+                            background: #fff;
+                        }
+                    }
+                    .active{
+                    .item-event{
+                        background: #fff;
+                        color: #fc3439;
+                    }
+                    .item-event{
+                    width: 25px;
+                    }
             } 
             }
         }

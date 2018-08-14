@@ -1,5 +1,9 @@
 <template>
+
     <el-row class="container-header">
+        <!-- <div id="webgl" style="display:block;width:1900px;height:400px;z-index:10000000000;">
+            <iframe style="width: 100%;height:100%"  src="../webGL/index.html"></iframe>
+        </div> -->
         <el-col :span="24" class="header">
             <div class="headerImg">
                 <img :src="proimg?proimg:require('../assets/defaultlogo.png')"/>
