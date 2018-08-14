@@ -47,7 +47,8 @@
                         <div class="checkSite">
                             <h5 class="checkSite_header"><img class=imgIcon src="./images/checksite.png">检查点位列表</h5>
                             <div class="checkLabelBtn">
-                                <div class="btn" @click="printAllLabel">打印全部标签</div>
+                                <div class="btn" >打印全部标签</div>
+                                <!-- @click="printAllLabel" -->
                                 <div class="btn1" @click="editSite">编辑点位</div>
                             </div>
                             <div class="checkSite_table">

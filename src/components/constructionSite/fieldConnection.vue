@@ -67,8 +67,8 @@
                                 </div>
                                 <div  id="planeDIV1"  v-show="isFullPicture">
                                     <img width="100%" height="310px" ref="fullPicture" :src="pathPictureUrl" >
-                                    <span :class="['round']"  :style="{'top':imgdetial1.y+'px','left':imgdetial1.x+'px'}">
-                                    </span>
+                                    <!-- <span :class="['round']"  :style="{'top':imgdetial1.y+'px','left':imgdetial1.x+'px'}">
+                                    </span> -->
                                 </div>
                             </div>
                             <div class="video_bottom">
