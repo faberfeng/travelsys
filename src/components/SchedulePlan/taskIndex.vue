@@ -102,257 +102,19 @@
       </div>
     </div>
     <div id="gantEditorTemplates" style="display:none;">
-      <div class="__template__" type="GANTBUTTONS"><!--
-  <div class="ganttButtonBar noprint">
-    <div class="buttons">
-      <a href="https://gantt.twproject.com/"><img src="res/twGanttLogo.png" alt="Twproject" align="absmiddle" style="max-width: 136px; padding-right: 15px"></a>
-
-      <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo"><span class="teamworkIcon">&#39;</span></button>
-      <button onclick="$('#workSpace').trigger('redo.gantt');return false;" class="button textual icon requireCanWrite" title="redo"><span class="teamworkIcon">&middot;</span></button>
-      <span class="ganttButtonSeparator requireCanWrite requireCanAdd"></span>
-      <button onclick="$('#workSpace').trigger('addAboveCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert above"><span class="teamworkIcon">l</span></button>
-      <button onclick="$('#workSpace').trigger('addBelowCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert below"><span class="teamworkIcon">X</span></button>
-      <span class="ganttButtonSeparator requireCanWrite requireCanInOutdent"></span>
-      <button onclick="$('#workSpace').trigger('outdentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="un-indent task"><span class="teamworkIcon">.</span></button>
-      <button onclick="$('#workSpace').trigger('indentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="indent task"><span class="teamworkIcon">:</span></button>
-      <span class="ganttButtonSeparator requireCanWrite requireCanMoveUpDown"></span>
-      <button onclick="$('#workSpace').trigger('moveUpCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move up"><span class="teamworkIcon">k</span></button>
-      <button onclick="$('#workSpace').trigger('moveDownCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move down"><span class="teamworkIcon">j</span></button>
-      <span class="ganttButtonSeparator requireCanWrite requireCanDelete"></span>
-      <button onclick="$('#workSpace').trigger('deleteFocused.gantt');return false;" class="button textual icon delete requireCanWrite" title="Elimina"><span class="teamworkIcon">&cent;</span></button>
-      <span class="ganttButtonSeparator"></span>
-      <button onclick="$('#workSpace').trigger('expandAll.gantt');return false;" class="button textual icon " title="EXPAND_ALL"><span class="teamworkIcon">6</span></button>
-      <button onclick="$('#workSpace').trigger('collapseAll.gantt'); return false;" class="button textual icon " title="COLLAPSE_ALL"><span class="teamworkIcon">5</span></button>
-
-    <span class="ganttButtonSeparator"></span>
-      <button onclick="$('#workSpace').trigger('zoomMinus.gantt'); return false;" class="button textual icon " title="zoom out"><span class="teamworkIcon">)</span></button>
-      <button onclick="$('#workSpace').trigger('zoomPlus.gantt');return false;" class="button textual icon " title="zoom in"><span class="teamworkIcon">(</span></button>
-    <span class="ganttButtonSeparator"></span>
-      <button onclick="$('#workSpace').trigger('print.gantt');return false;" class="button textual icon " title="Print"><span class="teamworkIcon">p</span></button>
-    <span class="ganttButtonSeparator"></span>
-      <button onclick="ge.gantt.showCriticalPath=!ge.gantt.showCriticalPath; ge.redraw();return false;" class="button textual icon requireCanSeeCriticalPath" title="CRITICAL_PATH"><span class="teamworkIcon">&pound;</span></button>
-    <span class="ganttButtonSeparator requireCanSeeCriticalPath"></span>
-      <button onclick="ge.splitter.resize(.1);return false;" class="button textual icon" ><span class="teamworkIcon">F</span></button>
-      <button onclick="ge.splitter.resize(50);return false;" class="button textual icon" ><span class="teamworkIcon">O</span></button>
-      <button onclick="ge.splitter.resize(100);return false;" class="button textual icon"><span class="teamworkIcon">R</span></button>
-      <span class="ganttButtonSeparator"></span>
-      <button onclick="$('#workSpace').trigger('fullScreen.gantt');return false;" class="button textual icon" title="FULLSCREEN" id="fullscrbtn"><span class="teamworkIcon">@</span></button>
-      <button onclick="ge.element.toggleClass('colorByStatus' );return false;" class="button textual icon"><span class="teamworkIcon">&sect;</span></button>
-
-    <button onclick="editResources();" class="button textual requireWrite" title="edit resources"><span class="teamworkIcon">M</span></button>
-      &nbsp; &nbsp; &nbsp; &nbsp;
-    <button onclick="saveGanttOnServer();" class="button first big requireWrite" title="Save">Save</button>
-    <button onclick='newProject();' class='button requireWrite newproject'><em>clear project</em></button>
-    <button class="button login" title="login/enroll" onclick="loginEnroll($(this));" style="display:none;">login/enroll</button>
-    <button class="button opt collab" title="Start with Twproject" onclick="collaborate($(this));" style="display:none;"><em>collaborate</em></button>
-    </div></div>
-  --></div>
-
-      <div class="__template__" type="TASKSEDITHEAD"><!--
-  <table class="gdfTable" cellspacing="0" cellpadding="0">
-    <thead>
-    <tr style="height:40px">
-      <th class="gdfColHeader" style="width:35px; border-right: none"></th>
-      <th class="gdfColHeader" style="width:25px;"></th>
-      <th class="gdfColHeader gdfResizable" style="width:100px;">code/short name</th>
-      <th class="gdfColHeader gdfResizable" style="width:300px;">name</th>
-      <th class="gdfColHeader"  align="center" style="width:17px;" title="Start date is a milestone."><span class="teamworkIcon" style="font-size: 8px;">^</span></th>
-      <th class="gdfColHeader gdfResizable" style="width:80px;">start</th>
-      <th class="gdfColHeader"  align="center" style="width:17px;" title="End date is a milestone."><span class="teamworkIcon" style="font-size: 8px;">^</span></th>
-      <th class="gdfColHeader gdfResizable" style="width:80px;">End</th>
-      <th class="gdfColHeader gdfResizable" style="width:50px;">dur.</th>
-      <th class="gdfColHeader gdfResizable" style="width:20px;">%</th>
-      <th class="gdfColHeader gdfResizable requireCanSeeDep" style="width:50px;">depe.</th>
-      <th class="gdfColHeader gdfResizable" style="width:1000px; text-align: left; padding-left: 10px;">assignees</th>
-    </tr>
-    </thead>
-  </table>
-  --></div>
-
-      <div class="__template__" type="TASKROW"><!--
-  <tr id="tid_(#=obj.id#)" taskId="(#=obj.id#)" class="taskEditRow (#=obj.isParent()?'isParent':''#) (#=obj.collapsed?'collapsed':''#)" level="(#=level#)">
-    <th class="gdfCell edit" align="right" style="cursor:pointer;"><span class="taskRowIndex">(#=obj.getRow()+1#)</span> <span class="teamworkIcon" style="font-size:12px;" >e</span></th>
-    <td class="gdfCell noClip" align="center"><div class="taskStatus cvcColorSquare" status="(#=obj.status#)"></div></td>
-    <td class="gdfCell"><input type="text" name="code" value="(#=obj.code?obj.code:''#)" placeholder="code/short name"></td>
-    <td class="gdfCell indentCell" style="padding-left:(#=obj.level*10+18#)px;">
-      <div class="exp-controller" align="center"></div>
-      <input type="text" name="name" value="(#=obj.name#)" placeholder="name">
-    </td>
-    <td class="gdfCell" align="center"><input type="checkbox" name="startIsMilestone"></td>
-    <td class="gdfCell"><input type="text" name="start"  value="" class="date"></td>
-    <td class="gdfCell" align="center"><input type="checkbox" name="endIsMilestone"></td>
-    <td class="gdfCell"><input type="text" name="end" value="" class="date"></td>
-    <td class="gdfCell"><input type="text" name="duration" autocomplete="off" value="(#=obj.duration#)"></td>
-    <td class="gdfCell"><input type="text" name="progress" class="validated" entrytype="PERCENTILE" autocomplete="off" value="(#=obj.progress?obj.progress:''#)" (#=obj.progressByWorklog?"readOnly":""#)></td>
-    <td class="gdfCell requireCanSeeDep"><input type="text" name="depends" autocomplete="off" value="(#=obj.depends#)" (#=obj.hasExternalDep?"readonly":""#)></td>
-    <td class="gdfCell taskAssigs">(#=obj.getAssigsString()#)</td>
-  </tr>
-  --></div>
-
-      <div class="__template__" type="TASKEMPTYROW"><!--
-  <tr class="taskEditRow emptyRow" >
-    <th class="gdfCell" align="right"></th>
-    <td class="gdfCell noClip" align="center"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell"></td>
-    <td class="gdfCell requireCanSeeDep"></td>
-    <td class="gdfCell"></td>
-  </tr>
-  --></div>
-
-      <div class="__template__" type="TASKBAR"><!--
-  <div class="taskBox taskBoxDiv" taskId="(#=obj.id#)" >
-    <div class="layout (#=obj.hasExternalDep?'extDep':''#)">
-      <div class="taskStatus" status="(#=obj.status#)"></div>
-      <div class="taskProgress" style="width:(#=obj.progress>100?100:obj.progress#)%; background-color:(#=obj.progress>100?'red':'rgb(153,255,51);'#);"></div>
-      <div class="milestone (#=obj.startIsMilestone?'active':''#)" ></div>
-
-      <div class="taskLabel"></div>
-      <div class="milestone end (#=obj.endIsMilestone?'active':''#)" ></div>
-    </div>
-  </div>
-  --></div>
-
-
-      <div class="__template__" type="CHANGE_STATUS"><!--
-    <div class="taskStatusBox">
-    <div class="taskStatus cvcColorSquare" status="STATUS_ACTIVE" title="Active"></div>
-    <div class="taskStatus cvcColorSquare" status="STATUS_DONE" title="Completed"></div>
-    <div class="taskStatus cvcColorSquare" status="STATUS_FAILED" title="Failed"></div>
-    <div class="taskStatus cvcColorSquare" status="STATUS_SUSPENDED" title="Suspended"></div>
-    <div class="taskStatus cvcColorSquare" status="STATUS_WAITING" title="Waiting" style="display: none;"></div>
-    <div class="taskStatus cvcColorSquare" status="STATUS_UNDEFINED" title="Undefined"></div>
-    </div>
-  --></div>
-
-
-
-
-      <div class="__template__" type="TASK_EDITOR"><!--
-  <div class="ganttTaskEditor">
-    <h2 class="taskData">Task editor</h2>
-    <table  cellspacing="1" cellpadding="5" width="100%" class="taskData table" border="0">
-          <tr>
-        <td width="200" style="height: 80px"  valign="top">
-          <label for="code">code/short name</label><br>
-          <input type="text" name="code" id="code" value="" size=15 class="formElements" autocomplete='off' maxlength=255 style='width:100%' oldvalue="1">
-        </td>
-        <td colspan="3" valign="top"><label for="name" class="required">name</label><br><input type="text" name="name" id="name"class="formElements" autocomplete='off' maxlength=255 style='width:100%' value="" required="true" oldvalue="1"></td>
-          </tr>
-
-
-      <tr class="dateRow">
-        <td nowrap="">
-          <div style="position:relative">
-            <label for="start">start</label>&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="checkbox" id="startIsMilestone" name="startIsMilestone" value="yes"> &nbsp;<label for="startIsMilestone">is milestone</label>&nbsp;
-            <br><input type="text" name="start" id="start" size="8" class="formElements dateField validated date" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DATE">
-            <span title="calendar" id="starts_inputDate" class="teamworkIcon openCalendar" onclick="$(this).dateField({inputField:$(this).prevAll(':input:first'),isSearchField:false});">m</span>          </div>
-        </td>
-        <td nowrap="">
-          <label for="end">End</label>&nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="checkbox" id="endIsMilestone" name="endIsMilestone" value="yes"> &nbsp;<label for="endIsMilestone">is milestone</label>&nbsp;
-          <br><input type="text" name="end" id="end" size="8" class="formElements dateField validated date" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DATE">
-          <span title="calendar" id="ends_inputDate" class="teamworkIcon openCalendar" onclick="$(this).dateField({inputField:$(this).prevAll(':input:first'),isSearchField:false});">m</span>
-        </td>
-        <td nowrap="" >
-          <label for="duration" class=" ">Days</label><br>
-          <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays" title="Duration is in working days." autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
-        </td>
-      </tr>
-
-      <tr>
-        <td  colspan="2">
-          <label for="status" class=" ">status</label><br>
-          <select id="status" name="status" class="taskStatus" status="(#=obj.status#)"  onchange="$(this).attr('STATUS',$(this).val());">
-            <option value="STATUS_ACTIVE" class="taskStatus" status="STATUS_ACTIVE" >active</option>
-            <option value="STATUS_WAITING" class="taskStatus" status="STATUS_WAITING" >suspended</option>
-            <option value="STATUS_SUSPENDED" class="taskStatus" status="STATUS_SUSPENDED" >suspended</option>
-            <option value="STATUS_DONE" class="taskStatus" status="STATUS_DONE" >completed</option>
-            <option value="STATUS_FAILED" class="taskStatus" status="STATUS_FAILED" >failed</option>
-            <option value="STATUS_UNDEFINED" class="taskStatus" status="STATUS_UNDEFINED" >undefined</option>
-          </select>
-        </td>
-
-        <td valign="top" nowrap>
-          <label>progress</label><br>
-          <input type="text" name="progress" id="progress" size="7" class="formElements validated percentile" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="PERCENTILE">
-        </td>
-      </tr>
-
-          </tr>
-          <tr>
-            <td colspan="4">
-              <label for="description">Description</label><br>
-              <textarea rows="3" cols="30" id="description" name="description" class="formElements" style="width:100%"></textarea>
-            </td>
-          </tr>
-        </table>
-
-    <h2>Assignments</h2>
-  <table  cellspacing="1" cellpadding="0" width="100%" id="assigsTable">
-    <tr>
-      <th style="width:100px;">name</th>
-      <th style="width:70px;">Role</th>
-      <th style="width:30px;">est.wklg.</th>
-      <th style="width:30px;" id="addAssig"><span class="teamworkIcon" style="cursor: pointer">+</span></th>
-    </tr>
-  </table>
-
-  <div style="text-align: right; padding-top: 20px">
-    <span id="saveButton" class="button first" onClick="$(this).trigger('saveFullEditor.gantt');">Save</span>
-  </div>
-
-  </div>
-  --></div>
-
-
-
-      <div class="__template__" type="ASSIGNMENT_ROW"><!--
-  <tr taskId="(#=obj.task.id#)" assId="(#=obj.assig.id#)" class="assigEditRow" >
-    <td ><select name="resourceId"  class="formElements" (#=obj.assig.id.indexOf("tmp_")==0?"":"disabled"#) ></select></td>
-    <td ><select type="select" name="roleId"  class="formElements"></select></td>
-    <td ><input type="text" name="effort" value="(#=getMillisInHoursMinutes(obj.assig.effort)#)" size="5" class="formElements"></td>
-    <td align="center"><span class="teamworkIcon delAssig del" style="cursor: pointer">d</span></td>
-  </tr>
-  --></div>
-
-
-
-      <div class="__template__" type="RESOURCE_EDITOR"><!--
-  <div class="resourceEditor" style="padding: 5px;">
-
-    <h2>Project team</h2>
-    <table  cellspacing="1" cellpadding="0" width="100%" id="resourcesTable">
-      <tr>
-        <th style="width:100px;">name</th>
-        <th style="width:30px;" id="addResource"><span class="teamworkIcon" style="cursor: pointer">+</span></th>
-      </tr>
-    </table>
-
-    <div style="text-align: right; padding-top: 20px"><button id="resSaveButton" class="button big">Save</button></div>
-  </div>
-  --></div>
-
-
-
-      <div class="__template__" type="RESOURCE_ROW"><!--
-  <tr resId="(#=obj.id#)" class="resRow" >
-    <td ><input type="text" name="name" value="(#=obj.name#)" style="width:100%;" class="formElements"></td>
-    <td align="center"><span class="teamworkIcon delRes del" style="cursor: pointer">d</span></td>
-  </tr>
-  --></div>
-
-
+      <div class="__template__" type="GANTBUTTONS"></div>
+      <div class="__template__" type="TASKSEDITHEAD"></div>
+      <div class="__template__" type="TASKROW"></div>
+      <div class="__template__" type="TASKEMPTYROW"></div>
+      <div class="__template__" type="TASKBAR"></div>
+      <div class="__template__" type="CHANGE_STATUS"></div>
+      <div class="__template__" type="TASK_EDITOR"></div>
+      <div class="__template__" type="ASSIGNMENT_ROW"></div>
+      <div class="__template__" type="RESOURCE_EDITOR"></div>
+      <div class="__template__" type="RESOURCE_ROW"></div>
     </div>
 
-    <div :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-if="!showCommonList">
+    <div :class="[{'box-right-active1':screenLeft.show},'box-right-container']" v-if="!showCommonList">
       <div id="center-selection">
         <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
           <i class="icon-right"></i>
@@ -1339,25 +1101,24 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-  // import './jQueryGantt/platform.css'
-  // import './jQueryGantt/gantt.css'
-  // import './jQueryGantt/ganttPrint.css'
-  // import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
-  // import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
-  // import './jQueryGantt/libs/jquery/jquery.timers.js'
-  // import './jQueryGantt/libs/utilities.js'
-  // import './jQueryGantt/libs/forms.js'
-  //  import './jQueryGantt/libs/date.js'
-  // import './jQueryGantt/libs/dialogs.js'
-//  import './jQueryGantt/libs/layout.js'
-  // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
-  // import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
-//  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
-  // import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
-  // import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
-  // import {GanttMaster} from './jQueryGantt/ganttMaster.js'
+//   import './jQueryGantt/platform.css'
+//   import './jQueryGantt/gantt.css'
+//   import './jQueryGantt/ganttPrint.css'
+//   import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
+//   import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
+//   import './jQueryGantt/libs/jquery/jquery.timers.js'
+//   import './jQueryGantt/libs/utilities.js'
+//   import './jQueryGantt/libs/forms.js'
+//    import './jQueryGantt/libs/date.js'
+//   import './jQueryGantt/libs/dialogs.js'
+// //  import './jQueryGantt/libs/layout.js'
+//   // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
+//   import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
+// //  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
+//   import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
+//   import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+//   import {GanttMaster} from './jQueryGantt/ganttMaster.js'
 
-  //import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
   import commonList from './qingdan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
@@ -4162,6 +3923,7 @@
       }
     }
     // 右侧
+    
     .box-right-container {
       display: block;
       position: fixed;
@@ -4174,759 +3936,760 @@
       background: #ffffff;
       z-index: 10;
       overflow-y: auto;
-      #center-selection {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 25px;
-        border-right: 1px solid #cccccc;
-        .SH_right {
-          width: 100%;
-          height: 48px;
-          border-left: 1px solid #cccccc;
-          border-bottom: 1px solid #cccccc;
-          position: relative;
-          cursor: pointer;
-          .icon-right {
-            display: block;
-            position: absolute;
-            top: 19px;
-            left: 6px;
-            width: 14px;
-            height: 14px;
-            background: url('./images/right.png') no-repeat 0 0;
-            transition: all ease .5s;
-            transform: rotateZ(0deg);
-          }
-        }
-        .item-property { //任务
-          display: block;
+        #center-selection {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
           width: 25px;
-          height: 68px;
-          background: #fafafa;
-          padding-top: 15px;
-          font-size: 12px;
-          color: #666666;
-          text-align: center;
-          border-left: 1px solid #cccccc;
-          position: relative;
-          cursor: pointer;
-          &::after {
-            display: block;
-            position: absolute;
-            bottom: -9px;
-            width: 24px;
-            height: 15px;
-            background: #fafafa;
-            border-top: 1px solid #cccccc;
-            transform: skewY(30deg);
-            content: '';
-          }
-        }
-        .item-version { //核实
-          display: block;
-          width: 25px;
-          height: 68px;
-          background: #fafafa;
-          padding-top: 12px;
-          font-size: 12px;
-          color: #666666;
-          text-align: center;
-          border-left: 1px solid #cccccc;
-          position: relative;
-          cursor: pointer;
-          &::after {
-            display: block;
-            position: absolute;
-            bottom: -7px;
-            width: 24px;
-            height: 13px;
-            background: #fafafa;
+          border-right: 1px solid #cccccc;
+          .SH_right {
+            width: 100%;
+            height: 48px;
+            border-left: 1px solid #cccccc;
             border-bottom: 1px solid #cccccc;
-            transform: skewY(30deg);
-            content: '';
-          }
-        }
-        .item-version-3 { //资源
-          display: block;
-          width: 25px;
-          height: 68px;
-          background: #fafafa;
-          padding-top: 24px;
-          font-size: 12px;
-          color: #666666;
-          text-align: center;
-          border-left: 1px solid #cccccc;
-          position: relative;
-          cursor: pointer;
-          &::after {
-            display: block;
-            position: absolute;
-            bottom: -7px;
-            width: 24px;
-            height: 13px;
-            background: #fafafa;
-            border-bottom: 1px solid #cccccc;
-            transform: skewY(30deg);
-            content: '';
-          }
-        }
-
-        .active-version { //中间 核实 高显
-          .item-version { //核实
-            background: #fff;
-            color: #fc3439;
-            z-index: 15;
-            &::after {
-              background: #fff;
+            position: relative;
+            cursor: pointer;
+            .icon-right {
+              display: block;
+              position: absolute;
+              top: 19px;
+              left: 6px;
+              width: 14px;
+              height: 14px;
+              background: url('./images/right.png') no-repeat 0 0;
+              transition: all ease .5s;
+              transform: rotateZ(0deg);
             }
           }
-          .item-property::after { //任务
-            background: #fff;
+          .item-property { //任务
+            display: block;
+            width: 25px;
+            height: 68px;
+            background: #fafafa;
+            padding-top: 15px;
+            font-size: 12px;
+            color: #666666;
+            text-align: center;
+            border-left: 1px solid #cccccc;
+            position: relative;
+            cursor: pointer;
+            &::after {
+              display: block;
+              position: absolute;
+              bottom: -9px;
+              width: 24px;
+              height: 15px;
+              background: #fafafa;
+              border-top: 1px solid #cccccc;
+              transform: skewY(30deg);
+              content: '';
+            }
+          }
+          .item-version { //核实
+            display: block;
+            width: 25px;
+            height: 68px;
+            background: #fafafa;
+            padding-top: 12px;
+            font-size: 12px;
+            color: #666666;
+            text-align: center;
+            border-left: 1px solid #cccccc;
+            position: relative;
+            cursor: pointer;
+            &::after {
+              display: block;
+              position: absolute;
+              bottom: -7px;
+              width: 24px;
+              height: 13px;
+              background: #fafafa;
+              border-bottom: 1px solid #cccccc;
+              transform: skewY(30deg);
+              content: '';
+            }
           }
           .item-version-3 { //资源
-            z-index: 10;
-          }
-        }
-        .active { //上边 任务 高显
-          .item-property {
-            background: #fff;
-            color: #fc3439;
-          }
-          .item-version {
-            z-index: 15;
-          }
-          .item-version-3 {
-            z-index: 10;
-          }
-        }
-        .active-version-3 { //下边 资源 高显
-          .item-version {
-            z-index: 15;
-            &::after {
-              background: #fafafa;
-            }
-          }
-          .item-property::after {
-            background: #fff;
-          }
-          .item-version-3 {
-            z-index: 10;
-            background: #fff;
-            color: #fc3439;
-            &::after {
-              background: #fff;
-            }
-          }
-        }
-      }
-      #box-right {
-        padding: 19px 13px 0 10px;
-        #taskInformation {
-          display: none;
-          > li:last-of-type {
-            padding-bottom: 7px;
-          }
-        }
-        .header-attribute {
-          font-size: 14px;
-          color: #333333;
-          line-height: 14px;
-          padding-bottom: 4px;
-          border-bottom: 1px solid #e6e6e6;
-          text-align: left;
-          .trrangle {
-            display: inline-block;
-            width: 0px;
-            height: 0px;
-            border-left: 10px solid #fc3439;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-          }
-          .actionIcon {
             display: block;
-            float: right;
-            width: 12px;
-            height: 12px;
-            cursor: pointer;
-          }
-          .icon-dropDown {
-            display: block;
-            width: 12px;
-            height: 12px;
-            background: url('./images/arror.png') no-repeat 0 0;
-            float: right;
-            cursor: pointer;
-            transition: all ease .2s;
-            transform: rotate(180deg);
-          }
-          .icon-dropDown1 {
-            display: block;
-            width: 12px;
-            height: 12px;
-            margin-right: 5px;
-            float: right;
-            cursor: pointer;
-            transition: all ease .2s;
-          }
-          .active {
-            transform: rotate(0deg);
-          }
-        }
-        .header-attribute:nth-last-of-type(2) {
-          margin-top: 20px;
-        }
-        .header-attribute:nth-last-of-type(3) {
-          margin-top: 20px;
-        }
-        .header-attribute:nth-last-of-type(1) {
-          margin-top: 20px;
-        }
-        .uploadFileUl {
-          display: none;
-          > li:last-of-type {
-            padding-bottom: 7px;
-          }
-          width: 100%;
-          overflow-y: auto;
-          padding: 5px;
-          .uploadFileLi {
-            height: 32px;
+            width: 25px;
+            height: 68px;
+            background: #fafafa;
+            padding-top: 24px;
             font-size: 12px;
-            line-height: 30px;
-            color: #999999;
-            text-align: left;
+            color: #666666;
+            text-align: center;
+            border-left: 1px solid #cccccc;
             position: relative;
-            &:hover {
-              background: #fafafa;
-              .icon-goujian {
-                display: inline-block;
-              }
-            }
-            .uploadFileText {
-              max-width: 160px;
-              float: left;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow-x: hidden;
-            }
-            .icon {
-              display: inline-block;
-              height: 16px;
-              position: absolute;
-              right: 0px;
-              top: 10px;
-              .icon-goujian {
-                float: left;
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-              }
-              .icon-download {
-                background: url('./images/download.png') no-repeat 0 0;
-
-                &:hover {
-                  background: url('./images/download1.png') no-repeat 0 0;
-                }
-              }
-              .icon-search {
-                background: url('./images/search.png') no-repeat 0 0;
-                &:hover {
-                  background: url('./images/search1.png') no-repeat 0 0;
-                }
-              }
-              .icon-delete {
-                float: right;
-                background: url('./images/delete.png') no-repeat 0 0;
-
-                &:hover {
-                  background: url('./images/delete1.png') no-repeat 0 0;
-                }
-              }
-              i {
-                margin-left: 3px;
-              }
-            }
-          }
-                .active-version{//中间 核实 高显
-                    .item-version{//核实
-                        background: #fff;
-                        color: #fc3439;
-                        z-index: 15;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                    .item-property::after{//任务
-                        background: #fff;
-                    }
-                    .item-version-3{//资源
-                        z-index: 10;
-                    }
-                }
-                .active{//上边 任务 高显
-                    .item-property{
-                        background: #fff;
-                        color: #fc3439;
-                    }
-                    .item-version{
-                        z-index: 15;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                    }
-                }
-                .active-version-3{//下边 资源 高显
-                    .item-version{
-                        z-index: 15;
-                        &::after{
-                            background: #fafafa;
-                        }
-                    }
-                    .item-property::after{
-                        background: #fff;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                        background: #fff;
-                        color: #fc3439;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                }
-            }
-             #box-right{
-                    padding: 19px 13px 0 10px;
-                    #taskInformation{
-                        display: none;
-                        >li:last-of-type{
-                            padding-bottom: 7px;
-                        }
-                    }
-                    .header-attribute{
-                        font-size: 14px;
-                        color: #333333;
-                        line-height: 14px;
-                        padding-bottom:4px;
-                        border-bottom: 1px solid #e6e6e6;
-                        text-align: left;
-                            .trrangle{
-                                display: inline-block;
-                                width: 0px;
-                                height: 0px;
-                                border-left: 10px solid #fc3439;
-                                border-top: 6px solid transparent;
-                                border-bottom: 6px solid transparent;
-                            }
-                            .actionIcon{
-                                display: block;
-                                float: right;
-                                width: 12px;
-                                height: 12px;
-                                cursor:pointer;
-                            }
-                            .icon-dropDown{
-                                display: block;
-                                width: 12px;
-                                height: 12px;
-                                background:url('./images/arror.png')no-repeat 0 0;
-                                float: right;
-                                cursor: pointer;
-                                transition:  all ease .2s;
-                                transform: rotate(180deg);
-                            }
-                            .icon-dropDown1{
-                                display: block;
-                                width: 12px;
-                                height: 12px;
-                                margin-right: 5px;
-                                float: right;
-                                cursor: pointer;
-                                transition:  all ease .2s;
-                            }
-                            .active{
-                                transform: rotate(0deg);
-                            }
-                    }
-                    .header-attribute:nth-last-of-type(2){
-                        margin-top: 20px;
-                    }
-                    .header-attribute:nth-last-of-type(3){
-                        margin-top: 20px;
-                    }
-                     .header-attribute:nth-last-of-type(1){
-                        margin-top: 20px;
-                    }
-                    .uploadFileUl{
-                        display: none;
-                        >li:last-of-type{
-                            padding-bottom: 7px;
-                        }
-                        width: 100%;
-                        overflow-y: auto;
-                        padding: 5px;
-                        .uploadFileLi{
-                            height: 32px;
-                            font-size:12px;
-                            line-height: 30px;
-                            color:#999999;
-                            text-align: left;
-                            position: relative;
-                             &:hover{
-                                background: #fafafa;
-                                .icon-goujian{
-                                    display: inline-block;
-                                }
-                                }
-                            .uploadFileText{
-                                max-width: 130px;
-                                float: left;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                overflow-x: hidden;
-                            }
-                            .icon{
-                                display: inline-block;
-                                height:16px;
-                                position:absolute;
-                                right:0px;
-                                top:10px;
-                                .icon-goujian{
-                                    float:left;
-                                    width: 16px;
-                                    height: 16px;
-                                    cursor: pointer;
-                                }
-                                .icon-download{
-                                        background: url('./images/download.png')no-repeat 0 0;
-
-                                        &:hover{
-                                            background: url('./images/download1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    .icon-search{
-                                        background: url('./images/search.png')no-repeat 0 0;
-                                        &:hover{
-                                            background: url('./images/search1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    .icon-delete{
-                                        float: right;
-                                        background: url('./images/delete.png')no-repeat 0 0;
-
-                                        &:hover{
-                                            background: url('./images/delete1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    i{
-                                        margin-left:3px;
-                                    }
-                            }
-                        }
-
-                    }
-                    .bindPicUl{
-                        display: none;
-                        >li:last-of-type{
-                            padding-bottom: 7px;
-                        }
-                        width: 100%;
-                        overflow-y: auto;
-                        padding: 5px;
-                        .bindPicLi{
-                            height: 32px;
-                            font-size:12px;
-                            line-height: 30px;
-                            color:#999999;
-                            text-align: left;
-                            position: relative;
-                             &:hover{
-                                background: #fafafa;
-                                .icon-goujian{
-                                    display: inline-block;
-                                }
-                                }
-                            .bindPicText{
-                                max-width: 130px;
-                                float: left;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                overflow-x: hidden;
-                            }
-                            .icon{
-                                display: inline-block;
-                                height:16px;
-                                position:absolute;
-                                right:0px;
-                                top:10px;
-                                .icon-goujian{
-                                    float:left;
-                                    width: 16px;
-                                    height: 16px;
-                                    cursor: pointer;
-                                }
-                                .icon-download{
-                                        background: url('./images/download.png')no-repeat 0 0;
-
-                                        &:hover{
-                                            background: url('./images/download1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    .icon-search{
-                                        background: url('./images/search.png')no-repeat 0 0;
-                                        &:hover{
-                                            background: url('./images/search1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    .icon-delete{
-                                        float: right;
-                                        background: url('./images/delete.png')no-repeat 0 0;
-
-                                        &:hover{
-                                            background: url('./images/delete1.png')no-repeat 0 0;
-                                        }
-                                    }
-                                    i{
-                                        margin-left:3px;
-                                    }
-                                }
-                            }
-
-                    }
-                    .detial-item{
-                        font-size: 12px;
-                        line-height: 12px;
-                        margin-top: 16px;
-                        text-align: left;
-                        // width: 200px;
-                        // height: 15px;
-                        .detial-text-name{
-                            color: #999999;
-                            width: 65px;
-                            float: left;
-                        }
-                        .detial-text-value{
-                            float: left;
-                            color: #333333;
-                            max-width: 130px;
-                            cursor: pointer;
-                            overflow: hidden;
-                            // overflow-x: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                        }
-                        &:first-of-type{
-                            margin-top: 18px;
-                        }
-                        .detail-text{
-                            font-size: 12px;
-                            line-height: 16px;
-                             overflow: hidden;
-                            width: 70px;
-                            text-overflow: ellipsis;
-                             white-space: nowrap;
-                            display: inline-block;
-                            margin-left: 10px;
-                            color:#333333;
-                        }
-                        // .detail-text1{
-                        //     font-size: 12px;
-                        //     line-height: 16px;
-                        //     overflow: hidden;
-                        //     width: 65px;
-                        //     display: inline-block;
-                        //     margin-right: 10px;
-                        //     color:#333333;
-                        // }
-                    }
-                    .goujian-item{
-                            font-size: 12px;
-                            line-height: 12px;
-                            margin-top: 10px;
-                            padding: 10px;
-                            text-align: left;
-                            box-shadow: 0px 0px 8px rgba(93,94,94,.16);
-                            border-radius: 6px;
-                            .icon-goujian{
-                                float: left;
-                                width: 16px;
-                                height: 16px;
-                                margin-right: 10px;
-                                cursor: pointer;
-                            }
-                            .icon-add{
-                                background: url('../ManageCost/images/add.png')no-repeat 0 0;
-                                margin-right: 56px;
-                                &:hover{
-                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
-                                }
-                            }
-                            .icon-detial{
-                                background: url('../ManageCost/images/detial.png')no-repeat 0 0;
-                                &:hover{
-                                    background: url('../ManageCost/images/detial1.png')no-repeat 0 0;
-                                }
-                            }
-                            .icon-QRcode{
-                                background: url('../ManageCost/images/qrcode.png')no-repeat 0 0;
-                                &:hover{
-                                    background: url('../ManageCost/images/qrcode1.png')no-repeat 0 0;
-                                }
-                            }
-                            .icon-location{
-                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
-                                width: 12px;
-                                &:hover{
-                                    background: url('../ManageCost/images/location1.png')no-repeat 0 0;
-                                }
-                            }
-                            .icon-delete{
-                                background: url('../ManageCost/images/delete.png')no-repeat 0 0;
-                                margin-right: 0;
-                                &:hover{
-                                    background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
-                                }
-                            }
-                            .clearfix{
-                                clear: both;
-                                overflow: hidden;
-                                content: "";
-                                // margin-top:5px;
-                            }
-                            .detial-text-name{
-                                color: #999999;
-                                width: 65px;
-                                // display: inline-block;
-                                //  float: left;
-                            }
-                            .detial-text-value{
-                                // float: left;
-                                // margin-left:-100px;
-                                color: #333333;
-                                width: 130px;
-                                cursor: pointer;
-                                overflow: hidden;
-                                // overflow-x: hidden;
-                                text-overflow: ellipsis;
-                                // white-space: nowrap;
-                            }
-                            .item-detial{
-                                margin-top: 16px;
-                                 font-size: 12px;
-                                line-height: 12px;
-                                text-align: left;
-                                width: 195px;
-                                &:first-of-type{
-                                    margin-top: 10px;
-                                }
-                            }
-                            &:first-of-type{
-                                padding-top: 14px;
-                            }
-                    }
-                    #associationList{
-                        display: none;
-                    }
-                    .verifyList{
-                        .detial-item{
-                        font-size: 12px;
-                        line-height: 12px;
-                        margin-top: 16px;
-                        text-align: left;
-                        .detial-text-value1{
-                        // float: left;
-                        display: inline-block;
-                            color: #333333;
-                            width: 35px;
-                            // overflow-x: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                            margin-left:20px;
-                            }
-                            .detial-text-value2{
-                                display: inline-block;
-                        // float: left;
-                            color: #333333;
-                            // overflow-x: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                            margin-left:40px;
-                            width: 85px;
-                            }
-                        }
-
-        }
-      }
-      #box-right1 {
-        .addResourceType {
-          .action {
-            color: #78a0f8;
-            margin-left: -153px;
             cursor: pointer;
-            font-size: 12px;
-            line-height: 12px;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            &::after {
+              display: block;
+              position: absolute;
+              bottom: -7px;
+              width: 24px;
+              height: 13px;
+              background: #fafafa;
+              border-bottom: 1px solid #cccccc;
+              transform: skewY(30deg);
+              content: '';
+            }
           }
 
-          height: 30px;
-          border-bottom: 1px solid #e6e6e6;
-        }
-        .resourceList {
-          width: 100%;
-          table {
-            margin: 0 auto;
-            width: 100%;
-            border-collapse: collapse;
-            // border-top: 1px solid #e6e6e6;
-            border-bottom: 1px solid #e6e6e6;
-            thead {
-              background: #f2f2f2;
-              tr {
-                th {
-                  padding-left: 10px;
-                  height: 30px;
-                  text-align: center;
-                  box-sizing: border-box;
-                  border-right: 1px solid #e6e6e6;
-                  border-left: 1px solid #e6e6e6;
-                  font-size: 12px;
-                  color: #666666;
-
-                }
-              }
-            }
-            tbody {
+          .active-version { //中间 核实 高显
+            .item-version { //核实
               background: #fff;
-              tr {
-                td {
-                  padding-left: 10px;
-                  height: 30px;
-                  text-align: left;
-                  font-size: 12px;
-                  box-sizing: border-box;
-                  border-right: 1px solid #e6e6e6;
-                  border-left: 1px solid #e6e6e6;
-                  color: #666666;
-                  border-bottom: 1px solid #e6e6e6;
-                  max-width: 80px;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  overflow: hidden;
-                }
+              color: #fc3439;
+              z-index: 15;
+              &::after {
+                background: #fff;
+              }
+            }
+            .item-property::after { //任务
+              background: #fff;
+            }
+            .item-version-3 { //资源
+              z-index: 10;
+            }
+          }
+          .active { //上边 任务 高显
+            .item-property {
+              background: #fff;
+              color: #fc3439;
+            }
+            .item-version {
+              z-index: 15;
+            }
+            .item-version-3 {
+              z-index: 10;
+            }
+          }
+          .active-version-3 { //下边 资源 高显
+            .item-version {
+              z-index: 15;
+              &::after {
+                background: #fafafa;
+              }
+            }
+            .item-property::after {
+              background: #fff;
+            }
+            .item-version-3 {
+              z-index: 10;
+              background: #fff;
+              color: #fc3439;
+              &::after {
+                background: #fff;
               }
             }
           }
-
+        }
+    }
+    .box-right-active1{
+        right:0px;
+        transition:all ease .5s;
+      }
+    #box-right {
+      padding: 19px 13px 0 10px;
+      #taskInformation {
+        display: none;
+        > li:last-of-type {
+          padding-bottom: 7px;
         }
       }
+      .header-attribute {
+        font-size: 14px;
+        color: #333333;
+        line-height: 14px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #e6e6e6;
+        text-align: left;
+        .trrangle {
+          display: inline-block;
+          width: 0px;
+          height: 0px;
+          border-left: 10px solid #fc3439;
+          border-top: 6px solid transparent;
+          border-bottom: 6px solid transparent;
+        }
+        .actionIcon {
+          display: block;
+          float: right;
+          width: 12px;
+          height: 12px;
+          cursor: pointer;
+        }
+        .icon-dropDown {
+          display: block;
+          width: 12px;
+          height: 12px;
+          background: url('./images/arror.png') no-repeat 0 0;
+          float: right;
+          cursor: pointer;
+          transition: all ease .2s;
+          transform: rotate(180deg);
+        }
+        .icon-dropDown1 {
+          display: block;
+          width: 12px;
+          height: 12px;
+          margin-right: 5px;
+          float: right;
+          cursor: pointer;
+          transition: all ease .2s;
+        }
+        .active {
+          transform: rotate(0deg);
+        }
+      }
+      .header-attribute:nth-last-of-type(2) {
+        margin-top: 20px;
+      }
+      .header-attribute:nth-last-of-type(3) {
+        margin-top: 20px;
+      }
+      .header-attribute:nth-last-of-type(1) {
+        margin-top: 20px;
+      }
+      .uploadFileUl {
+        display: none;
+        > li:last-of-type {
+          padding-bottom: 7px;
+        }
+        width: 100%;
+        overflow-y: auto;
+        padding: 5px;
+        .uploadFileLi {
+          height: 32px;
+          font-size: 12px;
+          line-height: 30px;
+          color: #999999;
+          text-align: left;
+          position: relative;
+          &:hover {
+            background: #fafafa;
+            .icon-goujian {
+              display: inline-block;
+            }
+          }
+          .uploadFileText {
+            max-width: 160px;
+            float: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow-x: hidden;
+          }
+          .icon {
+            display: inline-block;
+            height: 16px;
+            position: absolute;
+            right: 0px;
+            top: 10px;
+            .icon-goujian {
+              float: left;
+              width: 16px;
+              height: 16px;
+              cursor: pointer;
+            }
+            .icon-download {
+              background: url('./images/download.png') no-repeat 0 0;
+
+              &:hover {
+                background: url('./images/download1.png') no-repeat 0 0;
+              }
+            }
+            .icon-search {
+              background: url('./images/search.png') no-repeat 0 0;
+              &:hover {
+                background: url('./images/search1.png') no-repeat 0 0;
+              }
+            }
+            .icon-delete {
+              float: right;
+              background: url('./images/delete.png') no-repeat 0 0;
+
+              &:hover {
+                background: url('./images/delete1.png') no-repeat 0 0;
+              }
+            }
+            i {
+              margin-left: 3px;
+            }
+          }
+        }
+              .active-version{//中间 核实 高显
+                  .item-version{//核实
+                      background: #fff;
+                      color: #fc3439;
+                      z-index: 15;
+                      &::after{
+                          background: #fff;
+                      }
+                  }
+                  .item-property::after{//任务
+                      background: #fff;
+                  }
+                  .item-version-3{//资源
+                      z-index: 10;
+                  }
+              }
+              .active{//上边 任务 高显
+                  .item-property{
+                      background: #fff;
+                      color: #fc3439;
+                  }
+                  .item-version{
+                      z-index: 15;
+                  }
+                  .item-version-3{
+                      z-index: 10;
+                  }
+              }
+              .active-version-3{//下边 资源 高显
+                  .item-version{
+                      z-index: 15;
+                      &::after{
+                          background: #fafafa;
+                      }
+                  }
+                  .item-property::after{
+                      background: #fff;
+                  }
+                  .item-version-3{
+                      z-index: 10;
+                      background: #fff;
+                      color: #fc3439;
+                      &::after{
+                          background: #fff;
+                      }
+                  }
+              }
+          }
+          #box-right{
+                  padding: 19px 13px 0 10px;
+                  #taskInformation{
+                      display: none;
+                      >li:last-of-type{
+                          padding-bottom: 7px;
+                      }
+                  }
+                  .header-attribute{
+                      font-size: 14px;
+                      color: #333333;
+                      line-height: 14px;
+                      padding-bottom:4px;
+                      border-bottom: 1px solid #e6e6e6;
+                      text-align: left;
+                          .trrangle{
+                              display: inline-block;
+                              width: 0px;
+                              height: 0px;
+                              border-left: 10px solid #fc3439;
+                              border-top: 6px solid transparent;
+                              border-bottom: 6px solid transparent;
+                          }
+                          .actionIcon{
+                              display: block;
+                              float: right;
+                              width: 12px;
+                              height: 12px;
+                              cursor:pointer;
+                          }
+                          .icon-dropDown{
+                              display: block;
+                              width: 12px;
+                              height: 12px;
+                              background:url('./images/arror.png')no-repeat 0 0;
+                              float: right;
+                              cursor: pointer;
+                              transition:  all ease .2s;
+                              transform: rotate(180deg);
+                          }
+                          .icon-dropDown1{
+                              display: block;
+                              width: 12px;
+                              height: 12px;
+                              margin-right: 5px;
+                              float: right;
+                              cursor: pointer;
+                              transition:  all ease .2s;
+                          }
+                          .active{
+                              transform: rotate(0deg);
+                          }
+                  }
+                  .header-attribute:nth-last-of-type(2){
+                      margin-top: 20px;
+                  }
+                  .header-attribute:nth-last-of-type(3){
+                      margin-top: 20px;
+                  }
+                  .header-attribute:nth-last-of-type(1){
+                      margin-top: 20px;
+                  }
+                  .uploadFileUl{
+                      display: none;
+                      >li:last-of-type{
+                          padding-bottom: 7px;
+                      }
+                      width: 100%;
+                      overflow-y: auto;
+                      padding: 5px;
+                      .uploadFileLi{
+                          height: 32px;
+                          font-size:12px;
+                          line-height: 30px;
+                          color:#999999;
+                          text-align: left;
+                          position: relative;
+                          &:hover{
+                              background: #fafafa;
+                              .icon-goujian{
+                                  display: inline-block;
+                              }
+                              }
+                          .uploadFileText{
+                              max-width: 130px;
+                              float: left;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
+                              overflow-x: hidden;
+                          }
+                          .icon{
+                              display: inline-block;
+                              height:16px;
+                              position:absolute;
+                              right:0px;
+                              top:10px;
+                              .icon-goujian{
+                                  float:left;
+                                  width: 16px;
+                                  height: 16px;
+                                  cursor: pointer;
+                              }
+                              .icon-download{
+                                      background: url('./images/download.png')no-repeat 0 0;
+
+                                      &:hover{
+                                          background: url('./images/download1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  .icon-search{
+                                      background: url('./images/search.png')no-repeat 0 0;
+                                      &:hover{
+                                          background: url('./images/search1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  .icon-delete{
+                                      float: right;
+                                      background: url('./images/delete.png')no-repeat 0 0;
+
+                                      &:hover{
+                                          background: url('./images/delete1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  i{
+                                      margin-left:3px;
+                                  }
+                          }
+                      }
+
+                  }
+                  .bindPicUl{
+                      display: none;
+                      >li:last-of-type{
+                          padding-bottom: 7px;
+                      }
+                      width: 100%;
+                      overflow-y: auto;
+                      padding: 5px;
+                      .bindPicLi{
+                          height: 32px;
+                          font-size:12px;
+                          line-height: 30px;
+                          color:#999999;
+                          text-align: left;
+                          position: relative;
+                          &:hover{
+                              background: #fafafa;
+                              .icon-goujian{
+                                  display: inline-block;
+                              }
+                              }
+                          .bindPicText{
+                              max-width: 130px;
+                              float: left;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
+                              overflow-x: hidden;
+                          }
+                          .icon{
+                              display: inline-block;
+                              height:16px;
+                              position:absolute;
+                              right:0px;
+                              top:10px;
+                              .icon-goujian{
+                                  float:left;
+                                  width: 16px;
+                                  height: 16px;
+                                  cursor: pointer;
+                              }
+                              .icon-download{
+                                      background: url('./images/download.png')no-repeat 0 0;
+
+                                      &:hover{
+                                          background: url('./images/download1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  .icon-search{
+                                      background: url('./images/search.png')no-repeat 0 0;
+                                      &:hover{
+                                          background: url('./images/search1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  .icon-delete{
+                                      float: right;
+                                      background: url('./images/delete.png')no-repeat 0 0;
+
+                                      &:hover{
+                                          background: url('./images/delete1.png')no-repeat 0 0;
+                                      }
+                                  }
+                                  i{
+                                      margin-left:3px;
+                                  }
+                              }
+                          }
+
+                  }
+                  .detial-item{
+                      font-size: 12px;
+                      line-height: 12px;
+                      margin-top: 16px;
+                      text-align: left;
+                      // width: 200px;
+                      // height: 15px;
+                      .detial-text-name{
+                          color: #999999;
+                          width: 65px;
+                          float: left;
+                      }
+                      .detial-text-value{
+                          float: left;
+                          color: #333333;
+                          max-width: 130px;
+                          cursor: pointer;
+                          overflow: hidden;
+                          // overflow-x: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                      }
+                      &:first-of-type{
+                          margin-top: 18px;
+                      }
+                      .detail-text{
+                          font-size: 12px;
+                          line-height: 16px;
+                          overflow: hidden;
+                          width: 70px;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          display: inline-block;
+                          margin-left: 10px;
+                          color:#333333;
+                      }
+                      // .detail-text1{
+                      //     font-size: 12px;
+                      //     line-height: 16px;
+                      //     overflow: hidden;
+                      //     width: 65px;
+                      //     display: inline-block;
+                      //     margin-right: 10px;
+                      //     color:#333333;
+                      // }
+                  }
+                  .goujian-item{
+                          font-size: 12px;
+                          line-height: 12px;
+                          margin-top: 10px;
+                          padding: 10px;
+                          text-align: left;
+                          box-shadow: 0px 0px 8px rgba(93,94,94,.16);
+                          border-radius: 6px;
+                          .icon-goujian{
+                              float: left;
+                              width: 16px;
+                              height: 16px;
+                              margin-right: 10px;
+                              cursor: pointer;
+                          }
+                          .icon-add{
+                              background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                              margin-right: 56px;
+                              &:hover{
+                                  background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                              }
+                          }
+                          .icon-detial{
+                              background: url('../ManageCost/images/detial.png')no-repeat 0 0;
+                              &:hover{
+                                  background: url('../ManageCost/images/detial1.png')no-repeat 0 0;
+                              }
+                          }
+                          .icon-QRcode{
+                              background: url('../ManageCost/images/qrcode.png')no-repeat 0 0;
+                              &:hover{
+                                  background: url('../ManageCost/images/qrcode1.png')no-repeat 0 0;
+                              }
+                          }
+                          .icon-location{
+                              background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                              width: 12px;
+                              &:hover{
+                                  background: url('../ManageCost/images/location1.png')no-repeat 0 0;
+                              }
+                          }
+                          .icon-delete{
+                              background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                              margin-right: 0;
+                              &:hover{
+                                  background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                              }
+                          }
+                          .clearfix{
+                              clear: both;
+                              overflow: hidden;
+                              content: "";
+                              // margin-top:5px;
+                          }
+                          .detial-text-name{
+                              color: #999999;
+                              width: 65px;
+                              // display: inline-block;
+                              //  float: left;
+                          }
+                          .detial-text-value{
+                              // float: left;
+                              // margin-left:-100px;
+                              color: #333333;
+                              width: 130px;
+                              cursor: pointer;
+                              overflow: hidden;
+                              // overflow-x: hidden;
+                              text-overflow: ellipsis;
+                              // white-space: nowrap;
+                          }
+                          .item-detial{
+                              margin-top: 16px;
+                              font-size: 12px;
+                              line-height: 12px;
+                              text-align: left;
+                              width: 195px;
+                              &:first-of-type{
+                                  margin-top: 10px;
+                              }
+                          }
+                          &:first-of-type{
+                              padding-top: 14px;
+                          }
+                  }
+                  #associationList{
+                      display: none;
+                  }
+                  .verifyList{
+                      .detial-item{
+                      font-size: 12px;
+                      line-height: 12px;
+                      margin-top: 16px;
+                      text-align: left;
+                      .detial-text-value1{
+                      // float: left;
+                      display: inline-block;
+                          color: #333333;
+                          width: 35px;
+                          // overflow-x: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          margin-left:20px;
+                          }
+                          .detial-text-value2{
+                              display: inline-block;
+                      // float: left;
+                          color: #333333;
+                          // overflow-x: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          margin-left:40px;
+                          width: 85px;
+                          }
+                      }
+
+      }
     }
-    .box-right-active {
-      right: 0;
-      transition: all ease .5s;
+    #box-right1 {
+      .addResourceType {
+        .action {
+          color: #78a0f8;
+          margin-left: -153px;
+          cursor: pointer;
+          font-size: 12px;
+          line-height: 12px;
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+
+        height: 30px;
+        border-bottom: 1px solid #e6e6e6;
+      }
+      .resourceList {
+        width: 100%;
+        table {
+          margin: 0 auto;
+          width: 100%;
+          border-collapse: collapse;
+          // border-top: 1px solid #e6e6e6;
+          border-bottom: 1px solid #e6e6e6;
+          thead {
+            background: #f2f2f2;
+            tr {
+              th {
+                padding-left: 10px;
+                height: 30px;
+                text-align: center;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                border-left: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #666666;
+
+              }
+            }
+          }
+          tbody {
+            background: #fff;
+            tr {
+              td {
+                padding-left: 10px;
+                height: 30px;
+                text-align: left;
+                font-size: 12px;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                border-left: 1px solid #e6e6e6;
+                color: #666666;
+                border-bottom: 1px solid #e6e6e6;
+                max-width: 80px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+            }
+          }
+        }
+
+      }
     }
+      
     #edit {
       .el-dialog__body {
         .editBody {
@@ -5589,6 +5352,7 @@
 </style>
 
 <style lang="less">
+ #taskIndex 
   // @import './jQueryGantt/platform.css';
   // @import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css';
   // @import './jQueryGantt/gantt.css';

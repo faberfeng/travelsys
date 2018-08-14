@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    
     <router-view/>
   </div>
 </template>
@@ -24,6 +23,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   min-width: 1200px;
+  height: 100%;
 }
 .UserList{
    td,th{

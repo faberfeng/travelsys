@@ -24,6 +24,9 @@
                             </div>
                             <div class="video_body">
                                 <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX" ></iframe>
+                                
+                                    <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
+                                
                                 <!-- src="https://site.altizure.cn/s/ryLw2SAxX" -->
                             </div>
                             <div class="video_bottom">
@@ -49,7 +52,7 @@
                                 layout="prev, pager, next"
                                 :page-size="1"
                                 :current-page.sync="currentPage3"
-                                :total=videoPageTotal>
+                                :total="videoPageTotal">
                                 </el-pagination>
                             </div>
                         </div>
@@ -105,6 +108,19 @@
                         </div>
                     </div>
                     <div class="messageDiv">
+                        <div class="message_header">
+                            <span class="text">远程会议</span>
+                            <span class="btn">
+                                <span class="btnFrame">发言</span>
+                                <span class="btnFrame">媒体同步</span>
+                                <span class="btnFrame">退出</span>
+                            </span>
+                        </div>
+                        <div class="message_member"></div>
+                        <div class="message_body"></div>
+                        <div class="message_textarea">
+                            <textarea  id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -259,7 +275,8 @@ export default {
                 path:'',
                 x:'',
                 y:''
-            }
+            },
+            messageText:''
         }
     },
     filters:{
@@ -435,7 +452,7 @@ export default {
         //改变全景直播
         handleLiveCurrentChange(val){
             console.log(val+'页');
-            this.$refs.lineLive.src=this.QJFileManageSystemURL+"project/jsp/video.jsp?videoPath="+this.mediaUrlList[val-1].path;
+            this.$refs.lineLive.src=this.BDMSUrl+"?videoPath="+this.mediaUrlList[val-1].path;
         },
         checkItem(num){
             this.isActive=num;
@@ -1080,8 +1097,61 @@ export default {
                 width:26%;
                 float: right;
                 margin: 8px;
-                height: 96%;
-                border:1px solid #0fc;
+                height: 100%;
+                border:1px solid #999;
+                .message_header{
+                    height: 40px;
+                    background: #fafafa;
+                    border-bottom: 1px solid #999;
+                    .text{
+                        float: left;
+                        font-size:14px;
+                        line-height: 40px;
+                        color:#323232;
+                        margin-left:10px;
+                    }
+                    .btn{
+                        float: right;
+                        margin-top:8px;
+                        margin-right:8px;
+                        .btnFrame{
+                            font-size: 14px;
+                            line-height: 22px;
+                            border:1px solid #999;
+                            color:#a7a7a7;
+                            height: 22px;
+                            padding:2px;
+                            border-radius: 2px;
+                            // display: inline-block;
+                            margin-right:2px;
+                            cursor: pointer;
+                        }
+                    }
+                }
+                .message_member{
+                    height: 40px;
+                    border-bottom: 1px solid #999;
+                }
+                .message_body{
+                    height:70%;
+                }
+                .message_textarea{
+                    border-top:1px solid #999;
+                    #messageTextArea{
+                            width: 97%;
+                            margin: 6px;
+                            height: 110px;
+                            border: 0;
+                    }
+                    // input{
+                    //     display: none;
+                    // }
+                    textarea {
+                    resize: none;
+                    text-decoration: none;
+                    font-size: 12px;
+                    }
+                }
             }
 
 
@@ -1214,48 +1284,48 @@ export default {
     margin:0px 100px;
     overflow-y:auto;
                                    
-                                    #ugGroupTree{
-                                    /*
-                                    修改eleUI树形组件
-                                    */
-                                            .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
-                                                    background-color: #dfdfdf;
-                                            }
-                                            .el-tree-node__label{
-                                                font-size: 12px;
-                                                min-height: 16px;
-                                                color: #666666;
-                                                padding-left: 22px; 
-                                                position: relative;
-                                            }
-                                            
-                                            .el-tree-node__expand-icon .el-icon-caret-right:before{
-                                                content: "\E604";
-                                                color: #999999;
-                                                font-weight: bold;
-                                                display: block;
-                                                position: absolute;
-                                                top: 2px;
-                                                left: 4px;
-                                                width: 14px;
-                                                height: 13px;
-                                                background: url('./images/file.png')no-repeat 0 0 !important;
-                                                content: '';
-                                                
-                                            }
-                                            .el-tree-node__label::before{
-                                                display: block;
-                                                position: absolute;
-                                                top: 6px;
-                                                left: 4px;
-                                                width: 14px;
-                                                height: 13px;
-                                                background: url('./images/file.png')no-repeat 0 0;
-                                                content: '';
-                                            }
-                                           
-                                        } 
-                                }
+        #ugGroupTree{
+        /*
+        修改eleUI树形组件
+        */
+                .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+                        background-color: #dfdfdf;
+                }
+                .el-tree-node__label{
+                    font-size: 12px;
+                    min-height: 16px;
+                    color: #666666;
+                    padding-left: 22px; 
+                    position: relative;
+                }
+                
+                .el-tree-node__expand-icon .el-icon-caret-right:before{
+                    content: "\E604";
+                    color: #999999;
+                    font-weight: bold;
+                    display: block;
+                    position: absolute;
+                    top: 2px;
+                    left: 4px;
+                    width: 14px;
+                    height: 13px;
+                    background: url('./images/file.png')no-repeat 0 0 !important;
+                    content: '';
+                    
+                }
+                .el-tree-node__label::before{
+                    display: block;
+                    position: absolute;
+                    top: 6px;
+                    left: 4px;
+                    width: 14px;
+                    height: 13px;
+                    background: url('./images/file.png')no-repeat 0 0;
+                    content: '';
+                }
+                
+            } 
+    }
 
 </style>
 
