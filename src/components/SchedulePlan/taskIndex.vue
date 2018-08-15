@@ -54,7 +54,7 @@
                 @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick">
                 <template slot="action" slot-scope="scope">
                   <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                  <button class="deleteBtn actionBtn" title="删除" @click="deleteTab(scope)"></button>
+                  <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
                   <button class="sortBtn actionBtn" title="排序" @click="sort(scope)"></button>
                 </template>
                 <template slot="taskStart" slot-scope="scope">
@@ -196,7 +196,7 @@
           <li class="detial-item clearfix">
             <span class="detail-text" v-text="item.linkTaskName"></span>
             <span class="detail-text">{{item.linkType | linkType()}}</span>
-            <button class="deleteBtn actionBtn1" @click="deleteLinkType(item.linkTaskId)"></button>
+            <button class="deleteBtnIcon actionBtn1" @click="deleteLinkType(item.linkTaskId)"></button>
           </li>
         </ul>
       </div>
@@ -226,10 +226,10 @@
             <li class="goujian-item" v-for="(item,index) in relaList" :key="index">
               <p class="clearfix">
                 <i class="icon-goujian icon-add"></i>
-                <i class="icon-goujian icon-detial" @click="showDetialList(item.main)"></i>
-                <i class="icon-goujian icon-QRcode" @click="qrcode(item.main.pkId)"></i>
-                <i class="icon-goujian icon-location" @click="location()"></i>
-                <i class="icon-goujian icon-delete" @click="deleteAssociationList(item.main.pkId)"></i>
+                <i class="icon-goujian icon-detial" title="清单详细" @click="showDetialList(item.main)"></i>
+                <i class="icon-goujian icon-QRcode" title="清单二维码" @click="qrcode(item.main.pkId)"></i>
+                <i class="icon-goujian icon-location" title="定位" @click="location()"></i>
+                <i class="icon-goujian icon-delete" title="删除" @click="deleteAssociationList(item.main.pkId)"></i>
               </p>
               <p class="item-detial">
                 <span class="detial-text-name">ID :</span>
@@ -246,7 +246,7 @@
               </p>
               <p class="item-detial">
                 <span class="detial-text-name">名称 :</span>
-                <span class="detial-text-value" v-text="item.main.mName"></span>
+                <span class="detial-text-value" :tilte="item.main.mName" v-text="item.main.mName"></span>
               </p>
             </li>
           </ul>
@@ -307,7 +307,7 @@
               <td v-text="item.unit"></td>
               <td v-text="item.amount"></td>
               <td>
-                <button class="deleteBtn actionBtn1" @click="deleteTaskResource(item.id)"></button>
+                <button class="deleteBtnIcon actionBtn1" @click="deleteTaskResource(item.id)"></button>
               </td>
             </tr>
             </tbody>
@@ -3598,11 +3598,12 @@
   }
 </script>
 <style lang="less" scoped>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+   *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-size: 12px;
+      }
 
   li {
     list-style: none;
@@ -4513,14 +4514,6 @@
     }
   #edit {
     .el-dialog__wrapper{
-          position: fixed;
-          top: 1px;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          overflow: auto;
-          margin: 0;
-    
           .el-dialog__body {
             .editBody {
               width: 100%;
@@ -5187,12 +5180,12 @@
   // @import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css';
   // @import './jQueryGantt/gantt.css';
   // @import './jQueryGantt/ganttPrint.css';
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-size: 12px;
-      }
+      // * {
+      //   margin: 0;
+      //   padding: 0;
+      //   box-sizing: border-box;
+      //   font-size: 12px;
+      // }
 
       // .resEdit {
       //     padding: 15px;
@@ -5517,7 +5510,7 @@
         background: url('../../assets/edit.png') no-repeat;
       }
 
-      .deleteBtn {
+      .deleteBtnIcon {
         background: url('../../assets/delete.png') no-repeat;
       }
 

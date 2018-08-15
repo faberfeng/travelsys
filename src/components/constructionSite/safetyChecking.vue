@@ -74,7 +74,7 @@
                                             <td>
                                                 <button class="printLabelBtn actionBtn" @click.stop="printLabel(item.checkRecord.id)" title="打印标签"></button>
                                                 <button class="checkBtn actionBtn" @click="srCheck(item.checkPoint.id)" title="检查"></button>
-                                                <button class="deleteBtn actionBtn" title="删除"></button>
+                                                <button class="deleteBtn actionBtn" @click="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -144,7 +144,15 @@
                                         <span class="next_btn">下一条</span>
                                     </div>
                                 </div>
-                                <div class="header_body"></div>
+                                <div class="header_body" style="min-width: 1000px; overflow: auto">
+                                    <p>
+                                        <span>检查序号：</span><span id="checkNumber"></span>
+                                        <span>状态：</span><span id="checkStatus"></span>
+                                        <span>检查人：</span><span id="checkUser3"></span>
+                                        <span>检查时间：</span><span id="checkTime"></span>
+                                    </p>
+                                    <ul id="checkPics" style="overflow: auto;"></ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -154,12 +162,12 @@
                             <span class="clearfix_icon">
                                 <i class="icon-goujian icon-add" title="添加"></i>
                                 <i class="icon-goujian icon-edit"  title="更名"></i>
-                                <i class="icon-goujian icon-delete"  title="删除"></i>
+                                <i class="icon-goujian icon-delete" @click="deleteItemNode"  title="删除"></i>
                             </span>
                         </div>
                         <div class="tree">
                             <el-tree id="treeData" ref="treeData" highlight-current  node-key="id" :empty-text="'内容为空'" :data="loadzTreeDataList"  :props="defaultProps" @node-click="nodeClick">
-                                </el-tree>
+                            </el-tree>
                         </div>
                     </div>
 
@@ -310,6 +318,37 @@
                         <button class="editBtnC" @click="srStatusCancle">取消</button>
                     </div>
                 </el-dialog>
+
+                <!-- <el-dialog width="400px" title="添加安全检查项目" :visible="securityStatusShow" @close="srStatusCancle">
+
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="srStatusConfirm">确定</button>
+                        <button class="editBtnC" @click="srStatusCancle">取消</button>
+                    </div>
+                </el-dialog> -->
+            </div>
+            <div id="inital">
+                <!-- 检查点位删除 -->
+                <el-dialog  :visible.sync="deleteCheckPointDialog" width="398px" @close="deleteCheckPointClose">
+                    <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                    <p class="deleteDialogWarning">删除提醒</p>
+                    <p class="deleteDialogText">确定要删除选定的检查点位吗？该操作会删除该点位下所有的检查记录！</p>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="deleteBtn" @click="deleteCheckPointMakeSure">确认</button>
+                        <button class="cancelBtn" @click="deleteCheckPointClose">取消</button>
+                    </div>
+                </el-dialog>
+                <!-- 删除检查项目节点 -->
+                <el-dialog  :visible.sync="deleteItemNodeDialog" width="398px" @close="deleteItemNodeClose">
+                    <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                    <p class="deleteDialogWarning">删除提醒</p>
+                    <p class="deleteDialogText">确定要删除当前检查项目节点吗？</p>
+                    <p class="deleteDialogCare">注意：所有与当前项目节点关联的检查点位、点位的检查记录都将被删除，并且不可恢复！</p>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="deleteBtn" @click="deleteItemNodeMakeSure">确认</button>
+                        <button class="cancelBtn" @click="deleteItemNodeClose">取消</button>
+                    </div>
+                </el-dialog>
             </div>
     </div>
 </template>
@@ -346,6 +385,8 @@ export default {
             isshow:'',
             labelListShow:false,
             labelListShow1:false,
+            deleteCheckPointDialog:false,
+            deleteItemNodeDialog:false,
             pageLabelList:{
                 pagePerNum:20,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
@@ -630,7 +671,7 @@ export default {
             if(response.data.cd=='0'){
                 vm.$message(
                     {type:'success',
-                    message:'状态修改成功'})
+                    message:response.data.msg})
                     vm.getCheckPointsByItemId();
 
             }else if(response.data.cd=='-1'){
@@ -638,6 +679,96 @@ export default {
             }
         })
 
+
+    },
+    //删除检查点位
+    deleteCheckPoint(num){
+        this.checkPointId=num;
+        this.deleteCheckPointDialog=true;
+    },
+    //删除检查点位确认
+    deleteCheckPointMakeSure(){
+        var vm=this;
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               id:this.checkPointId
+            },
+            url:this.BDMSUrl+'/project2/security/deleteCheckPoint'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.deleteCheckPointDialog=false;
+                vm.$message(
+                    {type:'success',
+                    message:response.data.msg})
+                vm.getCheckPointsByItemId();
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    deleteCheckPointClose(){
+        this.deleteCheckPointDialog=false;
+    },
+    //删除检查项目节点
+    deleteItemNode(){
+        this.deleteItemNodeDialog=true;
+    },
+    deleteItemNodeMakeSure(){
+        var vm=this;
+         axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               itemId:this.itemId
+            },
+            url:this.BDMSUrl+'/project2/security/deleteItemNode'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                vm.$message(
+                    {type:'success',
+                    message:response.data.msg})
+                    vm.loadzTreeData();
+                    this.itemId='';
+                    this.deleteItemNodeDialog=false;
+
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    deleteItemNodeClose(){
+        this.deleteItemNodeDialog=false;
+    },
+    //获取当前项目的用户群组
+    getManageDept(){
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               itemId:this.itemId
+            },
+            url:this.BDMSUrl+'/project2/security/getManageDept'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                vm.$message(
+                    {type:'success',
+                    message:response.data.msg})
+                    vm.loadzTreeData();
+                    this.itemId='';
+                    this.deleteItemNodeDialog=false;
+
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
 
     },
     changePage(val,isTop){//分页 0 -1 1 2
@@ -1126,6 +1257,7 @@ export default {
                                 font-size:14px;
                                 line-height: 40px;
                                 margin-left:10px;
+                                color:#666;
                             }
                             .selectBtn{
                                 width: 150px;
@@ -1157,13 +1289,20 @@ export default {
                                     cursor: pointer;
                                     background-color:#ffffff;
                                     border:1px solid #f3f3f3;
-
                                 }
-
-
                             }
                         }
                         .header_body{
+                            p{
+                                margin-top:10px;
+                                float: left;
+                                span{
+                                    margin-right: 20px;
+                                    font-size:14px;
+                                    line-height: 14px;
+                                    color:#333333;
+                                }
+                            }
 
 
                         }
@@ -1342,6 +1481,37 @@ export default {
             height: 100%;
             opacity: .5;
             background: #000;
+        }
+        //删除弹出框
+        #inital{
+            .deleteDialogImg{
+                height: 50px;
+                }
+            .deleteDialogWarning{
+            font-size: 18px;
+            line-height: 18px;
+            font-family: 'MicrosoftYahei';
+            color: #fc3439;
+            font-weight: bold;
+            margin:20px 0 0 0;
+            }
+            .deleteDialogText{
+                color: #333333;
+                font-size: 14px;
+                line-height: 14px;
+                font-family: 'MicrosoftYahei';
+                font-weight: normal;
+                margin: 16px 5px 0px 5px;
+            }
+            .deleteDialogCare{
+                color: #333333;
+                font-size: 14px;
+                line-height: 14px;
+                font-family: 'MicrosoftYahei';
+                font-weight: normal;
+                margin: 16px 5px 0px 5px;
+                 color: #fc3439;
+            }
         }
     }
 
