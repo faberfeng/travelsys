@@ -1,5 +1,5 @@
 <template>
-<div id="CommenList" v-loading.fullscreen.lock="fullscreenLoading">
+<div id="CommenList1" v-loading.fullscreen.lock="fullscreenLoading">
         <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
             <input type="hidden" name="p" ref="labelContent">
         </form>
@@ -602,7 +602,7 @@
     .navigation{
         z-index: 0!important;
     }
-    #CommenList{
+    #CommenList1{
         #print-qrcode{
             display: none;
         }

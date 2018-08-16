@@ -195,13 +195,13 @@
                 </el-dialog>
                 <el-dialog width="400px" title="质量检查状态修改" :visible="dcStatus.show" @close="dcStatusCancle">
                     <div class="editBody">
-                        <div class="editBodytwo imageBody" style="padding-left:120px;">
+                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
                             <el-radio v-model="dcStatus.val" label="10">继续整改</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:120px;">
+                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
                             <el-radio v-model="dcStatus.val" label="11">整改撤销</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:120px;">
+                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
                             <el-radio v-model="dcStatus.val" label="12">整改完成</el-radio>
                         </div>
                     </div>
