@@ -18,7 +18,7 @@
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress"></el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
-                                <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase">物资采购</el-tab-pane>
+                                <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase"></el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings"></el-tab-pane>
@@ -352,7 +352,9 @@ export default {
             }else if(tab.label === '物资采购'){
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
-
+                this.$router.push({
+                    path:'/metarialpurchase/productioncenter'//物资采购
+                })
             }else if(tab.label === '施工现场'){
                 this.$router.push({
                     path:'/constructionSite/fieldConnection'
