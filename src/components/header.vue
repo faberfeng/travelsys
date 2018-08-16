@@ -1,10 +1,10 @@
 <template>
-
     <el-row class="container-header">
         <!-- <div id="webgl" style="display:block;width:1900px;height:400px;z-index:10000000000;">
-            <iframe style="width: 100%;height:100%"  src="../webGL/index.html"></iframe>
+            <iframe ref="iframe1" id="webIframe" style="width: 100%;height:100%"  src="http://10.252.29.22/"></iframe>
         </div> -->
         <el-col :span="24" class="header">
+            <!-- <button style="width:80px; height:30px;background:white;" @click="app">按钮</button> -->
             <div class="headerImg">
                 <img :src="proimg?proimg:require('../assets/defaultlogo.png')"/>
             </div>
@@ -34,8 +34,13 @@ export default Vue.component('common-header', {
         var vm = this
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        // this.app();
     },
     methods:{
+        app(){
+            var app1 =this.$refs.iframe1.contentWindow;
+            console.log(app1);
+        },
         logout(){
             var vm = this
             axios({

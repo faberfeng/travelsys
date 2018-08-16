@@ -34,7 +34,7 @@
                                     <tbody>
                                         <tr v-if="checkItemDataList">
                                             <td v-text="checkItemDataList.item.itemName"></td>
-                                            <td></td>
+                                            <td v-text="$options.filters.checkFrequencyChange(checkItemDataList.item.checkFrequency)"></td>
                                             <td v-text="checkItemDataList.respDeptName"></td>
                                             <td v-text="checkItemDataList.respUserName"></td>
                                             <td v-text="checkItemDataList.checkDeptName"></td>
@@ -67,14 +67,14 @@
                                         <tr :class="{'check':index==isshow}" v-for="(item,index) in checkPointsByItemIdList" :key="index" @click="checkItem(index)">
                                             <td>{{index+1}}</td>
                                             <td>{{item.checkPoint.name}}</td>
-                                            <td>{{item.checkRecord.currCheckStatus}}</td>
+                                            <td>{{item.checkRecord.currCheckStatus|securityStatusChange()}}</td>
                                             <td>{{item.checkRecord.checkTime | changeTime()}}</td>
                                             <td>{{item.checkUserName | nameChange()}}</td>
-                                            <td>{{item.checkRecord.expectCheckStatus}}</td>
+                                            <td>{{item.checkRecord.expectCheckStatus|expectCheckStatusChange()}}</td>
                                             <td>
                                                 <button class="printLabelBtn actionBtn" @click.stop="printLabel(item.checkRecord.id)" title="打印标签"></button>
-                                                <button class="checkBtn actionBtn" @click="srCheck(item.checkPoint.id)" title="检查"></button>
-                                                <button class="deleteBtn actionBtn" @click="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
+                                                <button class="checkBtn actionBtn" @click.stop="srCheck(item.checkPoint.id)" title="检查"></button>
+                                                <button class="deleteBtn actionBtn" @click.stop="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -138,18 +138,18 @@
                         <div class="bottom">
                             <div class="bottom_table">
                                 <div class="header_text">
-                                    <span class="text">点位【】检查记录</span>
+                                    <span class="text">点位【{{checkPointName}}】检查记录</span>
                                     <div class="selectBtn">
-                                        <span class="pre_btn">上一条</span>
-                                        <span class="next_btn">下一条</span>
+                                        <span class="pre_btn" @click="getPreviousCheckRecord()">上一条</span>
+                                        <span class="next_btn" @click="getNextCheckRecord()">下一条</span>
                                     </div>
                                 </div>
-                                <div class="header_body" style="min-width: 1000px; overflow: auto">
-                                    <p>
-                                        <span>检查序号：</span><span id="checkNumber"></span>
-                                        <span>状态：</span><span id="checkStatus"></span>
-                                        <span>检查人：</span><span id="checkUser3"></span>
-                                        <span>检查时间：</span><span id="checkTime"></span>
+                                <div class="header_body">
+                                    <p >
+                                        <span class="text">检查序号：</span><span class="value">{{checkId}}</span>
+                                        <span class="text">状态：</span><span class="value">{{currCheckStatus|securityStatusChange()}}</span>
+                                        <span class="text">检查人：</span><span class="value">{{checkUserName|nameChange()}}</span>
+                                        <span class="text">检查时间：</span><span class="value">{{checkTime | changeTime()}}</span>
                                     </p>
                                     <ul id="checkPics" style="overflow: auto;"></ul>
                                 </div>
@@ -160,7 +160,7 @@
                         <div class="checkProjectList_header">
                             <span class="text">检查项目目录</span>
                             <span class="clearfix_icon">
-                                <i class="icon-goujian icon-add" title="添加"></i>
+                                <i class="icon-goujian icon-add" @click="addCheckItemNode" title="添加"></i>
                                 <i class="icon-goujian icon-edit"  title="更名"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteItemNode"  title="删除"></i>
                             </span>
@@ -319,13 +319,93 @@
                     </div>
                 </el-dialog>
 
-                <!-- <el-dialog width="400px" title="添加安全检查项目" :visible="securityStatusShow" @close="srStatusCancle">
-
-                    <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="srStatusConfirm">确定</button>
-                        <button class="editBtnC" @click="srStatusCancle">取消</button>
+                <el-dialog width="500px" title="添加安全检查项目" :visible="addCheckItemNodeShow" @close="addCheckItemNodeCancle">
+                    <div class="editBody">
+                        <div class="editBodytwo">
+                            <label class="parentItem">父级项目:</label>
+                            <label class="parentValue">{{this.parentItemName}}</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <div class="editBodytwo2">
+                                <label class="itemName">项目名称:</label>
+                                <el-input v-model="projectName"></el-input>
+                            </div>
+                        </div>
+                        <div class="editBodytwo">
+                            <label>检查频率:</label>
+                            <el-select v-model="checkFrequency">
+                                <el-option v-for="item in checkFrequencyList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="editBodytwo">
+                            <label>负责单位:</label>
+                            <el-select v-model="respDept" @change="respDeptChange">
+                                <el-option v-for="item in manageUserList" :key="item.ugId" :value="item.ugId" :label="item.ugName"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="editBodytwo">
+                            <label>负责人:</label>
+                            <el-select v-model="respUser">
+                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.userName" ></el-option>
+                            </el-select>
+                        </div>
+                        <div class="editBodytwo">
+                            <label>检查单位:</label>
+                            <el-select v-model="checkDept" @change="checkDeptChange" >
+                                <el-option v-for="item in manageUserList" :key="item.ugId" :value="item.ugId" :label="item.ugName"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="editBodytwo">
+                            <label>检查人:</label>
+                            <el-select v-model="checkUser">
+                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
+                            </el-select>
+                        </div> 
                     </div>
-                </el-dialog> -->
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addCheckItemNodeConfirm">确定</button>
+                        <button class="editBtnC" @click="addCheckItemNodeCancle">取消</button>
+                    </div>
+                </el-dialog>
+
+                <el-dialog width="400px" title="点位编辑" :visible="spotEditDialog" @close="spotEditCancle">
+                    <div class="editBody">
+                        <div class="editBody_left">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>点位</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr :class="{'tdBackground':item.id==tdValue}" id="checkPointId" v-for="(item,index) in checkPointsList" :key="index" @click="checkTable(item.id)" >
+                                        <!-- 此处逻辑复杂，得慢慢捋清楚 -->
+                                        <!-- v-show="!(tdValue==item.id)" -->
+                                        <td ><span >{{item.name}}</span><input v-show="showTd&&!item.id||rwriteShow&&tdValue==item.id" v-model="checkPointTdName" id="tdInput" type="text"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="editBody_right">
+                            <div class="editBody_right1">
+                                <span class="newFile actionBtn" @click="newTabFile">新建</span>
+                                <span class="deleteFile actionBtn" @click="deleteTabCheckPoint">删除</span>
+                                <span class="editFile actionBtn" @click="rwrite()">重命名</span>
+                            </div>
+                            <div class="editBody_right2">
+                                <span class="newFile actionBtn" @click="addCheckPoint()">确认</span>
+                                <span class="newFile actionBtn" @click="checkPointCancel()">撤销</span>
+                            </div>
+                            <div class="editBody_right3">
+                                <span class="newFile actionBtn" @click="newFileClose()">关闭</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <!-- <button class="editBtnS" @click="spotEditConfirm">确定</button>
+                        <button class="editBtnC" @click="spotEditCancle">取消</button> -->
+                    </div>
+                </el-dialog>
             </div>
             <div id="inital">
                 <!-- 检查点位删除 -->
@@ -366,6 +446,8 @@ export default {
             checkPointsByItemIdList:'',
             pointTotal:'',
             checkPointsForPageList:'',
+            checkPointsList:'',
+            checkPointTdName:'',
             pointsForPagePager:'',
             loadzTreeDataList_original:'',//原始树形图
             loadzTreeDataList:[],
@@ -382,7 +464,7 @@ export default {
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
-            isshow:'',
+            isshow:0,
             labelListShow:false,
             labelListShow1:false,
             deleteCheckPointDialog:false,
@@ -394,7 +476,68 @@ export default {
             },
             singleLable:false,
             securityStatus:'',
-            securityStatusShow:false
+            securityStatusShow:false,
+            addCheckItemNodeShow:false,
+            spotEditDialog:false,
+            itemName:'',
+            checkFrequency:0,//检查频率
+            respDept:'',//负责部门/单位
+            respUser:'',//负责人
+            checkDept:'',//检查部门/单位
+            checkUser:'',//检查人
+            manageUserList:'',//项目管理用户列表
+            personInChargeByDeptList:'',//项目管理的用户
+            checkFrequencyList:[
+                {
+                    value:0,
+                    label:'每天'
+                },
+                {
+                    value:1,
+                    label:'每隔一天'
+                },
+                {
+                    value:2,
+                    label:'每周两次'
+                },
+                {
+                    value:3,
+                    label:'每周一次'
+                },
+                {
+                    value:4,
+                    label:'两周一次'
+                },
+                {
+                    value:5,
+                    label:'每月一次'
+                },
+                {
+                    value:6,
+                    label:'两月一次'
+                },
+                {
+                    value:7,
+                    label:'三月一次'
+                }
+            ],
+            byDeptId:'',
+            parentItemId:0,
+            addNodeparentItemId:'',
+            itemLength:'',
+            parentItemName:'',
+            projectName:'',
+            checkId:'',
+            currCheckStatus:'',
+            checkPointName:'',
+            checkPointId:'',
+            checkUserName:'',
+            checkTime:'',
+            list:'',
+            list1:'',
+            tdValue:'',
+            showTd:false,
+            rwriteShow:false,
         }
     },
     created(){
@@ -430,18 +573,79 @@ export default {
           var vm = this
           vm.getCheckPointsForPage()
       },
+    //   'respDept':function(val){
+    //       var vm=this
+    //       vm.getPersonInChargeByDept()
+    //   },
+    //   'checkDept':function(val){
+    //       var vm=this
+    //       vm.getPersonInChargeByDept()
+    //   }
 
     },
     filters:{
         changeTime(val){
-            return moment(val).format("YYYY-MM-DD HH:mm:ss");
+            if(val==''){
+                return ''
+            }else {
+                return moment(val).format("YYYY-MM-DD HH:mm:ss");
+            }
         },
         nameChange(val){
             if(val==null){
                 val='系统'
             }
             return val;
+        },
+        checkFrequencyChange(val){
+            switch(val)
+            {
+                case 0:
+                return val='每天';
+                break;
+                case 1:
+                return val='每隔一天';
+                break;
+                case 2:
+                return val='每周两次';
+                break;
+                case 3:
+                return val='每周一次';
+                break;
+                case 4:
+                return val='两周一次';
+                break;
+                case 5:
+                return val='每月一次';
+                break;
+                case 6:
+                return val='两月一次';
+                break;
+                case 7:
+                return val='三月一次';
+                break;
+            }
+        },
+        securityStatusChange(val){
+            if(val == 1) {
+                return "安全";
+                } else if(val == 2) {
+                    return "不安全";
+                } else if(val == 3) {
+                    return "未知";
+                }
+        },
+        expectCheckStatusChange(status){
+            if(status == 1) {
+                        return "安全";
+                    } else if(status == 2) {
+                        return "待检查";
+                    } else if(status == 3) {
+                        return "整改中";
+                    }
+    
         }
+
     },
     methods:{
     //进入安全检查页面
@@ -568,8 +772,14 @@ export default {
         })
     },
     nodeClick(obj){
+        // console.log(obj);
+        // this.itemLength=obj.children.length;
         this.itemId=obj.itemId;
         console.log(this.itemId);
+        this.itemName=obj.itemName;
+        console.log(this.itemName);
+        this.addNodeparentItemId=obj.parentItemId;
+        console.log(this.addNodeparentItemId);
         this.getCheckItemData();
         this.getCheckPointsByItemId();
         
@@ -577,11 +787,19 @@ export default {
     checkItem(num){
         this.isshow=num;
         console.log('dhsjdhj');
+        this.checkPointId=this.checkPointsByItemIdList[this.isshow].checkPoint.id;
+        this.checkPointName=this.checkPointsByItemIdList[this.isshow].checkPoint.name;
+        this.checkId=this.checkPointsByItemIdList[this.isshow].checkRecord.id;
+        this.currCheckStatus=this.checkPointsByItemIdList[this.isshow].checkRecord.currCheckStatus;
+        this.checkUserName=this.checkPointsByItemIdList[this.isshow].checkUserName;
+        this.checkTime=this.checkPointsByItemIdList[this.isshow].checkRecord.checkTime;
     },
     //打印全部标签
     printAllLabel(){
-        this.labelListShow=true;
-        this.getCheckPointsForPage();
+        if(this.checkPointsByItemIdList){
+            this.labelListShow=true;
+            this.getCheckPointsForPage();
+        }
     },
     labelListCancle(){
         this.labelListShow=false;
@@ -618,9 +836,38 @@ export default {
             }
         })
     },
+    //获取指定检查项目下的所有检查点位
+    getCheckPoints(){
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                itemId:this.itemId,
+            },
+            url:this.BDMSUrl+'/project2/security/getCheckPoints'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.checkPointsList=response.data.rt;
+                console.log(this.checkPointsList);
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
     //编辑点位
     editSite(){
-
+        var vm=this;
+        if(this.addNodeparentItemId){
+            this.spotEditDialog=true;
+            this.getCheckPoints();
+        }else{
+            vm.$message({
+                type:'error',
+                message:'请先选择检查项目'
+            })
+        }
     },
     //打印标签
     printLabel(num){
@@ -681,6 +928,60 @@ export default {
 
 
     },
+    //重命名
+    rwrite(){
+        var vm=this;
+        if(this.tdValue){
+            // this.checkPointsList.forEach((item)=>{
+            //     if(this.tdValue==item.id){
+            //         this.checkPointTdName=item.name;
+            //     }
+            // })
+            this.rwriteShow=true
+        }else{
+            vm.$message({
+                type:'error',
+                message:'请选择要重命名的检查点位'
+            })
+        }
+    },
+    //撤销检查点位
+    checkPointCancel(){
+        this.showTd=false;
+        this.checkPointTdName='';
+        this.checkPointsList.shift();
+    },
+    //添加检查点位
+    addCheckPoint(){
+        var vm=this;
+         axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               name:this.checkPointTdName,
+               itemId:this.itemId,
+               projId:this.projId
+            },
+            url:this.BDMSUrl+'/project2/security/addCheckPoint'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                    this.checkPointTdName='';
+                    this.getCheckPointsByItemId();
+                    this.getCheckPoints();
+
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    //关闭
+    newFileClose(){
+        this.spotEditDialog=false;
+        this.checkPointTdName='';
+        
+    },
     //删除检查点位
     deleteCheckPoint(num){
         this.checkPointId=num;
@@ -705,6 +1006,7 @@ export default {
                     {type:'success',
                     message:response.data.msg})
                 vm.getCheckPointsByItemId();
+                vm.getCheckPoints();
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }
@@ -712,6 +1014,137 @@ export default {
     },
     deleteCheckPointClose(){
         this.deleteCheckPointDialog=false;
+    },
+    //获取当前项目的用户群组
+    getManageDept(){
+        var vm=this;
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               projId:this.projId
+            },
+            url:this.BDMSUrl+'/project2/security/getManageDept'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.manageUserList=response.data.rt;
+                console.log(this.manageUserList)
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    //
+    respDeptChange(){
+        this.manageUserList.forEach((item)=>{
+            if(item.ugId==this.respDept){
+                this.byDeptId=item.ugId;
+            }
+        })
+        this.getPersonInChargeByDept();
+    },
+    checkDeptChange(){
+        this.manageUserList.forEach((item)=>{
+            if(item.ugId==this.checkDept){
+                this.byDeptId=item.ugId;
+            }
+        })
+        this.getPersonInChargeByDept();
+    },
+    //校验当前项目节点是否可以添加子检查项目节点
+    validateAddNode(){
+        var vm=this;
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+               itemId:this.itemId
+            },
+            url:this.BDMSUrl+'/project2/security/validateAddNode'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.addCheckItemNodeShow=true;
+                
+            }else if(response.data.cd=='-1'){
+                vm.$message({
+                    type:'error',
+                    message:response.data.msg
+                })
+            }
+        })
+    },
+    //获取当前用户群组下的用户
+    getPersonInChargeByDept(){
+         var vm=this;
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                ugId:this.byDeptId
+            },
+            url:this.BDMSUrl+'/project2/security/getPersonInChargeByDept'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.personInChargeByDeptList=response.data.rt;
+                console.log(this.personInChargeByDeptList);
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    //添加检查条目节点
+    addCheckItemNode(){
+        this.validateAddNode();
+        this.parentItemId=this.itemId;
+        this.parentItemName=this.itemName;
+        this.getManageDept();
+    },
+    addCheckItemNodeConfirm(){
+        var vm=this;
+        axios({
+            method:'post',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                parentItemId:this.itemId,
+                projId:this.projId,
+                itemName:this.projectName,
+                checkFrequency:this.checkFrequency,//检查频率
+                respDept:this.respDept,//负责部门/单位
+                respUser:this.respUser,//负责人
+                checkDept:this.checkDept,//检查部门/单位
+                checkUser:this.checkUser,//检查人
+                ugId:this.checkItemDataList.item.ugId //安全检查的ugid
+            },
+            url:this.BDMSUrl+'/project2/security/addCheckItemNode'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.addCheckItemNodeShow=false;
+                vm.$message(
+                    {type:'success',
+                    message:'添加成功'})
+                vm.loadzTreeData();
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+        })
+    },
+    addCheckItemNodeCancle(){
+        this.addCheckItemNodeShow=false;
+    },
+    //点位编辑
+    spotEditConfirm(){
+
+    },
+    spotEditCancle(){
+        this.spotEditDialog=false;
     },
     //删除检查项目节点
     deleteItemNode(){
@@ -745,31 +1178,99 @@ export default {
     deleteItemNodeClose(){
         this.deleteItemNodeDialog=false;
     },
-    //获取当前项目的用户群组
-    getManageDept(){
-        axios({
+    checkTable(num){
+        console.log('ffsd')
+        this.tdValue=num;
+        this.checkPointId=num;
+    },
+    newTabFile(){
+        var name='';
+        this.checkPointsList.unshift({'name':name});
+        console.log(this.checkPointsList);
+        this.checkPointsList.forEach((item)=>{
+            if(item.name==""){
+                this.showTd=true;
+            }
+        })
+        // let str =document.getElementById("checkPointId");
+        // var td = document.createElement('td');
+        // tr.appendChild(td);
+        // console.log(str);
+    },
+    deleteTabCheckPoint(){
+        var vm=this;
+        if(this.checkPointId){
+            this.deleteCheckPointDialog=true;
+        }else{
+            vm.$message({
+                type:'error',
+                message:'请选择要删除的检查点位'
+            })
+        } 
+    },
+    //获取下一条检查记录
+    getNextCheckRecord(){
+        var vm=this;
+         axios({
             method:'get',
             headers:{
                 'token':this.token
             },
             params:{
-               itemId:this.itemId
+               id:this.checkId,
+               checkPointId:this.checkPointId
             },
-            url:this.BDMSUrl+'/project2/security/getManageDept'
+            url:this.BDMSUrl+'/project2/security/getNextCheckRecord'
         }).then(response=>{
             if(response.data.cd=='0'){
-                vm.$message(
-                    {type:'success',
-                    message:response.data.msg})
-                    vm.loadzTreeData();
-                    this.itemId='';
-                    this.deleteItemNodeDialog=false;
+                    this.list=response.data.rt;
+                    console.log(this.list);
+                    // this.checkPointId=this.list.checkPoint.id;
+                    // this.checkPointName=this.list.checkPoint.name;
+                    this.checkId=this.list.checkRecord.id;
+                    this.currCheckStatus=this.list.checkRecord.currCheckStatus;
+                    this.checkUserName=this.list.checkUserName;
+                    this.checkTime=this.list.checkRecord.checkTime;
 
             }else if(response.data.cd=='-1'){
-                alert(response.data.msg);
+                vm.$message(
+                    {type:'error',
+                    message:response.data.msg})
             }
         })
-
+    },
+    //获取上一条检查记录
+    getPreviousCheckRecord(){
+        
+            var vm=this;
+            axios({
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                id:this.checkId,
+                checkPointId:this.checkPointId
+                },
+                url:this.BDMSUrl+'/project2/security/getPreviousCheckRecord'
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                        this.list1=response.data.rt;
+                        console.log(this.list1);
+                        // this.checkPointId=this.list1.checkPoint.id;
+                        // this.checkPointName=this.list1.checkPoint.name;
+                        this.checkId=this.list1.checkRecord.id;
+                        this.currCheckStatus=this.list1.checkRecord.currCheckStatus;
+                        this.checkUserName=this.list1.checkUserName;
+                        this.checkTime=this.list1.checkRecord.checkTime;
+                }else if(response.data.cd=='-1'){
+                    vm.$message(
+                        {type:'error',
+                        message:response.data.msg})
+                }
+            })
+        
+        
     },
     changePage(val,isTop){//分页 0 -1 1 2
                 var vm = this; 
@@ -857,7 +1358,7 @@ export default {
         content: '';
     }
      .tree{
-            height:200px;
+            height:600px;
             margin:10px 10px;
             overflow-y:auto;
                                     
@@ -1023,7 +1524,6 @@ export default {
                                     text-overflow: ellipsis;
                                     white-space: nowrap;
                                     overflow: hidden;
-                                    
                                 }
                             }
                             }
@@ -1032,8 +1532,9 @@ export default {
                 }
                 .checkSite{
                     margin-top:75px;
-                    height:300px;
+                    // height:300px;
                     // border:1px solid red;
+                    // overflow-x: auto;
                     margin-bottom:25px;
                     position: relative;
                     .checkSite_header{
@@ -1086,10 +1587,13 @@ export default {
                         }
                     }
                     .checkSite_table{
-                        width: 100%;
+                            width: 100%;
+                            height: 200px;
+                            overflow-x: auto;
                             table {
                                 margin: 0 auto;
                                 width: 100%;
+                                
                                 border-collapse: collapse;
                                 // border-top: 1px solid #e6e6e6;
                                 border-bottom: 1px solid #e6e6e6;
@@ -1162,6 +1666,10 @@ export default {
                         background: #f5f5f5;
                     }
                     .pagination{
+                        margin-top:20px;
+                        // bottom: 0px;
+                        // position: absolute;;
+                        // left:0px;
                         border-top: none;
                     }
                     .pagination table {
@@ -1293,14 +1801,27 @@ export default {
                             }
                         }
                         .header_body{
+                            width: 100%;
                             p{
+                                text-align: left;
                                 margin-top:10px;
                                 float: left;
-                                span{
+                                .text{
                                     margin-right: 20px;
+                                    width: 100px;
+                                    display: inline-block;
                                     font-size:14px;
                                     line-height: 14px;
                                     color:#333333;
+                                }
+                                .value{
+                                    margin-right: 20px;
+                                    width: 150px;
+                                    display: inline-block;
+                                    font-size:14px;
+                                    line-height: 14px;
+                                    color:#333333;
+
                                 }
                             }
 
@@ -1481,6 +2002,192 @@ export default {
             height: 100%;
             opacity: .5;
             background: #000;
+        }
+        #edit{
+            .el-dialog__body {
+            .editBody {
+                .editBodytwo{
+                    .editBodytwo2{
+                        margin-left:63px;
+                        .itemName{
+                            float: left;
+                            position: relative;
+                            margin-left:-85px;
+                            top:40px;
+                            display:inline-block;
+                            font-size: 14px;
+                        }
+                    }
+                    .parentItem{
+                        float: left;
+                        left:49px;
+                        width: 70px;
+                        height: 33px;
+                        position: relative;
+                        // display: inline-block;
+                    }
+                    .parentValue{
+                        float: left;
+                        position: relative;
+                        left:40px;
+                        width: 70px;
+                        height: 20px;
+                        display: inline-block;
+                    }
+
+                }
+                .editBody_left{
+                    float: left;
+                    width: 70%;
+                    height: 300px;
+                    overflow-x: auto;
+                    border:1px solid #999;
+                    table {
+                            margin: 0 auto;
+                            width: 100%;
+                            border-collapse: collapse;
+                            // border-top: 1px solid #e6e6e6;
+                            border-bottom: 1px solid #e6e6e6;
+                            thead {
+                                background: #f2f2f2;
+                                tr {
+                                    th {
+                                    padding-left: 10px;
+                                    height: 30px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    border-left: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #666666;
+
+                                    }
+                                }
+                            }
+                            tbody {
+                                background: #fff;
+                                overflow:auto;
+                                .tdBackground{
+                                    background:#0081c2;
+                                    td{color:#fff !important;}
+                                }
+                                tr {
+                                    td {
+                                        padding-left: 10px;
+                                        height: 30px;
+                                        text-align: left;
+                                        font-size: 12px;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        border-left: 1px solid #e6e6e6;
+                                        color: #666666;
+                                        border-bottom: 1px solid #e6e6e6;
+                                        max-width: 80px;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        #tdInput{
+                                            background: #fff;
+                                            width: 100%;
+                                            height:30px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                .editBody_right{
+                    border:1px solid #999;
+                    float: right;
+                    width: 25%;
+                    height: 300px;
+                    .editBody_right1{
+                        height:140px;
+                        
+                        .actionBtn{
+                                float: left;
+                                width: 16px;
+                                height: 16px;
+                                cursor: pointer;
+                                display: inline-block;
+                                width: 100px;
+                                font-size:14px;
+                                line-height: 16px;
+                                margin-top:25px;
+                                margin-left:10px;
+                        }
+                        .newFile{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .deleteFile{
+                            
+                            background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                            margin-right: 10px;
+                            &:hover{
+                                background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                            } 
+                        }
+                        .editFile{
+                            
+                            background: url('../ManageCost/images/edit.png')no-repeat 0 0;
+                            margin-right: 10px;
+                            &:hover{
+                                background: url('../ManageCost/images/edit1.png')no-repeat 0 0;
+                            }
+                        }
+                    }
+                    .editBody_right2{
+                        .actionBtn{
+                                float: left;
+                                width: 16px;
+                                height: 16px;
+                                cursor: pointer;
+                                display: inline-block;
+                                width: 100px;
+                                font-size:14px;
+                                line-height: 16px;
+                                margin-top:25px;
+                                margin-left:10px;
+                        }
+                        .newFile{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                    }
+                    .editBody_right3{
+                        border-bottom: 1px solid #999;
+                        .actionBtn{
+                                float: left;
+                                width: 16px;
+                                height: 16px;
+                                cursor: pointer;
+                                display: inline-block;
+                                width: 100px;
+                                font-size:14px;
+                                line-height: 16px;
+                                margin-top:25px;
+                                margin-left:10px;
+                        }
+                        .newFile{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                    }
+                }
+
+                }
+            }
+
         }
         //删除弹出框
         #inital{
