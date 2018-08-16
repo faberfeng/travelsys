@@ -184,6 +184,18 @@ const router = new Router({
         }
       ]
     },
+    //物资采购
+    {
+      path:'/metarialpurchase',
+      name:'MetarialPurchase',
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[{
+        path:'/metarialpurchase/productioncenter',
+        name:'ProductionCenter',
+        component:resolve=>require(['@/components/MetarialPurchase/ProductionCenter'],resolve)
+
+      }]
+    },
     {
       path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
       name:'getManifestDetailInfoForPage',

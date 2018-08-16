@@ -621,7 +621,7 @@
                     <button class="editBtnC" @click="datadistinguishCancel">取消导入</button>
                 </div>
             </el-dialog>
-            <el-dialog title="选择创建和映射方式" :visible="createShow" @close="createShowClose">
+            <el-dialog title="选择需要配置的映射方式" :visible="createShow" @close="createShowClose">
                 <div class="editBodytwo">
                     <p class="ptitle">选择生成工程量清单的选择方式:</p>
                     <select class="pselect" v-model="projMethodData">
@@ -637,7 +637,7 @@
                     <i class="icon-down"></i>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="createShowSure">创建</button>
+                    <button class="editBtnS" @click="createShowSure">确定</button>
                     <button class="editBtnC" @click="createShowClose">取消</button>
                 </div>
             </el-dialog>
