@@ -57,7 +57,7 @@
                             index-text="序号"
                             :data="mappingData" :columns="columns" :tree-type="props.treeType"
                             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                            :border="props.border" empty-text="正在加载...">
+                            :border="props.border" empty-text="暂无数据...">
                             <template slot="action" slot-scope="scope">
                                 <div v-if="scope.row.level == 3">
                                     <div v-if="scope.row.unmappingEntity == 0">

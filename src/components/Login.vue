@@ -26,7 +26,7 @@
                         <a class="loginInfoLeft" href="http://10.252.26.240:8080/bdms-usercenter/register/registerIndex" target="blank">立即注册</a>
                         <a class="loginInfoRight" href="http://10.252.26.240:8080/bdms-usercenter/register/forgetPwd" target="blank">忘记密码</a>
                     </div>
-                    <button class="loginWidthYun">云华建账号登陆</button>
+                    <button class="loginWidthYun" style="display:none">云华建账号登陆</button>
                 </div>
             </div>
         </div>   

@@ -20,7 +20,7 @@
                             成本管理<i class="icon-sanjiao-right"></i>
                             <span style="cursor:pointer"  @click="back()">工程量清单</span>
                             <i class="icon-sanjiao-right"></i>
-                            <span class="strong">{{projObj.engineerName}}【{{projObj.classifyCode.split('-')[1]}}】构件名称</span>
+                            <span class="strong">【{{projObj.classifyCode.split('-')[1]}}】构件名称</span>
                         </p>
                         <p class="header clearfix">
                             <span class="left_header">
@@ -155,6 +155,7 @@
                                             <th>原始文档</th>
                                             <th>原始ID</th>
                                             <th>构件名称</th>
+                                            <th v-if="expandPrperty.length==0">操作</th>
                                         </thead>
                                         <tbody>
                                             <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index,1)">
@@ -162,6 +163,9 @@
                                                 <td>{{item.originalFile}}</td>
                                                 <td>{{item.originalId}}</td>
                                                 <td>{{item.originalName}}</td>
+                                                <td v-if="expandPrperty.length==0">
+                                                    <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
+                                                </td>
                                             </tr>
                                         </tbody>
                                         </table>
@@ -596,7 +600,6 @@ export default Vue.component('mapping-project',{
                     cacheId:currCacheId,
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
@@ -647,7 +650,6 @@ export default Vue.component('mapping-project',{
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
@@ -1501,7 +1503,25 @@ export default Vue.component('mapping-project',{
     }
     .doubleTable{
         margin:10px 10px 0 10px;
-       display: flex;
+        display: flex;
+        tr{
+            margin: 0;
+        }
+        td{
+            height: 42px;
+            margin: 0;
+            padding: 0 0 0 10px;
+            border: 1px solid #e6e6e6;
+            color: #333;
+        }
+        th{
+            height: 42px;
+            background: #f2f2f2;
+            margin: 0 ;
+            padding: 0 0 0 10px;
+            border: 1px solid #ccc;
+            color: #e6e6e6;
+        }
     }
     .UserListtwoLeft{
         width: 30%;
