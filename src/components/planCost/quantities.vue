@@ -1304,8 +1304,10 @@ export default {
         },
         reCalculate(mid,index){
             var vm = this
-            vm.fullscreenloading = true
-            vm.$set(vm.S_quantitiesList[index],'HasbId',false)
+            vm.fullscreenloading = true;
+            if(vm.S_quantitiesList[index] !== undefined){
+                vm.$set(vm.S_quantitiesList[index],'HasbId',false)
+            }
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'project2/report/reCalculateWorkAmount',
@@ -1348,7 +1350,7 @@ export default {
             }).then(() => {
                 axios({
                     method:'GET',
-                    url:vm.BDMSUrl+'/manifest2/deleteMBRelation',
+                    url:vm.BDMSUrl+'manifest2/deleteMBRelation',
                     headers:{
                         token:vm.token
                     },

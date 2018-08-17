@@ -15,8 +15,8 @@
                 <i class="detial icon"></i>明细基本信息
             </span>
              <span class="item-btn clearfix">
-                <label class="item-btn-icon icon-0" v-if="!isSnapshot && checkEditAuth" @click="editReport()">设计</label>
-                <label class="item-btn-icon icon-1" v-if="!isSnapshot" @click="showSnapshotBox()">快照</label>
+                <label class="item-btn-icon icon-0" style="display:none" v-if="!isSnapshot && checkEditAuth" @click="editReport()">设计</label>
+                <label class="item-btn-icon icon-1" style="display:none" v-if="!isSnapshot" @click="showSnapshotBox()">快照</label>
                 <label class="item-btn-icon icon-2" @click="exportToExcel()">导出EXCEL</label>
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>

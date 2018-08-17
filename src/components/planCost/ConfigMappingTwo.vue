@@ -57,7 +57,7 @@
                             index-text="序号"
                             :data="mappingData" :columns="columns" :tree-type="props.treeType"
                             :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                            :border="props.border" empty-text="正在加载...">
+                            :border="props.border" empty-text="暂无数据...">
                             <template slot="action" slot-scope="scope">
                                 <div v-if="scope.row.level == 2">
                                     <div v-if="scope.row.unmappingEntity == 0">
@@ -445,6 +445,7 @@ export default {
                     token:this.token
                 }
             }).then(response=>{
+                console.log(response.data)
                 if(response.data.cd == 0){
                     if(response.data.rt.rows!=null && response.data.rt.rows.length != 0){
                         response.data.rt.rows.forEach(item=>{
@@ -538,6 +539,7 @@ export default {
                     projectId:this.projId,
                 }
             }).then(response=>{
+                console.log(response.data)
                 if(response.data.cd == 0){
                     this.loading = false;
                     if(response.data.rt !=null){
