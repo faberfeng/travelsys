@@ -78,7 +78,6 @@
                         <div class="cancle">
                             <i class="cancle1" @click="cancleLeft"></i>
                         </div>
-                        但是JFK就
                     </div>
                 </div>
             </div>
