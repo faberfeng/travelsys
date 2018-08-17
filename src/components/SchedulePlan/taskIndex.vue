@@ -23,11 +23,11 @@
             更多配置
           </router-link>
           <div v-if="!showCommonList" class="item-search">
-                        <span class="title-right">
-                                <input type="text" placeholder="请输入文件名称" v-model="searchTaskName"
-                                       class="title-right-icon" @keyup.enter="getTaskList">
-                                <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
-                        </span>
+                <span class="title-right">
+                    <input type="text" placeholder="请输入文件名称" v-model="searchTaskName"
+                            class="title-right-icon" @keyup.enter="getTaskList">
+                    <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
+                </span>
             <span class="icon-type" @click="getGanttList"></span>
           </div>
         </div>

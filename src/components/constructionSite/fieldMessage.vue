@@ -1,5 +1,11 @@
 <template>
     <div id="fieldMessage">
+        <div id="GroupSelect">
+            <!-- <select v-model="selectUgId" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
+            </select> -->
+            <i class="icon-sanjiao"></i>
+        </div>
             <div class="topHeader">
                 <div id="item-box-file">
                     <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
@@ -33,6 +39,44 @@ export default {
         return{
 
         }
+    },
+    create(){
+         var vm = this;
+        // vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        this.token = localStorage.getItem('token');
+        this.projId = localStorage.getItem('projId');
+        vm.userId  = localStorage.getItem('userid');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+    },
+    filters:{
+
+    },
+    methods:{
+        getContactIndex(){
+            axios({
+            method:'get',
+            url:this.BDMSUrl+'/project2/buildSite/contactIndex',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                projId:this.projId,
+            },
+            
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    
+                    // this.entType=response.data.rt.entType;
+                    // this.ugId=response.data.rt.ugId;
+                    // this.validateAuth();
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+        }
+
+
     }
     
 }
@@ -47,7 +91,43 @@ export default {
         list-style: none;
     }
     #fieldMessage{
-         .topHeader{
+        #GroupSelect {
+            display: block;
+            width: 168px;
+            height: 30px;
+            position: fixed;
+            top: 77px;
+            z-index: 1000;
+            right: 24px;
+            .inp-search {
+                width: 168px;
+                border-radius: 15px;
+                height: 30px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #fafafa;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                float: left;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .icon-sanjiao {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 12px;
+                right: 11px;
+            }
+        }
+        .topHeader{
             box-sizing: border-box;
             position: fixed;
             top: 116px;
