@@ -30,19 +30,8 @@
                                 <span class="item-draft" @click="draftMsg">草<br>稿</span>
                             </div>
                         </div>
-                        <div class="left_content">
+                        <div :class="[{'left_content_box1':showLeftContent},'left_content']">
                             <div class="left_content_box">
-                                <!-- <div class="left_content_sendMsg" v-if="screenLeft.item==2">
-                                    <div class="left_content_header">
-                                            <span class="item_word">收件()</span>
-                                            <span class="item-upload">新建</span>
-                                    </div>
-                                    <div class="left_content_body">
-                                        <ul>
-                                            <li></li>
-                                        </ul>
-                                    </div>
-                                </div> -->
                                 <div class="left_content_receive">
                                     <div class="left_content_header">
                                             <span class="item_word" v-if="screenLeft.item==2">收件({{rowsListLength}})</span>
@@ -60,17 +49,6 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <!-- <div class="left_content_draft" v-if="screenLeft.item==0">
-                                    <div class="left_content_header">
-                                            <span class="item_word">草稿()</span>
-                                            <span class="item-upload">新建</span>
-                                    </div>
-                                    <div class="left_content_body">
-                                        <ul>
-                                            <li></li>
-                                        </ul>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -78,8 +56,92 @@
                         <div class="cancle">
                             <i class="cancle1" @click="cancleLeft"></i>
                         </div>
+                        <div class="box_header">
+                            <span>详细</span>
+                        </div>
+                        <div class="box_content">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>主题：</th>
+                                        <td><el-input v-model="projectValue"></el-input></td>
+                                    </tr>
+                                    <tr>
+                                        <th>主送：</th>
+                                        <td>
+                                            <el-select v-model="mainSendMsgValue">
+                                                <el-option :value="item.ugId" v-for="(item) in  ugList" :key="item.ugId" :label="item.ugName">
+                                                </el-option>
+                                            </el-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>抄送：</th>
+                                        <td>
+                                            <el-select v-model="copySendMsgValue">
+                                                <el-option :value="item.ugId" v-for="(item) in  ugList" :key="item.ugId" :label="item.ugName">
+                                                </el-option>
+                                            </el-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>内容：</th>
+                                        <td>
+                                            <el-input
+                                                type="textarea"
+                                                :rows="5"
+                                                :cols="100"
+                                                placeholder="请输入内容"
+                                                v-model="textarea">
+                                            </el-input>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="files">
+                                <span class="text">附件:</span>
+                                <span class="icon-eye" >视点</span>
+                                <span class="icon-file" @click="showUploadBox_file">文档</span>
+                                <span class="icon-message" >清单</span>
+                                <span class="icon-image" @click="showUploadBox_img" >图片</span>
+                            </div>
+                            <div class="btn">
+                                <span class="item-cancle" >取消</span>
+                                <span class="item-save" >保存</span>
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div :title="title" v-if="uploadshow"  id="edit" class="hahahha">
+                    <div class="el-dialog__header">
+                        <span class="el-dialog__title" v-text="type==1?'图片上传':'文件上传'"></span>
+                        <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="upImgCancle">
+                            <i class="el-dialog__close el-icon el-icon-close"></i>
+                        </button>
+                    </div>
+                    <div class="el-dialog__body">
+                        <div class="editBody">
+                            <div class="editBodytwo imageBody">
+                                <label class=" imageBodyText">上传文件 :</label>
+                                <span class="updataImageSpan">
+                                    <span @click="selectImg">
+                                        <button class="upImgBtn">选择文件</button>
+                                    </span>
+                                    <input class="upInput"  type="file" :accept="type == 1?'image/*':''" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                                </span>
+                                <span class="upImgText">{{imageName}}</span> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-dialog__footer">
+                        <div slot="footer" class="dialog-footer">
+                            <button class="editBtnS" @click="uploadIMG">上传</button>
+                            <button class="editBtnC" @click="upImgCancle">取消</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="mask" v-if="uploadshow"></div>
             </div>
     </div>
 </template>
@@ -92,6 +154,9 @@ export default {
         return{
             contactIndexList:'',
             selectUgId:'',
+            mainSendMsgValue:'',
+            copySendMsgValue:'',
+            textarea:'',
             ugList:'',
             contactList:'',
             rowsList:'',
@@ -102,6 +167,13 @@ export default {
             },
             ischeck:'',
             showLeftContent:false,
+            projectValue:'',
+            uploadshow:false,
+            type:'',
+            imageName:'',
+            filesList:'',
+            attachList:'',
+            title:'',
         }
     },
     created(){
@@ -127,6 +199,7 @@ export default {
     watch:{
         selectUgId: function (val) {
         var vm = this;
+        vm.getContactIndex();
       },
     },
     methods:{
@@ -147,6 +220,8 @@ export default {
                     this.contactIndexList=response.data.rt;
                     this.ugList=response.data.rt.pug.ugList;
                     this.selectUgId=response.data.rt.pug.selectUgId;
+                    this.mainSendMsgValue=response.data.rt.pug.selectUgId;
+                    this.copySendMsgValue=response.data.rt.pug.selectUgId;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -196,7 +271,92 @@ export default {
         },
         newFile(){
             this.showLeftContent=!this.showLeftContent;
-        }
+        },
+        showUploadBox_img(){
+            var vm = this
+            vm.type = 1
+            vm.uploadshow = true
+        },
+        showUploadBox_file(){
+             var vm = this
+            vm.type = 2
+            vm.uploadshow = true
+        },
+        fileChanged(file){
+            var vm = this
+            const list = vm.$refs.file.files
+            vm.imageName = list[0].name
+            if(vm.type == 1){
+                 vm.attachList = list[0]
+            }else{
+                 vm.filesList = list[0]
+            }
+        },
+        upImgCancle(){
+            var vm = this
+            vm.uploadshow = false
+            vm.imageName = '未选择任何文件'
+            vm.filesList = null
+            vm.attachList = null
+        },
+        uploadIMG(){
+            var vm = this
+            if(vm.type == 1){
+                if(vm.attachList == null){
+                    vm.$message({
+                        type:'error',
+                        message:'请选择图片！'
+                    })
+                    return false
+                }
+            }else{
+                if(vm.filesList == null){
+                    vm.$message({
+                        type:'error',
+                        message:'请选择文件！'
+                    })
+                    return false
+                }
+            }
+            var returnUrl = vm.BDMSUrl+'project/contactList2/dcUpload?ugId='+vm.selectugid+"&type="+vm.type+'&dirId=-1'
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData = new FormData()
+            formData.append('token',vm.token);
+            formData.append('projId',vm.projId);
+            formData.append('type',1);
+            if(vm.type == 1){
+                  formData.append('file',vm.attachList);
+            }else{
+                formData.append('file',vm.filesList);
+            }
+            formData.append('userId',vm.userId);
+            formData.append('modelCode','006');//施工现场的文件代码
+            formData.append('returnUrl',returnUrl);
+            axios({
+                method:'POST',
+                url:vm.QJFileManageSystemURL+'/uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData,
+            }).then((response)=>{
+                if(response.data.rt){
+                    if(vm.type == 1){
+                         vm.attachId.push(response.data.rt)
+                    }else{
+                         vm.fileId.push(response.data.rt)
+                    }
+                    vm.$refs.file.value = ''
+                    vm.upImgCancle()
+                }
+            }).catch((err)=>{
+                vm.imageName ='未选择任何文件'
+                console.log(err)
+            })
+        },
+        selectImg(){
+             this.$refs.file.click()
+        },
 
     }
     
@@ -207,6 +367,12 @@ export default {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+     .el-input__inner {
+            width: 400px !important;
+        }
+    .upInput{
+        display: none;
     }
     li{
         list-style: none;
@@ -435,14 +601,17 @@ export default {
                         }
                     }
                 }
+                // .left_content_box1{
+                //     width: 40%;
+                // }
                 .left_content{
                     border-top:1px solid #ccc;
                     padding: 19px 13px 0 10px;
                     .left_content_box{
                         //发送样式
-                        .left_content_sendMsg,.left_content_receive,.left_content_draft{
+                        .left_content_receive{
                             .left_content_header{
-                                height: 40px;
+                                height: 33px;
                                 border-bottom: 1px solid #ccc;
                                     .item_word{
                                         font-size: 16px;
@@ -515,13 +684,15 @@ export default {
                 position: fixed;
                 right: 0px;
                 bottom: 0;
-                width: 40%;
+                width: 50%;
                 padding-left: 25px;
                 top: 116px;
-                transition: all .5s ease;
+                transition: all .7s ease;
                 background: #fff;
                 z-index: 10;
                 overflow-y: auto;
+                //  border-top: 1px solid #ccc;
+                //  padding: 19px 13px 0 10px;
                 // border-left:1px solid #ccc;
                 
                 // -webkit-box-shadow: 3px 3px 3px #aaaaaa;
@@ -547,14 +718,173 @@ export default {
                         background-image: url('./images/cancle.png');
                     }
                 }
+                .box_header{
+                    height: 50px;
+                    margin-left:20px;
+                    // width: 90%;
+                    border-bottom: 1px solid #ccc;
+                    span{
+                        font-size: 16px;
+                        color:#fc3439;
+                        line-height: 16px;
+                        float: left;
+                        margin-left:25px;
+                        margin-top:20px;
+                        font-weight: bold;
+                        display: inline-block;
+                        
+                    }
+
+                }
+                .box_content{
+                    table{
+                        tbody{
+                            th{
+                                font-size: 14px;
+                                line-height: 14px;
+                                color:#666;
+                            }
+                            tr{
+                                width: 100%;
+                                margin-left:25px;
+                                margin-top:30px;
+                                display: inline-block;
+                                
+                            }
+                        }
+                        
+                    }
+                    .files{
+                        width:400px;
+                        height: 30px;
+                        margin-left:10px;
+                        margin-top:10px;
+                            .text{
+                                font-size: 14px;
+                                line-height: 14px;
+                                color:#666;
+                                font-weight: bold;
+                            }
+                            span{
+                                line-height: 16px;
+                                height: 16px;
+                                float: left;
+                                position: relative;
+                                cursor: pointer;
+                                margin-left: 24px;
+                                margin-right: 20px;
+                                font-size: 12px;
+                                color: #666666;
+                            }
+                            .icon-eye::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 12px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/eye.png')no-repeat 0 0;
+                                content: '';
+                            }
+                            .icon-image::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 14px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/image.png')no-repeat 0 0;
+                                content: '';
+                            }
+                            .icon-file::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 16px;
+                                height: 18px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/file.png')no-repeat 0 0;
+                                content: '';
+                            }
+                            .icon-message::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 15px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/message.png')no-repeat 0 0;
+                                content: '';
+                            }
+                        }
+                        .btn{
+                            float: right;
+                            margin-right:100px;
+                            .item-save{
+                                float: right;
+                                margin-right: 14px;
+                                background: #fc3439;
+                                color: #ffffff;
+                                font-size: 12px;
+                                height: 26px;
+                                width: 78px;
+                                border-radius: 2px;
+                                text-align: center;
+                                line-height: 26px;
+                                cursor: pointer;
+
+                            }
+                            .item-cancle{
+                                float: right;
+                                margin-right: 14px;
+                                background: #666;
+                                color: #ffffff;
+                                font-size: 12px;
+                                height: 26px;
+                                width: 78px;
+                                border-radius: 2px;
+                                text-align: center;
+                                line-height: 26px;
+                                cursor: pointer;
+                            }
+
+                        }
+                }
             }
             .box-left{
                 right: 0px;
                 bottom: 0px;
                 width: 0px;
-                transition: all .5s ease;
+                transition: all .7s ease;
             }
         }
+        #edit{
+            position: fixed;
+            z-index: 3003;
+            background: #ffffff;
+            }
+        .hahahha{
+            top: 15vh;
+            left: 50%;
+            width: 660px;
+            margin-left:-330px;
+            border-radius: 5px;
+        }
+        #mask{
+            z-index: 3000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+            background: #000;
+        }
+       
     }
 
 </style>
