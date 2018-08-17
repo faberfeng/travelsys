@@ -1371,7 +1371,7 @@ export default Vue.component('common-edit',{
             },
             pageDetialTtotal:'',
             goujianList:[],
-            
+            flag:false,
         }
     },
     watch:{
@@ -1931,7 +1931,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         },
-        saveForm(needCount){
+        saveFormTwo(needCount){
             var vm = this
             if(vm.database == ''){
                 vm.$message({
@@ -1953,23 +1953,12 @@ export default Vue.component('common-edit',{
                 })
                 return
             }
-            //判断报表名称是否重复
-            let flag = vm.isReportNameRepeat(rcId,rcName);
-            console.log(flag)
-            if(flag){
-                 vm.$message({
-                    type:'warning',
-                    message:'名称重复!'
-                })
-                return;
-            }
-        let rtName = '';
-        this.options_type.forEach(item=>{
-            if(item.id == vm.value_type){
-                rtName = item.Name;
-            }
-        })
-        
+            let rtName = '';
+            this.options_type.forEach(item=>{
+                if(item.id == vm.value_type){
+                    rtName = item.Name;
+                }
+            })
             var rc = {
                 reportName: rcName,
                 reportTableName: rtName,   //筛选 - 类型 表名
@@ -2259,14 +2248,14 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         },
-        isReportNameRepeat(rcId,rcName){
+        saveForm(needCount){
             var vm = this
             $.ajax({
                 type: "POST",
                 url:vm.BDMSUrl + 'project2/report/isRepeat',
                 data:{
-                    id: rcId,
-                    name: rcName,
+                    id: this.rcId,
+                    name: this.rcName,
                     projId:vm.projId
                 },
                 headers:{
@@ -2275,15 +2264,21 @@ export default Vue.component('common-edit',{
                 async:false, //同步
                 success:function(response){
                     if(response.cd == 0){
-                        if(response.msg == 'ok!'){
-                            return false;
-                        }
-                    }else if(response.msg == 'repeat!'){
-                        return  true;
+                        //if(response.msg == 'ok!'){
+                           // this.flag = false;
+                            vm.saveFormTwo(needCount);
+                        //}
+                    }else if(response.cd == '10001'){
+                        //this.flag = true;
+                        vm.$message({
+                            type:'warning',
+                            message:'名称重复!'
+                        })
                     }
                 }
             });
         },
+
         initFiled(isClear){
             var vm = this
             vm.data_right = []

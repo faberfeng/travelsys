@@ -606,7 +606,6 @@ export default {
         },
         refrehPage(event){
             var vm = this
-            console.log(event)
             if(event != null){
                 if(event.showData){
                     vm.backToH()
