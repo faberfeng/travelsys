@@ -14,12 +14,12 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <router-link :to="''"  class="label-item">  
+                <!-- <router-link :to="''"  class="label-item">  
                     成本审批  
                 </router-link>
                 <router-link :to="''"  class="label-item">  
                     成本分析  
-                </router-link>
+                </router-link> -->
             </div>
             <div class="project" v-loading="loading" v-if='showMainProject'>
                 <!--以下是实时列表-->
@@ -70,7 +70,7 @@
                         </tbody>
                     </table>
                     <div v-if=" S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                            无实时报表
+                            无实时可追溯工程量清单
                     </div>
                 </div>
                 <!--以下是page-navigitation-->
@@ -165,7 +165,7 @@
                         </tbody>
                     </table>
                     <div v-if=" D_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                            无快照报表
+                            无独立工程量清单
                     </div>
                 </div>
                 <!--以下是page-navigitation-->
@@ -621,7 +621,7 @@
                     <button class="editBtnC" @click="datadistinguishCancel">取消导入</button>
                 </div>
             </el-dialog>
-            <el-dialog title="选择需要配置的映射方式" :visible="createShow" @close="createShowClose">
+            <el-dialog title="选择创建和映射方式" :visible="createShow" @close="createShowClose">
                 <div class="editBodytwo">
                     <p class="ptitle">选择生成工程量清单的选择方式:</p>
                     <select class="pselect" v-model="projMethodData">
@@ -641,7 +641,7 @@
                     <button class="editBtnC" @click="createShowClose">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="选择创建和映射方式" :visible="mappingShow" @close="mappingShowClose">
+            <el-dialog title="选择需要配置的映射方式" :visible="mappingShow" @close="mappingShowClose">
                 <div class="editBodytwo">
                     <p class="ptitle">选择需要配置映射的方式:</p>
                     <select class="pselect" v-model="mappingmethods">
@@ -981,9 +981,7 @@ export default {
     methods:{
         //配置映射
         configMapping(){
-            
             this.mappingShow = true;
-
         },
         mappingShowSure(){
             if(this.mappingmethods == '1'){
@@ -1100,49 +1098,56 @@ export default {
             selectedRight.forEach(item=>{
                 componentCodesCopy.push(item.number);
             })
-
-            if(this.yinsheMethodData == 1){
-                axios({
-                    method:'get',
-                    url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpace',
-                    headers:{
-                        token:this.token
-                    },
-                    params:{
-                        projectId:this.projId,
-                        buildName:this.builduname,
-                        holderIds:JSON.stringify(holderIdCopy),
-                        componentCodes:JSON.stringify(componentCodesCopy)
-                    },
-                }).then(response=>{
-                    console.log(response.data);
-                    if(response.data.cd == 0){
-
-                    }else{
-                        alert(response.data.msg);
-                    }
-                })
-            }else if(this.yinsheMethodData == 2){
-                axios({
-                    method:'get',
-                    url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpaceTemplate',
-                    headers:{
-                        token:this.token
-                    },
-                    params:{
-                        projectId:this.projId,
-                        holderIds:JSON.stringify(holderIdCopy),
-                        componentCodes:JSON.stringify(componentCodesCopy),
-                        buildName:this.builduname
-                    }
-                }).then(response=>{
-                    console.log(response.data);
-                    if(response.data.cd == 0){
-
-                    }else{
-                        alert(response.data.msg);
-                    }
-                })
+            if(holderIdCopy.length !== 0 && componentCodesCopy.length !== 0){
+                if(this.yinsheMethodData == 1){
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpace',
+                        headers:{
+                            token:this.token
+                        },
+                        params:{
+                            projectId:this.projId,
+                            buildName:this.builduname,
+                        },
+                        data:{
+                            holderIds:holderIdCopy,
+                            componentCodes:componentCodesCopy
+                        }
+                    }).then(response=>{
+                        if(response.data.cd == 0){
+                            this.getSnapWorkAmountList();
+                            this.createMonomer.show = false;
+                        }else{
+                            alert(response.data.msg);
+                        }
+                    })
+                }else if(this.yinsheMethodData == 2){
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'project2/report/createWorkAmountManifestBySpaceTemplate',
+                        headers:{
+                            token:this.token
+                        },
+                        params:{
+                            projectId:this.projId,
+                            buildName:this.builduname
+                        },
+                        data:{
+                            holderIds:holderIdCopy,
+                            componentCodes:componentCodesCopy,
+                        }
+                    }).then(response=>{
+                        if(response.data.cd == 0){
+                            this.getSnapWorkAmountList();
+                            this.createMonomer.show = false;
+                        }else{
+                            alert(response.data.msg);
+                        }
+                    })
+                }
+            }else{
+                alert('空间范围和工程量范围为必须项！')
             }
         },
         //取消添加单体清单
@@ -1469,7 +1474,7 @@ export default {
                     if(response.data.rt != null){
                         vm.pageDetial_1.total = response.data.rt.pager.totalSize
                         if(response.data.rt.rows != null){
-                            vm. D_quantitiesList = response.data.rt.rows
+                            vm.D_quantitiesList = response.data.rt.rows;
                         }
                     }
                 }else if(response.data.cd == '-1'){

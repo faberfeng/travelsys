@@ -13,12 +13,12 @@
              <router-link :to="'/Cost/inventory'" class=" label-item">  
                 物料量清单  
             </router-link>
-            <router-link :to="''"  class="label-item">  
+            <!-- <router-link :to="''"  class="label-item">  
                 成本审批  
             </router-link>
             <router-link :to="''"  class="label-item">  
                 成本分析  
-            </router-link>
+            </router-link> -->
         </div>
         <div class="tableBox" v-loading="loading">
             <table class="UserList" border="1" width="100%" >

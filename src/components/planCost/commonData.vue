@@ -621,7 +621,6 @@ export default Vue.component('common-list',{
             vm.UPID = vm.$store.state.UPID
             vm.BDMSUrl = vm.$store.state.BDMSUrl
             vm.getIntoList();
-            console.log(this.token)
     }, 
     mounted(){
         var vm = this
@@ -749,7 +748,6 @@ export default Vue.component('common-list',{
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     vm.rcStyle = response.data.rt.rcStyle
                     vm.dataName = response.data.rt.reportName
@@ -768,13 +766,13 @@ export default Vue.component('common-list',{
                          * floor_summary
                          * **/
                         var monomer_summary = [],partition_summary = [],floor_summary = []
+
                         response.data.rt.rowList.forEach((element,index)=>{
                             if(element.rowType == 'ROW_TITLE'){
                                 vm.detailsHead = element.infoList;
                                 titleLength = element.infoList.length;
                             }else if(element.rowType == 'ROW_GROUP'){
                                 var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList)
-                                // console.log(ROW_GROUP_length)
                                 element.length = ROW_GROUP_length
                                 if(element.groupLevel == 1){//单体
                                     vm.groupHead.monomer.push(element)
@@ -784,19 +782,18 @@ export default Vue.component('common-list',{
                                     vm.groupHead.floor.push(element)
                                 }
         
-                            }else if(element.rowType == 'ROW_CONTENT'){
-                                // if(element.groupLevel == 3){
-                                //     element.infoList.splice(0,3);
-                                // }else if(element.groupLevel == 2){
-                                //     element.infoList.splice(0,2);
-                                // }else if(element.groupLevel == 1){
-                                //     element.infoList.splice(0,1);
-                                // }  
+                            }else if(element.rowType == 'ROW_CONTENT'){ 
+                                if(element.infoList[2]!=''){
+                                    element.infoList[11] = element.infoList[2];
+                                }else if(element.infoList[1]!=''){
+                                    element.infoList[11] = element.infoList[1];
+                                }else if(element.infoList[0]!=''){
+                                    element.infoList[11] = element.infoList[0];
+                                }
                                 vm.DatatableList.push({
                                     'list':element.infoList,
                                     'level':element.groupLevel
-                                });
-                                
+                                });                                
                             }else if(element.rowType == 'ROW_SUMMARY'){
                                 if(element.groupLevel == 1){//单体 的 小计
                                     monomer_summary.push(element)
@@ -823,7 +820,9 @@ export default Vue.component('common-list',{
                                 }
                             }
                         })
-
+                        vm.DatatableList.forEach(item=>{
+                            item.list.pop();    
+                        })
                         /**
                          * 查看各个小计数组，
                          * 确定插入总列表的方式
@@ -837,7 +836,6 @@ export default Vue.component('common-list',{
                         //     info:{}
                         // },
                     }
-                    // console.log(vm.groupHead)
                 }else{
                     vm.$message({
                         type:'error',
@@ -865,7 +863,6 @@ export default Vue.component('common-list',{
                 })
                 length++
             })      
-           //console.log(vm.DatatableList)
         },
         handelLevel(level){
             switch(level){

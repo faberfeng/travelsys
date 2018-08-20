@@ -14,12 +14,12 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item label-item-active">  
                     物料量清单  
                 </router-link>
-                <router-link :to="''"  class="label-item">  
+                <!-- <router-link :to="''"  class="label-item">  
                     成本审批  
                 </router-link>
                 <router-link :to="''"  class="label-item">  
                     成本分析  
-                </router-link>
+                </router-link> -->
             </div>
             <div class="project" v-if="!showCommonList && !showCommonDetial &&!duliWuliaoObj.show" v-loading="loading">
                 <!--以下是实时列表-->
@@ -66,7 +66,7 @@
                         </tbody>
                     </table>
                     <div v-if=" S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                            无实时报表
+                        无可追溯物料量清单
                     </div>
                 </div>
                 <!--以下是page-navigitation-->
