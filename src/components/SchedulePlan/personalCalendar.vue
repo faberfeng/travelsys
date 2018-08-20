@@ -2194,28 +2194,28 @@ export default {
                         }
                     }
                         .active-version{
-                        .item-file{
+                            .item-file{
+                                background: #fff;
+                                color: #fc3439;
+                                width: 25px;
+                                &::after{
+                                    background: #fff;
+                                    // border-right: 1px solid #ffffff;
+                                }
+                            }
+                            .item-event::after{
+                                background: #fff;
+                            }
+                         }
+                    .active{
+                        .item-event{
                             background: #fff;
                             color: #fc3439;
-                            width: 25px;
-                            &::after{
-                                background: #fff;
-                                // border-right: 1px solid #ffffff;
-                            }
                         }
-                        .item-event::after{
-                            background: #fff;
+                        .item-event{
+                        width: 25px;
                         }
-                    }
-                    .active{
-                    .item-event{
-                        background: #fff;
-                        color: #fc3439;
-                    }
-                    .item-event{
-                    width: 25px;
-                    }
-            } 
+                 } 
             }
         }
         .box-right-active{
