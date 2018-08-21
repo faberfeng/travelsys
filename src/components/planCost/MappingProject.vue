@@ -20,7 +20,7 @@
                             成本管理<i class="icon-sanjiao-right"></i>
                             <span style="cursor:pointer"  @click="back()">工程量清单</span>
                             <i class="icon-sanjiao-right"></i>
-                            <span class="strong">【{{projObj.classifyCode.split('-')[1]}}】构件名称</span>
+                            <span class="strong">{{projObj.engineerName}}【{{projObj.classifyCode.split('-')[1]}}】构件明细</span>
                         </p>
                         <p class="header clearfix">
                             <span class="left_header">
@@ -566,6 +566,7 @@ export default Vue.component('mapping-project',{
     },
     created(){
         this.projObj = this.projData;
+        console.log(this.projObj);
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 

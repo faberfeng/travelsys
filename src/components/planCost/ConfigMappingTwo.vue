@@ -17,12 +17,12 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <router-link :to="''"  class="label-item">  
+                <!-- <router-link :to="''"  class="label-item">  
                     成本审批  
                 </router-link>
                 <router-link :to="''"  class="label-item">  
                     成本分析  
-                </router-link>
+                </router-link> -->
             </div>
             <div v-if="showMain">
                 <div id="containerMessage">
@@ -336,12 +336,12 @@ export default {
                 },
                 {
                     label: '工程量编码',
-                    prop: 'code',
+                    prop: 'componentNumber',
                     align:"center",
                     headerAlign:"center"  
                 },
                 {
-                    label: '工程量项目',
+                    label: '工程量条目',
                     prop: 'entityCount',
                     align:"center",
                     headerAlign:"center" ,
@@ -970,11 +970,12 @@ export default {
         */
        editMapping(scope){
             this.editProjectMapped.show = true;
+            console.log(scope);
             this.editMappingData = scope.row;
             this.jiLiangCondition = scope.row.calCondition;
             this.jiLiangResult = scope.row.formula;
             this.projectNumber = scope.row.componentNumber.split('-')[1];
-            this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.componentName;
+            this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.name;
             axios({
                 method:'get',
                 url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',

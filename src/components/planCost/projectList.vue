@@ -20,7 +20,7 @@
                             成本管理<i class="icon-sanjiao-right"></i>
                             <span style="cursor:pointer"  @click="back()">工程量清单</span>
                             <i class="icon-sanjiao-right"></i>
-                            <span class="strong">{{projObj.title}}【{{projObj.number}}】构件名称</span>
+                            <span class="strong">{{projObj.title}}【{{projObj.number}}】构件明细</span>
                         </p>
                         <p class="header clearfix">
                              <span class="left_header">
@@ -51,8 +51,8 @@
                                                     <td>{{item.originalName}}</td>
                                                     <td>{{item.dCount}}</td>
                                                     <td>{{item.dUnit}}</td>
-                                                    <td>{{item.totalPrice}}</td>
                                                     <td>{{item.colligatePrice}}</td>
+                                                    <td>{{item.totalPrice}}</td>
                                                     <td>
                                                         <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
                                                         <button class="listBtn actionBtn" title="特征" @click="seeProperty(item)"></button>
@@ -140,17 +140,17 @@
                                 </el-table-column>
                                 <el-table-column
                                     label="计量单位"
-                                    prop="amount"
+                                    prop="unit"
                                     align="center">
                                 </el-table-column>
                                 <el-table-column
                                     label="综合单价"
-                                    prop="totalPrice"
+                                    prop="price"
                                     align="center">
                                 </el-table-column>
                                 <el-table-column
                                     label="价格"
-                                    prop="price"
+                                    prop="totalPrice"
                                     align="center">
                                 </el-table-column>
                                 <el-table-column
@@ -570,6 +570,7 @@ export default Vue.component('project-list',{
         this.projId = localStorage.getItem('projId');
         this.mainifistId = this.mId;
         this.projObjArr = this.baseObj.children;
+        
         this.projObjArr.forEach(item=>{
             if(item.characterValues.length!=0){
                 Object.assign(item,{
@@ -577,6 +578,7 @@ export default Vue.component('project-list',{
                 })
             }
         })
+        console.log(this.projObjArr)
         this.BDMSUrl = this.$store.state.BDMSUrl;  
     },
     methods:{
