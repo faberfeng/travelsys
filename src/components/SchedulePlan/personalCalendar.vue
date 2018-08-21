@@ -2657,7 +2657,7 @@ export default {
                                             
                                             td{
                                                 padding-left:10px;
-                                                height: 40px;
+                                                height: 36px;
                                                 text-align: left;
                                                 font-size: 12px;
                                                 box-sizing: border-box;
@@ -2976,7 +2976,7 @@ export default {
                 tbody{
                     tr{
                         td{
-                            height: 40px;
+                            height: 36px;
                             text-align: center;
                             font-weight: bold;
                             font-size: 12px;

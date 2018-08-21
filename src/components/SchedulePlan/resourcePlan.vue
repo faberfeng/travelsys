@@ -2443,7 +2443,7 @@ export default{
                         tr{
                             td{
                                 padding-left:10px;
-                                height: 40px;
+                                height: 36px;
                                 text-align: center;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
@@ -2457,7 +2457,7 @@ export default{
                             background:#fff;
                             td{
                                 padding-left:10px;
-                                height: 40px;
+                                height: 36px;
                                 text-align: center;
                                 font-size: 12px;
                                 box-sizing: border-box;

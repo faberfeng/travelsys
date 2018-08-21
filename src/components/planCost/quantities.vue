@@ -2051,7 +2051,7 @@ export default {
             this.listItem.showProject = false;
         },
         //查看清单
-        viewList(val){
+        listItem(val){
             this.duliProject.showProject = false;
             this.showDetail = false;
             this.showMainProject = false;

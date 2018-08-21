@@ -532,7 +532,7 @@ export default Vue.component('common-upload',{
             border-bottom: 1px solid #e1e1e1;
             background: #f3f3f3;
             th{
-                height: 50px;
+                height: 36px;
                 text-align: left;
                 font-size: 12px;
                 color: #999999;
@@ -544,7 +544,7 @@ export default Vue.component('common-upload',{
         tbody{
             tr{
                 td{
-                    height: 50px;
+                    height: 36px;
                     text-align: left;
                     box-sizing: border-box;
                     font-size: 14px;
