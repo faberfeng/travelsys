@@ -387,6 +387,9 @@
     .navigation{
         z-index: 0!important;
     }
+    .el-table .cell{
+        line-height: 14px;
+    }
     #CommenList{
         #print-qrcode{
             display: none;
@@ -852,7 +855,7 @@
                                 td{
                                     padding-left: 6px;
                                     padding-right: 15px;
-                                    height: 55px;
+                                    height: 36px;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -1021,7 +1024,7 @@
                         thead{
                             tr{
                                 th{
-                                    height: 50px;
+                                    height: 36px;
                                     padding-left: 10px;
                                     background: #f2f2f2;
                                     font-size: 14px;
@@ -1035,7 +1038,7 @@
                          tbody{
                             tr{
                                 td{
-                                    height: 50px;
+                                    height: 36px;
                                     padding-left: 10px;
                                     background: #ffffff;
                                     font-size: 14px;

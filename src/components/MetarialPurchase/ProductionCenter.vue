@@ -1167,15 +1167,15 @@ export default {
         thead {
             background: #f2f2f2;
             th {
-            padding-left: 6px;
-            padding-right: 15px;
-            height: 55px;
-            text-align: left;
-            box-sizing: border-box;
-            border-right: 1px solid #e6e6e6;
-            font-size: 12px;
-            color: #333333;
-            font-weight: normal;
+                padding-left: 6px;
+                padding-right: 15px;
+                height: 36px;
+                text-align: left;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #333333;
+                font-weight: normal;
             }
         }
         tbody {
@@ -1183,7 +1183,7 @@ export default {
                 td {
                     padding-left: 6px;
                     padding-right: 15px;
-                    height: 55px;
+                    height: 36px;
                     text-align: left;
                     box-sizing: border-box;
                     border-right: 1px solid #e6e6e6;

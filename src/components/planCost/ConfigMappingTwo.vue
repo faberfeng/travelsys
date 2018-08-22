@@ -445,7 +445,6 @@ export default {
                     token:this.token
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     if(response.data.rt.rows!=null && response.data.rt.rows.length != 0){
                         response.data.rt.rows.forEach(item=>{
@@ -539,7 +538,6 @@ export default {
                     projectId:this.projId,
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.loading = false;
                     if(response.data.rt !=null){
@@ -970,7 +968,6 @@ export default {
         */
        editMapping(scope){
             this.editProjectMapped.show = true;
-            console.log(scope);
             this.editMappingData = scope.row;
             this.jiLiangCondition = scope.row.calCondition;
             this.jiLiangResult = scope.row.formula;
@@ -1080,7 +1077,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    console.log(response.data)
                     this.addProjectMappingData = response.data.rt.rows;
                         this.addProjectMappingData.forEach(item=>{
                             item = Object.assign(item,{

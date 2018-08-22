@@ -674,7 +674,7 @@ export default {
             background: #f2f2f2;
             th{
                 padding-left: 10px;
-                height: 52px;
+                height: 36px;
                 text-align: left;
                 box-sizing: border-box;
                 border-right: 1px solid #e6e6e6;
@@ -686,7 +686,7 @@ export default {
             tr{
                 td{
                     padding-left: 10px;
-                    height: 52px;
+                    height: 36px;
                     text-align: left;
                     box-sizing: border-box;
                     border-right: 1px solid #e6e6e6;

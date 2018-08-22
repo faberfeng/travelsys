@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" id="logger">
         <h4 class="title"><span>工程日志管理</span></h4>
         <div class="loggerManage">
             <div class="selectMode">
@@ -12,7 +12,7 @@
                 <button class="queryBtn"  @click="queryLogger">查询</button>
             </div>
             <div class="projectTable">
-                <el-table class="table" border :data="enterpriseLoggerData" style="width:100%">
+                <el-table  border :data="enterpriseLoggerData" style="width:100%">
                     <el-table-column prop="operateUser" label="操作人" width="200px"></el-table-column>
                     <el-table-column prop="operateContent" label="事件"></el-table-column>
                     <el-table-column prop="operateTime" label="操作时间" width="250px"></el-table-column>
@@ -222,5 +222,25 @@ export default {
     .el-date-editor{
         height: 36px;
         width: 146px;
+    }
+</style>
+<style lang="less">
+    #logger{
+        .el-table th{
+            height: 36px;
+            padding: 0;   
+        }
+        .el-table__row{
+            height:36px!important;
+        }
+        .el-table td{
+            padding: 0!important;
+        }
+        .has-gutter tr{
+            background: #e6e6e6;
+        }
+        .is-leaf{
+            background: #e6e6e6;
+        }
     }
 </style>

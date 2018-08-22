@@ -1109,8 +1109,8 @@ export default {
         margin-right: 16px;
     }
     .zk-table__cell-inner {
-    padding: 6px 12px;
-}   
+        padding: 0px 12px;
+    }   
     .editBtn{
         background: url('../../assets/edit.png') no-repeat;
     }
@@ -1317,6 +1317,9 @@ export default {
                 border-radius: 2px;
             }
         }
+    }
+    .zk-table__body-row,.zk-table__header-row{
+        height: 36px;
     }
 }
 </style>

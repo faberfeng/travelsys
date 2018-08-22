@@ -85,7 +85,7 @@
                     <el-table-column prop="ResourceType" label="资源类型"></el-table-column>
                     <el-table-column prop="ResourceName" label="资源名称"></el-table-column>
                     <el-table-column prop="FileSize" label="资源包大小"></el-table-column>
-                    <el-table-column prop="UpdateTime" label="上传时间"></el-table-column>
+                    <el-table-column prop="UpdateTime" label="上传时间" width="200"></el-table-column>
                     <el-table-column prop="FileVersion" label="版本"></el-table-column>
                     <el-table-column prop="Comments" label="备注"></el-table-column>
                     <el-table-column prop="Loaded" label="当前状态"></el-table-column>
@@ -1400,9 +1400,6 @@ export default {
     .el-table--enable-row-hover .el-table__body tr:hover>td {
         background-color: #fafafa;
     }
-    .el-table th{
-            padding: 15px 0;
-    }
     .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
      border-right: 1px solid #e0e0e0;
     }
@@ -1414,6 +1411,16 @@ export default {
     }
     .el-table::before,.el-table--border::after, .el-table--group::after{
         display: none;
+    }
+    //修改行高
+    .el-table__row{
+        height:36px;
+    }
+    .el-table td,.el-table th{
+        padding: 0;
+    }
+    .el-table tr{
+        height: 36px;
     }
 </style>
 

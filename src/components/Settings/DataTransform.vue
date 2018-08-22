@@ -583,7 +583,14 @@ export default {
     }
     .el-table th{
         background-color: #f2f2f2!important;
-        height: 55px;
+        height: 36px;
+        padding:0;
+    }
+    .el-table td{
+        padding:0;
+    }
+    .el-table tr{
+        height: 36px;
     }
     .updataImageSpan{
         overflow: hidden;

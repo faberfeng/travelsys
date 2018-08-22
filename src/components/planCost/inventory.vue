@@ -14,12 +14,6 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item label-item-active">  
                     物料量清单  
                 </router-link>
-                <!-- <router-link :to="''"  class="label-item">  
-                    成本审批  
-                </router-link>
-                <router-link :to="''"  class="label-item">  
-                    成本分析  
-                </router-link> -->
             </div>
             <div class="project" v-if="!showCommonList && !showCommonDetial &&!duliWuliaoObj.show" v-loading="loading">
                 <!--以下是实时列表-->
@@ -1511,13 +1505,17 @@ export default {
                     },
                     data:formData
                 }).then(response=>{
-                    this.shureToImportshow = true;
-                    this.editBySelfShow = false;
-                    this.checkedResults = response.data.rt.dataProfiling;
-                    if(JSON.stringify(response.data.rt.checkResults)=='{}'){
-                        this.jiapyanResult = '所有数据校验通过!';
+                    if(response.data.cd == 0){
+                        this.editBySelfShow = false;
+                        this.checkedResults = response.data.rt.dataProfiling;
+                        if(JSON.stringify(response.data.rt.checkResults)=='{}'){
+                            this.jiapyanResult = '所有数据校验通过!';
+                        }else{
+                            this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
+                        }
+                        this.shureToImportshow = true;
                     }else{
-                        this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
+                        alert(response.data.msg);
                     }
                 })
             }else if(num == 0){
@@ -1984,7 +1982,7 @@ export default {
                     th{
                         padding-left: 6px;
                         padding-right: 15px;
-                        height: 55px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -1998,7 +1996,7 @@ export default {
                         td{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -2207,7 +2205,7 @@ export default {
                     border-bottom: 1px solid #e1e1e1;
                     background: #f3f3f3;
                     th{
-                        height: 50px;
+                        height: 36px;
                         text-align: left;
                         font-size: 12px;
                         color: #999999;
@@ -2219,7 +2217,7 @@ export default {
                 tbody{
                     tr{
                         td{
-                            height: 50px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             font-size: 14px;
@@ -2497,7 +2495,7 @@ export default {
                         th{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -2511,7 +2509,7 @@ export default {
                             td{
                                 padding-left: 6px;
                                 padding-right: 15px;
-                                height: 55px;
+                                height: 36px;
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;

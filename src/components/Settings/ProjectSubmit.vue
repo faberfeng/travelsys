@@ -1974,6 +1974,9 @@ export default {
             padding: 0;
             box-sizing: border-box;
         }
+        .zk-table__body-row,.zk-table__header-row{
+            height: 36px;
+        }
         .tableInputClass{
             margin: 0 30px;
             table{
@@ -2504,7 +2507,7 @@ export default {
             margin-top: 7px;
         }
         .zk-table__cell-inner {
-            padding: 6px 12px;
+            padding: 0px 12px;
         }   
         .editBtn{
             background: url('../../assets/edit.png') no-repeat;

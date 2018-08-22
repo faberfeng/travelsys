@@ -719,7 +719,7 @@ export default {
                 {
                     label: '项目名称',
                     prop: 'title',
-                     
+                    minWidth: '260px',
                     align:"center",
                     headerAlign:"center"  
                 },
@@ -777,7 +777,6 @@ export default {
                     prop:'operator',
                     type: 'template',
                     template: 'action',
-                    minWidth:'125px',
                     align:"center",
                     headerAlign:"center" 
                 }
@@ -1229,7 +1228,7 @@ export default {
                         }
                     }).then(response=>{
                         if(response.data.cd == 0){
-                            this.getSnapWorkAmountList();
+                            this.getSnapWorkAmountListTwo();
                             this.editBySelfShow = false;
                         }else{
                             alert(response.data.msg);
@@ -1415,6 +1414,43 @@ export default {
                 vm.getSingleWorkAmountList()
             })
         },
+        getSnapWorkAmountListTwo(){
+            var vm = this;
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/report/getSnapWorkAmountList',
+                headers:{
+                    token:vm.token
+                },
+                params:{
+                    projectId:vm.projId,
+                    pageNo:vm.pageDetial.currentPage,
+                    pageSize:vm.pageDetial.pagePerNum,
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null){
+                        vm.pageDetial.total = response.data.rt.total;
+                        if(response.data.rt.rows != null){
+                            vm.S_quantitiesList = response.data.rt.rows;
+                            vm.S_quantitiesList.forEach((Element,index)=>{
+                                if(Element.bId != null){
+                                    vm.$set(Element,'HasbId',true)
+                                }
+                            });
+                        }
+                    }
+                }else if(response.data.cd == '1'){
+                    vm.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    alert(response.data.msg);
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         //实时可追溯工程量清单
         getSnapWorkAmountList(){
             var vm = this;
@@ -1444,12 +1480,12 @@ export default {
                             });
                         }
                     }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
+                }else if(response.data.cd == '1'){
                     vm.$router.push({
                         path:'/login'
                     })
+                }else{
+                    alert(response.data.msg);
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -2130,6 +2166,9 @@ export default {
 </script>
 <style lang="less" >
     #quantitiesList{
+        .zk-table__header-row,.zk-table__body-row{
+            height:36px;
+        }
         .threeP{
             button{
                 width: 200px;
@@ -2667,7 +2706,7 @@ export default {
                     th{
                         padding-left: 6px;
                         padding-right: 15px;
-                        height: 55px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -2681,7 +2720,7 @@ export default {
                         td{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
