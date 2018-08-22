@@ -145,12 +145,12 @@
                                     </div>
                                 </div>
                                 <div class="header_body">
-                                    <p >
+                                    
                                         <span class="text">检查序号：</span><span class="value">{{checkId}}</span>
                                         <span class="text">状态：</span><span class="value">{{currCheckStatus|securityStatusChange()}}</span>
                                         <span class="text">检查人：</span><span class="value">{{checkUserName|nameChange()}}</span>
                                         <span class="text">检查时间：</span><span class="value">{{checkTime | changeTime()}}</span>
-                                    </p>
+                                
                                     <ul id="checkPics" style="overflow: auto;"></ul>
                                 </div>
                             </div>
@@ -229,12 +229,12 @@
                             </el-pagination> -->
                         </div>
                     </div>
-                    <div class="el-dialog__footer">
+                    <!-- <div class="el-dialog__footer">
                         <div slot="footer" class="dialog-footer">
                             <button class="editBtnS">网页预览</button> 
                             <button class="editBtnC">打印当前页标签</button>
                         </div>
-                    </div>
+                    </div> -->
             </div>
             <div v-if="labelListShow1"  id="edit" class="dialog">
                     <div class="el-dialog__header">
@@ -292,12 +292,12 @@
                             </el-pagination> -->
                         </div>
                     </div>
-                    <div class="el-dialog__footer">
+                    <!-- <div class="el-dialog__footer">
                         <div slot="footer" class="dialog-footer">
                             <button class="editBtnS">网页预览</button> 
                             <button class="editBtnC">打印当前页标签</button>
                         </div>
-                    </div>
+                    </div> -->
             </div>
             <div id="mask" v-if="labelListShow||labelListShow1" ></div>
             <div id="edit">
@@ -953,6 +953,9 @@ export default {
     },
     //添加检查点位
     addCheckPoint(){
+        if(this.checkPointTdName==''){
+            return ''
+        }else{
         var vm=this;
          axios({
             method:'get',
@@ -975,6 +978,7 @@ export default {
                 alert(response.data.msg);
             }
         })
+        }
     },
     //关闭
     newFileClose(){
@@ -1496,7 +1500,7 @@ export default {
                             tr {
                                 th {
                                 padding-left: 10px;
-                                height: 30px;
+                                height: 36px;
                                 text-align: center;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
@@ -1512,7 +1516,7 @@ export default {
                             tr {
                                 td {
                                     padding-left: 10px;
-                                    height: 30px;
+                                    height: 36px;
                                     text-align: left;
                                     font-size: 12px;
                                     box-sizing: border-box;
@@ -1602,7 +1606,7 @@ export default {
                                     tr {
                                         th {
                                         padding-left: 10px;
-                                        height: 30px;
+                                        height: 36px;
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
@@ -1622,7 +1626,7 @@ export default {
                                     tr {
                                         td {
                                         padding-left: 10px;
-                                        height: 30px;
+                                        height: 36px;
                                         text-align: left;
                                         font-size: 12px;
                                         box-sizing: border-box;
@@ -1674,7 +1678,7 @@ export default {
                     }
                     .pagination table {
                         float: left;
-                        height: 30px;
+                        height: 36px;
                         th, td {
                             min-width: 5px;
                             padding: 0px;
@@ -1802,20 +1806,19 @@ export default {
                         }
                         .header_body{
                             width: 100%;
-                            p{
                                 text-align: left;
                                 margin-top:10px;
                                 float: left;
                                 .text{
-                                    margin-right: 20px;
-                                    width: 100px;
+                                    // margin-right: 0px;
+                                    width: 80px;
                                     display: inline-block;
                                     font-size:14px;
                                     line-height: 14px;
                                     color:#333333;
                                 }
                                 .value{
-                                    margin-right: 20px;
+                                    margin-right: 5px;
                                     width: 150px;
                                     display: inline-block;
                                     font-size:14px;
@@ -1823,8 +1826,6 @@ export default {
                                     color:#333333;
 
                                 }
-                            }
-
 
                         }
                     }
@@ -1901,8 +1902,11 @@ export default {
             z-index: 3001;
             position: fixed;
             background: #fff;
+            
             .el-dialog__body{
                 margin-top: 20px;
+                overflow-y: auto;
+                height: 580px;
             }
             .editBody{
                 margin: 0 20px;
@@ -2053,7 +2057,7 @@ export default {
                                 tr {
                                     th {
                                     padding-left: 10px;
-                                    height: 30px;
+                                    height: 36px;
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -2074,7 +2078,7 @@ export default {
                                 tr {
                                     td {
                                         padding-left: 10px;
-                                        height: 30px;
+                                        height: 36px;
                                         text-align: left;
                                         font-size: 12px;
                                         box-sizing: border-box;
@@ -2118,6 +2122,13 @@ export default {
                         }
                         .newFile{
                             background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .make{
+                             background: url('../ManageCost/images/add.png')no-repeat 0 0;
                                 margin-right: 10px;
                                 &:hover{
                                     background: url('../ManageCost/images/add1.png')no-repeat 0 0;

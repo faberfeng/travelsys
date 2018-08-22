@@ -933,7 +933,7 @@
                         th{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -947,7 +947,7 @@
                             td{
                                 padding-left: 6px;
                                 padding-right: 15px;
-                                height: 55px;
+                                height: 36px;
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
@@ -1496,7 +1496,7 @@
                             th{
                                 padding-left: 6px;
                                 padding-right: 15px;
-                                height: 55px;
+                                height: 36px;
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
@@ -1510,7 +1510,7 @@
                                 td{
                                     padding-left: 6px;
                                     padding-right: 15px;
-                                    height: 55px;
+                                    height: 36px;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;

@@ -938,7 +938,7 @@
                                 background:#f2f2f2;
                                 td{
                                     padding-left:10px;
-                                    height: 40px;
+                                    height: 36px;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -1002,7 +1002,7 @@
                                         background:#fff;
                                        td{
                                            padding-left:10px;
-                                            height: 40px;
+                                            height: 36px;
                                             text-align: left;
                                             font-size: 12px;
                                             box-sizing: border-box;
@@ -1057,7 +1057,7 @@
                             tbody{
                                 tr{
                                     td{
-                                        height: 44px;
+                                        height: 36px;
                                         text-align: center;
                                         font-size: 12px;
                                         color: #d3d3d3;
@@ -1098,7 +1098,7 @@
                                         background:#f2f2f2;
                                     td{
                                         padding-left:10px;
-                                        height: 42px;
+                                        height: 36px;
                                         text-align: left;
                                         font-size: 14px;
                                         color: #666666;
@@ -1108,7 +1108,7 @@
                                         background:#fff;
                                         td{
                                             padding-left:10px;
-                                            height: 40px;
+                                            height: 36px;
                                             text-align: left;
                                             font-size: 12px;
                                             box-sizing: border-box;
@@ -1209,7 +1209,7 @@
                                         background:#f2f2f2;
                                     td{
                                         padding-left:10px;
-                                        height: 42px;
+                                        height: 36px;
                                         text-align: left;
                                         font-size: 14px;
                                         color: #666666;
@@ -1219,7 +1219,7 @@
                                         background:#fff;
                                         td{
                                             padding-left:10px;
-                                            height: 40px;
+                                            height: 36px;
                                             text-align: left;
                                             font-size: 12px;
                                             box-sizing: border-box;
@@ -1379,7 +1379,7 @@
                 tbody{
                     tr{
                         td{
-                            height: 40px;
+                            height: 36px;
                             text-align: center;
                             font-weight: bold;
                             font-size: 12px;

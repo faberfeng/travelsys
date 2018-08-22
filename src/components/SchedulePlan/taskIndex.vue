@@ -6,7 +6,6 @@
       </select>
       <i class="icon-sanjiao"></i>
     </div>
-
     <div :class="[{'box-left-active':!screenLeft.show},'box-left-container']">
       <div style="min-width: 950px;overflow-y: auto;">
         <div id="item-box-file">
@@ -4389,19 +4388,16 @@
                     .detial-text-name{
                         color: #999999;
                         width: 65px;
-                        // display: inline-block;
+                        display: inline-block;
                         //  float: left;
                     }
                     .detial-text-value{
-                        // float: left;
-                        // margin-left:-100px;
+                        display: inline-block;
                         color: #333333;
-                        width: 130px;
-                        cursor: pointer;
+                        max-width: 90px;
                         overflow: hidden;
-                        // overflow-x: hidden;
                         text-overflow: ellipsis;
-                        // white-space: nowrap;
+                        white-space: nowrap;
                     }
                     .item-detial{
                         margin-top: 16px;
@@ -4477,7 +4473,7 @@
             tr {
               th {
                 padding-left: 10px;
-                height: 30px;
+                height: 36px;
                 text-align: center;
                 box-sizing: border-box;
                 border-right: 1px solid #e6e6e6;
@@ -4493,7 +4489,7 @@
             tr {
               td {
                 padding-left: 10px;
-                height: 30px;
+                height: 36px;
                 text-align: left;
                 font-size: 12px;
                 box-sizing: border-box;
@@ -4808,7 +4804,7 @@
                       tr {
                         td {
                           padding-left: 10px;
-                          height: 32px;
+                          height: 36px;
                           text-align: center;
                           box-sizing: border-box;
                           border-right: 1px solid #e6e6e6;
@@ -4825,7 +4821,7 @@
 
                         td {
                           padding-left: 10px;
-                          height: 32px;
+                          height: 36px;
                           text-align: left;
                           font-size: 12px;
                           box-sizing: border-box;
@@ -5044,7 +5040,7 @@
                         td {
                           padding-left: 6px;
                           padding-right: 15px;
-                          height: 31px;
+                          height: 36px;
                           text-align: left;
                           box-sizing: border-box;
                           border-right: 1px solid #e6e6e6;

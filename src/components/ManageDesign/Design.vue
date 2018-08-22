@@ -619,7 +619,7 @@
                         background: #f8f8f9;
                         th{
                             padding-left: 10px;
-                            height: 40px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -635,7 +635,7 @@
                             td{
                                 padding-left: 5px;
                                 padding-right: 5px;
-                                height: 40px;
+                                height: 36px;
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;

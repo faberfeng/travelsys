@@ -51,7 +51,6 @@
                                 @current-change="handleVideoCurrentChange"
                                 layout="prev, pager, next"
                                 :page-size="1"
-                                :current-page.sync="currentPage3"
                                 :total="videoPageTotal">
                                 </el-pagination>
                             </div>
@@ -67,8 +66,13 @@
                                 </div>
                                 <div  id="planeDIV1"  v-show="isFullPicture">
                                     <img width="100%" height="310px" ref="fullPicture" :src="pathPictureUrl" >
-                                    <!-- <span :class="['round']"  :style="{'top':imgdetial1.y+'px','left':imgdetial1.x+'px'}">
-                                    </span> -->
+                                    <ul>
+                                        <li v-for="(item,index) in imgdetial1" :key="index">
+                                            <span :class="['round']" @click="clickQjPic(item.index)"  :style="{'top':(item.y/5)+'px','left':(item.x/5)+'px'}">
+                                            </span>
+                                        </li>
+                                    </ul>
+                                    
                                 </div>
                             </div>
                             <div class="video_bottom">
@@ -80,7 +84,7 @@
                                 @current-change="handlePictureCurrentChange"
                                 layout="prev, pager, next"
                                 :page-size="1"
-                                :current-page.sync="currentPage3"
+                                
                                 :total=picturePageTotal>
                                 </el-pagination>
                             </div>
@@ -101,8 +105,8 @@
                                 @current-change="handleLiveCurrentChange"
                                 layout="prev, pager, next"
                                 :page-size="1"
-                                :current-page.sync="currentPage3"
-                                :total=livePageTotal>
+                                
+                                :total="livePageTotal">
                                 </el-pagination>
                             </div>
                         </div>
@@ -119,7 +123,7 @@
                         <div class="message_member"></div>
                         <div class="message_body"></div>
                         <div class="message_textarea">
-                            <textarea  id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
+                            <textarea  v-model="sendText" id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
                         </div>
                     </div>
                 </div>
@@ -204,16 +208,6 @@
     </div>
 </template>
 <script>
-$(document).ready(function(){
-    $('.video_model').mouseover(function(){
-        $(video_header).show();
-    })
-    $('.video_model').mouseover(function(){
-        $(video_header).hide();
-    })
-})
-</script>
-<script>
 // import { ModelThree } from 'vue-3d-model'
 var THREE = require('three');
 import axios from 'axios'
@@ -230,6 +224,7 @@ export default {
     name:'fieldConnection',
     data(){
         return{
+            sendText:'',
             token:'',
             projId:'',
             userId:'',
@@ -276,7 +271,8 @@ export default {
                 x:'',
                 y:''
             },
-            messageText:''
+            messageText:'',
+            websock: null,
         }
     },
     filters:{
@@ -293,15 +289,43 @@ export default {
         // vm.imgdetial.path = obj.image
         // vm.imgdetial.x = obj.x
         // vm.imgdetial.y = obj.y
-        this.getPanoramaMain();//获取全景图主图路径及点位信息
-        this.getPanoramaPathList();//获取全景图真实路径集合
+        // this.getPanoramaMain();//获取全景图主图路径及点位信息
+        // this.getPanoramaPathList();//获取全景图真实路径集合
         this.getMediaInformation(2);
+        // this.getMediaInformation(4);
         this.getUserGroup();
+        // this.initWebSocket();//现场连线
     },
+    //   destroyed(){ 
+    //       this.websock.close()
+    //   }, 
+      //离开路由之后断开websocket连接
+
     mounted(){
     //    this.getMediaInformation(4);
     },
     methods:{
+        //  initWebSocket(){ const wsuri = "ws://127.0.0.1:8080"; 
+        //         this.websock = new WebSocket(wsuri); 
+        //         this.websock.onmessage = this.websocketonmessage;  
+        //         this.websock.onopen = this.websocketonopen;
+        //         this.websock = this.websocket;
+        //         this.websock.onclose = this.websocketclose; 
+        //         },
+        //         //连接建立之后执行send方法发送数据
+        //     websocketonopen(){  let actions = {"test":"12345"};  
+        //     this.websocketsend(JSON.stringify(actions));  },
+        //     //连接建立失败重连  
+        //     websocket(){  this.initWebSocket();  }, 
+        //     //数据接收
+        //     websocketonmessage(e){  const redata = JSON.parse(e.data);}, 
+        //     //数据发送 
+        //     //关闭
+        //     websocketsend(Data){ this.websock.send(Data);   },  
+        //     websocketclose(e){           
+        //             console.log('断开连接',e);       
+        //             },
+
         fullModule(){
             var elem=document.getElementById("mm");
 	        this.requestFullscreen(elem);
@@ -325,6 +349,14 @@ export default {
             else if (elem.mozRequestFullScreen) {
                 elem.mozRequestFullScreen();
             }
+        },
+        clickQjPic(val){
+            console.log(val);
+            console.log(this.PanoramaPathList);
+            this.isFullPicture=false;
+            this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[val];
+            var source=this.QJFileManageSystemURL+this.PanoramaPathList[val];
+            console.log('jdhfjhj')
         },
         fullVideo(){
             console.log('hdjshdjshj')
@@ -423,10 +455,12 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.mediaUrlList=response.data.rt;
                     this.videoPageTotal=this.mediaUrlList.length;
-                    this.$refs.video.src=this.mediaUrlList[0].path;
+                    this.$refs.video.src=this.BDMSUrl+this.mediaUrlList[0].path;
+                    // this.livePageTotal=this.mediaUrlList.length;
+                    // this.$refs.lineLive.src=this.mediaUrlList[0].path;
                     console.log(this.videoPageTotal);
                     console.log(this.mediaUrlList);
                 }else if(response.data.cd=='-1'){
@@ -650,10 +684,10 @@ export default {
                     projectId:this.projId
                 }
                 }).then(response=>{
-                    if(response.data.cd=='0'){
+                    if(response.data.rt){
                         this.PanoramaMainList=response.data.rt;
                         this.$refs.fullPicture.src=this.PanoramaMainList.path;
-                        this.imgdetial1=this.PanoramaMainList.list[0];
+                        this.imgdetial1=this.PanoramaMainList.list;
                         console.log(this.imgdetial1);
                         console.log(this.PanoramaMainList);
                         }
@@ -674,7 +708,7 @@ export default {
                     projectId:this.projId
                 }
             }).then(response=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.PanoramaPathList=response.data.rt;
                     this.picturePageTotal=this.PanoramaPathList.length;
                     this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[0];
