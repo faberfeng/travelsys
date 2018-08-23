@@ -14,12 +14,6 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <!-- <router-link :to="''"  class="label-item">  
-                    成本审批  
-                </router-link>
-                <router-link :to="''"  class="label-item">  
-                    成本分析  
-                </router-link> -->
             </div>
             <div class="project" v-loading="loading" v-if='showMainProject'>
                 <!--以下是实时列表-->
@@ -2092,7 +2086,7 @@ export default {
             this.listItem.showProject = false;
         },
         //查看清单
-        listItem(val){
+        viewList(val){
             this.duliProject.showProject = false;
             this.showDetail = false;
             this.showMainProject = false;
@@ -2101,6 +2095,16 @@ export default {
             
             this.listItem.viewDetailObj = val;
         },
+        //查看清单
+        // listItem(val){
+        //     this.duliProject.showProject = false;
+        //     this.showDetail = false;
+        //     this.showMainProject = false;
+        //     this.projList.showProject = false;
+        //     this.listItem.showProject = true;
+            
+        //     this.listItem.viewDetailObj = val;
+        // },
         //新建自定义清单查询
         searchResult(flag){
             let rangeData = [];
