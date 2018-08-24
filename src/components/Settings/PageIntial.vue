@@ -574,23 +574,25 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.florData = response.data.rt.rows;
-                    this.florData.forEach((item,index,arr)=>{
-                        if(item.IsDefault){
+                    if(response.data.rt != null){
+                        this.florData = response.data.rt.rows;
+                        this.florData.forEach((item,index,arr)=>{
+                            if(item.IsDefault){
+                                item = Object.assign(item,{
+                                    Remark:'默认楼层'
+                                })
+                            };
+                            if(item.BottomHeight == -2147483648){
+                                item = Object.assign(item,{
+                                    BottomHeight:'最小值',
+                                    isShowDelete:false
+                                })
+                            }
                             item = Object.assign(item,{
-                                Remark:'默认楼层'
+                                index:index
                             })
-                        };
-                        if(item.BottomHeight == -2147483648){
-                            item = Object.assign(item,{
-                                BottomHeight:'最小值',
-                                isShowDelete:false
-                            })
-                        }
-                        item = Object.assign(item,{
-                            index:index
-                        })
-                    });
+                        });
+                    }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{

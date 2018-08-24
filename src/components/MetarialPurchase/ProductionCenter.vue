@@ -13,16 +13,16 @@
                 <router-link :to="'/'" class="navItem navactive">  
                     产品管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
                     物料跟踪  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
                     订货管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
                     发货管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/checked'" class="navItem">  
                     检查验收  
                 </router-link>
             </div>
@@ -411,7 +411,7 @@ export default {
             token:'',
             productionList:[],
             pageDetial:{
-                pagePerNum:10,//一页几份数据
+                pagePerNum:20,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
@@ -1069,15 +1069,6 @@ export default {
 </script>
 <style lang="less">
 #productionCenter{
-    // .topHeader{
-    //     box-sizing: border-box;
-    //     position: fixed;
-    //     top: 116px;
-    //     left: 26px;
-    //     bottom:0;
-    //     right: 0;
-    //     overflow: auto;
-    // }
     .purchaseNav{
         height: 49px;
         padding-top: 16px;

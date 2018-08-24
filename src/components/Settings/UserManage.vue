@@ -544,7 +544,7 @@ export default {
           position_default:{},//工程管理员岗位
           position_list:[],//可选其他岗位
           pageDetial:{
-              pagePerNum:10,//一页几份数据
+              pagePerNum:20,//一页几份数据
               currentPage:1,//初始查询页数 第一页
               total:'',//所有数据
               pageNum:0//页面数

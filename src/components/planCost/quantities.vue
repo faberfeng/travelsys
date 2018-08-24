@@ -2095,16 +2095,6 @@ export default {
             
             this.listItem.viewDetailObj = val;
         },
-        //查看清单
-        // listItem(val){
-        //     this.duliProject.showProject = false;
-        //     this.showDetail = false;
-        //     this.showMainProject = false;
-        //     this.projList.showProject = false;
-        //     this.listItem.showProject = true;
-            
-        //     this.listItem.viewDetailObj = val;
-        // },
         //新建自定义清单查询
         searchResult(flag){
             let rangeData = [];
