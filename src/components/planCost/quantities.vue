@@ -153,7 +153,7 @@
                                 <td v-text="initData(val.createTime)"></td>
                                 <td >
                                     <button class="detailBtn actionBtn" title="明细"  @click="showSnapWorkAmouontDetail(val,2)" ></button>
-                                    <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.manifestId,2)" ></button>
+                                    <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.manifestId,2,false)" ></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -1338,7 +1338,6 @@ export default {
                 })
             })
         },
-
         deleteItem(mid,bid,istop){
             var vm = this
             vm.$confirm('确定要将清单与当前业务解除关联关系吗？', '请确认', {
@@ -1358,12 +1357,7 @@ export default {
                         bType:3
                     }
                 }).then(response=>{
-                    if(response.data.cd != '0'){
-                        vm.$message({
-                            type:'error',
-                            message:response.data.msg
-                        })
-                    }else{
+                    if(response.data.cd == 0){
                         vm.$message({
                             type:'success',
                             message:'清单删除成功!'
@@ -1373,6 +1367,11 @@ export default {
                         }else{
                             vm.getSingleWorkAmountList()
                         }
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
                     }
                 }).catch((err)=>{
                     console.log(err)
@@ -2092,7 +2091,6 @@ export default {
             this.showMainProject = false;
             this.projList.showProject = false;
             this.listItem.showProject = true;
-            
             this.listItem.viewDetailObj = val;
         },
         //新建自定义清单查询

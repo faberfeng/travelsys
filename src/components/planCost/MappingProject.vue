@@ -566,7 +566,6 @@ export default Vue.component('mapping-project',{
     },
     created(){
         this.projObj = this.projData;
-        console.log(this.projObj);
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 
@@ -652,6 +651,7 @@ export default Vue.component('mapping-project',{
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
+                    console.log(response.data);
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
                     this.tableHeadData = [];

@@ -17,12 +17,6 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <!-- <router-link :to="''"  class="label-item">  
-                    成本审批  
-                </router-link>
-                <router-link :to="''"  class="label-item">  
-                    成本分析  
-                </router-link> -->
             </div>
             <div v-if="showMain">
                 <div id="containerMessage">
@@ -354,8 +348,8 @@ export default {
                     headerAlign:"center" 
                 },
                 {
-                    label: '构件数量',
-                    prop: 'mappingCount',
+                    label: '构件数量(未映射)',
+                    prop: 'entityCount_',
                     align:"center",
                     headerAlign:"center" 
                 },
@@ -545,9 +539,26 @@ export default {
                         let templateList0 = response.data.rt.templateList0;
                         let templateList1 = response.data.rt.templateList1;
                         let templateList2 = response.data.rt.templateList2;
+                        console.log(componentList);
                         componentList.forEach(item=>{
                             Object.assign(item,{
-                                _level:4
+                                _level:4,
+                                entityCount_:`${item.entityCount}(${item.unMappingCount})`
+                            })
+                        })
+                        templateList0.forEach(item=>{
+                            Object.assign(item,{
+                                entityCount_:`${item.entityCount}(${item.unMappingCount})`
+                            })
+                        })
+                        templateList1.forEach(item=>{
+                            Object.assign(item,{
+                                entityCount_:`${item.entityCount}(${item.unMappingCount})`
+                            })
+                        })
+                        templateList2.forEach(item=>{
+                            Object.assign(item,{
+                                entityCount_:`${item.entityCount}(${item.unMappingCount})`
                             })
                         })
                         let aData = [...templateList0,...templateList1,...templateList2];
@@ -588,6 +599,7 @@ export default {
                             }
                         }
                         this.mappingData = templateList0;
+                        console.log(this.mappingData)
                     }
                 }else{
                     alert(response.data.msg);
@@ -959,7 +971,7 @@ export default {
                 if(transformData[i].level == num-1){
                     this.entityNumber = transformData[i].classifyCode.split('-')[1];
                 }
-                if(transformData[i].children.length!=0){
+                if(transformData[i].children!=null && transformData[i].children.length!=0){
                     return this.getEntityNumber(transformData[i].children,num);
                 }
             }
@@ -969,8 +981,8 @@ export default {
        editMapping(scope){
             this.editProjectMapped.show = true;
             this.editMappingData = scope.row;
-            this.jiLiangCondition = scope.row.calCondition;
-            this.jiLiangResult = scope.row.formula;
+            this.jiLiangCondition = scope.row.formula;
+            this.jiLiangResult = scope.row.calCondition;
             this.projectNumber = scope.row.componentNumber.split('-')[1];
             this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.name;
             axios({
@@ -1136,10 +1148,10 @@ export default {
                     },
                     data:{
                         projId:this.projId,
-                        condition:this.jiLiangCondition,
+                        condition:this.jiLiangResult,
                         engineeringNumber:this.projectNumber,
                         templateId:this.editMappingData.templateId,
-                        formula:this.jiLiangResult,
+                        formula:this.jiLiangCondition,
                         mappings:arr,
                     },
                     params:{

@@ -7,7 +7,7 @@
     </form>
     <div class="project" v-loading="loading">
         <p class="antsLine">
-            成本管理<i class="icon-sanjiao-right"></i><span @click="back()">构件量清单</span><i class="icon-sanjiao-right"></i>
+            成本管理<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">构件量清单</span><i class="icon-sanjiao-right"></i>
             <span class="strong">{{'数据-'+dataName}}</span>
         </p>
         <p class="header clearfix"  style="margin-top:20px;">
@@ -15,8 +15,8 @@
                 <i class="detial icon"></i>明细基本信息
             </span>
              <span class="item-btn clearfix">
-                <label class="item-btn-icon icon-0" style="display:none" v-if="!isSnapshot && checkEditAuth" @click="editReport()">设计</label>
-                <label class="item-btn-icon icon-1" style="display:none" v-if="!isSnapshot" @click="showSnapshotBox()">快照</label>
+                <label class="item-btn-icon icon-0"  v-if="isbaobiao" @click="editReport()">设计</label>
+                <label class="item-btn-icon icon-1"  v-if="isbaobiao" @click="showSnapshotBox()">快照</label>
                 <label class="item-btn-icon icon-2" @click="exportToExcel()">导出EXCEL</label>
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>
@@ -559,7 +559,7 @@ import '../ManageCost/js/date.js'
 // import JsonData from './js/dataCommonJson.json'
 
 export default Vue.component('common-list',{
-    props:['rcId','isSnapshot'],
+    props:['rcId','isSnapshot','isbaobiao'],
     data(){
         return {
             token:'',
@@ -736,8 +736,8 @@ export default Vue.component('common-list',{
             })
         },
         getIntoList(){
-            var vm = this
-            vm.fullscreenLoading =true
+            var vm = this;
+            vm.fullscreenLoading =true;
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/count',
@@ -751,29 +751,25 @@ export default Vue.component('common-list',{
                 if(response.data.cd == 0){
                     vm.rcStyle = response.data.rt.rcStyle
                     vm.dataName = response.data.rt.reportName
-                    vm.DatatableList = []
-                    vm.detailsHead = []
-                    vm.groupHead.monomer = []
-                    vm.groupHead.partition = []
-                    vm.groupHead.floor = []
-                    var titleLength = 0
+                    vm.DatatableList = [];
+                    vm.detailsHead = [];
+                    vm.groupHead.monomer = [];
+                    vm.groupHead.partition = [];
+                    vm.groupHead.floor = [];
+                    let titleLength = 0;
                     if(response.data.rt.rowList != null){
-                        var rowLenth = response.data.rt.rowList.length
-
-                        /**
-                         * 定义 单体小计数组 monomer_summary
-                         * partition_summary
-                         * floor_summary
-                         * **/
-                        var monomer_summary = [],partition_summary = [],floor_summary = []
-
+                        var rowLenth = response.data.rt.rowList.length;
+                        var monomer_summary = [],
+                        partition_summary = [],
+                        floor_summary = [];
+                        console.log(response.data.rt.rowList)
                         response.data.rt.rowList.forEach((element,index)=>{
                             if(element.rowType == 'ROW_TITLE'){
                                 vm.detailsHead = element.infoList;
                                 titleLength = element.infoList.length;
                             }else if(element.rowType == 'ROW_GROUP'){
-                                var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList)
-                                element.length = ROW_GROUP_length
+                                var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList);
+                                    element.length = ROW_GROUP_length
                                 if(element.groupLevel == 1){//单体
                                     vm.groupHead.monomer.push(element)
                                 }else if(element.groupLevel == 2){//分区
@@ -781,7 +777,6 @@ export default Vue.component('common-list',{
                                 }else if(element.groupLevel == 3){//楼层
                                     vm.groupHead.floor.push(element)
                                 }
-        
                             }else if(element.rowType == 'ROW_CONTENT'){ 
                                 if(element.infoList[2]!=''){
                                     element.infoList[11] = element.infoList[2];
@@ -796,11 +791,11 @@ export default Vue.component('common-list',{
                                 });                                
                             }else if(element.rowType == 'ROW_SUMMARY'){
                                 if(element.groupLevel == 1){//单体 的 小计
-                                    monomer_summary.push(element)
+                                    monomer_summary.push(element);
                                 }else if(element.groupLevel == 2){//分区 的 小计
                                     partition_summary.push(element)
                                 }else if(element.groupLevel == 3){//楼层 的 小计
-                                    floor_summary.push(element)
+                                    floor_summary.push(element);
                                 }else if(element.groupLevel == 0){ //总计
                                     var totalFooterNum = 1;
                                     if(vm.groupHead.floor.length>0){
@@ -815,26 +810,23 @@ export default Vue.component('common-list',{
                                         totalFooterNum++;
                                         this.totalTitleNum++;
                                     }
-                                    vm.Footer.num = totalFooterNum
+                                    vm.Footer.num = totalFooterNum;
                                     vm.Footer.info = element.infoList;
                                 }
                             }
                         })
-                        vm.DatatableList.forEach(item=>{
-                            item.list.pop();    
+                        console.log(vm.Footer.info )
+                        vm.DatatableList.forEach((item,index)=>{
+                            item.list.splice(titleLength,item.list.length-titleLength);    
                         })
                         /**
                          * 查看各个小计数组，
                          * 确定插入总列表的方式
                          * 并对层级做标记
-                         * ***/
-                        if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList)
-                        if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList)
-                        if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList)
-                        //  Foorer:{
-                        //     num:0,
-                        //     info:{}
-                        // },
+                        * ***/
+                        if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList);
+                        if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList);
+                        if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList);
                     }
                 }else{
                     vm.$message({

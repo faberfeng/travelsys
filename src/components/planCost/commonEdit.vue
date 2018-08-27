@@ -1378,7 +1378,7 @@ export default Vue.component('common-edit',{
         
     },
     created(){
-        var vm = this
+        var vm = this;
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
@@ -1388,7 +1388,9 @@ export default Vue.component('common-edit',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        // vm.getDataBase()
+        
+        this.data_right = [];
+        console.log(this.data_right);
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
             vm.getIntoDesignPage(true)
@@ -1931,7 +1933,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         },
-        saveFormTwo(needCount){
+        realSaveForm(needCount){
             var vm = this
             if(vm.database == ''){
                 vm.$message({
@@ -2129,10 +2131,6 @@ export default Vue.component('common-edit',{
             }
             /***排序和分组***/
             var fieldGroupList = new Array()
-                // val:0,
-                // build_name:'nofield',
-                // ordertype:'ACENding',
-                // grouptype:'NONE_GROUP',
             vm.list_order.forEach((ele,index)=>{
                 if (ele.build_name == 'nofield') return;
                 var tableType = ''
@@ -2152,8 +2150,6 @@ export default Vue.component('common-edit',{
                 })
             })
             /*****判断 样式 过滤****/
-            // titleUseReportName:false,
-            // styleShowTitle:false,
             if (vm.titleUseReportName) {
                 vm.titleName = rcName
             }
@@ -2215,7 +2211,7 @@ export default Vue.component('common-edit',{
                 },
             }).then(response=>{
                 if(response.data.cd == 0){
-                     var msg = ''
+                    var msg = '';
                     if(rcId == 0){
                         msg = '创建报表成功！'
                     }else{
@@ -2236,7 +2232,8 @@ export default Vue.component('common-edit',{
                             showData:false
                         }
                     }
-                    vm.$emit('aftersave',params)
+                    vm.$emit('aftersave',params);
+                    
                 }else{
                     vm.$message({
                         type:'error',
@@ -2264,12 +2261,8 @@ export default Vue.component('common-edit',{
                 async:false, //同步
                 success:function(response){
                     if(response.cd == 0){
-                        //if(response.msg == 'ok!'){
-                           // this.flag = false;
-                            vm.saveFormTwo(needCount);
-                        //}
+                        vm.realSaveForm(needCount);
                     }else if(response.cd == '10001'){
-                        //this.flag = true;
                         vm.$message({
                             type:'warning',
                             message:'名称重复!'
@@ -2283,7 +2276,6 @@ export default Vue.component('common-edit',{
             var vm = this
             vm.data_right = []
             vm.data_left = dataLeft
-            
             if(isClear){
                 vm.addField()
             }
