@@ -991,7 +991,7 @@ export default {
         height: 40px;
         line-height: 40px;
         text-align: left;
-        margin: 20px 20px 15px;
+        margin: 20px 20px 15px 15px;
         font-size: 16px;
         font-weight: bold;
     }

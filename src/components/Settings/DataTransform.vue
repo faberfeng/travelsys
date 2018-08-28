@@ -637,7 +637,7 @@ export default {
         text-align: left;
     }
     .sTitle span{
-        margin-left: 20px;
+        margin-left: 15px;
         font-size: 18px;
         line-height: 18px;
     }

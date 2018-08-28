@@ -1034,7 +1034,7 @@ export default {
         }
         .groundTitle{
             width: 97%;
-            padding-left: 20px;
+            padding-left: 15px;
         }
         .groundIcon{
             float: right;

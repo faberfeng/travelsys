@@ -148,7 +148,6 @@ export default {
                             vm.tfooter.designIdentity += info.designIdentity
                             vm.tfooter.outputTotal += info.outputTotal
                             vm.tfooter.dischargeTotal += info.dischargeTotal
-                            console.log(vm.tfooter)
                         })
                         // 基于准备好的dom，初始化echarts实例
                         var myChart = echarts.init(document.getElementById('Pie'))
