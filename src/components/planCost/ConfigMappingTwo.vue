@@ -933,10 +933,10 @@ export default {
                     },
                     data:{
                         projId:this.projId,
-                        condition:this.jiLiangCondition,
+                        condition:this.jiLiangResult,
                         engineeringNumber:this.projectNumber,
                         templateId:this.addMappingData.id,
-                        formula:this.jiLiangResult,
+                        formula:this.jiLiangCondition,
                         mappings:arr,
                         projId:this.projId
                     },

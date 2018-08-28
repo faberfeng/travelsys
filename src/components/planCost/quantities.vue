@@ -1358,15 +1358,15 @@ export default {
                     }
                 }).then(response=>{
                     if(response.data.cd == 0){
-                        vm.$message({
-                            type:'success',
-                            message:'清单删除成功!'
-                        })
                         if(istop){
                             vm.getSnapWorkAmountList()
                         }else{
                             vm.getSingleWorkAmountList()
                         }
+                        vm.$message({
+                            type:'success',
+                            message:'清单删除成功!'
+                        })
                     }else{
                         vm.$message({
                             type:'error',

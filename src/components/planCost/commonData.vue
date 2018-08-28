@@ -779,12 +779,18 @@ export default Vue.component('common-list',{
                                     vm.groupHead.floor.push(element)
                                 }
                             }else if(element.rowType == 'ROW_CONTENT'){ 
-                                if(element.infoList[2]!=''){
-                                    //element.infoList[11] = element.infoList[2];
-                                }else if(element.infoList[1]!=''){
-                                    //element.infoList[11] = element.infoList[1];
-                                }else if(element.infoList[0]!=''){
-                                    //element.infoList[11] = element.infoList[0];
+                                let itemIndex;
+                                this.detailsHead.forEach((item,index)=>{
+                                    if(item == '所在空间'){
+                                        itemIndex = index;
+                                    }
+                                })
+                                if(element.infoList[2]!='' && itemIndex!= undefined){
+                                    element.infoList[itemIndex] = element.infoList[2];
+                                }else if(element.infoList[1]!=''&& itemIndex!= undefined){
+                                    element.infoList[itemIndex] = element.infoList[1];
+                                }else if(element.infoList[0]!='' && itemIndex!= undefined){
+                                    element.infoList[itemIndex] = element.infoList[0];
                                 }
                                 vm.DatatableList.push({
                                     'list':element.infoList,
