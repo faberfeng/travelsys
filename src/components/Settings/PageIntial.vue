@@ -57,7 +57,7 @@
                     <el-table-column prop="ResourceType" label="资源类型"></el-table-column>
                     <el-table-column prop="ResourceName" label="资源名称"></el-table-column>
                     <el-table-column prop="FileSize" label="资源包大小"></el-table-column>
-                    <el-table-column prop="UpdateTime" label="上传时间"></el-table-column>
+                    <el-table-column prop="UpdateTime" label="上传时间" width="200"></el-table-column>
                     <el-table-column prop="FileVersion" label="版本"></el-table-column>
                     <el-table-column prop="Comments" label="备注"></el-table-column>
                     <el-table-column prop="Loaded" label="当前状态"></el-table-column>
@@ -574,23 +574,25 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.florData = response.data.rt.rows;
-                    this.florData.forEach((item,index,arr)=>{
-                        if(item.IsDefault){
+                    if(response.data.rt != null){
+                        this.florData = response.data.rt.rows;
+                        this.florData.forEach((item,index,arr)=>{
+                            if(item.IsDefault){
+                                item = Object.assign(item,{
+                                    Remark:'默认楼层'
+                                })
+                            };
+                            if(item.BottomHeight == -2147483648){
+                                item = Object.assign(item,{
+                                    BottomHeight:'最小值',
+                                    isShowDelete:false
+                                })
+                            }
                             item = Object.assign(item,{
-                                Remark:'默认楼层'
+                                index:index
                             })
-                        };
-                        if(item.BottomHeight == -2147483648){
-                            item = Object.assign(item,{
-                                BottomHeight:'最小值',
-                                isShowDelete:false
-                            })
-                        }
-                        item = Object.assign(item,{
-                            index:index
-                        })
-                    });
+                        });
+                    }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -1024,6 +1026,15 @@ export default {
 </script>
 <style lang='less'>
     #pageIn{
+        .el-table__row{
+            height:36px;
+        }
+        .el-table td,.el-table th{
+            padding: 0;
+        }
+        .el-table tr{
+            height: 36px;
+        }
         .wrapper{
             width: 100%;
         }
@@ -1258,11 +1269,8 @@ export default {
         .el-table--enable-row-hover .el-table__body tr:hover>td {
             background-color: #fafafa;
         }
-        .el-table th{
-                padding: 15px 0;
-        }
         .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
-        border-right: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
         }
         .el-table td, .el-table th.is-leaf {
             border-bottom: 1px solid #e0e0e0;

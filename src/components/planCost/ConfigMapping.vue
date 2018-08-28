@@ -17,12 +17,6 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <!-- <router-link :to="''"  class="label-item">  
-                    成本审批  
-                </router-link>
-                <router-link :to="''"  class="label-item">  
-                    成本分析  
-                </router-link> -->
             </div>
             <div v-if="showMain">
                 <div id="containerMessage">
@@ -427,6 +421,7 @@ export default {
             },//编辑映射
             editMappingData:{},//拿到编辑映射行
             entityNumber:'',
+            parentNumber:'',
         }
     },
     created(){
@@ -520,7 +515,7 @@ export default {
                 if(response.data.cd == 0){
                     this.loading = false;
                     this.mappingData = response.data.rt;
-                    console.log(this.mappingData);
+
                 }else{
                     alert(response.data.msg);
                 }
@@ -854,7 +849,7 @@ export default {
                         projId:this.projId,
                         condition:this.jiLiangCondition,
                         engineeringNumber:this.projectNumber,
-                        entityNumber:this.addMappingData.classifyCode.split('-')[1],
+                        entityNumber:this.addMappingData.classifyCode,
                         formula:this.jiLiangResult,
                         mappings:arr,
                         type:1
@@ -892,10 +887,23 @@ export default {
                 }
             }
         },
+        getParentNumber(transformData,num){
+            let number = num.split('.');
+            number.pop();
+            for(let i=0;i<transformData.length;i++){
+                if(transformData[i].no == number.join('.')){
+                    this.parentNumber = transformData[i].classifyCode;
+                }
+                if(transformData[i].children.length!=0){
+                    this.getParentNumber(transformData[i].children,num);
+                }
+            }
+        },
         /**编辑映射 
         */
        editMapping(scope){
             this.getEntityNumber(this.mappingData,scope.row.level);
+            this.getParentNumber(this.mappingData,scope.row.no);
             this.editProjectMapped.show = true;
             this.editMappingData = scope.row;
             this.jiLiangCondition = scope.row.condition;
@@ -1047,7 +1055,7 @@ export default {
        //确定编辑
         editProjectMappedSure(){
             var arr = [];
-            var vm = this
+            var vm = this;
             this.addProjectMappingData.forEach((item,index)=>{
                 arr.push({
                     id:item.id,
@@ -1067,7 +1075,7 @@ export default {
                         projId:this.projId,
                         condition:this.jiLiangCondition,
                         engineeringNumber:this.projectNumber,
-                        entityNumber:this.entityNumber,
+                        entityNumber:this.parentNumber,
                         formula:this.jiLiangResult,
                         mappings:arr,
                         type:2
@@ -1134,6 +1142,9 @@ export default {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    .zk-table__body-row{
+        height: 36px;
     }
     .el-dialog{
         margin: 15vh auto!important;
@@ -1277,6 +1288,7 @@ export default {
             height: 34px!important;
             color: #333;
             padding-left: 11px;
+            width: 186px;
         }
         //zk-table组件样式
         .zk-table{

@@ -1381,12 +1381,6 @@ export default {
                     })
                     console.log( vm.fileList)
                     vm.pageDetial.currentPage++
-                }else{
-                    vm.$message({
-                        type:'info',
-                        message:'未匹配到相应的数据'
-                    })
-                    vm.fileList = ''
                 }
             }
 

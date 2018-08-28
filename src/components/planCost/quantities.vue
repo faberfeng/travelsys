@@ -14,12 +14,6 @@
                 <router-link :to="'/Cost/inventory'" class=" label-item">  
                     物料量清单  
                 </router-link>
-                <!-- <router-link :to="''"  class="label-item">  
-                    成本审批  
-                </router-link>
-                <router-link :to="''"  class="label-item">  
-                    成本分析  
-                </router-link> -->
             </div>
             <div class="project" v-loading="loading" v-if='showMainProject'>
                 <!--以下是实时列表-->
@@ -159,7 +153,7 @@
                                 <td v-text="initData(val.createTime)"></td>
                                 <td >
                                     <button class="detailBtn actionBtn" title="明细"  @click="showSnapWorkAmouontDetail(val,2)" ></button>
-                                    <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.manifestId,2)" ></button>
+                                    <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.manifestId,2,false)" ></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -719,7 +713,7 @@ export default {
                 {
                     label: '项目名称',
                     prop: 'title',
-                     
+                    minWidth: '260px',
                     align:"center",
                     headerAlign:"center"  
                 },
@@ -777,7 +771,6 @@ export default {
                     prop:'operator',
                     type: 'template',
                     template: 'action',
-                    minWidth:'125px',
                     align:"center",
                     headerAlign:"center" 
                 }
@@ -1229,7 +1222,7 @@ export default {
                         }
                     }).then(response=>{
                         if(response.data.cd == 0){
-                            this.getSnapWorkAmountList();
+                            this.getSnapWorkAmountListTwo();
                             this.editBySelfShow = false;
                         }else{
                             alert(response.data.msg);
@@ -1345,7 +1338,6 @@ export default {
                 })
             })
         },
-
         deleteItem(mid,bid,istop){
             var vm = this
             vm.$confirm('确定要将清单与当前业务解除关联关系吗？', '请确认', {
@@ -1365,21 +1357,21 @@ export default {
                         bType:3
                     }
                 }).then(response=>{
-                    if(response.data.cd != '0'){
-                        vm.$message({
-                            type:'error',
-                            message:response.data.msg
-                        })
-                    }else{
-                        vm.$message({
-                            type:'success',
-                            message:'清单删除成功!'
-                        })
+                    if(response.data.cd == 0){
                         if(istop){
                             vm.getSnapWorkAmountList()
                         }else{
                             vm.getSingleWorkAmountList()
                         }
+                        vm.$message({
+                            type:'success',
+                            message:'清单删除成功!'
+                        })
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
                     }
                 }).catch((err)=>{
                     console.log(err)
@@ -1415,6 +1407,43 @@ export default {
                 vm.getSingleWorkAmountList()
             })
         },
+        getSnapWorkAmountListTwo(){
+            var vm = this;
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/report/getSnapWorkAmountList',
+                headers:{
+                    token:vm.token
+                },
+                params:{
+                    projectId:vm.projId,
+                    pageNo:vm.pageDetial.currentPage,
+                    pageSize:vm.pageDetial.pagePerNum,
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    if(response.data.rt != null){
+                        vm.pageDetial.total = response.data.rt.total;
+                        if(response.data.rt.rows != null){
+                            vm.S_quantitiesList = response.data.rt.rows;
+                            vm.S_quantitiesList.forEach((Element,index)=>{
+                                if(Element.bId != null){
+                                    vm.$set(Element,'HasbId',true)
+                                }
+                            });
+                        }
+                    }
+                }else if(response.data.cd == '1'){
+                    vm.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    alert(response.data.msg);
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         //实时可追溯工程量清单
         getSnapWorkAmountList(){
             var vm = this;
@@ -1444,12 +1473,12 @@ export default {
                             });
                         }
                     }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
+                }else if(response.data.cd == '1'){
                     vm.$router.push({
                         path:'/login'
                     })
+                }else{
+                    alert(response.data.msg);
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -2056,13 +2085,12 @@ export default {
             this.listItem.showProject = false;
         },
         //查看清单
-        listItem(val){
+        viewList(val){
             this.duliProject.showProject = false;
             this.showDetail = false;
             this.showMainProject = false;
             this.projList.showProject = false;
             this.listItem.showProject = true;
-            
             this.listItem.viewDetailObj = val;
         },
         //新建自定义清单查询
@@ -2130,6 +2158,9 @@ export default {
 </script>
 <style lang="less" >
     #quantitiesList{
+        .zk-table__header-row,.zk-table__body-row{
+            height:36px;
+        }
         .threeP{
             button{
                 width: 200px;
@@ -2665,7 +2696,7 @@ export default {
                     th{
                         padding-left: 6px;
                         padding-right: 15px;
-                        height: 55px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -2679,7 +2710,7 @@ export default {
                         td{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;

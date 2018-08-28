@@ -566,7 +566,6 @@ export default Vue.component('mapping-project',{
     },
     created(){
         this.projObj = this.projData;
-        console.log(this.projObj);
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 
@@ -652,6 +651,7 @@ export default Vue.component('mapping-project',{
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
+                    console.log(response.data);
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
                     this.tableHeadData = [];
@@ -909,47 +909,6 @@ export default Vue.component('mapping-project',{
             margin: 0 20px;
             .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
                 margin: 0 5px;
-            }
-        }
-        .item-label{
-            border-bottom: 1px solid #ebebeb;
-            .img_left{
-                float: left;
-                width: 90px;
-                height: 90px;
-                margin:40px 30px 0 10px;
-            }
-            .right{
-                float: left;
-                width: 450px;
-                .item-list{
-                    margin-bottom: 14px;
-                    .text-left{
-                        float: left;
-                        font-size: 12px;
-                        line-height: 12px;
-                        width: 80px;
-                        color: #999;
-                        text-align: left;
-                    }
-                    .text-right{
-                        float: left;
-                        width: 300px;
-                        font-size: 12px;
-                        line-height: 12px;
-                        color: #333333;
-                        text-align: left;
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                        white-space: nowrap;
-                    }
-                    &:last-of-type{
-                        margin-bottom: 20px; 
-                    }
-                }
-            }
-            &:last-of-type{
-                border-bottom: none;
             }
         }
         .item-attibuteAuth{

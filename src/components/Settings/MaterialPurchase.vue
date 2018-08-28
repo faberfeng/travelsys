@@ -1094,6 +1094,12 @@ export default {
 </script>
 <style lang="less">
     #wrapper{
+        .zk-table__body-row,.zk-table__header-row{
+            height: 36px;
+        }
+        .zk-table__cell-inner{
+            padding: 0px 12px;
+        }
         .title{
             color: #fc343a;
             font-size: 18px;

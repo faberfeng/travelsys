@@ -13,16 +13,16 @@
                 <router-link :to="'/'" class="navItem navactive">  
                     产品管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
                     物料跟踪  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
                     订货管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
                     发货管理  
                 </router-link>
-                <router-link :to="'/'" class="navItem">  
+                <router-link :to="'/metarialpurchase/checked'" class="navItem">  
                     检查验收  
                 </router-link>
             </div>
@@ -411,7 +411,7 @@ export default {
             token:'',
             productionList:[],
             pageDetial:{
-                pagePerNum:10,//一页几份数据
+                pagePerNum:20,//一页几份数据
                 currentPage:1,//初始查询页数 第一页
                 total:'',//所有数据
             },
@@ -1069,15 +1069,6 @@ export default {
 </script>
 <style lang="less">
 #productionCenter{
-    // .topHeader{
-    //     box-sizing: border-box;
-    //     position: fixed;
-    //     top: 116px;
-    //     left: 26px;
-    //     bottom:0;
-    //     right: 0;
-    //     overflow: auto;
-    // }
     .purchaseNav{
         height: 49px;
         padding-top: 16px;
@@ -1167,15 +1158,15 @@ export default {
         thead {
             background: #f2f2f2;
             th {
-            padding-left: 6px;
-            padding-right: 15px;
-            height: 55px;
-            text-align: left;
-            box-sizing: border-box;
-            border-right: 1px solid #e6e6e6;
-            font-size: 12px;
-            color: #333333;
-            font-weight: normal;
+                padding-left: 6px;
+                padding-right: 15px;
+                height: 36px;
+                text-align: left;
+                box-sizing: border-box;
+                border-right: 1px solid #e6e6e6;
+                font-size: 12px;
+                color: #333333;
+                font-weight: normal;
             }
         }
         tbody {
@@ -1183,7 +1174,7 @@ export default {
                 td {
                     padding-left: 6px;
                     padding-right: 15px;
-                    height: 55px;
+                    height: 36px;
                     text-align: left;
                     box-sizing: border-box;
                     border-right: 1px solid #e6e6e6;

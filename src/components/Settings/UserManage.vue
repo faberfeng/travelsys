@@ -203,7 +203,7 @@
                     background: #f2f2f2;
                     th{
                         padding-left: 10px;
-                        height: 52px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -215,7 +215,7 @@
                     tr{
                         td{
                             padding-left: 10px;
-                            height: 52px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -544,7 +544,7 @@ export default {
           position_default:{},//工程管理员岗位
           position_list:[],//可选其他岗位
           pageDetial:{
-              pagePerNum:10,//一页几份数据
+              pagePerNum:20,//一页几份数据
               currentPage:1,//初始查询页数 第一页
               total:'',//所有数据
               pageNum:0//页面数
@@ -991,7 +991,7 @@ export default {
         height: 40px;
         line-height: 40px;
         text-align: left;
-        margin: 20px 20px 15px;
+        margin: 20px 20px 15px 15px;
         font-size: 16px;
         font-weight: bold;
     }

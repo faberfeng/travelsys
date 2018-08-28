@@ -148,7 +148,6 @@ export default {
                             vm.tfooter.designIdentity += info.designIdentity
                             vm.tfooter.outputTotal += info.outputTotal
                             vm.tfooter.dischargeTotal += info.dischargeTotal
-                            console.log(vm.tfooter)
                         })
                         // 基于准备好的dom，初始化echarts实例
                         var myChart = echarts.init(document.getElementById('Pie'))
@@ -327,7 +326,7 @@ export default {
                     background: #f2f2f2;
                     td{
                         padding-left: 9px;
-                        height: 52px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -339,7 +338,7 @@ export default {
                     tr{
                         td{
                             padding-left: 9px;
-                            height: 52px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;

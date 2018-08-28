@@ -194,6 +194,22 @@ const router = new Router({
         name:'ProductionCenter',
         component:resolve=>require(['@/components/MetarialPurchase/ProductionCenter'],resolve)
 
+      },{
+        path:'/metarialpurchase/wuliaopurchase',
+        name:'Wuliaopurchase',
+        component:resolve=>require(['@/components/MetarialPurchase/Wuliao'],resolve)
+      },{
+        path:'/metarialpurchase/dinghuoManage',
+        name:'DinghuoManage',
+        component:resolve=>require(['@/components/MetarialPurchase/DinghuoManage'],resolve)
+      },{
+        path:'/metarialpurchase/fahuoManage',
+        name:'FahuoManage',
+        component:resolve=>require(['@/components/MetarialPurchase/FahuoManage'],resolve)
+      },{
+        path:'/metarialpurchase/checked',
+        name:'Checked',
+        component:resolve=>require(['@/components/MetarialPurchase/Checked'],resolve)
       }]
     },
     {

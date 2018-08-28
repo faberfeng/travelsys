@@ -54,7 +54,7 @@
                              <td v-text="val.updateUser"></td>
                             <td >
                                 <button class="editBtn actionBtn" title="设计"  @click="editReport(val)" ></button>
-                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
+                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val,true)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rcId,true)" ></button>
                             </td>
                         </tr>
@@ -148,7 +148,7 @@
                             <td v-text="initData(val.createTime)"></td>
                              <td v-text="val.createUser"></td>
                             <td >
-                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val)" ></button>
+                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val,false)" ></button>
                                  <button class="listBtn actionBtn" title="清单"  @click="showDetialList(val)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rssId,false)" ></button>
                             </td>
@@ -221,7 +221,7 @@
         <!--下面是报表清单的编码-->
         <common-list v-on:back="backToH" :mId="checkItem.rssId" rType="7" :bId='checkItem.rssId'  :title="'构件量清单'" v-if="showCommonList"></common-list>
         <!--下面是报表数据的编码-->
-        <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItem.rcId" :isSnapshot="false"></common-data>
+        <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItem.rcId" :isSnapshot="false" :isbaobiao="isBaoBiao"></common-data>
     </div>
     <div id="edit">
 
@@ -375,7 +375,7 @@
                     th{
                         padding-left: 6px;
                         padding-right: 15px;
-                        height: 55px;
+                        height: 36px;
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
@@ -389,7 +389,7 @@
                         td{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -568,6 +568,7 @@ export default {
             showCommonList:false,
             showCommonData:false,
             checkItem:{},
+            isBaoBiao:true,
 
         }
     },
@@ -631,10 +632,15 @@ export default {
             vm.checkItem = val;
             vm.showCommonEdit = true
         },
-        showData(val){
+        showData(val,istrue){
+            if(istrue){
+                this.isBaoBiao = true;
+            }else{
+                this.isBaoBiao = false;
+            }
             var vm = this
-            vm.showCommonData = true
-            vm.checkItem = val
+            vm.showCommonData = true;
+            vm.checkItem = val;
         },
         showDetialList(val){
             var vm = this

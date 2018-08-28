@@ -1144,6 +1144,12 @@ export default {
             padding: 0;
             box-sizing: border-box;
         }
+        .zk-table__body-row,.zk-table__header-row{
+            height: 36px;
+        }
+        .zk-table__cell-inner{
+            padding: 0px 12px;
+        }
         .el-dialog__body{
             margin-top: 30px;
         }
@@ -1281,10 +1287,7 @@ export default {
             border: none;
             cursor: pointer;
             margin-right: 16px;
-        }
-        .zk-table__cell-inner {
-        padding: 6px 12px;
-    }   
+        } 
         .editBtn{
             background: url('../../assets/edit.png') no-repeat;
         }

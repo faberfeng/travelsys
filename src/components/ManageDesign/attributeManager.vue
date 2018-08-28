@@ -15,7 +15,7 @@
                 </div>
                 <div id="containerMessage" v-show="SHOWMain">
                     <p class="header clearfix">
-                        <span class="title">
+                        <span class="title" style="visibility:hidden">
                           数据版本 <input type="tel" v-model="dataVision">/{{holderMaxVersion}}
                            <span class="reset" @click="selectData">重设</span>
                         </span>
@@ -3429,6 +3429,20 @@ export default {
         selectData(){
             this.getParams();
             this.fullscreenLoading = true;
+            console.log(this.value_leibie);
+            console.log(this.value_model);
+            console.log(this.value_typeC);
+            let tempId = '';
+            if(this.value_leibie == 'ALL' && this.value_model == 'ALL' && this.value_typeC == 'ALL'){
+                tempId = null;
+            }else if(this.value_leibie !== 'ALL' && this.value_model == 'ALL' && this.value_typeC == 'ALL'){
+                tempId = this.value_leibie;
+            }else if(this.value_model !== 'ALL' && this.value_typeC == 'ALL'){
+                tempId = this.value_model;
+            }else if(this.value_typeC !== 'ALL'){
+                tempId = this.value_typeC;
+            }
+            console.log(tempId);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/dc/searchPropertyData',
@@ -3442,7 +3456,8 @@ export default {
                     dataVision:this.dataVision,
                     rows:this.pageDetial.pagePerNum,
                     page:this.pageDetial.currentPage,
-                    templateId:this.value_leibie+'__'+this.value_model+'__'+this.value_typeC,
+                    templateId:encodeURI(tempId),
+                    // templateId:encodeUR(null),
                     buildInfo:this.globalBUildinInfo,
                 }
             }).then(response=>{

@@ -387,12 +387,15 @@
     .navigation{
         z-index: 0!important;
     }
+    .el-table .cell{
+        line-height: 14px;
+    }
     #CommenList{
         #print-qrcode{
             display: none;
         }
         .dialog{
-            top: 15vh;
+            top: 10vh;
             left: 50%;
             width: 660px;
             margin-left:-330px;
@@ -402,6 +405,8 @@
             background: #fff;
             .el-dialog__body{
                 margin-top: 20px;
+                overflow: scroll;
+                height: 50vh;
             }
             .editBody{
                 margin: 0 20px;
@@ -419,7 +424,8 @@
                 }
                 .right{
                     float: left;
-                    width: 450px;
+                    width: 400px;
+                    margin-top: 20px;
                     .item-list{
                         margin-bottom: 14px;
                         .text-left{
@@ -852,7 +858,7 @@
                                 td{
                                     padding-left: 6px;
                                     padding-right: 15px;
-                                    height: 55px;
+                                    height: 36px;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -1021,7 +1027,7 @@
                         thead{
                             tr{
                                 th{
-                                    height: 50px;
+                                    height: 36px;
                                     padding-left: 10px;
                                     background: #f2f2f2;
                                     font-size: 14px;
@@ -1035,7 +1041,7 @@
                          tbody{
                             tr{
                                 td{
-                                    height: 50px;
+                                    height: 36px;
                                     padding-left: 10px;
                                     background: #ffffff;
                                     font-size: 14px;
@@ -1414,6 +1420,7 @@ export default Vue.component('common-list',{
         showOperate:true,
         S_quantitiesList:[],//明细基本信息
         S_Label_quantitiesList:[],
+        copyS_Label_quantitiesList:[],
         showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
         labelListShow:false,//
         ListHeaderShow:false,//
@@ -1441,7 +1448,6 @@ export default Vue.component('common-list',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.manifestId = vm.mId
-        console.log(this.token);
         vm.getIntoList();
   }, 
   mounted(){
@@ -1516,9 +1522,9 @@ export default Vue.component('common-list',{
         })
       },
       openLabel(scope){
-          var vm = this
-        vm.labelListShow = true
-        vm.singleLable = true
+        var vm = this;
+        vm.labelListShow = true;
+        vm.singleLable = true;
         vm.pageLabelList.total = 1
         vm.S_Label_quantitiesList = []
         vm.S_Label_quantitiesList.push(scope.row)
@@ -1603,8 +1609,9 @@ export default Vue.component('common-list',{
          })
       },
       showLabel(){
-          var vm = this
-          vm.labelListShow = true
+          var vm = this;
+          vm.labelListShow = true;
+          this.S_Label_quantitiesList = this.copyS_Label_quantitiesList;
       },
       showLabelHeader(){
          var vm = this
@@ -1720,7 +1727,6 @@ export default Vue.component('common-list',{
                              _mType:'物料量清单'
                         })
                     }
-                    console.log(this.ManifestInfo);
                 }
                 vm.findManifestDetailList(2)
                 }else if(response.data.cd == '-1'){
@@ -1801,9 +1807,10 @@ export default Vue.component('common-list',{
                     vm.pageDetial.total = response.data.rt.total
                     if(isDialog == 1){
                         if(response.data.rt.rows != null){
-                            vm.S_Label_quantitiesList = response.data.rt.rows
+                            vm.S_Label_quantitiesList = response.data.rt.rows;
+                            this.copyS_Label_quantitiesList = response.data.rt.rows;
                         }else{
-                            vm.S_Label_quantitiesList = []
+                            vm.S_Label_quantitiesList = [];
                         }
                     }else if(isDialog == 0){
                         if(response.data.rt.rows != null){
@@ -1818,6 +1825,7 @@ export default Vue.component('common-list',{
                     }else if(isDialog == 2){
                             if(response.data.rt.rows != null){
                             vm.S_Label_quantitiesList = response.data.rt.rows
+                            this.copyS_Label_quantitiesList = response.data.rt.rows;
                             vm.S_quantitiesList = response.data.rt.rows
                             vm.S_quantitiesList.forEach((element,index) => {
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
