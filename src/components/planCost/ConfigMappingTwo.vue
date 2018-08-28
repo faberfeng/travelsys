@@ -343,7 +343,7 @@ export default {
                 },
                 {
                     label: '计量条件',
-                    prop: 'formula',
+                    prop: 'calCondition',
                     align:"center",
                     headerAlign:"center" 
                 },
@@ -539,7 +539,6 @@ export default {
                         let templateList0 = response.data.rt.templateList0;
                         let templateList1 = response.data.rt.templateList1;
                         let templateList2 = response.data.rt.templateList2;
-                        console.log(componentList);
                         componentList.forEach(item=>{
                             Object.assign(item,{
                                 _level:4,
@@ -599,7 +598,6 @@ export default {
                             }
                         }
                         this.mappingData = templateList0;
-                        console.log(this.mappingData)
                     }
                 }else{
                     alert(response.data.msg);
@@ -981,8 +979,8 @@ export default {
        editMapping(scope){
             this.editProjectMapped.show = true;
             this.editMappingData = scope.row;
-            this.jiLiangCondition = scope.row.formula;
-            this.jiLiangResult = scope.row.calCondition;
+            this.jiLiangCondition = scope.row.calCondition;
+            this.jiLiangResult = scope.row.formula;
             this.projectNumber = scope.row.componentNumber.split('-')[1];
             this.fourthSelectTitle = this.projectNumber.substr(6,3)+'-'+scope.row.name;
             axios({
