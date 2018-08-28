@@ -8,16 +8,6 @@
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
-                <div id="center-selection">
-                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                        <i class="icon-right"></i>
-                    </div>
-                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
-                        <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
-                        <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
-                    </div>
-                </div>
                 <div id="item-box-file">
                     <router-link :to="'/Design/management'" class="label-item-active label-item">  
                      设计协调  
@@ -206,8 +196,18 @@
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
-            <div v-if="screenLeft.item == 1" class="screenRight_1">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+            <div id="center-selection">
+                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                        <i class="icon-right"></i>
+                    </div>
+                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
+                        <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
+                        <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                    </div>
+            </div>
+            <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div v-if="showAction">
                     <p class="clearfix" v-if="IsFolderAction">
                         <i class="icon-goujian icon-add" title="新建文件夹" @click="addFile"></i>
@@ -236,7 +236,7 @@
                 <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                 </el-tree>
             </div>
-            <div id="box-right" v-else-if="screenLeft.item == 2">
+            <div id="box-right" v-show="screenLeft.show" v-else-if="screenLeft.item == 2">
                 <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;" v-if="hasAuthDelUser">
                     <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i>
                 </p>
@@ -746,13 +746,19 @@
             }
         }
         #GroupSelect{
-            display: block;
+            // display: block;
+            // width: 168px;
+            // height: 30px;
+            // position: fixed;
+            // top: 77px;
+            // z-index: 1000;
+            // right: 24px;
+            display: inline-block;
+            float: right;
+            margin-top:-40px;
+            margin-right:10px;
             width: 168px;
             height: 30px;
-            position: fixed;
-            top: 77px;
-            z-index: 1000;
-            right: 24px;
             .inp-search{
                 width: 168px;
                 border-radius: 15px;
@@ -777,169 +783,28 @@
                 background-image:url('../Settings/images/sanjiao.png');
                 background-size: 100% 100%;
                 content: '';
-                top: 12px;
-                right: 11px;
+                top: 19px;
+                right: 18px;
             }
         }
         .box-left-container{
-            display: block;
-            position: fixed;
-            top: 115px;
-            left: 26px;
-            bottom: 0;
-            right: 225px;
-            z-index: 1001;
+            // display: block;
+            // position: fixed;
+            // top: 115px;
+            // left: 26px;
+            // bottom: 0;
+            // right: 225px;
+            // z-index: 1001;
+            // transition:  all ease .5s;
+            // overflow: auto;
+             display: inline-block;
+            width: 85%;
+            position: relative;
+            // margin-top:109px;
+            // margin-left:24px;
+            // z-index: 1001;
             transition:  all ease .5s;
-            overflow: auto;
-            #center-selection{
-                position: fixed;
-                top: 115px;
-                // bottom: 0;
-                right: 225px;
-                width: 25px;
-                z-index: 100;
-                transition: all ease .5s;
-                background: #ffffff;
-                .SH_right{
-                    width: 25px;
-                    height: 48px;
-                    border-left: 1px solid #cccccc;
-                    border-bottom: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    .icon-right{
-                        display: block;
-                        position: absolute;
-                        top: 19px;
-                        left: 6px;
-                        width: 14px;
-                        height: 14px;
-                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
-                        transition: all ease .5s;
-                        transform: rotateZ(0deg);
-                    }
-                }
-                .item-property{//目录
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:15px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom: -9px;
-                        width: 24px;
-                        height: 15px;
-                        background: #fafafa;
-                        border-top: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }   
-                .item-version{//属性
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:12px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .item-version-3{//版本
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:24px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .active-version{//中间 属性 高显
-                    .item-version{//属性
-                        background: #fff;
-                        color: #fc3439;
-                        z-index: 15;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                    .item-property::after{//目录
-                        background: #fff;
-                    }
-                    .item-version-3{//版本
-                        z-index: 10;
-                    }
-                }
-                .active{//上边 目录 高显
-                    .item-property{
-                        background: #fff;
-                        color: #fc3439;
-                    }
-                    .item-version{
-                        z-index: 15;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                    }
-                }
-                .active-version-3{//下边 版本 高显
-                    .item-version{
-                        z-index: 15;
-                        &::after{
-                            background: #fafafa;
-                        }
-                    }
-                    .item-property::after{
-                        background: #fff;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                        background: #fff;
-                        color: #fc3439;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                }
-                
-            }
+           
             #containerMessage{
                 padding-left:30px; 
                 .header{
@@ -1860,7 +1725,7 @@
             }
         }
         .box-left-avtive{
-            right: 0px;
+            width: 98%;
             transition:  all ease .5s;
             #center-selection{
                 right: 0;
@@ -1908,25 +1773,191 @@
         右侧
         */
         .box-right-container{
-            display: block;
-            position: fixed;
-            right: -225px;
-            bottom: 0;
-            width: 225px;
-            top: 116px;
+            // display: block;
+            // position: fixed;
+            // right: -225px;
+            // bottom: 0;
+            // width: 225px;
+            // top: 116px;
+            // transition: all ease .5s;
+            // background: #ffffff;
+            // z-index: 10;
+            // border-left:none;
+            // z-index: 1000;
+            display: inline-block;
+            position: relative;
+            float: right;
+            width: 15%;
+            // margin-top: -763px;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
-            border-left:none;
-            z-index: 1000;
+            height: 785px;
+            overflow-y: auto;
+            overflow-x: hidden;
+             #center-selection{
+                // position: fixed;
+                // top: 115px;
+                // // bottom: 0;
+                // right: 225px;
+                // width: 25px;
+                // z-index: 100;
+                // transition: all ease .5s;
+                // background: #ffffff;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 25px;
+                border-right: 1px solid #cccccc;
+                .SH_right{
+                    width: 25px;
+                    height: 48px;
+                    border-left: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    .icon-right{
+                        display: block;
+                        position: absolute;
+                        top: 19px;
+                        left: 6px;
+                        width: 14px;
+                        height: 14px;
+                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
+                        transition: all ease .5s;
+                        transform: rotateZ(0deg);
+                    }
+                }
+                .item-property{//目录
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:15px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom: -9px;
+                        width: 24px;
+                        height: 15px;
+                        background: #fafafa;
+                        border-top: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }   
+                .item-version{//属性
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:12px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .item-version-3{//版本
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:24px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .active-version{//中间 属性 高显
+                    .item-version{//属性
+                        background: #fff;
+                        color: #fc3439;
+                        z-index: 15;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                    .item-property::after{//目录
+                        background: #fff;
+                    }
+                    .item-version-3{//版本
+                        z-index: 10;
+                    }
+                }
+                .active{//上边 目录 高显
+                    .item-property{
+                        background: #fff;
+                        color: #fc3439;
+                    }
+                    .item-version{
+                        z-index: 15;
+                    }
+                    .item-version-3{
+                        z-index: 10;
+                    }
+                }
+                .active-version-3{//下边 版本 高显
+                    .item-version{
+                        z-index: 15;
+                        &::after{
+                            background: #fafafa;
+                        }
+                    }
+                    .item-property::after{
+                        background: #fff;
+                    }
+                    .item-version-3{
+                        z-index: 10;
+                        background: #fff;
+                        color: #fc3439;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                }
+                
+            }
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
-                margin: 0 14px 0 10px;
+                margin: 0 14px 0 30px;
                 border-bottom: 1px solid #e6e6e6;
                 #cloudDirveFileTree{
                     display: block;
                     position: absolute;
-                    left: 10px;
+                    left: 32px;
                     right: 0;
                     bottom: 0;
                     top: 42px;
@@ -1999,12 +2030,13 @@
             }
         }
         .box-right-avtive{
-            right: 0;
+             width: 2%;
             transition: all ease .5s;
-            border-left: 1px solid #cccccc;
+            // border-left: 1px solid #cccccc;
         }
         #box-right{
             padding: 10px 13px 0 10px;
+            margin-left:24px;
             .icon-goujian{
                 float: left;
                 width: 16px;
@@ -2025,7 +2057,7 @@
                 top: 32px;
                 bottom: 10px;
                 right: 13px;
-                width: 202px;
+                width: 80%;
                 .member{
                     display: block;
                     margin-bottom: 5px;

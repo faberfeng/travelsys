@@ -616,16 +616,19 @@
     li{
         list-style: none;
     }
+    ::-webkit-scrollbar{width:0px}
     #personalCalendar{
         width: 100%;
         .topHeader{
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            box-sizing: border-box;
+            // margin-top:107px;
+            float: left;
+            width: 100%;
+            max-height: 800px;
             overflow: auto;
+            
         }
+        ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;

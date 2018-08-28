@@ -1418,12 +1418,17 @@ export default {
         }
     #safetyChecking{
          .topHeader{
+            // box-sizing: border-box;
+            // position: fixed;
+            // top: 116px;
+            // left: 26px;
+            // bottom:0;
+            // right: 0;
+            // overflow: auto;
             box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            float: left;
+            width: 100%;
+            height:800px;
             overflow: auto;
         }
         #item-box-file{
@@ -1833,12 +1838,15 @@ export default {
                 }
             }
             .project_right{
-                border:1px solid #999;
+                border-left:1px solid #999;
                 // border-left:1px solid #999;
                 // border-top:1px solid #999;
                 width: 18%;
-                height: 100%;
+                // height: 100%;
                 float: right;
+                position: absolute;
+                top: 98px;
+                right: 0px;
                 .checkProjectList_header{
                     height: 40px;
                     border-bottom:1px solid #999; 

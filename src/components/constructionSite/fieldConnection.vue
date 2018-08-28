@@ -17,13 +17,13 @@
                 </div>
                 <div id="live_body">
                     <div class="videoDiv">
-                        <div class="video_model">
-                            <div class="video_header">
+                        <div class="video_model"  @mouseenter="changeActive(1)" @mouseleave="removeActive(1)">
+                            <div class="video_header" v-show="mouseToggle1" >
                                 <span class="vt">场地模型</span>
                                 <span class="fullScreen" @click="fullModule"></span>
                             </div>
                             <div class="video_body">
-                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX" ></iframe>
+                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" ></iframe>
                                 
                                     <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
                                 
@@ -33,8 +33,8 @@
                                 <span class="fullSet" @click="getMedia(1)"></span>
                             </div>
                         </div>
-                        <div class="video_model">
-                            <div class="video_header">
+                        <div class="video_model" @mouseenter="changeActive(2)" @mouseleave="removeActive(2)">
+                            <div class="video_header" v-show="mouseToggle2">
                                 <span class="vt">航拍视频</span>
                                 <span class="fullScreen" @click="fullVideo"></span>
                             </div>
@@ -55,8 +55,8 @@
                                 </el-pagination>
                             </div>
                         </div>
-                        <div class="video_model">
-                            <div class="video_header">
+                        <div class="video_model" @mouseenter="changeActive(3)" @mouseleave="removeActive(3)" >
+                            <div class="video_header" v-show="mouseToggle3" >
                                 <span class="vt">全景图片</span>
                                 <span class="fullScreen" @click="fullPicture"></span>
                             </div>
@@ -68,7 +68,7 @@
                                     <img width="100%" height="310px" ref="fullPicture" :src="pathPictureUrl" >
                                     <ul>
                                         <li v-for="(item,index) in imgdetial1" :key="index">
-                                            <span :class="['round']" @click="clickQjPic(item.index)"  :style="{'top':(item.y/5)+'px','left':(item.x/5)+'px'}">
+                                            <span :class="['round']" @click="clickQjPic(item.index)"  :style="{'top':(20+item.y/2)+'px','left':(item.x/5)+'px'}">
                                             </span>
                                         </li>
                                     </ul>
@@ -83,22 +83,21 @@
                                 background
                                 @current-change="handlePictureCurrentChange"
                                 layout="prev, pager, next"
-                                :page-size="1"
-                                
-                                :total=picturePageTotal>
+                                :page-size="1" 
+                                :total="picturePageTotal">
                                 </el-pagination>
                             </div>
                         </div>
-                        <div class="video_model">
-                            <div class="video_header">
-                                <span class="vt">实时直播</span>
+                        <div class="video_model" @mouseenter="changeActive(4)" @mouseleave="removeActive(4)">
+                            <div v-show="mouseToggle4" class="video_header" >
+                                <span class="vt" >实时直播</span>
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
                             <div class="video_body">
                                 <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe>
                             </div>
                             <div class="video_bottom">
-                                <span class="fullSet" @click="getMedia(4)"></span>
+                                <span class="fullSet" @click="getMedia1(4)"></span>
                                 <el-pagination 
                                 class="pagination"
                                 background
@@ -156,6 +155,33 @@
                         <button class="editBtnC" @click="addMediaCancle">取消</button>
                     </div>
                 </el-dialog>
+                <el-dialog title="来源配置" :visible.sync="addMediaDialog1" @close="addMediaCancle">
+                    <div class="body">
+                        <table class="planTabel" border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <td>序号</td>
+                                    <td>文件路径/URL路径</td>
+                                    <td>操作</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr :class="{'select':index==isActive}" v-for="(item,index) in mediaUrlList1" :key="index" @click="checkItem(index)">
+                                    <td>{{index+1}}</td>
+                                    <td>{{item.displayPath}}</td>
+                                    <td>
+                                        <button class="editBtn actionBtn" @click="editMediaUrl1(item.fileGroupId)"></button>
+                                        <button class="deleteBtn actionBtn" @click="deleteMediaUrl1(item.id)"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addResource1">新增</button>
+                        <button class="editBtnC" @click="addMediaCancle">取消</button>
+                    </div>
+                </el-dialog>
 
                 <el-dialog title="文件路径选择" :visible.sync="addResourceDialog" @close="addResourceCancle">
                     <div class="body1">
@@ -181,6 +207,30 @@
                     </div>
                 </el-dialog>
 
+                <el-dialog title="文件路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
+                    <!-- <div class="body1">
+                        <div class="head">
+                            <span class="text">群组选择:</span>
+                            <div class=editSelect1>
+                                <select v-model="ugGroupNameValue" @change="ugGroupChange">
+                                    <option v-for="(item,index) in getUserGroupList" :key="index" :value="item.ugId">{{item.ugName}}</option>
+                                </select>
+                                <i class="icon-sanjiao"></i>
+                            </div>
+                        </div>
+                        <div class="head"><span class="text">名称:</span>
+                            <div class="tree">
+                                <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
+                                </el-tree>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addResourceMakeSure1">保存</button>
+                        <button class="editBtnC" @click="addResourceCancle1">取消</button>
+                    </div>
+                </el-dialog>
+
                 <el-dialog title="文件路径选择" :visible.sync="updateResourceDialog" @close="updateResourceCancle">
                     <div class="body1">
                         <div class="head">
@@ -202,6 +252,29 @@
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="updateResourceMakeSure">保存</button>
                         <button class="editBtnC" @click="updateResourceCancle">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog title="文件路径选择" :visible.sync="updateResourceDialog1" @close="updateResourceCancle1">
+                    <div class="body1">
+                        <!-- <div class="head">
+                            <span class="text">群组选择:</span>
+                            <div class=editSelect1>
+                                <select v-model="ugGroupNameValue" @change="ugGroupChange">
+                                    <option v-for="(item,index) in getUserGroupList" :key="index" :value="item.ugId">{{item.ugName}}</option>
+                                </select>
+                                <i class="icon-sanjiao"></i>
+                            </div>
+                        </div>
+                        <div class="head"><span class="text">名称:</span>
+                            <div class="tree">
+                                <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :default-expand-all='true' :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
+                                </el-tree>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="updateResourceMakeSure1">保存</button>
+                        <button class="editBtnC" @click="updateResourceCancle1">取消</button>
                     </div>
                 </el-dialog>
             </div>
@@ -239,10 +312,14 @@ export default {
             ugId:'',
             groupName:'',
             type:'',
-            addMediaDialog:false,//增加媒体弹框
-            addResourceDialog:false,//增加资源弹框
+            addMediaDialog:false,
+            addMediaDialog1:false,//增加媒体弹框
+            addResourceDialog:false,
+            addResourceDialog1:false,//增加资源弹框
             updateResourceDialog:false,//变更资源弹框
+            updateResourceDialog1:false,
             mediaUrlList:[],//媒体url列表
+            mediaUrlList1:[],
             fileTreeList_original:[],//文件树原列表
             fileTreeList:[],//文件树列表
              defaultProps:{
@@ -273,6 +350,11 @@ export default {
             },
             messageText:'',
             websock: null,
+            // mouseToggle:false,
+            mouseToggle1:false,
+            mouseToggle2:false,
+            mouseToggle3:false,
+            mouseToggle4:false,
         }
     },
     filters:{
@@ -292,8 +374,9 @@ export default {
         // this.getPanoramaMain();//获取全景图主图路径及点位信息
         // this.getPanoramaPathList();//获取全景图真实路径集合
         this.getMediaInformation(2);
-        // this.getMediaInformation(4);
+        // this.getMediaInformation1(4);
         this.getUserGroup();
+       
         // this.initWebSocket();//现场连线
     },
     //   destroyed(){ 
@@ -330,6 +413,28 @@ export default {
             var elem=document.getElementById("mm");
 	        this.requestFullscreen(elem);
         },
+        changeActive(val){
+            if(val==1){
+                this.mouseToggle1=true;
+            }else if(val==2){
+                this.mouseToggle2=true;
+            }else if(val==3){
+                this.mouseToggle3=true;
+            }else if(val==4){
+                this.mouseToggle4=true;
+            }
+        },
+        removeActive(val){
+            if(val==1){
+                this.mouseToggle1=false;
+            }else if(val==2){
+                this.mouseToggle2=false;
+            }else if(val==3){
+                this.mouseToggle3=false;
+            }else if(val==4){
+                this.mouseToggle4=false;
+            }
+        },
         //实现全屏
         requestFullscreen( elem ) {
             if (elem.requestFullscreen) {
@@ -356,6 +461,7 @@ export default {
             this.isFullPicture=false;
             this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[val];
             var source=this.QJFileManageSystemURL+this.PanoramaPathList[val];
+            this.init(source);
             console.log('jdhfjhj')
         },
         fullVideo(){
@@ -389,6 +495,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.getUserGroupList=response.data.rt;
+                    console.log(this.getUserGroupList);
                     this.ugGroupNameValue=this.getUserGroupList[0].ugId;
                     this.ugGroupName=this.getUserGroupList[0].ugName;
                 }
@@ -439,6 +546,13 @@ export default {
         getMedia(type){
             this.addMediaDialog=true;
             this.getMediaInformation(type);
+            // this.getMediaInformation1(type);
+            // this.getMediaLiveInformation(type);
+        },
+        getMedia1(type){
+            this.addMediaDialog1=true;
+            this.getMediaInformation1(type);
+            // this.getMediaInformation1(type);
             // this.getMediaLiveInformation(type);
         },
         //获取修改媒体
@@ -458,17 +572,40 @@ export default {
                 if(response.data.rt){
                     this.mediaUrlList=response.data.rt;
                     this.videoPageTotal=this.mediaUrlList.length;
-                    this.$refs.video.src=this.BDMSUrl+this.mediaUrlList[0].path;
-                    // this.livePageTotal=this.mediaUrlList.length;
-                    // this.$refs.lineLive.src=this.mediaUrlList[0].path;
+                    this.$refs.video.src=this.mediaUrlList[0].path;
                     console.log(this.videoPageTotal);
                     console.log(this.mediaUrlList);
-                }else if(response.data.cd=='-1'){
-                    alert(response.data.msg);
+                }else{
+                    alert('大笨蛋')
                 }
+                
             })
         },
         //获取直播
+        getMediaInformation1(type){
+            this.type=type;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'lc/get',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projectId:this.projId,
+                    mediaType:type
+                }
+            }).then(response=>{
+                if(response.data.rt){
+                    this.mediaUrlList1=response.data.rt;
+                    this.livePageTotal=this.mediaUrlList1.length;
+                    this.$refs.lineLive.src=this.mediaUrlList1[0].path;
+                }else{
+
+                }
+                
+            })
+        },
+
         //改变视频
         handleVideoCurrentChange(val){
             console.log(val+'页');
@@ -486,7 +623,7 @@ export default {
         //改变全景直播
         handleLiveCurrentChange(val){
             console.log(val+'页');
-            this.$refs.lineLive.src=this.BDMSUrl+"?videoPath="+this.mediaUrlList[val-1].path;
+            this.$refs.lineLive.src=this.BDMSUrl+"?videoPath="+this.mediaUrlList1[val-1].path;
         },
         checkItem(num){
             this.isActive=num;
@@ -506,6 +643,32 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.getMediaInformation(this.type);
+                    // this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+
+        },
+        deleteMediaUrl1(num){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'lc/delete',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projectId:this.projId,
+                    id:num
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    // this.getMediaInformation(this.type);
+                    this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -537,17 +700,29 @@ export default {
         addMediaCancle(){
             this.addMediaDialog=false;
         },
+         addMediaCancle1(){
+            this.addMediaDialog1=false;
+        },
         //增加资源
         addResource(){
             this.addResourceDialog=true;
             // this.getUserGroup();
             this.getFileTree();
             // this.getFileTree();
+        },
+        addResource1(){
+            this.addResourceDialog1=true;
+            // this.getUserGroup();
+            // this.getFileTree();
+            // this.getFileTree();
 
         },
         //取消资源弹框
         addResourceCancle(){
             this.addResourceDialog=false;
+        },
+         addResourceCancle1(){
+            this.addResourceDialog1=false;
         },
         //用户群组改变
         ugGroupChange(){
@@ -557,7 +732,6 @@ export default {
                 }
             });
             this.getFileTree();
-
 
         },
         //树形图节点点击
@@ -585,7 +759,37 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.getMediaInformation(this.type);
+                    // this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
                     this.addResourceDialog=false;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+        },
+        addResourceMakeSure1(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'lc/add',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projectId:this.projId,
+                    mediaType:this.type,
+                    ugId:this.ugGroupNameValue,
+                    fgId:this.fgId,
+                    name:this.fgName,
+                    path:'',
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    // this.getMediaInformation(this.type);
+                    this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
+                    this.addResourceDialog1=false;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -604,6 +808,9 @@ export default {
             this.getUserGroup();
             this.getFileUserGroup();
             this.getEditFileTree(num);
+        },
+        editMediaUrl1(num){
+            
         },
         //获取编辑文件树
         getEditFileTree(num){
@@ -662,7 +869,39 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.getMediaInformation(this.type);
+                    // this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
                     this.updateResourceDialog=false;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+
+        },
+        updateResourceMakeSure1(){
+             axios({
+                method:'get',
+                url:this.BDMSUrl+'lc/update',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projectId:this.projId,
+                    mediaType:this.type,
+                    ugId:this.ugGroupNameValue,
+                    fgId:this.fgId,
+                    name:this.fgName,
+                    path:'',
+                    id:this.updateId
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    // this.getMediaInformation(this.type);
+                    this.getMediaInformation1(this.type);
+                    this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    this.getPanoramaPathList();//获取全景图真实路径集合
+                    this.updateResourceDialog1=false;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -671,6 +910,9 @@ export default {
         },
         updateResourceCancle(){
             this.updateResourceDialog=false;
+        },
+        updateResourceCancle1(){
+            this.updateResourceDialog1=false;
         },
             //获取全景图主图路径及点位信息
         getPanoramaMain(){
@@ -1038,7 +1280,7 @@ export default {
                             width: 100%;
                             background-color: rgb(0, 0, 0);
                             opacity: 0.2;
-                            z-index: 999;
+                            z-index:900;
                             // display: none;
                             .vt{
                                     color: #fff;
@@ -1047,7 +1289,11 @@ export default {
                                     float: left;
                                     margin-left: 20px;
                                     font-size: 16px;
+                                    // display: none;
                                 }
+                            // span{
+                            //     color: #fff !important;
+                            //     }
                             .fullScreen{
                                 background-image: url(./images/fullScreen.png);
                                 background-repeat: no-repeat;
@@ -1060,6 +1306,11 @@ export default {
                                 cursor: pointer;
                             }
                         }
+                        // .video_header1{
+                        //      position: absolute;
+                        //     height: 40px;
+                        //     width: 100%;
+                        // }
                         .video_body{
                              position:relative;;
                             width: 100%;
@@ -1363,3 +1614,8 @@ export default {
 
 </style>
 
+
+
+
+// WEBPACK FOOTER //
+// src/components/constructionSite/fieldConnection.vue

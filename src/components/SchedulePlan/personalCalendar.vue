@@ -95,7 +95,7 @@
             </el-row> -->
         </div>
         <!-- 个人事件模块 -->
-        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-show="!showTaskCalendar">
+        <div :class="[{'box-right-active':!screenLeft.show},'box-right-container']" v-show="!showTaskCalendar">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -105,7 +105,7 @@
                     <span class="item-file " @click="screenLeft.item = 2">附<br>件</span>
                 </div>
             </div>
-            <div id="box-right" v-if="screenLeft.item == 1">
+            <div id="box-right" v-show="screenLeft.show"  v-if="screenLeft.item == 1">
                 <h3 class="header-information" style="margin-top:0;">
                     <i class="trrangle"></i>
                     基本信息
@@ -142,7 +142,7 @@
                         </li>
                     </ul>
             </div>
-            <div id="box-right1" v-if="screenLeft.item == 2">
+            <div id="box-right1" v-show="screenLeft.show" v-if="screenLeft.item == 2">
                 <div id="bindword">
                     <h3 class="header-information" style="margin-top:0;">
                         <i class="trrangle"></i>
@@ -170,7 +170,7 @@
             </div>
         </div>
         <!-- task模块与工程任务绑定 -->
-        <div :class="[{'box-right-active':screenLeft.show},'box-right-container']" v-show="showTaskCalendar">
+        <div :class="[{'box-right-active':!screenLeft.show},'box-right-container']" v-show="showTaskCalendar">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -179,7 +179,7 @@
                     <span class="item-event " @click="screenLeft.item = 1;">任<br>务</span>
                 </div>
             </div>
-            <div id="box-right" v-if="screenLeft.item == 1">
+            <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 1">
                 <h3 class="header-information" style="margin-top:0;">
                     <i class="trrangle"></i>
                     基本信息
@@ -1780,7 +1780,6 @@ export default {
         list-style: none;
     }
     #personalCalendar{
-        
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
@@ -1816,25 +1815,23 @@ export default {
                     position:absolute;
                     top:18px;
                     right:4%;
-                    z-index:10000;
+                    // z-index:10000;
                     width: 17px;
                     height: 17px;
                     
                 }
         }
         .box-left-container{
-            display: block;
-            position: fixed;
-            top: 115px;
-            left: 26px;
-            bottom: 0;
-            right: 290px;
+            display: inline-block;
+            width: 85%;
+            position: relative;
+            // margin-top:109px;
+            // margin-left:24px;
             // z-index: 1001;
             transition:  all ease .5s;
-            
         }
         .box-left-active{
-            right: 27px;
+             width: 98%;
             transition:  all ease .5s;
             .icon-right{
                 transform: rotateZ(180deg)!important;
@@ -2106,17 +2103,17 @@ export default {
         }
         // 右侧
         .box-right-container{
-            display: block;
-            position: fixed;
-            right: -264px;
-            bottom: 0;
-            width: 290px;
-            padding-left: 25px;
-            top: 116px;
+            display: inline-block;
+            position: relative;
+            float: right;
+            width: 15%;
+            // margin-top: -763px;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
+            height: 785px;
             overflow-y: auto;
+            overflow-x: hidden;
                 #center-selection{
                     position: absolute;
                     top: 0;
@@ -2219,11 +2216,12 @@ export default {
             }
         }
         .box-right-active{
-            right: 0;
+            width: 2%;
             transition: all ease .5s;
         }
         #box-right{
             padding: 19px 13px 0 10px;
+            margin-left:24px;
             .header-information{
                 font-size: 14px;
                 color: #333333;
@@ -2322,6 +2320,7 @@ export default {
         }
         #box-right1{
             padding: 19px 13px 0 10px;
+            margin-left:24px;
             #bindword{
 
                  .show{

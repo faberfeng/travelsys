@@ -10,12 +10,12 @@ export default {
   name: 'App',
    created() {
     /* eslint-disable*/
-    console.log($)
   }
 }
 </script>
 
 <style lang="less">
+*{margin:0; padding:0;} 
 #app {
   font-family: '微软雅黑', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -368,5 +368,52 @@ padding-right: 14px;
         margin-left: 10px;
         font-weight: normal;
         color: #999;
-    } 
+    }
+
+    // #webgl{
+    //     height: 650px;
+    //     width: 100%;
+    //     position: fixed;
+    //     top:68px;
+    //     left:0px;
+    //     display: inline-block;
+    //     transition: all 0.7s ease;
+    // }
+    // .navigation{
+    //     height:46px;
+    //     width:100%;
+    //     position: fixed;
+    //     top: 46px; 
+    //     left: 26px;
+    //     right: 0;
+    //     background: #fff;
+    //     z-index: 1000!important;
+    //     transition: all 0.7s ease;
+    // }
+    // .navigation1{
+    //     height:46px;
+    //     width:100%;
+    //     position: fixed;
+    //     top: 590px; 
+    //     left: 26px;
+    //     right: 0;
+    //     background: #fff;
+    //     z-index: 1000!important;
+    //     transition: all 0.7s ease;
+    // }
+    // .settingsRight{
+    //     display: block;
+    //     margin-left: 219px;
+    //     margin-top: 116px;
+    //     transition: all 0.7s ease;
+    // }
+    // .settingsRight1{
+    //     top:635px;
+    //     position: fixed;
+    //     display: block;
+    //     margin-left: 219px;
+    //     height: 100%;
+    //     overflow:auto;
+    //     transition: all 0.7s ease;
+    // } 
 </style>

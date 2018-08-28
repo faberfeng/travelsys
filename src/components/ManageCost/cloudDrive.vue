@@ -169,7 +169,7 @@
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -180,8 +180,8 @@
                     <span class="item-version-3  " @click="screenLeft.item = 3;getVersion()">版<br>本</span>
                 </div>
             </div>
-            <div id="verticalBar"></div>
-            <div v-show="screenLeft.item == 1" class="screenRight_1">
+            <!-- <div id="verticalBar"></div> -->
+            <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                  <p class="clearfix">
                     <i class="icon-goujian icon-add" title="添加" @click="addFile"></i>
                     <i class="icon-goujian icon-authrity"  title="权限" @click="authrityFile"></i>
@@ -205,7 +205,7 @@
                     </el-tree>
                 </div>
             </div>
-            <div id="box-right" v-if="screenLeft.item == 2">
+            <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 2">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
                     <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
@@ -315,7 +315,7 @@
                     </ul>
                 </div>
             </div>
-            <div id="box-right-1" v-if="screenLeft.item == 3">
+            <div id="box-right-1" v-show="screenLeft.show" v-if="screenLeft.item == 3">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
                     <p class="head" v-if="checkedItem.dirId || checkedRound">
                         <i class="icon-goujian icon-search" @click="view()"></i>
@@ -560,13 +560,19 @@
         }
     }
     #GroupSelect{
-        display: block;
+        // display: block;
+        // width: 168px;
+        // height: 30px;
+        // position: fixed;
+        // top: 77px;
+        // z-index: 1000;
+        // right: 24px;
+        display: inline-block;
+        float: right;
+        margin-top:-40px;
+        margin-right:10px;
         width: 168px;
         height: 30px;
-        position: fixed;
-        top: 77px;
-        z-index: 1000;
-        right: 24px;
         .inp-search{
             width: 168px;
             border-radius: 15px;
@@ -591,19 +597,26 @@
             background-image:url('../Settings/images/sanjiao.png');
             background-size: 100% 100%;
             content: '';
-            top: 12px;
-            right: 11px;
+            top: 19px;
+            right: 18px;
         }
     }
     .box-left-container{
-        display: block;
-        position: fixed;
-        top: 115px;
-        left: 26px;
-        bottom: 0;
-        right: 225px;
+        // display: block;
+        // position: fixed;
+        // top: 115px;
+        // left: 26px;
+        // bottom: 0;
+        // right: 225px;
+        // transition:  all ease .5s;
+        // overflow: auto;
+        display: inline-block;
+        width: 83%;
+        position: relative;
+        // margin-top:109px;
+        margin-left:24px;
+        // z-index: 1001;
         transition:  all ease .5s;
-        overflow: auto;
         #planeFigureDiv{
             overflow: auto;
             position: absolute;
@@ -1020,7 +1033,7 @@
                 tbody{
                     tr{
                         td{
-                            height: 54px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             font-size: 14px;
@@ -1090,8 +1103,8 @@
         }
     }
     .box-left-avtive{
-         right: 0px;
-          transition:  all ease .5s;
+        width: 96%;
+        transition:  all ease .5s;
           .icon-right{
               transform: rotateZ(180deg)!important;
               transition: all ease .5s;
@@ -1134,17 +1147,28 @@
       右侧
     */
     .box-right-container{
-        display: block;
-        position: fixed;
-        right: -225px;
-        bottom: 0;
-        width: 250px;
-        padding-left: 25px;
-        top: 116px;
+        // display: block;
+        // position: fixed;
+        // right: -225px;
+        // bottom: 0;
+        // width: 250px;
+        // padding-left: 25px;
+        // top: 116px;
+        // transition: all ease .5s;
+        // background: #ffffff;
+        // z-index: 10;
+        // overflow-y: auto;
+        display: inline-block;
+        position: relative;
+        float: right;
+        width: 15%;
+        // margin-top: -763px;
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        height: 785px;
         overflow-y: auto;
+        overflow-x: hidden;
             #verticalBar{
                 display: block;
                 position: fixed;
@@ -1161,6 +1185,7 @@
             bottom: 0;
             left: 0;
             width: 25px;
+            border-right: 1px solid #cccccc;
             .SH_right{
                 width: 100%;
                 height: 48px;
@@ -1190,7 +1215,7 @@
                 color: #666666; 
                 text-align: center;
                 border-left: 1px solid #cccccc;
-                // border-right: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
                 position: relative;
                 cursor: pointer;
                 &::after{
@@ -1240,7 +1265,7 @@
                 color: #666666; 
                 text-align: center;
                 border-left: 1px solid #cccccc;
-                // border-right: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
                 position: relative;
                 cursor: pointer;
                 &::after{
@@ -1305,11 +1330,13 @@
             
         }
         .screenRight_1{
-            padding: 10px 14px 10px 10px;
+            // padding: 10px 14px 10px 10px;
+            padding: 10px 0px 5px 0px;
+            margin: 0 14px 0 30px;
             #cloudDirveFileTree{
                 display: block;
                 position: absolute;
-                left: 35px;
+                left: 32px;
                 right: 0;
                 bottom: 0;
                 top: 42px;
@@ -1359,11 +1386,12 @@
         }
     }
     .box-right-avtive{
-        right: 0;
-         transition: all ease .5s;
+        width: 2%;
+        transition: all ease .5s;
     }
     #box-right{
         padding: 19px 13px 0 10px;
+        margin-left:24px;
         #basicAttributes{
             display: none;
             >li:last-of-type{
@@ -3041,6 +3069,7 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
+                console.log(vm.FileTree_original);
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
                 console.log(JSON.stringify(this.FileTree))
                 if(name){

@@ -1815,11 +1815,8 @@ export default {
         }
         .topHeader{
             box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            float: left;
+            width: 100%;
             overflow: auto;
         }
         #item-box-file{

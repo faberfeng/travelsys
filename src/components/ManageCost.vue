@@ -2,16 +2,26 @@
     <div class="wrapper" ref="allHeight">
       <!--2018/3/21 付伟超修改-->
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg' :userimg='header.userImg'></headerCommon>
+        
         <div class="contentBody">
-            <div class="sideBar" ref="sideB">
+            
+            <!-- <div class="sideBar" ref="sideB">
                 <a href="#" >
                     <img src="../assets/arrow-left.png"/>
                 </a>
+            </div> -->
+            <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
+            <!-- <button class="backTop">回到顶部</button> -->
+            <div v-show="webGlShow" class="webglBackground">
+                <div id="webgl" v-show="webGlShow">
+                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                </div>
             </div>
             <div  class="main">
                 <div class="content">
-                    <el-row class="navigation">
+                    <el-row class="navigation1">
                         <el-col :span="24" >
+                            <!-- <button @click="btn12">下拉</button> -->
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
@@ -26,7 +36,7 @@
                             </el-tabs>
                         </el-col>
                     </el-row>
-                    <div :class="[{'settingsCenter':settingsCenter},'settingsRight']">
+                    <div :class="[{'settingsCenter':settingsCenter},{'settingsRight':!webGlShow},{'settingsRight1':webGlShow}]" >
                         <router-view></router-view>
                     </div>
                 </div>
@@ -37,12 +47,14 @@
 <script>
 import headerCommon from './header.vue'
 import axios from 'axios'
+var app
 export default {
     name:'Home',
     components: {
       headerCommon
     },
     data(){
+          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
             settingsCenter:true,//是否是两边铺满
             header:{
@@ -59,6 +71,7 @@ export default {
             screenWidth: document.documentElement.clientHeight,
             token:'',
             projId:'',
+            subProjId:'',
             cHeight:'',
             /*********
                  *要判断导航栏功能； 
@@ -81,13 +94,21 @@ export default {
                 configurationCenter:false
             },
             QJFileManageSystemURL:'',
-            BDMSUrl:''
+            BDMSUrl:'',
+            webGlShow:false,
+            InitdataList:'',
+            WebGlId:'',
+            WebGlUrl:'',
+            WebGlType:'',
+            WebGlName:'',
         }
     },
     created(){
         var vm = this
         vm.projId = localStorage.getItem('projId');//获取工程编号
+        vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
@@ -100,6 +121,9 @@ export default {
         vm.token  = localStorage.getItem('token')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial(vm.projId);
+        this.getInitdata();
+        
+        // this.getInitdata();
     },
     mounted(){
         var height = ''
@@ -108,7 +132,7 @@ export default {
         }else{
            this.cHeight = document.body.clientHeight;
         }
-       // this.$refs.sideB.style.height = this.cHeight+'px';
+    //    this.$refs.iframe1.style.height = this.cHeight+'px';
         
         // this.$refs.settingsL.style.height = this.cHeight+'px';
     },
@@ -118,6 +142,67 @@ export default {
         },
     },
     methods:{
+        btn12(){
+             console.log('fjd')
+            //  localStorage.setItem('webGlShow',this.webGlShow)
+            this.webGlShow=!this.webGlShow
+            localStorage.setItem('webGlShow',this.webGlShow)
+            this.$router.push({
+                params: {
+                id:'123'
+                }
+            })
+            // localStorage.setItem('webGlShow',this.webGlShow)
+            app = this.$refs.iframe1.contentWindow
+            app.postMessage({command:"Init",parameter:null},"*");
+        },
+        callback(e){
+            console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+                    let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
+                    console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+
+				break;
+			case "CurrentSelectedEnt":
+				break;
+			case "ViewpointSubmited":
+
+				// ScreenPara = e.data.parameter
+
+				break;
+		    }
+        },
+        //获取项目模型展示初始化数据
+        getInitdata(){
+            axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'/model2/'+this.projId+'/'+this.subProjId+'/model/initdata'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.InitdataList=JSON.parse(response.data.rt);
+                this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
+                this.WebGlId=String(this.WebGlId);
+                this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
+                this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
+
+                // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
+                console.log(JSON.stringify(this.WebGlId));
+                console.log(this.InitdataList);
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+            })
+        },
         getPJDetial(key){
             var vm = this
             //console.log("look the proj_id")
@@ -143,6 +228,7 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
+                    console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
                 }
             }).catch((err)=>{
@@ -168,6 +254,7 @@ export default {
                 vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.QJFileManageSystemURL+response.data.rt.onlineInfo.imgUuid:''
                 localStorage.setItem('userImg',vm.header.userImg)
                  localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
+                 console.log(response.data.rt.defaultSubProjId)
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
@@ -410,7 +497,7 @@ export default {
         visibility: hidden;
         box-shadow:-2px 2px 2px 2px #d9d9d9 ;
         border-radius: 5px;
-        z-index: 10;
+        z-index: 100;
     }
     .infoHover .p1{
         border-bottom: 1px solid #e6e6e6;
@@ -438,6 +525,7 @@ export default {
     }
     .headerInfo:hover{
         background: #343a43;
+         z-index: 100;
     }
     .headerInfoImg{
         width: 48px;
@@ -464,10 +552,11 @@ export default {
     }
     /* 侧边栏 */
     .contentBody{
-        display: flex;
+        /* display: flex; */
         height:100%;
         position: relative;
     }
+    
     .sideBar{
         width: 25px;
         min-width: 25px;
@@ -485,15 +574,25 @@ export default {
     }
     /* 导航栏 */
     .main{
-        flex: 1;
-        overflow:auto;
+        /* flex: 1; */
+        /* overflow:auto; */
         /* margin-left: 18px; */
     }
     .content{
         width: 100%;
         position: relative;
     }
-    .navigation{
+    .webIframe1{
+        height:0px;
+        transition: all 0.5s ease;
+    }
+    .webIframe{
+        /* position: fixed; */
+        /* z-index:100000000000000; */
+        height:800px;
+        transition: all 0.5s ease;
+    }
+    /* .navigation{
         height:48px;
         width:100%;
         position: fixed;
@@ -502,5 +601,108 @@ export default {
         right: 0;
         background: #fff;
         z-index: 1000;
+    } */
+    .backTop{
+        position: fixed;
+        bottom:30px;
+        left: 30px;
+        border:1px solid #888;
     }
+    .downWebGl{
+        /* position: fixed; */
+        position:absolute;
+        top:-40px;
+        right:100px;
+        z-index: 10000000;
+        color: #7a818a;
+        cursor: pointer;
+    }
+    #webgl{
+       	height: 800px;
+        width: 95%;
+        /* margin-top: 60px; */
+        display: inline-block;
+        /* overflow-y: auto; */
+        transition: all 0.7s ease;
+    }
+    .webglBackground{
+         width: 100%;
+         height: 810px;
+        background-color:#333333;
+    }
+    /* .navigation{
+        height:48px;
+        width:100%;
+        position: fixed;
+        top: 68px; 
+        left: 26px;
+        right: 0;
+        background: #fff;
+        z-index: 1000!important;
+        transition: all 0.7s ease;
+    } */
+    .navigation1{
+        height: 48px;
+        width: 100%;
+        /* margin-top: 392px; */
+        float: left;
+        background: #fff;
+        /* z-index: 1000!important; */
+        
+        transition: all 0.7s ease;
+    }
+    /* .settingsCenter[data-v-fed36922] {
+     margin-left: 26px!important;
+    } */
+    .settingsRight{
+        display: block;
+        /* margin-left: 219px; */
+        /* margin-top: 116px; */
+        transition: all 0.7s ease;
+    }
+    .settingsRight1{
+        /* float: left;
+        display: block; */
+        /* margin-top: 486px; */
+        height: 100%;
+        /* overflow:auto; */
+        transition: all 0.7s ease;
+    }
+    /* .navigation{
+        height:48px;
+        width:100%;
+        position: fixed;
+        top: 68px; 
+        left: 26px;
+        right: 0;
+        background: #fff;
+        z-index: 1000!important;
+        transition: all 0.7s ease;
+    }
+    .navigation1{
+        height:48px;
+        width:100%;
+        position: fixed;
+        top: 590px; 
+        left: 26px;
+        right: 0;
+        background: #fff;
+        z-index: 1000!important;
+        transition: all 0.7s ease;
+    }
+    .settingsRight{
+        display: block;
+        margin-left: 219px;
+        margin-top: 116px;
+        transition: all 0.7s ease;
+    }
+    .settingsRight1{
+        top:635px;
+        position: fixed;
+        display: block;
+        margin-left: 219px;
+        height: 100%;
+        overflow:auto;
+        transition: all 0.7s ease;
+    } */
 </style>

@@ -233,13 +233,17 @@ export default {
 </script>
 <style lang="less" scoped>
     #costOverView{
+        // box-sizing: border-box;
+        // position: fixed;
+        // top: 116px;
+        // left: 26px;
+        // bottom:0;
+        // right: 0;
+        // overflow: auto;
         box-sizing: border-box;
-        position: fixed;
-        top: 116px;
-        left: 26px;
-        bottom:0;
-        right: 0;
-        overflow: auto;
+        float: left;
+        width: 100%;
+        // overflow: auto;
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;

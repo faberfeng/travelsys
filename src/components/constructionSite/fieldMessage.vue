@@ -1456,13 +1456,19 @@ export default {
             content: '';
         }
         #GroupSelect {
-            display: block;
+            // display: block;
+            // width: 168px;
+            // height: 30px;
+            // position: fixed;
+            // top: 77px;
+            // z-index: 1000;
+            // right: 24px;
+             display: inline-block;
+            float: right;
+            margin-top:-40px;
+            margin-right:10px;
             width: 168px;
             height: 30px;
-            position: fixed;
-            top: 77px;
-            z-index: 1000;
-            right: 24px;
             .inp-search {
                 width: 168px;
                 border-radius: 15px;
@@ -1487,18 +1493,24 @@ export default {
                 background-image: url('../Settings/images/sanjiao.png');
                 background-size: 100% 100%;
                 content: '';
-                top: 12px;
-                right: 11px;
+                top: 19px;
+                right: 18px;
             }
         }
         .topHeader{
-            box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            // box-sizing: border-box;
+            // position: fixed;
+            // top: 116px;
+            // left: 26px;
+            // bottom:0;
+            // right: 0;
             // overflow: auto;
+            box-sizing: border-box;
+            float: left;
+            width: 100%;
+            height:800px;
+            // overflow-y: auto;
+            // overflow-x:hidden;
         }
         #item-box-file{
             display: block;
