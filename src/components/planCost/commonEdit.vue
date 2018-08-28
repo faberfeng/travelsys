@@ -1389,8 +1389,6 @@ export default Vue.component('common-edit',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         
-        this.data_right = [];
-        console.log(this.data_right);
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
             vm.getIntoDesignPage(true)
@@ -1804,6 +1802,7 @@ export default Vue.component('common-edit',{
                     token:vm.token
                 },
             }).then(response=>{
+                console.log(response.data)
                  if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
@@ -1839,16 +1838,15 @@ export default Vue.component('common-edit',{
                             response.data.rt.filterList.forEach((element,index)=>{
                                 if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.profession'){
                                      switch(element.fieldCode){
-                                         case 'range.db':
-                                                vm.database = element.fieldSearchContent
+                                        case 'range.db':
+                                            vm.database = element.fieldSearchContent
                                             break;
                                         case 'range.build':
-
-                                                vm.value_monomer = element.fieldSearchContent.split('&&')[0]
-                                                vm.value_partition = element.fieldSearchContent.split('&&')[1]
-                                                vm.value_floor = element.fieldSearchContent.split('&&')[2]
-                                                vm.value_monomer_change(true)
-                                                vm.value_partition_change(true)
+                                            vm.value_monomer = element.fieldSearchContent.split('&&')[0]
+                                            vm.value_partition = element.fieldSearchContent.split('&&')[1]
+                                            vm.value_floor = element.fieldSearchContent.split('&&')[2]
+                                            vm.value_monomer_change(true)
+                                            vm.value_partition_change(true)
                                             break;
                                         // case 'range.partition':
                                         //         vm.value_partition = element.fieldSearchContent
@@ -1863,18 +1861,18 @@ export default Vue.component('common-edit',{
                                             因为默认为 000000；
                                             因此无何全部字段无法区分，默认为全部 -1
                                         **/
-                                                vm.value_professional = element.fieldSearchContent.substr(0,2) == '00'?'-1':element.fieldSearchContent.substr(0,2)+'0000'
-                                                vm.value_system = element.fieldSearchContent.substr(2,2) == '00'?'-1':element.fieldSearchContent.substr(0,4)+'00'
-                                                vm.value_type = element.fieldSearchContent.substr(4,2) == '00'?'-1':element.fieldSearchContent
-                                                vm.value_professional_change(true)
-                                                vm.value_system_change(true)
+                                            vm.value_professional = element.fieldSearchContent.substr(0,2) == '00'?'-1':element.fieldSearchContent.substr(0,2)+'0000'
+                                            vm.value_system = element.fieldSearchContent.substr(2,2) == '00'?'-1':element.fieldSearchContent.substr(0,4)+'00'
+                                            vm.value_type = element.fieldSearchContent.substr(4,2) == '00'?'-1':element.fieldSearchContent
+                                            vm.value_professional_change(true)
+                                            vm.value_system_change(true)
                                             break;
                                         // case 'range.system':
-                                        //         vm.value_system = element.fieldSearchContent
-                                        //         vm.value_system_change(true)
+                                        //     vm.value_system = element.fieldSearchContent
+                                        //     vm.value_system_change(true)
                                         //     break;
                                         // case 'range.type':
-                                        //         vm.value_type = element.fieldSearchContent
+                                        //     vm.value_type = element.fieldSearchContent
                                         //     break;
                                      }
                                 }else{
@@ -1943,7 +1941,7 @@ export default Vue.component('common-edit',{
                 return false
             }
             var rcId = vm.rcId
-            vm.fullscreenLoading =true
+            vm.fullscreenLoading =true;
 
             needCount = needCount || false
             /***先获取rc 中的值***/
@@ -1997,9 +1995,9 @@ export default Vue.component('common-edit',{
             // 过滤条件
             /**
              *   val:0,
-                    build_name:'nofield',
-                    filtertype:'',
-                    filtercontent:'',
+                build_name:'nofield',
+                filtertype:'',
+                filtercontent:'',
             **/
             vm.list_filter.forEach((ele,index)=>{
                 if (ele.build_name == 'nofield') return

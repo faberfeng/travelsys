@@ -748,6 +748,7 @@ export default Vue.component('common-list',{
                     projId:this.projId
                 }
             }).then(response=>{
+                console.log(response.data)
                 if(response.data.cd == 0){
                     vm.rcStyle = response.data.rt.rcStyle
                     vm.dataName = response.data.rt.reportName
@@ -779,11 +780,11 @@ export default Vue.component('common-list',{
                                 }
                             }else if(element.rowType == 'ROW_CONTENT'){ 
                                 if(element.infoList[2]!=''){
-                                    element.infoList[11] = element.infoList[2];
+                                    //element.infoList[11] = element.infoList[2];
                                 }else if(element.infoList[1]!=''){
-                                    element.infoList[11] = element.infoList[1];
+                                    //element.infoList[11] = element.infoList[1];
                                 }else if(element.infoList[0]!=''){
-                                    element.infoList[11] = element.infoList[0];
+                                    //element.infoList[11] = element.infoList[0];
                                 }
                                 vm.DatatableList.push({
                                     'list':element.infoList,
@@ -815,7 +816,6 @@ export default Vue.component('common-list',{
                                 }
                             }
                         })
-                        console.log(vm.Footer.info )
                         vm.DatatableList.forEach((item,index)=>{
                             item.list.splice(titleLength,item.list.length-titleLength);    
                         })
