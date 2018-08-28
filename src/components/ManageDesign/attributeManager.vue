@@ -24,7 +24,7 @@
                 </div>
                 <div id="containerMessage" v-show="SHOWMain">
                     <p class="header clearfix">
-                        <span class="title">
+                        <span class="title" style="visibility:hidden">
                           数据版本 <input type="tel" v-model="dataVision">/{{holderMaxVersion}}
                            <span class="reset" @click="selectData">重设</span>
                         </span>

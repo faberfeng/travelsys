@@ -449,47 +449,6 @@
                     text-align: left;
                 }
             }
-            .item-label{
-                border-bottom: 1px solid #ebebeb;
-                .img_left{
-                    float: left;
-                    width: 90px;
-                    height: 90px;
-                    margin:40px 30px 0 10px;
-                }
-                .right{
-                    float: left;
-                    width: 450px;
-                    .item-list{
-                        margin-bottom: 14px;
-                        .text-left{
-                            float: left;
-                            font-size: 12px;
-                            line-height: 12px;
-                            width: 80px;
-                            color: #999;
-                            text-align: left;
-                        }
-                        .text-right{
-                            float: left;
-                            width: 300px;
-                             font-size: 12px;
-                            line-height: 12px;
-                            color: #333333;
-                            text-align: left;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                            white-space: nowrap;
-                        }
-                        &:last-of-type{
-                             margin-bottom: 20px; 
-                        }
-                    }
-                }
-                &:last-of-type{
-                    border-bottom: none;
-                }
-            }
              .item-attibuteAuth{
                  float: left;
                  width: 33.3%;
