@@ -23,14 +23,14 @@
                                 <span class="fullScreen" @click="fullModule"></span>
                             </div>
                             <div class="video_body">
-                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" ></iframe>
+                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;"></iframe>
                                 
                                     <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
                                 
                                 <!-- src="https://site.altizure.cn/s/ryLw2SAxX" -->
                             </div>
                             <div class="video_bottom">
-                                <span class="fullSet" @click="getMedia(1)"></span>
+                                <!-- <span class="fullSet" @click="getMedia(1)"></span> -->
                             </div>
                         </div>
                         <div class="video_model" @mouseenter="changeActive(2)" @mouseleave="removeActive(2)">
@@ -371,10 +371,10 @@ export default {
         // vm.imgdetial.path = obj.image
         // vm.imgdetial.x = obj.x
         // vm.imgdetial.y = obj.y
-        // this.getPanoramaMain();//获取全景图主图路径及点位信息
-        // this.getPanoramaPathList();//获取全景图真实路径集合
+        this.getPanoramaMain();//获取全景图主图路径及点位信息
+        this.getPanoramaPathList();//获取全景图真实路径集合
         this.getMediaInformation(2);
-        // this.getMediaInformation1(4);
+        this.getMediaInformation1(4);
         this.getUserGroup();
        
         // this.initWebSocket();//现场连线
@@ -545,6 +545,7 @@ export default {
         },
         getMedia(type){
             this.addMediaDialog=true;
+            this.mediaUrlList=[];
             this.getMediaInformation(type);
             // this.getMediaInformation1(type);
             // this.getMediaLiveInformation(type);
@@ -569,14 +570,14 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length != 0){
                     this.mediaUrlList=response.data.rt;
                     this.videoPageTotal=this.mediaUrlList.length;
                     this.$refs.video.src=this.mediaUrlList[0].path;
                     console.log(this.videoPageTotal);
                     console.log(this.mediaUrlList);
-                }else{
-                    alert('大笨蛋')
+                }else if(response.data.cd==-1){
+                    alert(response.data.msg)
                 }
                 
             })
@@ -595,11 +596,12 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.mediaUrlList1=response.data.rt;
                     this.livePageTotal=this.mediaUrlList1.length;
                     this.$refs.lineLive.src=this.mediaUrlList1[0].path;
-                }else{
+                }else if(response.data.cd==-1){
+                    alert(response.data.msg)
 
                 }
                 
@@ -926,7 +928,7 @@ export default {
                     projectId:this.projId
                 }
                 }).then(response=>{
-                    if(response.data.rt){
+                    if(response.data.rt.length!=0){
                         this.PanoramaMainList=response.data.rt;
                         this.$refs.fullPicture.src=this.PanoramaMainList.path;
                         this.imgdetial1=this.PanoramaMainList.list;
@@ -950,7 +952,7 @@ export default {
                     projectId:this.projId
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.PanoramaPathList=response.data.rt;
                     this.picturePageTotal=this.PanoramaPathList.length;
                     this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[0];
@@ -1213,14 +1215,20 @@ export default {
     }
     #fieldConnection{
          .topHeader{
+            // box-sizing: border-box;
+            // position: fixed;
+            // top: 116px;
+            // left: 26px;
+            // bottom:0;
+            // right: 0;
+            // overflow: auto;
             box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            float: left;
+            width: 100%;
             overflow: auto;
+            height: 800px;
         }
+         ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;

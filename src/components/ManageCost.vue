@@ -153,8 +153,12 @@ export default {
                 }
             })
             // localStorage.setItem('webGlShow',this.webGlShow)
+            if(app){
+                
+            }else{
             app = this.$refs.iframe1.contentWindow
             app.postMessage({command:"Init",parameter:null},"*");
+            }
         },
         callback(e){
             console.log(e)

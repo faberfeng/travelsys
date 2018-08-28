@@ -1110,7 +1110,7 @@ export default {
                     end:this.end1
                     }
                     }).then(response=>{
-                        if(response.data.cd == '0'){
+                        if(response.data.rt){
                             // this.calendarEventList=response.data.rt;
                             // console.log(JSON.stringify(this.calendarEventList));
                             // this.initCalendar();
@@ -1118,10 +1118,6 @@ export default {
                             this.initCalendar1();
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg)
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
                         }
                     })
             },

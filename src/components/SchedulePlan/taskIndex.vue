@@ -1825,7 +1825,7 @@
             taskName: this.searchTaskName
           }
         }).then(response => {
-          if (response.data.cd == "0") {
+          if (response.data.rt) {
             var vm=this
             this.taskIndexData = response.data.rt;
             // console.log(this.taskIndexData.length);
