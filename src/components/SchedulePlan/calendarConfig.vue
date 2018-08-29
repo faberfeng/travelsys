@@ -215,7 +215,7 @@
                             </div>
                             <el-button type="danger" @click="updateComponentCheck">修改</el-button>
                         </div>
-                        <div class="taskStatus">
+                        <div class="taskStatus1">
                             <h2><span>任务状态图例</span></h2>
                             <div class="statusTab">
                                 <table  border="1" width="100%">
@@ -1189,7 +1189,7 @@
                         height: 36px;
                         width: 20%;}
                     }
-                    .taskStatus{
+                    .taskStatus1{
                             margin-top:90px;
                             margin-bottom: 20px;
                             // border-bottom: 15px solid #fff;
