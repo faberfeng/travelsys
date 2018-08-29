@@ -31,100 +31,115 @@
                             </span>
                         </p>
                         <div class="project">
-                            <div v-if="!isMapped">
-                                <div class="doubleTable">
-                                    <table  :class="[expandPrperty.length!=0?'UserListtwoLeft':'UserListtwoLeftone']">
-                                        <thead>
-                                            <th>所在空间</th>
-                                            <th>原始文档</th>
-                                            <th>原始ID</th>
-                                            <th>构件名称</th>
-                                            <th v-if="expandPrperty!=null && expandPrperty.length==0">操作</th>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index,1)">
-                                                <td>{{item.partition}}</td>
-                                                <td>{{item.originalFile}}</td>
-                                                <td>{{item.originalId}}</td>
-                                                <td>{{item.originalName}}</td>
-                                                <td v-if="expandPrperty!=null && expandPrperty.length==0">
-                                                    <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        </table>
-                                        <table class="UserListtwoRight" v-if="expandPrperty!=null && expandPrperty.length!=0">
-                                            <thead>
-                                                <th v-for="(item,index) in tableHeadData" v-if="item.showModel" :key="index">{{item.name}}</th>
-                                                <th>操作</th>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(item,index) in expandPrperty" :key="index" @click="clickDetailInfo(item,index,1)">
-                                                    <td v-for="(iteml,indexl) in item" :key="indexl" v-if="iteml[3]">  
-                                                        <span >{{iteml[1]}}</span>
-                                                    </td>
-                                                    <td>
-                                                        <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="datagrid-pager pagination" >
-                                        <table cellspacing="0" cellpadding="0" border="0" >
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
-                                                            <option value="20">20</option>
-                                                            <option value="30">30</option>
-                                                            <option value="40">40</option>
-                                                            <option value="50">50</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <div class="pagination-btn-separator"></div>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
-                                                    </td>
-                                                    <td>
-                                                        <div class="pagination-btn-separator"></div>
-                                                    </td>
-                                                    <td>
-                                                        <span  class="pagination-title" style="padding-left:5px;">第</span>
-                                                    </td>
-                                                    <td>
-                                                        <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
-                                                    </td>
-                                                    <td>
-                                                        <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="pagination-btn-separator"></div>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
-                                                    </td>
-                                                    <td>
-                                                        <div class="pagination-btn-separator"></div>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript:void(0)" @click="loadMappingEntityInfo(getComponentDetailsObj.uuid)" class="btn-refresh btn-TAB"></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
-                                    <div style="clear:both;"></div>
-                                </div>
-                            </div>
+                            <el-table  :data="projObjArr" style="width:100%" border @expand-change="showRowInfo" v-if="isMapped">
+                                <el-table-column type="expand">
+                                    <template slot-scope="props">
+                                        <div class="doubleTable">
+                                            <table  :class="[expandPrperty.length!=0?'UserListtwoLeft':'UserListtwoLeftone']">
+                                                <thead>
+                                                    <th>所在空间</th>
+                                                    <th>原始文档</th>
+                                                    <th>原始ID</th>
+                                                    <th>构件名称</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(item,index) in detailInfoObj" :key="index" @click="clickDetailInfo(item,index,1)">
+                                                        <td>{{item.build}}</td>
+                                                        <td>{{item.originalFile}}</td>
+                                                        <td>{{item.originalId}}</td>
+                                                        <td>{{item.originalName}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="UserListtwoRight" v-if="expandPrperty.length!=0">
+                                                <thead>
+                                                    <th v-for="(item,index) in tableHeadData" v-if="item.showModel" :key="index">{{item.name}}</th>
+                                                    <th>操作</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(item,index) in expandPrperty" :key="index" @click="clickDetailInfo(item,index,2)">
+                                                        <td v-for="(iteml,indexl) in item" :key="indexl" v-if="iteml[3]">  
+                                                            <span >{{iteml[1]}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="locationtwo actionBtn" title="定位" @click="goToLocation()"></button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="datagrid-pager pagination" >
+                                            <table cellspacing="0" cellpadding="0" border="0" >
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
+                                                                <option value="20">20</option>
+                                                                <option value="30">30</option>
+                                                                <option value="40">40</option>
+                                                                <option value="50">50</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'1')"></a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'1')"></a>
+                                                        </td>
+                                                        <td>
+                                                                <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                                        </td>
+                                                        <td>
+                                                                <input class="pagination-num" type="text" v-model="pageDetial.currentPage">
+                                                        </td>
+                                                        <td>
+                                                            <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageDetial.total/pageDetial.pagePerNum)}}页</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'1')"></a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePage(2,'1')"></a>
+                                                        </td>
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" @click="loadMappingEntityInfo(getComponentDetailsObj.uuid)" class="btn-refresh btn-TAB"></a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
+                                            <div style="clear:both;"></div>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column 
+                                label="项目编码" 
+                                prop="projectCode" 
+                                align="center">
+                                </el-table-column>
+                                <el-table-column
+                                    label="项目名称"
+                                    prop="projectName"
+                                    align="center">
+                                </el-table-column>
+                                <el-table-column
+                                    label="计量单位"
+                                    prop="unit"
+                                    align="center">
+                                </el-table-column>
+                            </el-table>
                         </div>
                     </div>
                 </div>
@@ -453,7 +468,6 @@ export default Vue.component('mapping-project',{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 
-        console.log(this.projObj)
         if(this.isMapped){
             this.showEntityList();//构件列表时触发
         }else{
@@ -469,58 +483,57 @@ export default Vue.component('mapping-project',{
                 expandedRows.shift();
             }
             this.getComponentDetailsObj = row;
-            this.loadMappingEntityInfo(row.uuid);
+           // this.loadMappingEntityInfo(row.uuid);
         },
         //获取未被映射的构件信息
-        loadUnMappingEntityInfo(currCacheId){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/report/getUnMappingEntityList',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    pageNo:this.pageDetial.currentPage,
-                    rowNum:this.pageDetial.pagePerNum,
-                    projectId:this.projId,
-                    templateId:encodeURIComponent(currCacheId),
-                }
-            }).then(response=>{
-                console.log(response.data);
-                if(response.data.cd == 0){
-                    this.detailInfoObj = response.data.rt.rows;
-                    this.pageDetial.total = response.data.rt.total;
-                    this.tableHeadData = [];
-                    this.showExpandTable = [];
-                    this.expandPrperty = [];
-                    if(this.detailInfoObj[0].extendAttributes != null && this.detailInfoObj[0].extendAttributes.length!=0){
-                        this.detailInfoObj[0].extendAttributes.forEach(item=>{
-                            this.tableHeadData.push({
-                                name:item[2],
-                                showModel:true,
-                            })
-                        })
-                        this.detailInfoObj[0].extendAttributes.forEach(item=>{
-                            this.showExpandTable.push({
-                                name:item[2],
-                                showModel:true,
-                            })
-                        })
-                        this.detailInfoObj.forEach((item,index)=>{
-                            this.expandPrperty.push(item.extendAttributes);
-                        });
-                    }
-                    this.expandPrperty.forEach(item=>{
-                        item.forEach(itemone=>{
-                            itemone[3] = true;
-                        })
-                    });
+        // loadUnMappingEntityInfo(currCacheId){
+        //     axios({
+        //         method:'get',
+        //         url:this.BDMSUrl+'project2/report/getUnMappingEntityList',
+        //         headers:{
+        //             token:this.token
+        //         },
+        //         params:{
+        //             pageNo:this.pageDetial.currentPage,
+        //             rowNum:this.pageDetial.pagePerNum,
+        //             projectId:this.projId,
+        //             templateId:encodeURIComponent(currCacheId),
+        //         }
+        //     }).then(response=>{
+        //         if(response.data.cd == 0){
+        //             this.detailInfoObj = response.data.rt.rows;
+        //             this.pageDetial.total = response.data.rt.total;
+        //             this.tableHeadData = [];
+        //             this.showExpandTable = [];
+        //             this.expandPrperty = [];
+        //             if(this.detailInfoObj[0].extendAttributes != null && this.detailInfoObj[0].extendAttributes.length!=0){
+        //                 this.detailInfoObj[0].extendAttributes.forEach(item=>{
+        //                     this.tableHeadData.push({
+        //                         name:item[2],
+        //                         showModel:true,
+        //                     })
+        //                 })
+        //                 this.detailInfoObj[0].extendAttributes.forEach(item=>{
+        //                     this.showExpandTable.push({
+        //                         name:item[2],
+        //                         showModel:true,
+        //                     })
+        //                 })
+        //                 this.detailInfoObj.forEach((item,index)=>{
+        //                     this.expandPrperty.push(item.extendAttributes);
+        //                 });
+        //             }
+        //             this.expandPrperty.forEach(item=>{
+        //                 item.forEach(itemone=>{
+        //                     itemone[3] = true;
+        //                 })
+        //             });
                     
-                }else{
-                    alert(response.data.msg);
-                }
-            })
-        },
+        //         }else{
+        //             alert(response.data.msg);
+        //         }
+        //     })
+        // },
         //获取映射的构件信息
         loadMappingEntityInfo(currCacheId){
             axios({
@@ -537,7 +550,6 @@ export default Vue.component('mapping-project',{
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response.data)
                 if(response.data.cd == 0){
                     this.detailInfoObj = response.data.rt.rows;
                     this.pageDetial.total = response.data.rt.total;
@@ -571,35 +583,29 @@ export default Vue.component('mapping-project',{
                 }
             })
         },
+        
         //显示指定工程量映射的构件列表
         showEntityList(){
+            console.log(this.projObj);
             axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/showEntityList',
+                method:'get',
+                url:this.BDMSUrl+'project2/report/getMappingEntityList',
                 headers:{
                     token:this.token
                 },
-                data:{
-                    eCode:this.projObj.classifyCode.split('-')[1],
-                    cacheId:this.projObj.uuid,
-                    projId:this.projId
+                params:{
+                    engineeringNumber:this.projObj.componentNumber.split('-')[1],
+                    templateId:this.projObj.templateId,
+                    projectId:this.projId
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    this.projObjArr = response.data.rt;
-                    if(this.projObjArr!=null && this.projObjArr.length!=0){
-                        var str = '';
-                        this.projObjArr.forEach(item=>{
-                            if(item.characterValues.length!=0){
-                                item.characterValues.forEach(num=>{
-                                    str+=num.characterName+':'+num.currCharacterValue+';  ';
-                                })
-                            };
-                            Object.assign(item,{
-                                description:str,
-                            })
-                        })
+                    console.log(response.data);
+                    if(response.data.rt !=null){
+                        this.projObjArr = response.data.rt.characterGroup;
+                        this.detailInfoObj = response.data.rt.elementInfo[this.projObjArr[0].characterSummary];
                     }
+                    console.log(this.detailInfoObj);
                 }else{
                     alert(response.data.msg);
                 }
@@ -608,8 +614,6 @@ export default Vue.component('mapping-project',{
         //右侧属性面板
         clickDetailInfo(item,index,num){
             this.screenLeft.show = true;
-            console.log(item);
-            console.log(this.token)
             let tranceid = '';
             let dGCCode = '';
             let engineeringCodeParam = '';

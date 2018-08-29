@@ -348,8 +348,8 @@ export default {
                     headerAlign:"center" 
                 },
                 {
-                    label: '构件数量(未映射)',
-                    prop: 'entityCount_',
+                    label: '构件数量',
+                    prop: 'entityCount',
                     align:"center",
                     headerAlign:"center" 
                 },

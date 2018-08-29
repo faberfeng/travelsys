@@ -147,7 +147,7 @@
                                     align="center">
                                 </el-table-column>
                             </el-table>
-                            <div v-if="!isMapped">
+                            <!-- <div v-if="!isMapped">
                                 <div class="doubleTable">
                                     <table  :class="[expandPrperty.length!=0?'UserListtwoLeft':'UserListtwoLeftone']">
                                         <thead>
@@ -240,7 +240,7 @@
                                     <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
                                     <div style="clear:both;"></div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
