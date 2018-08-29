@@ -1,10 +1,6 @@
 <template>
     <el-row class="container-header">
-        <!-- <div id="webgl" style="display:block;width:1900px;">
-            <iframe ref="iframe1" id="webIframe" style="display:block;width: 100%;"  ></iframe>
-        </div> -->
         <el-col :span="24" class="header">
-            <!-- <button style="width:80px; height:30px;background:white;" @click="app">按钮</button> -->
             <div class="headerImg">
                 <img :src="proimg?proimg:require('../assets/defaultlogo.png')"/>
             </div>
@@ -34,15 +30,6 @@ export default Vue.component('common-header', {
         var vm = this
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-    //     var height = ''
-    //     if(document.documentElement.clientHeight){
-    //         this.cHeight = document.documentElement.clientHeight;
-    //     }else{
-    //        this.cHeight = document.body.clientHeight;
-    //     }
-    //    this.$refs.iframe1.style.height = this.cHeight+'px';
-        // this.$refs.settingsL.style.height = this.cHeight+'px';
-        // this.app();
     },
     methods:{
         app(){

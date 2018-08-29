@@ -1,9 +1,9 @@
 
 <style scoped>
 .calendar {
-    margin:auto;
+    margin:0 auto;
     width: 100%;
-    min-width:450px;
+    min-width:360px;
     height:302px;
     background: #fff;
     font-family: "PingFang SC","Hiragino Sans GB","STHeiti","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;

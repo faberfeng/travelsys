@@ -1100,23 +1100,23 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-//   import './jQueryGantt/platform.css'
-//   import './jQueryGantt/gantt.css'
-//   import './jQueryGantt/ganttPrint.css'
-//   import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
-//   import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
-//   import './jQueryGantt/libs/jquery/jquery.timers.js'
-//   import './jQueryGantt/libs/utilities.js'
-//   import './jQueryGantt/libs/forms.js'
-//    import './jQueryGantt/libs/date.js'
-//   import './jQueryGantt/libs/dialogs.js'
-// //  import './jQueryGantt/libs/layout.js'
-//   // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
-//   import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
-// //  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
-//   import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
-//   import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
-//   import {GanttMaster} from './jQueryGantt/ganttMaster.js'
+  import './jQueryGantt/platform.css'
+  import './jQueryGantt/gantt.css'
+  import './jQueryGantt/ganttPrint.css'
+  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
+  import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
+  import './jQueryGantt/libs/jquery/jquery.timers.js'
+  import './jQueryGantt/libs/utilities.js'
+  import './jQueryGantt/libs/forms.js'
+  import './jQueryGantt/libs/date.js'
+  import './jQueryGantt/libs/dialogs.js'
+//  import './jQueryGantt/libs/layout.js'
+  // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
+  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
+//  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
+  import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
+  import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+  import {GanttMaster} from './jQueryGantt/ganttMaster.js'
 
   import commonList from './qingdan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
@@ -1813,7 +1813,6 @@
 
       //获取工程列表
       getTaskList() {
-        //   console.log(this.selectUgId);
         axios({
           method: 'post',
           url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/list',
@@ -1828,7 +1827,7 @@
           if (response.data.rt) {
             var vm=this
             this.taskIndexData = response.data.rt;
-            // console.log(this.taskIndexData.length);
+            
             
             this.taskIndexData.forEach((item)=>{
               var ganttList={}
@@ -1842,7 +1841,7 @@
               //  vm.$set(ganttList,'endIsMilestone',false);
               //  vm.$set(ganttList,'status',"STATUS_SUSPENDED");
               this.loadGanttList.tasks.push(ganttList)
-              // console.log(this.loadGanttList);
+              
               item.children.forEach((item1)=>{
                 var ganttList1={}
                 vm.$set(ganttList1,'id',item1.taskId);
@@ -1887,7 +1886,6 @@
             if (this.taskIndexData == null) {
               this.taskIndexData = [];
             }
-            // console.log(JSON.stringify(this.taskIndexData));
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
           }
@@ -1952,14 +1950,6 @@
       rowClick(row, rowIndex) {
         console.log(row);
         console.log(rowIndex);
-        //   if(row.isTrusted==true){
-        //       console.log("选中")
-        //   }
-        // if(row.path)
-        // if(row.isTrusted==true){
-        //     row.path[2].bgColor='red';
-        // }
-        // console.log(row.path[2]);
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
@@ -1975,14 +1965,11 @@
 
       },
       rowKey(row, rowIndex) {
-        console.log(row);
-        console.log(rowIndex);
+      
       },
       rowStyle(row, rowIndex) {
         var vm = this;
         if (row.children == null) {
-          //  console.log(row.colorValue);
-          //  console.log("****:"+(row.colorValue));
           var color = vm.selectColor(parseInt(row.colorValue));
           return 'background:' + color;
         }
@@ -2256,7 +2243,6 @@
       },
       //鼠标单击树形icon
       treeIconClick(row, rowIndex) {
-        // console.log(JSON.stringify(rowIndex));
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
@@ -2265,7 +2251,6 @@
             this.tableCollapse = item._isFold == true ? 1 : 0;
           }
         })
-        //  console.log(this.tableCollapse)
       },
 
       //获取资源类别
@@ -2279,7 +2264,6 @@
         }).then(response => {
           if (response.data.cd == "0") {
             this.resourceTypeList = response.data.rt;
-            //   console.log(JSON.stringify(this.resourceTypeList));
           } else if (response.data.cd == "-1") {
             alert(resposne.data.msg)
           }
@@ -2317,7 +2301,6 @@
             } else {
               return;
             }
-            //   console.log(this.taskresourceTypeList);
           } else if (response.data.cd == "-1") {
             alert(resposne.data.msg)
           }
@@ -2390,7 +2373,6 @@
                   this.ugList1=this.editTaskUserGroupList.ugList;
                   var num=this.ugList1[0].ugId;
                   this.groupIds.push(num.toString());
-                  console.log(JSON.stringify(this.editTaskUserGroupList));
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -2400,13 +2382,13 @@
         //    var groupIdList=[];
         var str=this.ugList1[index].ugId
           this.groupIds.push(str.toString());
-          console.log(this.groupIds);
+          
       },
       userGroupTaskMakeSure(){
           this.taskId=this.editTaskUserGroupList.taskId;
           this.taskName=this.editTaskUserGroupList.taskName;
           this.taskParId=this.taskInformationList.taskParId;
-          console.log(this.editTaskUserGroupList);
+         
           axios({
               method:'post',
               url:this.BDMSUrl+'/project2/schedule/saveTaskUserGroup',
@@ -3141,7 +3123,6 @@
         },
         //确认添加核实任务
         addVerifyTaskMakeSure(){
-            console.log(this.verifyStartTime);
             var myDate = new Date();
             if(this.verifyStartTime>myDate){
                 alert('核实日期不能超过当前日期!')
@@ -3419,7 +3400,6 @@
         this.uploadfilesList = e.target.files[0];
         this.MppName = this.uploadfilesList.name;
         var extName = this.MppName.substring(this.MppName.lastIndexOf(".") + 1).trim().toLowerCase();
-        console.log(extName);
         if (extName != "mpp") {
           alert("提示:文件只限于mmp格式");
           this.uploadfilesList = [];

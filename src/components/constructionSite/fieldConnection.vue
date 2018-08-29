@@ -23,7 +23,7 @@
                                 <span class="fullScreen" @click="fullModule"></span>
                             </div>
                             <div class="video_body">
-                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;"></iframe>
+                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX"></iframe>
                                 
                                     <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
                                 
@@ -119,7 +119,9 @@
                                 <span class="btnFrame">退出</span>
                             </span>
                         </div>
-                        <div class="message_member"></div>
+                        <div class="message_member">
+                            <img class="memeberInfoImg" :src="userImg?userImg:require('../../assets/people.png')" />
+                        </div>
                         <div class="message_body"></div>
                         <div class="message_textarea">
                             <textarea  v-model="sendText" id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
@@ -155,7 +157,7 @@
                         <button class="editBtnC" @click="addMediaCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="来源配置" :visible.sync="addMediaDialog1" @close="addMediaCancle">
+                <el-dialog title="来源配置" :visible.sync="addMediaDialog1" @close="addMediaCancle1">
                     <div class="body">
                         <table class="planTabel" border="1" width="100%">
                             <thead>
@@ -179,7 +181,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addResource1">新增</button>
-                        <button class="editBtnC" @click="addMediaCancle">取消</button>
+                        <button class="editBtnC" @click="addMediaCancle1">取消</button>
                     </div>
                 </el-dialog>
 
@@ -207,24 +209,11 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog title="文件路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
-                    <!-- <div class="body1">
-                        <div class="head">
-                            <span class="text">群组选择:</span>
-                            <div class=editSelect1>
-                                <select v-model="ugGroupNameValue" @change="ugGroupChange">
-                                    <option v-for="(item,index) in getUserGroupList" :key="index" :value="item.ugId">{{item.ugName}}</option>
-                                </select>
-                                <i class="icon-sanjiao"></i>
-                            </div>
-                        </div>
-                        <div class="head"><span class="text">名称:</span>
-                            <div class="tree">
-                                <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
-                                </el-tree>
-                            </div>
-                        </div>
-                    </div> -->
+                <el-dialog  title="媒体路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
+                    <div class="mediaUrl">
+                        <div class="urlWord">目标URL</div>
+                        <div class="urlInp"><el-input v-model="mediaUrl"></el-input></div>
+                    </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addResourceMakeSure1">保存</button>
                         <button class="editBtnC" @click="addResourceCancle1">取消</button>
@@ -254,23 +243,10 @@
                         <button class="editBtnC" @click="updateResourceCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="文件路径选择" :visible.sync="updateResourceDialog1" @close="updateResourceCancle1">
-                    <div class="body1">
-                        <!-- <div class="head">
-                            <span class="text">群组选择:</span>
-                            <div class=editSelect1>
-                                <select v-model="ugGroupNameValue" @change="ugGroupChange">
-                                    <option v-for="(item,index) in getUserGroupList" :key="index" :value="item.ugId">{{item.ugName}}</option>
-                                </select>
-                                <i class="icon-sanjiao"></i>
-                            </div>
-                        </div>
-                        <div class="head"><span class="text">名称:</span>
-                            <div class="tree">
-                                <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :default-expand-all='true' :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
-                                </el-tree>
-                            </div>
-                        </div> -->
+                <el-dialog title="媒体路径选择" :visible.sync="updateResourceDialog1" @close="updateResourceCancle1">
+                    <div class="mediaUrl">
+                        <div class="urlWord">目标URL</div>
+                        <div class="urlInp"><el-input v-model="mediaUrl"></el-input></div>
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="updateResourceMakeSure1">保存</button>
@@ -297,9 +273,11 @@ export default {
     name:'fieldConnection',
     data(){
         return{
+            mediaUrl:'',//媒体URL
             sendText:'',
             token:'',
             projId:'',
+            userImg:'',
             userId:'',
             BDMSUrl:'',
             QJFileManageSystemURL:'',
@@ -365,6 +343,7 @@ export default {
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid')
+        vm.userImg=localStorage.getItem('userImg')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         // var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
@@ -572,10 +551,12 @@ export default {
             }).then(response=>{
                 if(response.data.rt.length != 0){
                     this.mediaUrlList=response.data.rt;
-                    this.videoPageTotal=this.mediaUrlList.length;
-                    this.$refs.video.src=this.mediaUrlList[0].path;
-                    console.log(this.videoPageTotal);
-                    console.log(this.mediaUrlList);
+                    if(type==2){
+                        this.videoPageTotal=this.mediaUrlList.length;
+                        this.$refs.video.src=this.mediaUrlList[0].path;
+                        console.log(this.videoPageTotal);
+                        console.log(this.mediaUrlList);
+                    }
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
                 }
@@ -724,6 +705,7 @@ export default {
             this.addResourceDialog=false;
         },
          addResourceCancle1(){
+             this.mediaUrl='';
             this.addResourceDialog1=false;
         },
         //用户群组改变
@@ -780,17 +762,12 @@ export default {
                 params:{
                     projectId:this.projId,
                     mediaType:this.type,
-                    ugId:this.ugGroupNameValue,
-                    fgId:this.fgId,
-                    name:this.fgName,
-                    path:'',
+                    path:this.mediaUrl,
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
                     // this.getMediaInformation(this.type);
                     this.getMediaInformation1(this.type);
-                    this.getPanoramaMain();//获取全景图主图路径及点位信息
-                    this.getPanoramaPathList();//获取全景图真实路径集合
                     this.addResourceDialog1=false;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
@@ -810,9 +787,17 @@ export default {
             this.getUserGroup();
             this.getFileUserGroup();
             this.getEditFileTree(num);
+            this.getFileTree();
         },
         editMediaUrl1(num){
-            
+            this.updateResourceDialog1=true;
+            this.mediaUrlList1.forEach((item)=>{
+                if(item.fileGroupId==num){
+                    this.updateId=item.id;
+                    this.getFgId=item.fileGroupId;
+                    this.mediaUrl=item.path;
+                }
+            }) 
         },
         //获取编辑文件树
         getEditFileTree(num){
@@ -891,18 +876,13 @@ export default {
                 params:{
                     projectId:this.projId,
                     mediaType:this.type,
-                    ugId:this.ugGroupNameValue,
-                    fgId:this.fgId,
-                    name:this.fgName,
-                    path:'',
+                    path:this.mediaUrl,
                     id:this.updateId
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
                     // this.getMediaInformation(this.type);
                     this.getMediaInformation1(this.type);
-                    this.getPanoramaMain();//获取全景图主图路径及点位信息
-                    this.getPanoramaPathList();//获取全景图真实路径集合
                     this.updateResourceDialog1=false;
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
@@ -914,7 +894,8 @@ export default {
             this.updateResourceDialog=false;
         },
         updateResourceCancle1(){
-            this.updateResourceDialog1=false;
+            this.mediaUrl='';
+                        this.updateResourceDialog1=false;
         },
             //获取全景图主图路径及点位信息
         getPanoramaMain(){
@@ -1424,6 +1405,12 @@ export default {
                 .message_member{
                     height: 40px;
                     border-bottom: 1px solid #999;
+                    .memeberInfoImg{
+                        margin-top:3px;
+                        height: 30px;
+                        width: 30px;
+                        border-radius: 50%;
+                    }
                 }
                 .message_body{
                     height:70%;
@@ -1566,12 +1553,26 @@ export default {
                         }
 
             }
+            .mediaUrl{
+
+                .urlWord{
+                    margin-left: -368px;
+                    margin-bottom: 25px;
+                }
+                .urlInp{
+
+                }
+
+            }
         }
     }
 
 </style>
 
 <style lang="less">
+.el-input__inner{
+    width:450px !important;
+}
 .tree{
     height:350px;
     margin:0px 100px;

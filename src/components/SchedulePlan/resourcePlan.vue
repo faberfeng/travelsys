@@ -311,11 +311,7 @@ export default{
                             events: {
                                 click: function (e) {
                                     var html=this.title;
-                                    // var str = html.charAt(html.length - 1);
-                                    // console.log('大笨蛋急急急急急急');
-                                        console.log(e.point.category);
                                         this.nowTime=e.point.category;
-                                        console.log(this.nowTime);
                                         this.getResouceTypeByParams();
                                     // this.getResouceTypeByParams();
                                 }
@@ -337,7 +333,6 @@ export default{
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
         this.webGlShow=localStorage.getItem('webGlShow');
-        console.log(this.webGlShow);
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getcurTime();
@@ -345,8 +340,6 @@ export default{
         this.getLineDataOfMonth();    
     },
     mounted(){
-        console.log(this.webGlShow)
-        console.log('更新')
         this.isActive.item1=true;
         this.getResouceType();
         this.load();
@@ -503,7 +496,6 @@ export default{
         //点击树型图
         nodeClick(obj){
             this.newId=obj.id;
-            console.log(this.newId);
         },
         //点击新增新资源
         addNewResource(){
@@ -581,7 +573,6 @@ export default{
             }).then(response=>{
                 this.resourceTypeTreeList=response.data.rt
                 this.resourceTypeData=response.data.rt
-                console.log(this.resourceTypeData);
             })
         },
         // this.$refs.lineCharts.on('click', function(params){}),
@@ -1481,43 +1472,6 @@ export default{
                             })
                     }
                     this.load();
-                    // var obj = this.lineDataOfMonthList;
-                    // var categories = '[';
-                    // var series = '[';
-                    // for (var i in obj) {
-                    //     var ml = obj[i];
-                    //         series = series + "{'name':'" + ml[0].name + "','data':'[";
-                    //         for (var j in ml) {
-                    //             if (i == 0) {
-                    //                 categories = categories + "'" + ml[j].calendarTime + "'";
-                    //                 if (j == ml.length - 1) {
-
-                    //                 } else {
-                    //                     categories += ",";
-                    //                 }
-                    //             }
-                    //             series = series + ml[j].amount;
-                    //             if (j == ml.length - 1) {
-
-                    //             } else {
-                    //                 series += ",";
-                    //             }
-                    //         }
-                    //         series += "]'}";
-                    //         if (i == 7) {
-
-                    //         } else {
-                    //             series += ",";
-                    //         }
-                        
-
-                    // }
-                    // categories += ']';
-                    // series +=']';
-                    // this.categoriesNum=categories;
-                    // this.seriesNum=series;
-                    // this.load();
-                   
                 }else if(response.data.cd == '-1'){
                         console.log(response.data.msg)
                     }
@@ -1563,7 +1517,6 @@ export default{
                                     this.lineCalendarTime1=caTime1;
                                     this.lineName1=caName1;
                                     this.lineAmount1=amount1;
-                                    console.log(JSON.stringify(this.lineCalendarTime1));
                                 })
                             obj[1].forEach((item2)=>{
                                 caTime2.push(item2.calendarTime);
@@ -1851,38 +1804,6 @@ export default{
                             })
                     }
                     this.load();
-            // var categories = "[";
-            // var series = "[";
-            // for (var i in obj) {
-            //     var ml = obj[i];
-            //         series = series + "{name:'" + ml[0].name + "',data:[";
-            //         for (var j in ml) {
-            //             if (i == 0) {
-            //                 categories = categories + "'" + ml[j].calendarTime + "'";
-            //                 if (j == ml.length - 1) {
-
-            //                 } else {
-            //                     categories += ",";
-            //                 }
-            //             }
-            //             series = series + ml[j].amount;
-            //             if (j == ml.length - 1) {
-
-            //             } else {
-            //                 series += ",";
-            //             }
-            //         }
-            //         series += "]}";
-            //         if (i == 7) {
-
-            //         } else {
-            //             series += ",";
-            //         }
-                
-
-            // }
-            // categories += "]";
-            // series +="]";
                 }else if(response.data.cd=='-1'){
                     console.log(response.data.msg)
                 }

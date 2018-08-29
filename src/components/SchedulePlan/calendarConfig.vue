@@ -2795,8 +2795,6 @@ export default{
         },
         //确认新增工作周
         addweektimeMakeSure(){
-            console.log(this.startweektimeValue);
-            console.log(this.dateChange(this.startweektimeValue));
             let weekNum = [];
             this.weektimeList.forEach((item)=>{
                 weekNum.push(item.num);
@@ -2856,7 +2854,6 @@ export default{
             this.cwtId=this.cwtList[this.weektimeNum].id;
             this.cwtimeName=this.cwtList[this.weektimeNum].cwtName;
             this.startweektimeValue=this.StrToGMT(this.cwtList[this.weektimeNum].cwtStart);
-            console.log(this.startweektimeValue);
             this.endweektimeValue=this.StrToGMT(this.cwtList[this.weektimeNum].cwtEnd);
 
              this.calendarIndex.forEach((item)=>{
@@ -2868,7 +2865,6 @@ export default{
                 }
             })
             this.weekNumList=this.cwtList[this.weektimeNum].cwtContent.split('');
-            console.log(JSON.stringify(this.weekNumList))
            
             this.weektimeList.forEach((item,index)=>{
                 item.num=0;
@@ -2876,7 +2872,6 @@ export default{
                     item.num=1
                 }
             })
-            console.log(JSON.stringify(this.weektimeList))
             this.updateweektimeDialog=true;
         },
         // 时间检查器
@@ -3023,8 +3018,6 @@ export default{
                 this.monthshow=false;
                 this.yearshow=false;
                this.checkWeekListNum=this.cedList[this.cedListNum].cedContent.split('');
-               console.log(this.checkWeekListNum);
-                console.log(JSON.stringify(this.checkWeekNumList));
              this.checkWeekNumList.forEach((item,index)=>{
                   if(item.num==this.checkWeekListNum[index])
                      {
@@ -3032,8 +3025,6 @@ export default{
                       }  
               });
               this.checkList=Array.from(new Set(this.checkList));
-              console.log(JSON.stringify(this.checkList))
-                //  this.checkList='';
               
             }
             else if(this.repeatway=="2")
@@ -3051,7 +3042,6 @@ export default{
                 this.yearList=this.cedList[this.cedListNum].cedContent.split('-');
                 this.item1= this.yearList[0];
                 this.item2= this.yearList[1];
-                console.log(JSON.stringify(this.yearList))
             }
              this.startValue=this.StrToGMT(this.cedList[this.cedListNum].cedStart);
             this.endValue=this.StrToGMT(this.cedList[this.cedListNum].cedEnd);
@@ -3225,7 +3215,6 @@ export default{
                     }
                 })
             });
-            console.log(this.checkList+'123')
              let weekNum1 = [];
             this.checkWeekList.forEach((item)=>{
                 weekNum1.push(item.num);
@@ -3234,7 +3223,6 @@ export default{
             //  this.cedContent=weekNum1;
              
               this.cedContent=weekNum1; 
-              console.log(this.cedContent)
         },
         changemonth(){
             this.cedContent=this.value  
@@ -3257,7 +3245,6 @@ export default{
             }
            this.cedContent=this.item1+'-'+this.item2;
             // this.cedContent=this
-            console.log(this.cedContent+'show2')
         },
         //添加例外休息日确定
         addCedList(){
@@ -3310,7 +3297,6 @@ export default{
         },
         //编辑例外休息日确定
         updateEDMakeSure(){
-            console.log(this.cedContent);
             if(this.cedateName==''){
                 alert('请输入名称')
             }else{

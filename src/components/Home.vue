@@ -80,7 +80,7 @@
                             </el-submenu>
                         </el-menu>
                     </div>
-                    <div :class="[{'settingsCenter':settingsCenter},{'settingsRight':!webGlShow},{'settingsRight1':webGlShow}]">
+                    <div :class="[{'settingsCenter':settingsCenter},{'settingsRight':!settingsCenter}]">
                         <router-view></router-view>
                     </div>
                 </div>
@@ -652,49 +652,30 @@ export default {
          height: 810px;
         background-color:#333333;
     }
-    /* .navigation{
-        height:48px;
-        width:100%;
-        position: fixed;
-        top: 68px; 
-        left: 26px;
-        right: 0;
-        background: #fff;
-        z-index: 1000!important;
-        transition: all 0.7s ease;
-    } */
     .navigation1{
         height: 48px;
         width: 100%;
         /* margin-top: 392px; */
         float: left;
         background: #fff;
-        /* z-index: 1000!important; */
-        
         transition: all 0.7s ease;
     }
     .settingsRight{
-        display: block;
+        /* display: block;
         margin-left: 219px;
         float: left;
-        /* margin-top: 116px; */
         height: 800px;
         width: 88%;
         overflow-y: auto;
-        overflow-x: hidden;
-        /* transition: all 0.7s ease; */
+        overflow-x: hidden; */
+
+        position: absolute;
+        top: 48px;
+        left: 212px;
+        bottom: 0px;
+        right: 0px;
     }
     ::-webkit-scrollbar{width:0px}
-    .settingsRight1{
-        float: left;
-        display: block;
-        margin-left: 219px;
-        width: 88%;
-        /* margin-top: 486px; */
-        height: 800px;
-        overflow:auto;
-        /* transition: all 0.7s ease; */
-    }
     /* 工程列表 */
 
     .title span{
@@ -783,8 +764,12 @@ export default {
     .settingsCenter{
       margin-left: 26px!important;
       width:98% !important;
-      overflow-x: hidden;
-    
+       display: block;
+        margin-left: 219px;
+        float: left;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .settingsLeft h5{
         width:100%;

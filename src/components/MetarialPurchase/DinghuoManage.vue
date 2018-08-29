@@ -1,168 +1,170 @@
 
 <template>
     <div id="wuliao">
-        <div class="purchaseNav">
-            <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
-                产品管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
-                物料跟踪  
-            </router-link>
-            <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem navactive">  
-                订货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
-                发货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/checked'" class="navItem">  
-                检查验收  
-            </router-link>
-        </div>
-        <div class="elselect">
-            <el-select v-model="selectUser" placeholder="请选择">
-                <el-option
-                v-for="(item,index) in userGroup"
-                :key="index"
-                :label="item.ugName"
-                :value="item.ugId">
-                </el-option>
-            </el-select>
-            <label class="elselecttitle">群组:</label>
-        </div>
-        <div class="pbody">
-            <div class="pbodyleft">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane :label="'已订货'" name="first">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
-                                    <label class="lefttitlelab">{{item.orderCode}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="未订货" name="second">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
-                                    <label class="lefttitlelab">{{item.orderCode}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
+        <div class="topHeader">
+            <div class="purchaseNav">
+                <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
+                    产品管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
+                    物料跟踪  
+                </router-link>
+                <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem navactive">  
+                    订货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
+                    发货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/checked'" class="navItem">  
+                    检查验收  
+                </router-link>
             </div>
-            <div class="pbodyright">
-                <div v-if="showDetail">
-                    请在左侧内选择订货单
+            <div class="elselect">
+                <el-select v-model="selectUser" placeholder="请选择">
+                    <el-option
+                    v-for="(item,index) in userGroup"
+                    :key="index"
+                    :label="item.ugName"
+                    :value="item.ugId">
+                    </el-option>
+                </el-select>
+                <label class="elselecttitle">群组:</label>
+            </div>
+            <div class="pbody">
+                <div class="pbodyleft">
+                    <el-tabs v-model="activeName" @tab-click="handleClick">
+                        <el-tab-pane :label="'已订货'" name="first">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
+                                        <label class="lefttitlelab">{{item.orderCode}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="未订货" name="second">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
+                                        <label class="lefttitlelab">{{item.orderCode}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                    </el-tabs>
                 </div>
-                <div v-if="!showDetail" class="scrolldiv">
-                    <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
-                    <div class="jindu">
-                        <i class="titleimg"></i>
-                        <label class="titletext">基本信息</label>
+                <div class="pbodyright">
+                    <div v-if="showDetail">
+                        请在左侧内选择订货单
                     </div>
-                    <div class="borderbottom">   
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr  class="userList-thead">
-                                    <th>单号</th>
-                                    <th>名称</th>
-                                    <th>定货方</th>
-                                    <th>供货方</th>
-                                    <th>订货日期</th>
-                                    <th>经手人</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td v-text="orderInfo.orderCode"></td>
-                                    <td v-text="orderInfo.orderTitle"></td>
-                                    <td v-text="orderInfo.orderUgName"></td>
-                                    <td v-text="orderInfo.supply"></td>
-                                    <td v-text="orderInfo.orderDate_"></td>
-                                    <td v-text="orderInfo.orderUserName"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="jindu">
-                        <i class="titleimg fukuan"></i>
-                        <label class="titletext">付款项目</label>
-                    </div>
-                    <div class="borderbottom">   
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr  class="userList-thead">
-                                    <th>序号</th>
-                                    <th>款项类型</th>
-                                    <th>计价单位</th>
-                                    <th>数量</th>
-                                    <th>单价</th>
-                                    <th>总价</th>
-                                    <th>经手人</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item,index) in orderInfoData" :key="index">
-                                    <td v-text="item.itemId"></td>
-                                    <td v-text="item.itemName"></td>
-                                    <td v-text="item.unit"></td>
-                                    <td v-text="item.count"></td>
-                                    <td v-text="item.unitPrice"></td>
-                                    <td v-text="item.totalPrice"></td>
-                                    <td v-text="item.userName"></td>
-                                    <td>
-                                        <span class="editIcon" @click="viewDeatil(index)" :title="'编辑'"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="jindu">
-                        <i class="shebeiimg"></i>
-                        <label class="titletext">设备主清单</label>
-                    </div>
-                    <div class="borderbottom">   
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr  class="userList-thead">
-                                    <th>清单</th>
-                                    <th>来源</th>
-                                    <th>清单名称</th>
-                                    <th>构件数</th>
-                                    <th>清单总价</th>
-                                    <th>增加日期</th>
-                                    <th>经手人</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item,index) in orderDeatilData" :key="index">
-                                    <td v-text="item.orderDetailCode"></td>
-                                    <td v-text="item.title"></td>
-                                    <td v-text="item.title"></td>
-                                    <td v-text="item.count"></td>
-                                    <td v-text="item.amount"></td>
-                                    <td v-text="item.updateDateTime_"></td>
-                                    <td v-text="item.updateUserName"></td>
-                                    <td>
-                                        <span class="editIcon" @click="viewDeatil(index)"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div v-if="!showDetail" class="scrolldiv">
+                        <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
+                        <div class="jindu">
+                            <i class="titleimg"></i>
+                            <label class="titletext">基本信息</label>
+                        </div>
+                        <div class="borderbottom">   
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr  class="userList-thead">
+                                        <th>单号</th>
+                                        <th>名称</th>
+                                        <th>定货方</th>
+                                        <th>供货方</th>
+                                        <th>订货日期</th>
+                                        <th>经手人</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td v-text="orderInfo.orderCode"></td>
+                                        <td v-text="orderInfo.orderTitle"></td>
+                                        <td v-text="orderInfo.orderUgName"></td>
+                                        <td v-text="orderInfo.supply"></td>
+                                        <td v-text="orderInfo.orderDate_"></td>
+                                        <td v-text="orderInfo.orderUserName"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="jindu">
+                            <i class="titleimg fukuan"></i>
+                            <label class="titletext">付款项目</label>
+                        </div>
+                        <div class="borderbottom">   
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr  class="userList-thead">
+                                        <th>序号</th>
+                                        <th>款项类型</th>
+                                        <th>计价单位</th>
+                                        <th>数量</th>
+                                        <th>单价</th>
+                                        <th>总价</th>
+                                        <th>经手人</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in orderInfoData" :key="index">
+                                        <td v-text="item.itemId"></td>
+                                        <td v-text="item.itemName"></td>
+                                        <td v-text="item.unit"></td>
+                                        <td v-text="item.count"></td>
+                                        <td v-text="item.unitPrice"></td>
+                                        <td v-text="item.totalPrice"></td>
+                                        <td v-text="item.userName"></td>
+                                        <td>
+                                            <span class="editIcon" @click="viewDeatil(index)" :title="'编辑'"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="jindu">
+                            <i class="shebeiimg"></i>
+                            <label class="titletext">设备主清单</label>
+                        </div>
+                        <div class="borderbottom">   
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr  class="userList-thead">
+                                        <th>清单</th>
+                                        <th>来源</th>
+                                        <th>清单名称</th>
+                                        <th>构件数</th>
+                                        <th>清单总价</th>
+                                        <th>增加日期</th>
+                                        <th>经手人</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in orderDeatilData" :key="index">
+                                        <td v-text="item.orderDetailCode"></td>
+                                        <td v-text="item.title"></td>
+                                        <td v-text="item.title"></td>
+                                        <td v-text="item.count"></td>
+                                        <td v-text="item.amount"></td>
+                                        <td v-text="item.updateDateTime_"></td>
+                                        <td v-text="item.updateUserName"></td>
+                                        <td>
+                                            <span class="editIcon" @click="viewDeatil(index)"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -352,10 +354,13 @@ export default {
 </script>
 <style lang="less">
 #wuliao{
-    top: 116px;
-    position: fixed;
-    left: 26px;
+    ::-webkit-scrollbar{width:0px}//隐藏滚动条
+    .topHeader{
+    box-sizing: border-box;
+    float: left;
     width: 100%;
+    overflow: auto;
+    max-height: 800px;
     .purchaseNav{
         height: 49px;
         padding-top: 16px;
@@ -545,6 +550,7 @@ export default {
             }
             }
         }
+    }
     }
 }
 </style>
