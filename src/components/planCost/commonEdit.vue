@@ -36,23 +36,21 @@
                 <p class="clearfix">
                     <span class="item-title">单体</span>
                     <span class="item-container">
-                        <select  class="value-box" v-model="value_monomer" @change="value_monomer_change(false)">
+                        <select  class="value-box" v-model="value_monomer" @change="value_monomer_change(false)" :disabled="disbaledanti" :class="{isDisable:disbaledanti}">
                             <option v-for="(item,index) in options_monomer" :key="index" :value="item.id" v-text="item.Name"  ></option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </span>
-
                     <span class="item-title">分区</span>
                     <span class="item-container">
-                        <select v-model="value_partition" class="value-box" @change="value_partition_change(false)">
+                        <select v-model="value_partition" class="value-box" @change="value_partition_change(false)" :disabled="disbalefenqu" :class="{isDisable:disbalefenqu}">
                             <option v-for="(item,index) in options_partition" :key="index" :value="item.id" v-text="item.Name"  ></option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </span>
-
-                     <span class="item-title">楼层</span>
+                    <span class="item-title">楼层</span>
                     <span class="item-container">
-                        <select  v-model="value_floor" class="value-box">
+                        <select  v-model="value_floor" class="value-box" :disabled="disbalelouceng" :class="{isDisable:disbalelouceng}">
                             <option v-for="(item,index) in options_floor" :key="index" :value="item.id" v-text="item.Name"  ></option>
                         </select>
                         <i class="icon-sanjiao"></i>
@@ -411,6 +409,9 @@
 <style lang="less">
    #commonEditBox{
        margin: 0 20px 20px!important;
+       .isDisable{
+           background: #ccc;
+       }
        .hideInput{
            display: none;
        }
@@ -1331,10 +1332,26 @@ export default Vue.component('common-edit',{
             pageDetialTtotal:'',
             goujianList:[],
             flag:false,
+            disbalelouceng:false,
+            disbalefenqu:false,
+            disbaledanti:false,
         }
     },
     watch:{
-        
+        'database':function(val,oldVal){
+            if(val == 'CITY'){
+               this.value_monomer = 'OVERALL_FIELD' ;
+               this.value_partition = 'NONE';
+               this.value_floor = 'NONE';
+               this.disbaledanti = true;
+               this.disbalelouceng = true;
+               this.disbalefenqu = true;
+            }else{
+                this.disbaledanti = false;
+                this.disbalelouceng = false;
+                this.disbalefenqu = false;
+            }
+        }
     },
     created(){
         var vm = this;
@@ -1404,11 +1421,6 @@ export default Vue.component('common-edit',{
         basicConfirm(){
             var vm = this
             var arr = []
-            // fieldCode: "level_.part_name",
-            // fieldName: "分区",
-            // fieldType: "STRING",
-            // checked:false,
-            // tableType: 8
             vm.data_right.forEach((item,key)=>{
                 if(!item.isPrivate){
                     arr.push(item)
@@ -1691,7 +1703,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         }, 
-         getIntoDesignPage(isEdit){
+        getIntoDesignPage(isEdit){
             var vm = this
             axios({
                 method:'POST',
@@ -1704,7 +1716,7 @@ export default Vue.component('common-edit',{
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    $.extend(vm.options_monomer,response.data.rt)//单体列表
+                    $.extend(vm.options_monomer,response.data.rt);//单体列表
                     vm.options_monomer.unshift({
                         id:'OVERALL_FIELD',
                         Name:'总体场地'
@@ -1748,12 +1760,6 @@ export default Vue.component('common-edit',{
         },
         getReportData(){
             var vm = this;
-            // rc: rc,
-            // fieldList: fieldList,
-            // fieldFilterList: fieldFilterList,
-            // fieldGroupList: fieldGroupList,
-            // rcStyle: rcStyle,
-           
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'project2/report/rc/'+vm.rcId,
@@ -1807,32 +1813,13 @@ export default Vue.component('common-edit',{
                                             vm.value_monomer_change(true)
                                             vm.value_partition_change(true)
                                             break;
-                                        // case 'range.partition':
-                                        //         vm.value_partition = element.fieldSearchContent
-                                        //         vm.value_partition_change(true)
-                                        //     break;
-                                        // case 'range.storey':
-                                        //         vm.value_floor = element.fieldSearchContent
-                                        //     break;
                                         case 'range.profession':
-                                        /**
-                                            更改时间：2018-8-16
-                                            因为默认为 000000；
-                                            因此无何全部字段无法区分，默认为全部 -1
-                                        **/
                                             vm.value_professional = element.fieldSearchContent.substr(0,2) == '00'?'-1':element.fieldSearchContent.substr(0,2)+'0000'
                                             vm.value_system = element.fieldSearchContent.substr(2,2) == '00'?'-1':element.fieldSearchContent.substr(0,4)+'00'
                                             vm.value_type = element.fieldSearchContent.substr(4,2) == '00'?'-1':element.fieldSearchContent
                                             vm.value_professional_change(true)
                                             vm.value_system_change(true)
                                             break;
-                                        // case 'range.system':
-                                        //     vm.value_system = element.fieldSearchContent
-                                        //     vm.value_system_change(true)
-                                        //     break;
-                                        // case 'range.type':
-                                        //     vm.value_type = element.fieldSearchContent
-                                        //     break;
                                      }
                                 }else{
                                     vm.list_filter[index].build_name = element.fieldCode
@@ -2004,32 +1991,6 @@ export default Vue.component('common-edit',{
                 fieldSearchContent: vm.database,
                 tableType: -1
             })
-            //  /**danti**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.build', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_monomer,
-            //     tableType: -1
-            // })
-            //  /**分区**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.partition', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_partition,
-            //     tableType: -1
-            // })
-            //  /**楼层**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.storey', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_floor,
-            //     tableType: -1
-            // })
-              /***
-             * 更改时间 2018-7-16
-             * 后端更改 数据类型
-             * 三项合并
-             * ****/
             var combinCode_type = vm.value_monomer+'&&'+vm.value_partition+'&&'+vm.value_floor
             fieldFilterList.push({
                 fieldCode: 'range.build', 
@@ -2037,32 +1998,6 @@ export default Vue.component('common-edit',{
                 fieldSearchContent: combinCode_type,
                 tableType: -1
             })
-             /**专业**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.profession', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_professional,
-            //     tableType: -1
-            // })
-            //  /**系统**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.system', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_system,
-            //     tableType: -1
-            // })
-            //  /**类型**/
-            //  fieldFilterList.push({
-            //     fieldCode: 'range.type', 
-            //     fieldSearchType: 'EQUALS',
-            //     fieldSearchContent: vm.value_type,
-            //     tableType: -1
-            // })
-            /***
-             * 更改时间 2018-7-10
-             * 后端更改 数据类型
-             * 三项合并
-             * ****/
             var combinCode = '000000'
             if(vm.value_professional != -1){//专业选择 不为全部
                 combinCode = vm.value_professional

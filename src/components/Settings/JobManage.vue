@@ -107,7 +107,8 @@
                 <el-radio  v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
             </div>
             <div  class="JobName">
-                <input type="text" v-model="jobDetial.posName" placeholder="请输入" :disabled='checkName(jobDetial.posName)'>
+                <!-- <input type="text" v-model="jobDetial.posName" placeholder="请输入" :disabled='checkName(jobDetial.posName)'> -->
+                <input type="text" v-model="jobDetial.posName" placeholder="请输入">
             </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">岗位权限:</span>

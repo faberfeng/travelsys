@@ -1713,7 +1713,7 @@ export default Vue.component('common-list',{
                     }else{
                         vm.ManifestInfo = response.data.rt ; 
                     }
-
+                    console.log(vm.ManifestInfo)
                     if(vm.ManifestInfo.mType == 2){
                         Object.assign(vm.ManifestInfo,{
                             _mType:'工程量清单'
@@ -1722,7 +1722,7 @@ export default Vue.component('common-list',{
                         Object.assign(vm.ManifestInfo,{
                             _mType:'构件量清单'
                         })
-                    }else if(vm.ManifestInfo.mType == 2){
+                    }else if(vm.ManifestInfo.mType == 3){
                         Object.assign(vm.ManifestInfo,{
                              _mType:'物料量清单'
                         })

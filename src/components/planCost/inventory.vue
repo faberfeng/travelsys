@@ -573,7 +573,7 @@
             </el-dialog>
             <el-dialog title="校验结果" :visible="shureToImportshow" @close="createCancle">
                 <div class="editBody">
-                    <p>{{jiapyanResult}}</p>
+                    <p v-for="(item,index) in jiapyanResult" :key="index">{{item}}</p>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="sureToImport">确定导入</button>
@@ -583,8 +583,8 @@
             <el-dialog title="数据概况" :visible="shujugaikuangshow" @close="shujuNotSure" class="shuju">
                 <div class="editBody shujugaikuang">
                     <p><label>新建创建可追溯的物料量清单结果统计:</label><span></span></p>
-                    <p><label>待导入的构件的总数:</label><span>{{checkedResults.hasOut}}</span></p>
-                    <p><label>可出物料量的构件数:</label><span>{{checkedResults.totalCount}}</span></p>
+                    <p><label>待导入的构件的总数:</label><span>{{checkedResults.totalCount}}</span></p>
+                    <p><label>可出物料量的构件数:</label><span>{{checkedResults.hasOut}}</span></p>
                     <p><label>可出物料量条目数:</label><span>{{checkedResults.itemsCount}}</span></p>
                     <p><label>可出物料量总价:</label><span>{{checkedResults.totalPrice}}</span></p>
                 </div>
@@ -789,7 +789,7 @@ export default {
                 },
                 {
                     label: '产品ID',
-                    prop: 'entityName',
+                    prop: 'id',
                     align:"center",
                     headerAlign:"center" 
                 },
@@ -1511,7 +1511,7 @@ export default {
                         if(JSON.stringify(response.data.rt.checkResults)=='{}'){
                             this.jiapyanResult = '所有数据校验通过!';
                         }else{
-                            this.jiapyanResult = response.data.rt.checkResults.verifyProductId[0];
+                            this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode;
                         }
                         this.shureToImportshow = true;
                     }else{
@@ -1654,6 +1654,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.mappingData = response.data.rt.rows;
+                    console.log(this.mappingData);
                     this.wuliaoData.total = response.data.rt.total;
                     let parentArr = [];
                     let childrenArr = [];

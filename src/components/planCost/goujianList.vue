@@ -14,12 +14,6 @@
              <router-link :to="'/Cost/inventory'" class=" label-item">  
                 物料量清单  
             </router-link>
-            <!-- <router-link :to="''"  class="label-item">  
-                成本审批  
-            </router-link>
-            <router-link :to="''"  class="label-item">  
-                成本分析  
-            </router-link> -->
         </div>
         <div class="project"  v-if="!showCommonList && !showCommonData && !showCommonEdit" v-loading="loading">
             <!--以下是实时列表-->

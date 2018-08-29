@@ -29,7 +29,7 @@
                                     index-text="序号"
                                     :data="S_quantitiesList" :columns="columns" :tree-type="props.treeType" 
                                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                                    @row-click="test" row-class-name="row_self"
+                                    @row-click="rowClick" row-class-name="row_self"
                                     :border="props.border" empty-text="正在加载...">
                                         <template slot="action" slot-scope="scope">
                                             <button class="locationBtn actionBtn" title="定位"  v-if="scope.row.relaType != 4" @click="locate(scope)"></button>
@@ -394,30 +394,8 @@
                 </div>
             </div>
         </div>
-        <!-- <div v-if="ListHeaderShow"  id="edit" class="dialog">
-            <div class="el-dialog__header">
-                <span class="el-dialog__title">显示列</span>
-                <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="headerListCancle">
-                    <i class="el-dialog__close el-icon el-icon-close"></i>
-                </button>
-            </div>
-            <div class="el-dialog__body">
-                <div class="clearfix" >
-                    <span class="item-attibuteAuth" v-for="(item,index) in detailsHead_model" :key="index" v-if="index >=2">
-                          <label  :class="[item.showModel?'active':'','checkbox-fileItem']" :for="item.prop+'_header'" v-text="item.name"></label>
-                          <input  type="checkbox" :id="item.prop+'_header'" class="checkbox-arr" v-model="item.showModel">
-                    </span>
-                </div>
-            </div>
-            <div class="el-dialog__footer">
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="headerListConfirm">确定</button>
-                    <button class="editBtnC" @click="headerListCancle">取消</button>
-                </div>
-            </div>
-        </div> -->
         <div id="mask" v-if="labelListShow || ListHeaderShow" ></div>
-</div>       
+    </div>       
 </template>
 <style  lang='less' >
      .navigation{
@@ -730,7 +708,7 @@
                 }
             }
             #containerMessage{
-                padding-left:30px; 
+                // padding-left:30px; 
                 padding-bottom: 65px;
                 margin-right: 25px;
                 .table-list{
@@ -1306,7 +1284,7 @@
         background: #ffffff;
         }
         .zk-table--row-hover .zk-table--tree-icon{
-    background: #ebf7ff;
+            background: #ebf7ff;
         }
         .zk-table--tree-icon::after {
             display: block;
@@ -1533,7 +1511,7 @@ export default Vue.component('common-list',{
         AssociatedDocumentList:[],//
       }
   },
-  created(){
+    created(){
         var vm = this
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
@@ -1544,264 +1522,265 @@ export default Vue.component('common-list',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-  }, 
-  mounted(){
-      var vm = this
-    vm.findList()
-  },
-  watch:{
-      'show.basicAttributes':function(val){
-          if(val){
-            $("#basicAtt").show(200);
-          }else{
-            $("#basicAtt").hide(200);
-          }
-      },
-      'show.generalDesignInfo':function(val){
-          if(val){
-            $("#genealAtt").show(200);
-          }else{
-            $("#genealAtt").hide(200);
-          }
-      },
-      'pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.findList()
-      },
-      'pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.findList()
-      },
-  },
-  methods:{
-      test(row, rowIndex,event){
-          var vm = this
-          console.log(rowIndex)
-          console.log(row)
-      },
-      locate(){
-          var vm = this
-          vm.$message({
-              type:'warning',
-              message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-          })
-      },
-      checkLabel(scope){
-          var vm = this
-          vm.screenLeft.show = true
-          if(scope.row){
-               var pkId = scope.row.pkId
-               var tag = 1
-          }else if(scope.pkId){
-               var pkId = scope.pkId
-                var tag = 2
-          }
-        axios({
-            method:'GET',
-            url:vm.BDMSUrl+'show2/getEntityDetailInfo',
-            headers:{
-                token:vm.token
-            },
-            params:{
-                detailId:pkId,//类型 1 企业物料产品库显示列 2 清单物料量清单明细显示列 3 订货清单明细显示列
-                projectId:vm.projId
-            }
-        }).then(response=>{
-            vm.checkedItem = {}
-            if(response.data.cd == 0){
-                if(response.data.rt !=null)vm.checkedItem = response.data.rt
-                if(tag == 1){
-                    vm.$set(vm.checkedItem,'space',scope.row.dStorey ? scope.row.dStorey : (scope.row.dDistrict ? scope.row.dDistrict : (scope.row.dBuild ? scope.row.dBuild : "")))
-                    vm.$set(vm.checkedItem,'unit',scope.row.unit)
-                }else if( tag == 2){
-                    vm.$set(vm.checkedItem,'space',scope.dStorey ? scope.dStorey : (scope.dDistrict ? scope.dDistrict : (scope.dBuild ? scope.dBuild : "")))
-                    vm.$set(vm.checkedItem,'unit',scope.unit)
-                }
+    }, 
+    mounted(){
+        var vm = this
+        vm.findList()
+    },
+    watch:{
+        'show.basicAttributes':function(val){
+            if(val){
+                $("#basicAtt").show(200);
             }else{
-                vm.$message({
-                    type:'error',
-                    message:response.data.msg
-                })
+                $("#basicAtt").hide(200);
             }
-            vm.fullscreenLoading =false
-        }).catch((err)=>{
-            console.log(err)
-        })
-      },
-      openLabel(row){
-        var vm = this
-        vm.labelListShow = true
-        vm.selectRow = []
-        vm.selectRow.push(row)
-        console.log(row)
-      },
-      openLocation(){
-        var vm  = this
-          vm.$message({
-              type:'info',
-              message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-          })
-      },
-      changeBottomExpend(){
-          var vm = this
-          vm.bottomExpend.isExpend = !vm.bottomExpend.isExpend
-          vm.bottomExpend.title = vm.bottomExpend.isExpend?'收起':'展开'
-      },
-      changeTopExpend(){
-          var vm = this
-          vm.topExpend.isExpend = !vm.topExpend.isExpend
-          vm.topExpend.title = vm.topExpend.isExpend?'收起':'展开'
-      },
-      labelListConfirm(){
-          var vm = this
-          if(vm.singleLable == true){
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/'+vm.S_Label_quantitiesList[0].pkId)
-          }else{
-               window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/0')
-          }
-      },
-      labelListCancle(){
-        var vm = this
-        vm.labelListShow = false
-      },
-      headerListCancle(){
-        var vm = this
-        vm.ListHeaderShow = false
-        vm.detailsHead_model.forEach((item,index)=>{
-             vm.$set(item,'showModel',item.show)
-         })
-      },
-      headerListConfirm(){
-        var vm = this
-        vm.ListHeaderShow = false
-        vm.detailsHead_model.forEach((item,index)=>{
-             vm.$set(item,'show',item.showModel)
-             vm.$set(vm.detailsHead[index],'show',item.showModel)
-         })
-      },
-      showLabel(){
-          var vm = this
-          vm.labelListShow = true
-      },
-      showLabelHeader(){
-         var vm = this
-         vm.ListHeaderShow = true
-         var b = []
-         $.extend(b,vm.detailsHead)
-         vm.detailsHead_model = b
-         vm.detailsHead_model.forEach((item,index)=>{
-             vm.$set(item,'showModel',item.show)
-         })
-      },
-      back(){
-          var vm = this
-          vm.$emit('back')
-      },
-    findList(isDialog=0){
+        },
+        'show.generalDesignInfo':function(val){
+            if(val){
+                $("#genealAtt").show(200);
+            }else{
+                $("#genealAtt").hide(200);
+            }
+        },
+        'pageDetial.currentPage':function(val,oldval){
             var vm = this
-             //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
-             /**
-              * @augments isDialog 判断是否是弹框
-              *   pageLabelList:{
-                    pagePerNum:10,//一页几份数据
-                    currentPage:1,//初始查询页数 第一页
-                    total:0,//所有数据
-                },
-              * **/
-            var showType = 1
-            /*@李从文
-                这个接口对应 show/getManifestDetailInfo
-            */
-            if(vm.showType == 'combine'){
-                showType = 2
-            }
-            var page = vm.pageDetial.currentPage
-            var rows = vm.pageDetial.pagePerNum
-            var setting = {
-                data: {
-                    key:{
-                        children:'children'
-                    },
-                    simpleData: {
-                        enable: true,
-                        idKey: "id",
-                        pIdKey: "_parentId",
-                        rootPId: 0
-                    }
-                }
+            vm.findList()
+        },
+        'pageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.findList()
+        },
+    },
+    methods:{
+        locate(){
+            var vm = this
+            vm.$message({
+                type:'warning',
+                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+            })
+        },
+        //单击某行
+        rowClick(row,rowIndex,$event){
+            console.log(row);
+            console.log(rowIndex);
+        },
+        checkLabel(scope){
+            var vm = this
+            vm.screenLeft.show = true
+            if(scope.row){
+                var pkId = scope.row.pkId
+                var tag = 1
+            }else if(scope.pkId){
+                var pkId = scope.pkId
+                    var tag = 2
             }
             axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/report/listMaterialComponent',
+                method:'GET',
+                url:vm.BDMSUrl+'show2/getEntityDetailInfo',
                 headers:{
                     token:vm.token
                 },
                 params:{
-                    projectId:vm.projId,
-                    detailId:vm.detailId,
-                    page:page,
-                    rows:rows,
+                    detailId:pkId,//类型 1 企业物料产品库显示列 2 清单物料量清单明细显示列 3 订货清单明细显示列
+                    projectId:vm.projId
                 }
             }).then(response=>{
+                vm.checkedItem = {}
                 if(response.data.cd == 0){
-                    if(response.data.rt.rows != null){
-                        vm.pageDetial.total = response.data.rt.total
-                        // TotalPrice
-                        let arr = response.data.rt.rows
-                        arr.forEach(ele=>{
-                            if(ele.id == 0){
-                                vm.$set(ele,'TotalPrice','-')
-                            }
-                            let num = parseFloat((ele.totalCount * ele.referencePrice).toFixed(2))
-                            vm.$set(ele,'TotalPrice',num)
-                        })
-                        vm.S_quantitiesList = dataTransform.transformTozTreeFormat(setting, arr)
+                    if(response.data.rt !=null)vm.checkedItem = response.data.rt
+                    if(tag == 1){
+                        vm.$set(vm.checkedItem,'space',scope.row.dStorey ? scope.row.dStorey : (scope.row.dDistrict ? scope.row.dDistrict : (scope.row.dBuild ? scope.row.dBuild : "")))
+                        vm.$set(vm.checkedItem,'unit',scope.row.unit)
+                    }else if( tag == 2){
+                        vm.$set(vm.checkedItem,'space',scope.dStorey ? scope.dStorey : (scope.dDistrict ? scope.dDistrict : (scope.dBuild ? scope.dBuild : "")))
+                        vm.$set(vm.checkedItem,'unit',scope.unit)
                     }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
                 }else{
-                    vm.$router.push({
-                        path:'/login'
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
                     })
                 }
+                vm.fullscreenLoading =false
             }).catch((err)=>{
                 console.log(err)
             })
         },
-      changePage(val){//分页 0 -1 1 2
-            var vm = this; 
-            if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
-                vm.$message('这已经是第一页!')
-                return false
-            }
-            if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
-                vm.$message('这已经是最后一页!')
-                return false
-            }
-            switch(val){
-                case 0:
-                    vm.pageDetial.currentPage = 1
-                    break;
-                case -1:
-                    vm.pageDetial.currentPage--
-                    break;
-                case 1:
-                    vm.pageDetial.currentPage++
-                    break;
-                case 2:
-                    vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
-                    break;
-            }
-      },
-      trim(str){ 
-        /**去掉字符串前后所有空格*/
-        return str.replace(/(^\s*)|(\s*$)/g, ""); 
-      },
-        initData(val){
-            if(!val)return ''
-            var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
-            return tt; 
+        openLabel(row){
+            var vm = this
+            vm.labelListShow = true
+            vm.selectRow = []
+            vm.selectRow.push(row)
+            //console.log(row)
         },
-  }
+        openLocation(){
+            var vm  = this
+            vm.$message({
+                type:'info',
+                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+            })
+        },
+        changeBottomExpend(){
+            var vm = this
+            vm.bottomExpend.isExpend = !vm.bottomExpend.isExpend
+            vm.bottomExpend.title = vm.bottomExpend.isExpend?'收起':'展开'
+        },
+        changeTopExpend(){
+            var vm = this
+            vm.topExpend.isExpend = !vm.topExpend.isExpend
+            vm.topExpend.title = vm.topExpend.isExpend?'收起':'展开'
+        },
+        labelListConfirm(){
+            var vm = this
+            if(vm.singleLable == true){
+                window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/'+vm.S_Label_quantitiesList[0].pkId)
+            }else{
+                window.open('/#/Cost/getManifestDetailInfoForPage/'+vm.manifestId+'/0')
+            }
+        },
+        labelListCancle(){
+            var vm = this
+            vm.labelListShow = false
+        },
+        headerListCancle(){
+            var vm = this
+            vm.ListHeaderShow = false
+            vm.detailsHead_model.forEach((item,index)=>{
+                vm.$set(item,'showModel',item.show)
+            })
+        },
+        headerListConfirm(){
+            var vm = this
+            vm.ListHeaderShow = false
+            vm.detailsHead_model.forEach((item,index)=>{
+                vm.$set(item,'show',item.showModel)
+                vm.$set(vm.detailsHead[index],'show',item.showModel)
+            })
+        },
+        showLabel(){
+            var vm = this
+            vm.labelListShow = true
+        },
+        showLabelHeader(){
+            var vm = this
+            vm.ListHeaderShow = true
+            var b = []
+            $.extend(b,vm.detailsHead)
+            vm.detailsHead_model = b
+            vm.detailsHead_model.forEach((item,index)=>{
+                vm.$set(item,'showModel',item.show)
+            })
+        },
+        back(){
+            var vm = this
+            vm.$emit('back')
+        },
+        findList(isDialog=0){
+                var vm = this
+                //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
+                /**
+                 * @augments isDialog 判断是否是弹框
+                 *   pageLabelList:{
+                        pagePerNum:10,//一页几份数据
+                        currentPage:1,//初始查询页数 第一页
+                        total:0,//所有数据
+                    },
+                * **/
+                var showType = 1
+                /*@李从文
+                    这个接口对应 show/getManifestDetailInfo
+                */
+                if(vm.showType == 'combine'){
+                    showType = 2
+                }
+                var page = vm.pageDetial.currentPage
+                var rows = vm.pageDetial.pagePerNum
+                var setting = {
+                    data: {
+                        key:{
+                            children:'children'
+                        },
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "_parentId",
+                            rootPId: 0
+                        }
+                    }
+                }
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'project2/report/listMaterialComponent',
+                    headers:{
+                        token:vm.token
+                    },
+                    params:{
+                        projectId:vm.projId,
+                        detailId:vm.detailId,
+                        page:page,
+                        rows:rows,
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        if(response.data.rt.rows != null){
+                            vm.pageDetial.total = response.data.rt.total
+                            // TotalPrice
+                            let arr = response.data.rt.rows
+                            arr.forEach(ele=>{
+                                if(ele.id == 0){
+                                    vm.$set(ele,'TotalPrice','-')
+                                }
+                                let num = parseFloat((ele.totalCount * ele.referencePrice).toFixed(2))
+                                vm.$set(ele,'TotalPrice',num)
+                            })
+                            vm.S_quantitiesList = dataTransform.transformTozTreeFormat(setting, arr);
+                            console.log(vm.S_quantitiesList)
+                        }
+                    }else if(response.data.cd == '-1'){
+                        alert(response.data.msg);
+                    }else{
+                        vm.$router.push({
+                            path:'/login'
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+        changePage(val){//分页 0 -1 1 2
+                var vm = this; 
+                if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
+                    vm.$message('这已经是第一页!')
+                    return false
+                }
+                if(vm.pageDetial.currentPage >= Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum) && (val == 1 || val == 2)){
+                    vm.$message('这已经是最后一页!')
+                    return false
+                }
+                switch(val){
+                    case 0:
+                        vm.pageDetial.currentPage = 1
+                        break;
+                    case -1:
+                        vm.pageDetial.currentPage--
+                        break;
+                    case 1:
+                        vm.pageDetial.currentPage++
+                        break;
+                    case 2:
+                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
+                        break;
+                }
+        },
+        trim(str){ 
+            /**去掉字符串前后所有空格*/
+            return str.replace(/(^\s*)|(\s*$)/g, ""); 
+        },
+            initData(val){
+                if(!val)return ''
+                var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
+                return tt; 
+            },
+    }
 })
 </script>

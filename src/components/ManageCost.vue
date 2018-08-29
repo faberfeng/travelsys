@@ -4,7 +4,7 @@
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg' :userimg='header.userImg'></headerCommon>
         
         <div class="contentBody">
-            
+
             <!-- <div class="sideBar" ref="sideB">
                 <a href="#" >
                     <img src="../assets/arrow-left.png"/>
@@ -161,14 +161,14 @@ export default {
             }
         },
         callback(e){
-            console.log(e)
+           // console.log(e)
             switch(e.data.command){
 			case "EngineReady":
 				{
 					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                    console.log(Horder);
+                    // console.log(Horder);
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
@@ -200,8 +200,8 @@ export default {
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
 
                 // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
-                console.log(JSON.stringify(this.WebGlId));
-                console.log(this.InitdataList);
+                // console.log(JSON.stringify(this.WebGlId));
+                // console.log(this.InitdataList);
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }
@@ -232,7 +232,7 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
-                    console.log(response.data.rt.defaultSubProjId+'1111')
+                    // console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
                 }
             }).catch((err)=>{
@@ -258,7 +258,7 @@ export default {
                 vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.QJFileManageSystemURL+response.data.rt.onlineInfo.imgUuid:''
                 localStorage.setItem('userImg',vm.header.userImg)
                  localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
-                 console.log(response.data.rt.defaultSubProjId)
+                //  console.log(response.data.rt.defaultSubProjId)
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
@@ -325,7 +325,7 @@ export default {
                 //遍历判断
                 if(vm.$route.query.firstView == 'Y'){
                     if(vm.auth.homePage){
-                        console.log('首页')
+                        // console.log('首页')
                     }else if(vm.auth.progress){
                         vm.$router.push({
                             path:'/SchedulePlan/personalCalendar'//进度计划；
@@ -577,11 +577,11 @@ export default {
 
     }
     /* 导航栏 */
-    .main{
-        /* flex: 1; */
-        /* overflow:auto; */
-        /* margin-left: 18px; */
-    }
+    /* .main{
+        flex: 1;
+        overflow:auto;
+        margin-left: 18px;
+    } */
     .content{
         width: 100%;
         position: relative;
