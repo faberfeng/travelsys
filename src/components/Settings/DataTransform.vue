@@ -569,6 +569,11 @@ export default {
 </script>
 <style lang="less">
 #datatransform{
+    width: 100%;
+    display: block;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
     .elTable{
         margin: 0 auto;
         thead{

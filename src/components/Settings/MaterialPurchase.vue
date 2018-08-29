@@ -1094,6 +1094,11 @@ export default {
 </script>
 <style lang="less">
     #wrapper{
+        width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         .zk-table__body-row,.zk-table__header-row{
             height: 36px;
         }

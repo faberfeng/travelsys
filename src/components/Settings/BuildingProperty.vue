@@ -1004,6 +1004,10 @@ export default {
 <style scoped>
     .wrapper{
         width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         /* border-left: 1px solid #ccc; */
     }
     .title{

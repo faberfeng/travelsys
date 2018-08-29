@@ -226,6 +226,11 @@ export default {
 </style>
 <style lang="less">
     #logger{
+        width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         .el-table th{
             height: 36px;
             padding: 0;   

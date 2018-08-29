@@ -878,6 +878,11 @@ export default {
 </script>
 <style  lang='less'>
 #groupPage{
+    width: 100%;
+    display: block;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
     /***********设置滚动条************/
     /* 设置滚动条的样式 */
     ::-webkit-scrollbar {

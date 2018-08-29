@@ -1030,6 +1030,11 @@ export default {
 </script>
 <style lang='less'>
     #pageIn{
+        width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         .el-table__row{
             height:36px;
         }

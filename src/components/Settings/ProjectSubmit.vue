@@ -1850,6 +1850,10 @@ export default {
 </script>
 <style scoped>
     .wrapper{
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         width: 100%;
     }
     .title{

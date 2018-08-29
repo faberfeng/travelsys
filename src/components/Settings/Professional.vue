@@ -962,6 +962,11 @@ export default {
 </script>
 <style  lang='less'>
 #Professional{
+    width: 100%;
+    display: block;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
     *{
         margin: 0;
         padding: 0;
