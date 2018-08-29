@@ -149,6 +149,11 @@
 
 <style  lang='less'>
 #userPage{
+    width: 100%;
+    display: block;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
     *{
         box-sizing: border-box;
         

@@ -4052,6 +4052,7 @@
             color: #666666;
             text-align: center;
             border-left: 1px solid #cccccc;
+            border-right: 1px solid #cccccc;
             position: relative;
             cursor: pointer;
             &::after {
@@ -4076,6 +4077,7 @@
             color: #666666;
             text-align: center;
             border-left: 1px solid #cccccc;
+            border-right: 1px solid #cccccc;
             position: relative;
             cursor: pointer;
             &::after {
@@ -4100,6 +4102,7 @@
             color: #666666;
             text-align: center;
             border-left: 1px solid #cccccc;
+            border-right: 1px solid #cccccc;
             position: relative;
             cursor: pointer;
             &::after {

@@ -170,6 +170,11 @@ export default {
 </script>
 <style lang="less">
     #projectStation{
+        width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
         .stationManage{
             margin: 0 20px 0 15px;
             

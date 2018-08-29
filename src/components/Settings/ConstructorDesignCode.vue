@@ -3165,6 +3165,10 @@ export default {
     }
     .wrapper{
         width: 100%;
+        display: block;
+        height: 800px;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .title{
         border-bottom:1px solid #ccc; 
