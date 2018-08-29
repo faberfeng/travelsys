@@ -522,10 +522,7 @@ export default {
     .wrapper{
         width: 100%;
         display: block;
-        /* float: left; */
-        /* margin-top: 116px; */
         height: 800px;
-        /* width: 88%; */
         overflow-y: auto;
         overflow-x: hidden;
     }

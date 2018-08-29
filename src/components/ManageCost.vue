@@ -192,7 +192,7 @@ export default {
             },
             url:this.BDMSUrl+'/model2/'+this.projId+'/'+this.subProjId+'/model/initdata'
         }).then(response=>{
-            if(response.data.cd=='0'){
+            if(response.data.rt){
                 this.InitdataList=JSON.parse(response.data.rt);
                 this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
                 this.WebGlId=String(this.WebGlId);
@@ -203,7 +203,6 @@ export default {
                 // console.log(JSON.stringify(this.WebGlId));
                 // console.log(this.InitdataList);
             }else if(response.data.cd=='-1'){
-                alert(response.data.msg);
             }
             })
         },
