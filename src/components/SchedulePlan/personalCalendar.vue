@@ -985,7 +985,6 @@ export default {
                 this.showTaskCalendar=true;
                 this.taskId=calEvent.id;
                 var str=this.eventSources[0].events;
-                console.log(JSON.stringify(str));
                 str.forEach((item)=>{
                 if(item.id==calEvent.id){
                     item.borderColor="black";
@@ -1000,10 +999,8 @@ export default {
                 // this.eventSources=[];
             }else {
                 this.showTaskCalendar=false;
-                console.log(calEvent);
                 this.eventId=calEvent.id;
                 var str=this.eventSources[0].events;
-                console.log(JSON.stringify(str));
                 str.forEach((item)=>{
                     if(item.id==calEvent.id){
                         item.borderColor="black";
@@ -1051,7 +1048,7 @@ export default {
               if(response.data.cd=="0"){
                   this.taskInformationList=response.data.rt
                   this.linkList=this.taskInformationList.linkList
-                //   console.log(JSON.stringify( this.taskInformationList))
+                
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -1085,7 +1082,6 @@ export default {
                     }).then(response=>{
                         if(response.data.cd == '0'){
                             this.calendarEventList=response.data.rt;
-                            console.log(JSON.stringify(this.calendarEventList));
                             this.initCalendar();
                             this.eventSources.push({events:this.event,textColor:'black',color:'red',});
                         }else if(response.data.cd == '-1'){
@@ -1371,10 +1367,6 @@ export default {
             this.eventNames=this.eventInformationList.eventName;
             this.startTimeValue=this.StrToGMT(this.eventInformationList.eventStart);
             this.endTimeValue=this.StrToGMT(this.eventInformationList.eventEnd);
-            console.log(this.startTimeValue);
-            console.log(this.endTimeValue);
-            console.log(this.dateChange(this.startTimeValue));
-            console.log(this.dateChange(this.endTimeValue));
             this.eventPositions=this.eventInformationList.eventPosition;
             this.repeatTypeValue=this.eventInformationList.repeatType;
             this.repeatTypeList.forEach((item)=>{
@@ -1433,7 +1425,6 @@ export default {
                 alert('提示：结束时间必须大于开始时间')
                 return;
             }
-            console.log()
             
              axios({
                     method:'post',

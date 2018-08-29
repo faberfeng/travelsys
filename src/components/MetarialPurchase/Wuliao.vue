@@ -1,231 +1,233 @@
 <template>
     <div id="wuliao">
-        <div class="purchaseNav">
-            <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
-                产品管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem navactive">  
-                物料跟踪  
-            </router-link>
-            <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
-                订货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
-                发货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/checked'" class="navItem">  
-                检查验收  
-            </router-link>
-        </div>
-        <div class="elselect">
-            <el-select v-model="selectUser" placeholder="请选择">
-                <el-option
-                v-for="(item,index) in userGroup"
-                :key="index"
-                :label="item.ugName"
-                :value="item.ugId">
-                </el-option>
-            </el-select>
-            <label class="elselecttitle">群组:</label>
-        </div>
-        <div class="pbody">
-            <div class="pbodyleft">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane :label="'有计划'" name="first">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
-                                    <label class="lefttitlelab">{{item.planName.split(' ')[0]}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.planName.split(' ')[1]+item.planName.split(' ')[2]}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="无计划" name="second">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index">
-                                    <label class="lefttitlelab">{{item.orderCode}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="模板" name="third">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">模板名称</label>
-                                    <span class="lefttitlespan">使用次数</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in templateData" :key="index">
-                                    <label class="lefttitlelab">{{item.planTemplateName}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.isCheck}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
+        <div class="topHeader">
+            <div class="purchaseNav">
+                <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
+                    产品管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem navactive">  
+                    物料跟踪  
+                </router-link>
+                <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
+                    订货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
+                    发货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/checked'" class="navItem">  
+                    检查验收  
+                </router-link>
             </div>
-            <div class="pbodyright">
-                <div v-if="showDetail">
-                    请在左侧内选择跟踪计划单
+            <div class="elselect">
+                <el-select v-model="selectUser" placeholder="请选择">
+                    <el-option
+                    v-for="(item,index) in userGroup"
+                    :key="index"
+                    :label="item.ugName"
+                    :value="item.ugId">
+                    </el-option>
+                </el-select>
+                <label class="elselecttitle">群组:</label>
+            </div>
+            <div class="pbody">
+                <div class="pbodyleft">
+                    <el-tabs v-model="activeName" @tab-click="handleClick">
+                        <el-tab-pane :label="'有计划'" name="first">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
+                                        <label class="lefttitlelab">{{item.planName.split(' ')[0]}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.planName.split(' ')[1]+item.planName.split(' ')[2]}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="无计划" name="second">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index">
+                                        <label class="lefttitlelab">{{item.orderCode}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="模板" name="third">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">模板名称</label>
+                                        <span class="lefttitlespan">使用次数</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in templateData" :key="index">
+                                        <label class="lefttitlelab">{{item.planTemplateName}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.isCheck}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                    </el-tabs>
                 </div>
-                <div v-if="!showDetail" class="scrolldiv">
-                    <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
-                    <div class="jindu">
-                        <i class="titleimg"></i>
-                        <label class="titletext">进度</label>
-                        <span class="curData">当前日期 {{planInfo.currtDate}}</span>
+                <div class="pbodyright">
+                    <div v-if="showDetail">
+                        请在左侧内选择跟踪计划单
                     </div>
-                    <div class="jindujihua">
-                        <label class="jindujihuatext">计划进度-计划环节: 厂家发货</label>
-                        <button class="jiadubutton">链接任务</button>
-                    </div>
-                    <div class="jihuabody">
-                        <ul class="jihuabodyul">
-                            <li class="li1">
-                                <p class="ptitle">启动</p>
-                                <span class="spantitle">{{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.day1}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li2">
-                                <p class="ptitle">订货下单</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.day2}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li3">
-                                <p class="ptitle">厂家发货</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.day3}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li4">
-                                <p class="ptitle">抽样检查</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.day4}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li5">
-                                <p class="ptitle">到场签收</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="jindujihua">
-                        <label class="jindujihuatext">实际进度-实际环节: 厂家发货</label>
-                        <span class="jiadutext">{{planInfo.result}}</span>
-                    </div>
-                    <div class="jihuabody">
-                        <ul class="jihuabodyul">
-                            <li class="li1" style="visibility:hidden">
-                                <p class="ptitle">启动</p>
-                                <span class="spantitle">{{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="li2" style="margin-left:30px">
-                                <p class="ptitle">订货下单</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.realDay0}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li3">
-                                <p class="ptitle">厂家发货</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.realDay1}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li4">
-                                <p class="ptitle">抽样检查</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                            <li class="limiddle">
-                                <p class="limiddletext">{{planInfo.realDay2}}</p>
-                                <i class="limiddelimg1"></i>
-                                <i class="limiddelimg2"></i>
-                            </li>
-                            <li class="li5">
-                                <p class="ptitle">到场签收</p>
-                                <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
-                                <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="biaoqian">
-                        <ul class="biaoqianul">
-                            <li class="icon1 icon"></li>
-                            <li class="icontext">未开始</li>
-                            <li class="icon2 icon"></li>
-                            <li class="icontext">进行中</li>
-                            <li class="icon3 icon"></li>
-                            <li class="icontext">已完成</li>
-                        </ul>
-                    </div>
-                    <div class="jindu">
-                        <i class="shebeiimg"></i>
-                        <label class="titletext">设备主清单</label>
-                    </div>
-                    <div class="borderbottom">   
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr  class="userList-thead">
-                                    <th>清单编号</th>
-                                    <th>清单名称</th>
-                                    <th>明细/构件数量</th>
-                                    <th>当前环节</th>
-                                    <th>业务状态</th>
-                                    <th>操作人</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item,index) in orderDeatilData" :key="index">
-                                    <td v-text="item.orderDetailCode"></td>
-                                    <td v-text="item.title"></td>
-                                    <td v-text="item.count"></td>
-                                    <td v-text="item.currentStep"></td>
-                                    <td v-text="item.status"></td>
-                                    <td v-text="item.sendRecordUserName"></td>
-                                    <td>
-                                        <span class="editIcon" @click="viewDeatil(index)"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div v-if="!showDetail" class="scrolldiv">
+                        <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
+                        <div class="jindu">
+                            <i class="titleimg"></i>
+                            <label class="titletext">进度</label>
+                            <span class="curData">当前日期 {{planInfo.currtDate}}</span>
+                        </div>
+                        <div class="jindujihua">
+                            <label class="jindujihuatext">计划进度-计划环节: 厂家发货</label>
+                            <button class="jiadubutton">链接任务</button>
+                        </div>
+                        <div class="jihuabody">
+                            <ul class="jihuabodyul">
+                                <li class="li1">
+                                    <p class="ptitle">启动</p>
+                                    <span class="spantitle">{{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.day1}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li2">
+                                    <p class="ptitle">订货下单</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.day2}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li3">
+                                    <p class="ptitle">厂家发货</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.day3}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li4">
+                                    <p class="ptitle">抽样检查</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.day4}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li5">
+                                    <p class="ptitle">到场签收</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="jindujihua">
+                            <label class="jindujihuatext">实际进度-实际环节: 厂家发货</label>
+                            <span class="jiadutext">{{planInfo.result}}</span>
+                        </div>
+                        <div class="jihuabody">
+                            <ul class="jihuabodyul">
+                                <li class="li1" style="visibility:hidden">
+                                    <p class="ptitle">启动</p>
+                                    <span class="spantitle">{{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="li2" style="margin-left:30px">
+                                    <p class="ptitle">订货下单</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.realDay0}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li3">
+                                    <p class="ptitle">厂家发货</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.realDay1}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li4">
+                                    <p class="ptitle">抽样检查</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                                <li class="limiddle">
+                                    <p class="limiddletext">{{planInfo.realDay2}}</p>
+                                    <i class="limiddelimg1"></i>
+                                    <i class="limiddelimg2"></i>
+                                </li>
+                                <li class="li5">
+                                    <p class="ptitle">到场签收</p>
+                                    <span class="spantitle">开始 {{planInfo.orderCreateDate}}</span>
+                                    <span class="spantitle">完成 {{planInfo.orderCreateDate}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="biaoqian">
+                            <ul class="biaoqianul">
+                                <li class="icon1 icon"></li>
+                                <li class="icontext">未开始</li>
+                                <li class="icon2 icon"></li>
+                                <li class="icontext">进行中</li>
+                                <li class="icon3 icon"></li>
+                                <li class="icontext">已完成</li>
+                            </ul>
+                        </div>
+                        <div class="jindu">
+                            <i class="shebeiimg"></i>
+                            <label class="titletext">设备主清单</label>
+                        </div>
+                        <div class="borderbottom">   
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr  class="userList-thead">
+                                        <th>清单编号</th>
+                                        <th>清单名称</th>
+                                        <th>明细/构件数量</th>
+                                        <th>当前环节</th>
+                                        <th>业务状态</th>
+                                        <th>操作人</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in orderDeatilData" :key="index">
+                                        <td v-text="item.orderDetailCode"></td>
+                                        <td v-text="item.title"></td>
+                                        <td v-text="item.count"></td>
+                                        <td v-text="item.currentStep"></td>
+                                        <td v-text="item.status"></td>
+                                        <td v-text="item.sendRecordUserName"></td>
+                                        <td>
+                                            <span class="editIcon" @click="viewDeatil(index)"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -413,10 +415,18 @@ export default {
 </script>
 <style lang="less">
 #wuliao{
-    top: 116px;
-    position: fixed;
-    left: 26px;
+    // top: 116px;
+    // position: fixed;
+    // left: 26px;
+    // width: 100%;
+    ::-webkit-scrollbar{width:0px}
+    .topHeader{
+    box-sizing: border-box;
+    float: left;
     width: 100%;
+    overflow: auto;
+    max-height: 800px;
+    
     .purchaseNav{
         height: 49px;
         padding-top: 16px;
@@ -783,6 +793,7 @@ export default {
             }
             }
         }
+    }
     }
 }
 </style>

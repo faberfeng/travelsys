@@ -1,180 +1,182 @@
 
 <template>
     <div id="wuliao">
-        <div class="purchaseNav">
-            <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
-                产品管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
-                物料跟踪  
-            </router-link>
-            <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
-                订货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
-                发货管理  
-            </router-link>
-            <router-link :to="'/metarialpurchase/checked'" class="navItem  navactive">  
-                检查验收  
-            </router-link>
-        </div>
-        <div class="elselect">
-            <el-select v-model="selectUser" placeholder="请选择">
-                <el-option
-                v-for="(item,index) in userGroup"
-                :key="index"
-                :label="item.ugName"
-                :value="item.ugId">
-                </el-option>
-            </el-select>
-            <label class="elselecttitle">群组:</label>
-        </div>
-        <div class="pbody">
-            <div class="pbodyleft">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane :label="'已签收'" name="first">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
-                                    <label class="lefttitlelab">{{item.orderCode}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="未签收" name="second">
-                        <div class="leftcontent">
-                            <ul class="leftcontentul">
-                                <li class="lefttitle">
-                                    <label class="lefttitlelab">订单号</label>
-                                    <span class="lefttitlespan">订单名称</span>
-                                </li>
-                                <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
-                                    <label class="lefttitlelab">{{item.orderCode}}</label>
-                                    <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
+        <div class="topHeader">
+            <div class="purchaseNav">
+                <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
+                    产品管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
+                    物料跟踪  
+                </router-link>
+                <router-link :to="'/metarialpurchase/dinghuoManage'" class="navItem">  
+                    订货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/fahuoManage'" class="navItem">  
+                    发货管理  
+                </router-link>
+                <router-link :to="'/metarialpurchase/checked'" class="navItem  navactive">  
+                    检查验收  
+                </router-link>
             </div>
-            <div class="pbodyright">
-                <div v-if="showDetail">
-                    请在左侧内选择发货单
-                </div>
-                <div v-if="!showDetail" class="scrolldiv">
-                    <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
-                    <div class="jindu">
-                        <i class="titleimg"></i>
-                        <label class="titletext">检查记录</label>
-                    </div>
-                    <div class="borderbottom1">   
-                        <div class="quanxuan">
-                            <el-checkbox>全选</el-checkbox>
-                            <button class="btn">检查完成</button>
-                        </div>
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr class="userList-thead">
-                                    <th></th>
-                                    <th>清单编号</th>
-                                    <th>清单名称</th>
-                                    <th>总数量</th>
-                                    <th>取样数量</th>
-                                    <th>取样率</th>
-                                    <th>检查人</th>
-                                    <th>检查时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><el-checkbox></el-checkbox></td>
-                                    <td v-text="orderInfo.orderCode"></td>
-                                    <td v-text="orderInfo.orderTitle"></td>
-                                    <td v-text="orderInfo.componentSize"></td>
-                                    <td v-text="orderInfo.sampleSize"></td>
-                                    <td v-text="orderInfo.sampleRate"></td>
-                                    <td v-text="orderInfo.checkUserName"></td>
-                                    <td v-text="orderInfo.checkDate_"></td>
-                                    <td v-text="orderInfo.orderUserName"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="tableinfo">
-                            <label class="checkqz">检查群组：</label><span class="checktext">{{orderInfo.checkUgName}}</span>
-                            <label class="checkpeo">检查人：</label><span class="checktext">{{orderInfo.checkUserName}}</span>
-                            <label class="checktime">检查时间：</label><span class="checktext">{{orderInfo.checkDate_}}</span>
-                        </div>
-                    </div>
-                    <div class="jindu">
-                        <i class="titleimg"></i>
-                        <label class="titletext">签收记录</label>
-                    </div>
-                    <div class="borderbottom1">   
-                        <div class="quanxuan huoweixuanz">
-                            <label class="huoweilabel">货位选择</label>
-                            <el-select v-model="huoweiselect">
-                                <el-option value="1">123</el-option>
-                                <el-option value="2">233</el-option>
-                                <el-option value="3">345</el-option>
-                            </el-select>
-                        </div>
-                        <div class="quanxuan">
-                            <el-checkbox>全选</el-checkbox>
-                            <button class="btn">签收订单</button>
-                        </div>
-                        <table class="UserList" border="1" width="100%">
-                            <thead>
-                                <tr class="userList-thead">
-                                    <th></th>
-                                    <th>清单编号</th>
-                                    <th>清单名称</th>
-                                    <th>总数量</th>
-                                    <th>堆场位号</th>
-                                    <th>签收状态</th>
-                                    <th>签收人</th>
-                                    <th>签收时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item,index) in orderDeatilData" :key="index">
-                                    <td><el-checkbox></el-checkbox></td>
-                                    <td v-text="item.orderDetailCode"></td>
-                                    <td v-text="item.title"></td>
-                                    <td v-text="item.count"></td>
-                                    <td v-text="item.warehouseName"></td>
-                                    <td v-text="item.currentStep"></td>
-                                    <td v-text="item.receiptUserName"></td>
-                                    <td v-text="item.checkDate_"></td>
-                                    <td>
-                                        <span class="editIcon" @click="viewDeatil(index)"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="tableinfo">
-                            <label class="checkqz">检查群组：</label><span class="checktext">{{orderInfo.checkUgName}}</span>
-                            <label class="checkpeo">检查人：</label><span class="checktext">{{orderInfo.checkUserName}}</span>
-                            <label class="checktime">签收时间：</label><span class="checktext">{{orderInfo.checkDate_}}</span>
-                        </div>
-                    </div>
-                    <div class="borderbottom1 huowei">
-                        <div class="huoweileft">货位选择：</div>
-                        <div class="huoweiright">
-                            <div class="huiweirighttitle">
-                                选择堆场
+            <div class="elselect">
+                <el-select v-model="selectUser" placeholder="请选择">
+                    <el-option
+                    v-for="(item,index) in userGroup"
+                    :key="index"
+                    :label="item.ugName"
+                    :value="item.ugId">
+                    </el-option>
+                </el-select>
+                <label class="elselecttitle">群组:</label>
+            </div>
+            <div class="pbody">
+                <div class="pbodyleft">
+                    <el-tabs v-model="activeName" @tab-click="handleClick">
+                        <el-tab-pane :label="'已签收'" name="first">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
+                                        <label class="lefttitlelab">{{item.orderCode}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul class="huiweirightimg">
-                                <li>1</li>
-                                <li>2</li>
-                                <li>3</li>
-                            </ul>
+                        </el-tab-pane>
+                        <el-tab-pane label="未签收" name="second">
+                            <div class="leftcontent">
+                                <ul class="leftcontentul">
+                                    <li class="lefttitle">
+                                        <label class="lefttitlelab">订单号</label>
+                                        <span class="lefttitlespan">订单名称</span>
+                                    </li>
+                                    <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
+                                        <label class="lefttitlelab">{{item.orderCode}}</label>
+                                        <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+                <div class="pbodyright">
+                    <div v-if="showDetail">
+                        请在左侧内选择发货单
+                    </div>
+                    <div v-if="!showDetail" class="scrolldiv">
+                        <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
+                        <div class="jindu">
+                            <i class="titleimg"></i>
+                            <label class="titletext">检查记录</label>
+                        </div>
+                        <div class="borderbottom1">   
+                            <div class="quanxuan">
+                                <el-checkbox>全选</el-checkbox>
+                                <button class="btn">检查完成</button>
+                            </div>
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr class="userList-thead">
+                                        <th></th>
+                                        <th>清单编号</th>
+                                        <th>清单名称</th>
+                                        <th>总数量</th>
+                                        <th>取样数量</th>
+                                        <th>取样率</th>
+                                        <th>检查人</th>
+                                        <th>检查时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><el-checkbox></el-checkbox></td>
+                                        <td v-text="orderInfo.orderCode"></td>
+                                        <td v-text="orderInfo.orderTitle"></td>
+                                        <td v-text="orderInfo.componentSize"></td>
+                                        <td v-text="orderInfo.sampleSize"></td>
+                                        <td v-text="orderInfo.sampleRate"></td>
+                                        <td v-text="orderInfo.checkUserName"></td>
+                                        <td v-text="orderInfo.checkDate_"></td>
+                                        <td v-text="orderInfo.orderUserName"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="tableinfo">
+                                <label class="checkqz">检查群组：</label><span class="checktext">{{orderInfo.checkUgName}}</span>
+                                <label class="checkpeo">检查人：</label><span class="checktext">{{orderInfo.checkUserName}}</span>
+                                <label class="checktime">检查时间：</label><span class="checktext">{{orderInfo.checkDate_}}</span>
+                            </div>
+                        </div>
+                        <div class="jindu">
+                            <i class="titleimg"></i>
+                            <label class="titletext">签收记录</label>
+                        </div>
+                        <div class="borderbottom1">   
+                            <div class="quanxuan huoweixuanz">
+                                <label class="huoweilabel">货位选择</label>
+                                <el-select v-model="huoweiselect">
+                                    <el-option value="1">123</el-option>
+                                    <el-option value="2">233</el-option>
+                                    <el-option value="3">345</el-option>
+                                </el-select>
+                            </div>
+                            <div class="quanxuan">
+                                <el-checkbox>全选</el-checkbox>
+                                <button class="btn">签收订单</button>
+                            </div>
+                            <table class="UserList" border="1" width="100%">
+                                <thead>
+                                    <tr class="userList-thead">
+                                        <th></th>
+                                        <th>清单编号</th>
+                                        <th>清单名称</th>
+                                        <th>总数量</th>
+                                        <th>堆场位号</th>
+                                        <th>签收状态</th>
+                                        <th>签收人</th>
+                                        <th>签收时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in orderDeatilData" :key="index">
+                                        <td><el-checkbox></el-checkbox></td>
+                                        <td v-text="item.orderDetailCode"></td>
+                                        <td v-text="item.title"></td>
+                                        <td v-text="item.count"></td>
+                                        <td v-text="item.warehouseName"></td>
+                                        <td v-text="item.currentStep"></td>
+                                        <td v-text="item.receiptUserName"></td>
+                                        <td v-text="item.checkDate_"></td>
+                                        <td>
+                                            <span class="editIcon" @click="viewDeatil(index)"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="tableinfo">
+                                <label class="checkqz">检查群组：</label><span class="checktext">{{orderInfo.checkUgName}}</span>
+                                <label class="checkpeo">检查人：</label><span class="checktext">{{orderInfo.checkUserName}}</span>
+                                <label class="checktime">签收时间：</label><span class="checktext">{{orderInfo.checkDate_}}</span>
+                            </div>
+                        </div>
+                        <div class="borderbottom1 huowei">
+                            <div class="huoweileft">货位选择：</div>
+                            <div class="huoweiright">
+                                <div class="huiweirighttitle">
+                                    选择堆场
+                                </div>
+                                <ul class="huiweirightimg">
+                                    <li>1</li>
+                                    <li>2</li>
+                                    <li>3</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -367,10 +369,13 @@ export default {
 </script>
 <style lang="less">
 #wuliao{
-    top: 116px;
-    position: fixed;
-    left: 26px;
+    ::-webkit-scrollbar{width:0px}
+    .topHeader{
+    box-sizing: border-box;
+    float: left;
     width: 100%;
+    overflow: auto;
+    max-height: 800px;
     .purchaseNav{
         height: 49px;
         padding-top: 16px;
@@ -646,6 +651,7 @@ export default {
             }
             }
         }
+    }
     }
 }
 </style>
