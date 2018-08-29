@@ -199,9 +199,9 @@
                     <div class="editBodytwo"><label class="editInpText">资源名称 :</label><input class="inp" v-model="editUnityName"/></div>
                     <div class="editBodytwo edit-item clearfix"><label class="editInpText">发布平台 :</label>
                         <select  class="editSelect" v-model="platform" >
-                            <option >Web</option>
-                            <option >Android</option>
-                            <option >iOS</option>
+                            <option>Web</option>
+                            <option>Android</option>
+                            <option>iOS</option>
                         </select>
                         <i class="icon-sanjiao"></i>
                     </div>
@@ -1016,7 +1016,11 @@ export default {
             
         },
         editUnityBundlePropertySure(){
-            this.editUnityBundleProperty = false;
+            if(this.editUnityName == ''){
+                alert('资源名称不能为空！')
+            }else{
+                this.editUnityBundleProperty = false;
+            }
         },
         editUnityBundlePropertyClose(){
             this.editUnityBundleProperty = false;

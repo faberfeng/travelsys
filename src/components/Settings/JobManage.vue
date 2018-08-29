@@ -198,10 +198,11 @@ export default {
     methods:{
         checkName(name){
             var vm = this
-            if(name != '' || name.indexOf('默认岗位') == -1){
+            if(name == '' || name.indexOf('默认岗位') == -1){
                 return false
+            }else{
+                return 'disabled'
             }
-            return 'disabled'
         },
         changePage(val){//分页 0 -1 1 2
             var vm = this; 
