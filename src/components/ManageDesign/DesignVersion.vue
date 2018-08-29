@@ -196,12 +196,17 @@ export default {
 </script>
 <style lang="less" scoped>
     #designVersion{
+        // box-sizing: border-box;
+        // position: fixed;
+        // top: 116px;
+        // left: 26px;
+        // bottom:0;
+        // right: 0;
         box-sizing: border-box;
-        position: fixed;
-        top: 116px;
-        left: 26px;
-        bottom:0;
-        right: 0;
+        // margin-top:107px;
+        float: left;
+        width: 100%;
+        overflow: auto;
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
@@ -315,14 +320,20 @@ export default {
                 }
             }
             #detial-table{
-                display: block;
-                position: fixed;
-                top: 237px;
-                left: 46px;
-                bottom: 20px;
-                right: 20px;
-                width: auto;
+                // display: block;
+                // position: fixed;
+                // top: 237px;
+                // left: 46px;
+                // bottom: 20px;
+                // right: 20px;
+                // width: auto;
+                // overflow: auto;
+                box-sizing: border-box;
+                // margin-top:107px;
+                float: left;
+                width: 100%;
                 overflow: auto;
+                
             }
         }
         *{

@@ -21,6 +21,7 @@
     "highcharts": "^6.1.1",
     "jquery": "^3.3.1",
     "js-md5": "^0.7.3",
+    "sockjs-client": "^1.1.5",
     "three": "^0.92.0",
     "vue": "^2.5.2",
     "vue-full-calendar": "^4.0.0-1",
@@ -28,7 +29,8 @@
     "vue-table-with-tree-grid": "^0.2.4",
     "vue2-highcharts": "^1.2.4",
     "vuedraggable": "^2.16.0",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "websocket": "^1.0.26"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

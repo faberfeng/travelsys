@@ -113,15 +113,20 @@
         content: '';
     }
     .box-left-container{
-        display: block;
-        position: fixed;
-        overflow-x: hidden;
-        top: 115px;
-        left: 26px;
-        bottom: 0;
-        right: 0;
+        // display: block;
+        // position: fixed;
+        // overflow-x: hidden;
+        // top: 115px;
+        // left: 26px;
+        // bottom: 0;
+        // right: 0;
+        // transition:  all ease .5s;
+        // overflow: auto;
+        display: inline-block;
+        width: 100%;
+        position: relative;
+        // margin-left:24px;
         transition:  all ease .5s;
-        overflow: auto;
          .title-right{
             float: left;;
             width: 214px;
@@ -411,7 +416,7 @@
                 tbody{
                     tr{
                         td{
-                            height: 54px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             font-size: 14px;

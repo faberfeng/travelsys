@@ -864,13 +864,18 @@ export default {
             display: none;
         }
         
-         .topHeader{
+        .topHeader{
+            // box-sizing: border-box;
+            // position: fixed;
+            // top: 116px;
+            // left: 26px;
+            // bottom:0;
+            // right: 0;
+            // overflow: auto;
             box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            float: left;
+            width: 100%;
+            height:800px;
             overflow: auto;
         }
         #item-box-file{

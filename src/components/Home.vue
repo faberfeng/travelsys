@@ -3,15 +3,21 @@
       <!--2018/3/21 付伟超修改-->
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
         <div class="contentBody">
-            <div class="sideBar" ref="sideB">
+            <!-- <div class="sideBar" ref="sideB">
                 <a href="#" >
                     <img src="../assets/arrow-left.png"/>
                 </a>
+            </div> -->
+            <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
+            <div v-show="webGlShow" class="webglBackground">
+                <div id="webgl" v-show="webGlShow">
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                </div>
             </div>
             <div  class="main">
                 <div class="content">
-                    <el-row class="navigation">
-                        <el-col :span="24" >
+                    <el-row class="navigation1">
+                        <el-col :span="24">
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
@@ -74,7 +80,7 @@
                             </el-submenu>
                         </el-menu>
                     </div>
-                    <div :class="[{'settingsCenter':settingsCenter},'settingsRight']">
+                    <div :class="[{'settingsCenter':settingsCenter},{'settingsRight':!webGlShow},{'settingsRight1':webGlShow}]">
                         <router-view></router-view>
                     </div>
                 </div>
@@ -85,12 +91,14 @@
 <script>
 import headerCommon from './header.vue'
 import axios from 'axios'
+var app
 export default {
     name:'Home',
     components: {
       headerCommon
     },
     data(){
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
@@ -108,6 +116,7 @@ export default {
             screenWidth: document.documentElement.clientHeight,
             token:'',
             projId:'',
+            subProjId:'',
             cHeight:'',
             /*********
                  *要判断导航栏功能； 
@@ -128,13 +137,21 @@ export default {
                 spaceManagement:false,
                 assetManagement:false,
                 configurationCenter:false
-            }
+            },
+            webGlShow:false,
+            InitdataList:'',
+            WebGlId:'',
+            WebGlUrl:'',
+            WebGlType:'',
+            WebGlName:'',
         }
     },
     created(){
         var vm = this
         vm.projId = localStorage.getItem('projId');//获取工程编号
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.subProjId=localStorage.getItem('defaultSubProjId');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
@@ -146,6 +163,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
+        this.getInitdata();
     },
     mounted(){
         var height = ''
@@ -164,6 +182,66 @@ export default {
         },
     },
     methods:{
+        btn12(){
+            console.log('fjd');
+            this.webGlShow=!this.webGlShow;
+            localStorage.setItem('webGlShow',this.webGlShow);
+            app = this.$refs.iframe1.contentWindow
+            app.postMessage({command:"Init",parameter:null},"*");
+        },
+        callback(e){
+            console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+					let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
+                    console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+
+				break;
+			case "CurrentSelectedEnt":
+				break;
+			case "ViewpointSubmited":
+
+				// ScreenPara = e.data.parameter
+
+				break;
+		    }
+        },
+
+
+        changeFrameHeight(){
+                var ifm= document.getElementById("webIframe"); 
+                ifm.height=document.documentElement.clientHeight;
+            },
+           //获取项目模型展示初始化数据
+        getInitdata(){
+            axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'/model2/'+this.projId+'/'+this.subProjId+'/model/initdata'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                this.InitdataList=JSON.parse(response.data.rt);
+                this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
+                this.WebGlId=String(this.WebGlId);
+                this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
+                this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
+                // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
+                console.log(JSON.stringify(this.WebGlId));
+                console.log(this.InitdataList);
+            }else if(response.data.cd=='-1'){
+                alert(response.data.msg);
+            }
+            })
+        },
+             
         getPJDetial(key){
             var vm = this
             //console.log("look the proj_id")
@@ -188,6 +266,7 @@ export default {
                 }else{
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
+                    localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
                     vm.getUserInfo();
                 }
             }).catch((err)=>{
@@ -388,6 +467,10 @@ export default {
 }
 </script>
 <style scoped>
+    
+    /* img{
+        transform:rotateX(90deg);
+        } */
     a{
         text-decoration: none;
         display: inline-block;
@@ -395,7 +478,7 @@ export default {
     .wrapper{
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        /* overflow: hidden; */
     }
     .header{
         height: 68px;
@@ -501,9 +584,11 @@ export default {
     }
     /* 侧边栏 */
     .contentBody{
-        display: flex;
+        /* display: flex; */
+        /* background-color: #333; */
         height:100%;
         position: relative;
+        /* overflow-y: auto; */
     }
     .sideBar{
         width: 25px;
@@ -519,29 +604,97 @@ export default {
     .sideBar img{
         position: relative;
         top: 22px;
-
     }
     /* 导航栏 */
     .main{
-        flex: 1;
-        overflow:auto;
+        /* flex: 1; */
+        /* overflow:auto; */
         /* margin-left: 18px; */
     }
     .content{
         width: 100%;
         position: relative;
     }
-    .navigation{
+    /* .webglBackGround{
+        	height: 800px;
+        height: 800px;
+        width: 100%;
+        margin:0 auto;
+        margin-top: 60px;
+        display: inline-block;
+        background: #666666;
+        opacity: 0;
+
+    } */
+    .downWebGl{
+        /* position: fixed; */
+        position:absolute;
+        top:-40px;
+        right:100px;
+        z-index: 10000000;
+        color: #7a818a;
+        cursor: pointer;
+    }
+    #webgl{
+       	height: 800px;
+        width: 95%;
+        margin:0 auto;
+        /* margin-top: 60px; */
+        display: inline-block;
+        z-index: 10;
+        background-color:#333333;
+        /* border:1px solid #666; */
+        /* overflow-y: auto; */
+        transition: all 10s ease;
+    }
+    .webglBackground{
+         width: 100%;
+         height: 810px;
+        background-color:#333333;
+    }
+    /* .navigation{
         height:48px;
         width:100%;
         position: fixed;
-        top: 68px;
+        top: 68px; 
         left: 26px;
         right: 0;
         background: #fff;
         z-index: 1000!important;
+        transition: all 0.7s ease;
+    } */
+    .navigation1{
+        height: 48px;
+        width: 100%;
+        /* margin-top: 392px; */
+        float: left;
+        background: #fff;
+        /* z-index: 1000!important; */
+        
+        transition: all 0.7s ease;
     }
-    
+    .settingsRight{
+        display: block;
+        margin-left: 219px;
+        float: left;
+        /* margin-top: 116px; */
+        height: 800px;
+        width: 88%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* transition: all 0.7s ease; */
+    }
+    ::-webkit-scrollbar{width:0px}
+    .settingsRight1{
+        float: left;
+        display: block;
+        margin-left: 219px;
+        width: 88%;
+        /* margin-top: 486px; */
+        height: 800px;
+        overflow:auto;
+        /* transition: all 0.7s ease; */
+    }
     /* 工程列表 */
 
     .title span{
@@ -610,22 +763,27 @@ export default {
        
     }
     .settingsLeft{
-        width: 192px;
-        background: #fafafa;
-        border-right:1px solid #ccc; 
+        /* width: 192px;
         position: fixed;
         top: 116px;
         left: 26px;
-        bottom: 0;
+        bottom: 0; */
         z-index: 100;
+         background: #fafafa;
+        border-right:1px solid #ccc; 
+        position: absolute;
+        top:48px;
+        left:2px;
+        bottom: 0px;
+        right: 0px;
+        width: 192px;
+        height: 800px;
     }
-    .settingsRight{
-        display: block;
-        margin-left: 219px;
-        margin-top: 116px;
-    }
+    
     .settingsCenter{
       margin-left: 26px!important;
+      width:98% !important;
+      overflow-x: hidden;
     
     }
     .settingsLeft h5{

@@ -81,7 +81,8 @@
   padding: 0;
 }
 .header-bar{
-  margin-top: 92px;
+  /* margin-top: 92px; */
+  margin-top:25px;
   border-bottom: 1px solid #cccccc;
   height: 43px;
 }

@@ -41,7 +41,7 @@
                 <span class="btn-operate" @click="valueSearch()">产值查询</span>
                 <span class="btn-operate" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
-                <span class="btn-operate" @click="showColumnConfig()">显示列</span>
+                <!-- <span class="btn-operate" @click="showColumnConfig()">显示列</span> -->
               </div>
             </div>
             <div class="taskBody">
@@ -49,7 +49,7 @@
                 index-text="序号"
                 :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                :border="props.border" :is-fold="props.isFold" empty-text="正在加载..." @row-click="rowClick"
+                :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
                 @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick">
                 <template slot="action" slot-scope="scope">
                   <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
@@ -75,22 +75,21 @@
             </div>
           </div>
           <div v-show="!hiddenGanttList" class="taskWarp">
-            <div class="taskHead">
-              <div class="taskHeadLeft" @click="addTask">
+            <!-- <div class="taskHead">
+              <div class="taskHeadLeft" @click="addGanttTask">
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
               </div>
               <div class="taskHeadRight">
-                <span class="btn-operate">修改</span>
                 <span class="btn-operate" @click="upgrade()">升级</span>
                 <span class="btn-operate" @click="degrade()">降级</span>
                 <span class="btn-operate" @click="swap()">上移</span>
                 <span class="btn-operate" @click="swap()">下移</span>
                 <span class="btn-operate">移动</span>
-                <span class="btn-operate">删除</span>
+                <span class="btn-operate" @click="deleteGanttTab">删除</span>
                 <span class="btn-operate" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
               </div>
-            </div>
+            </div> -->
             <div class="taskBody">
               <div id="workSpace"
                    style="padding:0px; overflow-y:auto; overflow-x:hidden;border:1px solid #e5e5e5;position:relative;margin:0 5px">
@@ -101,6 +100,7 @@
       </div>
     </div>
     <div id="gantEditorTemplates" style="display:none;">
+      $('#workSpace').trigger('moveUpCurrentTask.gantt');return false;
       <div class="__template__" type="GANTBUTTONS"></div>
       <div class="__template__" type="TASKSEDITHEAD"></div>
       <div class="__template__" type="TASKROW"></div>
@@ -113,7 +113,7 @@
       <div class="__template__" type="RESOURCE_ROW"></div>
     </div>
 
-    <div :class="[{'box-right-active1':screenLeft.show},'box-right-container']" v-if="!showCommonList">
+    <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']" v-if="!showCommonList">
       <div id="center-selection">
         <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
           <i class="icon-right"></i>
@@ -124,7 +124,7 @@
           <span class="item-version-3 " @click="screenLeft.item = 3;">资<br>源</span>
         </div>
       </div>
-      <div id="box-right" v-if="screenLeft.item == 1">
+      <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 1">
         <h3 class="header-attribute" style="margin-top: 0px;">
           <i class="trrangle"></i>
           基本信息
@@ -199,7 +199,7 @@
           </li>
         </ul>
       </div>
-      <div id="box-right" v-show="taskId" v-if="screenLeft.item == 2">
+      <div id="box-right" v-show="taskId&&screenLeft.show" v-if="screenLeft.item == 2">
         <div class="verify">
           <h3 class="header-attribute" style="margin-top: 0px;">
             <i class="trrangle"></i>
@@ -288,7 +288,7 @@
           </ul>
         </div>
       </div>
-      <div id="box-right1" v-if="screenLeft.item == 3">
+      <div id="box-right1" v-show="screenLeft.show" v-if="screenLeft.item == 3">
         <div class="addResourceType"><i class="el-icon-plus action" @click="addResourceTask">增加</i></div>
         <div class="resourceList" v-show="taskId">
           <table border="0" width='100%'>
@@ -1002,7 +1002,7 @@
         <div class="editBody">
           <div class="editBodytwo3">
             <zk-table :data="taskIndexData" :columns="columns1" :tree-type="props.treeType"
-                      :expand-type="props.expandType" :is-fold="props.isFold" :show-index="props.showIndex"
+                      :expand-type="props.expandType" max-height="36px" :is-fold="props.isFold" :show-index="props.showIndex"
                       :selection-type="props.selectionType"
                       :border="props.border" empty-text="正在加载..." @row-click="removeTaskRowClick">
             </zk-table>
@@ -1445,38 +1445,34 @@
             show: true,
             type: 'template',
             template: 'action',
-            minWidth: '280px'
+            minWidth: '240px'
 
           },
-          {
-            label: '组别',
-            prop: 'taskGroupName',
-            show: true,
-            minWidth: '60px'
-          },
-          {
-            label: '序号',
-            prop: 'taskId',
-            show: true,
-            minWidth: '60px'
-
-          },
+          // {
+          //   label: '序号',
+          //   prop: 'taskId',
+          //   show: true,
+          //   minWidth: '60px'
+          // },
           {
             label: '编号',
             prop: 'completeTaskCode',
             show: true,
+            width: '70px'
 
           },
           {
             label: '优先级',
             prop: 'taskPriority',
             show: true,
+            width: '65px'
 
           },
           {
             label: '里程碑',
             prop: 'taskType',
             show: true,
+            width: '65px'
           },
           {
             label: '计划开始',
@@ -1484,7 +1480,7 @@
             show: true,
             type: 'template',
             template: 'taskStart',
-            minWidth: '100px'
+            width: '90px'
 
           },
           {
@@ -1493,7 +1489,7 @@
             show: true,
             type: 'template',
             template: 'taskEnd',
-            minWidth: '100px'
+            width: '90px'
           },
           {
             label: '实际开始',
@@ -1501,7 +1497,7 @@
             show: true,
             type: 'template',
             template: 'realTaskStart',
-            minWidth: '90px'
+           width: '90px'
           },
           {
             label: '实际结束',
@@ -1509,7 +1505,7 @@
             show: true,
             type: 'template',
             template: 'realTaskEnd',
-            minWidth: '90px'
+           width: '90px'
           },
           {
             label: '工作日',
@@ -1517,45 +1513,51 @@
             show: true,
             type: 'template',
             template: 'taskDuration',
+            width: '65px'
           },
           {
             label: '计划状态',
             prop: 'taskStatusStr',
             show: true,
+             width: '80px'
 
           },
           {
             label: '实际状态',
             prop: 'actualStatusStr',
             show: true,
+             width: '80px'
           },
           {
             label: '比对状态',
             prop: 'verifyStatusStr',
             show: true,
+             width: '80px'
           },
           {
             label: '负责群组',
             prop: 'taskUserGroupName',
             show: true,
+             width: '80px'
           },
           {
             label: '负责人',
             prop: 'dutyUserName',
             show: true,
+            width: '80px'
           },
-          {
-            label: '计划人',
-            prop: 'createUserName',
-            show: true,
-          },
+          // {
+          //   label: '计划人',
+          //   prop: 'createUserName',
+          //   show: true,
+          // },
           {
             label: '操作',
             prop: 'operator',
             type: 'template',
             show: true,
             template: 'action',
-            width: '150px'
+            width: '130px'
           }
         ],
         //以下为甘特图数据
@@ -1565,6 +1567,19 @@
         colorValueList: [],
         colorValueList1: [],
         ge:"",
+        loadGanttList:{
+            tasks: [
+              
+            ],
+            selectedRow: 0, 
+            deletedTaskIds: [],
+            resources: [],
+            roles:[],
+            canWrite:false,
+            canDelete:true, 
+            canWriteOnParent: true,
+            canAdd:true
+            }
       }
     },
     created() {
@@ -1810,17 +1825,80 @@
             taskName: this.searchTaskName
           }
         }).then(response => {
-          if (response.data.cd == "0") {
+          if (response.data.rt) {
+            var vm=this
             this.taskIndexData = response.data.rt;
+            // console.log(this.taskIndexData.length);
+            
+            this.taskIndexData.forEach((item)=>{
+              var ganttList={}
+              vm.$set(ganttList,'id',item.taskId);
+              vm.$set(ganttList,'name',item.taskName);
+              vm.$set(ganttList,'level',item.completeTaskCode);
+              vm.$set(ganttList,'start',item.taskStart);
+              vm.$set(ganttList,'end',item.taskEnd);
+              vm.$set(ganttList,'duration',item.taskDuration);
+              // vm.$set(ganttList,'startIsMilestone',false);
+              //  vm.$set(ganttList,'endIsMilestone',false);
+              //  vm.$set(ganttList,'status',"STATUS_SUSPENDED");
+              this.loadGanttList.tasks.push(ganttList)
+              // console.log(this.loadGanttList);
+              item.children.forEach((item1)=>{
+                var ganttList1={}
+                vm.$set(ganttList1,'id',item1.taskId);
+                vm.$set(ganttList1,'name',item1.taskName);
+                vm.$set(ganttList1,'level',item1.completeTaskCode);
+                vm.$set(ganttList1,'start',item1.taskStart);
+                vm.$set(ganttList1,'end',item1.taskEnd);
+                vm.$set(ganttList1,'duration',item1.taskDuration);
+              //   vm.$set(ganttList1,'startIsMilestone',false);
+              //  vm.$set(ganttList1,'endIsMilestone',false);
+              //  vm.$set(ganttList1,'status',"STATUS_SUSPENDED");
+                this.loadGanttList.tasks.push(ganttList1);
+                console.log(this.loadGanttList);
+                // item1.children.forEach((item2)=>{
+                //     var ganttList2={}
+                //     vm.$set(ganttList2,'id',item2.taskId);
+                //     vm.$set(ganttList2,'name',item2.taskName);
+                //     vm.$set(ganttList2,'level',item2.completeTaskCode);
+                //     vm.$set(ganttList2,'start',item2.taskStart);
+                //     vm.$set(ganttList2,'end',item2.taskEnd);
+                //     vm.$set(ganttList2,'duration',item2.taskDuration);
+                //     // vm.$set(ganttList2,'startIsMilestone',false);
+                //     // vm.$set(ganttList2,'endIsMilestone',false);
+                //     // vm.$set(ganttList2,'status',"STATUS_SUSPENDED");
+                //     this.loadGanttList.tasks.push(ganttList2);
+                //     console.log(this.loadGanttList);
+                //         // item2.children.forEach((item3)=>{
+                //         //   var ganttList3={}
+                //         //   vm.$set(ganttList3,'id',item3.taskId);
+                //         //   vm.$set(ganttList3,'name',item3.taskName);
+                //         //   vm.$set(ganttList3,'level',item3.completeTaskCode);
+                //         //   vm.$set(ganttList3,'level',item3.completeTaskCode);
+                //         //   vm.$set(ganttList3,'start',item3.taskStart);
+                //         //   vm.$set(ganttList3,'end',item3.taskEnd);
+                //         //   vm.$set(ganttList3,'duration',item3.taskDuration);
+                //         //   this.loadGanttList.tasks.push(ganttList3);
+                //         //   console.log(this.loadGanttList);
+                //         // })
+                // })
+              })
+            })
             if (this.taskIndexData == null) {
               this.taskIndexData = [];
             }
-            console.log(JSON.stringify(this.taskIndexData));
+            // console.log(JSON.stringify(this.taskIndexData));
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
           }
         })
       },
+      search(item){
+        item.forEach((val)=>{
+          item=val;
+        })
+          
+        },
       taskUserGroupChange() {
         this.ugList.forEach((item) => {
           if (item.ugId == this.taskUserGroup) {
@@ -2478,6 +2556,14 @@
           }
         })
       },
+      //点击新增甘特图
+      addGanttTask(){
+        var tableInfo = $(".gdfTable");
+        console.log(tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value);
+        // $('#workSpace').trigger('moveUpCurrentTask.gantt');return false;//上移
+        // $('#workSpace').trigger('moveDownCurrentTask.gantt');return false;//下移
+        // $('#workSpace').trigger('deleteFocused.gantt');return false;
+      },
       //点击新增任务
       addTask() {
         this.addTaskDialog = true;
@@ -2730,6 +2816,19 @@
         } else {
           this.showText1 = true;
         }
+      },
+      deleteGanttTab(){
+        this.deleteTaskDialog = true;
+        var tableInfo = $(".gdfTable");
+        console.log(tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value);
+        // console.log(this.deleteTabObject);
+        this.taskId = tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value;
+        // if (this.deleteTabObject.row.children) {
+        //   this.showText = true;
+        // } else {
+        //   this.showText1 = true;
+        // }
+
       },
       deleteTaskMakeSure() {
         axios({
@@ -3475,6 +3574,8 @@
         this.initGantt();
       },
       initGantt() {
+        // this.loadGanttList={}
+        // var canWrite=true;
         this.ge = new GanttMaster(this);
         this.ge.set100OnClose = true;
 
@@ -3493,6 +3594,7 @@
 
         this.ge.loadProject(project);
         this.ge.checkpoint();
+        // this.loadGanttList={}
       },
       upgrade() {
 
@@ -3561,30 +3663,7 @@
         return ret;
       },
       getDemoProject(){
-        var ret= {"tasks":    [
-          {"id": -1, "name": "Gantt editor", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 0, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 20, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-          {"id": -2, "name": "coding", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 1, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 10, "end": 1398203999999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-          {"id": -3, "name": "gantt part", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 2, "end": 1397167199999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-          {"id": -4, "name": "editor part", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "3", "canWrite": true, "start": 1397167200000, "duration": 4, "end": 1397685599999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-          {"id": -5, "name": "testing", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 1, "status": "STATUS_SUSPENDED", "depends": "2:5", "canWrite": true, "start": 1398981600000, "duration": 5, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-          {"id": -6, "name": "test on safari", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "", "canWrite": true, "start": 1398981600000, "duration": 2, "end": 1399327199999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-          {"id": -7, "name": "test on ie", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "6", "canWrite": true, "start": 1399327200000, "duration": 3, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-          {"id": -8, "name": "test on chrome", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "6", "canWrite": true, "start": 1399327200000, "duration": 2, "end": 1399499999999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false}
-        ], "selectedRow": 2, "deletedTaskIds": [],
-          "resources": [
-            {"id": "tmp_1", "name": "Resource 1"},
-            {"id": "tmp_2", "name": "Resource 2"},
-            {"id": "tmp_3", "name": "Resource 3"},
-            {"id": "tmp_4", "name": "Resource 4"}
-          ],
-          "roles":       [
-            {"id": "tmp_1", "name": "Project Manager"},
-            {"id": "tmp_2", "name": "Worker"},
-            {"id": "tmp_3", "name": "Stakeholder"},
-            {"id": "tmp_4", "name": "Customer"}
-          ], "canWrite":    true, "canDelete":true, "canWriteOnParent": true, canAdd:true}
-
-
+        var ret=this.loadGanttList;
         //actualize data
         var offset=new Date().getTime()-ret.tasks[0].start;
         for (var i=0;i<ret.tasks.length;i++) {
@@ -3613,7 +3692,7 @@
   }
 
   #taskIndex {
-
+    height: 100%;
     .dialog {
       top: 15vh;
       left: 50%;
@@ -3726,13 +3805,17 @@
       background: #000;
     }
     #GroupSelect {
-      display: block;
+      // display: block;
+      // position: fixed;
+      // top: 77px;
+      // z-index: 1000;
+      // right: 24px;
+      display: inline-block;
+      float: right;
+      margin-top:-40px;
+      margin-right:10px;
       width: 168px;
       height: 30px;
-      position: fixed;
-      top: 77px;
-      z-index: 1000;
-      right: 24px;
       .inp-search {
         width: 168px;
         border-radius: 15px;
@@ -3757,8 +3840,8 @@
         background-image: url('../Settings/images/sanjiao.png');
         background-size: 100% 100%;
         content: '';
-        top: 12px;
-        right: 11px;
+        top: 19px;
+        right: 18px;
       }
     }
     .topHeader {
@@ -3896,45 +3979,63 @@
 
       }
       .taskBody {
-        margin-top: 70px;
+        margin-top: 60px;
         width: 100%;
         overflow-y: auto;
       }
     }
     // 左侧
     .box-left-container {
-      display: block;
-      position: fixed;
-      top: 115px;
-      left: 26px;
-      bottom: 0;
-      right: 225px;
-      // z-index: 1001;
-      transition: all ease .5s;
-      overflow: auto;
+      // display: block;
+      // position: fixed;
+      // top: 115px;
+      // left: 26px;
+      // bottom: 0;
+      // right: 225px;
+      // // z-index: 1001;
+      // transition: all ease .5s;
+      // overflow: auto;
+        display: inline-block;
+        width: 85%;
+        position: relative;
+        // margin-top:109px;
+        // margin-left:24px;
+        // z-index: 1001;
+        transition:  all ease .5s;
 
     }
     .box-left-active {
-      right: 0px;
-      transition: all ease .5s;
-      .icon-right {
-        transform: rotateZ(180deg) !important;
-        transition: all ease .5s;
+      width: 98%;
+      transition:  all ease .5s;
+      .icon-right{
+          transform: rotateZ(180deg)!important;
+          transition: all ease .5s;
       }
     }
     // 右侧
     .box-right-container {
-      display: block;
-      position: fixed;
-      right: -225px;
-      bottom: 0;
-      width: 250px;
-      padding-left: 25px;
-      top: 116px;
-      transition: all ease .5s;
-      background: #ffffff;
-      z-index: 10;
-      overflow-y: auto;
+      // display: block;
+      // position: fixed;
+      // right: -225px;
+      // bottom: 0;
+      // width: 250px;
+      // padding-left: 25px;
+      // top: 116px;
+      // transition: all ease .5s;
+      // background: #ffffff;
+      // z-index: 10;
+      // overflow-y: auto;
+        display: inline-block;
+        position: relative;
+        float: right;
+        width: 15%;
+        // margin-top: -763px;
+        transition: all ease .5s;
+        background: #ffffff;
+        z-index: 10;
+        height: 785px;
+        overflow-y: auto;
+        overflow-x: hidden;
         #center-selection {
           position: absolute;
           top: 0;
@@ -4084,11 +4185,12 @@
         }
     }
     .box-right-active1{
-        right:0px;
-        transition:all ease .5s;
+        width: 2%;
+        transition: all ease .5s;
       }
     #box-right{
             padding: 19px 13px 0 10px;
+            margin-left:24px;
             #taskInformation{
                 display: none;
                 >li:last-of-type{
@@ -4446,6 +4548,7 @@
             }
     }
     #box-right1 {
+      
       .addResourceType {
         .action {
           color: #78a0f8;
@@ -4456,9 +4559,11 @@
           margin-top: 10px;
           margin-bottom: 10px;
         }
-
         height: 30px;
         border-bottom: 1px solid #e6e6e6;
+        // width: 100%;
+        // float: right;
+        // margin-left:10px;
       }
       .resourceList {
         width: 100%;
@@ -5437,7 +5542,9 @@
       .zk-table {
         color: #333333;
       }
-
+      .zk-table__body-row{
+        height: 36px;
+      }
       .zk-table--tree-icon {
         position: relative;
         width: 40px;
@@ -5468,6 +5575,7 @@
       .zk-table__body-row > td:first-of-type {
         width: 45px;
       }
+
 
       .zk-table--level-4-cell, .zk-table--level-3-cell, .zk-table--level-2-cell, .zk-table--level-1-cell, .zk-table--level-5-cell {
         position: relative;

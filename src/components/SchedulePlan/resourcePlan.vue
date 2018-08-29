@@ -1,6 +1,6 @@
 <template>
     <div id="resourcePlan">
-        <div class="topHeader">
+        <div :class="['topHeader',{'topHeaderWgl':!webGlShow}]">
             <div id="item-box-file">
                 <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
                 个人日历  
@@ -180,6 +180,7 @@ export default{
     },
     data(){
         return {
+            webGlShow:this.$route.params.id,
             title:'',//显示当前时间
             deleteResourcePlanDialog:false,//删除任务资源弹窗
             addResourceTypeDialog:false,//增加资源任务树形弹窗
@@ -252,7 +253,7 @@ export default{
                 },
                 title: {
                    
-                    text: '资源计划'
+                    text: ''
                 },
                 xAxis: {
                 categories:[]
@@ -334,7 +335,9 @@ export default{
         var vm = this
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
-        vm.userId  = localStorage.getItem('userid')
+        vm.userId  = localStorage.getItem('userid');
+        this.webGlShow=localStorage.getItem('webGlShow');
+        console.log(this.webGlShow);
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getcurTime();
@@ -342,6 +345,7 @@ export default{
         this.getLineDataOfMonth();    
     },
     mounted(){
+        console.log(this.webGlShow)
         console.log('更新')
         this.isActive.item1=true;
         this.getResouceType();
@@ -2302,12 +2306,15 @@ export default{
     #resourcePlan{
         .topHeader{
             box-sizing: border-box;
-            position: fixed;
-            top: 116px;
-            left: 26px;
-            bottom:0;
-            right: 0;
+            float: left;
+            width: 100%;
             overflow: auto;
+            max-height: 800px;
+        }
+         ::-webkit-scrollbar{width:0px}
+        .topHeaderWgl{
+            float: left;
+
         }
         #item-box-file{
             display: block;
@@ -2438,8 +2445,15 @@ export default{
                 .planTabel{
                     border-collapse:collapse;
                     border: 1px solid #e6e6e6;
+                    // display:block;  
+                    height:270px;  
+                    // width:100%;
+                    // overflow-y:scroll;
                     thead{
                         background:#f2f2f2;
+                        // display:table;  
+                        // width:100%;
+                        table-layout:fixed;  
                         tr{
                             td{
                                 padding-left:10px;

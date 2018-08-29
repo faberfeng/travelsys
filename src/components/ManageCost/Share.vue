@@ -181,7 +181,7 @@
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -191,7 +191,7 @@
                     <span class="item-version-3  " @click="screenLeft.item = 2">版<br>本</span>
                 </div>
             </div>
-            <div id="box-right" v-if="screenLeft.item == 1">
+            <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 1">
                 <h3 class="header-attribute" style="margin-top:0;">
                     <i class="trrangle"></i>
                     基本属性
@@ -264,7 +264,7 @@
                     </ul>
                 </div>
             </div>
-            <div id="box-right-1" v-else-if="fileCheckedNum == 1">
+            <div id="box-right-1" v-show="screenLeft.show" v-else-if="fileCheckedNum == 1">
                 <p class="head" ><!-- v-if="checkedItem.dirId"-->
                     <i class="icon-goujian icon-search" @click="view()"></i>
                     <i class="icon-goujian icon-download" @click="downLoad()"></i>
@@ -474,14 +474,19 @@
         }
     }
     .box-left-container{
-        display: block;
-        position: fixed;
-        top: 115px;
-        left: 26px;
-        bottom: 0;
-        right: 225px;
+        // display: block;
+        // position: fixed;
+        // top: 115px;
+        // left: 26px;
+        // bottom: 0;
+        // right: 225px;
+        // transition:  all ease .5s;
+        // overflow: auto;
+        display: inline-block;
+        width: 83%;
+        position: relative;
+        margin-left:24px;
         transition:  all ease .5s;
-        overflow: auto;
         #planeFigureDiv{
             overflow: auto;
             position: absolute;
@@ -908,7 +913,7 @@
                 tbody{
                     tr{
                         td{
-                            height: 54px;
+                            height: 36px;
                             text-align: left;
                             box-sizing: border-box;
                             font-size: 14px;
@@ -978,12 +983,12 @@
         }
     }
     .box-left-avtive{
-         right: 0px;
-          transition:  all ease .5s;
-          .icon-right{
-              transform: rotateZ(180deg)!important;
-              transition: all ease .5s;
-          }
+         width: 96%;
+        transition:  all ease .5s;
+        .icon-right{
+            transform: rotateZ(180deg)!important;
+            transition: all ease .5s;
+        }
     }
     .el-main{
         padding: 0;
@@ -1022,17 +1027,28 @@
       右侧
     */
     .box-right-container{
-        display: block;
-        position: fixed;
-        right: -225px;
-        bottom: 0;
-        width: 250px;
-        padding-left: 25px;
-        top: 116px;
+        // display: block;
+        // position: fixed;
+        // right: -225px;
+        // bottom: 0;
+        // width: 250px;
+        // padding-left: 25px;
+        // top: 116px;
+        // transition: all ease .5s;
+        // background: #ffffff;
+        // z-index: 10;
+        // overflow-y: auto;
+        display: inline-block;
+        position: relative;
+        float: right;
+        width: 15%;
+        // margin-top: -763px;
         transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
+        height: 785px;
         overflow-y: auto;
+        overflow-x: hidden;
            #center-selection{
             position: absolute;
             top: 0;
@@ -1229,11 +1245,12 @@
         }
     }
     .box-right-avtive{
-        right: 0;
-         transition: all ease .5s;
+        width: 2%;
+        transition: all ease .5s;
     }
     #box-right{
         padding: 19px 13px 0 10px;
+        margin-left:24px;
         #basicAttributes{
             display: none;
             >li:last-of-type{

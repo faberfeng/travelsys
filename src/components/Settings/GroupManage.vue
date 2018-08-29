@@ -915,10 +915,10 @@ export default {
           margin: 0;
     }
     .title{
-        position: fixed;
-        top: 115px;
+        position: absolute;
+        top: -53px;
         bottom: 0;
-        left: 218px;
+        left: 0px;
         right: 0px;
         color: #fc343a;
         font-size: 18px;
@@ -940,8 +940,8 @@ export default {
     }
     .container-right{
         display: block;
-        position: fixed;
-        top: 166px;
+        position: absolute;
+        top: 0px;
         bottom: 0;
         right: 0;
         width: 288px;
