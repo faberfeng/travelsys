@@ -1100,23 +1100,23 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-  import './jQueryGantt/platform.css'
-  import './jQueryGantt/gantt.css'
-  import './jQueryGantt/ganttPrint.css'
-  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css'
-  import './jQueryGantt/libs/jquery/jquery.livequery.1.1.1.min.js'
-  import './jQueryGantt/libs/jquery/jquery.timers.js'
-  import './jQueryGantt/libs/utilities.js'
-  import './jQueryGantt/libs/forms.js'
-  import './jQueryGantt/libs/date.js'
-  import './jQueryGantt/libs/dialogs.js'
-//  import './jQueryGantt/libs/layout.js'
-  // import './components/SchedulePlan/jQueryGantt/libs/i18nJs.js'
-  import './jQueryGantt/libs/jquery/dateField/jquery.dateField.js'
-//  import './jQueryGantt/libs/jquery/JST/jquery.JST.js'
-  import './jQueryGantt/libs/jquery/svg/jquery.svg.min.js'
-  import './jQueryGantt/libs/jquery/svg/jquery.svgdom.1.8.js'
-  import {GanttMaster} from './jQueryGantt/ganttMaster.js'
+  import './Gantt/platform.css'
+  import './Gantt/gantt.css'
+  import './Gantt/ganttPrint.css'
+  import './Gantt/libs/jquery/dateField/jquery.dateField.css'
+  import './Gantt/libs/jquery/jquery.livequery.1.1.1.min.js'
+  import './Gantt/libs/jquery/jquery.timers.js'
+  import './Gantt/libs/utilities.js'
+  import './Gantt/libs/forms.js'
+  import './Gantt/libs/date.js'
+  import './Gantt/libs/dialogs.js'
+//  import './Gantt/libs/layout.js'
+  // import './components/SchedulePlan/Gantt/libs/i18nJs.js'
+  import './Gantt/libs/jquery/dateField/jquery.dateField.js'
+//  import './Gantt/libs/jquery/JST/jquery.JST.js'
+  import './Gantt/libs/jquery/svg/jquery.svg.min.js'
+  import './Gantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+  import {GanttMaster} from './Gantt/ganttMaster.js'
 
   import commonList from './qingdan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
@@ -5257,10 +5257,10 @@
 
 <style lang="less">
  #taskIndex{
-  // @import './jQueryGantt/platform.css';
-  // @import './jQueryGantt/libs/jquery/dateField/jquery.dateField.css';
-  // @import './jQueryGantt/gantt.css';
-  // @import './jQueryGantt/ganttPrint.css';
+  // @import './Gantt/platform.css';
+  // @import './Gantt/libs/jquery/dateField/jquery.dateField.css';
+  // @import './Gantt/gantt.css';
+  // @import './Gantt/ganttPrint.css';
       // * {
       //   margin: 0;
       //   padding: 0;
