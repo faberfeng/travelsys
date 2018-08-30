@@ -1566,6 +1566,7 @@
         colorValueList: [],
         colorValueList1: [],
         ge:"",
+        rowJson:'',
         loadGanttList:{
             tasks: [
               
@@ -1947,20 +1948,43 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex) {
-        console.log(row);
         console.log(rowIndex);
+        // console.log(JSON.stringify(row));
+        // this.rowJson=JSON.stringify(row);
+        // console.log(row.isTrusted)
+        // this.rowStyle();
+        if(row.path[2].style.color=='red'){
+          row.path[2].style.color='black'
+        }else{
+            row.path[2].style.color='red';
+            }
+        
+        console.log(row.path[2]);
+        // row.path[2].style.backgroundcolor=='white'
+        console.log(row.path);
+        // row.path[2]="red";
+        // row.path[0].bgColor='red'
+        // if(row.isTrusted==true){
+        //   console.log(row.path);
+        // }
+        // if(row.isTrusted==true){
+        //  console.log(row.MouseEvent.path)
+        // }
+        // console.log(rowIndex);
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
           if (item._isHover == true) {
             this.taskId = item.taskId
             this.taskParId = item.taskParId
+            
           }
         })
         this.getTask();
         this.getVerifyList();
         this.getEntityRelation();
         this.getTaskResourceTaskList();
+        
 
       },
       rowKey(row, rowIndex) {
@@ -3192,13 +3216,14 @@
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
-
                     this.addAssociationListDialog=false;
                     this.getLoadManifest();
                     this.getEntityRelation();
                     this.checkedItem={};
                     this.loadManifestList=[];
-                    alert(response.data.msg);
+                    if(response.data.msg!=null){
+                      alert(response.data.msg);
+                    }
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }

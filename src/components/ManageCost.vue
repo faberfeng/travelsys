@@ -14,7 +14,7 @@
             <!-- <button class="backTop">回到顶部</button> -->
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">

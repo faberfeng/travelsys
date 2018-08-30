@@ -11,7 +11,7 @@
             <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">
