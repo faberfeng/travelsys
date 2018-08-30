@@ -214,7 +214,7 @@
                 <el-dialog  title="媒体路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
                     <div class="mediaUrl">
                         <div class="urlWord">目标URL</div>
-                        <div class="urlInp"><el-input v-model="mediaUrl"></el-input></div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="mediaUrl"/></div>
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addResourceMakeSure1">保存</button>
@@ -248,7 +248,7 @@
                 <el-dialog title="媒体路径选择" :visible.sync="updateResourceDialog1" @close="updateResourceCancle1">
                     <div class="mediaUrl">
                         <div class="urlWord">目标URL</div>
-                        <div class="urlInp"><el-input v-model="mediaUrl"></el-input></div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="mediaUrl"/></div>
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="updateResourceMakeSure1">保存</button>
@@ -1562,6 +1562,22 @@ export default {
                     margin-bottom: 25px;
                 }
                 .urlInp{
+                    .urlInp_inner{
+                        background-color: #fff;
+                        background-image: none;
+                        border-radius: 4px;
+                        border: 1px solid #dcdfe6;
+                        box-sizing: border-box;
+                        color: #606266;
+                        display: inline-block;
+                        font-size: inherit;
+                        height: 37px;
+                        line-height: 1;
+                        outline: 0;
+                        padding: 0 15px;
+                        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+                        width: 440px;
+                    }
 
                 }
 
@@ -1572,9 +1588,9 @@ export default {
 </style>
 
 <style lang="less">
-.el-input__inner{
-    width:450px !important;
-}
+// .el-input__inner{
+//     width:450px !important;
+// }
 .tree{
     height:350px;
     margin:0px 100px;

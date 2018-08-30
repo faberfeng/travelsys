@@ -6,7 +6,7 @@
       </select>
       <i class="icon-sanjiao"></i>
     </div>
-    <div :class="[{'box-left-active':!screenLeft.show},'box-left-container']">
+    <div :class="[{'box-left-active':!screenLeft.show},'box-left-container',{'gantt_left':!hiddenGanttList}]">
       <div style="min-width: 950px;overflow-y: auto;">
         <div id="item-box-file">
           <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">
@@ -27,7 +27,7 @@
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                 </span>
-            <span class="icon-type" ></span>
+            <span class="icon-type"  @click="getGanttList"></span>
             <!-- @click="getGanttList" -->
           </div>
         </div>
@@ -75,7 +75,8 @@
               </zk-table>
             </div>
           </div>
-          <div v-show="!hiddenGanttList" class="taskWarp">
+          <!-- 以下是以前的gantt图 -->
+          <div v-show="!hiddenGanttList" class="taskWarp1">
             <!-- <div class="taskHead">
               <div class="taskHeadLeft" @click="addGanttTask">
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
@@ -91,7 +92,7 @@
                 <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
               </div>
             </div> -->
-            <div class="taskBody">
+            <div class="taskBody1">
               <div id="workSpace"
                    style="padding:0px; overflow-y:auto; overflow-x:hidden;border:1px solid #e5e5e5;position:relative;margin:0 5px">
               </div>
@@ -101,7 +102,6 @@
       </div>
     </div>
     <div id="gantEditorTemplates" style="display:none;">
-      $('#workSpace').trigger('moveUpCurrentTask.gantt');return false;
       <div class="__template__" type="GANTBUTTONS"></div>
       <div class="__template__" type="TASKSEDITHEAD"></div>
       <div class="__template__" type="TASKROW"></div>
@@ -114,7 +114,7 @@
       <div class="__template__" type="RESOURCE_ROW"></div>
     </div>
 
-    <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']" v-if="!showCommonList">
+    <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']" v-show="hiddenGanttList" v-if="!showCommonList">
       <div id="center-selection">
         <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
           <i class="icon-right"></i>
@@ -263,10 +263,10 @@
             <li class="uploadFileLi" v-for="(item,index) in fileList" :key="index">
               <span class="uploadFileText">{{item.fileName}}</span>
               <span class="icon">
-                                <i class="icon-goujian icon-search" @click="searchsPic(item.filePath)"></i>
-                                <i class="icon-goujian icon-download" @click="downLoadPic(item.filePath)"></i>
-                                <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
-                            </span>
+                  <i class="icon-goujian icon-search" @click="searchsPic(item.filePath)"></i>
+                  <i class="icon-goujian icon-download" @click="downLoadPic(item.filePath)"></i>
+                  <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
+              </span>
             </li>
           </ul>
         </div>
@@ -281,10 +281,10 @@
             <li class="bindPicLi" v-for="(item,index) in attachList" :key="index">
               <span class="bindPicText">{{item.fileName}}</span>
               <span class="icon">
-                                <i class="icon-goujian icon-search" @click="searchs(item.relativePath)"></i>
-                                <i class="icon-goujian icon-download" @click="downLoad(item.relativePath)"></i>
-                                <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
-                    </span>
+                  <i class="icon-goujian icon-search" @click="searchs(item.relativePath)"></i>
+                  <i class="icon-goujian icon-download" @click="downLoad(item.relativePath)"></i>
+                  <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
+              </span>
             </li>
           </ul>
         </div>
@@ -1101,7 +1101,10 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-  
+  // import './Gantt/platform.css'
+  import './Gantt/gantt.css'
+  import './Gantt/ganttPrint.css'
+  import './Gantt/libs/jquery/dateField/jquery.dateField.css'
   import './Gantt/libs/jquery/jquery.livequery.1.1.1.min.js'
   import './Gantt/libs/jquery/jquery.timers.js'
   import './Gantt/libs/utilities.js'
@@ -1115,11 +1118,9 @@
   import './Gantt/libs/jquery/svg/jquery.svg.min.js'
   import './Gantt/libs/jquery/svg/jquery.svgdom.1.8.js'
   import {GanttMaster} from './Gantt/ganttMaster.js'
-
   import commonList from './qingdan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
-
   export default {
     name: 'taskIndex',
     data() {
@@ -1565,6 +1566,7 @@
         colorValueList: [],
         colorValueList1: [],
         ge:"",
+        rowJson:'',
         loadGanttList:{
             tasks: [
               
@@ -1595,7 +1597,7 @@
 
     },
     watch: {
-      selectUgId: function (val) {
+      'selectUgId': function (val) {
         var vm = this
         this.getTaskList();
       },
@@ -1946,20 +1948,43 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex) {
-        console.log(row);
         console.log(rowIndex);
+        // console.log(JSON.stringify(row));
+        // this.rowJson=JSON.stringify(row);
+        // console.log(row.isTrusted)
+        // this.rowStyle();
+        if(row.path[2].style.color=='red'){
+          row.path[2].style.color='black'
+        }else{
+            row.path[2].style.color='red';
+            }
+        
+        console.log(row.path[2]);
+        // row.path[2].style.backgroundcolor=='white'
+        console.log(row.path);
+        // row.path[2]="red";
+        // row.path[0].bgColor='red'
+        // if(row.isTrusted==true){
+        //   console.log(row.path);
+        // }
+        // if(row.isTrusted==true){
+        //  console.log(row.MouseEvent.path)
+        // }
+        // console.log(rowIndex);
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
           if (item._isHover == true) {
             this.taskId = item.taskId
             this.taskParId = item.taskParId
+            
           }
         })
         this.getTask();
         this.getVerifyList();
         this.getEntityRelation();
         this.getTaskResourceTaskList();
+        
 
       },
       rowKey(row, rowIndex) {
@@ -3191,13 +3216,14 @@
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
-
                     this.addAssociationListDialog=false;
                     this.getLoadManifest();
                     this.getEntityRelation();
                     this.checkedItem={};
                     this.loadManifestList=[];
-                    alert(response.data.msg);
+                    if(response.data.msg!=null){
+                      alert(response.data.msg);
+                    }
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -3548,6 +3574,8 @@
       //获得甘特图列表
       getGanttList() {
         this.hiddenGanttList = !this.hiddenGanttList;
+        //  this.ge = new GanttMaster(this);
+        // this.ge.reset();
         this.updateGanttCollapse();
         this.initGantt();
       },
@@ -3555,8 +3583,8 @@
         // this.loadGanttList={}
         // var canWrite=true;
         this.ge = new GanttMaster(this);
+        // this.ge.reset();
         this.ge.set100OnClose = true;
-
         this.ge.shrinkParent = true;
 
         this.ge.init($("#workSpace"));
@@ -3653,11 +3681,11 @@
     },
   }
 </script>
+<style scoped>
+  
+</style>
 <style lang="less" scoped>
-  @import './Gantt/platform.css';
-  @import './Gantt/gantt.css';
-  @import './Gantt/ganttPrint.css';
-  @import './Gantt/libs/jquery/dateField/jquery.dateField.css';
+  
    *{
         margin: 0;
         padding: 0;
@@ -3882,6 +3910,7 @@
           padding-right: 40px;
           margin-right: 5px;
           outline: none;
+          font-size:14px;
           &:focus {
             background: #ffffff;
           }
@@ -3923,12 +3952,14 @@
         }
       }
     }
+    ::-webkit-scrollbar{width:0px}
     .taskWarp {
       width: 96%;
       margin-top: 20px;
       padding: 12px;
       margin: 0 auto;
       box-sizing: border-box;
+      height: 750px; 
       .taskHead {
         margin-top: 20px;
         .taskHeadLeft {
@@ -3966,6 +3997,19 @@
         overflow-y: auto;
       }
     }
+    .taskWarp1{
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      height: 750px; 
+      .taskBody1 {
+        margin-top: 60px;
+        width: 100%;
+        overflow-y: auto;
+      }
+    }
     // 左侧
     .box-left-container {
       // display: block;
@@ -3985,6 +4029,9 @@
         // z-index: 1001;
         transition:  all ease .5s;
 
+    }
+    .gantt_left{
+      width: 100% !important;
     }
     .box-left-active {
       width: 98%;
@@ -4664,6 +4711,7 @@
                   background: #fafafa;
                   padding-left: 10px;
                   margin-top: 5px;
+                  font-size: 14px;
                 }
                 .editBodytwoLeft {
                   height: 40px;
@@ -5529,6 +5577,10 @@
       }
       .zk-table__body-row{
         height: 36px;
+        box-sizing:border-box
+      }
+      .zk-table__cell-inner{
+        padding:5px 12px;
       }
       .zk-table--tree-icon {
         position: relative;

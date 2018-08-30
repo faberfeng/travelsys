@@ -11,7 +11,7 @@
                     </div>
                     <div class="func_area">
                         <div class="limits">
-                            <span class="icon-eye" >视点</span>
+                            <span class="icon-eye" @click="viewPoin()" >视点</span>
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>

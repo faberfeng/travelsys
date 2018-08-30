@@ -11,7 +11,7 @@
             <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -163,7 +163,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
-        this.getInitdata();
+        
     },
     mounted(){
         var height = ''
@@ -201,7 +201,6 @@ export default {
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
-
 				break;
 			case "CurrentSelectedEnt":
 				break;
@@ -265,8 +264,10 @@ export default {
                 }else{
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
-                    localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
+                    localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId);
+                    this.subProjId=response.data.rt.defaultSubProjId;
                     vm.getUserInfo();
+                    vm.getInitdata();
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -414,7 +415,7 @@ export default {
                     path:'/SchedulePlan/personalCalendar'
                 });
                 this.navigationPath = tab.name;
-                sessionStorage.setItem('navigationPath',this.navigationPath)
+                sessionStorage.setItem('navigationPath',this.navigationPath);
             }else if(tab.label === '设计管理'){
                 this.$router.push({
                     path:'/Design/management'

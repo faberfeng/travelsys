@@ -1228,10 +1228,10 @@
         // transition:  all ease .5s;
         // overflow: auto;
         display: inline-block;
-        width: 83%;
+        width: 85%;
         position: relative;
         // margin-top:109px;
-        margin-left:24px;
+        // margin-left:24px;
         // z-index: 1001;
         transition:  all ease .5s;
         #planeFigureDiv{
@@ -1720,7 +1720,7 @@
         }
     }
     .box-left-avtive{
-        width: 96%;
+        width: 98%;
         transition:  all ease .5s;
           .icon-right{
               transform: rotateZ(180deg)!important;
@@ -2145,6 +2145,7 @@
         .head{
             padding: 11px 0 12px;
             height: 48px;
+            margin-left:20px;
             border-bottom: 1px solid #cccccc;
             position: relative;
               .icon-goujian{
@@ -2194,7 +2195,7 @@
                 }
         }
         .item-version{
-            margin:10px 15px 0 10px;
+            margin:10px 15px 0 30px;
             border-bottom: 1px solid #e6e6e6;
             .img{
                 float: left;

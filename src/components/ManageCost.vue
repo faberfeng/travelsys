@@ -14,7 +14,7 @@
             <!-- <button class="backTop">回到顶部</button> -->
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.22/index.html"  ></iframe>
+                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -147,18 +147,13 @@ export default {
             //  localStorage.setItem('webGlShow',this.webGlShow)
             this.webGlShow=!this.webGlShow
             localStorage.setItem('webGlShow',this.webGlShow)
-            this.$router.push({
-                params: {
-                id:'123'
-                }
-            })
-            // localStorage.setItem('webGlShow',this.webGlShow)
-            if(app){
-                
-            }else{
+            // this.$router.push({
+            //     params: {
+            //     id:'123'
+            //     }
+            // })
             app = this.$refs.iframe1.contentWindow
             app.postMessage({command:"Init",parameter:null},"*");
-            }
         },
         callback(e){
            // console.log(e)
@@ -179,10 +174,15 @@ export default {
 			case "ViewpointSubmited":
 
 				// ScreenPara = e.data.parameter
-
-				break;
+                break;
 		    }
         },
+        AddViewpoint(){
+		    app.postMessage({command:"AddViewpoint",parameter:123},"*");
+        },
+         MoveToViewpoint(){
+		    app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
+	    },
         //获取项目模型展示初始化数据
         getInitdata(){
             axios({
@@ -196,6 +196,7 @@ export default {
                 this.InitdataList=JSON.parse(response.data.rt);
                 this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
                 this.WebGlId=String(this.WebGlId);
+                // cosole.log(this.WebGlId);
                 this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
 
