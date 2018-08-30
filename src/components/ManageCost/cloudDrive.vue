@@ -298,7 +298,22 @@
                     </ul>
                 </div>
                 <div v-else>
-                     <h3 class="header-attribute" style="margin-top:0px;">
+                    <h3 class="header-attribute" style="margin-top:0px;">
+                        <i class="trrangle"></i>
+                        基本属性
+                        <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                    </h3>
+                    <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
+                            <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
+                        </li>
+                        <li class="detial-item clearfix">
+                            <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
+                            <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
+                        </li>
+                    </ul>
+                    <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
                         基本属性
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>

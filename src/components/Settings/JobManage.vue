@@ -103,8 +103,8 @@
             </div>
             <div class="log-head clearfix" v-else>
                 <span class="log-head-title">岗位名称:</span>
-                <el-radio  v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
-                <el-radio  v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
+                <el-radio :disabled="isD" v-model="jobDetial.posType" label="1">工程内岗位</el-radio>
+                <el-radio :disabled="isD" v-model="jobDetial.posType" label="2">合作方岗位</el-radio>
             </div>
             <div  class="JobName">
                 <input type="text" v-model="jobDetial.posName" placeholder="请输入" :disabled='checkName(jobDetial.posName)'>
@@ -173,6 +173,7 @@ export default {
             checkCode:[],
             idDefault:false,
             defaultCode:'1',
+            isD:false,
         }
     },
     watch:{
@@ -324,25 +325,27 @@ export default {
             rows.splice(index, 1);
         },
         addUser(type,name,val){
+            console.log(type)
             var vm = this;
             vm.adduser = true;
             if(val){
+                vm.isD = true;
+                
                 vm.jobDetial.posName = name;
                 vm.jobDetial.posType = ''+type;
                 vm.jobID = parseInt(val)
                 vm.title = '修改岗位'
+                if(type ==4 ){
+                    vm.jobDetial.posType = ''+2;
+                }
                 vm.getJobShuXingTu()//获取某val的权限
             }else{
+                vm.isD = false
                 vm.jobDetial.posName = '';
                 vm.jobDetial.posType = '1';
                 vm.jobID = 0
                 vm.title = '增加岗位'
                 vm.getJobShuXingTu()//获取某val的权限
-            }
-            if(type == 1 || type == 2){
-                vm.idDefault = false
-            }else if(type == 3 || type == 4){
-                vm.idDefault = true
             }
         },
         userClose(){
@@ -457,10 +460,6 @@ export default {
 <style scoped>
     .wrapper{
         width: 100%;
-        display: block;
-        height: 800px;
-        overflow-y: auto;
-        overflow-x: hidden;
     }
     ::-webkit-input-placeholder { /* WebKit browsers */
     color:    #999999;

@@ -500,7 +500,8 @@ export default {
                         token:this.token,
                     },
                     params:{
-                        projId:this.projId,
+                        projectId:this.projId,
+                        items:''
                     },
                     data:formData
                 }).then(response=>{

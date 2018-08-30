@@ -1535,26 +1535,31 @@ export default {
             this.addNewWuliao();
         },
         shujuSure(){
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/report/addMaterialDetail',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    detailId:this.selcetedItem.detailId,
-                    relaType:this.selcetedItem.relaType,
-                    projectId:this.projId,
-                    componentCount:this.selcetedItem.componentCount
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getSnapWorkAmountList();
-                    this.shujugaikuangshow = false;
-                }else{
-                    alert(response.data.msg);
-                }
-            })
+            if(this.checkedResults.hasOut == 0){
+                alert("没有可导入的数据");
+                this.shujugaikuangshow = false;
+            }else{
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/report/addMaterialDetail',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        detailId:this.selcetedItem.detailId,
+                        relaType:this.selcetedItem.relaType,
+                        projectId:this.projId,
+                        componentCount:this.selcetedItem.componentCount
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getSnapWorkAmountList();
+                        this.shujugaikuangshow = false;
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            } 
         },
         shujuNotSure(){
             this.shujugaikuangshow = false;

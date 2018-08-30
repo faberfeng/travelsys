@@ -67,12 +67,13 @@
                 <span class="icon icon-delect-qun" @click="deleteQR(item.ugId,item.ugName)"></span>
             </li>
         </ul>
-        <h1 class="icon-title icon-subcomany" v-text="'项目公司【'+subCompanyName+'】的部门及合作单位'"></h1>
+        <!--一下功能暂未用到，所以隐藏了，不可删-->
+        <!-- <h1 class="icon-title icon-subcomany" v-text="'项目公司【'+subCompanyName+'】的部门及合作单位'"></h1>
         <ul style="max-height:200px;overflow-y:auto;">
             <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in subCompanyList" :key="key" @click="changeQR(item.ugId,key,item,true)">
                 <span class='title-qun' v-text="item.ugName"></span>
             </li>
-        </ul>
+        </ul> -->
       </div>
       <!--添加用户弹窗-->
       <el-dialog
