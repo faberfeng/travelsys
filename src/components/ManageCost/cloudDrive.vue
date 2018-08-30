@@ -268,7 +268,7 @@
                         <i class="trrangle"></i>
                         绑定构件
                         <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
-                        <i class="icon-dropDown1"  @click="showExtension"></i>
+                        <i class="el-icon-plus icon-dropDown1"  @click="showExtension"></i>
                     </h3>
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
