@@ -27,7 +27,8 @@
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                 </span>
-            <span class="icon-type" @click="getGanttList"></span>
+            <span class="icon-type" ></span>
+            <!-- @click="getGanttList" -->
           </div>
         </div>
         <div v-if="!showCommonList">
@@ -283,7 +284,7 @@
                                 <i class="icon-goujian icon-search" @click="searchs(item.relativePath)"></i>
                                 <i class="icon-goujian icon-download" @click="downLoad(item.relativePath)"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
-                            </span>
+                    </span>
             </li>
           </ul>
         </div>
@@ -1100,10 +1101,7 @@
   import axios from 'axios';
   //import $ from 'jquery';
   //引入gantt图
-  import './Gantt/platform.css'
-  import './Gantt/gantt.css'
-  import './Gantt/ganttPrint.css'
-  import './Gantt/libs/jquery/dateField/jquery.dateField.css'
+  
   import './Gantt/libs/jquery/jquery.livequery.1.1.1.min.js'
   import './Gantt/libs/jquery/jquery.timers.js'
   import './Gantt/libs/utilities.js'
@@ -3656,6 +3654,10 @@
   }
 </script>
 <style lang="less" scoped>
+  @import './Gantt/platform.css';
+  @import './Gantt/gantt.css';
+  @import './Gantt/ganttPrint.css';
+  @import './Gantt/libs/jquery/dateField/jquery.dateField.css';
    *{
         margin: 0;
         padding: 0;

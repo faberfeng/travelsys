@@ -39,7 +39,8 @@
                                 <span class="fullScreen" @click="fullVideo"></span>
                             </div>
                             <div class="video_body">
-                                <video id="videoPlay" width="100%" height="88%" controls="controls" ref="video" allowfullscreen="true" :src="pathVideoUrl"></video>
+                                <img v-show="this.mediaUrlList==[]" width="100%" height="310px" src="../../assets/nosource.png" >
+                                <video v-show="this.mediaUrlList!=[]" id="videoPlay" width="100%" height="88%" controls="controls" ref="video" allowfullscreen="true" src="../../assets/nosource.png"></video>
                                 <source type="video/mp4">
                                 your browser does not support the video tag.
                             </div>
@@ -62,10 +63,10 @@
                             </div>
                             <div class="video_body">
                                  <div id="planeDIV" width="200px" height="310px" v-show="!isFullPicture">
-                                    <img width="100%" height="310px" ref="picture" :src="pathPictureUrl" >
+                                    <img width="100%" height="310px" ref="picture" src="../../assets/nosource.png" >
                                 </div>
                                 <div  id="planeDIV1"  v-show="isFullPicture">
-                                    <img width="100%" height="310px" ref="fullPicture" :src="pathPictureUrl" >
+                                    <img width="100%" height="310px" ref="fullPicture" src="../../assets/nosource.png" >
                                     <ul>
                                         <li v-for="(item,index) in imgdetial1" :key="index">
                                             <span :class="['round']" @click="clickQjPic(item.index)"  :style="{'top':(20+item.y/2)+'px','left':(item.x/5)+'px'}">
@@ -94,6 +95,7 @@
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
                             <div class="video_body">
+                                <img width="100%" height="310px" src="../../assets/nosource.png" >
                                 <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe>
                             </div>
                             <div class="video_bottom">
@@ -305,7 +307,7 @@ export default {
                 label: 'name'
             },
             pathVideoUrl:'',
-            pathPictureUrl:'',
+            pathPictureUrl:'../../asset/nopic.png',
             livePathUrl:'',
             isFullPicture:false,
             videoPageTotal:0,

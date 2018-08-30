@@ -207,6 +207,8 @@ export default {
         float: left;
         width: 100%;
         overflow: auto;
+        height: 800px;
+        ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
