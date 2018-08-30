@@ -1459,10 +1459,10 @@ export default {
         // transition: all .5s;
         // overflow-y: scroll;
         display: inline-block;
-        width: 83%;
+        width: 85%;
         position: relative;
         // margin-top:109px;
-        margin-left:24px;
+        // margin-left:24px;
         // z-index: 1001;
         transition:  all ease .5s;
         

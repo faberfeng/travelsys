@@ -163,7 +163,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
-        this.getInitdata();
+        
     },
     mounted(){
         var height = ''
@@ -201,7 +201,6 @@ export default {
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
-
 				break;
 			case "CurrentSelectedEnt":
 				break;
@@ -265,8 +264,10 @@ export default {
                 }else{
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
-                    localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
+                    localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId);
+                    this.subProjId=response.data.rt.defaultSubProjId;
                     vm.getUserInfo();
+                    vm.getInitdata();
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -414,7 +415,7 @@ export default {
                     path:'/SchedulePlan/personalCalendar'
                 });
                 this.navigationPath = tab.name;
-                sessionStorage.setItem('navigationPath',this.navigationPath)
+                sessionStorage.setItem('navigationPath',this.navigationPath);
             }else if(tab.label === '设计管理'){
                 this.$router.push({
                     path:'/Design/management'
