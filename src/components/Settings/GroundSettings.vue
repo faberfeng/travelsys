@@ -973,7 +973,7 @@ export default {
         fileChanged(){
             const list = this.$refs.file.files;
             this.fileName = list[0].name;
-            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
+            this.fileSize = (list[0].size/1024).toFixed(2)+'kb';
             this.filesList = list;
             this.editUnityBundleProperty = true;
             this.listData.forEach(item=>{

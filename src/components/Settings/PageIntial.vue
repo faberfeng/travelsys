@@ -848,7 +848,7 @@ export default {
         },
         groundClose(){
             this.addgroundShow = false;
-            this.$refs.file.files = {};
+            this.$refs.file.files = [];
             this.fileName = '';
         },
         //编辑资源包
@@ -1006,7 +1006,7 @@ export default {
             let list = [];
             list = this.$refs.file.files;
             this.fileName = list[0].name;
-            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
+            this.fileSize = (list[0].size/1024).toFixed(2)+'kb';
             this.filesList = list;
             if(this.fileName.split('.')[1] == 'utr' || this.fileName.split('.')[1] == 'uer'){
                 this.editUnityBundleProperty = true;
