@@ -564,7 +564,6 @@ export default {
         groundTableEdit(scope){
             this.editGorundData = scope.row;
             this.editgroundShow = true;
-            console.log(scope.row);
             this.editUnityPropertyData = ['【不关联任何单体】'];
             this.listData.forEach(item=>{
                 this.editUnityPropertyData.push(item.Name)
@@ -623,7 +622,6 @@ export default {
 
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    console.log(response.data);
                     this.getUnityBundle();
                     this.editgroundShow = false;
                 }else{
