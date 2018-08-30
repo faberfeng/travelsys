@@ -1,12 +1,12 @@
 <template>
   <div id="taskIndex">
     <div id="GroupSelect">
-      <select v-model="selectUgId" class="inp-search">
+      <select v-model="selectUgId"  class="inp-search">
         <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
       </select>
       <i class="icon-sanjiao"></i>
     </div>
-    <div :class="[{'box-left-active':!screenLeft.show},'box-left-container',{'gantt_left':!hiddenGanttList}]">
+    <div :class="[{'box-left-active':!screenLeft.show},'box-left-container',{'goujian':showCommonList},{'gantt_left':!hiddenGanttList}]">
       <div style="min-width: 950px;overflow-y: auto;">
         <div id="item-box-file">
           <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">
@@ -1091,7 +1091,7 @@
       </el-dialog>
     </div>
     <!--下面是报表清单的编码-->
-    <common-list v-on:back="backToH" :mId="checkList.pkId" rType="7" :bId='checkItem.pkId' :title="'构件量清单'"
+    <common-list v-on:back="backToH" :mId="checkList.pkId" rType="7"  :bId='checkItem.pkId' :title="'构件量清单'"
                  v-if="showCommonList"></common-list>
   </div>
 </template>
@@ -1111,10 +1111,10 @@
   import './Gantt/libs/forms.js'
   import './Gantt/libs/date.js'
   import './Gantt/libs/dialogs.js'
-//  import './Gantt/libs/layout.js'
-  // import './components/SchedulePlan/Gantt/libs/i18nJs.js'
+ import './Gantt/libs/layout.js'
+  import './Gantt/libs/i18nJs.js'
   import './Gantt/libs/jquery/dateField/jquery.dateField.js'
-//  import './Gantt/libs/jquery/JST/jquery.JST.js'
+ import './Gantt/libs/jquery/JST/jquery.JST.js'
   import './Gantt/libs/jquery/svg/jquery.svg.min.js'
   import './Gantt/libs/jquery/svg/jquery.svgdom.1.8.js'
   import {GanttMaster} from './Gantt/ganttMaster.js'
@@ -1567,6 +1567,7 @@
         colorValueList1: [],
         ge:"",
         rowJson:'',
+        screenLeftShow:false,
         loadGanttList:{
             tasks: [
               
@@ -1597,7 +1598,7 @@
 
     },
     watch: {
-      'selectUgId': function (val) {
+      selectUgId: function (val) {
         var vm = this
         this.getTaskList();
       },
@@ -1827,8 +1828,6 @@
           if (response.data.rt) {
             var vm=this
             this.taskIndexData = response.data.rt;
-            
-            
             this.taskIndexData.forEach((item)=>{
               var ganttList={}
               vm.$set(ganttList,'id',item.taskId);
@@ -1883,7 +1882,7 @@
                 // })
               })
             })
-            if (this.taskIndexData == null) {
+            if (response.data.rt == null) {
               this.taskIndexData = [];
             }
           } else if (response.data.cd == "-1") {
@@ -2437,6 +2436,10 @@
                   this.taskId="";
                   this.taskParId="";
                   this.taskName="";
+                  this.$message({
+                        type:'success',
+                        message:'群组权限保存成功'
+                    })
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -2651,6 +2654,11 @@
       },
       removeTaskRowClick(row, rowIndex) {
         this.selectRowList = rowIndex;
+        if(row.path[2].style.color=='red'){
+          row.path[2].style.color='black'
+        }else{
+            row.path[2].style.color='red';
+            }
         //   console.log(JSON.stringify(this.selectRowList))
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
@@ -4024,11 +4032,11 @@
         display: inline-block;
         width: 85%;
         position: relative;
-        // margin-top:109px;
-        // margin-left:24px;
-        // z-index: 1001;
         transition:  all ease .5s;
 
+    }
+    .goujian{
+      width: 100% !important;
     }
     .gantt_left{
       width: 100% !important;
@@ -5556,9 +5564,10 @@
                             .userGroupLi{
                                 .userGroupLiText{
                                     display: inline-block;
-                                    margin-left:10px;
+                                    margin-left:5px;
                                     font-size:14px;
                                     line-height:14px;
+                                    min-width:70px;
                                 }
                             }
                         }
