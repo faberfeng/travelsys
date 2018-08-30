@@ -1,5 +1,5 @@
 <template>
-<div id="cloudDrive">
+    <div id="cloudDrive">
         <div id="GroupSelect">
             <select v-model="selectUgId" class="inp-search" @change="InitselectUgId">
                 <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
@@ -272,11 +272,11 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"></i>
+                                <i class="icon-goujian icon-add"  @click="showExtension"></i>
                                 <i class="icon-goujian icon-detial"></i>
-                                <i class="icon-goujian icon-QRcode"></i>
-                                <i class="icon-goujian icon-location"></i>
-                                <i class="icon-goujian icon-delete"></i>
+                                <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
+                                <i class="icon-goujian icon-location" @click="goToLocation"></i>
+                                <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
@@ -379,7 +379,7 @@
                 <button class="editBtnC" @click="renameCancle">取消</button>
             </div>
         </el-dialog>
-          <el-dialog :title="sharePath.path ==''?'分享文件':'分享链接'" :visible.sync="sharePath.show" @close="sharePathHide">
+        <el-dialog :title="sharePath.path ==''?'分享文件':'分享链接'" :visible.sync="sharePath.show" @close="sharePathHide">
             <div class="editBody">
                 <p style="font-size: 14px; line-height: 1.5em" v-if="sharePath.path ==''">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;文档一但被分享，获得该地址的任何人都可以浏览、下载和使用。将不再受到用户账号和工程授权的制约。如果相关文档涉工程内保密信息不建议进行公开分享。
@@ -400,7 +400,7 @@
                 <button class="editBtnS" id="copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput" @click="copyURL" v-if="sharePath.path !=''">复制</button>
             </div>
         </el-dialog>
-         <el-dialog :title="fileName.title" :visible.sync="fileName.show" @close="addfileCancle">
+        <el-dialog :title="fileName.title" :visible.sync="fileName.show" @close="addfileCancle">
             <div class="editBody">
                 <div class="editBodytwo imageBody">
                     <label class=" imageBodyText">目录名称 :</label>
@@ -412,7 +412,7 @@
                 <button class="editBtnC" @click="addfileCancle">取消</button>
             </div>
         </el-dialog>
-         <el-dialog title="文件夹权限修改" :visible.sync="auth.show" @close="authCancle">
+        <el-dialog title="文件夹权限修改" :visible.sync="auth.show" @close="authCancle">
             <div class="editBody">
                  <p style="font-size: 14px; line-height: 1.5em;text-align:left;padding-left:50px;" v-text="'下列勾选的群组可以访问文件夹：'"></p>
                 <p style="font-size: 14px; line-height: 1.5em;text-align:left;padding-left:50px;" v-text="checkFileDir.nodeName"></p>
@@ -434,11 +434,613 @@
                 <button class="editBtnC" @click="authCancle">取消</button>
             </div>
         </el-dialog>
+
+        <el-dialog title="添加清单" :visible="editBySelfShow" @close="customCancle">
+            <div class="project1 project">
+                <div class="projectTitle">
+                <div class="projectTitleLeft">
+                    <el-radio>清单名称关键字：</el-radio>
+                    <div class="titleDiv">
+                    <input class="projectTitleLeftinp" v-model="newList.detailName" />
+                    </div>
+                    <span class="yewulaiyuan">业务来源：</span>
+                    <div class="titleDiv">
+                    <select class="projectTitleLeftinp" v-model="newList.soureFrom">
+                        <option value="0">全部</option>
+                        <option value="1">进度计划-任务核实</option>
+                        <option value="2">文档管理-关联构件</option>
+                        <option value="3">成本管理-报表快照</option>
+                    </select>
+                    <i class="downAngle"></i>
+                    </div>
+                </div>
+                <div class="projectTitleRight">
+                    <el-radio>创建时间：</el-radio>
+                    <div class="titleDiv">
+                        <el-date-picker class="projectTitleLeftinp" v-model="newList.dataRange" type="daterange" range-separator="至"
+                            start-placeholder="开始日期" end-placeholder="结束日期">
+                        </el-date-picker>
+                        </div>
+                        <span class="yewulaiyuan">业务状态：</span>
+                        <div class="titleDiv">
+                        <select class="projectTitleLeftinp" v-model="newList.sourceSate">
+                            <option value="0">全部</option>
+                            <option value="1">构件量核对完成</option>
+                            <option value="2">已计划</option>
+                        </select>
+                    <i class="downAngle"></i>
+                    </div>
+                </div>
+                </div>
+                <div style="overflow:hidden;">
+                    <button class="chaxun" @click="searchResult(true)">查询</button>
+                </div>
+                <div style="overflow:hidden;">
+                <span class="searchresult">查询结果</span>
+                    <button class="selectsence">场景选择</button>
+                <table border="1" class="UserList" width="100%">
+                    <thead>
+                    <tr class="userList-thead">
+                        <th>操作</th>
+                        <th>清单类型</th>
+                        <th>清单ID</th>
+                        <th>清单名称</th>
+                        <th>明细数量</th>
+                        <th>业务来源</th>
+                        <th>业务状态</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item,index) in  customData" :key="index">
+                        <td>
+                        <input type="checkbox" v-model="item.isChecked" />
+                        </td>
+                        <td>{{item.type_c}}</td>
+                        <td>{{item.detailId}}</td>
+                        <td>{{item.detailName}}</td>
+                        <td>{{item.componentCount}}</td>
+                        <td>{{item.relaType_c}}</td>
+                        <td>{{item.serviceState}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="datagrid-pager pagination">
+                    <table cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                        <tr>
+                        <td>
+                            <select class="pagination-page-list" v-model="customPageDetial.pagePerNum">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="pagination-btn-separator"></div>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePage(0,'3')"></a>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePage(-1,'3')"></a>
+                        </td>
+                        <td>
+                            <div class="pagination-btn-separator"></div>
+                        </td>
+                        <td>
+                            <span class="pagination-title" style="padding-left:5px;">第</span>
+                        </td>
+                        <td>
+                            <input class="pagination-num" type="text" v-model="customPageDetial.currentPage">
+                        </td>
+                        <td>
+                            <span class="pagination-title" style="padding-right:5px;">共{{Math.ceil(customPageDetial.total/customPageDetial.pagePerNum)}}页</span>
+                        </td>
+                        <td>
+                            <div class="pagination-btn-separator"></div>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePage(1,'3')"></a>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" class="btn-right0 btn-TAB" @click="changePage(2,'3')"></a>
+                        </td>
+                        <td>
+                            <div class="pagination-btn-separator"></div>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" @click="showExtension" class="btn-refresh btn-TAB"></a>
+                        </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                    <div class="pagination-info pagination-title" v-text="'显示1到'+customPageDetial.pagePerNum+',共'+customPageDetial.total+'记录'"></div>
+                    <div style="clear:both;"></div>
+                </div>
+            </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="customConfirm">确认</button>
+                <button class="editBtnC" @click="customCancle">取消</button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="标签信息预览" :visible.sync="isbiaoqianshow" @close="biaoqianCLose">
+            <div class="editBody">
+                <ul style="padding:0 20px">
+                    <li class="item-label clearfix">
+                        <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(biaoqianInfo.pkId, 7)" alt="二维码">
+                        <div class="right">
+                            <p class="item-list clearfix">
+                                <span class="text-left">清单ID：</span>
+                                <span class="text-right" v-text="biaoqianInfo.pkId"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">清单名称：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mName"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">生成方式：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mGSource_"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">源自业务：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mBSource_"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">创建用户：</span>
+                                <span class="text-right" v-text="biaoqianInfo.creator"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">创建时间：</span>
+                                <span class="text-right">{{new Date(biaoqianInfo.createTime).toLocaleString()}}</span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">变更版本：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mVersion"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">明细数量：</span>
+                                <span class="text-right" v-text="biaoqianInfo.manifestDetailCount"></span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div slot="footer" class="dialog-footer">
+               <button class="editBtnS" @click="labelListConfirm">网页预览</button>
+                    <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
+            </div>
+        </el-dialog>
     </div>
+    <div id="inital">
+        <el-dialog  :visible.sync="deleteDialog" width="398px">
+            <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+            <p class="deleteDialogWarning">删除提醒</p>
+            <p class="deleteDialogText">是否移除清单【{{removelistitem}}】?</p>
+            <div slot="footer" class="dialog-footer">
+                <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                <button class="cancelBtn" @click="deleteDialog=false">取消</button>
+            </div>
+        </el-dialog>
+    </div>
+    <form style="visibility:hidden" action="http://10.252.26.240:8080/qjbim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
+        <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
+        <input type="text" name="mName" :value="biaoqianInfo.mName">
+        <input type="text" name="mGSource" :value="biaoqianInfo.mGSource_">
+        <input type="text" name="mBSource" :value="biaoqianInfo.mBSource_">
+        <input type="text" name="creator" :value="biaoqianInfo.creator">
+        <input type="text" name="createTime" :value="new Date(biaoqianInfo.createTime).toLocaleString()">
+        <input type="text" name="mVersion" :value="biaoqianInfo.mVersion">
+        <input type="text" name="manifestDetailCount" :value="biaoqianInfo.manifestDetailCount">
+    </form>
 </div>
 </template>
 <style  lang='less'>
 #cloudDrive{
+    .img_left {
+      float: left;
+      width: 90px;
+      height: 90px;
+      margin: 40px 30px 0 10px;
+    }
+    .right {
+      float: left;
+      width: 400px;
+      margin-top: 20px;
+
+      .item-list {
+        margin-bottom: 14px;
+
+        .text-left {
+          float: left;
+          font-size: 12px;
+          line-height: 12px;
+          width: 80px;
+          color: #999;
+          text-align: left;
+        }
+
+        .text-right {
+          float: left;
+          width: 300px;
+          font-size: 12px;
+          line-height: 12px;
+          color: #333333;
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        &:last-of-type {
+          margin-bottom: 20px;
+        }
+      }
+    }
+    /*删除弹框*/
+    .deleteDialogImg{
+        height: 50px;
+    }
+    #inital{
+        .el-dialog{
+            margin:15vh auto;
+        }
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
+    }
+    .project1{
+            .projectTitle{
+                display: flex;
+                .projectTitleLeft,.projectTitleRight{
+                    width: 50%;
+                    overflow: hidden;
+                    .el-radio{
+                        float: left;
+                        margin-bottom: 5px;
+                    }
+                    .titleDiv,.yewulaiyuan{
+                        float: left;
+                    }
+                    .titleDiv{
+                        position: relative;
+                    }
+                    .downAngle{
+                        background: url('../planCost/images/sanjiao.png');
+                        width: 12px;
+                        height: 7px;
+                        display: block;
+                        position: absolute;
+                        top: 13px;
+                        left: 262px;
+                    }
+                    .yewulaiyuan{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        display: block;
+                        margin: 10px 0 5px 0;
+                    }
+                    .projectTitleLeftinp{
+                        width: 288px;
+                        height: 36px;
+                        padding-left: 10px;
+                        border:1px solid #d1d1d1;
+                    }
+                }
+                .projectTitleRight{
+                    width: 50%;
+                }
+            }
+        .chaxun{
+            width: 145px;
+            height: 35px;
+            background: #fc3439;
+            color: #fff;
+            border: none;
+            outline: none;
+            float: left;
+            margin:13px 0 0 0;
+            border-radius: 2px;
+                cursor: pointer;
+            }
+    }
+    .project{
+            margin: 0 20px;
+            .searchresult{
+                font-size: 12px;
+                line-height: 12px;
+                color: #999;
+                display: block;
+                float: left;
+                margin: 27px 0 13px 0;
+            }
+            .selectsence{
+                float: right;
+                width: 68px;
+                height: 24px;
+                background: #fff;
+                border:none;
+                outline: none;
+                margin: 20px 0 6px 0;
+                border: 1px solid #ccc;
+                border-radius: 1px;
+                font-size: 12px;
+                color: #666;
+                cursor: pointer;
+            }
+            .editBtn{
+                background: url('../../assets/edit.png') no-repeat;
+            }
+            .detailBtn{
+                background: url('../planCost/images/details.png') no-repeat;
+            }
+           
+            .actionBtn{
+                width: 16px;
+                height: 17px;
+                border: none;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+            .backToProjectBtn{
+                cursor: pointer;
+            }
+            .backToProjectBtn:hover{
+                color:#fc3439;
+            }
+            .header{
+                border-bottom: 2px solid #e6e6e6;
+                margin: 20px 0;
+                padding-bottom: 10px;
+                .left{
+                    float: left;
+                    font-size: 16px;
+                    line-height: 16px;
+                    color: #fc3439;
+                    font-weight: bold;
+                    padding-left:30px;
+                    position: relative;
+                    
+                    .reportS{
+                        background: url('../planCost/images/listS.png')no-repeat 0 0;
+                    } 
+                    .target{
+                        background: url('../planCost/images/target.png')no-repeat 0 0;
+                    } 
+                    .icon{
+                       display: block;
+                        width: 20px;
+                        height: 17px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+                .item-btn{
+                    float: right;
+                    label,.label-item{
+                        float:left;
+                        width:auto;
+                        height:26px;
+                        padding: 0 9px;
+                        border-top: 1px solid #e6e6e6;
+                        border-bottom: 1px solid #e6e6e6;
+                        text-align:center;
+                        line-height:24px;
+                        font-size:12px;
+                        color:#666666;
+                        cursor: pointer;
+                        border-left: 1px solid #e6e6e6;
+                        &:first-of-type{
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+                        }
+                        &:last-of-type{
+                        border-right: 1px solid #e6e6e6;
+                        border-top-right-radius: 2px;
+                        border-bottom-right-radius: 2px;
+                        }
+                    }
+                    .label-item{
+                            border-right: none!important;
+                    }
+                }
+                .right{
+                    text-decoration: none;
+                    float: right;
+                    font-size: 14px;
+                    color: #336699;
+                    line-height: 14px;
+                    margin-top:4px; 
+                }
+            }
+            .UserList{
+                border-collapse: collapse;
+                border: 1px solid #e6e6e6;
+                .checkbox-att{
+                    display:none;
+                }
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
+                    cursor: pointer;
+                    position: relative;
+                    margin-left:4px;
+                }
+                .active{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                    border: 1px solid #fc3439;
+                }
+                thead{
+                    background: #f2f2f2;
+                    th{
+                        padding-left: 6px;
+                        padding-right: 15px;
+                        height: 36px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        border-right: 1px solid #e6e6e6;
+                        font-size: 12px;
+                        color: #333333;
+                        font-weight: normal;
+                    }
+                }
+                tbody{
+                    tr{
+                        td{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 36px;
+                            text-align: left;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 12px;
+                            color: #333333;
+                            .location{
+                                display: block;
+                                width: 12px;
+                                height: 16px;
+                                background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                cursor: pointer;
+                            }
+                        }
+                        .Strong{
+                            font-weight: bold;
+                        }
+                        .deleteBtn{
+                            background: url('../../assets/delete.png') no-repeat;
+                        }
+                        .dataBtn{
+                            background: url('../planCost/images/data.png') no-repeat;
+                        }
+                        .listBtn{
+                            background: url('../planCost/images/list.png') no-repeat;
+                        }
+                        .refreshBtn{
+                              background: url('../planCost/images/refresh.png') no-repeat;
+                        }
+                    }
+                    .activeTr{
+                        background: #0081c2;
+                        td{
+                            color: #fff!important;
+                        }
+                    }
+                }
+            }
+        }
+    /**********一下是分页器的样式***************/
+        .datagrid-pager {
+            display: block;
+            height: 31px;
+            width: auto;
+            border:1px solid #d4d4d4;
+            box-sizing: border-box;
+            background: #f5f5f5;
+        }
+        .pagination{
+            border-top: none;
+        }
+        .pagination table {
+            float: left;
+            height: 30px;
+            th, td {
+                min-width: 5px;
+                padding: 0px;
+                margin: 0px;
+            }
+        }
+        .pagination-page-list {
+            margin: 0px 6px;
+            padding: 1px 2px;
+            width: 43px;
+            height: auto;
+            border-width: 1px;
+            border-style: solid;
+        }
+        .pagination .pagination-num {
+            border-color: #D4D4D4;
+            margin: 0 2px;
+            width: 30px;
+        }
+        .pagination-btn-separator {
+            float: left;
+            height: 24px;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #fff;
+            margin: 3px 1px;
+        }
+        .btn-TAB{
+            display: block;
+            width:26px;
+            height: 26px;
+            cursor: pointer;
+            position: relative;
+            &:hover{
+                box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+                border-radius: 5px;
+            }
+            &::after{
+                display: block;
+                position: absolute;
+                content: '';
+                width: 10px;
+                height: 10px;
+                background-size: 100% 100%; 
+                top: 8px;
+                left: 8px;
+            }
+        }
+        .btn-left0::after{
+            background-image: url('../../assets/fenye2.png');
+        }
+        .btn-left1::after{
+            background-image: url('../../assets/fenye1.png');
+        }
+        .btn-right0::after{
+            background-image: url('../../assets/fenye4.png');
+        }
+        .btn-right1::after{
+            background-image: url('../../assets/fenye3.png');
+        }
+        .btn-refresh::after{
+            background-image: url('../../assets/fenye5.png');
+        }
+        .pagination-title{
+            font-size: 14px;
+            color: #333333;
+        }
+        .pagination-info{
+            float: right;
+            margin-top: 5px;
+            margin-right: 25px;
+        }
+        .clearfix{
+            clear: both;
+            overflow: hidden;
+            content: '';
+        }
+
+
     /*
         修改eleUI树形组件
     */
@@ -1173,7 +1775,7 @@
         // background: #ffffff;
         // z-index: 10;
         // overflow-y: auto;
-        display: inline-block;
+        // display: inline-block;
         position: relative;
         float: right;
         width: 15%;
@@ -1330,9 +1932,9 @@
                         background: #fafafa;
                     }
                 }
-                .item-property::after{
-                    // background: #fff;
-                }
+                // .item-property::after{
+                //     // background: #fff;
+                // }
                 .item-version-3{
                     z-index: 10;
                       background: #fff;
@@ -1370,7 +1972,7 @@
             }
             .icon-add{
                 background: url('./images/add.png')no-repeat 0 0;
-                margin-right: 60px;
+                //margin-right: 60px;
                 &:hover{
                     background: url('./images/add1.png')no-repeat 0 0;
                 }
@@ -1484,7 +2086,7 @@
             }
             .icon-add{
                 background: url('./images/add.png')no-repeat 0 0;
-                margin-right: 60px;
+                //margin-right: 60px;
                 &:hover{
                     background: url('./images/add1.png')no-repeat 0 0;
                 }
@@ -1681,112 +2283,136 @@ import data from '../Settings/js/date.js'
 import upload from '../uploadFile.vue'
 
 export default {
-  name:'Costover',
-  components:{
-      upload
-  },
-  data(){
-      return {
-        activeIndex:'1',
-         tabShow:1,
-         listStyle:'table',//列表展示方式
-         fileSearchInfo:'',//查询文件名称
-         checkAll: false,
-         isIndeterminate: false,
-         fileList:[],//文件列表
-         folderList:[],//文件夹列表
-         screenLeft:{
-             show:true,
-             item:1,
-         },
-         token:'',
-         projId:'',
-         userId:'',
-         QJFileManageSystemURL:'',
-         BDMSUrl:'',
-         checkedItem:{},//选中的file
-         GouJianItem:{},//选中file的构件
-         versionItem:{},//选中file的版本信息
-         show:{
-             basicAttributes:false,
-             BindingArtifacts:false
-         },
-        docType:'',//个人上传是 1
-         posType:'',//versionType
-         FileTree_original:[],//原始文件树形图
-        FileTree:[],//文件夹树形图
-        defaultProps: {
-          children: 'children',
-          label: 'nodeName'
-        },
-        selectUgId:'',//选中的群组id
-        ugList:[],//群组列表
-        showQuanJing:true,//控制全景和非全景的显隐
-        checkFileDir:{},//选中的文件夹信息
-        QJ:{
-            imageBackground:{},
-            point:[]
-        },
-        checkedRound:{
-            ID:'',//选中的roundID
-            checked:false,
-            filepath:'',//文件路径
-            fgName:'',
-            version:'',
-            uploadUser:'',
-            uploadTime:'',
-            updateUser:'',
-            updateTime:'',
-            fileId:''
-        },
-        sharePath:{
-            show:false,
-            path:'',
-            password:''
-        },
-        PointFigure:{
-            renameshow:false,
-            oldname:'',//这是点位图的旧名称
-            newname:'',//点位图新名称
-            fgID:''
-        },
-        hasImg:false,//没有全景图
-        uploadImg:{
-            checked:false
-        },
-        uploadtitle:'',
-        isqj:0,
-        QJfgid:0,//要上传或更新的fgid
-        checkedFile_Folder:{
-            file:false,
-            folder:false,
-            fileCheckedNum:0,//选中的文件数量，多个文件不可同时更新，更名
-            folderCheckedNum:0//选中 的文件夹数量
-        },
-        hasFileToPaste:{
-            is:false,
-            obj:{}
-        },//session存在可以粘贴的文件
-        expandedKeys:[],
-        mayiList:[],//蚂蚁线列表
-        fileName:{
-            show:false,
-            newFileName:'',
-            currentFileName:'',
-            title:'',
-            new:true
-        },
-        auth:{
-            show:false,
-            isSubUse:false
-        },
-        firstTime:0,
-        acceptType:'',//可接受的文件类型
-        fileAuthList:[],//文件群组权限列表
-        fullscreenLoading: false,
-      }
-  },
-  created(){
+    name:'Costover',
+    components:{
+        upload
+    },
+    data() {
+        return {
+            activeIndex: '1',
+            tabShow: 1,
+            listStyle: 'table', //列表展示方式
+            fileSearchInfo: '', //查询文件名称
+            checkAll: false,
+            isIndeterminate: false,
+            fileList: [], //文件列表
+            folderList: [], //文件夹列表
+            screenLeft: {
+                show: true,
+                item: 1,
+            },
+            token: '',
+            projId: '',
+            userId: '',
+            QJFileManageSystemURL: '',
+            BDMSUrl: '',
+            checkedItem: {}, //选中的file
+            GouJianItem: {}, //选中file的构件
+            versionItem: {}, //选中file的版本信息
+            show: {
+                basicAttributes: false,
+                BindingArtifacts: false
+            },
+            docType: '', //个人上传是 1
+            posType: '', //versionType
+            FileTree_original: [], //原始文件树形图
+            FileTree: [], //文件夹树形图
+            defaultProps: {
+                children: 'children',
+                label: 'nodeName'
+            },
+            selectUgId: '', //选中的群组id
+            ugList: [], //群组列表
+            showQuanJing: true, //控制全景和非全景的显隐
+            checkFileDir: {}, //选中的文件夹信息
+            QJ: {
+                imageBackground: {},
+                point: []
+            },
+            checkedRound: {
+                ID: '', //选中的roundID
+                checked: false,
+                filepath: '', //文件路径
+                fgName: '',
+                version: '',
+                uploadUser: '',
+                uploadTime: '',
+                updateUser: '',
+                updateTime: '',
+                fileId: ''
+            },
+            sharePath: {
+                show: false,
+                path: '',
+                password: ''
+            },
+            PointFigure: {
+                renameshow: false,
+                oldname: '', //这是点位图的旧名称
+                newname: '', //点位图新名称
+                fgID: ''
+            },
+            hasImg: false, //没有全景图
+            uploadImg: {
+                checked: false
+            },
+            uploadtitle: '',
+            isqj: 0,
+            QJfgid: 0, //要上传或更新的fgid
+            checkedFile_Folder: {
+                file: false,
+                folder: false,
+                fileCheckedNum: 0, //选中的文件数量，多个文件不可同时更新，更名
+                folderCheckedNum: 0 //选中 的文件夹数量
+            },
+            hasFileToPaste: {
+                is: false,
+                obj: {}
+            }, //session存在可以粘贴的文件
+            expandedKeys: [],
+            mayiList: [], //蚂蚁线列表
+            fileName: {
+                show: false,
+                newFileName: '',
+                currentFileName: '',
+                title: '',
+                new: true
+            },
+            auth: {
+                show: false,
+                isSubUse: false
+            },
+            firstTime: 0,
+            acceptType: '', //可接受的文件类型
+            fileAuthList: [], //文件群组权限列表
+            fullscreenLoading: false,
+            editBySelfShow: false, //新增清单
+            newList: {
+                dataRange: [], //日期区间
+                detailName: '', //关键字
+                soureFrom: '0', //业务来源
+                sourceSate: '0', //业务状态
+            },
+            customData: [],
+            pageDetial: {
+                pagePerNum: 5, //一页几份数据
+                currentPage: 1, //初始查询页数 第一页
+                total: '', //所有数据
+            },
+            customPageDetial: {
+                pagePerNum: 10, //一页几份数据
+                currentPage: 1, //初始查询页数 第一页
+                total: '', //所有数据
+            },
+            selectedItem: {},
+            deleteDialog:false,
+            removelistitem:'',
+            isbiaoqianshow:false,
+            biaoqianInfo:{},
+            deleteInfo:{},
+        }
+    },
+    created(){
         var vm = this
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
@@ -1802,44 +2428,52 @@ export default {
             vm.pointLocationBindClick()
         },1000)
     },
-  watch:{
-      'show.basicAttributes':function(val){
-          if(val){
-            $("#basicAttributes").show(200);
-          }else{
-            $("#basicAttributes").hide(200);
-          }
-      },
-     'show.BindingArtifacts':function(val){
-          if(val){
-            $("#BindingArtifacts").show(200);
-          }else{
-            $("#BindingArtifacts").hide(200);
-          }
-      },
-      posType:function(){
-          var vm = this
-          vm.getVersion()
-      },
-      docType:function(){
-           var vm = this
-           vm.getInfo()
-      },
-      checkFileDir:function(val){
-          var vm = this
-          vm.mayiList = []
-          /**
-           * 从头添加目录
-           * **/
-          vm.mayiList.unshift({
-              nodeId:val.nodeId,//目录id
-              nodeName:val.nodeName,//目录名称
-              nodeParId:val.nodeParId
-          })
-        vm.findParent(val.nodeParId)
-      }
-  },
-  methods:{
+    watch:{
+        'show.basicAttributes':function(val){
+            if(val){
+                $("#basicAttributes").show(200);
+            }else{
+                $("#basicAttributes").hide(200);
+            }
+        },
+        'show.BindingArtifacts':function(val){
+            if(val){
+                $("#BindingArtifacts").show(200);
+            }else{
+                $("#BindingArtifacts").hide(200);
+            }
+        },
+        posType:function(){
+            var vm = this
+            vm.getVersion()
+        },
+        docType:function(){
+            var vm = this
+            vm.getInfo()
+        },
+        checkFileDir:function(val){
+            var vm = this
+            vm.mayiList = []
+            /**
+             * 从头添加目录
+             * **/
+            vm.mayiList.unshift({
+                nodeId:val.nodeId,//目录id
+                nodeName:val.nodeName,//目录名称
+                nodeParId:val.nodeParId
+            })
+            vm.findParent(val.nodeParId)
+        },
+        'customPageDetial.currentPage':function(val,oldval){
+            var vm = this
+            vm.showExtension()
+        },
+        'customPageDetial.pagePerNum':function(val,oldval){
+            var vm = this
+            vm.showExtension()
+        },
+    },
+    methods:{
        initAll(){
           var vm = this
           if(!vm.checkAll){
@@ -2883,7 +3517,7 @@ export default {
         vm.checkedFile_Folder.folder = false
         var fileCheckList = []
         vm.checkAll = false
-        console.log(isMultiSelect)
+        console.log(isMultiSelect);
         if(isMultiSelect){//多选
             if(file){
                 vm.fileList[val].checked =  vm.fileList[val].checked?false:true
@@ -3289,8 +3923,248 @@ export default {
                 }
             });
         }
+    },
+        //
+        goToLocation(){
+            alert('虚拟场景面板未打开，请打开虚拟场景面板。');
+        },
+        deleteList(item){
+            this.deleteDialog = true;
+            this.deleteInfo = item;
+            console.log(item);
+            this.removelistitem = item.main.pkId;
+        },
+        deleteMakeSure(){
+            console.log(this.deleteInfo)
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                headers:{
+                    token:this.token
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getGouJianInfo();
+                    this.deleteDialog = false;
+                }else{  
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //清单二维码
+        viewListQrcode(item){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'manifest2/getManifestInfoByMId',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    mId:item.main.pkId
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.isbiaoqianshow = true;
+                    this.biaoqianInfo = response.data.rt;
+                    Object.assign(this.biaoqianInfo,{
+                        mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
+                        mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
+
+                    })
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+
+        },
+        parseMBSource(mBSource) {
+            switch (mBSource) {
+                case 1:
+                    return "文档管理-关联构件";
+                case 2:
+                    return "进度计划-任务核实";
+                case 3:
+                    return "成本管理-工程量";
+                case 4:
+                    return "成本管理-物料量";
+                case 5:
+                    return "物资采购-订货管理";
+                case 6:
+                    return "讨论主题";
+                case 7:
+                    return "成本管理-报表快照";
+                default:
+                    return "";
+            }
+        },
+        parseMGSource(mGSource) {
+            switch (mGSource) {
+                case 1:
+                    return "选择集";
+                case 2:
+                    return "报表快照";
+                case 3:
+                    return "构件量生成";
+                case 4:
+                    return "外部导入";
+                case 5:
+                    return "构件量生成";
+                default:
+                    return "";
+            }
+        },
+        addZero(num,size){
+            var len = ('' + num).length;
+            return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
+        },
+        //网页预览
+        labelListConfirm(){
+            this.$refs.manifestQrCodeSingleForm.submit();
+        },
+        //打印当前标签页
+        printLabelList(){
+            alert('已向打印机发送请求！');
+        },  
+        biaoqianCLose(){
+            this.isbiaoqianshow = false;
+        },
+        //绑定构件
+        showExtension(){
+            this.editBySelfShow = true;
+            this.searchResult(false);
+        },
+        //新建自定义清单查询
+        searchResult(flag){
+            let rangeData = [];
+            this.newList.dataRange.forEach(item=>{
+                rangeData.push(new Date(item).toLocaleString().split(' ')[0]);
+            });
+            if(flag){
+                this.customPageDetial.currentPage =1;
+            }
+            let formData = new FormData();
+            formData.append('detailName',this.newList.detailName|| '');
+            formData.append('startDate',rangeData[0] || '');
+            formData.append('endDate',rangeData[1] || '');
+            formData.append('serviceState',this.newList.sourceSate);
+            formData.append('relaType',this.newList.soureFrom);
+            formData.append('page',this.customPageDetial.currentPage);
+            formData.append('rows',this.customPageDetial.pagePerNum);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/report/loadManifest',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    type:3
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.customData = response.data.rt.rows;
+                    this.customPageDetial.total = response.data.rt.total;
+                    var type_c = '';
+                    var relaType_c ='';
+                    this.customData.forEach((item,index)=>{
+                        if(item.type == 1){
+                            type_c = '构件量清单';
+                        }else if(item.type == 2){
+                            type_c = '工程量清单';
+                        }else if(item.type == 3){
+                            type_c = '物料量清单';
+                        }
+                        if(item.relaType == 2){
+                            relaType_c = '进度计划-任务核实';
+                        }else if(item.relaType == 1){
+                            relaType_c = "文档管理-关联构件" ;
+                        }else if(item.relaType == 7){
+                            relaType_c = "成本管理-报表快照" ;
+                        }
+                        Object.assign(item,{
+                            type_c:type_c,
+                            relaType_c:relaType_c,
+                            isChecked:false
+                        })
+                    });
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        //确认
+        customConfirm(){
+            let num =0 ;
+            this.selectedItem ={};
+            this.customData.forEach((item,index)=>{
+                if(item.isChecked == true){
+                    num+= 1; 
+                    this.selectedItem = item;
+                }
+            })
+            if(num == 1){
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/doc/addEntityByManifest',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projectId:this.projId,
+                        manifestId:this.selectedItem.detailId,
+                        relaType:this.selectedItem.relaType,
+                        relaId:this.fileList[0].fgId,
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.editBySelfShow = false;
+                        this.getGouJianInfo();
+                        alert('添加成功!');
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }else if(num == 0){
+                alert('请选择要导入的清单！');
+            }else{
+                alert('只能选择一个导入的清单！');
+            }
+        },
+        //取消
+        customCancle(){
+            this.editBySelfShow = false;
+        },
+
+        //表格页码改变时重新获取数据
+        changePage(val, isTop) { //分页 0 -1 1 2
+            var vm = this;
+            if (isTop == '3') {
+                if (vm.customPageDetial.currentPage == 1 && (val == 0 || val == -1)) {
+                vm.$message('这已经是第一页!')
+                return false
+                }
+                if (vm.customPageDetial.currentPage >= Math.ceil(vm.customPageDetial.total / vm.customPageDetial.pagePerNum) && (val == 1 || val == 2)) {
+                vm.$message('这已经是最后一页!')
+                return false
+                }
+                switch (val) {
+                case 0:
+                    vm.customPageDetial.currentPage = 1
+                    break;
+                case -1:
+                    vm.customPageDetial.currentPage--
+                    break;
+                case 1:
+                    vm.customPageDetial.currentPage++
+                    break;
+                case 2:
+                    vm.customPageDetial.currentPage = Math.ceil(vm.customPageDetial.total / vm.customPageDetial.pagePerNum)
+                    break;
+                }
+            }
+        },
     }
-  }
 }
 </script>
 
