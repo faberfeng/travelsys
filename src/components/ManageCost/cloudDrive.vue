@@ -268,11 +268,11 @@
                         <i class="trrangle"></i>
                         绑定构件
                         <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
+                        <i class="icon-dropDown1"  @click="showExtension"></i>
                     </h3>
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"  @click="showExtension"></i>
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location" @click="goToLocation"></i>
@@ -2042,6 +2042,15 @@
                 cursor: pointer;
                 transition:  all ease .2s;
                  transform: rotate(180deg);
+            }
+            .icon-dropDown1{
+                display: block;
+                width: 12px;
+                height: 12px;
+                margin-right: 5px;
+                float: right;
+                cursor: pointer;
+                transition:  all ease .2s;
             }
             .active{
                 transform: rotate(0deg);
