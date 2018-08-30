@@ -1365,6 +1365,20 @@ export default {
             overflow: hidden;
             content: '';
         }
+        //修改行高
+        .el-table__row{
+            height:36px;
+        }
+        .el-table td,.el-table th{
+            padding: 0;
+            
+        }
+        .el-table th{
+            background: #e0e0e0;
+        }
+        .el-table tr{
+            height: 36px;
+        }
     }
     /* 上传文件按钮 */
     #edit .imageBody{
@@ -1416,16 +1430,6 @@ export default {
     }
     .el-table::before,.el-table--border::after, .el-table--group::after{
         display: none;
-    }
-    //修改行高
-    .el-table__row{
-        height:36px;
-    }
-    .el-table td,.el-table th{
-        padding: 0;
-    }
-    .el-table tr{
-        height: 36px;
     }
 </style>
 
