@@ -622,9 +622,9 @@ export default {
             vm.showCommonEdit = true
         },
         editReport(val){
-            var vm = this
+            var vm = this;
             vm.checkItem = val;
-            vm.showCommonEdit = true
+            vm.showCommonEdit = true;
         },
         showData(val,istrue){
             if(istrue){

@@ -29,7 +29,7 @@
                                     index-text="序号"
                                     :data="S_quantitiesList" :columns="columns" :tree-type="props.treeType" 
                                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                                    @row-click="rowClick" row-class-name="row_self"
+                                    @cell-click="rowClick" row-class-name="row_self"
                                     :border="props.border" empty-text="正在加载...">
                                         <template slot="action" slot-scope="scope">
                                             <button class="locationBtn actionBtn" title="定位"  v-if="scope.row.relaType != 4" @click="locate(scope)"></button>
@@ -217,99 +217,89 @@
             </div>
              <div v-if="screenLeft.item == 2" class="screenRight_1">
                 <div>
-                        <h3 class="header-attribute" style="margin-top: 0px;">
-                            <i class="trrangle"></i>
-                            基本属性
-                            <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
-                        </h3>
+                    <h3 class="header-attribute" style="margin-top: 0px;">
+                        <i class="trrangle"></i>
+                            构件分类
+                        <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                    </h3>
                         <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">清单及序号</span>
-                                <span class="detial-text-value" v-text="checkedItem.manifestId+'-'+checkedItem.detailId" :title="checkedItem.manifestId+'-'+checkedItem.detailId"></span>
+                                <span class="detial-text-name">分类编码</span>
+                                <span class="detial-text-value" :title="leftInfo.classifyCode">{{leftInfo.classifyCode}}</span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">可追溯ID</span>
-                                <span class="detial-text-value" v-text="checkedItem.traceId" :title="checkedItem.traceId"></span>
+                                <span class="detial-text-name">构件专业</span>
+                                <span class="detial-text-value" v-text="leftInfo.classifyCode" :title="leftInfo.classifyCode"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">构件名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalName" :title="checkedItem.originalName"></span>
+                                <span class="detial-text-name">构件系统</span>
+                                <span class="detial-text-value" v-text="leftInfo.classifyCode" :title="leftInfo.classifyCode"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">所在空间</span>
-                                <span class="detial-text-value" v-text="checkedItem.space" :title="checkedItem.space"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">单位</span>
-                                <span class="detial-text-value" v-text="checkedItem.unit" :title="checkedItem.unit"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">数量</span>
-                                <span class="detial-text-value" v-text="checkedItem.count" :title="checkedItem.count"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">修改用户</span>
-                                <span class="detial-text-value" v-text="checkedItem.detailUpdateUser" :title="checkedItem.detailUpdateUser"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">修改时间</span>
-                                <span class="detial-text-value" v-text="initData(checkedItem.detailUpdateTime)" :title="initData(checkedItem.detailUpdateTime)"></span>
-                            </li>
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">业务状态</span>
+                                <span class="detial-text-name">构件类型</span>
+                                <span class="detial-text-value" v-text="leftInfo.classifyCode" :title="leftInfo.classifyCode"></span>
                             </li>
                         </ul>
                         <h3 class="header-attribute" style="margin-top: 33px;">
                             <i class="trrangle"></i>
-                            通用设计信息
+                                产品分类
                             <i :class="[{'active':show.generalDesignInfo},'icon-dropDown']" @click="show.generalDesignInfo = show.generalDesignInfo?false:true;"></i>
                         </h3>
                         <ul id="genealAtt" :class="[{'show':show.generalDesignInfo},'Att']">
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">GUID</span>
+                                <span class="detial-text-name">分类编码</span>
                                 <span class="detial-text-value" v-text="checkedItem.guid" :title="checkedItem.guid"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始文件</span>
+                                <span class="detial-text-name">大类</span>
                                 <span class="detial-text-value" v-text="checkedItem.originalFile" :title="checkedItem.originalFile"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始分类</span>
+                                <span class="detial-text-name">中类</span>
                                 <span class="detial-text-value" v-text="checkedItem.originalCategory" :title="checkedItem.originalCategory"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始ID</span>
+                                <span class="detial-text-name">小类</span>
                                 <span class="detial-text-value" v-text="checkedItem.originalId" :title="checkedItem.originalId"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">原始名称</span>
-                                <span class="detial-text-value" v-text="checkedItem.originalName" :title="checkedItem.originalName"></span>
+                                <span class="detial-text-name">类型</span>
+                                <span class="detial-text-value" v-text="leftInfo.productType" :title="leftInfo.productType"></span>
+                            </li>
+                        </ul>
+                        <h3 class="header-attribute" style="margin-top: 33px;">
+                            <i class="trrangle"></i>
+                                产品实例
+                            <i :class="[{'active':show.generalDesignInfo},'icon-dropDown']" @click="show.generalDesignInfo = show.generalDesignInfo?false:true;"></i>
+                        </h3>
+                        <ul id="genealAtt" :class="[{'show':show.generalDesignInfo},'Att']">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">ID</span>
+                                <span class="detial-text-value" v-text="leftInfo.relaId" :title="leftInfo.relaId"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">创建工具</span>
-                                <span class="detial-text-value" v-text="checkedItem.creator" :title="checkedItem.creator"></span>
+                                <span class="detial-text-name">品牌</span>
+                                <span class="detial-text-value" v-text="leftInfo.brand" :title="leftInfo.brand"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">设计分类</span>
-                                <span class="detial-text-value" v-text="checkedItem.classifyName" :title="checkedItem.classifyName"></span>
-                            </li>
-
-
-                            <li class="detial-item clearfix">
-                                <span class="detial-text-name">注释</span>
-                                <span class="detial-text-value" v-text="checkedItem.comment" :title="checkedItem.comment"></span>
+                                <span class="detial-text-name">名称</span>
+                                <span class="detial-text-value" v-text="leftInfo.productName" :title="leftInfo.productName"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">标记</span>
-                                <span class="detial-text-value" v-text="checkedItem.tag" :title="checkedItem.tag"></span>
+                                <span class="detial-text-name">规格参数</span>
+                                <span class="detial-text-value" v-text="leftInfo.specificationParameter" :title="leftInfo.specificationParameter"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">更新用户</span>
-                                <span class="detial-text-value" v-text="checkedItem.editor" :title="checkedItem.editor"></span>
+                                <span class="detial-text-name">单位</span>
+                                <span class="detial-text-value" v-text="leftInfo.unit" :title="leftInfo.unit"></span>
                             </li>
                             <li class="detial-item clearfix">
-                                <span class="detial-text-name">更新时间</span>
-                                <span class="detial-text-value" v-text="initData(checkedItem.entityUpdateTime)" :title="initData(checkedItem.entityUpdateTime)"></span>
+                                <span class="detial-text-name">价格</span>
+                                <span class="detial-text-value" v-text="leftInfo.TotalPrice" :title="leftInfo.TotalPrice"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">登记时间</span>
+                                <span class="detial-text-value" v-text="leftInfo.unit" :title="leftInfo.unit"></span>
                             </li>
                         </ul>
                 </div>
@@ -1509,6 +1499,7 @@ export default Vue.component('common-list',{
         },
         singleLable:false,//单个标签展示 不需要分页器
         AssociatedDocumentList:[],//
+        leftInfo:{},
       }
   },
     created(){
@@ -1552,17 +1543,19 @@ export default Vue.component('common-list',{
         },
     },
     methods:{
-        locate(){
-            var vm = this
+        locate(scope){
+            var vm = this;
+            console.log(scope);
             vm.$message({
                 type:'warning',
                 message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
             })
         },
         //单击某行
-        rowClick(row,rowIndex,$event){
-            console.log(row);
-            console.log(rowIndex);
+        rowClick(row,rowIndex,event){
+            // console.log(row);
+            // console.log(rowIndex);
+            // console.log(event)
         },
         checkLabel(scope){
             var vm = this
@@ -1607,11 +1600,13 @@ export default Vue.component('common-list',{
             })
         },
         openLabel(row){
-            var vm = this
-            vm.labelListShow = true
-            vm.selectRow = []
-            vm.selectRow.push(row)
-            //console.log(row)
+            var vm = this;
+            this.leftInfo = row;
+            console.log(this.leftInfo);
+            this.screenLeft.show = true;
+            vm.labelListShow = true;
+            vm.selectRow = [];
+            vm.selectRow.push(row);
         },
         openLocation(){
             var vm  = this

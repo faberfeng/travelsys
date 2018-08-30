@@ -87,7 +87,7 @@
                     <i class="icon_3 icon"></i>报表字段
                 </span>
             </p>
-             <div style="text-align: left;margin-left:110px;" class="clearfix">
+            <div style="text-align: left;margin-left:110px;" class="clearfix">
                 <div class="diolog-main">
                     <p class="clearfix" style="margin-bottom:6px;height:24px;">
                         <span class="title">可用字段</span>
@@ -1355,6 +1355,7 @@ export default Vue.component('common-edit',{
     },
     created(){
         var vm = this;
+        console.log(this.rcId);
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
@@ -1767,8 +1768,8 @@ export default Vue.component('common-edit',{
                     token:vm.token
                 },
             }).then(response=>{
-                console.log(response.data)
-                 if(response.data.cd == 0){
+                console.log(response.data);
+                if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
                         vm.value_type = response.data.rt.rcTableName//表名 筛选 - 类型
@@ -1802,7 +1803,7 @@ export default Vue.component('common-edit',{
                         if(length>0){
                             response.data.rt.filterList.forEach((element,index)=>{
                                 if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.profession'){
-                                     switch(element.fieldCode){
+                                    switch(element.fieldCode){
                                         case 'range.db':
                                             vm.database = element.fieldSearchContent
                                             break;
@@ -1820,7 +1821,7 @@ export default Vue.component('common-edit',{
                                             vm.value_professional_change(true)
                                             vm.value_system_change(true)
                                             break;
-                                     }
+                                    }
                                 }else{
                                     vm.list_filter[index].build_name = element.fieldCode
                                     vm.list_filter[index].val = 1

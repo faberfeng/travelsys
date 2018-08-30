@@ -317,7 +317,7 @@ export default {
             unityData:[],//场地资源包
             fileName:'未选择任何文件',
             fileSize:'',
-            filesList:[],
+            filesList:{},
             fileUpdataPath:'',
             userId:'',
             deleteUnityBundle:false,
@@ -378,11 +378,6 @@ export default {
                 }else{
                     alert(response.data.msg);
                 }
-                // else{
-                //     this.$router.push({
-                //         path:'/login'
-                //     })
-                // }
             })
         },
          groundInfoEditCJ(){
@@ -915,7 +910,7 @@ export default {
         //新增资源包
         addSource(){
             this.addgroundShow = true;
-            this.filesList = [];
+            this.filesList = {};
         },
         //新增场地资源包
         addGroundSure(){
@@ -971,7 +966,8 @@ export default {
             this.$refs.file.click();
         },
         fileChanged(){
-            const list = this.$refs.file.files;
+            let list ;
+            list = this.$refs.file.files;
             this.fileName = list[0].name;
             this.fileSize = (list[0].size/1024).toFixed(2)+'kb';
             this.filesList = list;
@@ -989,6 +985,7 @@ export default {
         },
         editUnityBundlePropertyClose(){
             this.editUnityBundleProperty = false;
+            this.addgroundShow = false;
         }
     }
 }
