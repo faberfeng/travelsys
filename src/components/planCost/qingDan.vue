@@ -5,14 +5,7 @@
         </form>
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
-                <div id="center-selection">
-                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                        <i class="icon-right"></i>
-                    </div>
-                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.item = 1">属<br>性</span>
-                    </div>
-                </div>
+                
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
                         <p class="antsLine">
@@ -193,8 +186,16 @@
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']" >
-            <div v-if="screenLeft.item == 1" class="screenRight_1">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']" >
+            <div id="center-selection">
+                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                        <i class="icon-right"></i>
+                    </div>
+                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                        <span class="item-property " @click="screenLeft.item = 1">属<br>性</span>
+                    </div>
+                </div>
+            <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div>
                         <h3 class="header-attribute" style="margin-top: 0px;">
                             <i class="trrangle"></i>
@@ -574,144 +575,20 @@
             }
         }
         .box-left-container{
-            display: block;
-            position: fixed;
-            top: 165px;
-            left: 26px;
-            bottom: 0;
-            right: 225px;
-            z-index: 1001;
+            // display: block;
+            // position: fixed;
+            // top: 165px;
+            // left: 26px;
+            // bottom: 0;
+            // right: 225px;
+            // z-index: 1001;
+            // transition:  all ease .5s;
+            // overflow: auto;
+            display: inline-block;
+            width: 85%;
+            position: relative;
             transition:  all ease .5s;
-            overflow: auto;
-            #center-selection{
-                position: fixed;
-                top: 115px;
-                right: 225px;
-                width: 25px;
-                z-index: 100;
-                transition: all ease .5s;
-                background: #ffffff;
-                .SH_right{
-                    width: 25px;
-                    height: 50px;
-                    border-left: 1px solid #cccccc;
-                    border-bottom: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    .icon-right{
-                        display: block;
-                        position: absolute;
-                        top: 19px;
-                        left: 6px;
-                        width: 14px;
-                        height: 14px;
-                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
-                        transition: all ease .5s;
-                        transform: rotateZ(0deg);
-                    }
-                }
-                .item-property{//目录
-                    display: block;
-                    width: 25px;
-                    height: 60px;
-                    background: #fafafa;
-                    padding-top:15px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom: -7px;
-                        width: 24px;
-                        height: 16px;
-                        background: #fff;
-                        border-bottom: 1px solid #cccccc;
-                        -webkit-transform: skewY(30deg);
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }   
-                .item-version{//属性
-                    display: block;
-                    width: 25px;
-                    height: 55px;
-                    background: #fafafa;
-                    padding-top:12px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .item-version-3{//版本
-                    display: block;
-                    width: 25px;
-                    height: 68px;
-                    background: #fafafa;
-                    padding-top:24px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .active-version{//中间 属性 高显
-                    .item-version{//属性
-                        background: #fff;
-                        color: #fc3439;
-                        z-index: 15;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                    .item-property::after{//目录
-                        background: #fff;
-                    }
-                    .item-version-3{//版本
-                        z-index: 10;
-                    }
-                }
-                .active{//上边 目录 高显
-                    .item-property{
-                        background: #fff;
-                        color: #fc3439;
-                    }
-                    .item-version{
-                        z-index: 15;
-                    }
-                    .item-version-3{
-                        z-index: 10;
-                    }
-                }
-            }
+            
             #containerMessage{
                 padding-left:30px; 
                 padding-bottom: 65px;
@@ -1150,7 +1027,7 @@
             }
         }
         .box-left-avtive,.box-left-avtive_pre{
-            right: 0px;
+            width: 98%;
             transition:  all ease .5s;
             #center-selection{
                 right: 0;
@@ -1198,21 +1075,159 @@
         右侧
         */
         .box-right-container{
-            display: block;
-            position: fixed;
-            overflow-y: auto;
-            right: -225px;
-            bottom: 0;
-            width: 225px;
-            top: 116px;
+            // display: block;
+            // position: fixed;
+            // overflow-y: auto;
+            // right: -225px;
+            // bottom: 0;
+            // width: 225px;
+            // top: 116px;
+            // transition: all ease .5s;
+            // background: #ffffff;
+            // z-index: 10;
+            // border-left:none;
+            // z-index: 1000;
+            display: inline-block;
+            position: relative;
+            float: right;
+            width: 15%;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
-            border-left:none;
-            z-index: 1000;
+            height: 785px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            #center-selection{
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 25px;
+                border-right: 1px solid #cccccc;
+                .SH_right{
+                    width: 100%;
+                    height: 48px;
+                    border-left: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    .icon-right{
+                        display: block;
+                        position: absolute;
+                        top: 19px;
+                        left: 6px;
+                        width: 14px;
+                        height: 14px;
+                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
+                        transition: all ease .5s;
+                        transform: rotateZ(0deg);
+                    }
+                }
+                .item-property{//目录
+                    display: block;
+                    width: 25px;
+                    height: 60px;
+                    background: #fafafa;
+                    padding-top:15px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom: -7px;
+                        width: 24px;
+                        height: 16px;
+                        background: #fff;
+                        border-bottom: 1px solid #cccccc;
+                        -webkit-transform: skewY(30deg);
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }   
+                .item-version{//属性
+                    display: block;
+                    width: 25px;
+                    height: 55px;
+                    background: #fafafa;
+                    padding-top:12px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .item-version-3{//版本
+                    display: block;
+                    width: 25px;
+                    height: 68px;
+                    background: #fafafa;
+                    padding-top:24px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .active-version{//中间 属性 高显
+                    .item-version{//属性
+                        background: #fff;
+                        color: #fc3439;
+                        z-index: 15;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                    .item-property::after{//目录
+                        background: #fff;
+                    }
+                    .item-version-3{//版本
+                        z-index: 10;
+                    }
+                }
+                .active{//上边 目录 高显
+                    .item-property{
+                        background: #fff;
+                        color: #fc3439;
+                    }
+                    .item-version{
+                        z-index: 15;
+                    }
+                    .item-version-3{
+                        z-index: 10;
+                    }
+                }
+            }
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
-                margin: 0 14px 0 10px;
+                margin: 0 14px 0 30px;
                 .noTop{
                     top: 12px!important;
                 }
@@ -1293,9 +1308,8 @@
             }
         }
         .box-right-avtive{
-            right: 0;
+            width: 2%;
             transition: all ease .5s;
-            border-left: 1px solid #cccccc;
         }
         /* 设置滚动条的样式 */
         ::-webkit-scrollbar {

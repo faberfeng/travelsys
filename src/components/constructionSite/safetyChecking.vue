@@ -2050,7 +2050,8 @@ export default {
                 }
                 .editBody_left{
                     float: left;
-                    width: 70%;
+                    margin-left:20px;
+                    width: 60%;
                     height: 300px;
                     overflow-x: auto;
                     border:1px solid #999;
@@ -2111,8 +2112,9 @@ export default {
                 .editBody_right{
                     border:1px solid #999;
                     float: right;
-                    width: 25%;
+                    width: 24%;
                     height: 300px;
+                    margin-right:20px;
                     .editBody_right1{
                         height:140px;
                         
