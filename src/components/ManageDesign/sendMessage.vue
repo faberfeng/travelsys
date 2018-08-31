@@ -253,7 +253,7 @@ export default Vue.component('common-upload',{
                         //     projId:this.projId,
                         //     type:1,
                         // },
-                        data:this.base64Str
+                        data:{"base64":this.base64Str}
                     }).then((response)=>{
                         if(response.data.cd == 0){
                             this.$message({

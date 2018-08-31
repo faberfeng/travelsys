@@ -1577,6 +1577,7 @@ export default Vue.component('common-list',{
           const para={"TraceID":this.TraceID} 
          const app = document.getElementById('webglIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
+        $('body').animate( {scrollTop: 0}, 500);
         //   vm.$message({
         //       type:'info',
         //       message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
