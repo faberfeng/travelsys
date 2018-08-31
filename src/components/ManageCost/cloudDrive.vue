@@ -1098,7 +1098,7 @@
         overflow: hidden;
         content: '';
     }
-     select.inp-search {  
+    select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
             /*很关键：将默认的select选择框样式清除*/  
             appearance:none;  
@@ -2260,24 +2260,24 @@
     }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
-    width:15px;
-     height: 15px;
+        width:15px;
+        height: 15px;
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
-    box-shadow:inset 006px rgba(0, 0, 0, .5);
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
     -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
-    border-radius:10px;
+        border-radius:10px;
     }
     /* 滚动条滑块 */
     ::-webkit-scrollbar-thumb {
-    border-radius:10px;
-    background:rgba(0,0,0,0.1);
-    box-shadow:inset 006px rgba(0, 0, 0, .5);
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
     -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {
-    background:rgba(255,0,0,0.4);
+        background:rgba(255,0,0,0.4);
     }
     /*********************/
 }
@@ -3868,11 +3868,13 @@ export default {
     },
     //打包
     pointLocationBindClick(){
-        var vm = this
+        var vm = this;
+        
         var $rounds = $('#planeDIV').find('.round');
+        console.log($rounds)
         if ($rounds && $('#planeFigure')[0]) {
-            var imgHeight = $('#planeFigure')[0].offsetHeight
-            var imgWidth = $('#planeFigure')[0].offsetWidth
+            var imgHeight = $('#planeFigure')[0].offsetHeight;
+            var imgWidth = $('#planeFigure')[0].offsetWidth;
             $rounds.draggable({
                 drag: function(e,ui) {// 在拖动过程中触发，当不能再拖动时返回false
                     if(ui.position.top<=-10){
@@ -3889,7 +3891,7 @@ export default {
                         })
                         return false
                     }
-                     if(ui.position.left >= imgWidth){
+                    if(ui.position.left >= imgWidth){
                          vm.$message({
                             type:'warning',
                             message:'已到最右边'
@@ -3897,7 +3899,7 @@ export default {
                         ui.position.left = imgWidth
                         // return false
                     }
-                     if(ui.position.top >= imgHeight){
+                    if(ui.position.top >= imgHeight){
                          vm.$message({
                             type:'warning',
                             message:'已到最底边'

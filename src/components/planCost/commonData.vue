@@ -45,9 +45,9 @@
                         <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
                     </td>
                 </tr>
-                <tr :style="{'backgroundColor':rcStyle.tableTitleBgColor}">
+                <tr :style="{'backgroundColor':rcStyle.tableTitleBgColor}" v-if="sumary_all">
                     <td :colspan="Footer.num" rowspan="1" style="font-weight: bold;">总计</td>
-                    <td v-for="(item,index) in Footer.info" :key="index+'footer'" v-text="item"></td>
+                    <td :colspan="Footer.info.length">{{sumary_all}}</td>
                 </tr>
             </tbody>
         </table>
@@ -515,7 +515,6 @@ import Vue from 'vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
-// import JsonData from './js/dataCommonJson.json'
 
 export default Vue.component('common-list',{
     props:['rcId','isSnapshot','isbaobiao'],
@@ -564,7 +563,8 @@ export default Vue.component('common-list',{
             snapShotName:'',
             relaId:'',//关系ID
             rcStyle:{},
-            totalTitleNum:0
+            totalTitleNum:0,
+            sumary_all:'',
         }
     },
     created(){
@@ -707,7 +707,7 @@ export default Vue.component('common-list',{
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response.data)
+                console.log(response.data);
                 if(response.data.cd == 0){
                     vm.rcStyle = response.data.rt.rcStyle
                     vm.dataName = response.data.rt.reportName
@@ -722,7 +722,6 @@ export default Vue.component('common-list',{
                         var monomer_summary = [],
                         partition_summary = [],
                         floor_summary = [];
-                        console.log(response.data.rt.rowList)
                         response.data.rt.rowList.forEach((element,index)=>{
                             if(element.rowType == 'ROW_TITLE'){
                                 vm.detailsHead = element.infoList;
@@ -756,6 +755,12 @@ export default Vue.component('common-list',{
                                     'level':element.groupLevel
                                 });                                
                             }else if(element.rowType == 'ROW_SUMMARY'){
+                                
+                                if(element.count != null){
+                                    this.sumary_all = element.count;
+                                    
+                                }
+                                console.log(this.sumary_all)
                                 if(element.groupLevel == 1){//单体 的 小计
                                     monomer_summary.push(element);
                                 }else if(element.groupLevel == 2){//分区 的 小计

@@ -48,7 +48,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="flor" style="margin-bottom:30px;">
+        <div class="flor" style="margin-bottom:30px;display:none">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
                 <el-table :data="UnityBundle" border class="table"  style="width:100%">
@@ -848,7 +848,7 @@ export default {
         },
         groundClose(){
             this.addgroundShow = false;
-            this.$refs.file.files = {};
+            this.$refs.file.files = [];
             this.fileName = '';
         },
         //编辑资源包
@@ -1006,7 +1006,7 @@ export default {
             let list = [];
             list = this.$refs.file.files;
             this.fileName = list[0].name;
-            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
+            this.fileSize = (list[0].size/1024).toFixed(2)+'kb';
             this.filesList = list;
             if(this.fileName.split('.')[1] == 'utr' || this.fileName.split('.')[1] == 'uer'){
                 this.editUnityBundleProperty = true;

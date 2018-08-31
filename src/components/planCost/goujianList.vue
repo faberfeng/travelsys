@@ -602,6 +602,8 @@ export default {
             vm.showCommonEdit = false
             vm.showCommonList = false
             vm.showCommonData = false
+            this.getSnapShootList();
+            this.getRealTimeList();
         },
         refrehPage(event){
             var vm = this
@@ -622,9 +624,9 @@ export default {
             vm.showCommonEdit = true
         },
         editReport(val){
-            var vm = this
+            var vm = this;
             vm.checkItem = val;
-            vm.showCommonEdit = true
+            vm.showCommonEdit = true;
         },
         showData(val,istrue){
             if(istrue){

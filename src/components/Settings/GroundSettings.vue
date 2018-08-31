@@ -32,7 +32,7 @@
         </div>
         <div class="groundSetting groundTitle">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置
-                 <span :class="[{'groundEdit-active':!canEditCj},'groundEdit']" @click="groundInfoEditCJ"></span>
+                <span :class="[{'groundEdit-active':!canEditCj},'groundEdit']" @click="groundInfoEditCJ"></span>
             </h5>
             <div  :class="[{'groundInfoInp-active':!canEditCj},'groundSettingBody']">
                 <div class="groundSettingBodyS">
@@ -76,7 +76,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="groundSource groundTitle" style="margin-bottom:30px;">
+        <div class="groundSource groundTitle" style="margin-bottom:30px; display:none">
            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addSource" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="unityData" style="width:100%">
@@ -317,7 +317,7 @@ export default {
             unityData:[],//场地资源包
             fileName:'未选择任何文件',
             fileSize:'',
-            filesList:[],
+            filesList:{},
             fileUpdataPath:'',
             userId:'',
             deleteUnityBundle:false,
@@ -378,11 +378,6 @@ export default {
                 }else{
                     alert(response.data.msg);
                 }
-                // else{
-                //     this.$router.push({
-                //         path:'/login'
-                //     })
-                // }
             })
         },
          groundInfoEditCJ(){
@@ -569,7 +564,6 @@ export default {
         groundTableEdit(scope){
             this.editGorundData = scope.row;
             this.editgroundShow = true;
-            console.log(scope.row);
             this.editUnityPropertyData = ['【不关联任何单体】'];
             this.listData.forEach(item=>{
                 this.editUnityPropertyData.push(item.Name)
@@ -628,7 +622,6 @@ export default {
 
             }).then((response)=>{
                 if(response.data.cd == 0){
-                    console.log(response.data);
                     this.getUnityBundle();
                     this.editgroundShow = false;
                 }else{
@@ -915,7 +908,7 @@ export default {
         //新增资源包
         addSource(){
             this.addgroundShow = true;
-            this.filesList = [];
+            this.filesList = {};
         },
         //新增场地资源包
         addGroundSure(){
@@ -971,9 +964,10 @@ export default {
             this.$refs.file.click();
         },
         fileChanged(){
-            const list = this.$refs.file.files;
+            let list ;
+            list = this.$refs.file.files;
             this.fileName = list[0].name;
-            this.fileSize = (list[0].size/1024).toFixed(2)+'M';
+            this.fileSize = (list[0].size/1024).toFixed(2)+'kb';
             this.filesList = list;
             this.editUnityBundleProperty = true;
             this.listData.forEach(item=>{
@@ -989,6 +983,7 @@ export default {
         },
         editUnityBundlePropertyClose(){
             this.editUnityBundleProperty = false;
+            this.addgroundShow = false;
         }
     }
 }
@@ -1374,7 +1369,7 @@ export default {
             
         }
         .el-table th{
-            background: #e0e0e0;
+            background: #f2f2f2;
         }
         .el-table tr{
             height: 36px;
