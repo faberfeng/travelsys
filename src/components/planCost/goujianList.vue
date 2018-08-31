@@ -602,6 +602,8 @@ export default {
             vm.showCommonEdit = false
             vm.showCommonList = false
             vm.showCommonData = false
+            this.getSnapShootList();
+            this.getRealTimeList();
         },
         refrehPage(event){
             var vm = this
