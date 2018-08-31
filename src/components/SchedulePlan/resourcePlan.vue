@@ -292,7 +292,7 @@ export default{
                 legend: {
                     align: 'right',
                     verticalAlign: 'top',
-                    y: 15,
+                    
                     floating: true,
                     borderWidth: 0
                 },

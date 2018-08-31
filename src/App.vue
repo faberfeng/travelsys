@@ -31,7 +31,7 @@ export default {
    }
 }
 .el-date-editor.el-input{
-  width: 435px;
+  width: 435px !important;
 }
 .dialog-footer{
     text-align: center;

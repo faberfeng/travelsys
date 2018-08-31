@@ -170,7 +170,6 @@
                             </el-tree>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div v-if="labelListShow"  id="edit" class="dialog">
@@ -1466,11 +1465,13 @@ export default {
             height: 90%;
             padding:20px;
             margin-top:5px;
+            ::-webkit-scrollbar{width:0px}
             .project_left{
                 // border:1px solid red;
                 width: 80%;
-                height: 100%;
+                height: 800px;
                 float: left;
+                ::-webkit-scrollbar{width:0px}
                 .information{
                     margin-top:10px;
                     height:60px;
@@ -1847,6 +1848,7 @@ export default {
                 position: absolute;
                 top: 98px;
                 right: 0px;
+                height: 800px;
                 .checkProjectList_header{
                     height: 40px;
                     border-bottom:1px solid #999; 
@@ -2131,6 +2133,27 @@ export default {
                                 margin-left:10px;
                         }
                         .newFile{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .newFile1{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .newFile2{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .newFile3{
                             background: url('../ManageCost/images/add.png')no-repeat 0 0;
                                 margin-right: 10px;
                                 &:hover{

@@ -652,7 +652,7 @@ export default {
                 ugId:this.selectUgId
             },
             }).then(response=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt.rows!=null){
                     this.contactList=response.data.rt;
                     this.rowsList=response.data.rt.rows;
                     this.rowsListLength=response.data.rt.rows.length;

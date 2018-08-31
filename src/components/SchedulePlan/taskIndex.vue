@@ -27,7 +27,7 @@
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                 </span>
-            <span class="icon-type"  @click="getGanttList"></span>
+            <!-- <span class="icon-type"  @click="getGanttList"></span> -->
             <!-- @click="getGanttList" -->
           </div>
         </div>
@@ -42,6 +42,7 @@
                 <span class="btn-operate" @click="valueSearch()">产值查询</span>
                 <span class="btn-operate" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
+                <span class="btn-operate" @click="cancleSelect()">取消选择</span>
                 <!-- <span class="btn-operate" @click="showColumnConfig()">显示列</span> -->
               </div>
             </div>
@@ -55,7 +56,7 @@
                 <template slot="action" slot-scope="scope">
                   <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
                   <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                  <button class="sortBtn actionBtn" title="排序" @click="sort(scope)"></button>
+                  <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button>
                 </template>
                 <template slot="taskStart" slot-scope="scope">
                   {{scope.row.taskStart | timeChange()}}
@@ -450,18 +451,20 @@
                         v-text="item.label"></option>
               </select>
             </div>
-            <div class="startTime">
-              <label>计划开始:</label>
-              <el-date-picker v-model="taskStart" type="date"
-                              placeholder="选择日期">
-              </el-date-picker>
-            </div>
-            <div class="endTime">
-              <label>计划结束:</label>
-              <el-date-picker v-model="taskEnd" type="date"
-                              placeholder="选择日期">
-              </el-date-picker>
-            </div>
+          </div>
+          <div class="editBodytwo1">
+              <div class="startTime">
+                  <label>计划开始:</label>
+                  <el-date-picker v-model="taskStart" type="date"
+                                  placeholder="选择日期">
+                  </el-date-picker>
+              </div>
+              <div class="endTime">
+                  <label>计划结束:</label>
+                  <el-date-picker v-model="taskEnd" type="date"
+                                  placeholder="选择日期">
+                  </el-date-picker>
+              </div>
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -519,16 +522,18 @@
                         v-text="item.label"></option>
               </select>
             </div>
+          </div>
+          <div class="editBodytwo1">
             <div class="startTime">
               <label>计划开始:</label>
-              <el-date-picker :disabled="disable" v-model="taskStart" type="date"
+              <el-date-picker  v-model="taskStart" type="date"
                               placeholder="选择日期">
               </el-date-picker>
             </div>
             <div class="endTime">
               <label>计划结束:</label>
-              <el-date-picker :disabled="disable" v-model="taskEnd" type="date"
-                              placeholder="选择日期">
+              <el-date-picker  v-model="taskEnd" type="date"
+                        placeholder="选择日期">
               </el-date-picker>
             </div>
           </div>
@@ -1828,60 +1833,6 @@
           if (response.data.rt) {
             var vm=this
             this.taskIndexData = response.data.rt;
-            this.taskIndexData.forEach((item)=>{
-              var ganttList={}
-              vm.$set(ganttList,'id',item.taskId);
-              vm.$set(ganttList,'name',item.taskName);
-              vm.$set(ganttList,'level',item.completeTaskCode);
-              vm.$set(ganttList,'start',item.taskStart);
-              vm.$set(ganttList,'end',item.taskEnd);
-              vm.$set(ganttList,'duration',item.taskDuration);
-              // vm.$set(ganttList,'startIsMilestone',false);
-              //  vm.$set(ganttList,'endIsMilestone',false);
-              //  vm.$set(ganttList,'status',"STATUS_SUSPENDED");
-              this.loadGanttList.tasks.push(ganttList)
-              
-              item.children.forEach((item1)=>{
-                var ganttList1={}
-                vm.$set(ganttList1,'id',item1.taskId);
-                vm.$set(ganttList1,'name',item1.taskName);
-                vm.$set(ganttList1,'level',item1.completeTaskCode);
-                vm.$set(ganttList1,'start',item1.taskStart);
-                vm.$set(ganttList1,'end',item1.taskEnd);
-                vm.$set(ganttList1,'duration',item1.taskDuration);
-              //   vm.$set(ganttList1,'startIsMilestone',false);
-              //  vm.$set(ganttList1,'endIsMilestone',false);
-              //  vm.$set(ganttList1,'status',"STATUS_SUSPENDED");
-                this.loadGanttList.tasks.push(ganttList1);
-                console.log(this.loadGanttList);
-                // item1.children.forEach((item2)=>{
-                //     var ganttList2={}
-                //     vm.$set(ganttList2,'id',item2.taskId);
-                //     vm.$set(ganttList2,'name',item2.taskName);
-                //     vm.$set(ganttList2,'level',item2.completeTaskCode);
-                //     vm.$set(ganttList2,'start',item2.taskStart);
-                //     vm.$set(ganttList2,'end',item2.taskEnd);
-                //     vm.$set(ganttList2,'duration',item2.taskDuration);
-                //     // vm.$set(ganttList2,'startIsMilestone',false);
-                //     // vm.$set(ganttList2,'endIsMilestone',false);
-                //     // vm.$set(ganttList2,'status',"STATUS_SUSPENDED");
-                //     this.loadGanttList.tasks.push(ganttList2);
-                //     console.log(this.loadGanttList);
-                //         // item2.children.forEach((item3)=>{
-                //         //   var ganttList3={}
-                //         //   vm.$set(ganttList3,'id',item3.taskId);
-                //         //   vm.$set(ganttList3,'name',item3.taskName);
-                //         //   vm.$set(ganttList3,'level',item3.completeTaskCode);
-                //         //   vm.$set(ganttList3,'level',item3.completeTaskCode);
-                //         //   vm.$set(ganttList3,'start',item3.taskStart);
-                //         //   vm.$set(ganttList3,'end',item3.taskEnd);
-                //         //   vm.$set(ganttList3,'duration',item3.taskDuration);
-                //         //   this.loadGanttList.tasks.push(ganttList3);
-                //         //   console.log(this.loadGanttList);
-                //         // })
-                // })
-              })
-            })
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
@@ -1957,19 +1908,21 @@
         }else{
             row.path[2].style.color='red';
             }
-        
+        //  this.taskId='';
+        // this.taskInformationList=[];
+        // this.lastNodeName='';
+        // this.taskIndexData=[];
+        // this.dutyUserId='';
+        // this.taskPriority='';
+        // this.taskUserGroup='';
+        // this.taskType='';
+        // this.taskName = '';
+        // this.taskStart = '';
+        // this.taskEnd = '';
+        // this.getTaskList();
+        // row.path[2].style.color='red'
         console.log(row.path[2]);
-        // row.path[2].style.backgroundcolor=='white'
         console.log(row.path);
-        // row.path[2]="red";
-        // row.path[0].bgColor='red'
-        // if(row.isTrusted==true){
-        //   console.log(row.path);
-        // }
-        // if(row.isTrusted==true){
-        //  console.log(row.MouseEvent.path)
-        // }
-        // console.log(rowIndex);
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
@@ -2590,39 +2543,77 @@
         //   this.getTaskUserGroupList();
       },
       addTaskMakeSure() {
-        axios({
-          method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/add',
-          headers: {
-            'token': this.token
-          },
-          params: {
-            currentGroupId: this.taskGroup
-          },
-          data: {
-            taskName: this.taskName,//任务名称
-            dutyUserId: this.dutyUserId,//群组成员数据id
-            taskPriority: this.taskPriority,//任务优先级
-            taskUserGroup: this.taskUserGroup,//任务负责群组
-            taskGroup: this.taskGroup,//任务组别
-            taskType: this.taskType,//任务类型
-            taskStart: moment(this.taskStart).format("YYYY-MM-DD"),//任务开始时间
-            taskEnd: moment(this.taskEnd).format("YYYY-MM-DD"),//任务结束时间
-            taskParId: this.taskParId,
-            id: '',
-          }
-        }).then(response => {
-          if (response.data.cd == "0") {
-            this.addTaskDialog = false;
-            this.getTaskList();
-            this.taskName = '';
-            this.taskStart = '';
-            this.taskEnd = '';
-          } else if (response.data.cd == "-1") {
-            alert(response.data.msg)
-          }
-        })
-
+        if(this.taskName==''){
+           this.$message({
+            type:"error",
+            message:"任务名称内容不能为空"
+          })
+        }else if(this.taskUserGroup =='0'){
+          this.$message({
+            type:"error",
+            message:"负责群组不能为空"
+          })
+        }
+        else if(this.taskGroup=='0')
+        {
+          this.$message({
+            type:"error",
+            message:"必须为任务指定一个任务组别"
+          })
+        }else if(this.taskStart==''){
+          this.$message({
+            type:"error",
+            message:"开始时间不能为空"
+          })
+        }else if(this.taskEnd==''){
+          this.$message({
+            type:"error",
+            message:"结束时间不能空"
+          })
+        }
+        else if(this.taskStart>=this.taskEnd){
+          this.$message({
+            type:"error",
+            message:"结束时间不能早于开始时间"
+          })
+        }else{
+          axios({
+            method: 'post',
+            url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/add',
+            headers: {
+              'token': this.token
+            },
+            params: {
+              currentGroupId: this.taskGroup
+            },
+            data: {
+              taskName: this.taskName,//任务名称
+              dutyUserId: this.dutyUserId,//群组成员数据id
+              taskPriority: this.taskPriority,//任务优先级
+              taskUserGroup: this.taskUserGroup,//任务负责群组
+              taskGroup: this.taskGroup,//任务组别
+              taskType: this.taskType,//任务类型
+              taskStart: moment(this.taskStart).format("YYYY-MM-DD"),//任务开始时间
+              taskEnd: moment(this.taskEnd).format("YYYY-MM-DD"),//任务结束时间
+              taskParId: this.taskParId,
+              id: '',
+            }
+          }).then(response => {
+            if (response.data.cd == "0") {
+              this.addTaskDialog = false;
+              this.getTaskList();
+              this.dutyUserId='';
+              this.taskPriority='';
+              this.taskUserGroup='';
+              this.taskType='';
+              this.taskName = '';
+              this.taskStart = '';
+              this.taskEnd = '';
+            } else if (response.data.cd == "-1") {
+              alert(response.data.msg)
+            }
+          })
+        }
       },
       timeChange(val) {
         if (val) {
@@ -2645,6 +2636,11 @@
       },
       linkTypeRowClick(row, rowIndex) {
         this.selectRowList = rowIndex;
+        if(row.path[2].style.color=='red'){
+            row.path[2].style.color='black'
+        }else{
+            row.path[2].style.color='red';
+            }
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.linkTaskId = item.taskId
@@ -2768,6 +2764,29 @@
         return GMT
       },
       editTaskMakeSure() {
+        if(this.taskName==''){
+           this.$message({
+            type:"error",
+            message:"任务名称内容不能为空"
+          })
+        }else if(this.taskUserGroup =='0'){
+          this.$message({
+            type:"error",
+            message:"负责群组不能为空"
+          })
+        }
+        else if(this.taskGroup=='0')
+        {
+          this.$message({
+            type:"error",
+            message:"必须为任务指定一个任务组别"
+          })
+        }else if(this.taskStart>=this.taskEnd){
+          this.$message({
+            type:"error",
+            message:"结束时间不能早于开始时间"
+          })
+        }else{
         axios({
           method: 'post',
           url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/update',
@@ -2804,6 +2823,7 @@
             alert(response.data.msg)
           }
         })
+        }
 
       },
       editTaskCancle() {
@@ -2862,6 +2882,20 @@
             this.showText = false;
             this.showText1 = false;
             this.deleteTaskDialog = false;
+            this.taskInformationList=[];
+            // this.lastNodeName='';
+            // this.taskIndexData=[];
+            this.dutyUserId='';
+            this.taskPriority='';
+            this.taskUserGroup='';
+            this.taskType='';
+            this.taskName = '';
+            this.taskStart = '';
+            this.taskEnd = '';
+            this.$message({
+              type:'success',
+              message:'删除任务成功'
+            })
           } else if (response.data.cd == '-1') {
             alert(response.data.msg)
           }
@@ -2888,7 +2922,10 @@
       },
       removeTaskMakeSure() {
         if (this.taskId == this.removeTaskId) {
-          alert('移动任务不能是当前任务本身')
+          this.$message({
+              type:'success',
+              message:'移动任务不能是当前任务本身'
+            })
           return;
         }
         axios({
@@ -2907,6 +2944,10 @@
             this.removeTaskDialog = false;
             this.getTaskList();
             this.removeTaskId = '';
+            this.$message({
+              type:'success',
+              message:'移动任务成功'
+            })
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
           }
@@ -3092,7 +3133,21 @@
         //导入文件
         exportProject(){
             this.exportProjectDialog=true;
-
+      },
+      cancleSelect(){
+        this.taskId='';
+        this.taskInformationList=[];
+        this.lastNodeName='';
+        this.taskIndexData=[];
+        this.dutyUserId='';
+        this.taskPriority='';
+        this.taskUserGroup='';
+        this.taskType='';
+        this.taskName = '';
+        this.taskStart = '';
+        this.taskEnd = '';
+        this.getTaskIndex();
+       this.getTaskList();
       },
       exportProjectMakeSure() {
         if (this.taskId == '') {
@@ -3232,6 +3287,10 @@
                     if(response.data.msg!=null){
                       alert(response.data.msg);
                     }
+                    this.$message({
+                      type:'success',
+                      message:'添加清单成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -4489,11 +4548,11 @@
                         cursor: pointer;
                     }
                     .icon-add{
-                        background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                        // background: url('../ManageCost/images/add.png')no-repeat 0 0;
                         margin-right: 56px;
-                        &:hover{
-                            background: url('../ManageCost/images/add1.png')no-repeat 0 0;
-                        }
+                        // &:hover{
+                        //     background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                        // }
                     }
                     .icon-detial{
                         background: url('../ManageCost/images/detial.png')no-repeat 0 0;
@@ -4780,11 +4839,10 @@
                     font-size: 14px;
                     outline: none;
                   }
-
                 }
                 .startTime {
                   margin-left: 26px;
-                  margin-top: 42px;
+                  margin-top: 15px;
                   height: 30px;
                   float: left;
 

@@ -1339,11 +1339,14 @@ import Vue from 'vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
-
+var app
+var CurrentSelectPara
 export default Vue.component('common-list',{
   props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne'],
   data(){
+      window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+          TraceID:'',
          screenLeft:{
              show:false,
              item:1,
@@ -1457,10 +1460,16 @@ export default Vue.component('common-list',{
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
+        vm.userImg = localStorage.getItem('userImg')
+        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.projName = localStorage.getItem('projName')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.manifestId = vm.mId
         vm.getIntoList();
   }, 
@@ -1493,6 +1502,25 @@ export default Vue.component('common-list',{
       },
   },
   methods:{
+      callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+                    // console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+                CurrentSelectPara = e.data.parameter;
+			case "ViewpointSubmited":
+                break;
+        }
+      },
       checkLabel(scope){
           var vm = this
           vm.screenLeft.show = true
@@ -1543,12 +1571,16 @@ export default Vue.component('common-list',{
         vm.S_Label_quantitiesList = []
         vm.S_Label_quantitiesList.push(scope.row)
       },
-      openLocation(){
-        var vm  = this
-          vm.$message({
-              type:'info',
-              message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-          })
+      openLocation(scope){
+          this.TraceID=String(scope.row.dTraceId);
+          console.log(this.TraceID);
+          const para={"TraceID":this.TraceID} 
+         const app = document.getElementById('webglIframe').contentWindow;
+        app.postMessage({command:"LookAtEntities",parameter:para},"*");
+        //   vm.$message({
+        //       type:'info',
+        //       message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+        //   })
       },
       printLabelList(){
         var vm = this
@@ -1829,10 +1861,12 @@ export default Vue.component('common-list',{
                     }else if(isDialog == 0){
                         if(response.data.rt.rows != null){
                             vm.S_quantitiesList = response.data.rt.rows;
+                            
                             vm.S_quantitiesList.forEach((element,index) => {
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
                             });
+                            console.log(vm.S_quantitiesList);
                         }else{
                             vm.S_quantitiesList = [];
                         }
@@ -1845,6 +1879,7 @@ export default Vue.component('common-list',{
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
                             });
+                            console.log(vm.S_quantitiesList);
                         }else{
                             vm.S_Label_quantitiesList = []
                             vm.S_quantitiesList = []
