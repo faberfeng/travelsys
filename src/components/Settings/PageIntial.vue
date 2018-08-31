@@ -48,7 +48,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="flor" style="margin-bottom:30px;">
+        <div class="flor" style="margin-bottom:30px;display:none">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="sourceTable"> 
                 <el-table :data="UnityBundle" border class="table"  style="width:100%">

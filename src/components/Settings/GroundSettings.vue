@@ -32,7 +32,7 @@
         </div>
         <div class="groundSetting groundTitle">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-setting.png"/>场景设置
-                 <span :class="[{'groundEdit-active':!canEditCj},'groundEdit']" @click="groundInfoEditCJ"></span>
+                <span :class="[{'groundEdit-active':!canEditCj},'groundEdit']" @click="groundInfoEditCJ"></span>
             </h5>
             <div  :class="[{'groundInfoInp-active':!canEditCj},'groundSettingBody']">
                 <div class="groundSettingBodyS">
@@ -76,7 +76,7 @@
                 </el-table>
             </div>
         </div>
-        <div class="groundSource groundTitle" style="margin-bottom:30px;">
+        <div class="groundSource groundTitle" style="margin-bottom:30px; display:none">
            <h5 class="accountTitle"><img class="imgicon" src="../../assets/ground-resource.png"/>场地资源包<span @click="addSource" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="unityData" style="width:100%">
@@ -1369,7 +1369,7 @@ export default {
             
         }
         .el-table th{
-            background: #e0e0e0;
+            background: #f2f2f2;
         }
         .el-table tr{
             height: 36px;

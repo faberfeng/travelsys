@@ -667,6 +667,7 @@ export default {
             vm.hasFileToPaste.is = false
             vm.hasFileToPaste.obj = {}
             var filePaste = JSON.parse(sessionStorage.getItem('fileObject'))
+            console.log(filePaste);
             /***
              * @param    fileObject = {
                 fgIds: fgIdList,
@@ -678,7 +679,8 @@ export default {
              * 
              * **/
             if(filePaste){//不能 粘贴 剪切的文件 ,不支持剪切
-                if(filePaste.shear || filePaste.fcIds != '' || filePaste.from != ''){
+            // if(filePaste.shear || filePaste.fcIds != '' || filePaste.from != ''){
+                if(filePaste.shear || filePaste.fcIds != ''){
                     vm.hasFileToPaste.is = false
                     vm.hasFileToPaste.obj ={}
                 }else{
