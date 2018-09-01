@@ -11,7 +11,7 @@
                     </div>
                     <div class="func_area">
                         <div class="limits">
-                            <span class="icon-eye" @click="AddViewpoint()" >视点</span>
+                            <span class="icon-eye" @click="AddViewpoint()">视点</span>
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>
@@ -27,9 +27,9 @@
                  <div class="fileitem">   
                      <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
                          <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <img :src="base64Str" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
-                                <i class="button-download" @click="downLoad(val.filePath)"></i>
+                                <i class="button-relocation" title="定位" @click="relocation()"></i>
                                 <i class="line"></i>
                                 <i class="button-search"  @click="preview(val.filePath)"></i>
                                  <i class="line"></i>
@@ -334,6 +334,13 @@ export default Vue.component('common-upload',{
             if(!val)return ''
             var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
             return tt; 
+        },
+        //重回定位
+        relocation(){
+            const app = document.getElementById('webglIframe').contentWindow;
+            app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
         },
         preview(val){
             var vm = this

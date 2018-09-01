@@ -309,10 +309,12 @@ export default{
                         cursor: 'pointer',
                         point: {
                             events: {
-                                click: function (e) {
-                                    var html=this.title;
+                                click(e) {
+                                    console.log(e);
+                                    // var html=this.title;
                                         this.nowTime=e.point.category;
-                                        this.getResouceTypeByParams();
+                                        console.log(this.nowTime);
+                                        // this.getResouceTypeByParams();
                                     // this.getResouceTypeByParams();
                                 }
                             }
@@ -2343,7 +2345,7 @@ export default{
                 margin: 0 auto;
                 .action{
                     width: 20px;
-                    height:20px;
+                    height:17px;
                     background: #f2f2f2;
                 }
                 .titleText{

@@ -187,8 +187,8 @@ padding-right: 14px;
   
 }
 #edit .el-input__inner{
-  width: 322px;
-  height: 36px;
+  // width: 322px;
+  // height: 36px;
 }
 #edit .el-dialog__footer{
   padding: 0;

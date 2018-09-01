@@ -83,6 +83,15 @@
                                         <p class="projectListTextName">{{item.createUserStr}}</p>
                                         <p class="font-color1" v-html="item.dcContent"></p>
                                         <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                                            <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                                <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <div class="actionbox clearfix">
+                                                     <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                                    <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                    <i class="line"></i>
+                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                                                </div>
+                                            </li>
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
@@ -139,6 +148,15 @@
                                                         <!--下面是文件图片的代码-->
                                                             <div>
                                                                 <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                                                                    <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                                                        <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                                        <div class="actionbox clearfix">
+                                                                            <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                                                            <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                                            <i class="line"></i>
+                                                                            <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                                                                        </div>
+                                                                    </li>
                                                                     <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
@@ -1460,7 +1478,24 @@
                                             background: rgba(40, 40, 40, .4);
                                             transform: translateY(36px);
                                                 transition: all ease .5s;
+                                                .button-relocation{
+                                                    float: left;
+                                                    margin: 10px 40px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    background: url('../planCost/images/location.png') no-repeat 0 0;
+                                                    // background: url('./images/search2.png')no-repeat 0 0;
+                                                    cursor: pointer;
+                                                }
                                                 .button-search{
+                                                    float: left;
+                                                    margin: 10px 40px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                   background: url('./images/search2.png')no-repeat 0 0;
+                                                    cursor: pointer;
+                                                }
+                                                .button-search1{
                                                     float: left;
                                                     margin: 10px 40px;
                                                     width: 16px;
@@ -2580,6 +2615,15 @@
                             background: rgba(40, 40, 40, .4);
                             transform: translateY(36px);
                                 transition: all ease .5s;
+                                .button-relocation{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../planCost/images/location.png') no-repeat 0 0;
+                                    // background: url('./images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                    }
                                 .button-search{
                                     float: left;
                                     margin: 10px 40px;
@@ -4024,6 +4068,10 @@ export default {
           if(!val)return ''
           var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
           return tt; 
+      },
+      //重回定位
+      relocation(){
+
       },
       /**
          * 预览文件集文件
