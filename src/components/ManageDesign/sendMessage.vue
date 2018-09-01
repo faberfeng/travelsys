@@ -29,9 +29,9 @@
                          <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
                             <img :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
-                                <i class="button-search"  @click="preview(val.filePath)"></i>
-                                <i class="line"></i>
                                 <i class="button-download" @click="downLoad(val.filePath)"></i>
+                                <i class="line"></i>
+                                <i class="button-search"  @click="preview(val.filePath)"></i>
                                  <i class="line"></i>
                                  <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
                             </div>
@@ -177,6 +177,7 @@ export default Vue.component('common-upload',{
             WebGlSaveType:'',
             WebGlSaveName:'',
             base64Str:'',
+            elementFilter:'',
             uploadViewPointList:[]
         }
     },
@@ -240,12 +241,13 @@ export default Vue.component('common-upload',{
                 console.log(ScreenPara);
                 console.log(ScreenPara.para2);
                 this.base64Str=ScreenPara.para2;
+                this.elementFilter=JSON.stringify(ScreenPara.para1);
                  var vm = this
                     axios({
                         method:'POST',
-                        // url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
+                        url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
                         // url:vm.BDMSUrl+'/project2/dc/uploadViewPoint',
-                        url:"http://10.252.29.13:8080/h2-bim-project/project2/dc/uploadViewPoint/1/"+this.projId,
+                        // url:"http://10.252.29.13:8080/h2-bim-project/project2/dc/uploadViewPoint/1/"+this.projId,
                         headers:{
                             'token':vm.token
                         },
@@ -460,11 +462,18 @@ export default Vue.component('common-upload',{
                     fileUuid:item.fileUuid
                 })
             });
-            vm.uploadViewPointList.farEach((item,index)=>{
+            vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
-
+                        // elementFilter:this.elementFilter,
+                        extension:item.fileExtension,
+                        relativePath:item.filePath,
+                        uuid:item.fileUuid,
+                        name:item.fileName,
+                        projId:this.projId,
+                        subProjId:this.defaultSubProjId,
                     })
             })
+            console.log(vpListUid)
             if(vm.iscomment){
                  var data = {
                     dirId:-1,
@@ -506,7 +515,7 @@ export default Vue.component('common-upload',{
                         ugId: vm.selectugid,
                         userId: vm.userId
                     },
-                    vpList: [],
+                    vpList: vpListUid,
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
                     fileIdList: fuuid
@@ -516,10 +525,11 @@ export default Vue.component('common-upload',{
                 }
                 var url = '/project2/dc/'+vm.dcid+'/review/add'
             }
-            vm.fullscreenLoading = true
+            vm.fullscreenLoading = true;
+            console.log(data);
              axios({
                 method:'POST',
-                url:vm.BDMSUrl+url,//vm.BDMSUrl+url
+                url:"http://10.252.29.11:8080"+url,//vm.BDMSUrl+url
                 headers:{
                     'token':vm.token
                 },

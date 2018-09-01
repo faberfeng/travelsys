@@ -1898,29 +1898,27 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex) {
-        console.log(rowIndex);
-        // console.log(JSON.stringify(row));
-        // this.rowJson=JSON.stringify(row);
-        // console.log(row.isTrusted)
-        // this.rowStyle();
-        if(row.path[2].style.color=='red'){
-          row.path[2].style.color='black'
-        }else{
-            row.path[2].style.color='red';
-            }
-        //  this.taskId='';
-        // this.taskInformationList=[];
-        // this.lastNodeName='';
-        // this.taskIndexData=[];
-        // this.dutyUserId='';
-        // this.taskPriority='';
-        // this.taskUserGroup='';
-        // this.taskType='';
-        // this.taskName = '';
-        // this.taskStart = '';
-        // this.taskEnd = '';
-        // this.getTaskList();
-        // row.path[2].style.color='red'
+        // console.log(rowIndex);
+        
+        console.log(typeof(row.path[3]));
+        // row.path[3].childNodes.forEach((item)=>{
+        //   if(item.style.background){
+        //     item.style.color='black'
+        //   }else{
+        //     item.style.color='black'
+        //     item.style.backgroundColor='white'
+        //     }
+        // })
+        // if(row.path[2].style.background){
+        //   row.path[2].style.color='white';
+        // }else{
+        //   row.path[2].style.color='white';
+        //   row.path[2].style.backgroundColor='#0081c2'
+        // }
+        row.path[3].childNodes.forEach((item)=>{
+            item.style.backgroundColor='white'
+        })
+        row.path[2].style.backgroundColor='#0081c2'
         console.log(row.path[2]);
         console.log(row.path);
         this.selectRowList = rowIndex;
@@ -1946,7 +1944,7 @@
         var vm = this;
         if (row.children == null) {
           var color = vm.selectColor(parseInt(row.colorValue));
-          return 'background:' + color;
+          return 'color:' + color;
         }
       },
       //根据工程获取状态颜色
@@ -3271,7 +3269,7 @@
                 },
                 params:{
                     bId:this.taskId,
-                    bType:this.checkedItem.type,
+                    bType:2,
                     mId:this.checkedItem.detailId,
                     currState:this.checkedItem.serviceState,
                     currOperate:41,
@@ -3279,6 +3277,7 @@
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
+                    this.$emit('refresh')
                     this.addAssociationListDialog=false;
                     this.getLoadManifest();
                     this.getEntityRelation();
@@ -3291,6 +3290,7 @@
                       type:'success',
                       message:'添加清单成功'
                     })
+                    
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
