@@ -449,6 +449,7 @@ export default Vue.component('project-list',{
     data(){
         return {
             BDMSUrl:'',
+            QJFileManageSystemURL:'',
             token:'',
             projId:'',
             projObj:{},
@@ -579,7 +580,8 @@ export default Vue.component('project-list',{
             }
         })
         console.log(this.projObjArr)
-        this.BDMSUrl = this.$store.state.BDMSUrl;  
+        this.BDMSUrl = this.$store.state.BDMSUrl; 
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL; 
     },
     methods:{
         //返回
@@ -885,7 +887,7 @@ export default Vue.component('project-list',{
         },
         //预览文件
         preViewFile(item,index){
-            window.open('http://10.252.26.240:8080/qjbim-file'+item.filePath+'/preview?token='+this.token);
+            window.open(this.QJFileManageSystemURL+item.filePath+'/preview?token='+this.token);
         }
     }
 })

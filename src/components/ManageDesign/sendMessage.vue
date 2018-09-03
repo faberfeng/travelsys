@@ -27,7 +27,7 @@
                  <div class="fileitem">   
                      <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
                          <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img :src="base64Str" :title="val.fileName" class="item-file-attach"/>
+                            <img :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
                                 <i class="button-relocation" title="定位" @click="relocation()"></i>
                                 <i class="line"></i>
@@ -241,20 +241,16 @@ export default Vue.component('common-upload',{
                 console.log(ScreenPara);
                 console.log(ScreenPara.para2);
                 this.base64Str=ScreenPara.para2;
-                this.elementFilter=JSON.stringify(ScreenPara.para1);
+                // console.log(ScreenPara.para1);
+                this.elementFilter=ScreenPara.para1;
+                console.log(this.elementFilter);
                  var vm = this
                     axios({
                         method:'POST',
                         url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
-                        // url:vm.BDMSUrl+'/project2/dc/uploadViewPoint',
-                        // url:"http://10.252.29.13:8080/h2-bim-project/project2/dc/uploadViewPoint/1/"+this.projId,
                         headers:{
                             'token':vm.token
                         },
-                        // params:{
-                        //     projId:this.projId,
-                        //     type:1,
-                        // },
                         data:{"base64":this.base64Str}
                     }).then((response)=>{
                         if(response.data.cd == 0){
@@ -270,14 +266,6 @@ export default Vue.component('common-upload',{
 		    }
         },
         AddViewpoint(){
-            // if(app){
-            // const app = document.getElementById('webglIframe').contentWindow;
-            //     console.log(app);
-            // app.postMessage({command:"AddViewpoint",parameter:123},"*");
-            // }else{
-            //     this.$message({type:'success',
-            //             message:'虚拟场景面板未打开，请打开顶部虚拟场景面板'})
-            // }
              const app = document.getElementById('webglIframe').contentWindow;
                 console.log(app);
             app.postMessage({command:"AddViewpoint",parameter:123},"*");
@@ -471,7 +459,7 @@ export default Vue.component('common-upload',{
             });
             vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
-                        // elementFilter:this.elementFilter,
+                        elementFilter:this.elementFilter,
                         extension:item.fileExtension,
                         relativePath:item.filePath,
                         uuid:item.fileUuid,
@@ -493,9 +481,10 @@ export default Vue.component('common-upload',{
                         subProjId: vm.defaultSubProjId,
                         builderId: vm.holderid   // 单体 holderId
                     },
-                    vpList: vpListUid,//视点集合
+                    vpList:vpListUid,//视点集合
                     attachList: imguuid,
                     fileIdList: fuuid
+
                 };
                 var params = {}
                 var url = '/project2/dc/add'
@@ -522,7 +511,7 @@ export default Vue.component('common-upload',{
                         ugId: vm.selectugid,
                         userId: vm.userId
                     },
-                    vpList: vpListUid,
+                    vpList: [],
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
                     fileIdList: fuuid
@@ -536,7 +525,7 @@ export default Vue.component('common-upload',{
             console.log(data);
              axios({
                 method:'POST',
-                url:"http://10.252.29.11:8080"+url,//vm.BDMSUrl+url
+                url:vm.BDMSUrl+url,//vm.BDMSUrl+url
                 headers:{
                     'token':vm.token
                 },

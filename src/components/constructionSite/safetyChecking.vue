@@ -537,6 +537,8 @@ export default {
             tdValue:'',
             showTd:false,
             rwriteShow:false,
+            QJFileManageSystemURL:'',
+            BDMSUrl:'',
         }
     },
     created(){
@@ -2234,7 +2236,6 @@ export default {
                                 width: 16px;
                                 height: 16px;
                                 cursor: pointer;
-                                display: inline-block;
                                 width: 100px;
                                 font-size:14px;
                                 line-height: 16px;

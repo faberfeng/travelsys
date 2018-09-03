@@ -551,6 +551,7 @@ export default {
             addAndSendList:'',
             vpList:[],
             qjContactId:0,
+            QJFileManageSystemURL:''
         }
     },
     created(){

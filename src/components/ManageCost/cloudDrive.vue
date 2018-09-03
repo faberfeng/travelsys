@@ -626,7 +626,7 @@
             </div>
         </el-dialog>
     </div>
-    <form style="visibility:hidden" action="http://10.252.26.240:8080/qjbim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
+    <form style="visibility:hidden" action="http://bdms.arctron.cn/h2-bim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
         <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
         <input type="text" name="mName" :value="biaoqianInfo.mName">
         <input type="text" name="mGSource" :value="biaoqianInfo.mGSource_">

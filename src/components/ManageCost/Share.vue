@@ -45,7 +45,7 @@
                     </ul>
                     <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
                     <input type="text" id="copyInput" v-if="fgList.length>0"
-                    :value="checkedItem.sharePassword !=null?'链接：http://10.252.26.240:8080/qjbim-project/cloud/share/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:'http://10.252.26.240:8080/qjbim-project/cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
+                    :value="checkedItem.sharePassword !=null?'链接：'+this.QJFileManageSystemURL+'cloud/share/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:this.QJFileManageSystemURL+'cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
                 </p>
                 <div>
                 <!--文件夹代码-->
@@ -1737,7 +1737,7 @@ export default {
              },**/
              console.log(vm.checkedItem)
             vm.sharePath.show = true
-            vm.sharePath.path = 'http://10.252.26.240:8080/qjbim-project/cloud/share/'+vm.checkedItem.shareNo
+            vm.sharePath.path = this.QJFileManageSystemURL+'/cloud/share/'+vm.checkedItem.shareNo
             vm.sharePath.password = vm.checkedItem.sharePassword !=null?vm.checkedItem.sharePassword:''
         },
         closeLink(){
