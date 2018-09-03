@@ -27,7 +27,7 @@
                  <div class="fileitem">   
                      <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
                          <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
                                 <i class="button-relocation" title="定位" @click="relocation()"></i>
                                 <i class="line"></i>
@@ -242,7 +242,9 @@ export default Vue.component('common-upload',{
                 console.log(ScreenPara.para2);
                 this.base64Str=ScreenPara.para2;
                 // console.log(ScreenPara.para1);
+                console.log(typeof(ScreenPara.para1));
                 this.elementFilter=ScreenPara.para1;
+
                 console.log(this.elementFilter);
                  var vm = this
                     axios({
@@ -266,8 +268,7 @@ export default Vue.component('common-upload',{
 		    }
         },
         AddViewpoint(){
-             const app = document.getElementById('webglIframe').contentWindow;
-                console.log(app);
+             const app = document.getElementById('webIframe').contentWindow;
             app.postMessage({command:"AddViewpoint",parameter:123},"*");
         },
         checkItem(index){
@@ -325,7 +326,7 @@ export default Vue.component('common-upload',{
         },
         //重回定位
         relocation(){
-            const app = document.getElementById('webglIframe').contentWindow;
+            const app = document.getElementById('webIframe').contentWindow;
             app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
@@ -555,6 +556,7 @@ export default Vue.component('common-upload',{
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
+                    vm.uploadViewPointList=[]                     
                     vm.$refs.message.value = ''
                     vm.newStmt = false
                 }else{

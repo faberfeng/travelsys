@@ -83,15 +83,16 @@
                                         <p class="projectListTextName">{{item.createUserStr}}</p>
                                         <p class="font-color1" v-html="item.dcContent"></p>
                                         <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                                            <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                            <!-- <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                                 <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
-                                                     <i class="button-relocation" title="定位" @click="relocation()"></i>
-                                                    <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                     <i class="button-relocation"  @click="relocation(val.locationInfo)"></i>
+                                                     <i class="line"></i>
+                                                    <i class="button-search" @click="relocation()" ></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                 </div>
-                                            </li>
+                                            </li> -->
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
@@ -110,9 +111,11 @@
                                                 </div>
                                             </li>
                                             <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <img style="object-fit: cover" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
-                                                    <i class="button-search"  @click="preview(val.relativePath)"></i>
+                                                    <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                     <i class="line"></i>
+                                                    <i class="button-search"   @click="preview(val.relativePath)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                 </div>
@@ -149,9 +152,10 @@
                                                             <div>
                                                                 <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
                                                                     <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                                        <img style="object-fit: cover" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
                                                                             <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                                                            <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(val.relativePath)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(val.relativePath)"></i>
@@ -175,7 +179,7 @@
                                                                         </div>
                                                                     </li>
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
+                                                                        <img  style="object-fit: cover"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
@@ -1019,6 +1023,7 @@
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
+                            object-fit: cover;
                         }
                         .actionbox{
                             display: block;
@@ -1029,11 +1034,21 @@
                             background: rgba(40, 40, 40, .4);
                             transform: translateY(36px);
                              transition: all ease .5s;
+                             .button-relocation{
+                                float: left;
+                                margin: 10px 64px;
+                                width: 16px;
+                                height: 16px;
+                                background: url('../planCost/images/location.png') no-repeat 0 0;
+                                // background: url('./images/search2.png')no-repeat 0 0;
+                                cursor: pointer;
+                             }
                              .button-search{
                                  float: left;
                                  margin: 10px 64px;
                                  width: 16px;
                                  height: 16px;
+                                //  background: url('../planCost/images/location.png') no-repeat 0 0;
                                  background: url('./images/search2.png')no-repeat 0 0;
                                  cursor: pointer;
                              }
@@ -1462,12 +1477,13 @@
                                         position: relative;
                                         padding: 8px;
                                         .item-file-attach{
-                                            width: 100%;
+                                            // width: 100%;
                                             height: 120px;
                                             margin: 0;
                                             padding: 0;
                                             border-radius:2px;
                                             cursor: pointer;
+                                            object-fit: cover;
                                         }
                                         .actionbox{
                                             display: block;
@@ -2599,12 +2615,13 @@
                         position: relative;
                         padding: 8px;
                         .item-file-attach{
-                            width: 100%;
+                            // width: 100%;
                             height: 120px;
                             margin: 0;
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
+                            object-fit: cover;
                         }
                         .actionbox{
                             display: block;
@@ -2795,6 +2812,7 @@ export default {
         sendMes
   },
   data(){
+       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
          screenLeft:{
              show:true,
@@ -3024,6 +3042,25 @@ export default {
       },
   },
   methods:{
+      callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+                    // console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+			case "CurrentSelectedEnt":
+				break;
+			case "ViewpointSubmited":
+                ScreenPara = e.data.parameter;
+		    }
+        },
       checkIcon(val){
           var vm = this
           var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
@@ -3083,6 +3120,7 @@ export default {
         }).then((response)=>{
             if(parseInt(response.data.cd) == 0){
                 vm.CommentList = response.data.rt.rows
+                console.log(vm.CommentList);
                 vm.CommunicationList.forEach((item,key)=>{
                     if(key == index){
                         item.showFlowChart = false
@@ -3363,6 +3401,7 @@ export default {
             vm.CommunicationList = {}
             if(response.data.cd == 0){
                vm.CommunicationList = response.data.rt.rows
+               console.log(this.CommunicationList);
                if(vm.CommunicationList != null){
                 vm.CommunicationList.forEach((item,index)=>{
                     vm.$set(item,'showFlowChart',false)
@@ -4070,8 +4109,12 @@ export default {
           return tt; 
       },
       //重回定位
-      relocation(){
-
+      relocation(val){
+          console.log(val);
+          const app = document.getElementById('webIframe').contentWindow;
+            app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
       },
       /**
          * 预览文件集文件
