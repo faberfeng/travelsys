@@ -2812,7 +2812,7 @@ export default {
         sendMes
   },
   data(){
-       window.addEventListener("message", (evt)=>{this.callback(evt)});
+    //    window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
          screenLeft:{
              show:true,
@@ -3042,25 +3042,22 @@ export default {
       },
   },
   methods:{
-      callback(e){
-           // console.log(e)
-            switch(e.data.command){
-			case "EngineReady":
-				{
-					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
-					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
-                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-                    // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-					app.postMessage({command:"EnterProject",parameter:para},"*");
-				}
-				break;
-			case "CurrentSelectedEnt":
-				break;
-			case "ViewpointSubmited":
-                ScreenPara = e.data.parameter;
-		    }
-        },
+    //   callback(e){
+    //        // console.log(e)
+    //         switch(e.data.command){
+	// 		case "EngineReady":
+	// 			{
+    //                 let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+	// 				let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+	// 				app.postMessage({command:"EnterProject",parameter:para},"*");
+	// 			}
+	// 			break;
+	// 		case "CurrentSelectedEnt":
+	// 			break;
+	// 		case "ViewpointSubmited":
+    //             ScreenPara = e.data.parameter;
+	// 	    }
+    //     },
       checkIcon(val){
           var vm = this
           var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
