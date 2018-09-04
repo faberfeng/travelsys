@@ -1355,7 +1355,6 @@ export default Vue.component('common-edit',{
     },
     created(){
         var vm = this;
-        console.log(this.rcId);
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
@@ -1768,7 +1767,6 @@ export default Vue.component('common-edit',{
                     token:vm.token
                 },
             }).then(response=>{
-                console.log(response.data);
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称

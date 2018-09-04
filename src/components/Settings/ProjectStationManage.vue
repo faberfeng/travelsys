@@ -23,7 +23,7 @@
                     <li v-for="(item,index) in projectStationList" :key="index">
                         <div class="projectListInfo">
                             <div class="projectListImg">
-                                <img :src="'http://10.252.26.240:8080/qjbim-file/'+item.userImg">
+                                <img :src="item.userImg?'http://10.252.26.240:8080/qjbim-file/'+item.userImg:require('../../assets/people.png')">
                             </div> 
                             <div class="projectListText">
                                 <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>

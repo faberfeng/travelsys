@@ -238,7 +238,6 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"></i>
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode"></i>
                                 <i class="icon-goujian icon-location"></i>

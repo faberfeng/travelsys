@@ -71,7 +71,7 @@
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
                                     <div class="projectListImg">
-                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/loginimg.png')">
+                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/people.png')">
                                     </div> 
                                     <div class="projectListText">
                                         <span class="action_rightBox">
@@ -126,7 +126,7 @@
                                             v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                             <ul >
                                                 <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
-                                                    <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/loginimg.png')" class="left">
+                                                    <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/people.png')" class="left">
                                                     <div  class="center">
                                                         <span class="icon-delete" v-if="val.editable"  @click="deleteComment(val.dcId,val.id,key,index)"></span>
                                                         <p class="head">
@@ -415,7 +415,7 @@
     </div>
     <el-dialog title="联系人详情" id="contactINFO" :visible="selectContact.infoShow" @close="selectInfoCancle">
         <div class="clearfix">
-            <img :src="selectContact.infoObj.imgUuid !=''?(QJFileManageSystemURL+selectContact.infoObj.imgUuid):require('../../assets/loginimg.png')" alt="" class="img">
+            <img :src="selectContact.infoObj.imgUuid !=''?(QJFileManageSystemURL+selectContact.infoObj.imgUuid):require('../../assets/people.png')" alt="" class="img">
             <div class="info">
                 <h1 v-text="selectContact.infoObj.realName"></h1>
                 <div class="detial">
@@ -529,13 +529,13 @@
             }
             /* 上传文件按钮 */
             .imageBody{
-            text-align: left;
+                text-align: left!important;
             }
             .el-radio__label{
                 padding-left: 10px;
                 padding-right: 10px;
             }
-            .imageBody .imageBodyText{
+            .imageBodyText{
                 color: #666;
                 font-size: 14px;
                 line-height: 14px;
@@ -2123,7 +2123,7 @@
                         width: 40px;
                         height: 40px;
                         margin: 10px;
-                        background-image: url('../../assets/loginimg.png');
+                        background-image: url('../../assets/people.png');
                         background-size:100% 100%; 
                         border-radius: 50%;
                     }
@@ -3742,12 +3742,10 @@ export default {
                 image.onload=function(){  
                     dwidth = image.width;  
                     dheight = image.height;  
-                    console.log(dwidth+'::'+dheight)
                 }; 
                 image.src= data;   
             };  
             reader.readAsDataURL(list[0])
-            // console.log(dwidth+'::::'+dheight)
             setTimeout(function(){
                   vm.fileList.push({
                     file:list[0],//文件
@@ -3758,7 +3756,6 @@ export default {
                     dwidth:dwidth,
                     dheight:dheight
                 })
-                console.log(vm.fileList)
             },0)
         },
       addfileCancle(){
@@ -3828,7 +3825,6 @@ export default {
                 },
                 data:formData,
             }).then((response)=>{
-                console.log(response)
                 if(response.data.rt){
                     vm.drawingsUploadShow = false
                     vm.fileList = []

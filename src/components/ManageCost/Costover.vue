@@ -147,7 +147,6 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"></i>
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode"></i>
                                 <i class="icon-goujian icon-location"></i>
@@ -159,15 +158,15 @@
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">状态 :</span>
-                            <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
+                                <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">明细 :</span>
-                            <span class="detial-text-value" v-text="item.details.length"></span>
+                                <span class="detial-text-value" v-text="item.details.length"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">名称 :</span>
-                            <span class="detial-text-value" v-text="item.main.mName"></span>
+                                <span class="detial-text-value" :title="item.main.mName" v-text="item.main.mName"></span>
                             </p>
                         </li>
                     </ul>
@@ -188,7 +187,7 @@
                 <ul>
                     <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem"  @click="selectVersion(index)" :key="index">
                         <div class="clearfix">
-                            <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
+                            <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                             <div class="versin-detial">
                                 <span class="user-name" v-text="item.uploadUserName"></span>
                                 <span class="version-number" v-text="'版本-'+item.version"></span>
@@ -755,9 +754,9 @@
                 float: left;
             }
             .detial-text-value{
-               float: left;
-               color: #333333;
-                max-width: 130px;
+                float: left;
+                color: #333333;
+                max-width: 120px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -816,15 +815,16 @@
             }
             .detial-text-name{
                 color: #999999;
-                width: 65px;
+                width: 45px;
                 display: inline-block;
             }
             .detial-text-value{
                 color: #333333;
-                max-width: 130px;
+                max-width: 100px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                display: inline-block;
             }
             .item-detial{
                 margin-top: 16px;

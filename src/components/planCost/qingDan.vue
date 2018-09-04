@@ -1298,7 +1298,7 @@
                     }
                     .detial-text-value{
                         color: #333333;
-                        max-width: 120px;
+                        max-width: 100px;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;

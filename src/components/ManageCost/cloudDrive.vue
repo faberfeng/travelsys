@@ -346,7 +346,7 @@
                     <ul>
                         <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
                             <div class="clearfix">
-                                <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
+                                <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                                 <div class="versin-detial">
                                     <span class="user-name" v-text="item.uploadUserName"></span>
                                     <span class="version-number" v-text="'版本-'+item.version"></span>
@@ -439,7 +439,7 @@
             <div class="project1 project">
                 <div class="projectTitle">
                 <div class="projectTitleLeft">
-                    <el-radio>清单名称关键字：</el-radio>
+                    <p style="text-align:left">清单名称关键字：</p>
                     <div class="titleDiv">
                     <input class="projectTitleLeftinp" v-model="newList.detailName" />
                     </div>
@@ -455,7 +455,7 @@
                     </div>
                 </div>
                 <div class="projectTitleRight">
-                    <el-radio>创建时间：</el-radio>
+                    <p style="text-align:left;">创建时间：</p>
                     <div class="titleDiv">
                         <el-date-picker class="projectTitleLeftinp" v-model="newList.dataRange" type="daterange" range-separator="至"
                             start-placeholder="开始日期" end-placeholder="结束日期">
@@ -477,7 +477,7 @@
                 </div>
                 <div style="overflow:hidden;">
                 <span class="searchresult">查询结果</span>
-                    <button class="selectsence">场景选择</button>
+                <!-- <button class="selectsence">场景选择</button> -->
                 <table border="1" class="UserList" width="100%">
                     <thead>
                     <tr class="userList-thead">

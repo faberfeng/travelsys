@@ -437,7 +437,7 @@
                 <div class="project1 project">
                     <div class="projectTitle">
                         <div class="projectTitleLeft">
-                            <el-radio>清单名称关键字：</el-radio>
+                            <p style="text-align:left">清单名称关键字：</p>
                             <div class="titleDiv">
                                 <input class="projectTitleLeftinp" v-model="newList.detailName"/>
                             </div>
@@ -453,7 +453,7 @@
                             </div>
                         </div>
                         <div class="projectTitleRight">
-                            <el-radio>创建时间：</el-radio>
+                            <p style="text-align:left">创建时间：</p>
                             <div class="titleDiv">
                                 <el-date-picker
                                     class="projectTitleLeftinp"
@@ -480,7 +480,7 @@
                     </div>
                     <div style="overflow:hidden;">
                         <span class="searchresult">查询结果</span>
-                        <button class="selectsence" @click="selectScence">场景选择</button>
+                        <!-- <button class="selectsence" @click="selectScence">场景选择</button> -->
                         <table border="1" class="UserList" width="100%">
                             <thead>
                                 <tr  class="userList-thead">

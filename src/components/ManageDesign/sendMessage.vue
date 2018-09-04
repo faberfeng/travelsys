@@ -1,5 +1,5 @@
 <template>
-      <div v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}"  v-loading.fullscreen.lock="fullscreenLoading">
+      <div id="sendme" v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}"  v-loading.fullscreen.lock="fullscreenLoading">
           <div class="left" v-if="iscomment">
               <img :src="userImg" alt="" >
           </div>
@@ -521,132 +521,132 @@ export default Vue.component('common-upload',{
     }
 })
 </script>
-<style lang="less" scoped>
-    
-    .UserList{
-        max-height: 402px;
-        overflow-y: auto;
-        border-collapse: collapse;
-        border: 1px solid #e1e1e1;
-        thead{
-            border-bottom: 1px solid #e1e1e1;
-            background: #f3f3f3;
-            th{
-                height: 36px;
-                text-align: left;
-                font-size: 12px;
-                color: #999999;
-                font-weight: normal;
-                border-right: 1px solid #e1e1e1;
-                  padding-left:10px!important; 
-            }
-        }
-        tbody{
-            tr{
-                td{
+<style lang="less">
+    #sendme{
+        .UserList{
+            max-height: 402px;
+            overflow-y: auto;
+            border-collapse: collapse;
+            border: 1px solid #e1e1e1;
+            thead{
+                border-bottom: 1px solid #e1e1e1;
+                background: #f3f3f3;
+                th{
                     height: 36px;
                     text-align: left;
-                    box-sizing: border-box;
-                    font-size: 14px;
-                    color: #333333;
-                    border-bottom: 1px solid #e1e1e1;
+                    font-size: 12px;
+                    color: #999999;
+                    font-weight: normal;
                     border-right: 1px solid #e1e1e1;
-                     padding-left:10px!important; 
-                    .checkbox-fileItem{
-                        display:block;
-                        width: 14px;
-                        height: 14px;
-                        border: 1px solid #cccccc;
-                        cursor: pointer;
-                        margin-left: 20px;
+                    padding-left:10px!important; 
+                }
+            }
+            tbody{
+                tr{
+                    td{
+                        height: 36px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        font-size: 14px;
+                        color: #333333;
+                        border-bottom: 1px solid #e1e1e1;
+                        border-right: 1px solid #e1e1e1;
+                        padding-left:10px!important; 
+                        .checkbox-fileItem{
+                            display:block;
+                            width: 14px;
+                            height: 14px;
+                            border: 1px solid #cccccc;
+                            cursor: pointer;
+                            margin-left: 20px;
+                        }
+                        .active{
+                            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                            border: 1px solid #fc3439;
+                        }
+                        img{
+                            height: 18px;
+                            float: left;
+                            margin-right: 7px;
+                        }
+                    .deleteBtn{
+                        display: block;
+                        width: 16px;
+                            height: 16px;
+                            border: none;
+                            cursor: pointer;
+                            margin-right: 16px;
+                            background: url('../../assets/delete.png') no-repeat;
+                        }
                     }
-                    .active{
-                        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                        border: 1px solid #fc3439;
-                    }
-                    img{
-                        height: 18px;
-                        float: left;
-                        margin-right: 7px;
-                    }
-                  .deleteBtn{
-                      display: block;
-                       width: 16px;
-                        height: 16px;
-                        border: none;
-                        cursor: pointer;
-                        margin-right: 16px;
-                        background: url('../../assets/delete.png') no-repeat;
+                    &:hover{
+                        background: #fafafa;
+                        .icon-goujian{
+                            display: inline-block;
+                        }
                     }
                 }
-                &:hover{
-                    background: #fafafa;
-                    .icon-goujian{
-                        display: inline-block;
+                tr:nth-child(2n){
+                    td{
+                        background: #f3f3f3;
+                    }
+                }
+                .active{
+                    border: none!important;
+                    td{
+                        background: #0081c2!important;
                     }
                 }
             }
-             tr:nth-child(2n){
-                 td{
-                    background: #f3f3f3;
-                }
+        }
+        .checkbox-fileItem{
+            float: left;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            margin-right: 100px!important;
+            position: relative;
+            &::after{
+                font-size:12px;
+                color:#cccccc;
+                display: block;
+                position: absolute;
+                right: -80px;
+                top: 0;
+                line-height:12px;
+                content: '保存为新短语';
             }
-            .active{
-                border: none!important;
-                td{
-                    background: #0081c2!important;
-                }
+        }
+        .checkbox-fileItem_same{
+            float: left;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            position: relative;
+            &::after{
+                font-size:12px;
+                color:#cccccc;
+                display: block;
+                position: absolute;
+                right: -115px;
+                top: 0;
+                line-height:12px;
+                content: '同时作为新主题发表';
             }
         }
-    }
-    .checkbox-fileItem{
-        float: left;
-        width: 14px;
-        height: 14px;
-        border: 1px solid #cccccc;
-        cursor: pointer;
-        margin-right: 100px!important;
-        position: relative;
-        &::after{
-            font-size:12px;
-            color:#cccccc;
-            display: block;
-            position: absolute;
-            right: -80px;
-            top: 0;
-            line-height:12px;
-            content: '保存为新短语';
+        .active{
+            background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                border: 1px solid #fc3439;
+        }
+        .el-checkbox{
+            float: left;
+        }
+        .imageBody{
+            text-align: center!important;
         }
     }
-    .checkbox-fileItem_same{
-        float: left;
-        width: 14px;
-        height: 14px;
-        border: 1px solid #cccccc;
-        cursor: pointer;
-        position: relative;
-        &::after{
-            font-size:12px;
-            color:#cccccc;
-            display: block;
-            position: absolute;
-            right: -115px;
-            top: 0;
-            line-height:12px;
-            content: '同时作为新主题发表';
-        }
-    }
-    .active{
-        background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-            border: 1px solid #fc3439;
-    }
-    .el-checkbox{
-        float: left;
-    }
-    .imageBody{
-        text-align: center;
-    }
-  
 </style>
 
 
