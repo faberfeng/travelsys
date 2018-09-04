@@ -62,9 +62,10 @@ export default {
         return{
             tabShow:1,
             token:'',
-            baseUrl:'http://10.252.26.240:8080/qjbim-file/',
+            baseUrl:'http://10.252.26.240:8080/qjbim-project/',
             // http://10.252.26.240:8080/qjbim-project/
             // http://42.159.154.173:8080/qjbim-file/
+            // http://10.252.26.240:8080/qjbim-file/
             QJFileManageSystemURL:'',
             BDMSUrl:'',
             notbeenUse:true,

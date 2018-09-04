@@ -53,12 +53,14 @@ export default {
     },
     created(){
         var vm = this;
+       
         const token = localStorage.getItem('token') 
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
         if(defaultSubProjId != 'undefined'){
             localStorage.removeItem('defaultSubProjId')
         }
+         this.validateInstance()
         if(token != 'undefined'){
             vm.token = token
             //判断是否登陆
@@ -69,6 +71,18 @@ export default {
         func(event){
             var event = event || e;
             event.preventDefault();
+        },
+        //实例验证
+        validateInstance(){
+            axios({
+                method:'get',
+                url: this.BDMSUrl +'user2/validateInstance',
+                headers:{
+                'token':this.token
+                },
+            }).then((response) => {
+               
+            })
         },
         BeforeLogin(){
             var vm = this
