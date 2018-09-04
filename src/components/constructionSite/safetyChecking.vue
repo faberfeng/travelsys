@@ -170,7 +170,6 @@
                             </el-tree>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div v-if="labelListShow"  id="edit" class="dialog">
@@ -393,11 +392,11 @@
                                 <span class="editFile actionBtn" @click="rwrite()">重命名</span>
                             </div>
                             <div class="editBody_right2">
-                                <span class="newFile actionBtn" @click="addCheckPoint()">确认</span>
-                                <span class="newFile actionBtn" @click="checkPointCancel()">撤销</span>
+                                <span class="makeSureFile actionBtn" @click="addCheckPoint()">确认</span>
+                                <span class="resetFile actionBtn" @click="checkPointCancel()">撤销</span>
                             </div>
                             <div class="editBody_right3">
-                                <span class="newFile actionBtn" @click="newFileClose()">关闭</span>
+                                <span class="closeFile actionBtn" @click="newFileClose()">关闭</span>
                             </div>
                         </div>
                     </div>
@@ -538,6 +537,8 @@ export default {
             tdValue:'',
             showTd:false,
             rwriteShow:false,
+            QJFileManageSystemURL:'',
+            BDMSUrl:'',
         }
     },
     created(){
@@ -1466,11 +1467,13 @@ export default {
             height: 90%;
             padding:20px;
             margin-top:5px;
+            ::-webkit-scrollbar{width:0px}
             .project_left{
                 // border:1px solid red;
                 width: 80%;
-                height: 100%;
+                height: 800px;
                 float: left;
+                ::-webkit-scrollbar{width:0px}
                 .information{
                     margin-top:10px;
                     height:60px;
@@ -1847,6 +1850,7 @@ export default {
                 position: absolute;
                 top: 98px;
                 right: 0px;
+                height: 800px;
                 .checkProjectList_header{
                     height: 40px;
                     border-bottom:1px solid #999; 
@@ -2137,6 +2141,28 @@ export default {
                                     background: url('../ManageCost/images/add1.png')no-repeat 0 0;
                             }
                         }
+                        
+                        .newFile1{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .newFile2{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
+                        .newFile3{
+                            background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                            }
+                        }
                         .make{
                              background: url('../ManageCost/images/add.png')no-repeat 0 0;
                                 margin-right: 10px;
@@ -2174,6 +2200,20 @@ export default {
                                 margin-top:25px;
                                 margin-left:10px;
                         }
+                        .makeSureFile{
+                            background: url('./images/baoc.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('./images/baocred.png')no-repeat 0 0;
+                            }
+                        }
+                        .resetFile{
+                            background: url('./images/cx.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('./images/cxred.png')no-repeat 0 0;
+                            }
+                        }
                         .newFile{
                             background: url('../ManageCost/images/add.png')no-repeat 0 0;
                                 margin-right: 10px;
@@ -2184,17 +2224,30 @@ export default {
                     }
                     .editBody_right3{
                         border-bottom: 1px solid #999;
+                        .closeFile{
+                            background: url('./images/guanb.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('./images/guanb-1.png')no-repeat 0 0;
+                            }
+                        }
                         .actionBtn{
                                 float: left;
                                 width: 16px;
                                 height: 16px;
                                 cursor: pointer;
-                                display: inline-block;
                                 width: 100px;
                                 font-size:14px;
                                 line-height: 16px;
                                 margin-top:25px;
                                 margin-left:10px;
+                        }
+                        .makeSureFile{
+                            background: url('./images/baoc.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('./images/baocred.png')no-repeat 0 0;
+                            }
                         }
                         .newFile{
                             background: url('../ManageCost/images/add.png')no-repeat 0 0;

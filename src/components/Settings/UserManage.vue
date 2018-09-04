@@ -113,7 +113,7 @@
             <div  class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url(http://10.252.26.240:8080/qjbim-file/'+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
@@ -556,7 +556,8 @@ export default {
           },
           projUserId:0,//编辑的用户ID
           token:'',
-          BDMSUrl:''
+          BDMSUrl:'',
+          QJFileManageSystemURL:''
       }
   },
   watch:{
@@ -575,6 +576,7 @@ export default {
       var vm = this
       var projAuth = localStorage.getItem('projAuth')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
+      vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')

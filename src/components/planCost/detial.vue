@@ -2,15 +2,6 @@
 <div id="CommenList" v-loading.fullscreen.lock="fullscreenLoading">
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
-                <div id="center-selection">
-                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                        <i class="icon-right"></i>
-                    </div>
-                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.show = true;screenLeft.item = 1">构<br>件</span>
-                        <span class="item-version " @click="screenLeft.show = true;screenLeft.item = 2">选<br>型</span>
-                    </div>
-                </div>
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
                         <p class="antsLine">
@@ -102,8 +93,17 @@
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':screenLeft.show},'box-right-container']" >
-            <div v-if="screenLeft.item == 1" class="screenRight_1">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']" >
+             <div id="center-selection">
+                    <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+                        <i class="icon-right"></i>
+                    </div>
+                    <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
+                        <span class="item-property " @click="screenLeft.show = true;screenLeft.item = 1">构<br>件</span>
+                        <span class="item-version " @click="screenLeft.show = true;screenLeft.item = 2">选<br>型</span>
+                    </div>
+            </div>
+            <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div>
                         <h3 class="header-attribute" style="margin-top: 0px;">
                             <i class="trrangle"></i>
@@ -215,7 +215,7 @@
                         </div>
                 </div>
             </div>
-             <div v-if="screenLeft.item == 2" class="screenRight_1">
+             <div v-show="screenLeft.show" v-if="screenLeft.item == 2" class="screenRight_1">
                 <div>
                     <h3 class="header-attribute" style="margin-top: 0px;">
                         <i class="trrangle"></i>
@@ -585,26 +585,38 @@
             }
         }
         .box-left-container{
-            display: block;
-            position: fixed;
-            top: 165px;
-            left: 26px;
-            bottom: 0;
-            right: 225px;
-            z-index: 1001;
+            // display: block;
+            // position: fixed;
+            // top: 165px;
+            // left: 26px;
+            // bottom: 0;
+            // right: 225px;
+            // z-index: 1001;
+            // transition:  all ease .5s;
+            // overflow: auto;
+            display: inline-block;
+            width: 85%;
+            position: relative;
             transition:  all ease .5s;
-            overflow: auto;
-            #center-selection{
-                position: fixed;
-                top: 115px;
-                right: 225px;
+             #center-selection{
+                // position: fixed;
+                // top: 115px;
+                // right: 225px;
+                // width: 25px;
+                // z-index: 100;
+                // transition: all ease .5s;
+                // background: #ffffff;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
                 width: 25px;
-                z-index: 100;
-                transition: all ease .5s;
-                background: #ffffff;
+                border-right: 1px solid #cccccc;
                 .SH_right{
-                    width: 25px;
-                    height: 50px;
+                    // width: 25px;
+                    // height: 50px;
+                    width: 100%;
+                    height: 48px;
                     border-left: 1px solid #cccccc;
                     border-bottom: 1px solid #cccccc;
                     position: relative;
@@ -1095,7 +1107,7 @@
             }
         }
         .box-left-avtive,.box-left-avtive_pre{
-            right: 0px;
+             width: 98%;
             transition:  all ease .5s;
             #center-selection{
                 right: 0;
@@ -1143,18 +1155,28 @@
         右侧
         */
         .box-right-container{
-            display: block;
-            position: fixed;
-            overflow-y: auto;
-            right: -225px;
-            bottom: 0;
-            width: 225px;
-            top: 116px;
+            // display: block;
+            // position: fixed;
+            // overflow-y: auto;
+            // right: -225px;
+            // bottom: 0;
+            // width: 225px;
+            // top: 116px;
+            // transition: all ease .5s;
+            // background: #ffffff;
+            // z-index: 10;
+            // border-left:none;
+            // z-index: 1000;
+            display: inline-block;
+            position: relative;
+            float: right;
+            width: 15%;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
-            border-left:none;
-            z-index: 1000;
+            height: 785px;
+            overflow-y: auto;
+            overflow-x: hidden;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
                 margin: 0 14px 0 10px;
@@ -1238,9 +1260,8 @@
             }
         }
         .box-right-avtive{
-            right: 0;
+            width: 2%;
             transition: all ease .5s;
-            border-left: 1px solid #cccccc;
         }
         /* 设置滚动条的样式 */
         ::-webkit-scrollbar {

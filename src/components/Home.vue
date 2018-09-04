@@ -3,15 +3,11 @@
       <!--2018/3/21 付伟超修改-->
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
         <div class="contentBody">
-            <!-- <div class="sideBar" ref="sideB">
-                <a href="#" >
-                    <img src="../assets/arrow-left.png"/>
-                </a>
-            </div> -->
-            <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
+            <div class="downWebGl" @click="webGlbtn">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                     <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
+                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe> -->
                 </div>
             </div>
             <div  class="main">
@@ -172,9 +168,6 @@ export default {
         }else{
            this.cHeight = document.body.clientHeight;
         }
-       // this.$refs.sideB.style.height = this.cHeight+'px';
-        
-        // this.$refs.settingsL.style.height = this.cHeight+'px';
     },
     computed:{
         path(){
@@ -182,7 +175,7 @@ export default {
         },
     },
     methods:{
-        btn12(){
+        webGlbtn(){
             console.log('fjd');
             this.webGlShow=!this.webGlShow;
             localStorage.setItem('webGlShow',this.webGlShow);
@@ -616,17 +609,6 @@ export default {
         width: 100%;
         position: relative;
     }
-    /* .webglBackGround{
-        	height: 800px;
-        height: 800px;
-        width: 100%;
-        margin:0 auto;
-        margin-top: 60px;
-        display: inline-block;
-        background: #666666;
-        opacity: 0;
-
-    } */
     .downWebGl{
         /* position: fixed; */
         position:absolute;
@@ -662,14 +644,6 @@ export default {
         transition: all 0.7s ease;
     }
     .settingsRight{
-        /* display: block;
-        margin-left: 219px;
-        float: left;
-        height: 800px;
-        width: 88%;
-        overflow-y: auto;
-        overflow-x: hidden; */
-
         position: absolute;
         top: 48px;
         left: 212px;
@@ -745,11 +719,6 @@ export default {
        
     }
     .settingsLeft{
-        /* width: 192px;
-        position: fixed;
-        top: 116px;
-        left: 26px;
-        bottom: 0; */
         z-index: 100;
          background: #fafafa;
         border-right:1px solid #ccc; 

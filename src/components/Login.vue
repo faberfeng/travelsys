@@ -16,15 +16,15 @@
                     <form onsubmit="return false;" method="post">
                         <div class="loginInput">
                             <div id="firstInp"><input placeholder="账号" name="id" class="input" v-model="login.Id"/></div>
-                            <div id="secondInp" class="af"><input @keyup.enter="Login" name="password" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
+                            <div id="secondInp" class="af"><input @keyup.enter.native="Login" name="password" placeholder="密码" type="password" class="input lastInput" v-model="login.Password"/></div>
                         </div>
                         <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
                         <input type="submit" style="display:none;"/>
                     </form>
                     <button class="login" @click="Login">登录</button>
                     <div class="loginInfo">
-                        <a class="loginInfoLeft" href="http://10.252.26.240:8080/arctron-usercenter/register/registerIndex" target="blank">立即注册</a>
-                        <a class="loginInfoRight" href="http://10.252.26.240:8080/arctron-usercenter/register/forgetPwd" target="blank">忘记密码</a>
+                        <a class="loginInfoLeft" href="http://bdms.arctron.cn/arctron-usercenter/register/registerIndex" target="blank">立即注册</a>
+                        <a class="loginInfoRight" href="http://bdms.arctron.cn/arctron-usercenter/register/forgetPwd" target="blank">忘记密码</a>
                     </div>
                     <button class="loginWidthYun" style="display:none">云华建账号登陆</button>
                 </div>

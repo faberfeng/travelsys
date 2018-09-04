@@ -70,7 +70,8 @@ export default {
     },
     created(){
         var vm = this
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
             this.token = localStorage.getItem('token');
             this.projId = localStorage.getItem('projId');
             this.getAuthorization();

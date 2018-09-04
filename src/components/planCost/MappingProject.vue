@@ -468,6 +468,7 @@ export default Vue.component('mapping-project',{
             showProperty:true,
             projObj:{},
             BDMSUrl:'',
+            QJFileManageSystemURL:'',
             token:'',
             projId:'',
             projObjArr:[],
@@ -569,6 +570,7 @@ export default Vue.component('mapping-project',{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl; 
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         if(this.isMapped){
             this.showEntityList();//构件列表时触发
         }else{
@@ -805,7 +807,7 @@ export default Vue.component('mapping-project',{
         },
         //预览文件
         preViewFile(item,index){
-            window.open('http://10.252.26.240:8080/qjbim-file'+item.filePath+'/preview?token='+this.token);
+            window.open(this.QJFileManageSystemURL+item.filePath+'/preview?token='+this.token);
         },
         //表格页码改变时重新获取数据
         changePage(val, isTop) { //分页 0 -1 1 2

@@ -4,24 +4,17 @@
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg' :userimg='header.userImg'></headerCommon>
         
         <div class="contentBody">
-
-            <!-- <div class="sideBar" ref="sideB">
-                <a href="#" >
-                    <img src="../assets/arrow-left.png"/>
-                </a>
-            </div> -->
-            <div class="downWebGl" @click="btn12">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
-            <!-- <button class="backTop">回到顶部</button> -->
+            <div class="downWebGl" @click="webGlbtn">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe  ref="iframe1" :class="[{'webIframe':webGlShow},'webIframe1']" name="ifd"   frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
+                     <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"  ></iframe>
+                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe> -->
                 </div>
             </div>
             <div  class="main">
                 <div class="content">
                     <el-row class="navigation1">
                         <el-col :span="24" >
-                            <!-- <button @click="btn12">下拉</button> -->
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
@@ -142,17 +135,11 @@ export default {
         },
     },
     methods:{
-        btn12(){
-             console.log('fjd')
-            //  localStorage.setItem('webGlShow',this.webGlShow)
+        webGlbtn(){
             this.webGlShow=!this.webGlShow
             localStorage.setItem('webGlShow',this.webGlShow)
-            // this.$router.push({
-            //     params: {
-            //     id:'123'
-            //     }
-            // })
-            app = this.$refs.iframe1.contentWindow
+            app = this.$refs.iframe1.contentWindow;
+            console.log(app);
             app.postMessage({command:"Init",parameter:null},"*");
         },
         callback(e){
@@ -160,10 +147,7 @@ export default {
             switch(e.data.command){
 			case "EngineReady":
 				{
-					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
-					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                    // console.log(Horder);
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
@@ -172,8 +156,6 @@ export default {
 			case "CurrentSelectedEnt":
 				break;
 			case "ViewpointSubmited":
-
-				// ScreenPara = e.data.parameter
                 break;
 		    }
         },
@@ -196,9 +178,12 @@ export default {
                 this.InitdataList=JSON.parse(response.data.rt);
                 this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
                 this.WebGlId=String(this.WebGlId);
+                localStorage.setItem('WebGlSaveId',this.WebGlId);
                 // cosole.log(this.WebGlId);
                 this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
+                localStorage.setItem('WebGlSaveType',this.WebGlType);
+                localStorage.setItem('WebGlSaveName',this.WebGlName);
 
                 // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
                 // console.log(JSON.stringify(this.WebGlId));

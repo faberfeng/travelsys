@@ -11,7 +11,7 @@
                     </div>
                     <div class="func_area">
                         <div class="limits">
-                            <span class="icon-eye" @click="viewPoin()" >视点</span>
+                            <span class="icon-eye" @click="AddViewpoint()">视点</span>
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>
@@ -26,6 +26,16 @@
                  </div>
                  <div class="fileitem">   
                      <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                         <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                <i class="line"></i>
+                                <i class="button-search"  @click="preview(val.filePath)"></i>
+                                 <i class="line"></i>
+                                 <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
+                            </div>
+                        </li>
                         <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
@@ -127,10 +137,13 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+var app;
+var ScreenPara;
 import '../ManageCost/js/jquery-1.8.3.js'
 import './js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
     data(){
+         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             QJFileManageSystemURL:'',
             BDMSUrl:'',
@@ -160,6 +173,12 @@ export default Vue.component('common-upload',{
                 obj:[],//短语列表
             },
             fullscreenLoading:false,
+            WebGlSaveId:'',
+            WebGlSaveType:'',
+            WebGlSaveName:'',
+            base64Str:'',
+            elementFilter:'',
+            uploadViewPointList:[]
         }
     },
     props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout'],
@@ -169,8 +188,12 @@ export default Vue.component('common-upload',{
         vm.userId  = localStorage.getItem('userid')
         vm.projId = localStorage.getItem('projId');
         vm.userImg = localStorage.getItem('userImg')
+        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         var setting = {
             projId:vm.projId,
@@ -178,7 +201,10 @@ export default Vue.component('common-upload',{
             basePath:vm.BDMSUrl,
             token:vm.token
         }
-        $('#dc-add-content'+vm.dcid+vm.selectugid).showAtUsers(setting)
+        $('#dc-add-content'+vm.dcid+vm.selectugid).showAtUsers(setting);
+        
+        // console.log(app)
+        // const oIframe = document.getElementById('show-iframe');
     },
     watch:{
          selectugid:function(val,oldval){
@@ -195,6 +221,56 @@ export default Vue.component('common-upload',{
         },
     },
     methods:{
+        callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+                    // console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+			case "CurrentSelectedEnt":
+				break;
+			case "ViewpointSubmited":
+                ScreenPara = e.data.parameter;
+                console.log(ScreenPara);
+                console.log(ScreenPara.para2);
+                this.base64Str=ScreenPara.para2;
+                // console.log(ScreenPara.para1);
+                console.log(typeof(ScreenPara.para1));
+                this.elementFilter=ScreenPara.para1;
+
+                console.log(this.elementFilter);
+                 var vm = this
+                    axios({
+                        method:'POST',
+                        url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{"base64":this.base64Str}
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            this.$message({
+                                type:'success',
+                                message:'视点截图成功'
+                            })
+                            this.uploadViewPointList.push(response.data.rt)
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+		    }
+        },
+        AddViewpoint(){
+             const app = document.getElementById('webIframe').contentWindow;
+            app.postMessage({command:"AddViewpoint",parameter:123},"*");
+        },
         checkItem(index){
             var vm = this
             vm.ShortStateMent.obj.forEach((item,key)=>{
@@ -248,6 +324,13 @@ export default Vue.component('common-upload',{
             var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
             return tt; 
         },
+        //重回定位
+        relocation(){
+            const app = document.getElementById('webIframe').contentWindow;
+            app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        },
         preview(val){
             var vm = this
             if(val){
@@ -266,6 +349,11 @@ export default Vue.component('common-upload',{
             }else{
                 vm.fileId.splice(index,1)
             }
+            
+        },
+        deleteFile1(index){
+            var vm=this;
+        vm.uploadViewPointList.splice(index,1)
         },
         downLoad(filePath){
             //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -284,6 +372,7 @@ export default Vue.component('common-upload',{
             vm.$emit('hide')
             vm.fileId = []
             vm.attachId = []
+            vm.uploadViewPointList=[]
             vm.$refs.message.value = ''
         },
         showUploadBox_img(){
@@ -291,6 +380,9 @@ export default Vue.component('common-upload',{
             vm.type = 1
             vm.uploadshow = true
         },
+        // viewPoin(){
+        //     app.postMessage({command:"AddViewpoint",parameter:123},"*");
+        // },
         showUploadBox_file(){
              var vm = this
             vm.type = 2
@@ -357,6 +449,7 @@ export default Vue.component('common-upload',{
             }
             var fuuid = []
             var imguuid = []
+            var vpListUid=[]
             vm.fileId.forEach((item,index) => {
                 fuuid.push(item.fileId+'')
             });
@@ -365,6 +458,18 @@ export default Vue.component('common-upload',{
                     fileUuid:item.fileUuid
                 })
             });
+            vm.uploadViewPointList.forEach((item,index)=>{
+                    vpListUid.push({
+                        elementFilter:this.elementFilter,
+                        extension:item.fileExtension,
+                        relativePath:item.filePath,
+                        uuid:item.fileUuid,
+                        name:item.fileName,
+                        projId:this.projId,
+                        subProjId:this.defaultSubProjId,
+                    })
+            })
+            console.log(vpListUid)
             if(vm.iscomment){
                  var data = {
                     dirId:-1,
@@ -377,9 +482,10 @@ export default Vue.component('common-upload',{
                         subProjId: vm.defaultSubProjId,
                         builderId: vm.holderid   // 单体 holderId
                     },
-                    vpList: [],//视点集合
+                    vpList:vpListUid,//视点集合
                     attachList: imguuid,
                     fileIdList: fuuid
+
                 };
                 var params = {}
                 var url = '/project2/dc/add'
@@ -416,7 +522,8 @@ export default Vue.component('common-upload',{
                 }
                 var url = '/project2/dc/'+vm.dcid+'/review/add'
             }
-            vm.fullscreenLoading = true
+            vm.fullscreenLoading = true;
+            console.log(data);
              axios({
                 method:'POST',
                 url:vm.BDMSUrl+url,//vm.BDMSUrl+url
@@ -449,6 +556,7 @@ export default Vue.component('common-upload',{
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
+                    vm.uploadViewPointList=[]                     
                     vm.$refs.message.value = ''
                     vm.newStmt = false
                 }else{

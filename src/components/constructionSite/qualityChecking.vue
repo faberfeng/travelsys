@@ -878,6 +878,7 @@ export default {
             height:800px;
             overflow: auto;
         }
+        ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
@@ -925,7 +926,7 @@ export default {
                     line-height: 38px;
                     text-align: left;
                     padding-left: 10px;
-                    background: #fafafa;
+                    // background: #fafafa;
                 }
                 >ul{
                     float: left;

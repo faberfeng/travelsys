@@ -62,7 +62,9 @@ export default {
         return{
             tabShow:1,
             token:'',
-            baseUrl:'http://10.252.26.240:8080/qjbim-project/',
+            baseUrl:'http://42.159.154.173:8080/qjbim-file/',
+            // http://10.252.26.240:8080/qjbim-project/
+            QJFileManageSystemURL:'',
             BDMSUrl:'',
             notbeenUse:true,
             projId:'',
@@ -81,6 +83,7 @@ export default {
     created(){
         var vm = this
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         vm.token = localStorage.getItem('token'); //获取token
         vm.projId = localStorage.getItem('projId');//获取工程id
         vm.getProjectInfo();//工程首页信息
