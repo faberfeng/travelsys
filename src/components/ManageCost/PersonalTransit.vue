@@ -590,6 +590,7 @@ export default {
         },//session存在可以粘贴的文件
         checkOne:false,
         fullscreenLoading:false,
+        WebGlUrl:'',
       }
   },
   created(){
@@ -597,7 +598,8 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.WebGlUrl = this.$store.state.WebGlUrl;
         vm.checkedPermission()
         vm.checkFilePaste()
   },
@@ -667,7 +669,6 @@ export default {
             vm.hasFileToPaste.is = false
             vm.hasFileToPaste.obj = {}
             var filePaste = JSON.parse(sessionStorage.getItem('fileObject'))
-            console.log(filePaste);
             /***
              * @param    fileObject = {
                 fgIds: fgIdList,
@@ -849,7 +850,11 @@ export default {
             })
             return false
         }
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        }
     },
     downLoad(filePath, fileId, fileName,fgId){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -865,7 +870,6 @@ export default {
     },
     downloadFile(){
         var vm = this
-        console.log(vm.fileList)
         var url = '/multiDownloadUrl?'
         var hasFilePath = false
         vm.fileList.forEach((item,key)=>{
@@ -969,7 +973,6 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
-                console.log( vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)
@@ -997,7 +1000,6 @@ export default {
     },
     changePage(val){//分页 0 -1 1 2
         var vm = this 
-        console.log(val)
         if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
             vm.$message('这已经是第一页!')
             return false
@@ -1071,9 +1073,6 @@ export default {
             console.log(err)
         })
     },
-    handleCheckAllChange(value){
-        console.log(value)
-    }
   }
 }
 </script>

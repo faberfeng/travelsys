@@ -756,7 +756,7 @@
             .detial-text-value{
                 float: left;
                 color: #333333;
-                max-width: 120px;
+                max-width: 110px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1014,7 +1014,8 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
-         fileCheckedNum:0,//选中的文件数量
+        fileCheckedNum:0,//选中的文件数量
+        WebGlUrl:'',
       }
   },
   created(){
@@ -1022,7 +1023,8 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.WebGlUrl = this.$store.state.WebGlUrl;
         vm.getInfo()
   },
   watch:{
@@ -1169,19 +1171,20 @@ export default {
          vm.$set(vm.versionItem[val],'checked',true)
     },
     splitType(val){
-          return val.split('.')[0]
-      },
-      initData(val){
-          if(!val)return ''
-          var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
-          return tt; 
-      },
-      /**
-         * 预览文件集文件
-         * @param fileUuid
-         */
+        return val.split('.')[0]
+    },
+    initData(val){
+        if(!val)return ''
+        var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
+        return tt; 
+    },
+    /**
+    * 预览文件集文件
+    * @param fileUuid
+    */
     view(filePath,fileId,fileName,fgId){
         //latestFile(fileId,fgId,"预览了文件"+fileName);
+        console.log(fileName);
         var vm = this
         if(vm.checkedItem && !filePath){
             vm.versionItem.forEach((item)=>{
@@ -1197,7 +1200,11 @@ export default {
             })
             return false
         }
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        }
     },
     downLoad(filePath, fileId, fileName,fgId){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -1220,7 +1227,6 @@ export default {
     },
     downloadFile(){
         var vm = this
-        console.log(vm.fileList)
         var url = '/multiDownloadUrl?'
         var hasFilePath = false
         vm.fileList.forEach((item,key)=>{
@@ -1241,7 +1247,6 @@ export default {
     },
     checkItem(val,isCtrl){
         var vm = this
-        console.log(isCtrl)
         vm.show.basicAttributes =true
         vm.show.BindingArtifacts =true
         var fileCheckList = []
@@ -1261,15 +1266,12 @@ export default {
                 vm.getVersion()
             }else if(vm.fileCheckedNum == vm.fileList.length){
                 vm.checkAll = true
-                console.log('1111')
             }
             if(vm.fileCheckedNum != vm.fileList.length){
-                  vm.checkAll = false
-                   console.log('2222')
+                vm.checkAll = false
             }
         }else{//单选
             vm.checkAll = false
-             console.log('3333')
             for(var i=0;i<vm.fileList.length;i++){
                 vm.$set(vm.fileList[i],'checked',false)
             }
@@ -1299,7 +1301,6 @@ export default {
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
                 })
-                console.log( vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)
@@ -1327,7 +1328,6 @@ export default {
     },
     changePage(val){//分页 0 -1 1 2
         var vm = this 
-        console.log(val)
         if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
             vm.$message('这已经是第一页!')
             return false
@@ -1337,16 +1337,16 @@ export default {
         }else{
             switch(val){
                 case 0:
-                        vm.pageDetial.currentPage = 1
+                    vm.pageDetial.currentPage = 1
                     break;
                 case -1:
-                        vm.pageDetial.currentPage--
+                    vm.pageDetial.currentPage--
                     break;
                 case 1:
-                        vm.pageDetial.currentPage++
+                    vm.pageDetial.currentPage++
                     break;
                 case 2:
-                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                    vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
                     break;
             }
         }
@@ -1380,7 +1380,6 @@ export default {
                     vm.fileList.forEach((item,key)=>{
                         vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                     })
-                    console.log( vm.fileList)
                     vm.pageDetial.currentPage++
                 }
             }
@@ -1389,9 +1388,6 @@ export default {
             console.log(err)
         })
     },
-    handleCheckAllChange(value){
-        console.log(value)
-    }
   }
 }
 </script>

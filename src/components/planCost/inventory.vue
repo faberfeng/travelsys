@@ -1776,6 +1776,9 @@ export default {
         .el-dialog{
             margin: 0 auto;
         }
+        #edit .el-dialog__body{
+            margin-top:20px;
+        }
         .actionBtn{
             width: 16px;
             height: 17px;
