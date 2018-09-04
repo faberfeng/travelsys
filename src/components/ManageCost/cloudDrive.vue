@@ -2301,7 +2301,8 @@ import commonList from  '../planCost/qingDan.vue'
 export default {
     name:'Costover',
     components:{
-        upload
+        upload,
+        commonList
     },
     data() {
         return {
