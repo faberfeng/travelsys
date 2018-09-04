@@ -111,7 +111,7 @@
                                                 </div>
                                             </li>
                                             <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                <img style="object-fit: cover" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
                                                     <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
                                                      <i class="line"></i>
@@ -152,7 +152,7 @@
                                                             <div>
                                                                 <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
                                                                     <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img style="object-fit: cover" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                                        <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
                                                                             <i class="button-relocation" title="定位" @click="relocation()"></i>
                                                                             <i class="line"></i>
@@ -179,7 +179,7 @@
                                                                         </div>
                                                                     </li>
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img  style="object-fit: cover"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
+                                                                        <img  style="object-fit:contain"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
@@ -1074,7 +1074,7 @@
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
-                            object-fit: cover;
+                            object-fit: contain;
                             background:#f2f2f2;
                         }
                         .actionbox{
@@ -1536,7 +1536,7 @@
                                             padding: 0;
                                             border-radius:2px;
                                             cursor: pointer;
-                                            object-fit: cover;
+                                            object-fit: contain;
                                         }
                                         .actionbox{
                                             display: block;
@@ -2736,7 +2736,7 @@
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
-                            object-fit: cover;
+                            object-fit: contain;
                         }
                         .actionbox{
                             display: block;
@@ -3102,6 +3102,7 @@ export default {
         }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BIMServerPort=vm.$store.state.BIMServerPort;
         var timer = setInterval(function(){
             if(vm.defaultSubProjId != null){
                 vm.getIntoDesignPage()//进入设计协调获取信息
@@ -3165,7 +3166,7 @@ export default {
 			case "EngineReady":
 				{
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;

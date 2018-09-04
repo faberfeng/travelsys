@@ -2301,7 +2301,7 @@ import commonList from  '../planCost/qingDan.vue'
 export default {
     name:'Costover',
     components:{
-        upload
+        upload,commonList
     },
     data() {
         return {
@@ -2437,7 +2437,7 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
-        this.WebGlUrl = this.$store.state.WebGlUrl;
+        this.WebGlUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
     },
@@ -3382,7 +3382,7 @@ export default {
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
         if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
-            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+            window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
@@ -3675,6 +3675,7 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
+                console.log(vm.GouJianItem);
             }
         }).catch((err)=>{
             console.log(err)

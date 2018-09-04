@@ -195,6 +195,7 @@ export default Vue.component('common-upload',{
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
+        vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         var setting = {
             projId:vm.projId,
@@ -231,7 +232,7 @@ export default Vue.component('common-upload',{
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
                     // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;

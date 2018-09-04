@@ -102,6 +102,7 @@ export default {
         vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
+        vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
@@ -145,7 +146,7 @@ export default {
 			case "EngineReady":
 				{
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
