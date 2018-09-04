@@ -276,7 +276,7 @@ padding-right: 14px;
     width: 146px;
   }
   .el-input__inner{
-      height: 36px;
+      height: 36px !important;
   }
   .el-input__prefix{
       top: -2px;

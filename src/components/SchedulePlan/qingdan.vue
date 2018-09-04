@@ -4,7 +4,7 @@
             <input type="hidden" name="p" ref="labelContent">
         </form>
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
-            <div style="min-width: 950px;overflow-y: auto;">
+            <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 
                 <div id="containerMessage">
                     <div class="project" v-loading="loading">
@@ -1549,10 +1549,10 @@ import Vue from 'vue'
 import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
-
 export default Vue.component('common-list',{
   props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne'],
   data(){
+       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
          screenLeft:{
              show:false,
@@ -1785,11 +1785,16 @@ export default Vue.component('common-list',{
         },
         singleLable:false,//单个标签展示 不需要分页器
         manifestId:Number,//mid
+        TraceID:''
       }
   },
   created(){
         var vm = this
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        vm.userImg = localStorage.getItem('userImg')
+        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
@@ -1830,6 +1835,25 @@ export default Vue.component('common-list',{
       },
   },
   methods:{
+      callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
+					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
+                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+                    // console.log(Horder);
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+                // CurrentSelectPara = e.data.parameter;
+			case "ViewpointSubmited":
+                break;
+        }
+      },
       checkLabel(scope){
           var vm = this
           vm.screenLeft.show = true
@@ -1880,12 +1904,21 @@ export default Vue.component('common-list',{
         vm.S_Label_quantitiesList = []
         vm.S_Label_quantitiesList.push(scope.row)
       },
-      openLocation(){
+      openLocation(scope){
+
         var vm  = this
-          vm.$message({
-              type:'info',
-              message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-          })
+        this.TraceID=String(scope.row.dTraceId);
+          console.log(this.TraceID);
+          const para={"TraceID":this.TraceID} 
+         const app = document.getElementById('webIframe').contentWindow;
+        app.postMessage({command:"LookAtEntities",parameter:para},"*");
+         document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        // $(window).animate( {scrollTop: 0}, 500);
+        //   vm.$message({
+        //       type:'info',
+        //       message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+        //   })
       },
       printLabelList(){
         var vm = this

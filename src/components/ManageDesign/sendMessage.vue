@@ -139,6 +139,7 @@ import Vue from 'vue'
 import axios from 'axios'
 var app;
 var ScreenPara;
+var CurrentSelectPara;
 import '../ManageCost/js/jquery-1.8.3.js'
 import './js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
@@ -230,12 +231,13 @@ export default Vue.component('common-upload',{
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
                     // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
-			case "CurrentSelectedEnt":
-				break;
+            case "CurrentSelectedEnt":
+                CurrentSelectPara = e.data.parameter;
+				console.log(CurrentSelectPara);
 			case "ViewpointSubmited":
                 ScreenPara = e.data.parameter;
                 console.log(ScreenPara);

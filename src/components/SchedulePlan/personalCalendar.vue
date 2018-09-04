@@ -1,7 +1,7 @@
 <template>
     <div id="personalCalendar">
         <div :class="[{'box-left-active':!screenLeft.show},'box-left-container']">
-            <div style="min-width: 950px;overflow-y: auto;">
+            <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 <div id="item-box-file">
                     <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item label-item-active">  
                     个人日历  
@@ -17,18 +17,18 @@
                     </router-link>
                     <div class="calendarChange" @click="viewChange">
                     </div>
-                </div>
-            </div>
-            <div class="calendarContext" v-show="viewshow" >
-                <div class="calendarHead">
-                    <h5 class="calendarHeadLeft"><img class=imgIcon src="./images/worklist.png">个人日历</h5>
-                    <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteCalendarEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateCalendarEvent" v-show="!showTaskCalendar">修改事件</span></div>
-                </div>
-                <div class="calendarBody" >
-                    <!-- <button @click="refreshEvents">Refresh</button>
-                    <button  @click="removeEvent">Remove</button>
-                    <pre>{{ selected }}</pre> -->
-                    <full-calendar ref="calendar" id="calendar" :events="events" :event-sources="eventSources"  :config="config"   @event-selected="eventSelected"   @event-created="eventCreated"  @event-render="eventRender" ></full-calendar>
+                </div>  
+                <div class="calendarContext" v-show="viewshow" >
+                    <div class="calendarHead">
+                        <h5 class="calendarHeadLeft"><img class=imgIcon src="./images/worklist.png">个人日历</h5>
+                        <div class="calendarHeadRight"><span class="el-icon-close btn" @click="deleteCalendarEvent">删除</span><span class="el-icon-plus btn" @click="addEvent">增加事件</span><span class="el-icon-edit-outline btn" @click="updateCalendarEvent" v-show="!showTaskCalendar">修改事件</span></div>
+                    </div>
+                    <div class="calendarBody" >
+                        <!-- <button @click="refreshEvents">Refresh</button>
+                        <button  @click="removeEvent">Remove</button>
+                        <pre>{{ selected }}</pre> -->
+                        <full-calendar ref="calendar" id="calendar" :events="events" :event-sources="eventSources"  :config="config"   @event-selected="eventSelected"   @event-created="eventCreated"  @event-render="eventRender" ></full-calendar>
+                    </div>
                 </div>
             </div>
             <div class="calendarContext1" v-show="!viewshow">
@@ -283,7 +283,7 @@
                         </select>
                         <label class="editInpText">颜色：</label>
                         <select class="editSelect" @change="eventColorChange" v-model="eventColorValue">
-                            <option v-for="(item,index) in eventColorList" :key="index" >{{item}}</option>
+                            <option v-for="(item,index) in eventColorList" :value="item.value" :key="index" >{{item.label}}</option>
                         </select>
                         <span v-if="eventColor" class="displayColor" :style="{'background-color':eventColorOne}"></span>
                     </div>
@@ -336,7 +336,7 @@
                     <div class="editBodytwo edit-item clearfix">
                         <label class="editInpText">颜色：</label>
                         <select class="editSelect" @change="eventColorChange" v-model="eventColorValue">
-                            <option v-for="(item,index) in eventColorList" :key="index" >{{item}}</option>
+                            <option v-for="(item,index) in eventColorList" :value="item.value" :key="index" >{{item.label}}</option>
                         </select>
                         <span v-if="eventColor" class="displayColor" :style="{'background-color':eventColorOne}"></span>
                     </div>
@@ -587,7 +587,32 @@ export default {
             dirId:'',
             searchFileList:[],
             addWordDialog:false,
-            eventColorList:['lightskyblue','cadetblue','cornflowerblue','darkseagreen','lightblue','lightseagreen','yellow','green','blue','violet'],
+            eventColorList:
+                [
+                    {value:'lightskyblue',
+                label:'天蓝色'},
+                {value:'cadetblue',
+                label:'军色蓝'},
+                {value:'cornflowerblue',
+                label:'亮蓝色'},
+                {value:'darkseagreen',
+                label:'深绿色'},
+                {value:'lightblue',
+                label:'浅蓝色'},
+                {value:'lightseagreen',
+                label:'浅海绿色'},
+                {value:'yellow',
+                label:'黄色'},
+                {value:'green',
+                label:'绿色'},
+                {
+                    value:'blue',
+                    label:'蓝色'
+                },{
+                    value:'violet',
+                    label:'蓝紫色'
+                }],
+            // ['lightskyblue','cadetblue','cornflowerblue','darkseagreen','lightblue','lightseagreen','yellow','green','blue','violet'],
             repeatTypeLabel:'',
             repeatTypeList:[
                 {
@@ -1236,8 +1261,8 @@ export default {
         addEvent(){
             this.repeatTypeValue=this.repeatTypeList[0].value;
             this.checkValue=true;
-            this.eventColorValue="yellow";
-            this.eventColorOne="yellow";
+            this.eventColorValue=this.eventColorList[0].value;
+            this.eventColorOne=this.toBeColor(this.eventColorValue);
             this.addEventTextDialog=true;
         },
         //新增事件确认
@@ -1544,6 +1569,11 @@ export default {
             })
         },
         eventColorChange(){
+            this.eventColorList.forEach((item)=>{
+                if(this.eventColorValue==item.value){
+                    this.eventColorValue=item.value
+                }
+            })
             this.eventColorOne=this.toBeColor(this.eventColorValue)
         },
         toBeColor(val){
@@ -1876,7 +1906,7 @@ export default {
             .calendarBody{
                 min-width: 700px;
                 #calendar{
-                    height:900px;
+                    height:750px;
                     .event-selected1{
                         
                           border:2px solid #000; box-shadow: 0 0 5px #000; border-radius: 5px; 
@@ -2548,6 +2578,26 @@ export default {
             }
 
         }
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+        width:0px;
+        }
+        // /* 滚动槽 */
+        // ::-webkit-scrollbar-track {
+        // box-shadow:inset 006px rgba(0, 0, 0, .5);
+        // -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+        // border-radius:10px;
+        // }
+        // /* 滚动条滑块 */
+        // ::-webkit-scrollbar-thumb {
+        // border-radius:10px;
+        // background:rgba(0,0,0,0.1);
+        // box-shadow:inset 006px rgba(0, 0, 0, .5);
+        // -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+        // }
+        // ::-webkit-scrollbar-thumb:window-inactive {
+        // background:rgba(255,0,0,0.4);
+        // }
 
         #edit{
             .el-dialog{

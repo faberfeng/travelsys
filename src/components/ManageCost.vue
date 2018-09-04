@@ -4,11 +4,11 @@
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg' :userimg='header.userImg'></headerCommon>
         
         <div class="contentBody">
-            <div class="downWebGl" @click="webGlbtn">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
+            <div class="downWebGl" @click="webGlbtn">虚拟场景<i :class="[{'active':webGlShow},'webGlDownBtn']"></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                     <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"  ></iframe>
-                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe> -->
+                     <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"></iframe> -->
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -125,9 +125,6 @@ export default {
         }else{
            this.cHeight = document.body.clientHeight;
         }
-    //    this.$refs.iframe1.style.height = this.cHeight+'px';
-        
-        // this.$refs.settingsL.style.height = this.cHeight+'px';
     },
     computed:{
         path(){
@@ -148,10 +145,9 @@ export default {
 			case "EngineReady":
 				{
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
-
 				break;
 			case "CurrentSelectedEnt":
 				break;
@@ -179,15 +175,10 @@ export default {
                 this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
                 this.WebGlId=String(this.WebGlId);
                 localStorage.setItem('WebGlSaveId',this.WebGlId);
-                // cosole.log(this.WebGlId);
                 this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
                 localStorage.setItem('WebGlSaveType',this.WebGlType);
                 localStorage.setItem('WebGlSaveName',this.WebGlName);
-
-                // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
-                // console.log(JSON.stringify(this.WebGlId));
-                // console.log(this.InitdataList);
             }else if(response.data.cd=='-1'){
             }
             })
@@ -605,6 +596,21 @@ export default {
         z-index: 10000000;
         color: #7a818a;
         cursor: pointer;
+    }
+    .webGlDownBtn{
+        width: 12px;
+        height: 12px;
+         background:url('./ManageCost/images/arror.png')no-repeat 0 0; 
+        float: right;
+        cursor: pointer;
+        transition:  all ease .2s;
+        transform: rotate(180deg);
+        margin-top:5px;
+        margin-left:7px;
+        /* display: block; */
+        }
+    .active{
+            transform: rotate(0deg);
     }
     #webgl{
        	height: 800px;

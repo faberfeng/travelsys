@@ -924,6 +924,7 @@
                         font-weight: bold;
                         #add{
                             float:right;
+                            cursor: pointer;
                             
                         }
                         #add i{margin-right:10px;}
@@ -1087,6 +1088,7 @@
                                 font-weight: bold;
                                 #add{
                                     float:right;
+                                    cursor: pointer;
                                 }
                                 #add i{margin-right:10px;}
                             }

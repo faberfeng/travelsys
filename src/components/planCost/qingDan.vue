@@ -1464,7 +1464,6 @@ export default Vue.component('common-list',{
         vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
         vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
         vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
-        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.projName = localStorage.getItem('projName')
@@ -1511,7 +1510,7 @@ export default Vue.component('common-list',{
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
                     // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
@@ -1575,7 +1574,7 @@ export default Vue.component('common-list',{
           this.TraceID=String(scope.row.dTraceId);
           console.log(this.TraceID);
           const para={"TraceID":this.TraceID} 
-         const app = document.getElementById('webglIframe').contentWindow;
+         const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
          document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
