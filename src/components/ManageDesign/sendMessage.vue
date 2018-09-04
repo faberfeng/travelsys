@@ -231,7 +231,7 @@ export default Vue.component('common-upload',{
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
                     // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;

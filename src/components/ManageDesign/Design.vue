@@ -3165,7 +3165,7 @@ export default {
 			case "EngineReady":
 				{
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"80",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
