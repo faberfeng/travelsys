@@ -2548,7 +2548,6 @@ export default {
       addfileConfirm(){
         var vm = this
         if(vm.fileName.new){
-            console.log(vm.checkFileDir)
              axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/directory/add',
@@ -3004,7 +3003,6 @@ export default {
             if(Math.ceil(response.data.cd) == 0){
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
-                console.log(response.data.rt.password)
             }
         }).catch((err)=>{
             console.log(err)
@@ -3201,7 +3199,6 @@ export default {
                     item.checked = false
               }
           })
-          console.log(vm.checkedRound)
       },
       dbcheckRound(val,x,y,id,name){
           if(!val)return false
@@ -3418,7 +3415,6 @@ export default {
     },
     latestFile(fileId,log){
         var vm = this
-        console.log(fileId)
         if(typeof(fileId) == 'number'){
             var arr = []
             arr.push(fileId)
@@ -3526,7 +3522,6 @@ export default {
         vm.checkedFile_Folder.folder = false
         var fileCheckList = []
         vm.checkAll = false
-        console.log(isMultiSelect);
         if(isMultiSelect){//多选
             if(file){
                 vm.fileList[val].checked =  vm.fileList[val].checked?false:true
@@ -3628,8 +3623,6 @@ export default {
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
                 })
-                console.log('文件版本')
-                console.log(vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)
@@ -3727,9 +3720,7 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
-                console.log(vm.FileTree_original);
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-                console.log(JSON.stringify(this.FileTree))
                 if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){
@@ -3779,7 +3770,6 @@ export default {
                          vm.QJ.point.push(item)
                      }
                  })
-                 console.log(vm.QJ.point)
                  if(vm.hasImg){
                     setTimeout(function(){
                         vm.pointLocationBindClick()
@@ -3869,9 +3859,7 @@ export default {
     //打包
     pointLocationBindClick(){
         var vm = this;
-        
         var $rounds = $('#planeDIV').find('.round');
-        console.log($rounds)
         if ($rounds && $('#planeFigure')[0]) {
             var imgHeight = $('#planeFigure')[0].offsetHeight;
             var imgWidth = $('#planeFigure')[0].offsetWidth;
@@ -3942,11 +3930,9 @@ export default {
         deleteList(item){
             this.deleteDialog = true;
             this.deleteInfo = item;
-            console.log(item);
             this.removelistitem = item.main.pkId;
         },
         deleteMakeSure(){
-            console.log(this.deleteInfo)
             axios({
                 method:'post',
                 url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
