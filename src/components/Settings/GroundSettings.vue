@@ -305,7 +305,7 @@ export default {
                 label: '傍晚'
             }],
             listData:[],
-            baseUrl:'http://10.252.26.240:8080/',
+            baseUrl:'',
             token:'',
             projId:'',
             effectLevelVal:'很好',//效果等级值
@@ -345,6 +345,7 @@ export default {
         this.userId = localStorage.getItem('userid')
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        this.baseUrl = this.$store.state.BDMSUrl;
         this.getGroundInformation();//场地信息
         this.getSceneEnvironment();//场景设置
         this.findSubProject();//获取单体列表 表格
@@ -793,7 +794,6 @@ export default {
                         projId:this.projId
                     }
                 }
-
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     if(response.data.rt.EffectLevel=='0'){
