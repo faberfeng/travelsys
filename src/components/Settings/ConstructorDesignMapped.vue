@@ -272,12 +272,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.pageDetial.total = response.data.rt.total;
-                }else if(response.data.cd == -1){
-                    alert(response.data.msg)
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg)
                 }
             }).then(()=>{
                 this.getTotalGeniceClassMapItem();
@@ -309,12 +305,8 @@ export default {
                             arr[index].name = '系统名称';
                         }
                     })
-                }else if(response.data.cd == '-1'){
+                }else {
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
             })
         },
@@ -334,12 +326,9 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.totalConstructorData = response.data.rt.rows;
-                }else if (response.data.cd == -1){
-                    alert(response.data.msg);
+                    console.log(this.totalConstructorData)
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg);
                 }
             })
         },
@@ -357,12 +346,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.geniceClassJson = response.data.rt;
-                }else if(response.data.cd == '-1'){
+                }else {
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
             })
         },
@@ -380,12 +365,8 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.retiveData = response.data.rt;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg)
                 }
             })
         },
@@ -489,16 +470,16 @@ export default {
                                 totalObject.splice(index,1);
                             }
                         })
-                        var keyword = totalObject.some(item=>{
-                            if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
-                                return true;
-                            }else{
-                                return false;
-                            }
-                        })
-                        if(keyword){
-                            alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！');
-                        }else{
+                        // var keyword = totalObject.some(item=>{
+                        //     if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
+                        //         return true;
+                        //     }else{
+                        //         return false;
+                        //     }
+                        // })
+                        // if(keyword){
+                        //     alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！');
+                        // }else{
                             axios({
                                 method:'post',
                                 url:this.BDMSUrl+'Config/updateGenieClassMap',
@@ -530,15 +511,11 @@ export default {
                                     this.goujianType = '';
                                     this.categoryBase = '';
                                     this.editListShow = false;
-                                }else if(response.data.cd =='-1' || response.data.cd =='40012'){
+                                }else {
                                     alert(response.data.msg);
-                                }else{
-                                    this.$router.push({
-                                        path:'/login'
-                                    })
                                 }
                             })
-                        }    
+                        //}    
                     }
                 }
             }
@@ -708,16 +685,16 @@ export default {
                             }else if(this.revitCategory == '植物'){
                                 revitCa = "Planting";
                             }
-                            var keyword = this.totalConstructorData.some(item=>{
-                                if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
-                                    return true;
-                                }else{
-                                    return false;
-                                }
-                            })
-                            if(keyword){
-                                alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！')
-                            }else{
+                            // var keyword = this.totalConstructorData.some(item=>{
+                            //     if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
+                            //         return true;
+                            //     }else{
+                            //         return false;
+                            //     }
+                            // })
+                            // if(keyword){
+                            //     alert('关键字已存在或关键字与已存在关键字有包含关系，不能添加！')
+                            // }else{
                                 axios({
                                     method:'post',
                                     url:this.BDMSUrl+'Config/addGenieClassMap',
@@ -747,15 +724,11 @@ export default {
                                         this.logicSystemValue = '';
                                         this.goujianType = '';
                                         this.addListShow = false;
-                                    }else if(response.data.cd == '-1'){
+                                    }else {
                                         alert(response.data.msg)
-                                    }else{
-                                        this.$router.push({
-                                            path:'/login'
-                                        })
                                     }
                                 })
-                            }
+                            //}
                         }
                     }
                 }
@@ -801,12 +774,8 @@ export default {
                     this.getGeniceClassMapItem(this.pageDetial.currentPage,this.pageDetial.pagePerNum);
                     this.firstGetGeniceClassMapItem();
                     this.deleteDialog = false;
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg)
                 }
             })
         },
