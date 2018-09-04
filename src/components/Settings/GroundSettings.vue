@@ -470,12 +470,8 @@ export default {
                             this.addListhigh='';
                             this.addListangle='';
                             this.addListShow = false;
-                        }else if(response.data.cd ='-1'){
-                            alert(response.data.msg);
                         }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
+                            alert(response.data.msg);
                         }
                     })
                 }else{
@@ -674,12 +670,8 @@ export default {
                 if(response.data.cd == '0'){
                     this.deleteListDialog = false;
                     this.findSubProject();
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg);
                 }
             })
         },
@@ -779,14 +771,9 @@ export default {
                 if(response.data.cd == '0'){
                     this.groundInfo = response.data.rt.site;
                     this.groundInfo.siteId = response.data.rt.siteId;
-                }else if(response.data.cd == '-1'){
+                }else{
                     alert(response.data.msg)
                 }
-                // else{
-                //     this.$router.push({
-                //         path:'/login'
-                //     })
-                // }
             }).then(()=>{
                 this.getUnityBundle();//获取场地资源包 表格
             })
@@ -828,12 +815,8 @@ export default {
                         response.data.rt.SceneTime='傍晚';
                     }
                     this.SceneEnvironmentList = response.data.rt;
-                }else if(response.data.cd == '-1'){
+                }else {
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
                 
             })
@@ -856,13 +839,7 @@ export default {
                     }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
-                }
-                // else{
-                //     this.$router.push({
-                //         path:'/login'
-                //     })
-                // }
-                
+                }          
             })
         },
         //获取场地静态资源包
@@ -899,9 +876,7 @@ export default {
                         })
                     }
                 }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                    alert(response.data.msg);
                 }
             })
         },
@@ -950,12 +925,8 @@ export default {
                     if(response.data.cd== '0'){
                         _this.getUnityBundle()
                         _this.addgroundShow = false;
-                    }else if(response.data.cd == '-1'){
-                        alert(response.data.msg)
                     }else{
-                        _this.$router.push({
-                            path:'/login'
-                        })
+                        alert(response.data.msg)
                     }
                 })
             } 
