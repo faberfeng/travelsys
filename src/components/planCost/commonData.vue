@@ -31,6 +31,7 @@
                     <th style="width:100px;" v-if="groupHead.partition.length>0"></th>
                     <th style="width:100px;" v-if="groupHead.floor.length>0"></th> -->
                     <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item"></th>
+                    <!-- <th v-if="DatatableList.length>detailsHead.length">数量</th> -->
                     <th>操作</th>
                 </tr>
             </thead>
@@ -41,6 +42,7 @@
                     <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
                     <td style="border-right:none;border-left: none;font-weight: bold;" v-for="(val_2,index_2) in val.level" :key="'kongge'+index_2" v-text="index_2==0?'小计':''"></td>
                     <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" ></td>
+                    <!-- <td v-if="DatatableList.length>detailsHead.length">{{item.infoList[0]}}</td> -->
                     <td >
                         <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
                     </td>

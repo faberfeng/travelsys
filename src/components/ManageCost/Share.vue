@@ -64,7 +64,7 @@
                                     <p v-text="initData(item.updateTime)"></p>
                                     <p class="operation">
                                         <span v-text="'版本'+item.version"></span>
-                                        <i class="icon-goujian icon-search" @click="view(item.filePath)"></i>
+                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
                                         <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
                                     </p>
                                 </span>
@@ -136,7 +136,7 @@
                                 </td>
                                 <td>
                                     <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
-                                    <i class="icon-goujian icon-search" @click="view(item.filePath)"></i>
+                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
                                 </td>
                                 <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
                                 <td v-text="splitType(item.icon)"></td>
@@ -238,7 +238,6 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"></i>
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode"></i>
                                 <i class="icon-goujian icon-location"></i>
@@ -279,7 +278,7 @@
                 <ul>
                     <li class="item-version" v-for="(item,index) in  versionItem" :key="index">
                         <div class="clearfix">
-                            <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
+                            <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                             <div class="versin-detial">
                                 <span class="user-name" v-text="item.uploadUserName"></span>
                                 <span class="version-number" v-text="'版本-'+item.version"></span>
@@ -310,7 +309,7 @@
                 </div>
             </el-dialog>
         </div>
-</div>
+    </div>
 </template>
 <style  lang='less'>
 #cloudDrive_Share{
@@ -1596,6 +1595,7 @@ export default {
         showLocation:false,
         fileCheckedNum:0,
         fullscreenLoading:false,
+        WebGlUrl:'',
       }
   },
   created(){
@@ -1604,7 +1604,8 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.WebGlUrl = this.$store.state.WebGlUrl;
         vm.getIntoShareList()
     },
     mounted(){
@@ -1659,7 +1660,6 @@ export default {
                     nodeName:val.nodeName,//目录名称
                     nodeParId:val.nodeParId
                 })
-                console.log(val.nodeParId)
                 vm.findParent(val.nodeParId)
               }
           }
@@ -1735,7 +1735,6 @@ export default {
                 path:'',
                 password:''
              },**/
-             console.log(vm.checkedItem)
             vm.sharePath.show = true
             vm.sharePath.path = this.QJFileManageSystemURL+'/cloud/share/'+vm.checkedItem.shareNo
             vm.sharePath.password = vm.checkedItem.sharePassword !=null?vm.checkedItem.sharePassword:''
@@ -1752,7 +1751,6 @@ export default {
         },
         cancleShare(){
             var vm = this
-            console.log(vm.checkedItem)
             var fgIds = []
             var shareIdList = []
             if(vm.shareIdList.length==0){
@@ -1813,7 +1811,6 @@ export default {
         findParent(val){
           var vm = this
           if(val == 0)return false
-          console.log(vm.fileAll)
           for(var i=0;i<vm.fileAll.length;i++){
               if(vm.fileAll[i].nodeId == val){
                    vm.breadList.unshift({
@@ -2015,7 +2012,6 @@ export default {
             if(Math.ceil(response.data.cd) == 0){
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
-                console.log(response.data.rt.password)
             }
         }).catch((err)=>{
             console.log(err)
@@ -2037,7 +2033,6 @@ export default {
         vm.uploadImg.checked = false
       },
       handleNodeClick(obj){
-          console.log(obj)
           var vm = this
           if(!obj.children){
             vm.$message({
@@ -2157,7 +2152,7 @@ export default {
          * 预览文件集文件
          * @param fileUuid
          */
-    view(filePath){
+    view(filePath,fileName){
         //latestFile(fileId,fgId,"预览了文件"+fileName);
         var vm = this
         if(!filePath){
@@ -2172,7 +2167,11 @@ export default {
         })
         return false
         }
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        }
     },
     downLoad(filePath){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -2266,7 +2265,6 @@ export default {
         var showLocationNum = 0
         vm.checkAll = false
         var checkList = []
-        console.log(isMultiSelect)
         if(isMultiSelect){//多选
             vm.fgList[val].checked =  vm.fgList[val].checked?false:true
             for(var i=0;i<vm.fgList.length;i++){
@@ -2298,7 +2296,6 @@ export default {
         var fileCheckList = []
         vm.fileCheckedNum = 0
         vm.checkAll = false
-        console.log(isMultiSelect)
         if(isMultiSelect){//多选
             if(file){
                 vm.fileList[val].checked =  vm.fileList[val].checked?false:true
@@ -2373,7 +2370,6 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.versionItem = response.data.rt == null?{}:response.data.rt
-                console.log( vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)

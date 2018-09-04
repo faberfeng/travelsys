@@ -107,9 +107,13 @@ export default {
                     localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
                     localStorage.setItem('username', this.projectData.rt.session.onlineInfo.realName);
                     localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
+                    this.$store.commit('changeImagePath',{
+                        imagePath:this.projectData.rt.session.onlineInfo.imgUuid
+                    })
                     this.$router.push({
                         path: '/showcompany'
                     })
+
                 } else if (this.projectData.cd === '10003') {
                     alert(this.projectData.msg) //密码不正确
                 } else if (this.projectData.cd === '10000') {

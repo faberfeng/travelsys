@@ -346,7 +346,7 @@
                     <ul>
                         <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
                             <div class="clearfix">
-                                <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
+                                <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                                 <div class="versin-detial">
                                     <span class="user-name" v-text="item.uploadUserName"></span>
                                     <span class="version-number" v-text="'版本-'+item.version"></span>
@@ -441,7 +441,7 @@
             <div class="project1 project">
                 <div class="projectTitle">
                 <div class="projectTitleLeft">
-                    <el-radio>清单名称关键字：</el-radio>
+                    <p style="text-align:left">清单名称关键字：</p>
                     <div class="titleDiv">
                     <input class="projectTitleLeftinp" v-model="newList.detailName" />
                     </div>
@@ -457,7 +457,7 @@
                     </div>
                 </div>
                 <div class="projectTitleRight">
-                    <el-radio>创建时间：</el-radio>
+                    <p style="text-align:left;">创建时间：</p>
                     <div class="titleDiv">
                         <el-date-picker class="projectTitleLeftinp" v-model="newList.dataRange" type="daterange" range-separator="至"
                             start-placeholder="开始日期" end-placeholder="结束日期">
@@ -479,7 +479,7 @@
                 </div>
                 <div style="overflow:hidden;">
                 <span class="searchresult">查询结果</span>
-                    <button class="selectsence">场景选择</button>
+                <!-- <button class="selectsence">场景选择</button> -->
                 <table border="1" class="UserList" width="100%">
                     <thead>
                     <tr class="userList-thead">
@@ -642,6 +642,9 @@
 </template>
 <style  lang='less'>
 #cloudDrive{
+    #edit .el-dialog__body{
+        margin-top:20px;
+    }
     .img_left {
       float: left;
       width: 90px;
@@ -2424,6 +2427,7 @@ export default {
             isbiaoqianshow:false,
             biaoqianInfo:{},
             deleteInfo:{},
+            WebGlUrl:''
         }
     },
     created(){
@@ -2432,7 +2436,8 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.WebGlUrl = this.$store.state.WebGlUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
     },
@@ -2553,7 +2558,6 @@ export default {
       addfileConfirm(){
         var vm = this
         if(vm.fileName.new){
-            console.log(vm.checkFileDir)
              axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/directory/add',
@@ -3009,7 +3013,6 @@ export default {
             if(Math.ceil(response.data.cd) == 0){
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
-                console.log(response.data.rt.password)
             }
         }).catch((err)=>{
             console.log(err)
@@ -3206,7 +3209,6 @@ export default {
                     item.checked = false
               }
           })
-          console.log(vm.checkedRound)
       },
       dbcheckRound(val,x,y,id,name){
           if(!val)return false
@@ -3376,10 +3378,14 @@ export default {
             type:'info',
             message:'请勾选要预览的文件的版本'
         })
-        return false
+            return false
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        }
     },
     /**
      * 下载文件 参数:index
@@ -3423,7 +3429,6 @@ export default {
     },
     latestFile(fileId,log){
         var vm = this
-        console.log(fileId)
         if(typeof(fileId) == 'number'){
             var arr = []
             arr.push(fileId)
@@ -3531,7 +3536,6 @@ export default {
         vm.checkedFile_Folder.folder = false
         var fileCheckList = []
         vm.checkAll = false
-        console.log(isMultiSelect);
         if(isMultiSelect){//多选
             if(file){
                 vm.fileList[val].checked =  vm.fileList[val].checked?false:true
@@ -3633,8 +3637,6 @@ export default {
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
                 })
-                console.log('文件版本')
-                console.log(vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)
@@ -3732,9 +3734,7 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt
-                console.log(vm.FileTree_original);
                 vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
-                console.log(JSON.stringify(this.FileTree))
                 if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){
@@ -3784,7 +3784,6 @@ export default {
                          vm.QJ.point.push(item)
                      }
                  })
-                 console.log(vm.QJ.point)
                  if(vm.hasImg){
                     setTimeout(function(){
                         vm.pointLocationBindClick()
@@ -3874,9 +3873,7 @@ export default {
     //打包
     pointLocationBindClick(){
         var vm = this;
-        
         var $rounds = $('#planeDIV').find('.round');
-        console.log($rounds)
         if ($rounds && $('#planeFigure')[0]) {
             var imgHeight = $('#planeFigure')[0].offsetHeight;
             var imgWidth = $('#planeFigure')[0].offsetWidth;
@@ -3947,11 +3944,9 @@ export default {
         deleteList(item){
             this.deleteDialog = true;
             this.deleteInfo = item;
-            console.log(item);
             this.removelistitem = item.main.pkId;
         },
         deleteMakeSure(){
-            console.log(this.deleteInfo)
             axios({
                 method:'post',
                 url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',

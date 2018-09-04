@@ -6,7 +6,7 @@
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
-                <img class="headerInfoImg" :src="userimg?userimg:require('../assets/people.png')" />
+                <img class="headerInfoImg" :src="userImg?'http://10.252.26.240:8080/qjbim-file'+userImg:require('../assets/people.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
                     <p class="p2 p-hover" @click="logout">退出</p>
@@ -20,21 +20,25 @@
 import Vue from 'vue'
 import axios from 'axios'
 export default Vue.component('common-header', {
-   data(){
+    data(){
         return{
             BDMSUrl:'',
-      }
-     },
+        }
+    },
     props: ['username','userid','proname','proimg','userimg'],
-    mounted(){
+    created(){
         var vm = this
         vm.token  = localStorage.getItem('token')
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+    },
+    computed:{
+        userImg(){
+            return this.$store.state.imgUuid
+        }
     },
     methods:{
         app(){
             var app1 =this.$refs.iframe1.contentWindow;
-            console.log(app1);
         },
         logout(){
             var vm = this
@@ -51,6 +55,7 @@ export default Vue.component('common-header', {
                     localStorage.removeItem('projId');
                     sessionStorage.removeItem('navigationPath');
                     sessionStorage.removeItem('settingActive');
+                    window && window.localStorage.clear();//清楚所有localStorage
                     vm.$router.push({
                         path:'/login'
                     }) 

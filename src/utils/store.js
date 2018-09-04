@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
         BDMSUrl:'http://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
         WebSocketUrl:"http://10.252.26.240:16800/message",
         // WebGlUrl:"http://10.252.26.240", 
-        WebGlUrl:"http://bdms.arctron.cn"
+        WebGlUrl:"http://bdms.arctron.cn",
+        imgUuid:'',
     },
     getters:{
         changePath(state){
@@ -25,11 +27,11 @@ export default new Vuex.Store({
         }   
     },
     mutations:{
-        change(state,index){
-            state.path = index;
-            this.getters.changePath;
-            console.log(index+'+++++++++');
-            console.log(state.path);
+        changeImagePath(state,payload){
+            state.imgUuid = payload.imagePath;
         },
-    }
+    },
+    plugins:[
+        createPersistedState()
+    ]
 })

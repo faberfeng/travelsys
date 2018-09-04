@@ -147,7 +147,6 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-add"></i>
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode"></i>
                                 <i class="icon-goujian icon-location"></i>
@@ -159,15 +158,15 @@
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">状态 :</span>
-                            <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
+                                <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">明细 :</span>
-                            <span class="detial-text-value" v-text="item.details.length"></span>
+                                <span class="detial-text-value" v-text="item.details.length"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">名称 :</span>
-                            <span class="detial-text-value" v-text="item.main.mName"></span>
+                                <span class="detial-text-value" :title="item.main.mName" v-text="item.main.mName"></span>
                             </p>
                         </li>
                     </ul>
@@ -188,7 +187,7 @@
                 <ul>
                     <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem"  @click="selectVersion(index)" :key="index">
                         <div class="clearfix">
-                            <img :src="QJFileManageSystemURL+'/'+item.imgUuid" class="img" alt="">
+                            <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                             <div class="versin-detial">
                                 <span class="user-name" v-text="item.uploadUserName"></span>
                                 <span class="version-number" v-text="'版本-'+item.version"></span>
@@ -755,9 +754,9 @@
                 float: left;
             }
             .detial-text-value{
-               float: left;
-               color: #333333;
-                max-width: 130px;
+                float: left;
+                color: #333333;
+                max-width: 110px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -816,15 +815,16 @@
             }
             .detial-text-name{
                 color: #999999;
-                width: 65px;
+                width: 45px;
                 display: inline-block;
             }
             .detial-text-value{
                 color: #333333;
-                max-width: 130px;
+                max-width: 100px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                display: inline-block;
             }
             .item-detial{
                 margin-top: 16px;
@@ -1014,7 +1014,8 @@ export default {
              BindingArtifacts:false
          },
          posType:'',//versionType
-         fileCheckedNum:0,//选中的文件数量
+        fileCheckedNum:0,//选中的文件数量
+        WebGlUrl:'',
       }
   },
   created(){
@@ -1022,7 +1023,8 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.WebGlUrl = this.$store.state.WebGlUrl;
         vm.getInfo()
   },
   watch:{
@@ -1169,19 +1171,20 @@ export default {
          vm.$set(vm.versionItem[val],'checked',true)
     },
     splitType(val){
-          return val.split('.')[0]
-      },
-      initData(val){
-          if(!val)return ''
-          var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
-          return tt; 
-      },
-      /**
-         * 预览文件集文件
-         * @param fileUuid
-         */
+        return val.split('.')[0]
+    },
+    initData(val){
+        if(!val)return ''
+        var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
+        return tt; 
+    },
+    /**
+    * 预览文件集文件
+    * @param fileUuid
+    */
     view(filePath,fileId,fileName,fgId){
         //latestFile(fileId,fgId,"预览了文件"+fileName);
+        console.log(fileName);
         var vm = this
         if(vm.checkedItem && !filePath){
             vm.versionItem.forEach((item)=>{
@@ -1197,7 +1200,11 @@ export default {
             })
             return false
         }
-        window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+        }
     },
     downLoad(filePath, fileId, fileName,fgId){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -1220,7 +1227,6 @@ export default {
     },
     downloadFile(){
         var vm = this
-        console.log(vm.fileList)
         var url = '/multiDownloadUrl?'
         var hasFilePath = false
         vm.fileList.forEach((item,key)=>{
@@ -1241,7 +1247,6 @@ export default {
     },
     checkItem(val,isCtrl){
         var vm = this
-        console.log(isCtrl)
         vm.show.basicAttributes =true
         vm.show.BindingArtifacts =true
         var fileCheckList = []
@@ -1261,15 +1266,12 @@ export default {
                 vm.getVersion()
             }else if(vm.fileCheckedNum == vm.fileList.length){
                 vm.checkAll = true
-                console.log('1111')
             }
             if(vm.fileCheckedNum != vm.fileList.length){
-                  vm.checkAll = false
-                   console.log('2222')
+                vm.checkAll = false
             }
         }else{//单选
             vm.checkAll = false
-             console.log('3333')
             for(var i=0;i<vm.fileList.length;i++){
                 vm.$set(vm.fileList[i],'checked',false)
             }
@@ -1299,7 +1301,6 @@ export default {
                 vm.versionItem.forEach((item)=>{
                     vm.$set(item,'checked',false)
                 })
-                console.log( vm.versionItem)
             }
         }).catch((err)=>{
             console.log(err)
@@ -1327,7 +1328,6 @@ export default {
     },
     changePage(val){//分页 0 -1 1 2
         var vm = this 
-        console.log(val)
         if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
             vm.$message('这已经是第一页!')
             return false
@@ -1337,16 +1337,16 @@ export default {
         }else{
             switch(val){
                 case 0:
-                        vm.pageDetial.currentPage = 1
+                    vm.pageDetial.currentPage = 1
                     break;
                 case -1:
-                        vm.pageDetial.currentPage--
+                    vm.pageDetial.currentPage--
                     break;
                 case 1:
-                        vm.pageDetial.currentPage++
+                    vm.pageDetial.currentPage++
                     break;
                 case 2:
-                        vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
+                    vm.pageDetial.currentPage = Math.ceil(vm.pageDetial.total%vm.pageDetial.pagePerNum)
                     break;
             }
         }
@@ -1380,7 +1380,6 @@ export default {
                     vm.fileList.forEach((item,key)=>{
                         vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
                     })
-                    console.log( vm.fileList)
                     vm.pageDetial.currentPage++
                 }
             }
@@ -1389,9 +1388,6 @@ export default {
             console.log(err)
         })
     },
-    handleCheckAllChange(value){
-        console.log(value)
-    }
   }
 }
 </script>
