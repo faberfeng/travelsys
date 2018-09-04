@@ -599,7 +599,7 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
-        this.WebGlUrl = this.$store.state.WebGlUrl;
+        this.WebGlUrl = this.$store.state.GMDUrl;
         vm.checkedPermission()
         vm.checkFilePaste()
   },
@@ -851,7 +851,7 @@ export default {
             return false
         }
         if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
-            window.open(this.WebGlUrl+':8080'+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+            window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
