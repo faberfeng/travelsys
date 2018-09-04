@@ -24,7 +24,7 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="item.userImg?('http://10.252.26.240:8080/qjbim-file/'+item.userImg):require('../../assets/loginimg.png')">
+                            <img :src="item.userImg?(baseUrl+item.userImg):require('../../assets/loginimg.png')">
                         </div> 
                         <div class="projectListText">
                             <p class="title">
@@ -64,6 +64,7 @@ export default {
             token:'',
             baseUrl:'http://42.159.154.173:8080/qjbim-file/',
             // http://10.252.26.240:8080/qjbim-project/
+            // http://42.159.154.173:8080/qjbim-file/
             QJFileManageSystemURL:'',
             BDMSUrl:'',
             notbeenUse:true,

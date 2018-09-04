@@ -7,7 +7,7 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div style="min-width: 950px;overflow-y: auto;">
+            <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 <div id="item-box-file">
                     <router-link :to="'/Design/management'" class="label-item-active label-item">  
                      设计协调  
@@ -274,7 +274,58 @@
                     </li>
                 </ul>
             </div>
-            <div id="box-right-1" v-else>
+            <div id="box-right-2" v-show="screenLeft.show"  v-else>
+                <h3 class="header-attribute1" style="margin-top:0;">
+                    <i class="trrangle"></i>
+                    基本属性
+                    <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                </h3>
+                 <ul id="basicAttributes1" :class="[{'show':show.basicAttributes}]">
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">所在空间</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.HolderID" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">原始文档</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.OriginalFile" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">原始ID</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.OriginalID" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">构件名称</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.OriginalName" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">构件分类</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.Title" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">GCCode</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.GCCode" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">脚本名称</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.Name" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">更新用户</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.Editor" ></span>
+                    </li>
+                     <li class="detial-item clearfix">
+                        <span class="detial-text-name">注释</span>
+                        <span class="detial-text-value" ></span>
+                    </li>
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">标记</span>
+                        <span class="detial-text-value" ></span>
+                    </li>
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">更新时间</span>
+                        <span class="detial-text-value" v-text="CurrentSelectPara.UpdateTime"></span>
+                    </li>
+                </ul>
             </div>
         </div>
       <div id="edit">
@@ -1010,7 +1061,7 @@
                      .item-file{
                         float: left;
                         width: 290px;
-                        height: 120px;
+                        height: 160px;
                         margin: 20px 15px 0 0;
                         border-radius: 6px;
                         box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -1018,12 +1069,13 @@
                         padding: 8px;
                         .item-file-attach{
                             width: 100%;
-                            height: 120px;
+                            height: 160px;
                             margin: 0;
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
                             object-fit: cover;
+                            background:#f2f2f2;
                         }
                         .actionbox{
                             display: block;
@@ -1094,13 +1146,14 @@
                                     width: 48px;
                                     height: 48px;
                                     display: block;
-                                    margin-top: 13PX;
+                                    margin-top: 15PX;
                                     margin-left: 11px;
                                 } 
                             }
                             .item-file-detial{
                                 display: block;
                                 margin-left:80px;
+                                margin-top:20px;
                                 .icon-goujian{
                                    float: right;
                                     width: 16px;
@@ -1143,7 +1196,7 @@
                                 .operation{
                                     display: block;
                                     position: absolute;
-                                    bottom: 0;
+                                    bottom: 15px;
                                     left: 88px;
                                     right: 0;
                                     span{
@@ -1470,7 +1523,7 @@
                                 .item-file{
                                         float: left;
                                         width: 290px;
-                                        height: 120px;
+                                        height: 160px;
                                         margin: 20px 15px 0 0;
                                         border-radius: 6px;
                                         box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -1478,7 +1531,7 @@
                                         padding: 8px;
                                         .item-file-attach{
                                             // width: 100%;
-                                            height: 120px;
+                                            height: 160px;
                                             margin: 0;
                                             padding: 0;
                                             border-radius:2px;
@@ -1569,13 +1622,14 @@
                                                     width: 48px;
                                                     height: 48px;
                                                     display: block;
-                                                    margin-top: 13PX;
+                                                    margin-top: 15PX;
                                                     margin-left: 11px;
                                                 } 
                                             }
                                             .item-file-detial{
                                                 display: block;
                                                 margin-left:80px;
+                                                 margin-top:20px;
                                                 .icon-goujian{
                                                     float: right;
                                                     width: 16px;
@@ -2311,6 +2365,68 @@
                 }
             }
         }
+        #box-right-2{
+            padding: 19px 13px 0 10px;
+            margin-left:24px;
+            #basicAttributes1{
+                display: none;
+                >li:last-of-type{
+                    padding-bottom: 7px;
+                }
+            }
+             .header-attribute1{
+                    font-size: 14px;
+                    color: #333333;
+                    line-height: 14px;
+                    padding-bottom:4px;
+                    border-bottom: 1px solid #e6e6e6;
+                    text-align: left; 
+                    .trrangle{
+                        display: inline-block;
+                        width: 0px;
+                        height: 0px;
+                        border-left: 10px solid #fc3439;
+                        border-top: 6px solid transparent;
+                        border-bottom: 6px solid transparent;
+                    }
+                    .icon-dropDown{
+                        display: block;
+                        width: 12px;
+                        height: 12px;
+                        background:url('../ManageCost/images/arror.png')no-repeat 0 0; 
+                        float: right;
+                        cursor: pointer;
+                        transition:  all ease .2s;
+                        transform: rotate(180deg);
+                    }
+                    .active{
+                        transform: rotate(0deg);
+                    }
+            }
+            .detial-item{
+                    font-size: 12px;
+                    line-height: 12px;
+                    margin-top: 16px;
+                    text-align: left;
+                    .detial-text-name{
+                        color: #999999;
+                        width: 65px;
+                        float: left;
+                    }
+                    .detial-text-value{
+                    float: left;
+                    color: #333333;
+                        max-width: 130px;
+                        overflow-x: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    &:first-of-type{
+                        margin-top: 18px;
+                    }
+            }
+
+        }
         #box-right-1{ 
             .head{
                 padding: 11px 0 12px;
@@ -2421,25 +2537,24 @@
         }
         /* 设置滚动条的样式 */
         ::-webkit-scrollbar {
-        width:10px;
-        height: 10px;
+        width:0px;
         }
-        /* 滚动槽 */
-        ::-webkit-scrollbar-track {
-        box-shadow:inset 006px rgba(0, 0, 0, .5);
-        -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
-        border-radius:10px;
-        }
-        /* 滚动条滑块 */
-        ::-webkit-scrollbar-thumb {
-        border-radius:10px;
-        background:rgba(0,0,0,0.1);
-        box-shadow:inset 006px rgba(0, 0, 0, .5);
-        -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
-        }
-        ::-webkit-scrollbar-thumb:window-inactive {
-        background:rgba(255,0,0,0.4);
-        }
+        // /* 滚动槽 */
+        // ::-webkit-scrollbar-track {
+        // box-shadow:inset 006px rgba(0, 0, 0, .5);
+        // -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+        // border-radius:10px;
+        // }
+        // /* 滚动条滑块 */
+        // ::-webkit-scrollbar-thumb {
+        // border-radius:10px;
+        // background:rgba(0,0,0,0.1);
+        // box-shadow:inset 006px rgba(0, 0, 0, .5);
+        // -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+        // }
+        // ::-webkit-scrollbar-thumb:window-inactive {
+        // background:rgba(255,0,0,0.4);
+        // }
         /**********以下是消息输入框样式***********/
          .sendmessage{
             margin: 30px 30px 20px 0;
@@ -2608,7 +2723,7 @@
                 .item-file{
                         float: left;
                         width: 290px;
-                        height: 120px;
+                        height: 160px;
                         margin: 20px 15px 0 0;
                         border-radius: 6px;
                         box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -2616,7 +2731,7 @@
                         padding: 8px;
                         .item-file-attach{
                             // width: 100%;
-                            height: 120px;
+                            height: 160px;
                             margin: 0;
                             padding: 0;
                             border-radius:2px;
@@ -2699,13 +2814,14 @@
                                     width: 48px;
                                     height: 48px;
                                     display: block;
-                                    margin-top: 13PX;
+                                    margin-top: 15PX;
                                     margin-left: 11px;
                                 } 
                             }
                             .item-file-detial{
                                 display: block;
                                 margin-left:80px;
+                                 margin-top:20px;
                                 .icon-goujian{
                                     float: right;
                                     width: 16px;
@@ -2755,7 +2871,7 @@
                                 .operation{
                                     display: block;
                                     position: absolute;
-                                    bottom: 0;
+                                    bottom: 15px;
                                     left: 88px;
                                     right: 0;
                                     span{
@@ -2805,15 +2921,16 @@ import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
-
+// var ;
 export default {
   name:'Costover',
   components:{
         sendMes
   },
   data(){
-    //    window.addEventListener("message", (evt)=>{this.callback(evt)});
+       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+          CurrentSelectPara:"",//图形引擎选中数据
          screenLeft:{
              show:true,
              item:1,
@@ -3042,22 +3159,25 @@ export default {
       },
   },
   methods:{
-    //   callback(e){
-    //        // console.log(e)
-    //         switch(e.data.command){
-	// 		case "EngineReady":
-	// 			{
-    //                 let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-	// 				let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-	// 				app.postMessage({command:"EnterProject",parameter:para},"*");
-	// 			}
-	// 			break;
-	// 		case "CurrentSelectedEnt":
-	// 			break;
-	// 		case "ViewpointSubmited":
-    //             ScreenPara = e.data.parameter;
-	// 	    }
-    //     },
+      callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:"8080",MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+               this.CurrentSelectPara = e.data.parameter;
+               console.log(this.CurrentSelectPara);
+               break;
+			case "ViewpointSubmited":
+                ScreenPara = e.data.parameter;
+                break;
+		    }
+        },
       checkIcon(val){
           var vm = this
           var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
@@ -3398,7 +3518,7 @@ export default {
             vm.CommunicationList = {}
             if(response.data.cd == 0){
                vm.CommunicationList = response.data.rt.rows
-               console.log(this.CommunicationList);
+            //    console.log(this.CommunicationList);
                if(vm.CommunicationList != null){
                 vm.CommunicationList.forEach((item,index)=>{
                     vm.$set(item,'showFlowChart',false)
@@ -4107,7 +4227,7 @@ export default {
       },
       //重回定位
       relocation(val){
-          console.log(val);
+        //   console.log(val);
           const app = document.getElementById('webIframe').contentWindow;
             app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
             document.body.scrollTop = 0;

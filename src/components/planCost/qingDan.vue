@@ -1464,7 +1464,6 @@ export default Vue.component('common-list',{
         vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
         vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
         vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
-        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.projName = localStorage.getItem('projName')
@@ -1575,7 +1574,7 @@ export default Vue.component('common-list',{
           this.TraceID=String(scope.row.dTraceId);
           console.log(this.TraceID);
           const para={"TraceID":this.TraceID} 
-         const app = document.getElementById('webglIframe').contentWindow;
+         const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
          document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;

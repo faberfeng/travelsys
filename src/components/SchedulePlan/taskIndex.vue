@@ -27,7 +27,8 @@
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                 </span>
-            <span class="icon-type"  @click="getGanttList"></span>
+            <!-- <span class="icon-type"  @click="getGanttList"></span> -->
+            <!-- 以上是甘特图按钮 -->
             <!-- @click="getGanttList" -->
           </div>
         </div>
@@ -1628,6 +1629,7 @@
     watch: {
       selectUgId: function (val) {
         var vm = this
+        this.taskIndexData=[];
         this.getTaskList();
       },
       'pageDetial_1.currentPage': function (val, oldval) {
@@ -1855,6 +1857,7 @@
         }).then(response => {
           if (response.data.rt) {
             var vm=this
+            // vm.$emit('refresh')
             this.taskIndexData = response.data.rt;
             if (response.data.rt == null) {
               this.taskIndexData = [];
@@ -1921,9 +1924,6 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex) {
-        // console.log(rowIndex);
-        
-        console.log(typeof(row.path[3]));
         // row.path[3].childNodes.forEach((item)=>{
         //   if(item.style.background){
         //     item.style.color='black'
@@ -1942,8 +1942,6 @@
             item.style.backgroundColor='white'
         })
         row.path[2].style.backgroundColor='#0081c2'
-        console.log(row.path[2]);
-        console.log(row.path);
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
@@ -1957,8 +1955,6 @@
         this.getVerifyList();
         this.getEntityRelation();
         this.getTaskResourceTaskList();
-        
-
       },
       rowKey(row, rowIndex) {
       
@@ -2657,11 +2653,10 @@
       },
       linkTypeRowClick(row, rowIndex) {
         this.selectRowList = rowIndex;
-        if(row.path[2].style.color=='red'){
-            row.path[2].style.color='black'
-        }else{
-            row.path[2].style.color='red';
-            }
+        row.path[3].childNodes.forEach((item)=>{
+            item.style.backgroundColor='white'
+        })
+        row.path[2].style.backgroundColor='#0081c2'
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.linkTaskId = item.taskId
@@ -2671,11 +2666,10 @@
       },
       removeTaskRowClick(row, rowIndex) {
         this.selectRowList = rowIndex;
-        if(row.path[2].style.color=='red'){
-          row.path[2].style.color='black'
-        }else{
-            row.path[2].style.color='red';
-            }
+        row.path[3].childNodes.forEach((item)=>{
+            item.style.backgroundColor='white'
+        })
+        row.path[2].style.backgroundColor='#0081c2'
         //   console.log(JSON.stringify(this.selectRowList))
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
@@ -4224,10 +4218,11 @@
               display: block;
               position: absolute;
               bottom: -7px;
-              width: 24px;
+              width: 23px;
               height: 13px;
               background: #fafafa;
               border-bottom: 1px solid #cccccc;
+              border-right:1px solid #cccccc;
               transform: skewY(30deg);
               content: '';
             }
@@ -4249,10 +4244,11 @@
               display: block;
               position: absolute;
               bottom: -7px;
-              width: 24px;
+              width: 23px;
               height: 13px;
               background: #fafafa;
               border-bottom: 1px solid #cccccc;
+              border-right:1px solid #cccccc;
               transform: skewY(30deg);
               content: '';
             }
@@ -4684,12 +4680,13 @@
         }
         height: 30px;
         border-bottom: 1px solid #e6e6e6;
-        // width: 100%;
-        // float: right;
+       
         // margin-left:10px;
       }
       .resourceList {
-        width: 100%;
+        // width: 100%;
+         width: 91%;
+        float: right;
         table {
           margin: 0 auto;
           width: 100%;

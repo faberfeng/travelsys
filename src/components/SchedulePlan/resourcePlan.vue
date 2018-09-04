@@ -2369,7 +2369,7 @@ export default{
                     border-collapse:collapse;
                     border: 1px solid #e6e6e6;
                     // display:block;  
-                    height:270px;  
+                    // height:270px;  
                     // width:100%;
                     // overflow-y:scroll;
                     thead{

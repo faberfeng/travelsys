@@ -139,6 +139,7 @@ import Vue from 'vue'
 import axios from 'axios'
 var app;
 var ScreenPara;
+var CurrentSelectPara;
 import '../ManageCost/js/jquery-1.8.3.js'
 import './js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
@@ -234,8 +235,9 @@ export default Vue.component('common-upload',{
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
-			case "CurrentSelectedEnt":
-				break;
+            case "CurrentSelectedEnt":
+                CurrentSelectPara = e.data.parameter;
+				console.log(CurrentSelectPara);
 			case "ViewpointSubmited":
                 ScreenPara = e.data.parameter;
                 console.log(ScreenPara);

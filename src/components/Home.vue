@@ -3,11 +3,11 @@
       <!--2018/3/21 付伟超修改-->
         <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
         <div class="contentBody">
-            <div class="downWebGl" @click="webGlbtn">虚拟场景<i><img style="margin-left=3px;" src="./Settings/images/sanjiao.png"/></i></div>
+            <div class="downWebGl" @click="webGlbtn">虚拟场景<i :class="[{'active':webGlShow},'webGlDownBtn']"></i></div>
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe>
-                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe> -->
+                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -402,6 +402,7 @@ export default {
                     path:'/home/projHome/'+this.projId
                 });
                 this.navigationPath = tab.name;
+                // this.webGlShow=true;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
             }else if(tab.label === '进度计划'){
                 this.$router.push({
@@ -617,6 +618,20 @@ export default {
         z-index: 10000000;
         color: #7a818a;
         cursor: pointer;
+    }
+    .webGlDownBtn{
+        width: 12px;
+        height: 12px;
+         background:url('./ManageCost/images/arror.png')no-repeat 0 0; 
+        float: right;
+        cursor: pointer;
+        transition:  all ease .2s;
+        transform: rotate(180deg);
+        margin-top:5px;
+        margin-left:7px;
+        }
+    .active{
+            transform: rotate(0deg);
     }
     #webgl{
        	height: 800px;

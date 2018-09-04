@@ -273,7 +273,7 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-detial"></i>
+                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location" @click="goToLocation"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
@@ -359,6 +359,8 @@
                  </div>
             </div>
         </div>
+        <!--下面是报表清单的编码-->
+        <!-- <common-list v-on:back="backToH" :mId="checkItem.rssId" rType="7" :bId='checkItem.rssId'  :title="'构件量清单'" v-if="showCommonList"></common-list> -->
       <div id="edit">
         <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.nodeId" :title="uploadtitle" :accept="acceptType"
         :fgid="QJfgid" :isqj="isqj" :ugid='selectUgId'
@@ -2292,7 +2294,7 @@ import './js/jquery-ui-1.9.2.custom.js'
 import './js/date.js'
 import data from '../Settings/js/date.js'
 import upload from '../uploadFile.vue'
-
+import commonList from  '../planCost/qingDan.vue'
 export default {
     name:'Costover',
     components:{
@@ -2300,6 +2302,7 @@ export default {
     },
     data() {
         return {
+            showCommonList:false,
             activeIndex: '1',
             tabShow: 1,
             listStyle: 'table', //列表展示方式
@@ -3963,6 +3966,10 @@ export default {
                     alert(response.data.msg);
                 }
             })
+        },
+        //清单列表
+        showDetialList(){
+            this.showCommonList=true;   
         },
         //清单二维码
         viewListQrcode(item){
