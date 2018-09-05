@@ -13,6 +13,7 @@ export default new Vuex.Store({
         // GMDUrl:"http://10.252.26.240:8080",
         // WebGlUrl:"http://10.252.26.240", 
         // BIMServerPort:'8080',
+        //以下是外网配置文件
         BIMServerPort:'80',
         QJFileManageSystemURL:'http://42.159.154.173:8080/qjbim-file/',//仅供文件下载使用的路径，
         BDMSUrl:'http://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用

@@ -439,7 +439,7 @@ export default Vue.component('common-upload',{
         sendInfo(){
             var vm = this
             vm.$refs.message.value = vm.trim(vm.$refs.message.value)
-            if(vm.$refs.message.value == ''){
+            if(vm.$refs.message.value==''){
                 vm.$message({
                     type:'error',
                     message:'请输入信息！'
@@ -558,10 +558,10 @@ export default Vue.component('common-upload',{
                     vm.$refs.message.value = ''
                     vm.newStmt = false
                 }else{
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
+                    // vm.$message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
                 }
                 vm.fullscreenLoading = false
             }).catch((err)=>{

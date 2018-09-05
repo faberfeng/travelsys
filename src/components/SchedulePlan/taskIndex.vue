@@ -2400,6 +2400,7 @@
           }).then(response=>{
               if(response.data.cd=="0"){
                   this.userGroupTaskDialog=false;
+                   this.taskIndexData=[];
                   this.getTaskList();
                   this.groupFlag=false;
                   this.groupIds=[];
@@ -2618,6 +2619,7 @@
           }).then(response => {
             if (response.data.cd == "0") {
               this.addTaskDialog = false;
+               this.taskIndexData=[];
               this.getTaskList();
               this.dutyUserId='';
               this.taskPriority='';
@@ -2823,6 +2825,7 @@
         }).then(response => {
           if (response.data.cd == "0") {
             this.editTaskDialog = false;
+            this.taskIndexData=[];
             this.getTaskList();
             this.taskName = '';
             this.taskStart = '';
@@ -2834,6 +2837,10 @@
             this.taskPriority = '';
             this.dutyUserId = '';
             this.taskGroup = '';
+            this.$message({
+              type:'success',
+              message:'修改工程任务成功'
+            })
           } else {
             alert(response.data.msg)
           }
@@ -2891,6 +2898,7 @@
           }
         }).then(response => {
           if (response.data.cd == '0') {
+             this.taskIndexData=[];
             this.getTaskList();
             this.taskId = '';
             this.Type = null;
@@ -2957,6 +2965,7 @@
         }).then(response => {
           if (response.data.cd == "0") {
             this.removeTaskDialog = false;
+             this.taskIndexData=[];
             this.getTaskList();
             this.removeTaskId = '';
             this.$message({
@@ -3184,6 +3193,7 @@
           data: formData
         }).then(response => {
           if (response.data.cd == '0') {
+             this.taskIndexData=[];
             this.getTaskList();
             this.exportProjectDialog = false;
           } else if (response.data.cd == '-1') {
@@ -4796,7 +4806,7 @@
                   height: 38px;
                   border: 1px solid #d1d1d1;
                   border-radius: 4px;
-                  background: #fafafa;
+                  background: #ffffff;
                   padding-left: 10px;
                   margin-top: 5px;
                   font-size: 14px;
