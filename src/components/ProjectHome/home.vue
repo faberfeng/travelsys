@@ -24,7 +24,7 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="item.userImg?('http://42.159.154.173:8080/qjbim-file/'+item.userImg):require('../../assets/people.png')">
+                            <img :src="item.userImg?(baseUrl+item.userImg):require('../../assets/people.png')">
                         </div> 
                         <div class="projectListText">
                             <p class="title">
@@ -42,7 +42,7 @@
                 <li v-for="(item,index) in projectNoticeListInfo" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="baseUrl+'common/css/default/images/notice/'+item.imagePath+'.png'"/>
+                            <img :src="baseUrl+'upload/notice/'+item.imagePath+'.png'"/>
                         </div> 
                         <div class="projectListText">
                             <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span :title="item.subTitle" class="projectList-detial" v-html="item.subTitle"></span><a @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a></p>
@@ -62,7 +62,7 @@ export default {
         return{
             tabShow:1,
             token:'',
-            baseUrl:'http://10.252.26.240:8080/qjbim-project/',
+            baseUrl:'http://42.159.154.173:8080/qjbim-file/',
             // http://10.252.26.240:8080/qjbim-project/
             // http://42.159.154.173:8080/qjbim-file/
             // http://10.252.26.240:8080/qjbim-file/

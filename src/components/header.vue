@@ -6,7 +6,7 @@
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
-                <img class="headerInfoImg" :src="userImg?'http://10.252.26.240:8080/qjbim-file'+userImg:require('../assets/people.png')" />
+                <img class="headerInfoImg" :src="userImg?QJFileManageSystemURL+userImg:require('../assets/people.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
                     <p class="p2 p-hover" @click="logout">退出</p>
@@ -23,6 +23,7 @@ export default Vue.component('common-header', {
     data(){
         return{
             BDMSUrl:'',
+            QJFileManageSystemURL:'',
         }
     },
     props: ['username','userid','proname','proimg','userimg'],
@@ -30,6 +31,7 @@ export default Vue.component('common-header', {
         var vm = this
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
+         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
     },
     computed:{
         userImg(){

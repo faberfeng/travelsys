@@ -3165,9 +3165,9 @@ export default {
             switch(e.data.command){
 			case "EngineReady":
 				{
-                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-					app.postMessage({command:"EnterProject",parameter:para},"*");
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
             case "CurrentSelectedEnt":
@@ -3175,7 +3175,7 @@ export default {
                console.log(this.CurrentSelectPara);
                break;
 			case "ViewpointSubmited":
-                ScreenPara = e.data.parameter;
+                // ScreenPara = e.data.parameter;
                 break;
 		    }
         },

@@ -553,7 +553,7 @@ export default{
                     'token':this.token
                 }
             }).then(response=>{
-                if(response.data.cd='0'){
+                if(response.data.rt.length!=0){
                     this.resourceTypeList=response.data.rt
                     this.resourceTypeNameValue=this.resourceTypeList[0].id
                     // this.typeId=this.resourceTypeList[0].id

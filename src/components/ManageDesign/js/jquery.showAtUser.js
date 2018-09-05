@@ -321,7 +321,7 @@ $.fn.showAtUsers = function(setting) {
             }
             $at_userslist.css({
                 "left":_left,   
-                "top":_top,
+                "top":"32px",
                 "display":"block"
             }).html('<ul>'+html+'</ul>').find("li").eq(1).addClass("on");
             TipLiEvent(obj);

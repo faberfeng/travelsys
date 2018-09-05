@@ -6,7 +6,7 @@
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <textarea   class="textArea" :id="'dc-add-content'+dcid+selectugid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
+                        <textarea  class="textArea" :id="'dc-add-content'+dcid+selectugid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
                         <div id="at_userslist"></div>
                     </div>
                     <div class="func_area">
@@ -223,32 +223,27 @@ export default Vue.component('common-upload',{
         },
     },
     methods:{
+       
         callback(e){
            // console.log(e)
             switch(e.data.command){
 			case "EngineReady":
 				{
-					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
-					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
-                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-                    // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-					app.postMessage({command:"EnterProject",parameter:para},"*");
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
             case "CurrentSelectedEnt":
-                CurrentSelectPara = e.data.parameter;
-				console.log(CurrentSelectPara);
+                // CurrentSelectPara = e.data.parameter;
 			case "ViewpointSubmited":
                 ScreenPara = e.data.parameter;
-                console.log(ScreenPara);
-                console.log(ScreenPara.para2);
                 this.base64Str=ScreenPara.para2;
                 // console.log(ScreenPara.para1);
-                console.log(typeof(ScreenPara.para1));
+                // console.log(typeof(ScreenPara.para1));
                 this.elementFilter=ScreenPara.para1;
 
-                console.log(this.elementFilter);
+                // console.log(this.elementFilter);
                  var vm = this
                     axios({
                         method:'POST',
@@ -472,7 +467,7 @@ export default Vue.component('common-upload',{
                         subProjId:this.defaultSubProjId,
                     })
             })
-            console.log(vpListUid)
+            // console.log(vpListUid)
             if(vm.iscomment){
                  var data = {
                     dirId:-1,
@@ -526,7 +521,7 @@ export default Vue.component('common-upload',{
                 var url = '/project2/dc/'+vm.dcid+'/review/add'
             }
             vm.fullscreenLoading = true;
-            console.log(data);
+            // console.log(data);
              axios({
                 method:'POST',
                 url:vm.BDMSUrl+url,//vm.BDMSUrl+url
