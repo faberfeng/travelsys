@@ -30,8 +30,7 @@
                         <full-calendar ref="calendar" id="calendar" :events="events" :event-sources="eventSources"  :config="config"   @event-selected="eventSelected"   @event-created="eventCreated"  @event-render="eventRender" ></full-calendar>
                     </div>
                 </div>
-            </div>
-            <div class="calendarContext1" v-show="!viewshow">
+                <div class="calendarContext1" v-show="!viewshow">
                     <div class="calendarHead">
                         <h5 class="calendarHeadLeft"><img class=imgIcon src="./images/worklist.png">个人日历</h5>
                         <div class="calendarHeadRight"><span class="el-icon-plus btn" @click="addEvent">增加事件</span></div>
@@ -83,6 +82,7 @@
                             </div>
                     </div>
                 </div>
+            </div>
             <!-- <el-row>
                 <el-col :span="24">
                     <el-container>
@@ -2892,6 +2892,13 @@ export default {
                             margin-left: 94px;
                             text-align: right;
                     }
+                    .inp{
+                        background-color: #fff;
+                        background-image: none;
+                        border-radius: 4px;
+                        height: 36px;
+                        width:444px;
+                    }
                     .updataImageSpan{
                         overflow: hidden;
                         width: 98px;
@@ -2904,7 +2911,6 @@ export default {
                         /* -ms-filter: 'alpha(opacity=0)'; */
                     }
                     
-
                     .editInpText1{
                         color: #666;
                         font-size: 14px;
