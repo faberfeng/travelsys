@@ -1289,7 +1289,10 @@ export default Vue.component('common-edit',{
                 {
                     id:'NONE',
                     Name:'无'
-                },
+                },{
+                    id:'-1',
+                    Name:'全部'
+                }
                 ],//分区选项
                 options_floor:[
                 {
@@ -1297,7 +1300,7 @@ export default Vue.component('common-edit',{
                     Name:'无'
                 },
             ],//楼层选项
-             option_professional:[],
+            option_professional:[],
             options_system:[
                 {
                     id:'NONE',
@@ -1347,7 +1350,21 @@ export default Vue.component('common-edit',{
                this.disbalelouceng = true;
                this.disbalefenqu = true;
             }else{
-                this.disbaledanti = false;
+                if(this.value_monomer == 'OVERALL_FIELD'){
+                    this.disbalelouceng = true;
+                    this.disbalefenqu = true;
+                    this.disbaledanti = false;
+                }else{
+                    this.disbalelouceng = false;
+                    this.disbalefenqu = false;
+                }
+            }
+        },
+        'value_monomer':function(val,oldVal){
+            if(val == 'OVERALL_FIELD'){
+                this.disbalelouceng = true;
+                this.disbalefenqu = true;
+            }else{
                 this.disbalelouceng = false;
                 this.disbalefenqu = false;
             }

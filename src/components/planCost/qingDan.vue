@@ -121,9 +121,9 @@
                                         </template>
                                     </el-table-column>
                                 </el-table>
-                                <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
+                                <!-- <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
                                     无符合当前筛选条件的记录
-                                </div>
+                                </div> -->
                             </div>
                             <!--以下是page-navigitation-->
                             <div class="datagrid-pager pagination" v-if="S_quantitiesList.length>0">
@@ -1087,7 +1087,7 @@
             // z-index: 10;
             // border-left:none;
             // z-index: 1000;
-            display: inline-block;
+            // display: inline-block;
             position: relative;
             float: right;
             width: 15%;

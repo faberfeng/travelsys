@@ -58,7 +58,7 @@
                 <p v-show="!canEditCj" style="margin-bottom:-6px;"><el-button @click="saveEditCJ" class="btn btn-save" type="primary">保存</el-button><el-button class="btn btn-cancle" @click="groundInfoEditCJ">取消</el-button></p>
             </div>
         </div>
-        <div class="singleList groundTitle">
+        <div class="singleList groundTitle" style="margin-bottom:30px;">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/single-list.png"/>单体列表<span @click="updateList" class="groundIcon"><i class="el-icon-plus"></i>新增</span></h5>
             <div class="groundTable">
                 <el-table class="table" border :data="listData" style="width:100%">
@@ -410,7 +410,7 @@ export default {
             }
             axios({
                 method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/setSceneEnvironment',
+                url:this.baseUrl+'project2/Config/setSceneEnvironment',
                 headers:{
                     'token':this.token
                 },
@@ -449,7 +449,7 @@ export default {
                 if(this.addListcoordinate.split(' ').length == 2 && !isNaN(this.addListcoordinate.split(' ')[0])  && !isNaN(this.addListcoordinate.split(' ')[1])){
                     axios({
                         method:'post',
-                        url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                        url:this.baseUrl+'project2/Config/updateSubProject',
                         headers:{
                             'token':this.token
                         },
@@ -520,7 +520,7 @@ export default {
                             }else{
                                 axios({
                                     method:'post',
-                                    url:this.baseUrl+'h2-bim-project/project2/Config/updateSubProject',
+                                    url:this.baseUrl+'project2/Config/updateSubProject',
                                     headers:{
                                         'token':this.token
                                     },
@@ -601,7 +601,7 @@ export default {
             }
             axios({
                 method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/updateUnityBundle',
+                url:this.baseUrl+'project2/Config/updateUnityBundle',
                 headers:{
                     'token':this.token
                 },
@@ -659,7 +659,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'get',
-                url:this.baseUrl+'h2-bim-project/project2/Config/deleteSubProject',
+                url:this.baseUrl+'project2/Config/deleteSubProject',
                 headers:{
                     'token':this.token
                 },
@@ -693,7 +693,7 @@ export default {
         uninstallUnityBundleSure(){
             axios({
                 method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/setUnityBundleStatus',
+                url:this.baseUrl+'project2/Config/setUnityBundleStatus',
                 headers:{
                     'token':this.token
                 },
@@ -734,7 +734,7 @@ export default {
         deleteUnitySure(){
             axios({
                 method:'get',
-                url:this.baseUrl+'/h2-bim-project/project2/Config/deleteUnityBundle',
+                url:this.baseUrl+'project2/Config/deleteUnityBundle',
                 headers:{
                     token:this.token
                 },
@@ -761,7 +761,7 @@ export default {
         getGroundInformation(){
             axios({
                 method:'get',
-                url:this.baseUrl+'h2-bim-project/project2/Config/projectSiteDatumIndex',
+                url:this.baseUrl+'project2/Config/projectSiteDatumIndex',
                 headers:{
                     'token':this.token
                 },
@@ -782,7 +782,7 @@ export default {
         getSceneEnvironment(){
             axios({
                 method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/getSceneEnvironmentByProjId',
+                url:this.baseUrl+'project2/Config/getSceneEnvironmentByProjId',
                 headers:{
                     token:this.token
                 },
@@ -824,12 +824,11 @@ export default {
         findSubProject(){
             axios({
                 method:'get',
-                url:this.baseUrl+'h2-bim-project/project2/Config/findSubProject/'+this.projId,
+                url:this.baseUrl+'project2/Config/findSubProject/'+this.projId,
                 headers:{
                     token:this.token
                 }
             }).then((response)=>{
-                
                 if(response.data.cd == '0'){
                     if(response.data.rt != null){
                         this.listData = response.data.rt.rows;
@@ -846,7 +845,7 @@ export default {
         getUnityBundle(){
             axios({
                 method:'post',
-                url:this.baseUrl+'h2-bim-project/project2/Config/getUnityBundleByHolderId',
+                url:this.baseUrl+'project2/Config/getUnityBundleByHolderId',
                 headers:{
                     token:this.token
                 },
@@ -904,7 +903,7 @@ export default {
                         editName = item.ID
                     }
                 })
-                var returnUrl = _this.baseUrl+'/h2-bim-project/project2/upload/uploadBundleDataFile?holderId='+_this.groundInfo.siteId+'&mainAsset='+_this.editUnityName+'&assetComment='+_this.editUnityRemark+'&assetStatus='+_this.isLoading+'&platform'+_this.platform+'&buildSurface'+editName;
+                var returnUrl = _this.baseUrl+'project2/upload/uploadBundleDataFile?holderId='+_this.groundInfo.siteId+'&mainAsset='+_this.editUnityName+'&assetComment='+_this.editUnityRemark+'&assetStatus='+_this.isLoading+'&platform'+_this.platform+'&buildSurface'+editName;
                 returnUrl = encodeURIComponent(returnUrl);
                 const formData = new FormData();
                 formData.append('projId',_this.projId);

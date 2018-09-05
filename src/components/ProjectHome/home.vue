@@ -45,7 +45,11 @@
                             <img :src="QJFileManageSystemURL+'upload/notice/'+item.imagePath+'.png'"/>
                         </div> 
                         <div class="projectListText">
-                            <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span :title="item.subTitle" class="projectList-detial" v-html="item.subTitle"></span><a @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a></p>
+                            <p class="title">
+                                <label class="projectListTextName">{{item.noticeName}}</label>
+                                <span :title="item.subTitle" class="projectList-detial" v-html="item.subTitle"></span>
+                                <a style="display:none" @click="gotoPath(index)">查看详情<i class="el-icon-arrow-right"></i></a>
+                            </p>
                             <p class="font-color1">{{item.message}}</p>
                             <p class="projectBottom">{{item.createDate | toLocalD}}</p>
                         </div>
