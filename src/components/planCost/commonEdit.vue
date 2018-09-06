@@ -125,7 +125,7 @@
             <div class="container container-F">
                 <p class="clearfix" v-for="(item) in list_filter" :key="item.key" v-show="item.show">
                     <span class="item-container">
-                        <select name="" v-model="item.build_name" class="value-box" @change="adjustCondition(item.key,item.build_name)">
+                        <select name="" v-model="item.build_name" class="value-box" @change="adjustCondition(item.key,item.build_name,item)">
                             <option value="nofield">【不使用】</option>
                             <option :value="val.fieldCode" v-text="val.fieldName" v-for="(val,index) in  data_right" :key="index"></option>
                         </select>
@@ -1392,7 +1392,7 @@ export default Vue.component('common-edit',{
         vm.getPV();
     },
     methods:{
-        adjustCondition(key,name){
+        adjustCondition(key,name,item){
             var vm = this
             if(name == 'nofield'){
                 vm.list_filter[key].type = ''
@@ -1424,16 +1424,16 @@ export default Vue.component('common-edit',{
             }
         },
         value_partition_change(inheirt){
-                var vm = this 
-                vm.findStorey(inheirt)
+            var vm = this 
+            vm.findStorey(inheirt)
         },
         value_professional_change(inheirt){
-                var vm = this 
-                vm.getGenieClass(2,inheirt)
+            var vm = this 
+            vm.getGenieClass(2,inheirt)
         },
         value_system_change(inheirt){
-                var vm = this 
-                vm.getGenieClass(3,inheirt)
+            var vm = this 
+            vm.getGenieClass(3,inheirt)
         },
         basicConfirm(){
             var vm = this
@@ -1785,6 +1785,7 @@ export default Vue.component('common-edit',{
                 },
             }).then(response=>{
                 if(response.data.cd == 0){
+                    console.log(response.data.rt)
                     if(response.data.rt != null){
                         vm.rcName = response.data.rt.rcName//报表名称
                         vm.value_type = response.data.rt.rcTableName//表名 筛选 - 类型
@@ -1792,8 +1793,8 @@ export default Vue.component('common-edit',{
                         vm.displayType = response.data.rt.displayType == 0?true:false//数据相同时合并多行
                         vm.displayTotal = response.data.rt.displayTotal == 1?true:false//显示总计
                         vm.titlePosition = response.data.rt.groupPosition+''//报表名称
-
-                        vm.data_right = []
+                        //报表字段
+                        vm.data_right = [];
                         if(response.data.rt.fieldList != null && response.data.rt.fieldList.length>0){
                             response.data.rt.fieldList.forEach(ele=>{
                                 for(var i=0;i<vm.data_left.length;i++){
@@ -1813,8 +1814,9 @@ export default Vue.component('common-edit',{
                             vm.addField()
                             vm.basicConfirm()
                         }
-                       
-                        var length = response.data.rt.filterList.length
+                        //过滤条件
+                        var length = response.data.rt.filterList.length;
+                        let lastArrindex = 0;
                         if(length>0){
                             response.data.rt.filterList.forEach((element,index)=>{
                                 if(element.fieldCode == 'range.db' || element.fieldCode == 'range.build' || element.fieldCode == 'range.profession'){
@@ -1838,15 +1840,23 @@ export default Vue.component('common-edit',{
                                             break;
                                     }
                                 }else{
+                                    for(let i=0;i<vm.data_right.length;i++){
+                                        if(vm.data_right[i].fieldCode == element.fieldCode){
+                                            vm.list_filter[index].type = vm.data_right[i].fieldType
+                                            break
+                                        }
+                                    }
+                                    lastArrindex = index;
                                     vm.list_filter[index].build_name = element.fieldCode
-                                    vm.list_filter[index].val = 1
+
+                                    vm.list_filter[index].val = 1;
 
                                     vm.list_filter[index].filtercontent = element.fieldSearchContent
                                     vm.list_filter[index].filtertype = element.fieldSearchType
                                     vm.list_filter[index].show = true
                                 }
                             })
-                            vm.list_filter[vm.list_filter.length-1].val = 0
+                            vm.list_filter[lastArrindex].val = 0
                         }
                         if(response.data.rt.groupList != null && response.data.rt.groupList.length>0){
                             response.data.rt.groupList.forEach((element,index)=>{
@@ -2192,11 +2202,14 @@ export default Vue.component('common-edit',{
             var vm = this;
             if(length == 5){
                 if(vm.list_filter[key].val == 1){
-                    vm.list_filter[key+1].show = true
+                    vm.list_filter[key+1].show = true;
                 }else{
                     for(var i = key+1;i<length;i++){
-                        vm.list_filter[i].show = false
-                        vm.list_filter[i].val = 0
+                        vm.list_filter[i].show = false;
+                        vm.list_filter[i].val = 0;
+                        vm.list_filter[i].build_name = 'nofield';
+                        vm.list_filter[i].filtertype = '';
+                        vm.list_filter[i].filtercontent = '';
                     }
                 }
             }else if(length == 3){

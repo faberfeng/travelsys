@@ -158,7 +158,7 @@
                                           <label  :class="[checkAll?'active':'','checkbox-fileItem']" for="allAttribute" @click="initAll()"></label>
                                           <input  type="checkbox" id='allAttribute' class="checkbox-att" v-model="checkAll" >
                                       </th>
-                                      <th v-if="GCPropertyList.length>0">定位</th>
+                                      
                                       <th v-if="basicAttributes_auth.old.holderType">所在空间</th>
                                       <th v-if="basicAttributes_auth.old.guid">元素GUID</th>
                                       <th v-if="basicAttributes_auth.old.originalFile">原始文件</th>
@@ -179,6 +179,7 @@
                                             GCPropertyValueList:[],//扩展属性查询的值 库
                                       -->
                                        <th v-for="(item,key) in GCPropertyList" :key="key" v-if="item.checked">{{item.propertyTitle}}</th>
+                                       <th >定位</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -186,9 +187,7 @@
                                       <td>
                                           <label  :class="[val.checked?'active':'','checkbox-fileItem']"  @click.stop="checkLabel(index,true)"></label>
                                       </td>
-                                      <td  v-if="GCPropertyList.length>0">
-                                          <i class="location"></i>
-                                      </td>
+                                      
                                       <td v-text="val.holderType"  v-if="basicAttributes_auth.old.holderType"></td>
                                       <td v-text="val.guid"  v-if="basicAttributes_auth.old.guid"></td>
                                       <td v-text="val.originalFile"  v-if="basicAttributes_auth.old.originalFile"></td>
@@ -209,6 +208,9 @@
                                             GCPropertyValueList:[],//扩展属性查询的值 库
                                       -->
                                      <td   v-if="item.checked" v-text="initVal(item.id,val.traceId,false)" :class="[{'Strong':(initVal(item.id,val.traceId,true)==1)}]"  v-for="(item,key) in GCPropertyList" :key="key"></td>
+                                     <td  >
+                                          <i class="location"></i>
+                                      </td>
                                   </tr>
                               </tbody>
                           </table>
@@ -933,9 +935,9 @@
                                 color: #333333;
                                 .location{
                                     display: block;
-                                    width: 12px;
+                                    width: 14px;
                                     height: 16px;
-                                    background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                    background: url('../planCost/images/location.png')no-repeat 0 0;
                                     cursor: pointer;
                                 }
                                 .inputvalue{
@@ -1362,9 +1364,9 @@
                                     color: #333333;
                                     .location{
                                         display: block;
-                                        width: 12px;
+                                        width: 14px;
                                         height: 16px;
-                                        background: url('../ManageCost/images/location.png')no-repeat 0 0;
+                                        background: url('../planCost/images/location.png')no-repeat 0 0;
                                         cursor: pointer;
                                     }
                                 }
@@ -1765,7 +1767,7 @@
                     }
                     .detial-text-value{
                         color: #333333;
-                        max-width: 120px;
+                        max-width: 100px;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
