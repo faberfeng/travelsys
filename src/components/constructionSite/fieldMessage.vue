@@ -1,8 +1,8 @@
 <template>
     <div id="fieldMessage">
         <div id="GroupSelect">
-            <select v-model="selectUgId" class="inp-search">
-                <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
+            <select v-model="allSelectUgId" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in  allUgList" :key="index" v-text="item.ugName"></option>
             </select>
             <i class="icon-sanjiao"></i>
         </div>
@@ -101,12 +101,14 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="files" v-show="!(screenLeft.item>0)">
+                        <div class="files" >
                             <span class="text">附件:</span>
-                            <span class="icon-eye" @click="viewSpot" >视点</span>
-                            <span class="icon-file" @click="showUploadBox_file">文档</span>
-                            <span class="icon-message" @click="getAssociationList" >清单</span>
-                            <span class="icon-image" @click="showUploadBox_img" >图片</span>
+                            <span v-show="!(screenLeft.item>0)">
+                                <span class="icon-eye"  @click="viewSpot" >视点</span>
+                                <span class="icon-file" @click="showUploadBox_file">文档</span>
+                                <span class="icon-message" @click="getAssociationList" >清单</span>
+                                <span class="icon-image" @click="showUploadBox_img" >图片</span>
+                            </span>
                         </div>
                         <div :class="['btn',{'btn1':showLeftContent}]" v-show="!(screenLeft.item>0)">
                             <span class="item-cancle" @click="addAndSend(1)">发送</span>
@@ -439,12 +441,14 @@ export default {
         return{
             contactIndexList:'',
             endFileMessage:false,
+            allSelectUgId:'',
             selectUgId:'',
             mainSendMsgValue:'',
             copySendMsgValue:'',
             createSendUgId:'',
             textarea:'',
             ugList:'',
+            allUgList:'',
             contactList:'',
             rowsList:'',
             rowsListLength:0,
@@ -576,9 +580,11 @@ export default {
 
     },
     watch:{
-        selectUgId: function (val) {
+        allSelectUgId: function (val,oldval) {
         var vm = this;
         this.screenLeft.item=2;
+        this.rowsList='',
+        this.rowsListLength=0,
         vm.getContactList();
       },
        'pageDetial_1.currentPage': function (val, oldval) {
@@ -606,8 +612,10 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.contactIndexList=response.data.rt;
-                    this.ugList=response.data.rt.pug.ugList;
+                    this.allUgList=response.data.rt.pug.ugList;
+                    this.ugList=response.data.rt.pug.allUgList
                     this.selectUgId=response.data.rt.pug.selectUgId;
+                    this.allSelectUgId=response.data.rt.pug.selectUgId;
                     // this.mainSendMsgValue=response.data.rt.pug.selectUgId;
                     // this.copySendMsgValue=response.data.rt.pug.selectUgId;
                      this.createSendUgId=response.data.rt.pug.selectUgId;
@@ -650,7 +658,7 @@ export default {
             params:{
                 projId:this.projId,
                 status:this.screenLeft.item,
-                ugId:this.selectUgId
+                ugId:this.allSelectUgId
             },
             }).then(response=>{
                 if(response.data.rt.rows!=null){
@@ -666,6 +674,22 @@ export default {
         //添加或者删除
         addAndSend(num){
             var vm=this;
+            if(this.projectValue==''){
+                this.$message({
+                    type:'info',
+                    message:'请填写发文的主题!'
+                })
+            }else if(this.mainSendMsgValue==''){
+                this.$message({
+                    type:'info',
+                    message:'请选择发文的主送!'
+                })
+            }else if(this.textarea==''){
+                this.$message({
+                    type:'info',
+                    message:'请填写发文的内容!'
+                })
+            }else{
             vm.$set(vm.qjContactList,'content',this.textarea)
             vm.$set(vm.qjContactList,'copySendUgIds',this.copySendMsgValue)
             vm.$set(vm.qjContactList,'createSendUgId',this.createSendUgId)
@@ -693,18 +717,24 @@ export default {
                     this.addAndSendList=response.data.rt;
                     console.log(this.addAndSendList);
                     // this.ischeck=0;
-                     this.ischeck=this.addAndSendList.id;
-                      this.getList();
+                    this.ischeck=this.addAndSendList.id;
+                    this.getList();
                     this.screenLeft.item=0;
-                     this.getContactList();
+                    this.getContactList();
                     this.screenLeft.item=1;
-                     this.getContactList();
+                    this.getContactList();
                     this.screenLeft.item=2;
                      this.getContactList();
                      if(this.addAndSendList.isSend==0){
-                         this.screenLeft.item=0;
+                        this.screenLeft.item=0;
+                        this.rowsListLength=0;
+                        this.rowsList='';
+                        this.getContactList();
                      }else if(this.addAndSendList.isSend==1){
-                         this.screenLeft.item=1;
+                        this.screenLeft.item=1;
+                        this.rowsListLength=0;
+                        this.rowsList='';
+                        this.getContactList();
                      }
                    
                    
@@ -715,6 +745,7 @@ export default {
                     alert(response.data.msg);
                 }
             })
+        }
         },
         
         backToH() {
@@ -927,6 +958,7 @@ export default {
         sendMsg(){
             this.rowsListLength=0;
             this.screenLeft.item = 2;
+            this.rowsList='';
             this.getContactList();
             this.showLeftContent=true;
             this.ischeck='';
@@ -934,16 +966,18 @@ export default {
         },
         receiveMsg(){
             this.screenLeft.item = 1;
+            this.rowsListLength=0;
+            this.rowsList='';
             this.getContactList();
             this.showLeftContent=true;
             this.ischeck='';
             this.projectValue='';
-            this.rowsListLength=0;
 
         },
         draftMsg(){
             this.screenLeft.item = 0;
             this.rowsListLength=0;
+            this.rowsList='';
             this.getContactList();
             this.showLeftContent=true;
             this.ischeck='';
@@ -985,9 +1019,12 @@ export default {
         newFile(){
             this.showLeftContent=false;
             this.newFileshow=false;
+             this.screenLeft.item=0;
+             this.rowsListLength=0;
+            this.rowsList='';
+            // this.getContactList();
             this.ischeck='';
             this.projectValue='';
-            this.screenLeft.item=0;
             this.mainSendMsgValue='';
             this.copySendMsgValue='';
             this.textarea='';
@@ -1302,6 +1339,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.relaList.push(response.data.rt);
                     console.log(this.relaList);
+                    this.addAssociationListDialog=false;
                     // console.log(this.relaList);
                     // this.addAssociationListDialog=false;
                     // this.getLoadManifest();

@@ -505,7 +505,7 @@ export default {
                     'token':this.token
                 },
                 params:{
-                    type:this.entType,
+                    type:3,
                     projId:this.projId
                 }
             }).then(response=>{

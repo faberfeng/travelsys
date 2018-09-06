@@ -166,7 +166,7 @@
                             </span>
                         </div>
                         <div class="tree">
-                            <el-tree id="treeData" ref="treeData" highlight-current  node-key="id" :empty-text="'内容为空'" :data="loadzTreeDataList"  :props="defaultProps" @node-click="nodeClick">
+                            <el-tree id="treeData" ref="treeData" :highlight-current="true" :expand-on-click-node="false"  node-key="id" :empty-text="'内容为空'" :data="loadzTreeDataList"  :props="defaultProps" @node-click="nodeClick">
                             </el-tree>
                         </div>
                     </div>
@@ -325,10 +325,8 @@
                             <label class="parentValue">{{this.parentItemName}}</label>
                         </div>
                         <div class="editBodytwo">
-                            <div class="editBodytwo2">
                                 <label class="itemName">项目名称:</label>
-                                <el-input v-model="projectName"></el-input>
-                            </div>
+                                <input class="itemInp" v-model="projectName"/>
                         </div>
                         <div class="editBodytwo">
                             <label>检查频率:</label>
@@ -380,7 +378,7 @@
                                     <tr :class="{'tdBackground':item.id==tdValue}" id="checkPointId" v-for="(item,index) in checkPointsList" :key="index" @click="checkTable(item.id)" >
                                         <!-- 此处逻辑复杂，得慢慢捋清楚 -->
                                         <!-- v-show="!(tdValue==item.id)" -->
-                                        <td ><span >{{item.name}}</span><input v-show="showTd&&!item.id||rwriteShow&&tdValue==item.id" v-model="checkPointTdName" id="tdInput" type="text"/></td>
+                                        <td ><span v-show="!(item.id==rwriteShowId)">{{item.name}}</span><input v-show="showTd&&!item.id||rwriteShow&&tdValue==item.id" v-model="checkPointTdName" id="tdInput" type="text"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -446,6 +444,7 @@ export default {
             pointTotal:'',
             checkPointsForPageList:'',
             checkPointsList:'',
+            checkPointsListLength:'',
             checkPointTdName:'',
             pointsForPagePager:'',
             loadzTreeDataList_original:'',//原始树形图
@@ -537,6 +536,7 @@ export default {
             tdValue:'',
             showTd:false,
             rwriteShow:false,
+            rwriteShowId:'',
             QJFileManageSystemURL:'',
             BDMSUrl:'',
         }
@@ -680,7 +680,7 @@ export default {
             },
             params:{
                 projId:this.projId,
-                type:this.entType,
+                type:5,
             },
             url:this.BDMSUrl+'/project2/buildSite/validateAuth'
         }).then(response=>{
@@ -851,6 +851,8 @@ export default {
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.checkPointsList=response.data.rt;
+                this.checkPointsListLength=response.data.rt.length;
+                console.log(this.checkPointsListLength);
                 console.log(this.checkPointsList);
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
@@ -917,27 +919,28 @@ export default {
             url:this.BDMSUrl+'/project2/security/updateCheckPointSecurityStatus'
         }).then(response=>{
             if(response.data.cd=='0'){
+                vm.securityStatusShow=false;
+                vm.securityStatus='',
                 vm.$message(
                     {type:'success',
-                    message:response.data.msg})
+                    message:'安全状态修改成功'})
                     vm.getCheckPointsByItemId();
 
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }
         })
-
-
     },
     //重命名
     rwrite(){
         var vm=this;
         if(this.tdValue){
-            // this.checkPointsList.forEach((item)=>{
-            //     if(this.tdValue==item.id){
-            //         this.checkPointTdName=item.name;
-            //     }
-            // })
+            this.checkPointsList.forEach((item)=>{
+                if(this.tdValue==item.id){
+                    this.checkPointTdName=item.name;
+                    this.rwriteShowId=item.id
+                }
+            })
             this.rwriteShow=true
         }else{
             vm.$message({
@@ -945,12 +948,37 @@ export default {
                 message:'请选择要重命名的检查点位'
             })
         }
+        // axios({
+        //     method:'get',
+        //     headers:{
+        //         'token':this.token
+        //     },
+        //     params:{
+        //        name:this.checkPointTdName,
+        //        itemId:this.itemId,
+        //        projId:this.projId
+        //     },
+        //     url:this.BDMSUrl+'/project2/security/renameCheckPoint'
+        // }).then(response=>{
+        //     if(response.data.cd=='0'){
+
+        //     }else if(response.data.cd=='-1'){
+        //         alert(response.data.msg);
+        //     }
+        // })
     },
+
     //撤销检查点位
     checkPointCancel(){
         this.showTd=false;
         this.checkPointTdName='';
-        this.checkPointsList.shift();
+            if( this.checkPointsList[0].name1!=undefined){
+                this.checkPointsList.shift();
+            }
+        // if(this.checkPointsList.==this.checkPointsListLength){
+        //     return;
+        // }
+        
     },
     //添加检查点位
     addCheckPoint(){
@@ -1190,7 +1218,7 @@ export default {
     },
     newTabFile(){
         var name='';
-        this.checkPointsList.unshift({'name':name});
+        this.checkPointsList.unshift({'name':name,'name1':1});
         console.log(this.checkPointsList);
         this.checkPointsList.forEach((item)=>{
             if(item.name==""){
@@ -1366,7 +1394,7 @@ export default {
             height:600px;
             margin:10px 10px;
             overflow-y:auto;
-                                    
+            width: 100%;                  
             #treeData{
                 .el-tree-node:focus .el-tree-node__content{
                     background-color: transparent;
@@ -1419,19 +1447,13 @@ export default {
         }
     #safetyChecking{
          .topHeader{
-            // box-sizing: border-box;
-            // position: fixed;
-            // top: 116px;
-            // left: 26px;
-            // bottom:0;
-            // right: 0;
-            // overflow: auto;
             box-sizing: border-box;
             float: left;
             width: 100%;
-            height:800px;
+            // height:800px;
             overflow: auto;
         }
+        ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
@@ -1465,14 +1487,16 @@ export default {
         #project{
             width: 100%;
             height: 90%;
-            padding:20px;
-            margin-top:5px;
+            padding:0px 20px 20px 20px;
             ::-webkit-scrollbar{width:0px}
             .project_left{
-                // border:1px solid red;
-                width: 80%;
-                height: 800px;
-                float: left;
+                // width: 80%;
+                // height: 800px;
+                // float: left;
+                display: inline-block;
+                width: 84%;
+                position: relative;
+                transition: all ease 0.5s;
                 ::-webkit-scrollbar{width:0px}
                 .information{
                     margin-top:10px;
@@ -1600,7 +1624,7 @@ export default {
                     }
                     .checkSite_table{
                             width: 100%;
-                            height: 200px;
+                            height: 328px;
                             overflow-x: auto;
                             table {
                                 margin: 0 auto;
@@ -1841,16 +1865,23 @@ export default {
                 }
             }
             .project_right{
-                border-left:1px solid #999;
-                // border-left:1px solid #999;
-                // border-top:1px solid #999;
-                width: 18%;
-                // height: 100%;
+                border-left:1px solid #ccc;
+                // width: 18%;
+                // float: right;
+                // position: absolute;
+                // top: 98px;
+                // right: 0px;
+                // height: 800px;
+                display:inline-block;
+                position:relative;
                 float: right;
-                position: absolute;
-                top: 98px;
-                right: 0px;
-                height: 800px;
+                width: 15%;
+                transition: all ease 0.5s;
+                background: #ffffff;
+                z-index: 10;
+                height: 750px;
+                overflow-y: auto;
+                overflow-x: hidden;
                 .checkProjectList_header{
                     height: 40px;
                     border-bottom:1px solid #999; 
@@ -2023,28 +2054,47 @@ export default {
             .el-dialog__body {
             .editBody {
                 .editBodytwo{
-                    .editBodytwo2{
-                        margin-left:63px;
                         .itemName{
-                            float: left;
-                            position: relative;
-                            margin-left:-85px;
-                            top:40px;
-                            display:inline-block;
-                            font-size: 14px;
+                            // float: left;
+                            // position: relative;
+                            // margin-left:-85px;
+                            // top:40px;
+                            // display:inline-block;
+                            // font-size: 14px;
                         }
+                        .itemInp{
+                            -webkit-appearance: none;
+                            background-color: #fff;
+                            background-image: none;
+                            border-radius: 4px;
+                            border: 1px solid #dcdfe6;
+                            -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            color: #606266;
+                            display: inline-block;
+                            font-size: inherit;
+                            height: 36px;
+                            line-height: 1;
+                            outline: 0;
+                            padding: 0 15px;
+                            -webkit-transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+                            transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+                            width: 217px;
+                            margin-top:10px;
+                        }
+                    
+                    label{
+                        display: inline-block;
+                        width:100px;
                     }
                     .parentItem{
-                        float: left;
-                        left:49px;
+                        // float: left;
                         width: 70px;
-                        height: 33px;
-                        position: relative;
-                        // display: inline-block;
+                        display: inline-block;
+                        height: 20px;
+                        margin-left:-145px;
                     }
                     .parentValue{
-                        float: left;
-                        position: relative;
                         left:40px;
                         width: 70px;
                         height: 20px;

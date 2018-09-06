@@ -195,6 +195,8 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+::-webkit-scrollbar{width:0px}
+/*webkit内核*/
     #designVersion{
         // box-sizing: border-box;
         // position: fixed;
@@ -208,7 +210,6 @@ export default {
         width: 100%;
         overflow: auto;
         height: 800px;
-        ::-webkit-scrollbar{width:0px}
         #item-box-file{
             display: block;
             border-bottom: 1px solid #e6e6e6;
