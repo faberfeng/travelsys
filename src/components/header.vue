@@ -2,7 +2,7 @@
     <el-row class="container-header">
         <el-col :span="24" class="header">
             <div class="headerImg">
-                <img :src="proimg?proimg:require('../assets/defaultlogo.png')"/>
+                <img :src="isUseDefaultLogo?newLogo:require('../assets/defaultlogo.png')"/>
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
@@ -12,7 +12,6 @@
                     <p class="p2 p-hover" @click="logout">退出</p>
                 </div>
             </div>
-            
         </el-col>
     </el-row>
 </template>
@@ -31,11 +30,17 @@ export default Vue.component('common-header', {
         var vm = this
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
-         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
     },
     computed:{
         userImg(){
-            return this.$store.state.imgUuid
+            return this.$store.state.imgUuid;
+        },
+        newLogo(){
+            return this.$store.state.projectLogo;
+        },
+        isUseDefaultLogo(){
+            return this.$store.state.isUseDefaultLogo;
         }
     },
     methods:{
@@ -57,14 +62,17 @@ export default Vue.component('common-header', {
                     localStorage.removeItem('projId');
                     sessionStorage.removeItem('navigationPath');
                     sessionStorage.removeItem('settingActive');
-                    window && window.localStorage.clear();//清楚所有localStorage
+                    this.$store.commit('switchLogo',{//显示默认logo
+                        isDefaultLogo:false
+                    })
+                    localStorage.clear('vuex');//清除所有localStorage
                     vm.$router.push({
                         path:'/login'
                     }) 
                 }
             }).catch((err)=>{
                 console.log('退出失败!')
-                    console.log(err)
+                console.log(err)
             })
         },
 
