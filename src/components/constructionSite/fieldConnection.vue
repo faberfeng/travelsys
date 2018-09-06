@@ -263,7 +263,7 @@
 var THREE = require('three');
 import axios from 'axios'
 import data from '../Settings/js/date.js'
-var source= '';
+// var source= '';
 var camera, scene, renderer;
 var isUserInteracting = false,
     onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -954,31 +954,21 @@ export default {
          init(source){
             var vm = this
                 var container, mesh;
-
-                container = document.getElementById( 'planeDIV' );
-
+                container = document.getElementById('planeDIV');
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );//相机
                 camera.target = new THREE.Vector3( 0, 0, 0 );
                 // camera.target = new THREE.Vector3( cx, cy, cz );
                 // camera.aspect = window.innerWidth / window.innerHeight;
                 // camera.lookAt(camera.target);
                 // camera.updateProjectionMatrix();
-
                 scene = new THREE.Scene();//场景
-
                 var geometry = new THREE.SphereGeometry( 500, 60, 40 );//几何体
                 geometry.scale( - 1, 1, 1 );
-
-                
-
                 var material = new THREE.MeshBasicMaterial( {
                     map: new THREE.TextureLoader().load(source)
                 } );//材质
-
                 mesh = new THREE.Mesh( geometry, material );
-
                 scene.add( mesh );
-
                 renderer = new THREE.WebGLRenderer();//渲染器
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize($("#planeDIV").width(),$("#planeDIV").height());
@@ -986,10 +976,10 @@ export default {
                 container.innerHTML = ''
                 container.appendChild( renderer.domElement );
                 renderer.setClearColor(0xFFFFFF, 1.0);
-                document.addEventListener( 'mousedown', vm.onDocumentMouseDown, false );
-                document.addEventListener( 'mousemove', vm.onDocumentMouseMove, false );
-                document.addEventListener( 'mouseup', vm.onDocumentMouseUp, false );
-                document.addEventListener( 'wheel', vm.onDocumentMouseWheel, false );
+                container.addEventListener( 'mousedown', vm.onDocumentMouseDown, false );
+                container.addEventListener( 'mousemove', vm.onDocumentMouseMove, false );
+                container.addEventListener( 'mouseup', vm.onDocumentMouseUp, false );
+                container.addEventListener( 'wheel', vm.onDocumentMouseWheel, false );
                 // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				// document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				// document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -998,7 +988,7 @@ export default {
                 
                 
 
-                document.addEventListener( 'dragover', function ( event ) {
+                container.addEventListener( 'dragover', function ( event ) {
 
                     event.preventDefault();
                     /** @namespace event.dataTransfer */
@@ -1006,18 +996,18 @@ export default {
 
                 }, false );
 
-                document.addEventListener('dragenter', function () {
+                container.addEventListener('dragenter', function () {
                     document.body.style.opacity = 0.5;
 
                 }, false );
 
-                document.addEventListener( 'dragleave', function () {
+                container.addEventListener( 'dragleave', function () {
 
                     document.body.style.opacity = 1;
 
                 }, false );
 
-                document.addEventListener( 'drop', function ( event ) {
+               container.addEventListener( 'drop', function ( event ) {
 
                     event.preventDefault();
 
@@ -1045,7 +1035,6 @@ export default {
 
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
-
                     renderer.setSize($("#planeDIV").width(),$("#planeDIV").height());
 
                 },

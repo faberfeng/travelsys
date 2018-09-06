@@ -122,7 +122,7 @@
                                     </el-table-column>
                                 </el-table>
                                 <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                                    无符合当前筛选条件的记录
+                                    <!-- 无符合当前筛选条件的记录 -->
                                 </div>
                             </div>
                             <!--以下是page-navigitation-->
@@ -230,7 +230,7 @@
                                     </el-table-column>
                                 </el-table>
                                 <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                                    无符合当前筛选条件的记录
+                                    <!-- 无符合当前筛选条件的记录 -->
                                 </div>
                             </div>
                             <!--以下是page-navigitation-->
@@ -340,7 +340,7 @@
                                     </el-table-column>
                                 </el-table>
                                 <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                                    无符合当前筛选条件的记录
+                                    <!-- 无符合当前筛选条件的记录 -->
                                 </div>
                             </div>
                             <!--以下是page-navigitation-->
