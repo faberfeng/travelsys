@@ -2,7 +2,8 @@
     <el-row class="container-header">
         <el-col :span="24" class="header">
             <div class="headerImg">
-                <img :src="isUseDefaultLogo?newLogo:require('../assets/defaultlogo.png')"/>
+                <img v-if="!newLogo" :src="require('../assets/defaultlogo.png')"/>
+                <img v-else :src="isUseDefaultLogo?newLogo:require('../assets/defaultlogo.png')"/>
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
@@ -60,7 +61,7 @@ export default Vue.component('common-header', {
                 if(response.data.cd == "0"){
                     localStorage.removeItem('token');
                     localStorage.removeItem('projId');
-                    sessionStorage.removeItem('navigationPath');
+                    //sessionStorage.removeItem('navigationPath');
                     sessionStorage.removeItem('settingActive');
                     this.$store.commit('switchLogo',{//显示默认logo
                         isDefaultLogo:false

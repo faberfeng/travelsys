@@ -598,11 +598,6 @@ export default {
         top: 22px;
     }
     /* 导航栏 */
-    .main{
-        /* flex: 1; */
-        /* overflow:auto; */
-        /* margin-left: 18px; */
-    }
     .content{
         width: 100%;
         position: relative;

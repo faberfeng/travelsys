@@ -368,11 +368,14 @@ export default {
                     this.projectConfig = response.data.rt.project;
                     this.projectLogoConfig = response.data.rt.projectConfig;
                     this.isAsdefault = response.data.rt.projectConfig.confVal;
-                    if(this.isAsdefault){
+                    if(this.isAsdefault == 'true'){
                         this.isAsdefault = true;
                     }else{
                         this.isAsdefault = false;
                     }
+                    this.$store.commit('changeProjectLogo',{
+                        projectImg:response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
+                    })
                     this.projectUseCount = response.data.rt.projectUserCount;
                     this.projectImage = response.data.rt.projectImage;
                 }else if(response.data.cd === '-1'){
@@ -514,7 +517,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    //this.getProjectInitalConfig()
                 }else {
                     alert(response.data.msg)
                 }
