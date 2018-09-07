@@ -133,7 +133,6 @@ export default Vue.component('common-header', {
         display: flex;
         justify-content: center;
         align-items: center;
-        
         cursor: pointer;
     }
     .headerInfo:hover .infoHover{
