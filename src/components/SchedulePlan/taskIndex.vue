@@ -3785,8 +3785,18 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-size: 12px;
+        font-size: 14px;
       }
+  select.inp-search {  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        }
 
   li {
     list-style: none;

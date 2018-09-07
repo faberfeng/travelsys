@@ -7,6 +7,18 @@ Vue.use(Router)
 
 const router = new Router({
   routes: [
+    //文档管理公有分享路由
+    {
+      path:'/cloud/share/:id',
+      name:'shareFile',
+      component:resolve=>require(['@/components/ManageCost/shareFile'],resolve),
+    },
+    //文档管理私有分享路由
+    {
+      path:'/cloud/sharePassword/:id',
+      naem:'shareFilePassWord',
+      component:resolve=>require(['@/components/ManageCost/shareFilePassWord'],resolve),
+    },
     {
       path: '/',
       redirect:'/login',

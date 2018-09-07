@@ -24,6 +24,7 @@ export default {
   color: #2c3e50;
   min-width: 1200px;
   height: 100%;
+  font-size: 14px;
 }
 .UserList{
    td,th{

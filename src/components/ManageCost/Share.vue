@@ -303,7 +303,7 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="openUrl()">打开页面</button>
+                    <button class="editBtnS" @click="openUrl(checkedItem.shareNo,sharePath.password)">打开页面</button>
                     <button class="editBtnS copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput" @click="copyURL" v-if="sharePath.path !=''">复制地址</button>
                     <button class="editBtnS" @click="closeLink">关闭</button>
                 </div>
@@ -473,14 +473,6 @@
         }
     }
     .box-left-container{
-        // display: block;
-        // position: fixed;
-        // top: 115px;
-        // left: 26px;
-        // bottom: 0;
-        // right: 225px;
-        // transition:  all ease .5s;
-        // overflow: auto;
         display: inline-block;
         width: 85%;
         position: relative;
@@ -1025,17 +1017,6 @@
       右侧
     */
     .box-right-container{
-        // display: block;
-        // position: fixed;
-        // right: -225px;
-        // bottom: 0;
-        // width: 250px;
-        // padding-left: 25px;
-        // top: 116px;
-        // transition: all ease .5s;
-        // background: #ffffff;
-        // z-index: 10;
-        // overflow-y: auto;
         display: inline-block;
         position: relative;
         float: right;
@@ -1737,6 +1718,7 @@ export default {
              },**/
             vm.sharePath.show = true
             vm.sharePath.path = this.QJFileManageSystemURL+'/cloud/share/'+vm.checkedItem.shareNo
+
             vm.sharePath.password = vm.checkedItem.sharePassword !=null?vm.checkedItem.sharePassword:''
         },
         closeLink(){
@@ -1745,9 +1727,19 @@ export default {
             vm.sharePath.path = ''
             vm.sharePath.password = ''
         },
-        openUrl(){
+        openUrl(id,passwordId){
             var vm = this
-            window.open(vm.sharePath.path);
+            // localStorage.setItem('projId',id)
+            if(passwordId==''){
+            vm.$router.push({
+              path:`/cloud/share/${id}`,
+            })
+            }else{
+                vm.$router.push({
+                    path:`/cloud/sharePassword/${id}`,
+                })
+            }
+            // window.open(vm.sharePath.path);
         },
         cancleShare(){
             var vm = this
@@ -2010,6 +2002,7 @@ export default {
             },
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
+                // console.log(response.data.rt)
                 vm.sharePath.path = response.data.rt.url
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
             }
