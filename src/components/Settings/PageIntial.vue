@@ -104,7 +104,7 @@
             <el-dialog title="新增竖向楼层" :visible.sync="addFloorList" :before-close="cancleAddFloorList">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
-                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入" v-model="FloorValue"/></div>
+                    <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入标高(单位mm)" v-model="FloorValue"/></div>
                 </div>
                 <el-checkbox v-model="setAsAuto">设置为默认楼层</el-checkbox>
                 <div slot="footer" class="dialog-footer">

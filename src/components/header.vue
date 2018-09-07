@@ -61,7 +61,7 @@ export default Vue.component('common-header', {
                 if(response.data.cd == "0"){
                     localStorage.removeItem('token');
                     localStorage.removeItem('projId');
-                    //sessionStorage.removeItem('navigationPath');
+                    sessionStorage.removeItem('navigationPath');
                     sessionStorage.removeItem('settingActive');
                     this.$store.commit('switchLogo',{//显示默认logo
                         isDefaultLogo:false
