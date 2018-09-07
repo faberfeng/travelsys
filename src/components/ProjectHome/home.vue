@@ -449,6 +449,7 @@ export default {
             width: 100%;
             height: 37px;
             line-height: 37px;
+            font-size: 14px;
         }
         .talUl label{
             color:#999999;

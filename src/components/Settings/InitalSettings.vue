@@ -18,12 +18,15 @@
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
                             <img v-if="projectImage" :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/>
                             </div>
-                        <div style="margin:0;"><el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> <label style="margin-left:
-                        -10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label></div>
+                        <div style="margin:0;">
+                            <el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> 
+                            <label style="margin-left:-10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label>
+                        </div>
                     </div>
                 </li>
             </ul>
         </div>
+        
         <div class="summary">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-state.png"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
             <ul class="accountList uniqueList" >
@@ -157,7 +160,8 @@ export default {
             deleteImageVisiable:false,
             deleteImageIndex:'',
             userId:'',
-            QJFileManageSystemURL:''
+            QJFileManageSystemURL:'',
+            projectLogoConfig:{},
         }
     },
     created(){
@@ -362,6 +366,16 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.projectConfig = response.data.rt.project;
+                    this.projectLogoConfig = response.data.rt.projectConfig;
+                    this.isAsdefault = response.data.rt.projectConfig.confVal;
+                    if(this.isAsdefault == 'true'){
+                        this.isAsdefault = true;
+                    }else{
+                        this.isAsdefault = false;
+                    }
+                    this.$store.commit('changeProjectLogo',{
+                        projectImg:response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
+                    })
                     this.projectUseCount = response.data.rt.projectUserCount;
                     this.projectImage = response.data.rt.projectImage;
                 }else if(response.data.cd === '-1'){
@@ -437,9 +451,9 @@ export default {
             this.imageType = 2;
         },
         upImgSure(){
-            var returnUrl = this.BDMSUrl+'/uploadImage?imageType='+this.imageType;
+            let returnUrl = this.BDMSUrl+'/uploadImage?imageType='+this.imageType;
             returnUrl = encodeURIComponent(returnUrl);
-            const formData = new FormData();
+            let formData = new FormData();
             formData.append('projId',this.projId);
             formData.append('type','1');
             formData.append('userId',this.userId);
@@ -481,7 +495,16 @@ export default {
             this.filesList = list;
         },
         //是否为默认图片
-        isAsDefault(){  
+        isAsDefault(){ 
+            if(this.isAsdefault){
+                this.$store.commit('switchLogo',{
+                    isDefaultLogo:false
+                })
+            }else{
+                this.$store.commit('switchLogo',{
+                    isDefaultLogo:true
+                })
+            }
             axios({
                 method:'post',
                 url:this.BDMSUrl+'useDefaultLogo',
@@ -494,15 +517,10 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                }else if(response.data.cd == '-1'){
+                }else {
                     alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
                 }
             })
-
         },
         //弹窗关闭
         addCancle(){

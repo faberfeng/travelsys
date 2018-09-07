@@ -203,10 +203,10 @@
                     </span>
                 </p>
                  <p class="clearfix">
-                   <label   :class="[displayType?'active':'','checkbox-fileItem']" for="displayType"></label>
-                   <input   type="checkbox" id='displayType' class="hideInput"  v-model="displayType">
+                    <label   :class="[displayType?'active':'','checkbox-fileItem']" for="displayType"></label>
+                    <input   type="checkbox" id='displayType' class="hideInput"  v-model="displayType">
                     <label   :class="[displayTotal?'active':'','checkbox-fileItem','right-checkbox']" for="displayTotal"></label>
-                   <input   type="checkbox" id='displayTotal' class="hideInput"  v-model="displayTotal">
+                    <input   type="checkbox" id='displayTotal' class="hideInput"  v-model="displayTotal">
                 </p>
             </div>
             <p class="header clearfix">

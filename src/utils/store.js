@@ -8,6 +8,7 @@ export default new Vuex.Store({
     state:{
         path:'',
         UPID:'BB1408IN16014',
+
         QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
         BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
         GMDUrl:"http://10.252.26.240:8080",
@@ -22,21 +23,31 @@ export default new Vuex.Store({
 
         
         WebSocketUrl:"http://10.252.26.240:16800/message",
-        imgUuid:'',
+        imgUuid:'',//用户头像
+        projectLogo:'',//企业logo
+        isUseDefaultLogo:false,
     },
     getters:{
         changePath(state){
-          console.log(state.path) ;
-          return state.path; 
+            return state.path; 
         },
         getBaseUrl(state){
             return state.BDMSUrl
         }   
     },
     mutations:{
+        //用户头像信息
         changeImagePath(state,payload){
             state.imgUuid = payload.imagePath;
         },
+        //企业logo信息
+        changeProjectLogo(state,payload){
+            state.projectLogo = payload.projectImg;
+        },
+        //切换工程logo
+        switchLogo(state,payload){
+            state.isUseDefaultLogo = payload.isDefaultLogo;
+        }
     },
     plugins:[
         createPersistedState()

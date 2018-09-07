@@ -188,12 +188,12 @@
                         产品资料
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                     </h3>
-                    <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
+                    <!-- <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
                         <li class="detial-item clearfix">
                             <span class="detial-text-name">产品ID</span>
                             <span class="detial-text-value" :title="detailTableInfo.productId">{{detailTableInfo.productId}}</span>
                         </li>
-                    </ul>
+                    </ul> -->
                 </div>
             </div>
         </div>
@@ -1576,7 +1576,7 @@ export default {
         // border-left:none;
         // z-index: 1000;
         // border-left: 1px solid #e6e6e6;
-         display: inline-block;
+        //  display: inline-block;
         position: relative;
         float: right;
         width: 15%;

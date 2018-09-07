@@ -390,11 +390,12 @@ export default {
             }).then(response=>{
                 if(response.data.cd == '0'){
                     this.dataTransformInfo = response.data.rt;
-                    this.component = response.data.rt.component
-                    this.dataTransformData[0].sNumber = 0;
-                    this.dataTransformData[0].eNumber = 0;
+                    this.component = response.data.rt.component;
+                    console.log(this.dataTransformInfo)   
+                    this.dataTransformData[0].sNumber = this.dataTransformInfo.initMapCount;
+                    this.dataTransformData[0].eNumber = this.dataTransformInfo.companyMapCount;
                     this.dataTransformData[0].pNumber = this.dataTransformInfo.mapProjectCount;
-                    this.dataTransformData[0].tNumber = this.dataTransformData[0].sNumber+this.dataTransformData[0].eNumber+this.dataTransformData[0].pNumber;
+                    this.dataTransformData[0].tNumber = this.dataTransformInfo.allMapCount;
                     
                     this.dataTransformData[1].sNumber = this.dataTransformInfo.t31Count;
                     this.dataTransformData[1].eNumber = this.dataTransformInfo.t31CompanyCount;
@@ -591,6 +592,7 @@ export default {
         background-color: #f2f2f2!important;
         height: 36px;
         padding:0;
+        text-align: center;
     }
     .el-table td{
         padding:0;

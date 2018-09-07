@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper" ref="allHeight">
       <!--2018/3/21 付伟超修改-->
-        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :proimg='header.projectImg'></headerCommon>
+        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' ></headerCommon>
         <div class="contentBody">
             <div class="downWebGl" @click="webGlbtn">虚拟场景<i :class="[{'active':webGlShow},'webGlDownBtn']"></i></div>
             <div v-show="webGlShow" class="webglBackground">
@@ -177,21 +177,18 @@ export default {
     },
     methods:{
         webGlbtn(){
-            console.log('fjd');
             this.webGlShow=!this.webGlShow;
             localStorage.setItem('webGlShow',this.webGlShow);
             app = this.$refs.iframe1.contentWindow
             app.postMessage({command:"Init",parameter:null},"*");
         },
         callback(e){
-            console.log(e)
             switch(e.data.command){
 			case "EngineReady":
 				{
 					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
 					let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                    console.log(Horder);
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
@@ -199,19 +196,16 @@ export default {
 			case "CurrentSelectedEnt":
 				break;
 			case "ViewpointSubmited":
-
 				// ScreenPara = e.data.parameter
-
 				break;
 		    }
         },
 
-
         changeFrameHeight(){
-                var ifm= document.getElementById("webIframe"); 
-                ifm.height=document.documentElement.clientHeight;
-            },
-           //获取项目模型展示初始化数据
+            var ifm= document.getElementById("webIframe"); 
+            ifm.height=document.documentElement.clientHeight;
+        },
+        //获取项目模型展示初始化数据
         getInitdata(){
             axios({
             method:'get',
@@ -227,8 +221,6 @@ export default {
                 this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
                 // this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
-                console.log(JSON.stringify(this.WebGlId));
-                console.log(this.InitdataList);
             }else if(response.data.cd=='-1'){
             }
             })
@@ -236,12 +228,10 @@ export default {
              
         getPJDetial(key){
             var vm = this
-            //console.log("look the proj_id")
             /*******
              * 谨记：
              * 获取路由params的写法是this.$route 不是this.$router!!!
              * ********/
-            // console.log(vm.$route.params.id);
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'project2/index?projId='+key,
@@ -250,7 +240,6 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                //console.log(response);
                 if(response.data.msg == "您没有登录或登录超时，请重新登录"){
                         vm.$router.push({
                         path:'/login'
@@ -258,6 +247,18 @@ export default {
                 }else{
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
+                    this.$store.commit('changeProjectLogo',{
+                        projectImg:vm.header.projectImg
+                    })
+                    if(vm.header.projectImg){
+                        this.$store.commit('switchLogo',{
+                            isDefaultLogo:true
+                        })
+                    }else{
+                        this.$store.commit('switchLogo',{
+                            isDefaultLogo:false
+                        })
+                    }
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId);
                     this.subProjId=response.data.rt.defaultSubProjId;
                     vm.getUserInfo();
@@ -280,7 +281,6 @@ export default {
                     'token':vm.token,
                 },
             }).then((response)=>{
-               // console.log('getUserInfo获取用户的姓名和项目权限')
                 vm.header.userName = response.data.rt.onlineInfo.userName
                 vm.header.userId = response.data.rt.onlineInfo.userId
                 /*********
@@ -303,8 +303,6 @@ export default {
                         configurationCenter:false
                     }
                  * *********/
-                // console.log("check this out!!!")
-                // console.log(new Date());
                 var id = localStorage.getItem('projId');
                 localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
                 for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
@@ -390,10 +388,8 @@ export default {
                         })
                     }
                 }
-                // console.log("check this out!!!")
-                // console.log(new Date());
             }).catch((err)=>{
-                    console.log(err)
+                console.log(err)
             })
         },
         handleClick(tab,event){
@@ -602,11 +598,6 @@ export default {
         top: 22px;
     }
     /* 导航栏 */
-    .main{
-        /* flex: 1; */
-        /* overflow:auto; */
-        /* margin-left: 18px; */
-    }
     .content{
         width: 100%;
         position: relative;
