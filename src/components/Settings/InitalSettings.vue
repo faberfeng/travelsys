@@ -473,6 +473,7 @@ export default {
                     this.getProjectImageList();
                     this.getProjectInitalConfig();
                     this.upImg = false;
+                    this.imageName = '未选择任何图片';
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
