@@ -330,7 +330,7 @@
                     </div>
                     
                     <div class="editBodytwo edit-item clearfix">
-                        <label class="editInpText1">重复方式 :<span class="editRepeat">{{this.repeatTypeLabel | repeatTypeChanges}}</span></label>
+                        <label class="editInpText1">重复方式 :<span class="editRepeat">{{repeatTypeLabel | repeatTypeChanges()}}</span></label>
                     </div>
 
                     <div class="editBodytwo edit-item clearfix">
@@ -1468,8 +1468,9 @@ export default {
                             eventColor:this.eventColorValue,
                             content:this.eventContext,
                             callType:'0',
+                           
                        },
-                       updateType:this.deleteTypeValue
+                       updateType:this.updateTypeValue
                    }
                     }).then(response=>{
                         if(response.data.cd == '0'){
@@ -1536,7 +1537,6 @@ export default {
                                 this.event=[];
                                 this.initEvent();
                                 this.initTask();
-                                initTask();
                                 this.eventView();
                                 this.deleteEventTextDialog=false;
                         }else if(response.data.cd == '-1'){

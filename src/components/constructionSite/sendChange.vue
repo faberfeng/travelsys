@@ -285,7 +285,8 @@ export default Vue.component('common-upload',{
             vm.fileId = []
             vm.attachId = []
             vm.$refs.message.value = ''
-            vm.checkTypeName=''
+            vm.$emit('showNameHide',false)
+            // vm.checkTypeName=''
         },
         showUploadBox_img(){
             var vm = this
@@ -372,7 +373,7 @@ export default Vue.component('common-upload',{
                     pageType:3,	//质量检查
                     newStmt:vm.newStmt,
                     designCoordinate:{
-                        dcContent: '[检查类型]'+'-'+vm.checkTypeName+vm.$refs.message.value,//质量检查传递的值
+                        dcContent: '[检查类型]'+'-'+vm.checkTypeName+'\n'+vm.$refs.message.value,//质量检查传递的值
                         ugId: vm.selectugid,
                         dirId:vm.dirId,//质量检查传递树节点
                         projId: vm.projId,
@@ -452,8 +453,9 @@ export default Vue.component('common-upload',{
                     vm.fileId = []
                     vm.attachId = []
                     vm.$refs.message.value = ''
-                    vm.checkTypeName=''
+                    // vm.checkTypeName=''
                     vm.newStmt = false
+                     vm.$emit('showNameHide',false)
                 }else{
                     vm.$message({
                         type:'error',

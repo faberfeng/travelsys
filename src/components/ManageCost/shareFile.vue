@@ -16,7 +16,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div class="header_shareFile" >
-                    {{fileListName}}
+                    {{fileListName[0]}}
                 </div>
                 <ul id="file-container" class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
@@ -179,7 +179,8 @@ export default {
                         this.$set(item,'checked',false)
                         this.fileList.push(item)
                     })
-                    this.fileListName=this.fileList[0].fgName;
+                    this.fileListName=this.fileList[0].fgName.split('.');
+                    console.log(this.fileListName[0])
                 }
             })
         },

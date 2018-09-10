@@ -154,7 +154,7 @@
                                                                     <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
-                                                                            <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                                                            <i class="button-relocation" title="定位" @click="relocation(val.locationInfo)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(val.relativePath)"></i>
                                                                             <i class="line"></i>
@@ -3097,6 +3097,11 @@ export default {
         vm.entId = localStorage.getItem('entId')
         vm.projAuth = localStorage.getItem('projAuth')
         vm.entType = localStorage.getItem('entType')
+        // vm.WebGlUrl=vm.$store.state.WebGlUrl
+        // vm.BIMServerPort=vm.$store.state.BIMServerPort;
+        // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         if(vm.projAuth.indexOf("00400205") > 0 || vm.entType == 1){
             vm.hasAuthDelUser = true
         }
@@ -4225,10 +4230,18 @@ export default {
       //重回定位
       relocation(val){
         //   console.log(val);
-          const app = document.getElementById('webIframe').contentWindow;
-            app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
+        if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+        }else{
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
       },
       /**
          * 预览文件集文件

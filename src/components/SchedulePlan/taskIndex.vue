@@ -213,6 +213,7 @@
             <li class="detial-item clearfix">
               <label class="detial-text-value1">{{item.tvRate + '%'}}</label>
               <label class="detial-text-value2">{{item.tvDate | timeChange}}</label>
+              <i class="icon-delete" v-show="item.tvRate!=0" title="删除" @click="deleteVerfiy(item.id,item.taskId)"></i>
             </li>
           </ul>
         </div>
@@ -1631,6 +1632,7 @@
         var vm = this
         this.taskIndexData=[];
         this.getTaskList();
+        // this.cancleSelect();
       },
       'pageDetial_1.currentPage': function (val, oldval) {
         var vm = this
@@ -1916,7 +1918,8 @@
             this.verifyLists = response.data.rt;
             this.attachList = this.verifyLists.attachList;
             this.fileList = this.verifyLists.fileList;
-            this.verifyList = this.verifyLists.verifyList
+            this.verifyList = this.verifyLists.verifyList;
+            // console.log(this.verifyList)
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
           }
@@ -1938,10 +1941,12 @@
         //   row.path[2].style.color='white';
         //   row.path[2].style.backgroundColor='#0081c2'
         // }
+        // console.log(typeof(document.getElementsByClassName(' zk-table__body-row')));
+
         row.path[3].childNodes.forEach((item)=>{
-            item.style.backgroundColor='white'
+            item.style.color='black'
         })
-        row.path[2].style.backgroundColor='#0081c2'
+        row.path[2].style.color='#0081c2'
         this.selectRowList = rowIndex;
         this.selectRowList.forEach((item, index) => {
           // console.log(index);
@@ -1963,7 +1968,7 @@
         var vm = this;
         if (row.children == null) {
           var color = vm.selectColor(parseInt(row.colorValue));
-          return 'color:' + color;
+          return 'backgroundColor:' + color;
         }
       },
       //根据工程获取状态颜色
@@ -2372,9 +2377,17 @@
       },
       checkFlgChange(index){
         //    var groupIdList=[];
-        var str=this.ugList1[index].ugId
-          this.groupIds.push(str.toString());
-          
+        console.log(this.ugList1);
+         var str=this.ugList1[index].ugId;
+        // this.ugList1.forEach((item)=>{
+        //   if(item.checkFlg==true){
+        //       this.groupIds.push(item.ugId.toString());
+        //   }else if(item.checkFlg==false){
+        //     this.groupIds.pop(item.ugId.toString());
+        //   }
+        // })
+        this.groupIds.push(str.toString());
+        console.log(this.groupIds);
       },
       userGroupTaskMakeSure(){
           this.taskId=this.editTaskUserGroupList.taskId;
@@ -2676,8 +2689,9 @@
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.curUgId = item.taskUserGroup
+            console.log(this.curUgId);
             this.removeTaskId = item.taskId
-            // console.log(this.removeTaskId)
+            console.log(this.removeTaskId)
           }
         })
       },
@@ -2958,8 +2972,8 @@
             'token': this.token
           },
           params: {
-            prevTaskId: this.taskId,
-            taskId: this.removeTaskId,
+            prevTaskId:this.removeTaskId,
+            taskId: this.taskId,
             curUgId: this.curUgId
           }
         }).then(response => {
@@ -3228,6 +3242,32 @@
                 vm.$set(item,'showModel',item.show)
             })
         },
+        //删除核实任务
+        deleteVerfiy(tvId,num){
+           axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/schedule/'+this.projId+'/task/deleteVerify',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                  tvId:tvId,
+                  taskId:num
+                }
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                  this.getTaskList();
+                  this.getVerifyList();
+                    this.$message({
+                      type:'success',
+                      message:'删除核实记录成功'
+                    })
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+
+        },
         //点击添加核实任务
         addVerifyRecord(){
             this.addVerifyTaskDialog=true;
@@ -3235,34 +3275,43 @@
         //确认添加核实任务
         addVerifyTaskMakeSure(){
             var myDate = new Date();
-            if(this.verifyStartTime>myDate){
+            if(this.verifyStartTime==''){
+              this.$message({
+                type:'info',
+                message:'请输入核实日期'
+              })
+            }else if(this.verifyStartTime>myDate){
                 alert('核实日期不能超过当前日期!')
                 return;
+            }else{
+              axios({
+                  method:'post',
+                  url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addVerify',
+                  headers:{
+                      'token':this.token
+                  },
+                  data:{
+                      taskVerify:{
+                          taskId:this.taskId,
+                          tvDate:moment(this.verifyStartTime).format("YYYY-MM-DD"),
+                          tvRate:this.tvValue
+                      }
+                  }
+              }).then(response=>{
+                  if(response.data.cd=='0'){
+                  this.getTaskList();
+                  this.getVerifyList();
+                  this.tvValue=0;
+                  this.verifyStartTime='';
+                  this.addVerifyTaskDialog=false;
+                  }else if(response.data.cd=='-1'){
+                      this.$message({
+                        type:'info',
+                        message:response.data.msg
+                      })
+                  }
+              })
             }
-
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addVerify',
-                headers:{
-                    'token':this.token
-                },
-                data:{
-                    taskVerify:{
-                        taskId:this.taskId,
-                        tvDate:moment(this.verifyStartTime).format("YYYY-MM-DD"),
-                        tvRate:this.tvValue
-                    }
-                }
-            }).then(response=>{
-                if(response.data.cd=='0'){
-                this.getVerifyList();
-                this.tvValue=0;
-                this.verifyStartTime='';
-                this.addVerifyTaskDialog=false;
-                }else if(response.data.cd=='-1'){
-                    alert(response.data.msg);
-                }
-            })
         },
         addVerifyTaskCancle(){
            this.verifyStartTime='';
@@ -3304,7 +3353,6 @@
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
-                    this.$emit('refresh')
                     this.addAssociationListDialog=false;
                     this.getLoadManifest();
                     this.getEntityRelation();
@@ -3785,7 +3833,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-size: 14px;
+        font-size: 12px;
       }
   select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
@@ -4683,6 +4731,16 @@
                       margin-left:40px;
                       width: 85px;
                     }
+                  .icon-delete{
+                              width: 16px;
+                              height: 16px;
+                              cursor: pointer;
+                              float: right;
+                              background: url('./images/delete.png')no-repeat 0 0;
+                              &:hover{
+                                  background: url('./images/delete1.png')no-repeat 0 0;
+                              }
+                        }
                 }
             }
     }
