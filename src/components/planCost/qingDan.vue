@@ -86,7 +86,7 @@
                         <div v-show="bottomExpend.isExpend">
                             <div style="overflow: auto;">
                                 <p  class="clearfix" style="margin: 7px 0 10px;text-align:left;">
-                                    <span  class="title-list" v-text="'明细总数：'+pageDetial.total"></span>
+                                    <span  class="title-list" v-text="'明细总数：'+detailNum"></span>
                                     <span class="item-btn clearfix">
                                         <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
                                         <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label>
@@ -95,7 +95,7 @@
                                     </span>
                                 </p>
                             <el-table  :data="S_quantitiesList"  border style="width: 100%" class="detialInfoTable"  @row-click="checkLabel">
-                                    <el-table-column
+                                <el-table-column
                                     v-for="(item,index) in detailsHead" :key="index"
                                     :prop="item.prop"
                                     :label="item.name"
@@ -105,25 +105,22 @@
                                     :width="index == 0?'50':''"
                                     :formatter="testIfIsNull"
                                     >
-                                    </el-table-column>
-                                    <el-table-column
-                                        prop="operate"
-                                        label="操作"
-                                        v-if="showOperate"
-                                        fixed="right"
-                                        align="center"
-                                        :formatter="testIfIsNull"
-                                        >
+                                </el-table-column>
+                                <el-table-column
+                                    prop="operate"
+                                    label="操作"
+                                    v-if="showOperate"
+                                    fixed="right"
+                                    align="center"
+                                    :formatter="testIfIsNull"
+                                    >
                                         <template slot-scope="scope">
-                                            <button class="locationBtn actionBtn" title="定位"  @click.stop="openLocation(scope)" ></button>
-                                            <button class="detialBtn actionBtn" title="详情"  @click.stop="checkLabel(scope)" v-if="showType == 'separate'"></button>
-                                            <button class="labelBtn actionBtn" title="标签"  @click.stop="openLabel(scope)" ></button>
-                                        </template>
+                                        <button class="locationBtn actionBtn" title="定位"  @click.stop="openLocation(scope)" ></button>
+                                        <button class="detialBtn actionBtn" title="详情"  @click.stop="checkLabel(scope)" v-if="showType == 'separate'"></button>
+                                        <button class="labelBtn actionBtn" title="标签"  @click.stop="openLabel(scope)" ></button>
+                                       </template>
                                     </el-table-column>
                                 </el-table>
-                                <!-- <div v-if="S_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                                    无符合当前筛选条件的记录
-                                </div> -->
                             </div>
                             <!--以下是page-navigitation-->
                             <div class="datagrid-pager pagination" v-if="S_quantitiesList.length>0">
@@ -1227,7 +1224,7 @@
             }
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
-                margin: 0 14px 0 30px;
+                margin: 0 14px 0 35px;
                 .noTop{
                     top: 12px!important;
                 }
@@ -1295,11 +1292,13 @@
                         color: #999999;
                         width: 65px;
                         display: inline-block;
+                        font-size: 12px;
                     }
                     .detial-text-value{
                         color: #333333;
                         max-width: 100px;
                         overflow: hidden;
+                        font-size: 12px;
                         text-overflow: ellipsis;
                         white-space: nowrap;
                         display: inline-block;
@@ -1451,6 +1450,8 @@ export default Vue.component('common-list',{
         },
         singleLable:false,//单个标签展示 不需要分页器
         manifestId:Number,//mid
+        detailNum:'',
+        jishuCount:0,
       }
   },
   created(){
@@ -1503,14 +1504,12 @@ export default Vue.component('common-list',{
   },
   methods:{
       callback(e){
-           // console.log(e)
             switch(e.data.command){
 			case "EngineReady":
 				{
 					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
 					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
                     let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-                    // console.log(Horder);
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
@@ -1764,7 +1763,6 @@ export default Vue.component('common-list',{
                     }else{
                         vm.ManifestInfo = response.data.rt ; 
                     }
-                    console.log(vm.ManifestInfo)
                     if(vm.ManifestInfo.mType == 2){
                         Object.assign(vm.ManifestInfo,{
                             _mType:'工程量清单'
@@ -1794,17 +1792,17 @@ export default Vue.component('common-list',{
     //加载明细列表
     changeShowType(val){
         var vm = this
-         //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
-         if(val && vm.showType == 'combine'){
-              vm.showType = 'separate'
-              vm.detailsHead[1].show = true //序号列不显示
-              vm.findManifestDetailList()
-         }
-         if(!val && vm.showType == 'separate'){
-              vm.showType = 'combine'
-              vm.detailsHead[1].show = false //序号列不显示
-              vm.findManifestDetailList()
-         }
+        //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
+        if(val && vm.showType == 'combine'){
+            vm.showType = 'separate'
+            vm.detailsHead[1].show = true //序号列不显示
+            vm.findManifestDetailList()
+        }
+        if(!val && vm.showType == 'separate'){
+            vm.showType = 'combine'
+            vm.detailsHead[1].show = false //序号列不显示
+            vm.findManifestDetailList()
+        }
     },
     findManifestDetailList(isDialog=0){
         var vm = this
@@ -1854,8 +1852,13 @@ export default Vue.component('common-list',{
         }).then(response=>{
             if(response.data.cd == 0){
                 if(response.data.rt != null){
+                    if(this.jishuCount==0){
+                        this.detailNum = response.data.rt.total;
+                        this.jishuCount++;
+                    }
                     vm.pageLabelList.total = response.data.rt.total
-                    vm.pageDetial.total = response.data.rt.total
+                    vm.pageDetial.total = response.data.rt.total;
+
                     if(isDialog == 1){
                         if(response.data.rt.rows != null){
                             vm.S_Label_quantitiesList = response.data.rt.rows;
@@ -1863,6 +1866,7 @@ export default Vue.component('common-list',{
                         }else{
                             vm.S_Label_quantitiesList = [];
                         }
+                        console.log(vm.S_quantitiesList)
                     }else if(isDialog == 0){
                         if(response.data.rt.rows != null){
                             vm.S_quantitiesList = response.data.rt.rows;
@@ -1871,12 +1875,12 @@ export default Vue.component('common-list',{
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
                             });
-                            console.log(vm.S_quantitiesList);
                         }else{
                             vm.S_quantitiesList = [];
                         }
+                        console.log(vm.S_quantitiesList)
                     }else if(isDialog == 2){
-                            if(response.data.rt.rows != null){
+                        if(response.data.rt.rows != null){
                             vm.S_Label_quantitiesList = response.data.rt.rows
                             this.copyS_Label_quantitiesList = response.data.rt.rows;
                             vm.S_quantitiesList = response.data.rt.rows
@@ -1884,19 +1888,15 @@ export default Vue.component('common-list',{
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
                             });
-                            console.log(vm.S_quantitiesList);
                         }else{
                             vm.S_Label_quantitiesList = []
                             vm.S_quantitiesList = []
                         }
+                        console.log(vm.S_quantitiesList)
                     }
                 }
-            }else if(response.data.cd == '-1'){
+            }else {
                 alert(response.data.msg);
-            }else{
-                vm.$router.push({
-                    path:'/login'
-                })
             }
            }).catch((err)=>{
             console.log(err)

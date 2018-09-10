@@ -1,5 +1,5 @@
 <template>
-<div id="CommenList" v-loading.fullscreen.lock="fullscreenLoading">
+<div id="CommenListTwo" v-loading.fullscreen.lock="fullscreenLoading">
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="containerMessage">
@@ -391,7 +391,7 @@
      .navigation{
         z-index: 0!important;
     }
-    #CommenList{
+    #CommenListTwo{
         #print-qrcode{
             display: none;
         }
@@ -1179,7 +1179,7 @@
             overflow-x: hidden;
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
-                margin: 0 14px 0 10px;
+                margin: 0 14px 0 35px;
                 .noTop{
                     top: 12px!important;
                 }
