@@ -11,7 +11,7 @@
                     </div>
                     <div class="func_area">
                         <div class="limits">
-                            <span class="icon-eye" >视点</span>
+                            <span class="icon-eye" @click="AddViewpoint()">视点</span>
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>
@@ -26,6 +26,16 @@
                  </div>
                  <div class="fileitem">   
                      <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                          <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                <i class="line"></i>
+                                <i class="button-search"  @click="preview(val.filePath)"></i>
+                                 <i class="line"></i>
+                                 <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
+                            </div>
+                        </li>
                         <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
@@ -54,6 +64,8 @@
                                  <i class="icon-goujian icon-delete" @click="deleteFile(key,1)"></i>
                             </div>
                         </li>
+
+
                     </ul>
               </div>
           </div>
@@ -127,10 +139,12 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+var ScreenPara;
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageDesign/js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
     data(){
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             QJFileManageSystemURL:'',
             BDMSUrl:'',
@@ -160,6 +174,10 @@ export default Vue.component('common-upload',{
                 obj:[],//短语列表
             },
             fullscreenLoading:false,
+            base64Str:'',
+            elementFilter:'',
+            uploadViewPointList:[],
+
         }
     },
     props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout','checkTypeName','dirId'],
@@ -248,6 +266,13 @@ export default Vue.component('common-upload',{
             var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
             return tt; 
         },
+        //重回定位
+        relocation(){
+             const app = document.getElementById('webIframe').contentWindow;
+            app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        },
         preview(val){
             var vm = this
             if(val){
@@ -284,9 +309,64 @@ export default Vue.component('common-upload',{
             vm.$emit('hide')
             vm.fileId = []
             vm.attachId = []
+             vm.uploadViewPointList=[]
             vm.$refs.message.value = ''
             vm.$emit('showNameHide',false)
             // vm.checkTypeName=''
+        },
+        callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+			case "ViewpointSubmited":
+                ScreenPara= e.data.parameter;
+                this.base64Str=ScreenPara.para2;
+                this.elementFilter=ScreenPara.para1;
+                 var vm = this
+                    axios({
+                        method:'POST',
+                        url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{"base64":this.base64Str}
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            this.$message({
+                                type:'success',
+                                message:'视点截图成功'
+                            })
+                            this.uploadViewPointList.push(response.data.rt)
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+		    }
+        },
+        //视点删除
+        deleteFile1(index){
+            var vm=this;
+        vm.uploadViewPointList.splice(index,1)
+        },
+        //视点保存
+        AddViewpoint(){
+             if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+            })}else{
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"AddViewpoint",parameter:123},"*");
+            }
         },
         showUploadBox_img(){
             var vm = this
@@ -359,6 +439,7 @@ export default Vue.component('common-upload',{
             }
             var fuuid = []
             var imguuid = []
+            var vpListUid=[]
             vm.fileId.forEach((item,index) => {
                 fuuid.push(item.fileId+'')
             });
@@ -366,6 +447,17 @@ export default Vue.component('common-upload',{
                 imguuid.push({
                     fileUuid:item.fileUuid
                 })
+            });
+             vm.uploadViewPointList.forEach((item,index)=>{
+                    vpListUid.push({
+                        elementFilter:this.elementFilter,
+                        extension:item.fileExtension,
+                        relativePath:item.filePath,
+                        uuid:item.fileUuid,
+                        name:item.fileName,
+                        projId:this.projId,
+                        subProjId:this.defaultSubProjId,
+                    })
             });
             if(vm.iscomment){
                  var data = {
@@ -380,7 +472,7 @@ export default Vue.component('common-upload',{
                         subProjId: vm.defaultSubProjId,
                         builderId: vm.holderid   // 单体 holderId
                     },
-                    vpList: [],//视点集合
+                    vpList:vpListUid,//视点集合
                     attachList: imguuid,
                     fileIdList: fuuid
                 };
@@ -409,7 +501,7 @@ export default Vue.component('common-upload',{
                         ugId: vm.selectugid,
                         userId: vm.userId
                     },
-                    vpList: [],
+                    vpList:vpListUid,
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
                     fileIdList: fuuid
@@ -452,6 +544,7 @@ export default Vue.component('common-upload',{
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
+                    vm.uploadViewPointList=[]
                     vm.$refs.message.value = ''
                     // vm.checkTypeName=''
                     vm.newStmt = false

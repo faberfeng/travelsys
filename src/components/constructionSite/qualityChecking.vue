@@ -85,6 +85,8 @@
                                             <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                                 <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
+                                                    <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                     <i class="line"></i>
                                                     <i class="button-search"  @click="preview(val.relativePath)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.relativePath)"></i>
@@ -143,6 +145,8 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
+                                                                            <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                                            <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(left.relativePath)"></i>
@@ -371,6 +375,21 @@ export default {
           if(!val)return ''
           var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
           return tt; 
+      },
+      //视点定位
+      relocation(val){
+          if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+        }else{
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
       },
       /**
          * 预览文件集文件
@@ -1106,22 +1125,22 @@ export default {
                     }
                 }
                     .item-file{
-                    float: left;
-                    width: 290px;
-                    height: 120px;
-                    margin: 20px 15px 0 0;
-                    border-radius: 6px;
-                    box-shadow: 0px 1px 8px rgba(93,94,94,.16);
-                    position: relative;
-                    padding: 8px;
-                    .item-file-attach{
-                        width: 100%;
+                        float: left;
+                        width: 290px;
                         height: 120px;
-                        margin: 0;
-                        padding: 0;
-                        border-radius:2px;
-                        cursor: pointer;
-                    }
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 120px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                        }
                     .actionbox{
                         display: block;
                         position: absolute;
@@ -1131,6 +1150,15 @@ export default {
                         background: rgba(40, 40, 40, .4);
                         transform: translateY(36px);
                             transition: all ease .5s;
+                             .button-relocation{
+                                float: left;
+                                margin: 10px 64px;
+                                width: 16px;
+                                height: 16px;
+                                background: url('../planCost/images/location.png') no-repeat 0 0;
+                                // background: url('./images/search2.png')no-repeat 0 0;
+                                cursor: pointer;
+                             }
                             .button-search{
                                 float: left;
                                 margin: 10px 64px;
@@ -1581,6 +1609,15 @@ export default {
                                     background: rgba(40, 40, 40, .4);
                                     transform: translateY(36px);
                                         transition: all ease .5s;
+                                        .button-relocation{
+                                            float: left;
+                                            margin: 10px 64px;
+                                            width: 16px;
+                                            height: 16px;
+                                            background: url('../planCost/images/location.png') no-repeat 0 0;
+                                            // background: url('./images/search2.png')no-repeat 0 0;
+                                            cursor: pointer;
+                                        }
                                         .button-search{
                                             float: left;
                                             margin: 10px 40px;
@@ -2036,6 +2073,15 @@ export default {
                                 background: rgba(40, 40, 40, .4);
                                 transform: translateY(36px);
                                     transition: all ease .5s;
+                                    .button-relocation{
+                                        float: left;
+                                        margin: 10px 64px;
+                                        width: 16px;
+                                        height: 16px;
+                                        background: url('../planCost/images/location.png') no-repeat 0 0;
+                                        // background: url('./images/search2.png')no-repeat 0 0;
+                                        cursor: pointer;
+                                     }
                                     .button-search{
                                         float: left;
                                         margin: 10px 40px;

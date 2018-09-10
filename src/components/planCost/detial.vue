@@ -1521,6 +1521,7 @@ export default Vue.component('common-list',{
         singleLable:false,//单个标签展示 不需要分页器
         AssociatedDocumentList:[],//
         leftInfo:{},
+        TraceID:''
       }
   },
     created(){
@@ -1565,12 +1566,20 @@ export default Vue.component('common-list',{
     },
     methods:{
         locate(scope){
-            var vm = this;
-            console.log(scope);
-            vm.$message({
-                type:'warning',
-                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
+            if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
             })
+            }else{
+                this.TraceID=String(scope.row.dTraceId);
+                console.log(this.TraceID);
+                const para={"TraceID":this.TraceID} 
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"LookAtEntities",parameter:para},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
         },
         //单击某行
         rowClick(row,rowIndex,event){
