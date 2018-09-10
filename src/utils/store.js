@@ -20,8 +20,6 @@ export default new Vuex.Store({
         // BDMSUrl:'http://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
         // WebGlUrl:"http://bdms.arctron.cn",
         // GMDUrl:"http://bdms.arctron.cn",
-
-        
         WebSocketUrl:"http://10.252.26.240:16800/message",
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
