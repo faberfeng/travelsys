@@ -318,7 +318,7 @@
                     </ul>
                     <h3 class="header-attribute" style="margin-top:0px;">
                         <i class="trrangle"></i>
-                        基本属性
+                        绑定构件
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                     </h3>
                     <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">

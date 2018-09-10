@@ -1622,7 +1622,7 @@ export default {
                 }
                 .item-property1{
                     display: block;
-                    width: 25px;
+                    width: 24px;
                     height: 48px;
                     background: #fafafa;
                     padding-top:15px;

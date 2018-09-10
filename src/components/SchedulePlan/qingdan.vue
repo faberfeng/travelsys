@@ -1436,7 +1436,7 @@
                 }
             .screenRight_1{
                 padding: 10px 0px 5px 0px;
-                margin: 0 14px 0 30px;
+                margin: 0 14px 0 35px;
                 .noTop{
                     top: 12px!important;
                 }
