@@ -3437,7 +3437,6 @@ export default {
                     if(response.data.rt.gridDataJson.rows != null){
                         this.empty = false
                         this.attributeList = response.data.rt.gridDataJson.rows
-                        console.log(this.attributeList);
                         if(response.data.rt.gcproperty != null){
                             this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
                             var b = []
@@ -3481,15 +3480,32 @@ export default {
             })
         },
         getParams(){
-            if(this.value_professional == -1 && this.value_system == -1 && this.value_type ==-1 || this.value_professional == -1 && this.value_system == 0 && this.value_type ==0){
-                this.globalCode = '000000';
-            }else if(this.value_type != -1 && this.value_type!=0){
-                this.globalCode = this.value_type;
-            }else if(this.value_system != -1 && this.value_system != 0 && (this.value_type == -1 || this.value_type == 0)){
-                this.globalCode = this.value_system;
-            }else if(this.value_professional !== -1 &&(this.value_system == -1 || this.value_system == 0) && (this.value_type == -1 || this.value_type == 0)){
-                this.globalCode = this.value_professional;
+            this.globalCode = '';
+            let firstone = '';
+            let secondone = '';
+            let thirdone = '';
+            if(this.value_professional == '-1'){
+                firstone = '-1';
+            }else{
+                firstone = this.value_professional.substr(0,2);
             }
+            if(this.value_system == '0'){
+                secondone = '00';
+            }else if(this.value_system == '-1'){
+                secondone = '-1';
+            }else{
+                secondone = this.value_system.substr(2,2);
+            }
+
+            if(this.value_type == '0'){
+                thirdone = '00';
+            }else if(this.value_type == '-1'){
+                thirdone = '-1';
+            }else{
+                thirdone = this.value_type.substr(4,2);
+            }
+            this.globalCode = firstone+secondone+thirdone;
+
             let oneParam = '',
                 twoParam = '',
                 threeParam = '';
