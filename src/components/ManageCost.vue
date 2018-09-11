@@ -40,7 +40,7 @@
 <script>
 import headerCommon from './header.vue'
 import axios from 'axios'
-var app
+var app;            
 export default {
     name:'Home',
     components: {
@@ -54,7 +54,7 @@ export default {
                  userName:'',
                  userId:'', 
                  projectName:'华建Q系列工程协同应用系统',
-                 projectImg:'',
+                 projectImg:'', 
                  userImg:''
             },          
             navigationPath:'projectPage',
@@ -135,9 +135,9 @@ export default {
     methods:{
         webGlbtn(){
             this.webGlShow=!this.webGlShow
-            localStorage.setItem('webGlShow',this.webGlShow)
+            // localStorage.setItem('webGlShow',this.webGlShow)
             app = this.$refs.iframe1.contentWindow;
-            console.log(app);
+            // console.log(app);
             app.postMessage({command:"Init",parameter:null},"*");
         },
         callback(e){
@@ -175,11 +175,11 @@ export default {
                 this.InitdataList=JSON.parse(response.data.rt);
                 this.WebGlId=this.InitdataList.StartViewPoint.CurrentHolder.ID;
                 this.WebGlId=String(this.WebGlId);
-                localStorage.setItem('WebGlSaveId',this.WebGlId);
                 this.WebGlType=this.InitdataList.StartViewPoint.CurrentHolder.Type;
                 this.WebGlName=this.InitdataList.StartViewPoint.CurrentHolder.Name;
-                localStorage.setItem('WebGlSaveType',this.WebGlType);
-                localStorage.setItem('WebGlSaveName',this.WebGlName);
+                // localStorage.setItem('WebGlSaveType',this.WebGlType);
+                // localStorage.setItem('WebGlSaveName',this.WebGlName);
+                // localStorage.setItem('WebGlSaveId',this.WebGlId);
             }else if(response.data.cd=='-1'){
             }
             })

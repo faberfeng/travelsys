@@ -107,7 +107,7 @@
                                         <!--下面是评论的代码-->
 
                                         <div class="comments" v-if="item.showResponse">
-                                            <sendMes :showBox="(item.dcStatus!=12)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="ugId" 
+                                            <sendMes :showBox="(item.dcStatus!=11)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="ugId" 
                                             :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  
                                             v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                             <ul>
@@ -877,7 +877,7 @@ export default {
         #edit .el-dialog .el-dialog__body{
             .tree{
                     height:200px;
-                    margin:0px 50px;
+                    margin:0px 10px;
                     overflow-y:auto;
                 }
         }

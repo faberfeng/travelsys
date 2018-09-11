@@ -1521,7 +1521,9 @@ export default Vue.component('common-list',{
         singleLable:false,//单个标签展示 不需要分页器
         AssociatedDocumentList:[],//
         leftInfo:{},
-        TraceID:''
+        TraceID:'',
+        HolderPath:'',
+        GCCode:''
       }
   },
     created(){
@@ -1573,8 +1575,9 @@ export default Vue.component('common-list',{
             })
             }else{
                 this.TraceID=String(scope.row.dTraceId);
-                console.log(this.TraceID);
-                const para={"TraceID":this.TraceID} 
+                this.HolderPath=scope.row.dHolderPath;
+                this.GCCode=scope.row.dGCCode;
+                const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode}
                 const app = document.getElementById('webIframe').contentWindow;
                 app.postMessage({command:"LookAtEntities",parameter:para},"*");
                 document.body.scrollTop = 0;

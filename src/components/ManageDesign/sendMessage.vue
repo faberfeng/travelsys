@@ -189,9 +189,9 @@ export default Vue.component('common-upload',{
         vm.userId  = localStorage.getItem('userid')
         vm.projId = localStorage.getItem('projId');
         vm.userImg = localStorage.getItem('userImg')
-        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
-        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
-        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
+        // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
