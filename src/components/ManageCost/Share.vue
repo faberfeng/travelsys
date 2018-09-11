@@ -2459,57 +2459,57 @@ export default {
             }
         })
     },
-    getInfoFolder(){
-            /**
-             * 
-             * 点击进入fg文件夹
-             * **/
-            var vm = this
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/doc/searchSharedFileGroupInfo',//查询单个文件 ，下面要查询单个文件夹
-                headers:{
-                    'token':vm.token
-                },
-                data:{
-                    projId:vm.projId,
-                    pageNo: 1,
-                    dirId:vm.checkFileDir.shareId,
-                    pageSize:20,//文件名称
-                }
-            }).then((response)=>{
-                vm.fgList = []
-                vm.folderList = []
-                vm.fileList = []
-                if(Math.ceil(response.data.cd) == 0){
-                    if(response.data.rt.rows.length>0){
-                        response.data.rt.rows.forEach((item,key)=>{
-                            vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                            if(item.icon != null){
-                                 vm.$set(item,'IsfgLevel',true)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                                 vm.fileList.push(item)
-                            }else{
-                                  vm.$set(item,'nodeName',item.fgName)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                                  vm.$set(item,'nodeId',item.fgId)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                                   vm.$set(item,'IsfgLevel',true)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                                  vm.folderList.push(item)
-                            }
-                        })
-                    }else{
-                        vm.$message({
-                            type:'info',
-                            message:'未匹配到相应的数据'
-                        })
+    getInfoFolder() {
+        /**
+         * 
+         * 点击进入fg文件夹
+         * **/
+        var vm = this
+        axios({
+            method: 'POST',
+            url: vm.BDMSUrl + 'project2/doc/searchSharedFileGroupInfo', //查询单个文件 ，下面要查询单个文件夹
+            headers: {
+                'token': vm.token
+            },
+            data: {
+                projId: vm.projId,
+                pageNo: 1,
+                dirId: vm.checkFileDir.shareId,
+                pageSize: 20, //文件名称
+            }
+        }).then((response) => {
+            vm.fgList = []
+            vm.folderList = []
+            vm.fileList = []
+            if (Math.ceil(response.data.cd) == 0) {
+                if (response.data.rt.rows.length > 0) {
+                response.data.rt.rows.forEach((item, key) => {
+                    vm.$set(item, 'checked', false) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    if (item.icon != null) {
+                    vm.$set(item, 'IsfgLevel', true) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    vm.fileList.push(item)
+                    } else {
+                    vm.$set(item, 'nodeName', item.fgName) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    vm.$set(item, 'nodeId', item.fgId) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    vm.$set(item, 'IsfgLevel', true) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                    vm.folderList.push(item)
                     }
+                })
+                } else {
+                vm.$message({
+                    type: 'info',
+                    message: '未匹配到相应的数据'
+                })
                 }
-        }).catch((err)=>{
+            }
+        }).catch((err) => {
             console.log(err)
         })
     },
     getSFInfo(){
         var vm = this
         /**
-         *             dirId: vm.checkFileDir.nodeId,//当前文件夹ID
+         *  dirId: vm.checkFileDir.nodeId,//当前文件夹ID
             ugId: vm.selectUgId, //ugid是群组ID
          * **/
         axios({
@@ -2537,48 +2537,48 @@ export default {
             }
         })
     },
-    getSFFolder(){
-            /**
-             * 
-             * 获取单个文件夹
-             * **/
-            var vm = this
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId,
-                    ugId: -1,
-                    parDirId:vm.checkFileDir.nodeId,
-                }
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    if(response.data.rt.length>0){
-                        vm.folderList = response.data.rt
-                        vm.folderList.forEach((item,key)=>{
-                            vm.$set(item,'checked',false)//设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
-                             var alreadyHas = false
-                            for(var i= 0;i<vm.fileAll.length;i++){
-                                if(item.nodeId == vm.fileAll[i].nodeId){
-                                    alreadyHas = true
-                                    break
-                                }
-                            }
-                            /*
-                                查询所有记录 没有相同nodeID，插入信息
-                            */
-                            if(!alreadyHas)vm.fileAll.push(item)
-                        })
-                    }else{
-                        vm.folderList = []
+    getSFFolder() {
+        /**
+       * 
+       * 获取单个文件夹
+       * **/
+        var vm = this
+        axios({
+            method: 'POST',
+            url: vm.BDMSUrl + 'project2/doc/searchFolderInfo', //查询单个文件 ，下面要查询单个文件夹
+            headers: {
+            'token': vm.token
+            },
+            params: {
+            projId: vm.projId,
+            ugId: -1,
+            parDirId: vm.checkFileDir.nodeId,
+            }
+        }).then((response) => {
+            if (Math.ceil(response.data.cd) == 0) {
+            if (response.data.rt.length > 0) {
+                vm.folderList = response.data.rt
+                vm.folderList.forEach((item, key) => {
+                vm.$set(item, 'checked', false) //设置了属性的get和set ,可以让vue获取该属性的变化，并渲染vitualdom
+                var alreadyHas = false
+                for (var i = 0; i < vm.fileAll.length; i++) {
+                    if (item.nodeId == vm.fileAll[i].nodeId) {
+                    alreadyHas = true
+                    break
                     }
-                }else{
-                    vm.folderList = []
                 }
-        }).catch((err)=>{
+                /*
+                    查询所有记录 没有相同nodeID，插入信息
+                */
+                if (!alreadyHas) vm.fileAll.push(item)
+                })
+            } else {
+                vm.folderList = []
+            }
+            } else {
+            vm.folderList = []
+            }
+        }).catch((err) => {
             console.log(err)
         })
     },

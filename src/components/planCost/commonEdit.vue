@@ -1496,7 +1496,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         },
-         getGenieClass(level,inheirt){//获取系统数据
+        getGenieClass(level,inheirt){//获取系统数据
             var vm = this
             var pCode = ''
             var parentClassifyCode='';
@@ -1903,6 +1903,7 @@ export default Vue.component('common-edit',{
                 console.log(err)
             })
         },
+        //保存 数据
         realSaveForm(needCount){
             var vm = this
             if(vm.database == ''){
@@ -2024,22 +2025,40 @@ export default Vue.component('common-edit',{
                 fieldSearchContent: combinCode_type,
                 tableType: -1
             })
-            var combinCode = '000000'
-            if(vm.value_professional != -1){//专业选择 不为全部
-                combinCode = vm.value_professional
-                if(vm.value_system != -1 && vm.value_system != 'NONE'){
-                     combinCode = vm.value_system
-                     if(vm.value_type != -1 && vm.value_type != 'NONE'){
-                           combinCode = vm.value_type
-                     }
-                }
+            //查询范围
+            let combinCode = '';
+            let firstone = '';
+            let secondone = '';
+            let thirdone = '';
+            if(this.value_professional == '-1'){
+                firstone = '-1';
+            }else{
+                firstone = this.value_professional.substr(0,2);
             }
-             fieldFilterList.push({
+            if(this.value_system == 'NONE'){
+                secondone = '00';
+            }else if(this.value_system == '-1'){
+                secondone = '-1';
+            }else{
+                secondone = this.value_system.substr(2,2);
+            }
+            //查询范围
+            if(this.value_type == 'NONE'){
+                thirdone = '00';
+            }else if(this.value_type == '-1'){
+                thirdone = '-1';
+            }else{
+                thirdone = this.value_type.substr(4,2);
+            }
+            combinCode = firstone+secondone+thirdone;
+
+            fieldFilterList.push({
                 fieldCode: 'range.profession', 
                 fieldSearchType: 'EQUALS',
                 fieldSearchContent: combinCode,
                 tableType: -1
             })
+
             if (error != '') {
                  vm.$message({
                     type:'warning',

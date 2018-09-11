@@ -1277,7 +1277,7 @@ export default {
             /**********一下是分页器的样式***************/
             .datagrid-pager {
                 display: block;
-                margin: 0 0 40px 0;
+                margin: 0 0 10px 0;
                 height: 31px;
                 width: auto;
                 border:1px solid #d4d4d4;

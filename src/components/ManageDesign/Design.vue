@@ -1937,6 +1937,7 @@
                     color: #666666; 
                     text-align: center;
                     border-left: 1px solid #cccccc;
+                    border-right: 1px solid #ccc;
                     position: relative;
                     cursor: pointer;
                     &::after{
@@ -1961,6 +1962,7 @@
                     color: #666666; 
                     text-align: center;
                     border-left: 1px solid #cccccc;
+                    border-right: 1px solid #ccc;
                     position: relative;
                     cursor: pointer;
                     &::after{
@@ -1968,7 +1970,7 @@
                         position: absolute;
                         bottom:-7px;
                         width: 24px;
-                        height: 13px;
+                        height: 0px;
                         background: #fafafa;
                         border-bottom: 1px solid #cccccc;
                         transform: skewY(30deg);
@@ -1985,6 +1987,7 @@
                     color: #666666; 
                     text-align: center;
                     border-left: 1px solid #cccccc;
+                    border-right: 1px solid #ccc;
                     position: relative;
                     cursor: pointer;
                     &::after{
@@ -1992,7 +1995,7 @@
                         position: absolute;
                         bottom:-7px;
                         width: 24px;
-                        height: 13px;
+                        height: 0px;
                         background: #fafafa;
                         border-bottom: 1px solid #cccccc;
                         transform: skewY(30deg);

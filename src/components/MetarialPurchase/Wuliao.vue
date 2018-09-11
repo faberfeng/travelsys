@@ -723,7 +723,7 @@ export default {
         }
         .jindujihua{
             border-bottom: 1px solid #e6e6e6;
-            margin: 0 30px 0 35px;
+            margin: 0 30px 15px 35px;
             text-align: left;
             height: 44px;
             line-height: 44px;
