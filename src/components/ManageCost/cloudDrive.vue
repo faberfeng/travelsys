@@ -1374,6 +1374,7 @@
                 cursor: pointer;
                 color: #333333;
                 font-weight: bold;
+                font-size: 12px;
                 &:last-of-type .icon-sanjiao-right{
                     display: none;
                 }
@@ -2074,14 +2075,16 @@
                 color: #999999;
                 width: 65px;
                 float: left;
+                font-size: 12px;
             }
             .detial-text-value{
-               float: left;
-               color: #333333;
-                max-width: 120px;
+                float: left;
+                color: #333333;
+                max-width: 100px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                font-size: 12px;
             }
             &:first-of-type{
                 margin-top: 18px;
@@ -2139,6 +2142,7 @@
                 color: #999999;
                 width: 65px;
                 display: inline-block;
+                font-size: 12px;
             }
             .detial-text-value{
                 display: inline-block;
@@ -2147,6 +2151,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                font-size: 12px;
             }
             .item-detial{
                 margin-top: 16px;

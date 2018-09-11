@@ -159,7 +159,7 @@
                         </tbody>
                     </table>
                     <div v-if=" D_quantitiesList.length == 0" style="height:250px;text-align: center;font-size:18px;line-height:250px;">
-                            无独立工程量清单
+                        无独立工程量清单
                     </div>
                 </div>
                 <!--以下是page-navigitation-->
@@ -1359,20 +1359,23 @@ export default {
                 }).then(response=>{
                     if(response.data.cd == 0){
                         if(istop){
-                            vm.getSnapWorkAmountList()
+                            vm.getSnapWorkAmountList();
+                            console.log(1)
                         }else{
-                            vm.getSingleWorkAmountList()
+                            vm.getSingleWorkAmountList();
+                            console.log(2)
                         }
-                        vm.$message({
-                            type:'success',
-                            message:'清单删除成功!'
-                        })
                     }else{
                         vm.$message({
                             type:'error',
                             message:response.data.msg
                         })
                     }
+                }).then(()=>{
+                    vm.$message({
+                        type:'success',
+                        message:'清单删除成功!'
+                    })
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -1504,6 +1507,8 @@ export default {
                         vm.pageDetial_1.total = response.data.rt.pager.totalSize
                         if(response.data.rt.rows != null){
                             vm.D_quantitiesList = response.data.rt.rows;
+                        }else{
+                            vm.D_quantitiesList = [];
                         }
                     }
                 }else if(response.data.cd == '-1'){
