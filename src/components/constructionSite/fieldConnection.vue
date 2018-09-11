@@ -437,16 +437,13 @@ export default {
             }
         },
         clickQjPic(val){
-            console.log(val);
-            console.log(this.PanoramaPathList);
             this.isFullPicture=false;
             this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[val];
             var source=this.QJFileManageSystemURL+this.PanoramaPathList[val];
             this.init(source);
-            console.log('jdhfjhj')
         },
         fullVideo(){
-            console.log('hdjshdjshj')
+          
             var elem=document.getElementById("videoPlay");
 	        this.requestFullscreen(elem);
         },
@@ -476,7 +473,6 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.getUserGroupList=response.data.rt;
-                    console.log(this.getUserGroupList);
                     this.ugGroupNameValue=this.getUserGroupList[0].ugId;
                     this.ugGroupName=this.getUserGroupList[0].ugName;
                 }
@@ -515,7 +511,6 @@ export default {
                 if(response.data.cd=='0'){
                     this.fileTreeList_original=response.data.rt;
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
-                    console.log(this.fileTreeList);
                 }
             })
 
@@ -556,8 +551,6 @@ export default {
                     if(type==2){
                         this.videoPageTotal=this.mediaUrlList.length;
                         this.$refs.video.src=this.mediaUrlList[0].path;
-                        console.log(this.videoPageTotal);
-                        console.log(this.mediaUrlList);
                     }
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
@@ -593,21 +586,17 @@ export default {
 
         //改变视频
         handleVideoCurrentChange(val){
-            console.log(val+'页');
             this.$refs.video.src=this.mediaUrlList[val-1].path;
         },
         //改变全景图片
         handlePictureCurrentChange(val){
-            console.log(val+'页');
             this.isFullPicture=false;
-            console.log(this.PanoramaPathList);
             this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[val-1];
             var source=this.QJFileManageSystemURL+this.PanoramaPathList[val-1];
             this.init(source);
         },
         //改变全景直播
         handleLiveCurrentChange(val){
-            console.log(val+'页');
             this.$refs.lineLive.src=this.BDMSUrl+"?videoPath="+this.mediaUrlList1[val-1].path;
         },
         checkItem(num){
@@ -724,8 +713,6 @@ export default {
         nodeClick(obj){
             this.fgId=obj.id;
             this.fgName=obj.name;
-            console.log(this.fgId);
-            console.log(this.fgName);
         },
         addResourceMakeSure(){
             axios({
@@ -785,7 +772,6 @@ export default {
                     this.getFgId=item.fileGroupId;
                 }
             })
-            console.log(this.getFgId);
             this.getUserGroup();
             this.getFileUserGroup();
             this.getEditFileTree(num);
@@ -835,7 +821,6 @@ export default {
                 if(response.data.cd=='0'){
                     this.fileTreeList_original=response.data.rt;
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
-                    console.log(this.fileTreeList);
                 }
             })
         },
@@ -915,8 +900,6 @@ export default {
                         this.PanoramaMainList=response.data.rt;
                         this.$refs.fullPicture.src=this.PanoramaMainList.path;
                         this.imgdetial1=this.PanoramaMainList.list;
-                        console.log(this.imgdetial1);
-                        console.log(this.PanoramaMainList);
                         }
                     else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -940,10 +923,7 @@ export default {
                     this.picturePageTotal=this.PanoramaPathList.length;
                     this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[0];
                     var source=this.QJFileManageSystemURL+this.PanoramaPathList[0];
-                    console.log(source);
                     this.init(source);
-                    console.log(this.picturePageTotal);
-                    console.log(this.PanoramaPathList);
                 }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
                     }

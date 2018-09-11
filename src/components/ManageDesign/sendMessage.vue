@@ -235,15 +235,10 @@ export default Vue.component('common-upload',{
 				}
 				break;
             case "CurrentSelectedEnt":
-                // CurrentSelectPara = e.data.parameter;
 			case "ViewpointSubmited":
                 ScreenPara = e.data.parameter;
                 this.base64Str=ScreenPara.para2;
-                // console.log(ScreenPara.para1);
-                // console.log(typeof(ScreenPara.para1));
                 this.elementFilter=ScreenPara.para1;
-
-                // console.log(this.elementFilter);
                  var vm = this
                     axios({
                         method:'POST',
@@ -266,8 +261,16 @@ export default Vue.component('common-upload',{
 		    }
         },
         AddViewpoint(){
-             const app = document.getElementById('webIframe').contentWindow;
-            app.postMessage({command:"AddViewpoint",parameter:123},"*");
+            if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else{
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                 const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"AddViewpoint",parameter:123},"*");
+            }
         },
         checkItem(index){
             var vm = this
@@ -510,7 +513,7 @@ export default Vue.component('common-upload',{
                         ugId: vm.selectugid,
                         userId: vm.userId
                     },
-                    vpList: [],
+                    vpList:vpListUid,
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
                     fileIdList: fuuid

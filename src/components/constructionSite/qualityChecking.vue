@@ -47,7 +47,7 @@
                         </p>
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
-                <sendMes :showBox="'true'" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" :checkTypeName='checkTypeValue' :dirId='checkTypeId' v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
+                <sendMes :showBox="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
                 <div class="project">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
@@ -85,6 +85,8 @@
                                             <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                                 <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
+                                                    <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                     <i class="line"></i>
                                                     <i class="button-search"  @click="preview(val.relativePath)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.relativePath)"></i>
@@ -143,6 +145,8 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
+                                                                            <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
+                                                                            <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(left.relativePath)"></i>
@@ -182,15 +186,14 @@
                 </div>
             </div>
             <div id="edit">
-                <el-dialog width="400px" title="检查类型选择" :visible.sync="checkTypeSelectDialog" @close="checkTypeSelectCancle">
-                   
+                <el-dialog width="450px" title="检查类型选择" :visible.sync="checkTypeSelectDialog" @close="checkTypeSelectCancle">
                         <div class="tree">
-                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick">
+                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
                             </el-tree>
-                    </div>
+                        </div>
                     <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="checkTypeSelectMakeSure">确定</button>
-                        <button class="editBtnC" @click="checkTypeSelectCancle">取消</button>
+                        <button class="editBtnS" @click="checkTypeSelectCancle">确定</button>
+                        <button class="editBtnC" @click="checkTypeSelectMakeSure">取消</button>
                     </div>
                 </el-dialog>
                 <el-dialog width="400px" title="质量检查状态修改" :visible="dcStatus.show" @close="dcStatusCancle">
@@ -364,10 +367,29 @@ export default {
               return false
           }
       },
+      showHide(data){
+          this.showName=data;
+          this.goingToSend=data;
+      },
        initData(val){
           if(!val)return ''
           var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
           return tt; 
+      },
+      //视点定位
+      relocation(val){
+          if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+        }else{
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
       },
       /**
          * 预览文件集文件
@@ -535,23 +557,28 @@ export default {
             })
         },
         checkTypeSelectMakeSure(){
-            // this.showName=true;
-            if(this.checkTypeValue==''){
-                vm.$message({
-                        type:'error',
-                        message:'请选择检查类型文件夹'
-                    })
-                // alert('请选择检查类型文件夹');
-            }else{
-                this.showName=true;
-                this.checkTypeSelectDialog=false;
+            this.showName=false;
+            this.checkTypeSelectDialog=false;
+             this.checkTypeId='';
+            this.checkTypeValue='';
+            this.goingToSend =false;
+            // if(this.checkTypeValue==''){
+            //     this.$message({
+            //             type:'error',
+            //             message:'请选择检查类型文件夹'
+            //         })
+            // }else{
                 
-            }
+                
+                
+            // }
         },
         checkTypeSelectCancle(){
             var vm=this;
             this.checkTypeSelectDialog=false;
-            this.showName=false;
+            this.showName=true;
+            // this.checkTypeId='';
+            // this.checkTypeValue='';
             // vm.goingToSend =false;
         },
         dcStatusCancle(){
@@ -592,12 +619,20 @@ export default {
         })
       },
         sendChange(){
-            this.checkTypeSelectDialog=true;
-            // this.showName=true;
-            var vm = this;
-            vm.goingToSend =true;
+            if(this.goingToSend==false){
+                 this.checkTypeSelectDialog=true;
+                // this.showName=true;
+                var vm = this;
+                vm.goingToSend =true;
+            }
         },
         nodeClick(obj){
+            if(obj.children.length==0){
+            this.$message({
+                type:'info',
+                message:'这个文件夹没有子文件!'
+            })
+          }
             console.log(obj);
             this.checkTypeId=obj.id;
             this.checkTypeValue=obj.text;
@@ -783,63 +818,57 @@ export default {
     li{
         list-style: none;
     }
+    /*
+        修改eleUI树形组件
+    */
+    .el-tree-node:focus .el-tree-node__content{
+        background-color: transparent;
+    }
+    .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+            background-color: #dfdfdf;
+    }
+    .el-tree-node__label{
+        font-size: 12px;
+        min-height: 16px;
+        color: #666666;
+        padding-left: 22px; 
+        position: relative;
+    }
+    .qjLeaf{
+        font-weight: bold;
+    }
+    .el-icon-caret-right:before{
+           content: "\E604";
+           color: #999999;
+           font-weight: bold;
+    }
+    .el-tree-node__label::before{
+        display: block;
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        width: 14px;
+        height: 13px;
+        background: url('../ManageCost/images/file.png')no-repeat 0 0;
+        content: '';
+    }
+    .el-tree-node__content{
+            height: 30px;
+    }
+    .is-current .el-tree-node__content{
+        color: #333333;
+        // font-weight: bold;
+    }
+    .is-current_fistload > .el-tree-node__content {
+        background-color: #dfdfdf;
+    }
     
     #qualityChecking{
         #edit .el-dialog .el-dialog__body{
             .tree{
-                height:200px;
-                margin:10px 10px;
-                overflow-y:auto;
-                                            
-                #ugGroupTree{
-                    .el-tree-node:focus .el-tree-node__content{
-                        background-color: transparent;
-                        }
-                    .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
-                            background-color: #dfdfdf;
-                    }
-                    .el-tree-node__label{
-                        font-size: 12px;
-                        color: #666666;
-                        padding-left: 22px; 
-                        position: relative;
-                    }
-                    .el-icon-caret-right:before{
-                        content: "\E604";
-                        color: #999999;
-                        font-weight: bold;
-                    }
-                
-                    .is-leaf:before{
-                        content: ""!important;
-                        color: #999999;
-                        font-weight: bold;
-                    }
-                    .el-tree-node__label::before{
-                        display: block;
-                        position: absolute;
-                        top: 2px;
-                        left: 4px;
-                        width: 14px;
-                        height: 13px;
-                        background: url('../ManageCost/images/file.png')no-repeat 0 0;
-                        content: '';
-                    }
-                    .fileIcon::before{
-                        width: 16px;
-                        height: 16px;
-                        top: 0px;
-                        background-image: url('../ManageDesign/images/zTreeStandard.png');
-                        background-position: -110px -32px;
-                    }
-                    .el-tree-node__content{
-                            height: 30px;
-                    }
-                    .is-current .el-tree-node__content{
-                        color: #333333;
-                        font-weight: bold;
-                    }
-                } 
+                    height:200px;
+                    margin:0px 50px;
+                    overflow-y:auto;
                 }
         }
         .clearfix{
@@ -1096,22 +1125,24 @@ export default {
                     }
                 }
                     .item-file{
-                    float: left;
-                    width: 290px;
-                    height: 120px;
-                    margin: 20px 15px 0 0;
-                    border-radius: 6px;
-                    box-shadow: 0px 1px 8px rgba(93,94,94,.16);
-                    position: relative;
-                    padding: 8px;
-                    .item-file-attach{
-                        width: 100%;
-                        height: 120px;
-                        margin: 0;
-                        padding: 0;
-                        border-radius:2px;
-                        cursor: pointer;
-                    }
+                        float: left;
+                        width: 290px;
+                        height: 160px;
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 160px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                            object-fit: contain;
+                            background:#f2f2f2;
+                        }
                     .actionbox{
                         display: block;
                         position: absolute;
@@ -1121,6 +1152,15 @@ export default {
                         background: rgba(40, 40, 40, .4);
                         transform: translateY(36px);
                             transition: all ease .5s;
+                             .button-relocation{
+                                float: left;
+                                margin: 10px 64px;
+                                width: 16px;
+                                height: 16px;
+                                background: url('../planCost/images/location.png') no-repeat 0 0;
+                                // background: url('./images/search2.png')no-repeat 0 0;
+                                cursor: pointer;
+                             }
                             .button-search{
                                 float: left;
                                 margin: 10px 64px;
@@ -1178,6 +1218,7 @@ export default {
                         .item-file-detial{
                             display: block;
                             margin-left:80px;
+                            margin-top:20px;
                             .icon-goujian{
                                 float: right;
                                 width: 16px;
@@ -1220,7 +1261,7 @@ export default {
                             .operation{
                                 display: block;
                                 position: absolute;
-                                bottom: 0;
+                                bottom: 15px;
                                 left: 88px;
                                 right: 0;
                                 span{
@@ -1548,7 +1589,7 @@ export default {
                         .item-file{
                                 float: left;
                                 width: 290px;
-                                height: 120px;
+                                height: 160px;
                                 margin: 20px 15px 0 0;
                                 border-radius: 6px;
                                 box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -1556,11 +1597,13 @@ export default {
                                 padding: 8px;
                                 .item-file-attach{
                                     width: 100%;
-                                    height: 120px;
+                                    height: 160px;
                                     margin: 0;
                                     padding: 0;
                                     border-radius:2px;
                                     cursor: pointer;
+                                    object-fit: contain;
+                                    background:#f2f2f2;
                                 }
                                 .actionbox{
                                     display: block;
@@ -1571,6 +1614,15 @@ export default {
                                     background: rgba(40, 40, 40, .4);
                                     transform: translateY(36px);
                                         transition: all ease .5s;
+                                        .button-relocation{
+                                            float: left;
+                                            margin: 10px 64px;
+                                            width: 16px;
+                                            height: 16px;
+                                            background: url('../planCost/images/location.png') no-repeat 0 0;
+                                            // background: url('./images/search2.png')no-repeat 0 0;
+                                            cursor: pointer;
+                                        }
                                         .button-search{
                                             float: left;
                                             margin: 10px 40px;
@@ -1629,13 +1681,14 @@ export default {
                                             width: 48px;
                                             height: 48px;
                                             display: block;
-                                            margin-top: 13PX;
+                                            margin-top: 15px;
                                             margin-left: 11px;
                                         } 
                                     }
                                     .item-file-detial{
                                         display: block;
                                         margin-left:80px;
+                                        margin-top:20px;
                                         .icon-goujian{
                                             float: right;
                                             width: 16px;
@@ -1685,7 +1738,7 @@ export default {
                                         .operation{
                                             display: block;
                                             position: absolute;
-                                            bottom: 0;
+                                            bottom: 15px;
                                             left: 88px;
                                             right: 0;
                                             span{
@@ -2003,7 +2056,7 @@ export default {
                     .item-file{
                             float: left;
                             width: 290px;
-                            height: 120px;
+                            height: 160px;
                             margin: 20px 15px 0 0;
                             border-radius: 6px;
                             box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -2011,11 +2064,13 @@ export default {
                             padding: 8px;
                             .item-file-attach{
                                 width: 100%;
-                                height: 120px;
+                                height: 160px;
                                 margin: 0;
                                 padding: 0;
                                 border-radius:2px;
                                 cursor: pointer;
+                                object-fit: contain;
+                                background:#f2f2f2;
                             }
                             .actionbox{
                                 display: block;
@@ -2026,6 +2081,15 @@ export default {
                                 background: rgba(40, 40, 40, .4);
                                 transform: translateY(36px);
                                     transition: all ease .5s;
+                                    .button-relocation{
+                                        float: left;
+                                        margin: 10px 40px;
+                                        width: 16px;
+                                        height: 16px;
+                                        background: url('../planCost/images/location.png') no-repeat 0 0;
+                                        // background: url('./images/search2.png')no-repeat 0 0;
+                                        cursor: pointer;
+                                     }
                                     .button-search{
                                         float: left;
                                         margin: 10px 40px;
@@ -2091,6 +2155,7 @@ export default {
                                 .item-file-detial{
                                     display: block;
                                     margin-left:80px;
+                                    margin-top:20px;
                                     .icon-goujian{
                                         float: right;
                                         width: 16px;
@@ -2140,7 +2205,7 @@ export default {
                                     .operation{
                                         display: block;
                                         position: absolute;
-                                        bottom: 0;
+                                        bottom: 15px;
                                         left: 88px;
                                         right: 0;
                                         span{
@@ -2189,5 +2254,4 @@ export default {
 
 </style>
 
-<style lang="less">
-</style>
+

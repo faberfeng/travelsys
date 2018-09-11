@@ -7,6 +7,12 @@ Vue.use(Router)
 
 const router = new Router({
   routes: [
+    //gantt
+    {
+      path:'/gantt',
+      name:'gantt',
+      component:resolve=>require(['@/components/SchedulePlan/gantt'],resolve),
+    },
     //文档管理公有分享路由
     {
       path:'/cloud/share/:id',

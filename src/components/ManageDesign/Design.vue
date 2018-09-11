@@ -83,16 +83,6 @@
                                         <p class="projectListTextName">{{item.createUserStr}}</p>
                                         <p class="font-color1" v-html="item.dcContent"></p>
                                         <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                                            <!-- <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
-                                                <div class="actionbox clearfix">
-                                                     <i class="button-relocation"  @click="relocation(val.locationInfo)"></i>
-                                                     <i class="line"></i>
-                                                    <i class="button-search" @click="relocation()" ></i>
-                                                    <i class="line"></i>
-                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
-                                                </div>
-                                            </li> -->
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
@@ -151,16 +141,16 @@
                                                         <!--下面是文件图片的代码-->
                                                             <div>
                                                                 <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
-                                                                    <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                                                    <!-- <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
-                                                                            <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                                                            <i class="button-relocation" title="定位" @click="relocation(val.locationInfo)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(val.relativePath)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                                         </div>
-                                                                    </li>
+                                                                    </li> -->
                                                                     <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
@@ -181,6 +171,8 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img  style="object-fit:contain"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
+                                                                             <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
+                                                                            <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(left.relativePath)"></i>
@@ -1345,6 +1337,7 @@
                             display: block;
                             padding-left:65px; 
                             position: relative;
+                            
                             .icon-delete{
                                 display: inline-block;     
                                 width: 16px;
@@ -3097,6 +3090,11 @@ export default {
         vm.entId = localStorage.getItem('entId')
         vm.projAuth = localStorage.getItem('projAuth')
         vm.entType = localStorage.getItem('entType')
+        // vm.WebGlUrl=vm.$store.state.WebGlUrl
+        // vm.BIMServerPort=vm.$store.state.BIMServerPort;
+        // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         if(vm.projAuth.indexOf("00400205") > 0 || vm.entType == 1){
             vm.hasAuthDelUser = true
         }
@@ -4225,10 +4223,18 @@ export default {
       //重回定位
       relocation(val){
         //   console.log(val);
-          const app = document.getElementById('webIframe').contentWindow;
-            app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
+        if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+        }else{
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
       },
       /**
          * 预览文件集文件

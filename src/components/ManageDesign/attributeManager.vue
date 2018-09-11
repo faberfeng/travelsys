@@ -209,7 +209,7 @@
                                       -->
                                      <td   v-if="item.checked" v-text="initVal(item.id,val.traceId,false)" :class="[{'Strong':(initVal(item.id,val.traceId,true)==1)}]"  v-for="(item,key) in GCPropertyList" :key="key"></td>
                                      <td  >
-                                          <i class="location"></i>
+                                          <i class="location" @click="locationSite(val.traceId)"></i>
                                       </td>
                                   </tr>
                               </tbody>
@@ -1990,6 +1990,7 @@ export default {
         templateInfos0Data:[],
         templateInfos1Data:[],
         templateInfos2Data:[],
+        TraceID:'',//追溯ID
       }
   },
     created(){
@@ -2871,6 +2872,22 @@ export default {
               })
           }
       },
+      //虚拟场景定位
+      locationSite(val){
+           if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+            }else{
+          this.TraceID=String(val);
+          const para={"TraceID":this.TraceID} 
+         const app = document.getElementById('webIframe').contentWindow;
+        app.postMessage({command:"LookAtEntities",parameter:para},"*");
+         document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        }
+      },
       initVal(id,traceId,from){
           /**
            * @param id 扩展属性headr id
@@ -3418,6 +3435,7 @@ export default {
                     if(response.data.rt.gridDataJson.rows != null){
                         this.empty = false
                         this.attributeList = response.data.rt.gridDataJson.rows
+                        console.log(this.attributeList);
                         if(response.data.rt.gcproperty != null){
                             this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
                             var b = []
