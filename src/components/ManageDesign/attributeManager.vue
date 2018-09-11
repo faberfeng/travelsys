@@ -2881,7 +2881,6 @@ export default {
             })
             }else{
           this.TraceID=String(val);
-          console.log(this.TraceID);
           const para={"TraceID":this.TraceID} 
          const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
@@ -3439,7 +3438,6 @@ export default {
                         console.log(this.attributeList);
                         if(response.data.rt.gcproperty != null){
                             this.GCPropertyList = response.data.rt.gcproperty//扩展属性头部
-                            console.log(this.GCPropertyList);
                             var b = []
                             $.extend(b,this.GCPropertyList)
                             this.GCPropertyList_to_select = b//扩展属性头部

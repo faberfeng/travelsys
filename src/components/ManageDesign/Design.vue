@@ -83,16 +83,6 @@
                                         <p class="projectListTextName">{{item.createUserStr}}</p>
                                         <p class="font-color1" v-html="item.dcContent"></p>
                                         <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                                            <!-- <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
-                                                <div class="actionbox clearfix">
-                                                     <i class="button-relocation"  @click="relocation(val.locationInfo)"></i>
-                                                     <i class="line"></i>
-                                                    <i class="button-search" @click="relocation()" ></i>
-                                                    <i class="line"></i>
-                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
-                                                </div>
-                                            </li> -->
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
@@ -181,7 +171,7 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img  style="object-fit:contain"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
-                                                                             <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                                             <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>

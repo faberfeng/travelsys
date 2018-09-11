@@ -145,7 +145,7 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
                                                                         <img :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
-                                                                            <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                                            <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-search"  @click="preview(left.relativePath)"></i>
                                                                             <i class="line"></i>
@@ -1127,7 +1127,7 @@ export default {
                     .item-file{
                         float: left;
                         width: 290px;
-                        height: 120px;
+                        height: 160px;
                         margin: 20px 15px 0 0;
                         border-radius: 6px;
                         box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -1135,11 +1135,13 @@ export default {
                         padding: 8px;
                         .item-file-attach{
                             width: 100%;
-                            height: 120px;
+                            height: 160px;
                             margin: 0;
                             padding: 0;
                             border-radius:2px;
                             cursor: pointer;
+                            object-fit: contain;
+                            background:#f2f2f2;
                         }
                     .actionbox{
                         display: block;
@@ -1216,6 +1218,7 @@ export default {
                         .item-file-detial{
                             display: block;
                             margin-left:80px;
+                            margin-top:20px;
                             .icon-goujian{
                                 float: right;
                                 width: 16px;
@@ -1258,7 +1261,7 @@ export default {
                             .operation{
                                 display: block;
                                 position: absolute;
-                                bottom: 0;
+                                bottom: 15px;
                                 left: 88px;
                                 right: 0;
                                 span{
@@ -1586,7 +1589,7 @@ export default {
                         .item-file{
                                 float: left;
                                 width: 290px;
-                                height: 120px;
+                                height: 160px;
                                 margin: 20px 15px 0 0;
                                 border-radius: 6px;
                                 box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -1594,11 +1597,13 @@ export default {
                                 padding: 8px;
                                 .item-file-attach{
                                     width: 100%;
-                                    height: 120px;
+                                    height: 160px;
                                     margin: 0;
                                     padding: 0;
                                     border-radius:2px;
                                     cursor: pointer;
+                                    object-fit: contain;
+                                    background:#f2f2f2;
                                 }
                                 .actionbox{
                                     display: block;
@@ -1676,13 +1681,14 @@ export default {
                                             width: 48px;
                                             height: 48px;
                                             display: block;
-                                            margin-top: 13PX;
+                                            margin-top: 15px;
                                             margin-left: 11px;
                                         } 
                                     }
                                     .item-file-detial{
                                         display: block;
                                         margin-left:80px;
+                                        margin-top:20px;
                                         .icon-goujian{
                                             float: right;
                                             width: 16px;
@@ -1732,7 +1738,7 @@ export default {
                                         .operation{
                                             display: block;
                                             position: absolute;
-                                            bottom: 0;
+                                            bottom: 15px;
                                             left: 88px;
                                             right: 0;
                                             span{
@@ -2050,7 +2056,7 @@ export default {
                     .item-file{
                             float: left;
                             width: 290px;
-                            height: 120px;
+                            height: 160px;
                             margin: 20px 15px 0 0;
                             border-radius: 6px;
                             box-shadow: 0px 1px 8px rgba(93,94,94,.16);
@@ -2058,11 +2064,13 @@ export default {
                             padding: 8px;
                             .item-file-attach{
                                 width: 100%;
-                                height: 120px;
+                                height: 160px;
                                 margin: 0;
                                 padding: 0;
                                 border-radius:2px;
                                 cursor: pointer;
+                                object-fit: contain;
+                                background:#f2f2f2;
                             }
                             .actionbox{
                                 display: block;
@@ -2075,7 +2083,7 @@ export default {
                                     transition: all ease .5s;
                                     .button-relocation{
                                         float: left;
-                                        margin: 10px 64px;
+                                        margin: 10px 40px;
                                         width: 16px;
                                         height: 16px;
                                         background: url('../planCost/images/location.png') no-repeat 0 0;
@@ -2147,6 +2155,7 @@ export default {
                                 .item-file-detial{
                                     display: block;
                                     margin-left:80px;
+                                    margin-top:20px;
                                     .icon-goujian{
                                         float: right;
                                         width: 16px;
@@ -2196,7 +2205,7 @@ export default {
                                     .operation{
                                         display: block;
                                         position: absolute;
-                                        bottom: 0;
+                                        bottom: 15px;
                                         left: 88px;
                                         right: 0;
                                         span{

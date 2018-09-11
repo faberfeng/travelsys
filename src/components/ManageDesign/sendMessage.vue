@@ -513,7 +513,7 @@ export default Vue.component('common-upload',{
                         ugId: vm.selectugid,
                         userId: vm.userId
                     },
-                    vpList: [],
+                    vpList:vpListUid,
                     newDC: vm.checked,//新主题
                     attachList: imguuid,
                     fileIdList: fuuid
