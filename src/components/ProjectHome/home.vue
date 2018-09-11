@@ -3,6 +3,7 @@
         <div class="projectInfo">
             <div class="lunbo-container">
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
+                    <img style="width:340px;height:237px" src="../../assets/nopic.jpg"/>
                     <el-carousel-item v-for="(item,index) in projectImageList" :key="index">
                         <img style="width:340px;height:242px" :src="item.filePath"/>
                         </el-carousel-item>
@@ -11,6 +12,7 @@
             <div class="tal">
                 <p class="talTitle">概况</p>
                 <ul class="talUl">
+                    <img v-show="dataShow" style="width:140px;height:115px" src="../../assets/nodata.png"/>
                     <li v-for="(item,index) in overviewList" :key='index'><label>{{item.viewKey}}</label>{{item.viewVal}}</li>
                 </ul>
             </div>
@@ -75,6 +77,7 @@ export default {
             projectImageList:[],//工程图片列表
             projectStationInfoList:[],//工程动态信息列表
             projectNoticeListInfo:[],//工程通知列表
+            dataShow:true
         }
     },
     filters:{
@@ -136,6 +139,9 @@ export default {
                     })
                 }else{
                     vm.overviewList = response.data.rt;
+                    if(vm.overviewList.length!=0){
+                        vm.dataShow=false;
+                    }    
                 }
             })
         },
@@ -154,6 +160,8 @@ export default {
                     })
                 }else{
                     this.projectImageList = response.data.rt;
+                    // this.projectImageList.push(this.srcPath);
+                    // console.log(this.projectImageList);
                 }
             })
         },
