@@ -762,7 +762,9 @@ export default {
                     if(response.data.rt != null){
                         vm.pageDetial_1.total = response.data.rt.pager.totalSize
                         if(response.data.rt.rows != null){
-                            vm.snapshotReportList = response.data.rt.rows
+                            vm.snapshotReportList = response.data.rt.rows;
+                        }else{
+                            vm.snapshotReportList = [];
                         }
                     }
                 }else if(response.data.cd == '-1'){
