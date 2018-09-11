@@ -3239,7 +3239,6 @@ export default {
         }).then((response)=>{
             if(parseInt(response.data.cd) == 0){
                 vm.CommentList = response.data.rt.rows
-                console.log(vm.CommentList);
                 vm.CommunicationList.forEach((item,key)=>{
                     if(key == index){
                         item.showFlowChart = false

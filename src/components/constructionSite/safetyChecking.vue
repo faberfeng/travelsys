@@ -72,7 +72,8 @@
                                             <td>{{item.checkUserName | nameChange()}}</td>
                                             <td>{{item.checkRecord.expectCheckStatus|expectCheckStatusChange()}}</td>
                                             <td>
-                                                <button class="printLabelBtn actionBtn" @click.stop="printLabel(item.checkRecord.id)" title="打印标签"></button>
+                                                <button class="printLabelBtn actionBtn"  title="打印标签"></button>
+                                                <!-- @click.stop="printLabel(item.checkRecord.id)" -->
                                                 <button class="checkBtn actionBtn" @click.stop="srCheck(item.checkPoint.id)" title="检查"></button>
                                                 <button class="deleteBtn actionBtn" @click.stop="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
                                             </td>
@@ -161,7 +162,7 @@
                             <span class="text">检查项目目录</span>
                             <span class="clearfix_icon">
                                 <i class="icon-goujian icon-add" @click="addCheckItemNode" title="添加"></i>
-                                <i class="icon-goujian icon-edit"  title="更名"></i>
+                                <i class="icon-goujian icon-edit" @click="renameFile"  title="更名"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteItemNode"  title="删除"></i>
                             </span>
                         </div>
@@ -235,17 +236,17 @@
                         </div>
                     </div> -->
             </div>
-            <div v-if="labelListShow1"  id="edit" class="dialog">
+            <div v-if="labelListSingleShow"  id="edit" class="dialog">
                     <div class="el-dialog__header">
                         <span class="el-dialog__title">标签信息预览</span>
-                        <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="labelListCancle">
+                        <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="labelListSingleCancle">
                         <i class="el-dialog__close el-icon el-icon-close"></i>
                         </button>
                     </div>
                     <div class="el-dialog__body">
                         <div class="editBody">
                             <ul>
-                                <li v-for="(item,index) in checkPointsForPageList" :key="index" class="item-label clearfix">
+                                <li v-for="(item,index) in checkPointsForPageSingleList" :key="index" class="item-label clearfix">
                                     <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-CP-' + addZero(item.id, 7)" alt="">
                                     <div class="right">
                                         <p class="item-list clearfix">
@@ -298,7 +299,7 @@
                         </div>
                     </div> -->
             </div>
-            <div id="mask" v-if="labelListShow||labelListShow1" ></div>
+            <div id="mask" v-if="labelListShow||labelListSingleShow" ></div>
             <div id="edit">
                 <el-dialog width="400px" title="安全状态修改" :visible="securityStatusShow" @close="srStatusCancle">
                     <div class="editBody">
@@ -315,6 +316,19 @@
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="srStatusConfirm">确定</button>
                         <button class="editBtnC" @click="srStatusCancle">取消</button>
+                    </div>
+                </el-dialog>
+
+                <el-dialog title="重命名目录" :visible.sync="fileNameShow" @close="addfileCancle">
+                    <div class="editBody">
+                        <div class="editBodytwo imageBody">
+                            <label class="imageBodyText">目录名称 :</label>
+                            <input type="text" class="inp" v-model="newFileName">
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addfileConfirm">确认</button>
+                        <button class="editBtnC" @click="addfileCancle">取消</button>
                     </div>
                 </el-dialog>
 
@@ -443,6 +457,7 @@ export default {
             checkPointsByItemIdList:'',
             pointTotal:'',
             checkPointsForPageList:'',
+            checkPointsForPageSingleList:'',//单个二维码
             checkPointsList:'',
             checkPointsListLength:'',
             checkPointTdName:'',
@@ -464,7 +479,7 @@ export default {
             },
             isshow:0,
             labelListShow:false,
-            labelListShow1:false,
+            labelListSingleShow:false,
             deleteCheckPointDialog:false,
             deleteItemNodeDialog:false,
             pageLabelList:{
@@ -475,6 +490,8 @@ export default {
             singleLable:false,
             securityStatus:'',
             securityStatusShow:false,
+            fileNameShow:false,//重命名显示
+            newFileName:'',//重命名数据
             addCheckItemNodeShow:false,
             spotEditDialog:false,
             itemName:'',
@@ -566,14 +583,14 @@ export default {
             var vm = this
             vm.getCheckPointsByItemId()
         },
-        'pageDetial.currentPage':function(val,oldval){
-          var vm = this
-          vm.getCheckPointsForPage()
-      },
-      'pageDetial.pagePerNum':function(val,oldval){
-          var vm = this
-          vm.getCheckPointsForPage()
-      },
+    //     'pageDetial.currentPage':function(val,oldval){
+    //       var vm = this
+    //       vm.getCheckPointsForPage()
+    //   },
+    //   'pageDetial.pagePerNum':function(val,oldval){
+    //       var vm = this
+    //       vm.getCheckPointsForPage()
+    //   },
     //   'respDept':function(val){
     //       var vm=this
     //       vm.getPersonInChargeByDept()
@@ -766,6 +783,7 @@ export default {
             if(response.data.cd=='0'){
                 this.checkPointsByItemIdList=response.data.rt.rows;
                 this.pointTotal=response.data.rt.total;
+                this.pageDetial.total=response.data.rt.total;
                 console.log(this.checkPointsByItemIdList);
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
@@ -801,6 +819,9 @@ export default {
             this.labelListShow=true;
             this.getCheckPointsForPage();
         }
+    },
+    labelListSingleCancle(){
+        this.labelListSingleShow=false;
     },
     labelListCancle(){
         this.labelListShow=false;
@@ -874,7 +895,13 @@ export default {
     },
     //打印标签
     printLabel(num){
-        // this.labelListShow1=true;
+        this.labelListSingleShow=true;
+        this.checkItemDataList.item.forEach((item)=>{
+            if(item.checkPoint.id==num){
+                this.checkPointsForPageSingleList.push(item)
+                console.log(this.checkPointsForPageSingleList);
+            }
+        })
         this.getRelaFilesByCrId(num);
     },
     //获取检查记录关联的图片信息
@@ -948,24 +975,6 @@ export default {
                 message:'请选择要重命名的检查点位'
             })
         }
-        // axios({
-        //     method:'get',
-        //     headers:{
-        //         'token':this.token
-        //     },
-        //     params:{
-        //        name:this.checkPointTdName,
-        //        itemId:this.itemId,
-        //        projId:this.projId
-        //     },
-        //     url:this.BDMSUrl+'/project2/security/renameCheckPoint'
-        // }).then(response=>{
-        //     if(response.data.cd=='0'){
-
-        //     }else if(response.data.cd=='-1'){
-        //         alert(response.data.msg);
-        //     }
-        // })
     },
 
     //撤销检查点位
@@ -982,31 +991,53 @@ export default {
     },
     //添加检查点位
     addCheckPoint(){
-        if(this.checkPointTdName==''){
-            return ''
-        }else{
-        var vm=this;
-         axios({
-            method:'get',
-            headers:{
-                'token':this.token
-            },
-            params:{
-               name:this.checkPointTdName,
-               itemId:this.itemId,
-               projId:this.projId
-            },
-            url:this.BDMSUrl+'/project2/security/addCheckPoint'
-        }).then(response=>{
-            if(response.data.cd=='0'){
-                    this.checkPointTdName='';
+        if(this.tdValue){
+                axios({
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                name:this.checkPointTdName,
+                itemId:this.itemId,
+                id:this.rwriteShowId,
+                },
+                url:this.BDMSUrl+'/project2/security/renameCheckPoint'
+            }).then(response=>{
+                if(response.data.cd=='0'){
                     this.getCheckPointsByItemId();
                     this.getCheckPoints();
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+        }else{
+            if(this.checkPointTdName==''){
+             return ''
+         }else{
+            var vm=this;
+            axios({
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                name:this.checkPointTdName,
+                itemId:this.itemId,
+                projId:this.projId
+                },
+                url:this.BDMSUrl+'/project2/security/addCheckPoint'
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                        this.checkPointTdName='';
+                        this.getCheckPointsByItemId();
+                        this.getCheckPoints();
 
-            }else if(response.data.cd=='-1'){
-                alert(response.data.msg);
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
             }
-        })
         }
     },
     //关闭
@@ -1130,6 +1161,39 @@ export default {
                 alert(response.data.msg);
             }
         })
+    },
+    //重命名
+    renameFile(){
+        this.fileNameShow=true;
+    },
+    //重命名确认
+    addfileConfirm(){
+        axios({
+            method:'post',
+            url:this.BDMSUrl+'project2/security/reNameNodeName',
+            headers:{
+                'token':this.token,
+            },
+            params:{
+                itemId:this.itemId,
+                itemName:this.newFileName
+            }
+        }).then((response)=>{
+            if(response.data.cd=='0'){
+                this.loadzTreeData()
+                this.fileNameShow=false;
+                this.newFileName='';
+
+                this.$message({
+                    type:'success',
+                    message:'重命名成功'
+                })
+            }
+        })
+    },
+    addfileCancle(){
+        this.fileNameShow=false;
+        this.newFileName='';
     },
     //添加检查条目节点
     addCheckItemNode(){
@@ -1390,60 +1454,59 @@ export default {
         overflow: hidden;
         content: '';
     }
+    //修改element-tree样式
+     .el-tree-node:focus .el-tree-node__content{
+            background-color: transparent;
+            }
+        .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+                background-color: #dfdfdf;
+        }
+        .el-tree-node__label{
+            font-size: 12px;
+            color: #666666;
+            padding-left: 22px; 
+            position: relative;
+        }
+        .el-icon-caret-right:before{
+            content: "\E604";
+            color: #999999;
+            font-weight: bold;
+        }
+    
+        .is-leaf:before{
+            content: ""!important;
+            color: #999999;
+            font-weight: bold;
+        }
+        .el-tree-node__label::before{
+            display: block;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            width: 14px;
+            height: 13px;
+            background: url('../ManageCost/images/file.png')no-repeat 0 0;
+            content: '';
+        }
+        .fileIcon::before{
+            width: 16px;
+            height: 16px;
+            top: 0px;
+            background-image: url('../ManageDesign/images/zTreeStandard.png');
+            background-position: -110px -32px;
+        }
+        .el-tree-node__content{
+                height: 30px;
+        }
+        .is-current .el-tree-node__content{
+            color: #333333;
+            font-weight: bold;
+        }
      .tree{
             height:600px;
             margin:10px 10px;
             overflow-y:auto;
             width: 100%;                  
-            #treeData{
-                .el-tree-node:focus .el-tree-node__content{
-                    background-color: transparent;
-                    }
-                .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
-                        background-color: #dfdfdf;
-                }
-                .el-tree-node__label{
-                    font-size: 12px;
-                    color: #666666;
-                    padding-left: 22px; 
-                    position: relative;
-                }
-                .el-icon-caret-right:before{
-                    content: "\E604";
-                    color: #999999;
-                    font-weight: bold;
-                }
-            
-                .is-leaf:before{
-                    content: ""!important;
-                    color: #999999;
-                    font-weight: bold;
-                }
-                .el-tree-node__label::before{
-                    display: block;
-                    position: absolute;
-                    top: 2px;
-                    left: 4px;
-                    width: 14px;
-                    height: 13px;
-                    background: url('../ManageCost/images/file.png')no-repeat 0 0;
-                    content: '';
-                }
-                .fileIcon::before{
-                    width: 16px;
-                    height: 16px;
-                    top: 0px;
-                    background-image: url('../ManageDesign/images/zTreeStandard.png');
-                    background-position: -110px -32px;
-                }
-                .el-tree-node__content{
-                        height: 30px;
-                }
-                .is-current .el-tree-node__content{
-                    color: #333333;
-                    font-weight: bold;
-                }
-            } 
         }
     #safetyChecking{
          .topHeader{

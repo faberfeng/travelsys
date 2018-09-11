@@ -8,7 +8,6 @@ export default new Vuex.Store({
     state:{
         path:'',
         UPID:'BB1408IN16014',
-
         QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
         BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
         GMDUrl:"http://10.252.26.240:8080",
@@ -22,7 +21,7 @@ export default new Vuex.Store({
         // WebGlUrl:"http://bdms.arctron.cn",
         // GMDUrl:"http://bdms.arctron.cn",
         // shareUrl:"http://bdms.arctron.cn",
-        // WebSocketUrl:"http://10.252.26.240:16800/message",
+        WebSocketUrl:"http://10.252.26.240:16800/message",
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,

@@ -1785,16 +1785,18 @@ export default Vue.component('common-list',{
         },
         singleLable:false,//单个标签展示 不需要分页器
         manifestId:Number,//mid
-        TraceID:''
+        TraceID:'',
+        HolderPath:'',
+        GCCode:'',
       }
   },
   created(){
         var vm = this
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.userImg = localStorage.getItem('userImg')
-        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
-        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
-        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
+        // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
@@ -1841,12 +1843,9 @@ export default Vue.component('common-list',{
             switch(e.data.command){
 			case "EngineReady":
 				{
-					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
-					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
-                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-                    // console.log(Horder);
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-					app.postMessage({command:"EnterProject",parameter:para},"*");
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
             case "CurrentSelectedEnt":
@@ -1906,20 +1905,23 @@ export default Vue.component('common-list',{
         vm.S_Label_quantitiesList.push(scope.row)
       },
       openLocation(scope){
-
-        var vm  = this
-        this.TraceID=String(scope.row.dTraceId);
-          console.log(this.TraceID);
-          const para={"TraceID":this.TraceID} 
-         const app = document.getElementById('webIframe').contentWindow;
-        app.postMessage({command:"LookAtEntities",parameter:para},"*");
-         document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-        // $(window).animate( {scrollTop: 0}, 500);
-        //   vm.$message({
-        //       type:'info',
-        //       message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-        //   })
+            if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+                console.log(scope);
+                this.TraceID=String(scope.row.dTraceId);
+                this.HolderPath=scope.row.dHolderPath;
+                this.GCCode=scope.row.dGCCode;
+                console.log(this.TraceID);
+                const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode} 
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"LookAtEntities",parameter:para},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+        }
       },
       printLabelList(){
         var vm = this

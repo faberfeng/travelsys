@@ -1345,7 +1345,9 @@ export default Vue.component('common-list',{
   data(){
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
-          TraceID:'',
+          TraceID:'',//追溯Id
+          HolderPath:'',//容器路径
+          GCCode:'',//分类编码
          screenLeft:{
              show:false,
              item:1,
@@ -1462,9 +1464,9 @@ export default Vue.component('common-list',{
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         vm.userImg = localStorage.getItem('userImg')
-        vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
-        vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
-        vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
+        // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
+        // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
+        // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
@@ -1507,11 +1509,9 @@ export default Vue.component('common-list',{
             switch(e.data.command){
 			case "EngineReady":
 				{
-					// let Horder = {"ID":"5b7a2f4006f2ff0918083f6f","Type":6,"Name":"临港海洋","ParentID":""};
-					// let Horder = {"ID":"5b7cbea206f2ff0918831301","Type":6,"Name":"临港海洋","ParentID":""};
-                    let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-					app.postMessage({command:"EnterProject",parameter:para},"*");
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
             case "CurrentSelectedEnt":
@@ -1578,9 +1578,10 @@ export default Vue.component('common-list',{
             })
             }else{
           this.TraceID=String(scope.row.dTraceId);
-          console.log(this.TraceID);
-          const para={"TraceID":this.TraceID} 
-         const app = document.getElementById('webIframe').contentWindow;
+          this.HolderPath=scope.row.dHolderPath;
+          this.GCCode=scope.row.dGCCode;
+          const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode}
+        const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
          document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;

@@ -1,6 +1,6 @@
 <template>
     <div id="resourcePlan">
-        <div :class="['topHeader',{'topHeaderWgl':!webGlShow}]">
+        <div :class="['topHeader']">
             <div id="item-box-file">
                 <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
                 个人日历  
@@ -180,7 +180,7 @@ export default{
     },
     data(){
         return {
-            webGlShow:this.$route.params.id,
+            // webGlShow:this.$route.params.id,
             title:'',//显示当前时间
             deleteResourcePlanDialog:false,//删除任务资源弹窗
             addResourceTypeDialog:false,//增加资源任务树形弹窗
@@ -334,7 +334,7 @@ export default{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
-        this.webGlShow=localStorage.getItem('webGlShow');
+        // this.webGlShow=localStorage.getItem('webGlShow');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getcurTime();
@@ -2237,7 +2237,6 @@ export default{
          ::-webkit-scrollbar{width:0px}
         .topHeaderWgl{
             float: left;
-
         }
         #item-box-file{
             display: block;

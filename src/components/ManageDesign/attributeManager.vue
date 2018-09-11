@@ -209,7 +209,7 @@
                                       -->
                                      <td   v-if="item.checked" v-text="initVal(item.id,val.traceId,false)" :class="[{'Strong':(initVal(item.id,val.traceId,true)==1)}]"  v-for="(item,key) in GCPropertyList" :key="key"></td>
                                      <td  >
-                                          <i class="location" @click="locationSite(val.traceId)"></i>
+                                          <i class="location" @click="locationSite(val.traceId,val.gccode,val.holderId)"></i>
                                       </td>
                                   </tr>
                               </tbody>
@@ -2875,15 +2875,16 @@ export default {
           }
       },
       //虚拟场景定位
-      locationSite(val){
+      locationSite(traceId,gccode,holderId){
            if(document.getElementById('webgl').style.display=='none'){
             this.$message({
                 type:'info',
                 message:'请打开顶部的虚拟场景'
             })
             }else{
-          this.TraceID=String(val);
-          const para={"TraceID":this.TraceID} 
+          this.TraceID=String(traceId);
+          const para={"TraceID":this.TraceID,"GCCode":gccode,"HolderPath":{"ID":holderId}}
+          console.log(para);
          const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
          document.body.scrollTop = 0;

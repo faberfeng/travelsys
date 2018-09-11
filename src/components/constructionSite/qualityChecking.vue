@@ -107,7 +107,7 @@
                                         <!--下面是评论的代码-->
 
                                         <div class="comments" v-if="item.showResponse">
-                                            <sendMes :showBox="(item.dcStatus!=12)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="ugId" 
+                                            <sendMes :showBox="(item.dcStatus==8||item.dcStatus==9)?true:false" :dcid='item.dcId' :keycomment="index" :iscomment="false" :selectugid="ugId" 
                                             :valuemonomer="value_monomer"  :valuestatus="value_status"   :valueabout="value_about"  
                                             v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                             <ul>
@@ -636,10 +636,20 @@ export default {
             console.log(obj);
             this.checkTypeId=obj.id;
             this.checkTypeValue=obj.text;
+            var str;
+            console.log(obj.attributes.dirParId)
+            this.CheckTypeSubDirList.forEach((item)=>{
+                if(item.id==obj.attributes.dirParId){
+                    str=item.text;
+                    this.checkTypeValue=str+'-'+this.checkTypeValue;
+                    console.log(this.checkTypeValue)
+                }
+            })
+            // if(obj.attributes.dirParId)
             // this.str=obj.Parent.text;
             // console.log(this.str);
-            console.log(this.checkTypeId);
-            console.log(this.checkTypeValue);
+            // console.log(this.checkTypeId);
+            // console.log(this.checkTypeValue);
         },
         hideSendMes(){
           var vm = this
@@ -867,7 +877,7 @@ export default {
         #edit .el-dialog .el-dialog__body{
             .tree{
                     height:200px;
-                    margin:0px 50px;
+                    margin:0px 10px;
                     overflow-y:auto;
                 }
         }
