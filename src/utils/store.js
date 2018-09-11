@@ -9,20 +9,20 @@ export default new Vuex.Store({
         path:'',
         UPID:'BB1408IN16014',
 
-        QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
-        BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
-        GMDUrl:"http://10.252.26.240:8080",
-        WebGlUrl:"http://10.252.26.240", 
-        BIMServerPort:'8080',
-        shareUrl:'http://139.219.7.177/#',
+        // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
+        // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
+        // GMDUrl:"http://10.252.26.240:8080",
+        // WebGlUrl:"http://10.252.26.240", 
+        // BIMServerPort:'8080',
+        // shareUrl:'http://139.219.7.177/#',
         //以下是外网配置文件
-        // BIMServerPort:'80',
-        // QJFileManageSystemURL:'http://42.159.154.173:8080/qjbim-file/',//仅供文件下载使用的路径，
-        // BDMSUrl:'http://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
-        // WebGlUrl:"http://bdms.arctron.cn",
-        // GMDUrl:"http://bdms.arctron.cn",
-        // shareUrl:"http://bdms.arctron.cn",
-        // WebSocketUrl:"http://10.252.26.240:16800/message",
+        BIMServerPort:'80',
+        QJFileManageSystemURL:'http://42.159.154.173:8080/qjbim-file/',//仅供文件下载使用的路径，
+        BDMSUrl:'http://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
+        WebGlUrl:"http://bdms.arctron.cn",
+        GMDUrl:"http://bdms.arctron.cn",
+        shareUrl:"http://bdms.arctron.cn",
+        WebSocketUrl:"http://10.252.26.240:16800/message",
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,

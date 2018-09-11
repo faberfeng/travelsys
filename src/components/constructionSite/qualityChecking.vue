@@ -636,10 +636,20 @@ export default {
             console.log(obj);
             this.checkTypeId=obj.id;
             this.checkTypeValue=obj.text;
+            var str;
+            console.log(obj.attributes.dirParId)
+            this.CheckTypeSubDirList.forEach((item)=>{
+                if(item.id==obj.attributes.dirParId){
+                    str=item.text;
+                    this.checkTypeValue=str+'-'+this.checkTypeValue;
+                    console.log(this.checkTypeValue)
+                }
+            })
+            // if(obj.attributes.dirParId)
             // this.str=obj.Parent.text;
             // console.log(this.str);
-            console.log(this.checkTypeId);
-            console.log(this.checkTypeValue);
+            // console.log(this.checkTypeId);
+            // console.log(this.checkTypeValue);
         },
         hideSendMes(){
           var vm = this
