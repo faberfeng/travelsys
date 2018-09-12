@@ -188,7 +188,7 @@
             <div id="edit">
                 <el-dialog width="450px" title="检查类型选择" :visible.sync="checkTypeSelectDialog" @close="checkTypeSelectCancle">
                         <div class="tree">
-                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
+                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'没有可选择的类型，请至文档管理建立所需的项目类型'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
                             </el-tree>
                         </div>
                     <div slot="footer" class="dialog-footer">
@@ -557,10 +557,12 @@ export default {
             })
         },
         checkTypeSelectMakeSure(){
-            this.showName=false;
+            
             this.checkTypeSelectDialog=false;
+
              this.checkTypeId='';
             this.checkTypeValue='';
+            this.showName=false;
             this.goingToSend =false;
             // if(this.checkTypeValue==''){
             //     this.$message({
@@ -877,7 +879,7 @@ export default {
         #edit .el-dialog .el-dialog__body{
             .tree{
                     height:200px;
-                    margin:0px 10px;
+                    margin:0px 0px;
                     overflow-y:auto;
                 }
         }

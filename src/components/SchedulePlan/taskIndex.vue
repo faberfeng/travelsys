@@ -53,7 +53,7 @@
                 :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
                 :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
-                @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick">
+                @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                 <template slot="action" slot-scope="scope">
                   <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
                   <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
@@ -1132,6 +1132,7 @@
     name: 'taskIndex',
     data() {
       return {
+        loading:false,
         showCommonList: false,//显示清单
         checkList: '',
         labelListShow: false,//二维码显示
@@ -1846,6 +1847,7 @@
 
       //获取工程列表
       getTaskList() {
+        this.loading=true;
         axios({
           method: 'post',
           url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/list',
@@ -1864,8 +1866,11 @@
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
+            this.loading=false;
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
+          }else if(response.data.cd=='0'){
+            this.loading=false;
           }
         })
       },
@@ -3826,14 +3831,11 @@
 </script>
 
 <style lang="less">
-  #taskIndex{
-
-  }
    *{
-        margin: 0;
-        padding: 0;
+        // margin: 0;
+        // padding: 0;
         box-sizing: border-box;
-        font-size: 12px;
+        // font-size: 12px;
       }
   select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
@@ -5470,49 +5472,12 @@
       margin: 16px 5px 0px 5px;
     }
   }
-  }
-</style>
 
-<style lang="less">
- #taskIndex{
-  // @import './Gantt/platform.css';
-  // @import './Gantt/libs/jquery/dateField/jquery.dateField.css';
-  // @import './Gantt/gantt.css';
-  // @import './Gantt/ganttPrint.css';
-      // * {
-      //   margin: 0;
-      //   padding: 0;
-      //   box-sizing: border-box;
-      //   font-size: 12px;
-      // }
-
-      // .resEdit {
-      //     padding: 15px;
-      //   }
-      //   .resLine {
-      //     width: 95%;
-      //     padding: 3px;
-      //     margin: 5px;
-      //     border: 1px solid #d0d0d0;
-      //   }
-      // //   body {
-      // //     overflow: hidden;
-      // //   }
-      //   .ganttButtonBar h1{
-      //     color: #000000;
-      //     font-weight: bold;
-      //     font-size: 28px;
-      //     margin-left: 10px;
-      //   }
-
-      #edit .bindListHead .bindListHeadRight .el-input__inner {
+   #edit .bindListHead .bindListHeadRight .el-input__inner {
         width: 130px;
         height: 36px;
-      }
+    }
 
-      li {
-        list-style: none;
-      }
 
       /**********一下是分页器的样式***************/
       .datagrid-pager {
@@ -5525,7 +5490,6 @@
         box-sizing: border-box;
         background: #f5f5f5;
       }
-
       .pagination {
         border-top: none;
       }
@@ -5824,6 +5788,5 @@
       .sortBtn {
         background: url('./images/sort.png') no-repeat 0 0;
       }
-  } 
-
+  }
 </style>

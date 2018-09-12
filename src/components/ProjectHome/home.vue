@@ -534,6 +534,8 @@ export default {
             color: #666;
             position: relative;
             top: 10px;
+            line-height: 35px;
+            height: 35px;
         }
         .btn{
             float: right;
