@@ -684,6 +684,8 @@ export default {
                                 revitCa = "SpecialityEquipment";
                             }else if(this.revitCategory == '植物'){
                                 revitCa = "Planting";
+                            }else if(this.revitCategory == '风道末端'){
+                                revitCa = "DuctTerminal";
                             }
                             // var keyword = this.totalConstructorData.some(item=>{
                             //     if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){
