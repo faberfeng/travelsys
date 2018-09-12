@@ -1554,6 +1554,7 @@ export default Vue.component('common-list',{
   data(){
        window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+          fullscreenLoading:false,//全屏loading
          screenLeft:{
              show:false,
              item:1,

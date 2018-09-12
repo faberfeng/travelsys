@@ -15,7 +15,7 @@
                     安全检查  
                     </router-link>
                 </div>
-                <div id="containerMessage" v-show="isShowQualityCheckAuth">
+                <div id="containerMessage"  v-show="isShowQualityCheckAuth">
                    <div class="ForumSelector">
                         <span class="name">筛选条件</span>
                         <ul>
@@ -48,7 +48,7 @@
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
                 <sendMes :showBox="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
-                <div class="project">
+                <div class="project" v-loading="loading">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
@@ -229,6 +229,7 @@ export default {
   },
     data(){
         return{
+            loading:true,
             token:'',
             projId:'',
             userId:'',
@@ -433,12 +434,14 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 vm.CommunicationList[index].collect = collect?false:true
+                 
             }else{
                     vm.$message({
                     type:'error',
                     message:response.data.msg
                 })
             }
+           
         }).catch((err)=>{
             console.log(err)
         })
@@ -483,6 +486,7 @@ export default {
                     type:'error',
                     message:response.data.msg
                 })
+                
             }
         }).catch((err)=>{
             console.log(err)
@@ -698,6 +702,7 @@ export default {
                     message:response.data.msg
                 })
             }
+            this.loading=false;
         }).catch((err)=>{
             console.log(err)
         })

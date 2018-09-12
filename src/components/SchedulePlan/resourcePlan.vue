@@ -37,69 +37,80 @@
                     <!-- <button @click="load">load</button> -->
                </div>
                 <div  class="planList">
-                    <table v-show="planType==1" class="planTabel" border="1" width="100%">
-                        <thead>
-                            <tr>
-                                <td>名称</td>
-                                <td>单位</td>
-                                <td>显示计划</td>
-                                <td>当前日计划</td>
-                                <td>当前周计划</td>
-                                <td>当前月计划</td>
-                                <td>显示指派</td>
-                                <td>任务日指派</td>
-                                <td>任务周指派</td>
-                                <td>任务月指派</td>
-                                <td>操作</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item,index) in resouceTypeByParamsList" :key="index">
-                                <td v-text="item.name"></td>
-                                <td v-text="item.unit"></td>
-                                <td><el-checkbox v-model="item.isShowPlanBolean" @change="showPlanChange(index)"></el-checkbox></td>
-                                <td ><span v-show="item.id!=isActive1">{{item.curDayPlan}}</span><input v-show="item.id==isActive1" v-model="planValue1" class="planInput" type="text"/></td>
-                                <td><span>{{item.curWeekPlan}}</span></td>
-                                <td v-text="item.curMonthPlan"></td>
-                                <td><el-checkbox v-model="item.isShowAssignBolean" @change="showAssignChange(index)"></el-checkbox></td>
-                                <td v-text="item.taskDayAssign"></td>
-                                <td v-text="item.taskWeekAssign"></td>
-                                <td v-text="item.taskMonthAssign"></td>
-                                <td><i class="editBtn actionBtn" v-show="item.id!=isActive1" @click="edit(item.id)"></i><i v-show="item.id==isActive1" class="saveBtn actionBtn" @click="save(index)"></i><i class="deleteBtn actionBtn" @click="deletePlan(index)"></i></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                     <table v-show="planType==2" class="planTabel" border="1" width="100%">
-                        <thead>
-                            <tr>
-                                <td>名称</td>
-                                <td>单位</td>
-                                <td>显示计划</td>
-                                <td>当前周计划</td>
-                                <td>当前月计划</td>
-                                <td>显示指派</td>
-                                <td>任务周指派</td>
-                                <td>任务月指派</td>
-                                <td>操作</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item,index) in resouceTypeByParamsList" :key="index">
-                                <td v-text="item.name"></td>
-                                <td v-text="item.unit"></td>
-                                <td><el-checkbox v-model="item.isShowPlanBolean" @change="showPlanChange(index)"></el-checkbox></td>
-                                <td><span v-show="item.id!=isActive2">{{item.curWeekPlan}}</span><input v-show="item.id==isActive2" v-model="planValue2" class="planInput" type="text"/></td>
-                                <td v-text="item.curMonthPlan"></td>
-                                <td><el-checkbox v-model="item.isShowAssignBolean" @change="showAssignChange(index)"></el-checkbox></td>
-                                <td v-text="item.taskWeekAssign"></td>
-                                <td v-text="item.taskMonthAssign"></td>
-                                <td><i class="editBtn actionBtn" v-show="item.id!=isActive2" @click="edit(item.id)"></i><i v-show="item.id==isActive2" class="saveBtn actionBtn" @click="save(index)"></i><i class="deleteBtn actionBtn" @click="deletePlan(index)"></i></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                     <table v-show="planType==3" class="planTabel" border="1" width="100%">
+                    <div v-show="planType==1">
+                        <table  class="planTabel" border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <td>名称</td>
+                                    <td>单位</td>
+                                    <td>显示计划</td>
+                                    <td>当前日计划</td>
+                                    <td>当前周计划</td>
+                                    <td>当前月计划</td>
+                                    <td>显示指派</td>
+                                    <td>任务日指派</td>
+                                    <td>任务周指派</td>
+                                    <td>任务月指派</td>
+                                    <td>操作</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in resouceTypeByParamsList" :key="index">
+                                    <td v-text="item.name"></td>
+                                    <td v-text="item.unit"></td>
+                                    <td><el-checkbox v-model="item.isShowPlanBolean" @change="showPlanChange(index)"></el-checkbox></td>
+                                    <td ><span v-show="item.id!=isActive1">{{item.curDayPlan}}</span><input v-show="item.id==isActive1" v-model="planValue1" class="planInput" type="text"/></td>
+                                    <td><span>{{item.curWeekPlan}}</span></td>
+                                    <td v-text="item.curMonthPlan"></td>
+                                    <td><el-checkbox v-model="item.isShowAssignBolean" @change="showAssignChange(index)"></el-checkbox></td>
+                                    <td v-text="item.taskDayAssign"></td>
+                                    <td v-text="item.taskWeekAssign"></td>
+                                    <td v-text="item.taskMonthAssign"></td>
+                                    <td><i class="editBtn actionBtn" v-show="item.id!=isActive1" @click="edit(item.id)"></i><i v-show="item.id==isActive1" class="saveBtn actionBtn" @click="save(index)"></i><i class="deleteBtn actionBtn" @click="deletePlan(index)"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <span v-show="dataShow">
+                            <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                            <p style="font-size:16px;color:#ccc">暂无数据</p>
+                        </span>
+                    </div>
+                    <div v-show="planType==2">
+                        <table  class="planTabel" border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <td>名称</td>
+                                    <td>单位</td>
+                                    <td>显示计划</td>
+                                    <td>当前周计划</td>
+                                    <td>当前月计划</td>
+                                    <td>显示指派</td>
+                                    <td>任务周指派</td>
+                                    <td>任务月指派</td>
+                                    <td>操作</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in resouceTypeByParamsList" :key="index">
+                                    <td v-text="item.name"></td>
+                                    <td v-text="item.unit"></td>
+                                    <td><el-checkbox v-model="item.isShowPlanBolean" @change="showPlanChange(index)"></el-checkbox></td>
+                                    <td><span v-show="item.id!=isActive2">{{item.curWeekPlan}}</span><input v-show="item.id==isActive2" v-model="planValue2" class="planInput" type="text"/></td>
+                                    <td v-text="item.curMonthPlan"></td>
+                                    <td><el-checkbox v-model="item.isShowAssignBolean" @change="showAssignChange(index)"></el-checkbox></td>
+                                    <td v-text="item.taskWeekAssign"></td>
+                                    <td v-text="item.taskMonthAssign"></td>
+                                    <td><i class="editBtn actionBtn" v-show="item.id!=isActive2" @click="edit(item.id)"></i><i v-show="item.id==isActive2" class="saveBtn actionBtn" @click="save(index)"></i><i class="deleteBtn actionBtn" @click="deletePlan(index)"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <span v-show="dataShow">
+                                <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                                <p style="font-size:16px;color:#ccc">暂无数据</p>
+                        </span>
+                    </div>
+                    <div v-show="planType==3">
+                     <table  class="planTabel" border="1" width="100%">
                         <thead>
                             <tr>
                                 <td>名称</td>
@@ -123,6 +134,11 @@
                             </tr>
                         </tbody>
                     </table>
+                    <span v-show="dataShow1">
+                                <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                                <p style="font-size:16px;color:#ccc">暂无数据</p>
+                    </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,6 +197,8 @@ export default{
     data(){
         return {
             // webGlShow:this.$route.params.id,
+            dataShow:true,//空数据显示
+            dataShow1:true,
             title:'',//显示当前时间
             deleteResourcePlanDialog:false,//删除任务资源弹窗
             addResourceTypeDialog:false,//增加资源任务树形弹窗
@@ -2158,6 +2176,7 @@ export default{
                 }
                 }).then(response=>{
                     if(response.data.cd=='0'){
+                        
                         let str=response.data.rt
                         str.forEach((item)=>{
                             if(item.isShowPlan==1){
@@ -2171,8 +2190,10 @@ export default{
                                 item.isShowAssignBolean=false;
                             }
                             this.resouceTypeByParamsList.push(item);
+                            if(this.resouceTypeByParamsList.length!=0){
+                                this.dataShow=false;
+                            }
                         })
-                       
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
                     }
@@ -2205,10 +2226,15 @@ export default{
                                 item.isShowAssignBolean=false;
                             }
                             this.resouceTypeByParamsThreeYearList.push(item);
+                            if(this.resouceTypeByParamsThreeYearList.length!=0){
+                                this.dataShow1=false;
+                            }
                         })
                     
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
+                }else if(response.data.rt.length!=0){
+                    
                 }
             })
 

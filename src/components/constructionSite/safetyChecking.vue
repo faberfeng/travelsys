@@ -80,6 +80,10 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <span v-show="dataShow">
+                                    <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                                    <p style="font-size:16px;color:#ccc">暂无数据</p>
+                                </span>
                             </div>
                              <!--以下是page-navigitation-->
                             <div class="datagrid-pager pagination">
@@ -451,6 +455,7 @@ export default {
     name:'safetyChecking',
     data(){
         return{
+            dataShow:true,
             entType:'',
             ugId:'',
             checkItemDataList:'',
@@ -569,7 +574,7 @@ export default {
         vm.getSecurityCheck();
         vm.loadzTreeData();
         vm.getCheckPointsByItemId();
-        vm.getCheckItemData();
+        // vm.getCheckItemData();
     },
     mount(){
 
@@ -785,6 +790,9 @@ export default {
                 this.pointTotal=response.data.rt.total;
                 this.pageDetial.total=response.data.rt.total;
                 console.log(this.checkPointsByItemIdList);
+                if(this.checkPointsByItemIdList){
+                    this.dataShow=false;
+                }
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }
@@ -1197,10 +1205,13 @@ export default {
     },
     //添加检查条目节点
     addCheckItemNode(){
-        this.validateAddNode();
         this.parentItemId=this.itemId;
         this.parentItemName=this.itemName;
         this.getManageDept();
+        this.addCheckItemNodeShow=true;
+        if(this.parentItemName){
+            this.validateAddNode();
+        }
     },
     addCheckItemNodeConfirm(){
         var vm=this;
@@ -1210,7 +1221,7 @@ export default {
                 'token':this.token
             },
             params:{
-                parentItemId:this.itemId,
+                parentItemId:this.parentItemId,
                 projId:this.projId,
                 itemName:this.projectName,
                 checkFrequency:this.checkFrequency,//检查频率
@@ -1218,7 +1229,7 @@ export default {
                 respUser:this.respUser,//负责人
                 checkDept:this.checkDept,//检查部门/单位
                 checkUser:this.checkUser,//检查人
-                ugId:this.checkItemDataList.item.ugId //安全检查的ugid
+                ugId:this.ugId //安全检查的ugid
             },
             url:this.BDMSUrl+'/project2/security/addCheckItemNode'
         }).then(response=>{
@@ -1228,6 +1239,15 @@ export default {
                     {type:'success',
                     message:'添加成功'})
                 vm.loadzTreeData();
+                this.parentItemId='';
+                this.projectName='';
+                this.parentItemName='';
+                this.itemName='';
+                this.checkFrequency=0;
+                this.respUser='';
+                this.respDept='';
+                this.checkDept='';
+                this.checkUser='';
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }
@@ -1235,6 +1255,16 @@ export default {
     },
     addCheckItemNodeCancle(){
         this.addCheckItemNodeShow=false;
+        // this.itemId=-1;
+        // this.parentItemId='';
+        this.projectName='';
+        // this.parentItemName='';
+        // this.itemName='';
+        this.checkFrequency=0;
+        this.respUser='';
+        this.respDept='';
+        this.checkDept='';
+        this.checkUser='';
     },
     //点位编辑
     spotEditConfirm(){
@@ -1264,7 +1294,16 @@ export default {
                     {type:'success',
                     message:response.data.msg})
                     vm.loadzTreeData();
-                    this.itemId='';
+                    this.itemId=-1;
+                    this.parentItemId='';
+                    this.projectName='';
+                    this.parentItemName='';
+                    this.itemName='';
+                    this.checkFrequency=0;
+                    this.respUser='';
+                    this.respDept='';
+                    this.checkDept='';
+                    this.checkUser='';
                     this.deleteItemNodeDialog=false;
 
             }else if(response.data.cd=='-1'){
@@ -1274,6 +1313,16 @@ export default {
     },
     deleteItemNodeClose(){
         this.deleteItemNodeDialog=false;
+        this.itemId=-1;
+        this.parentItemId='';
+        this.projectName='';
+        this.parentItemName='';
+        this.itemName='';
+        this.checkFrequency=0;
+        this.respUser='';
+        this.respDept='';
+        this.checkDept='';
+        this.checkUser='';
     },
     checkTable(num){
         console.log('ffsd')
