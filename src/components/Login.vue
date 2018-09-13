@@ -61,6 +61,7 @@ export default {
             localStorage.removeItem('defaultSubProjId')
         }
          this.validateInstance()
+         this.Login()
         if(token != 'undefined'){
             vm.token = token
             //判断是否登陆
@@ -78,10 +79,11 @@ export default {
                 method:'get',
                 url: this.BDMSUrl +'user2/validateInstance',
                 headers:{
-                'token':this.token
+                    'token':this.token
                 },
             }).then((response) => {
-               
+                var str=window.location.href;
+                console.log(str);
             })
         },
         BeforeLogin(){
@@ -101,7 +103,7 @@ export default {
                 }
             })
         },
-        //
+        //需要密码登陆
         Login(){
             this.login.Password = md5(this.login.Password);
             var formData = new FormData();

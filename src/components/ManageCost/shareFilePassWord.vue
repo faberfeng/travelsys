@@ -20,7 +20,8 @@
                 </div>
                 <div class="center_frame">
                     <div class="center_frame_top">
-                        <img class="userImg" :src="userImg?userImg:require('../../assets/people.png')"/>
+                        <img  v-if="userImg!=QJFileManageSystemURL1" class="userImg" :src="userImg"/>
+                        <img v-if="userImg==QJFileManageSystemURL1" class="userImg" src='../../assets/people.png'>
                         <label class="userItem"><label class="userItem_bold" v-text="user.realName"></label>给你加密分享了文件</label>
                     </div>
                     <div class="center_frame_bottom">
@@ -49,11 +50,13 @@ export default{
         var vm=this;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.QJFileManageSystemURL1 = vm.$store.state.QJFileManageSystemURL1;
     },
     mounted(){
         this.searchShareFile();
     },
     methods:{
+        //去空格
         trim(str){
             return str.replace(/\s/g,"")
         },
@@ -69,6 +72,7 @@ export default{
                     this.qjShareGroup=response.data.rt.qjShareGroup
                     this.user=response.data.rt.user
                     this.userImg=this.trim(this.user.imgUuid)
+                    console.log(this.userImg);
                 }
             })
         },

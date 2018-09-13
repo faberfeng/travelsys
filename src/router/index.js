@@ -35,6 +35,11 @@ const router = new Router({
       component:Login
     },
     {
+      path:'/noPassWordlogin',
+      name:'noPassWordlogin',
+      component:resolve=>require(['@/components/noPassWordLogin'],resolve),
+    },
+    {
       path:'/showcompany',
       name:'ProjectNavigation',
       component:resolve=>require(['@/components/ProjectNavigation'],resolve),
