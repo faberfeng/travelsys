@@ -53,7 +53,7 @@
                 :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
                 :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
-                @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick">
+                @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                 <template slot="action" slot-scope="scope">
                   <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
                   <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
@@ -202,7 +202,7 @@
           </li>
         </ul>
       </div>
-      <div id="box-right" v-show="taskId&&screenLeft.show" v-if="screenLeft.item == 2">
+      <div id="box-right" v-show="selectChildren==null&&screenLeft.show" v-if="screenLeft.item == 2">
         <div class="verify">
           <h3 class="header-attribute" style="margin-top: 0px;">
             <i class="trrangle"></i>
@@ -567,7 +567,7 @@
           <button class="editBtnC" @click="addLinkCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="进度查询" width="530px" :visible.sync="progressSearchDialog" @close="progressSearchCancle">
+      <el-dialog title="进度查询" width="560px" :visible.sync="progressSearchDialog" @close="progressSearchCancle">
         <div class="editBody">
           <div class="progressSearchBody">
             <label class="searchWayText">查询方式:</label>
@@ -702,7 +702,7 @@
           <button class="editBtnC" @click="progressSearchCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="产值查询" width="530px" :visible.sync="valueSearchDialog" @close="valueSearchCancle">
+      <el-dialog title="产值查询" width="560px" :visible.sync="valueSearchDialog" @close="valueSearchCancle">
         <div class="editBody">
           <div class="progressSearchBody">
             <label class="searchWayText">查询方式:</label>
@@ -1132,6 +1132,7 @@
     name: 'taskIndex',
     data() {
       return {
+        loading:false,
         showCommonList: false,//显示清单
         checkList: '',
         labelListShow: false,//二维码显示
@@ -1349,6 +1350,7 @@
         taskStart: '',//任务开始时间
         taskEnd: '',//任务结束时间
         taskParId: '',
+        selectChildren:'',//选中表格是否又子菜单
         linkTaskId: '',//前置任务Id
         removeTaskId: '',//移动任务Id
         disable: false,//是否禁止日期选择
@@ -1448,7 +1450,6 @@
           {
             label: '名称',
             prop: 'taskName',
-            show: true,
             type: 'template',
             template: 'action',
             minWidth: '240px'
@@ -1463,27 +1464,23 @@
           {
             label: '编号',
             prop: 'completeTaskCode',
-            show: true,
-            width: '70px'
+            width: '80px'
 
           },
           {
             label: '优先级',
             prop: 'taskPriority',
-            show: true,
             width: '65px'
 
           },
           {
             label: '里程碑',
             prop: 'taskType',
-            show: true,
             width: '65px'
           },
           {
             label: '计划开始',
             prop: 'taskStart',
-            show: true,
             type: 'template',
             template: 'taskStart',
             width: '90px'
@@ -1492,7 +1489,6 @@
           {
             label: '计划结束',
             prop: 'taskEnd',
-            show: true,
             type: 'template',
             template: 'taskEnd',
             width: '90px'
@@ -1500,7 +1496,6 @@
           {
             label: '实际开始',
             prop: 'realTaskStart',
-            show: true,
             type: 'template',
             template: 'realTaskStart',
            width: '90px'
@@ -1508,7 +1503,6 @@
           {
             label: '实际结束',
             prop: 'realTaskEnd',
-            show: true,
             type: 'template',
             template: 'realTaskEnd',
            width: '90px'
@@ -1516,7 +1510,6 @@
           {
             label: '工作日',
             prop: 'taskDuration',
-            show: true,
             type: 'template',
             template: 'taskDuration',
             width: '65px'
@@ -1524,32 +1517,27 @@
           {
             label: '计划状态',
             prop: 'taskStatusStr',
-            show: true,
              width: '80px'
 
           },
           {
             label: '实际状态',
             prop: 'actualStatusStr',
-            show: true,
              width: '80px'
           },
           {
             label: '比对状态',
             prop: 'verifyStatusStr',
-            show: true,
              width: '80px'
           },
           {
             label: '负责群组',
             prop: 'taskUserGroupName',
-            show: true,
              width: '80px'
           },
           {
             label: '负责人',
             prop: 'dutyUserName',
-            show: true,
             width: '80px'
           },
           // {
@@ -1846,6 +1834,7 @@
 
       //获取工程列表
       getTaskList() {
+        this.loading=true;
         axios({
           method: 'post',
           url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/list',
@@ -1864,8 +1853,11 @@
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
+            this.loading=false;
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
+          }else if(response.data.cd=='0'){
+            this.loading=false;
           }
         })
       },
@@ -1926,7 +1918,7 @@
         })
       },
       //点击zk-tree获取id
-      rowClick(row, rowIndex) {
+      rowClick(row, rowIndex,$event) {
         // row.path[3].childNodes.forEach((item)=>{
         //   if(item.style.background){
         //     item.style.color='black'
@@ -1942,20 +1934,41 @@
         //   row.path[2].style.backgroundColor='#0081c2'
         // }
         // console.log(typeof(document.getElementsByClassName(' zk-table__body-row')));
-
-        row.path[3].childNodes.forEach((item)=>{
-            item.style.color='black'
-        })
-        row.path[2].style.color='#0081c2'
-        this.selectRowList = rowIndex;
-        this.selectRowList.forEach((item, index) => {
-          // console.log(index);
-          if (item._isHover == true) {
-            this.taskId = item.taskId
-            this.taskParId = item.taskParId
+        if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+          row.path[4].childNodes.forEach((item)=>{
+              item.style.backgroundColor='white'
+            })
+          row.path[3].style.backgroundColor='#0081c2'
+        }
+         if(row.path[0]._prevClass=="zk-table__cell-inner"){
+            row.path[3].childNodes.forEach((item)=>{
+               item.style.backgroundColor='white'
+              })
+            row.path[2].style.backgroundColor='#0081c2'
+        }
+        if(row.path[0]._prevClass=="zk-table__body-cell zk-table--border-cell"){
+            row.path[2].childNodes.forEach((item)=>{
+                  item.style.backgroundColor='white'
+                })
+              row.path[1].style.backgroundColor='#0081c2'
+        }
+          // if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-2-cell"){
             
-          }
-        })
+          // }else if(row.path[0]._prevClass=="zk-table__cell-inner"){
+                
+          // }  
+          this.selectRowList = rowIndex;
+          this.selectRowList.forEach((item, index) => {
+            // console.log(index);
+            if (item._isHover == true) {
+              this.selectChildren=item.children
+              this.taskId = item.taskId
+              this.taskParId = item.taskParId
+            }
+          })
+        setTimeout(()=>{
+            
+        },200)
         this.getTask();
         this.getVerifyList();
         this.getEntityRelation();
@@ -1968,7 +1981,7 @@
         var vm = this;
         if (row.children == null) {
           var color = vm.selectColor(parseInt(row.colorValue));
-          return 'backgroundColor:' + color;
+          return 'color:' + color;
         }
       },
       //根据工程获取状态颜色
@@ -2633,6 +2646,7 @@
             if (response.data.cd == "0") {
               this.addTaskDialog = false;
                this.taskIndexData=[];
+               document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
               this.getTaskList();
               this.dutyUserId='';
               this.taskPriority='';
@@ -2667,11 +2681,25 @@
         }
       },
       linkTypeRowClick(row, rowIndex) {
+        if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+          row.path[4].childNodes.forEach((item)=>{
+              item.style.backgroundColor='white'
+            })
+          row.path[3].style.backgroundColor='#0081c2'
+        }
+         if(row.path[0]._prevClass=="zk-table__cell-inner"){
+            row.path[3].childNodes.forEach((item)=>{
+               item.style.backgroundColor='white'
+              })
+            row.path[2].style.backgroundColor='#0081c2'
+        }
+        if(row.path[0]._prevClass=="zk-table__body-cell zk-table--border-cell"){
+            row.path[2].childNodes.forEach((item)=>{
+                  item.style.backgroundColor='white'
+                })
+            row.path[1].style.backgroundColor='#0081c2'
+        }
         this.selectRowList = rowIndex;
-        row.path[3].childNodes.forEach((item)=>{
-            item.style.backgroundColor='white'
-        })
-        row.path[2].style.backgroundColor='#0081c2'
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.linkTaskId = item.taskId
@@ -2680,12 +2708,25 @@
         })
       },
       removeTaskRowClick(row, rowIndex) {
+         if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+          row.path[4].childNodes.forEach((item)=>{
+              item.style.backgroundColor='white'
+            })
+          row.path[3].style.backgroundColor='#0081c2'
+        }
+         if(row.path[0]._prevClass=="zk-table__cell-inner"){
+            row.path[3].childNodes.forEach((item)=>{
+               item.style.backgroundColor='white'
+              })
+            row.path[2].style.backgroundColor='#0081c2'
+        }
+        if(row.path[0]._prevClass=="zk-table__body-cell zk-table--border-cell"){
+            row.path[2].childNodes.forEach((item)=>{
+                  item.style.backgroundColor='white'
+                })
+              row.path[1].style.backgroundColor='#0081c2'
+        }
         this.selectRowList = rowIndex;
-        row.path[3].childNodes.forEach((item)=>{
-            item.style.backgroundColor='white'
-        })
-        row.path[2].style.backgroundColor='#0081c2'
-        //   console.log(JSON.stringify(this.selectRowList))
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.curUgId = item.taskUserGroup
@@ -2840,6 +2881,7 @@
           if (response.data.cd == "0") {
             this.editTaskDialog = false;
             this.taskIndexData=[];
+            document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
             this.getTaskList();
             this.taskName = '';
             this.taskStart = '';
@@ -2920,6 +2962,7 @@
             this.showText1 = false;
             this.deleteTaskDialog = false;
             this.taskInformationList=[];
+             document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
             // this.lastNodeName='';
             // this.taskIndexData=[];
             this.dutyUserId='';
@@ -2948,6 +2991,7 @@
         this.removeTaskDialog = true;
         this.sortObject = scope;
         this.taskId = this.sortObject.row.taskId;
+        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
         // if(this.deleteTabObject.row.children){
         //     this.showText=true;
         // }else{
@@ -2980,6 +3024,7 @@
           if (response.data.cd == "0") {
             this.removeTaskDialog = false;
              this.taskIndexData=[];
+              document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
             this.getTaskList();
             this.removeTaskId = '';
             this.$message({
@@ -3173,6 +3218,7 @@
             this.exportProjectDialog=true;
       },
       cancleSelect(){
+        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         this.taskId='';
         this.taskInformationList=[];
         this.lastNodeName='';
@@ -3826,14 +3872,11 @@
 </script>
 
 <style lang="less">
-  #taskIndex{
-
-  }
    *{
-        margin: 0;
-        padding: 0;
+        // margin: 0;
+        // padding: 0;
         box-sizing: border-box;
-        font-size: 12px;
+        // font-size: 12px;
       }
   select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
@@ -5470,49 +5513,12 @@
       margin: 16px 5px 0px 5px;
     }
   }
-  }
-</style>
 
-<style lang="less">
- #taskIndex{
-  // @import './Gantt/platform.css';
-  // @import './Gantt/libs/jquery/dateField/jquery.dateField.css';
-  // @import './Gantt/gantt.css';
-  // @import './Gantt/ganttPrint.css';
-      // * {
-      //   margin: 0;
-      //   padding: 0;
-      //   box-sizing: border-box;
-      //   font-size: 12px;
-      // }
-
-      // .resEdit {
-      //     padding: 15px;
-      //   }
-      //   .resLine {
-      //     width: 95%;
-      //     padding: 3px;
-      //     margin: 5px;
-      //     border: 1px solid #d0d0d0;
-      //   }
-      // //   body {
-      // //     overflow: hidden;
-      // //   }
-      //   .ganttButtonBar h1{
-      //     color: #000000;
-      //     font-weight: bold;
-      //     font-size: 28px;
-      //     margin-left: 10px;
-      //   }
-
-      #edit .bindListHead .bindListHeadRight .el-input__inner {
+   #edit .bindListHead .bindListHeadRight .el-input__inner {
         width: 130px;
         height: 36px;
-      }
+    }
 
-      li {
-        list-style: none;
-      }
 
       /**********一下是分页器的样式***************/
       .datagrid-pager {
@@ -5525,7 +5531,6 @@
         box-sizing: border-box;
         background: #f5f5f5;
       }
-
       .pagination {
         border-top: none;
       }
@@ -5824,6 +5829,5 @@
       .sortBtn {
         background: url('./images/sort.png') no-repeat 0 0;
       }
-  } 
-
+  }
 </style>

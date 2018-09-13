@@ -1578,9 +1578,10 @@ export default Vue.component('common-list',{
             })
             }else{
           this.TraceID=String(scope.row.dTraceId);
-          this.HolderPath=scope.row.dHolderPath;
+          this.HolderPath=JSON.parse(scope.row.dHolderPath);
           this.GCCode=scope.row.dGCCode;
           const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode}
+          console.log(para)
         const app = document.getElementById('webIframe').contentWindow;
         app.postMessage({command:"LookAtEntities",parameter:para},"*");
          document.body.scrollTop = 0;

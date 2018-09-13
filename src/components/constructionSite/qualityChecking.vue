@@ -15,7 +15,7 @@
                     安全检查  
                     </router-link>
                 </div>
-                <div id="containerMessage" v-show="isShowQualityCheckAuth">
+                <div id="containerMessage"  v-show="isShowQualityCheckAuth">
                    <div class="ForumSelector">
                         <span class="name">筛选条件</span>
                         <ul>
@@ -48,7 +48,7 @@
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
                 <sendMes :showBox="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
-                <div class="project">
+                <div class="project" v-loading="loading">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
@@ -188,7 +188,7 @@
             <div id="edit">
                 <el-dialog width="450px" title="检查类型选择" :visible.sync="checkTypeSelectDialog" @close="checkTypeSelectCancle">
                         <div class="tree">
-                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
+                            <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'没有可选择的类型，请至文档管理建立所需的项目类型'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
                             </el-tree>
                         </div>
                     <div slot="footer" class="dialog-footer">
@@ -229,6 +229,7 @@ export default {
   },
     data(){
         return{
+            loading:true,
             token:'',
             projId:'',
             userId:'',
@@ -433,12 +434,14 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 vm.CommunicationList[index].collect = collect?false:true
+                 
             }else{
                     vm.$message({
                     type:'error',
                     message:response.data.msg
                 })
             }
+           
         }).catch((err)=>{
             console.log(err)
         })
@@ -483,6 +486,7 @@ export default {
                     type:'error',
                     message:response.data.msg
                 })
+                
             }
         }).catch((err)=>{
             console.log(err)
@@ -557,10 +561,12 @@ export default {
             })
         },
         checkTypeSelectMakeSure(){
-            this.showName=false;
+            
             this.checkTypeSelectDialog=false;
+
              this.checkTypeId='';
             this.checkTypeValue='';
+            this.showName=false;
             this.goingToSend =false;
             // if(this.checkTypeValue==''){
             //     this.$message({
@@ -696,6 +702,7 @@ export default {
                     message:response.data.msg
                 })
             }
+            this.loading=false;
         }).catch((err)=>{
             console.log(err)
         })
@@ -877,7 +884,7 @@ export default {
         #edit .el-dialog .el-dialog__body{
             .tree{
                     height:200px;
-                    margin:0px 10px;
+                    margin:0px 0px;
                     overflow-y:auto;
                 }
         }

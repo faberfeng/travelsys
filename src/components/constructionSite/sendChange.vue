@@ -6,7 +6,7 @@
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
                     <div class="input ">
-                        <textarea   class="textArea" :id="'dc-add-content'+dcid+selectugid" :placeholder="iscomment?'发布新主题':'发布新回复'" ref="message"></textarea>
+                        <textarea   class="textArea" :id="'dc-add-content'+dcid+selectugid" :placeholder="iscomment?'发布新整改':'发布新回复'" ref="message"></textarea>
                         <div id="at_userslist"></div>
                     </div>
                     <div class="func_area">

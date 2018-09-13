@@ -12,7 +12,10 @@
             <div class="tal">
                 <p class="talTitle">概况</p>
                 <ul class="talUl">
-                    <img v-show="dataShow" style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                    <span v-show="dataShow">
+                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                        <p style="font-size:16px;color:#ccc">暂无数据</p>
+                    </span>
                     <li v-for="(item,index) in overviewList" :key='index'><label>{{item.viewKey}}</label>{{item.viewVal}}</li>
                 </ul>
             </div>
@@ -23,6 +26,10 @@
                 <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
             </div>
             <ul class="projectList" v-show="tabShow == 1">
+                <span v-show="tabdataShow1">
+                    <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                    <p style="font-size:16px;color:#ccc">暂无数据</p>
+                </span>
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
@@ -41,6 +48,10 @@
                 </li>
             </ul>
             <ul class="projectList" v-show="tabShow == 2">
+                <span v-show="tabdataShow2">
+                    <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                    <p style="font-size:16px;color:#ccc">暂无数据</p>
+                </span>
                 <li v-for="(item,index) in projectNoticeListInfo" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
@@ -77,7 +88,9 @@ export default {
             projectImageList:[],//工程图片列表
             projectStationInfoList:[],//工程动态信息列表
             projectNoticeListInfo:[],//工程通知列表
-            dataShow:true
+            dataShow:true,
+            tabdataShow1:true,
+            tabdataShow2:true,
         }
     },
     filters:{
@@ -186,6 +199,9 @@ export default {
                 }else{
                     if(response.data.rt.rows){
                         this.projectStationInfoList = response.data.rt.rows;
+                         this.tabdataShow1=false;
+                    }else if(response.data.rt.rows.length!=0){
+                       
                     }
                 }
 
@@ -208,6 +224,7 @@ export default {
                 if(response.data.cd === '0'){
                     if(response.data.rt.rows){
                         this.projectNoticeListInfo = response.data.rt.rows;
+                        this.tabdataShow2=false;
                          this.projectNoticeListInfo.forEach((item,index,arr)=>{
                             if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){
                                 arr[index].noticeName = '进度计划';
@@ -534,6 +551,8 @@ export default {
             color: #666;
             position: relative;
             top: 10px;
+            line-height: 35px;
+            height: 35px;
         }
         .btn{
             float: right;

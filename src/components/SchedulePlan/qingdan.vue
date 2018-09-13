@@ -1554,6 +1554,7 @@ export default Vue.component('common-list',{
   data(){
        window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+          fullscreenLoading:false,//全屏loading
          screenLeft:{
              show:false,
              item:1,
@@ -1913,7 +1914,7 @@ export default Vue.component('common-list',{
             }else{
                 console.log(scope);
                 this.TraceID=String(scope.row.dTraceId);
-                this.HolderPath=scope.row.dHolderPath;
+                this.HolderPath=JSON.parse(scope.row.dHolderPath);
                 this.GCCode=scope.row.dGCCode;
                 console.log(this.TraceID);
                 const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode} 
