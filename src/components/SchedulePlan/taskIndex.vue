@@ -2759,6 +2759,8 @@
               if(response.data.cd=="0"){
                   this.addLinkDialog=false;
                   this.getTask();
+                  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+                  document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
                   this.linkTaskId='';
                   this.linkType='';
               }else if(response.data.cd=="-1"){
@@ -2991,7 +2993,8 @@
         this.removeTaskDialog = true;
         this.sortObject = scope;
         this.taskId = this.sortObject.row.taskId;
-        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+        
+        // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
         // if(this.deleteTabObject.row.children){
         //     this.showText=true;
         // }else{
@@ -3025,6 +3028,7 @@
             this.removeTaskDialog = false;
              this.taskIndexData=[];
               document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+              document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
             this.getTaskList();
             this.removeTaskId = '';
             this.$message({
