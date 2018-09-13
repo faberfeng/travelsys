@@ -32,7 +32,7 @@
             <div class="pbody">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane :label="'有计划'" name="first">
+                        <el-tab-pane :label="'有计划 '+planData.length" name="first">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
@@ -46,7 +46,7 @@
                                 </ul>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="无计划" name="second">
+                        <el-tab-pane :label="'无计划 '+noPlanData.length" name="second">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
@@ -60,7 +60,7 @@
                                 </ul>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="模板" name="third">
+                        <el-tab-pane :label="'模板 '+templateData.length" name="third">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">

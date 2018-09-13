@@ -1832,9 +1832,27 @@ export default Vue.component('common-edit',{
                                             vm.value_partition_change(true)
                                             break;
                                         case 'range.profession':
-                                            vm.value_professional = element.fieldSearchContent.substr(0,2) == '00'?'-1':element.fieldSearchContent.substr(0,2)+'0000'
-                                            vm.value_system = element.fieldSearchContent.substr(2,2) == '00'?'-1':element.fieldSearchContent.substr(0,4)+'00'
-                                            vm.value_type = element.fieldSearchContent.substr(4,2) == '00'?'-1':element.fieldSearchContent
+                                            if(element.fieldSearchContent.substr(0,2) == '-1'){
+                                                vm.value_professional = '-1';
+                                            }else if(element.fieldSearchContent.substr(0,2) == '-1'){
+                                                vm.value_professional = 'NONE';
+                                            }else{
+                                                vm.value_professional = element.fieldSearchContent.substr(0,2)+'0000';
+                                            }
+                                            if(element.fieldSearchContent.substr(2,2) == '-1'){
+                                                vm.value_system = '-1';
+                                            }else if(element.fieldSearchContent.substr(2,2) == '00'){
+                                                vm.value_system = 'NONE';
+                                            }else{
+                                                vm.value_system = element.fieldSearchContent.substr(0,4)+'00';
+                                            }
+                                            if(element.fieldSearchContent.substr(4,2) == '-1'){
+                                                vm.value_type = '-1';
+                                            }else if(element.fieldSearchContent.substr(4,2) == '00'){
+                                                vm.value_type = 'NONE';
+                                            }else{
+                                                vm.value_type = element.fieldSearchContent;
+                                            }   
                                             vm.value_professional_change(true)
                                             vm.value_system_change(true)
                                             break;
