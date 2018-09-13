@@ -1867,7 +1867,6 @@ export default Vue.component('common-list',{
                         }else{
                             vm.S_Label_quantitiesList = [];
                         }
-                        console.log(vm.S_quantitiesList)
                     }else if(isDialog == 0){
                         if(response.data.rt.rows != null){
                             vm.S_quantitiesList = response.data.rt.rows;
@@ -1879,7 +1878,6 @@ export default Vue.component('common-list',{
                         }else{
                             vm.S_quantitiesList = [];
                         }
-                        console.log(vm.S_quantitiesList)
                     }else if(isDialog == 2){
                         if(response.data.rt.rows != null){
                             vm.S_Label_quantitiesList = response.data.rt.rows
@@ -1893,7 +1891,6 @@ export default Vue.component('common-list',{
                             vm.S_Label_quantitiesList = []
                             vm.S_quantitiesList = []
                         }
-                        console.log(vm.S_quantitiesList)
                     }
                 }
             }else {

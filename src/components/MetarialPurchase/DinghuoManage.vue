@@ -33,7 +33,7 @@
             <div class="pbody">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane :label="'已订货'" name="first">
+                        <el-tab-pane :label="'已订货 '+planData.length" name="0">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
@@ -47,7 +47,7 @@
                                 </ul>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="未订货" name="second">
+                        <el-tab-pane :label="'未订货 '+noPlanData.length" name="1">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
@@ -57,6 +57,10 @@
                                     <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
                                         <label class="lefttitlelab">{{item.orderCode}}</label>
                                         <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
+                                        <span style="float:right">
+                                            <i  @click="editOrder(item)" class="noplanEdit"></i>
+                                            <i @click="removeOrder(item)" class="noplanDelete"></i>
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
@@ -68,7 +72,11 @@
                         请在左侧内选择订货单
                     </div>
                     <div v-if="!showDetail" class="scrolldiv">
-                        <p class="pbodyrighttitle">【{{itemTitle}}】详情</p>
+                        <p class="pbodyrighttitle">
+                            【{{selectObject.orderTitle}}】详情
+                            <button @click="newListBtn" v-if="activeName == 1" class="newList">新建订单</button>    
+                        </p>
+                        
                         <div class="jindu">
                             <i class="titleimg"></i>
                             <label class="titletext">基本信息</label>
@@ -112,7 +120,7 @@
                                         <th>单价</th>
                                         <th>总价</th>
                                         <th>经手人</th>
-                                        <th>操作</th>
+                                        <th v-if="activeName == 1">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -124,7 +132,7 @@
                                         <td v-text="item.unitPrice"></td>
                                         <td v-text="item.totalPrice"></td>
                                         <td v-text="item.userName"></td>
-                                        <td>
+                                        <td v-if="activeName == 1">
                                             <span v-if="item.itemId !=1" class="editIcon" @click="viewDeatil(item)" :title="'编辑'"></span>
                                         </td>
                                     </tr>
@@ -134,6 +142,8 @@
                         <div class="jindu">
                             <i class="shebeiimg"></i>
                             <label class="titletext">设备主清单</label>
+                            <button v-if="activeName == 1" @click="viewAllDetail" style="margin-left:10px;" class="alllist">添加清单</button>
+                            <button @click="viewAllDetail" class="alllist">全部标签</button>
                         </div>
                         <div class="borderbottom">   
                             <table class="UserList" border="1" width="100%">
@@ -161,7 +171,7 @@
                                         <td>
                                             <span class="biaoqianIcon " :title="'标签'" @click="tips(item)"></span>
                                             <span class="editdetail" :title="'编辑明细'" @click="viewDeatil(index)"></span>
-                                            <span class="deleteIcon" :title="'删除'" @click="deleteItem(item)"></span>
+                                            <span v-if="activeName == 1" class="deleteIcon" :title="'删除'" @click="deleteItem(item)"></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -183,6 +193,145 @@
                     <button class="editBtnC" @click="editfukuanCancel">取消</button>
                 </div>
             </el-dialog>
+            <el-dialog title="标签信息预览" :visible.sync="isbiaoqianshow" @close="biaoqianCLose">
+                <div class="editBody">
+                    <p style="font-weight:bold">{{projectName}}项目物资清单标签</p>
+                    <ul style="padding:0 20px">
+                        <li class="item-label clearfix">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(biaoqianInfo.pkId, 7)" alt="二维码">
+                            <div class="right">
+                                <p class="item-list clearfix">
+                                    <span class="text-left">二维码URL：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mUrl"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单ID：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.pkId"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">订单名称：</span>
+                                    <span class="text-right" v-text="selectObject.orderTitle"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">生成方式：</span>
+                                    <span class="text-right" v-text="'【'+biaoqianInfo.mGSource_+'】'"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">源自业务：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mBSource_"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建用户：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.creator"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建时间：</span>
+                                    <span class="text-right" >{{new Date(biaoqianInfo.createTime).toLocaleString()}}</span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">构件数量：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.manifestDetailCount"></span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="labelListConfirm">网页预览</button>
+                    <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="全部清单标签预览" :visible.sync="isshowallbiaoqian" @close="isshowallbiaoqian = false">
+                <div class="editBody">
+                    <p style="font-weight:bold">{{projectName}}项目物资清单标签</p>
+                    <ul style="padding:0 20px;height:300px;overflow-y:scroll">
+                        <li class="item-label clearfix" v-for="(item,index) in allBiaoqianData" :key="index">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.pkId, 7)" alt="二维码">
+                            <div class="right">
+                                <p class="item-list clearfix">
+                                    <span class="text-left">二维码URL：</span>
+                                    <span class="text-right" v-text="item.mUrl"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单ID：</span>
+                                    <span class="text-right" v-text="item.pkId"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">订单名称：</span>
+                                    <span class="text-right" v-text="selectObject.orderTitle"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">生成方式：</span>
+                                    <span class="text-right" v-text="'【'+item.mGSource_+'】'"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">源自业务：</span>
+                                    <span class="text-right" v-text="item.mBSource_"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建用户：</span>
+                                    <span class="text-right" v-text="item.creator"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建时间：</span>
+                                    <span class="text-right" >{{new Date(item.createTime).toLocaleString()}}</span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">构件数量：</span>
+                                    <span class="text-right" v-text="item.manifestDetailCount"></span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <el-pagination background  layout="prev, pager, next" :current-page.sync="pageLabelList.currentPage"
+                     @current-change="findManifestDetailList(1)" 
+                     @prev-click="findManifestDetailList(1)"
+                     @next-click="findManifestDetailList(1)"
+                    :total="pageLabelList.total">
+                </el-pagination>
+                <div slot="footer" class="dialog-footer">
+                </div>
+            </el-dialog>
+            <el-dialog title="新建订货单" :visible.sync="addNewListShow" :before-close="listClose">
+                <div class="editBody">
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>订单名称 :</label>
+                        <input class="inp" placeholder="请输入" v-model="newListName"/>
+                    </div>
+                    <div class="editBodytwo editBodyone edit-item clearfix"><label class="editInpText">供货方 :</label>
+                        <select class="editSelect" v-model="suppyModel" >
+                            <option value="595">默认群组</option>
+                            <option value="596">质量验收</option>
+                            <option value="597">质量检查</option>
+                            <option value="598">安全验收</option>
+                            <option value="599">安全检查</option>
+                            <option value="560">供货商</option>
+                            <option value="561">施工单位</option>
+                            <option value="562">设计单位</option>
+                            <option value="563">建设单位</option>
+                            <option value="563">测试群组</option>
+                        </select>
+                        <i class="icon-sanjiao"></i>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addListSure">新建</button>
+                    <button class="editBtnC" @click="listClose">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="更改订货单名称" :visible.sync="editListTitle" :before-close="editListTitleCancel">
+                <div class="editBody">
+                    <div class="editBodytwo edit-item clearfix">
+                        <label class="editInpText"><i class="redDot"></i>订单名称 :</label>
+                        <input class="inp" placeholder="请输入" v-model="editTitle"/>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editListTitleSure">更改</button>
+                    <button class="editBtnC" @click="editListTitleCancel">取消</button>
+                </div>
+            </el-dialog>
         </div>
         <div id="inital">
             <el-dialog  :visible.sync="deleteDialog" width="398px">
@@ -197,6 +346,17 @@
                 </div>
             </el-dialog>
         </div>
+        <form style="visibility:hidden" action="http://10.252.26.240:8080/qjbim-project/project/order/QDQrCodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
+            <input type="text" name="projectName" :value="projectName">
+            <input type="text" name="manifestUrl" :value="biaoqianInfo.mUrl">
+            <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
+            <input type="text" name="orderTitle" :value="selectObject.orderTitle">
+            <input type="text" name="mGSource" :value="biaoqianInfo.mGSource_">
+            <input type="text" name="mBSource" :value="biaoqianInfo.mBSource_">
+            <input type="text" name="creator" :value="biaoqianInfo.creator">
+            <input type="text" name="createTime" :value="new Date(biaoqianInfo.createTime).toLocaleString()">
+            <input type="text" name="detailCount" :value="biaoqianInfo.manifestDetailCount">
+        </form>
     </div>
 </template>
 <script>
@@ -205,7 +365,7 @@ export default {
     name:'DinghuoManage',
     data(){
         return{
-            activeName:'first',
+            activeName:'0',
             BDMSUrl:'',
             token:'',
             projId:'',
@@ -213,7 +373,6 @@ export default {
             selectUser:'',
             planData:[],
             noPlanData:[],
-            itemTitle:'',
             showDetail:true,
             orderDeatilData:[],
             orderInfoData:[],
@@ -228,17 +387,124 @@ export default {
             },
             deleteDialog:false,
             deleteObjItem:{},
+            isbiaoqianshow:false,
+            biaoqianInfo:{},
+            shebeiObj:{},
+            projectName:'',
+            isshowallbiaoqian:false,
+            allBiaoqianData:[],
+            pageLabelList:{
+                pagePerNum:10,//一页几份数据
+                currentPage:1,//初始查询页数 第一页
+                total:0,//所有数据
+            },
+            addNewListShow:false,
+            newListName:'',
+            suppyModel:'595',
+            editListTitle:false,
+            editTitle:'',
+            editTitleObj:{},
         }
     },
     created(){
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl;
+        this.projectName = localStorage.getItem('projectName');
         this.getUserGroup();
     },
     methods:{
         handleClick(){
 
+        },
+        //新建订单
+        newListBtn(){
+            this.addNewListShow = true;
+        },
+        addListSure(){
+            this.addNewListShow = false;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/order/add',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    orderTitle:this.newListName,
+                    orderUgId:this.suppyModel,
+                    supplyUgId:this.suppyModel
+
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getNoPlanList(this.selectUser);
+                    this.newListName = '';
+                    this.suppyModel = '';
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        listClose(){
+            this.addNewListShow = false;
+        },  
+        //删除订单
+        removeOrder(item){
+            this.$confirm('确定要删除此订单？', '请确认', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/order/removeOrder',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projId:this.projId,
+                        orderId:item.id,
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getNoPlanList(this.selectUser);
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            })
+            
+        },
+        //编辑订单
+        editOrder(item){
+            this.editTitleObj = item;
+            this.editListTitle = true;
+            this.editTitle = item.orderTitle
+        },
+        editListTitleSure(){
+            this.editListTitle = false;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/order/updateOrderTitle',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    orderId:this.editTitleObj.id,
+                    orderTitle:this.editTitle
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getNoPlanList(this.selectUser);
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        editListTitleCancel(){
+            this.editListTitle = false;
         },
         //获取群组
         getUserGroup(){
@@ -287,7 +553,7 @@ export default {
                 }
             })
         },
-        //无计划列表
+        //
         getNoPlanList(ugId){
             axios({
                 method:'get',
@@ -313,7 +579,6 @@ export default {
         selectItem(item){
             this.selectObject = item;
             this.showDetail = false;
-            this.itemTitle = item.orderTitle;
             this.getOrderDetail(item.id);
             this.getOrderPaymentItem(item.id);
             this.getOrderInfo(item.id)
@@ -352,11 +617,13 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.orderDeatilData = response.data.rt.rows;
-                        this.orderDeatilData.forEach((item)=>{
-                            Object.assign(item,{
-                                updateDateTime_:new Date(item.updateDateTime).toLocaleString()
+                        if(this.orderDeatilData !=null){
+                            this.orderDeatilData.forEach((item)=>{
+                                Object.assign(item,{
+                                    updateDateTime_:new Date(item.updateDateTime).toLocaleString()
+                                })
                             })
-                        })
+                        } 
                     }
                 }else{
                     alert(response.data.msg);
@@ -424,7 +691,82 @@ export default {
         },
         //标签
         tips(item){
-
+            this.isbiaoqianshow = true;
+            this.shebeiObj = item;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/order/getManifestInfoByBId',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    bId:item.id,
+                    rType:5,
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    if(response.data.cd !=null){
+                        this.biaoqianInfo = response.data.rt;
+                        Object.assign(this.biaoqianInfo,{
+                            mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
+                            mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
+                        })
+                    }
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        addZero(num,size){
+            var len = ('' + num).length;
+            return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
+        },
+        //网页预览
+        labelListConfirm(){
+            this.$refs.manifestQrCodeSingleForm.submit();
+        },
+        parseMBSource(mBSource) {
+            switch (mBSource) {
+                case 1:
+                    return "文档管理-关联构件";
+                case 2:
+                    return "进度计划-任务核实";
+                case 3:
+                    return "成本管理-工程量";
+                case 4:
+                    return "成本管理-物料量";
+                case 5:
+                    return "物资采购-订货管理";
+                case 6:
+                    return "讨论主题";
+                case 7:
+                    return "成本管理-报表快照";
+                default:
+                    return "";
+            }
+        },
+        parseMGSource(mGSource) {
+            switch (mGSource) {
+                case 1:
+                    return "选择集";
+                case 2:
+                    return "报表快照";
+                case 3:
+                    return "构件量生成";
+                case 4:
+                    return "外部导入";
+                case 5:
+                    return "构件量生成";
+                default:
+                    return "";
+            }
+        },
+        //打印当前标签页
+        printLabelList(){
+            alert('已向打印机发送请求！');
+        },
+        biaoqianCLose(){
+            this.isbiaoqianshow = false;
         },
         //删除设备清单
         deleteItem(item){
@@ -453,6 +795,41 @@ export default {
             })
 
         },
+        //查看全部标签
+        viewAllDetail(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/order/listOrderDetailByOrderId',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    pageNo:this.pageLabelList.currentPage,
+                    pageSize:this.pageLabelList.pagePerNum,
+                    orderId:this.selectObject.id
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.isshowallbiaoqian = true;
+                    if(response.data.rt != null){
+                        this.allBiaoqianData = response.data.rt.rows;
+                        this.allBiaoqianData.forEach(item=>{
+                            Object.assign(item,{
+                                mBSource_:this.parseMBSource(item.mBSource),
+                                mGSource_:this.parseMGSource(item.mGSource)
+                            })
+                        })
+                        this.pageLabelList.total = response.data.rt.pager.totalSize;
+                    }
+                    
+                }else{
+                    alert(response.data.msg);
+                }
+            })
+        },
+        findManifestDetailList(){
+
+        }
 
     }
 }
@@ -553,6 +930,22 @@ export default {
                     display: inline-block;
                     margin-left: 87px;
                 }
+                .noplanEdit{
+                    display: inline-block;
+                    width: 17px;
+                    height: 16px;
+                    background: url('./images/1-2.png')no-repeat 0 0;
+                    cursor: pointer;
+                    margin-right: 12px;
+                }
+                .noplanDelete{
+                    display: inline-block;
+                    width: 17px;
+                    height: 16px;
+                    margin-right: 10px;
+                    background: url('./images/delete1.png')no-repeat 0 0;
+                    cursor: pointer;
+                }
                 .lefttitlespanone{
                     margin-left: 40px;
                 }
@@ -577,12 +970,26 @@ export default {
                 font-size: 16px;
                 font-weight: bold;
             }
+            .newList{
+                height: 26px;
+                width: 77px;
+                border: none;
+                float: right;
+                margin-top: 9px;
+                margin-right: 20px;
+                background: #fc3439;
+                color: #fff;
+                cursor: pointer;
+                font-size: 14px;
+                font-family: 'Microsoft YaHei';
+            }
             .jindu{
                 border-bottom: 1px solid #e6e6e6;
-                margin: 0 30px 0 20px;
+                margin: 0 20px;
                 text-align: left;
                 height: 44px;
                 line-height: 44px;
+                overflow: hidden;
             }
             .titleimg{
             width: 15px;
@@ -612,9 +1019,19 @@ export default {
                 font-size: 16px;
                 font-weight: bold;
             }
+            .alllist{
+                width: 77px;
+                height: 26px;
+                border: none;
+                background: #f5f5f5;
+                color: #666;
+                float: right;
+                cursor: pointer;
+                margin-top: 9px;
+            }
         }
         .borderbottom{
-            margin: 10px 30px 30px 20px;
+            margin: 10px 20px 30px 20px;
         }
         .editIcon{
             float: left;
@@ -681,6 +1098,69 @@ export default {
             }
         }
     }
+    .clearfix{
+        clear: both;
+        overflow: hidden;
+        content: '';
+    }
+    .img_left {
+        float: left;
+        width: 90px;
+        height: 90px;
+        margin: 40px 30px 0 10px;
+    }
+    .right {
+      float: left;
+      width: 400px;
+      margin-top: 20px;
+      .item-list {
+        margin-bottom: 14px;
+        .text-left {
+          float: left;
+          font-size: 12px;
+          line-height: 12px;
+          width: 80px;
+          color: #999;
+          text-align: left;
+        }
+
+        .text-right {
+          float: left;
+          width: 300px;
+          font-size: 12px;
+          line-height: 12px;
+          color: #333333;
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        &:last-of-type {
+          margin-bottom: 20px;
+        }
+      }
+    }
+    .editSelect{
+        width: 447px;
+        height:38px;
+        padding-left: 10px;
+    }
+    .editBodyone{
+        position: relative;
+        .icon-sanjiao{
+            display: block;
+            position: absolute;
+            width: 12px;
+            height: 7px;
+            // background-image:url('./images/sanjiao.png');
+            background-size: 100% 100%;
+            content: '';
+            top: 18px;
+            left: 590px;
+        }
+    }
+    
 }
 </style>
 

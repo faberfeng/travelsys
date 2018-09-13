@@ -242,6 +242,8 @@ export default {
                     })
                 }else{
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
+                    localStorage.setItem('projectName',vm.header.projectName);
+                    
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
                     this.$store.commit('changeProjectLogo',{
                         projectImg:vm.header.projectImg
