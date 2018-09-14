@@ -1,6 +1,6 @@
 
 <template>
-    <div id="wuliao">
+    <div id="dinghuo">
         <div class="topHeader">
             <div class="purchaseNav">
                 <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
@@ -20,7 +20,7 @@
                 </router-link>
             </div>
             <div class="elselect">
-                <el-select v-model="selectUser" placeholder="请选择">
+                <el-select v-model="selectUser" placeholder="请选择" @change="groupChange">
                     <el-option
                     v-for="(item,index) in userGroup"
                     :key="index"
@@ -40,7 +40,7 @@
                                         <label class="lefttitlelab">订单号</label>
                                         <span class="lefttitlespan">订单名称</span>
                                     </li>
-                                    <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
+                                    <li :class="[index == selectIndexone?'selectActive':'','lefttitlecontent']" v-for="(item,index) in planData" :key="index" @click="selectItem(item,index,false)">
                                         <label class="lefttitlelab">{{item.orderCode}}</label>
                                         <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
                                     </li>
@@ -54,10 +54,10 @@
                                         <label class="lefttitlelab">订单号</label>
                                         <span class="lefttitlespan">订单名称</span>
                                     </li>
-                                    <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
+                                    <li  :class="[index == selectIndextwo?'selectActive':'','lefttitlecontent']" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item,index,true)">
                                         <label class="lefttitlelab">{{item.orderCode}}</label>
                                         <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
-                                        <span style="float:right">
+                                        <span class="showIcon">
                                             <i  @click="editOrder(item)" class="noplanEdit"></i>
                                             <i @click="removeOrder(item)" class="noplanDelete"></i>
                                         </span>
@@ -169,8 +169,8 @@
                                         <td v-text="item.updateDateTime_"></td>
                                         <td v-text="item.updateUserName"></td>
                                         <td>
-                                            <span class="biaoqianIcon " :title="'标签'" @click="tips(item)"></span>
-                                            <span class="editdetail" :title="'编辑明细'" @click="viewDeatil(index)"></span>
+                                            <span class="biaoqianIcon" :title="'标签'" @click="tips(item)"></span>
+                                            <span class="editdetail" :title="'明细'" @click="viewDeatil(index)"></span>
                                             <span v-if="activeName == 1" class="deleteIcon" :title="'删除'" @click="deleteItem(item)"></span>
                                         </td>
                                     </tr>
@@ -368,6 +368,8 @@ export default {
             activeName:'0',
             BDMSUrl:'',
             token:'',
+            selectIndexone:'-1',
+            selectIndextwo:'-1',
             projId:'',
             userGroup:[],
             selectUser:'',
@@ -415,7 +417,14 @@ export default {
     },
     methods:{
         handleClick(){
-
+            this.selectIndexone = '-1';
+            this.selectIndextwo = '-1';
+            this.showDetail = true;
+        },
+        groupChange(){
+            this.getPlanList(this.selectUser);
+            this.getNoPlanList(this.selectUser);
+            this.showDetail = true;
         },
         //新建订单
         newListBtn(){
@@ -546,7 +555,11 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
-                        this.planData = response.data.rt.rows;
+                        if(response.data.rt.rows !=null){
+                            this.planData = response.data.rt.rows;
+                        }else{
+                            this.planData = [];
+                        }
                     }
                 }else{
                     alert(response.data.msg)
@@ -569,14 +582,23 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
-                        this.noPlanData = response.data.rt.rows;
+                        if(response.data.rt.rows!=null){
+                            this.noPlanData = response.data.rt.rows;
+                        }else{
+                            this.noPlanData = [];
+                        }
                     }
                 }else{
                     alert(response.data.msg)
                 }
             })
         },
-        selectItem(item){
+        selectItem(item,index,flag){
+            if(flag){
+                this.selectIndextwo = index;
+            }else{
+                this.selectIndexone = index;
+            }
             this.selectObject = item;
             this.showDetail = false;
             this.getOrderDetail(item.id);
@@ -725,6 +747,13 @@ export default {
         labelListConfirm(){
             this.$refs.manifestQrCodeSingleForm.submit();
         },
+        //打印当前标签页
+        printLabelList(){
+            alert('已向打印机发送请求！');
+        },
+        biaoqianCLose(){
+            this.isbiaoqianshow = false;
+        },
         parseMBSource(mBSource) {
             switch (mBSource) {
                 case 1:
@@ -760,13 +789,6 @@ export default {
                 default:
                     return "";
             }
-        },
-        //打印当前标签页
-        printLabelList(){
-            alert('已向打印机发送请求！');
-        },
-        biaoqianCLose(){
-            this.isbiaoqianshow = false;
         },
         //删除设备清单
         deleteItem(item){
@@ -835,7 +857,7 @@ export default {
 }
 </script>
 <style lang="less">
-#wuliao{
+#dinghuo{
     ::-webkit-scrollbar{width:0px}//隐藏滚动条
     .topHeader{
         box-sizing: border-box;
@@ -887,7 +909,7 @@ export default {
             border: 1px solid #e6e6e6;
             margin: 10px 10px 10px 20px;
             display: flex;
-            height: calc(100vh - 165px);
+            min-height: calc(100vh - 165px);
             .el-tabs__nav{
                 height: 40px;
                 line-height: 40px;
@@ -922,6 +944,17 @@ export default {
                     border-bottom: 1px solid #e6e6e6;
                     cursor: pointer;
                 }
+                .showIcon{
+                    float: right;
+                    visibility: hidden;
+                }
+                .selectActive{
+                    color: #333;
+                    font-weight: bold;
+                }
+                .lefttitlecontent:hover .showIcon{
+                    visibility: visible;
+                }
                 .lefttitlelab{
                     display: inline-block;
                     margin-left: 20px;
@@ -954,11 +987,11 @@ export default {
         .pbodyright{
             flex: 1;
             overflow: scroll;
-            .scrolldiv{
-                overflow-y:scroll;
-                height: calc(100vh - 226px); 
-                // margin-bottom: 20px;
-            }
+            // .scrolldiv{
+            //     overflow-y:scroll;
+            //     height: calc(100vh - 226px); 
+            //     // margin-bottom: 20px;
+            // }
             .pbodyrighttitle{
                 height: 39px;
                 margin: 0;
