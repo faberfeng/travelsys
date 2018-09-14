@@ -25,6 +25,7 @@ export default {
         var vm = this;
         const token = localStorage.getItem('token') 
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        this.createCookie("BITRIX_SM_LOGIN",13564978306)
         var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
         if(defaultSubProjId != 'undefined'){
             localStorage.removeItem('defaultSubProjId')
@@ -40,7 +41,9 @@ export default {
         Login(){
             this.login.Password = md5(this.login.Password);
             var formData = new FormData();
-            formData.append('account',13564978306);
+            var str=this.readCookie("BITRIX_SM_LOGIN");
+            console.log(str);
+            formData.append('account',str);
             formData.append('isRemember',this.isAuto);
             formData.append('password',this.login.Password);
             axios({
@@ -70,6 +73,27 @@ export default {
                 }
             })
         },
+       
+        createCookie(name,value,days) {
+                    if (days) {
+                        var date = new Date();
+                        date.setTime(date.getTime()+(days*24*60*60*1000));
+                        var expires = "; expires="+date.toGMTString();
+                    }
+                    else var expires = "";
+                    document.cookie = name+"="+value+expires+"; path=/";
+                },
+        
+        readCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
     }
 }
 </script>
