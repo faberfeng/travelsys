@@ -33,28 +33,28 @@
             <div class="pbody">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane :label="'已签收'" name="first">
+                        <el-tab-pane :label="'已签收'+planData.length" name="first">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
                                         <label class="lefttitlelab">订单号</label>
                                         <span class="lefttitlespan">订单名称</span>
                                     </li>
-                                    <li class="lefttitlecontent" v-for="(item,index) in planData" :key="index" @click="selectItem(item)">
+                                    <li :class="[selectIndexone == index ?'selectActive':'','lefttitlecontent']" v-for="(item,index) in planData" :key="index" @click="selectItem(item,index,false)">
                                         <label class="lefttitlelab">{{item.orderCode}}</label>
                                         <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
                                     </li>
                                 </ul>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="未签收" name="second">
+                        <el-tab-pane :label="'未签收'+noPlanData.length" name="second">
                             <div class="leftcontent">
                                 <ul class="leftcontentul">
                                     <li class="lefttitle">
                                         <label class="lefttitlelab">订单号</label>
                                         <span class="lefttitlespan">订单名称</span>
                                     </li>
-                                    <li class="lefttitlecontent" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item)">
+                                    <li :class="[selectIndextwo == index ?'selectActive':'','lefttitlecontent']" v-for="(item,index) in noPlanData" :key="index" @click="selectItem(item,index,true)">
                                         <label class="lefttitlelab">{{item.orderCode}}</label>
                                         <span class="lefttitlespan lefttitlespanone">{{item.orderTitle}}</span>
                                     </li>
@@ -204,6 +204,8 @@ export default {
             orderInfoData:[],
             orderInfo:{},
             huoweiselect:'',
+            selectIndexone:'-1',
+            selectIndextwo:'-1',
 
         }
     },
@@ -215,7 +217,8 @@ export default {
     },
     methods:{
         handleClick(){
-
+            this.selectIndexone = '-1';
+            this.selectIndextwo = '-1';
         },
         //获取群组
         getUserGroup(){
@@ -257,7 +260,12 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
-                        this.planData = response.data.rt.rows;
+                        if(response.data.rt.rows!=null){
+                            this.planData = response.data.rt.rows;
+                        }else{
+                            this.planData = [];
+                        }
+                        
                     }
                 }else{
                     alert(response.data.msg)
@@ -280,14 +288,24 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
-                        this.noPlanData = response.data.rt.rows;
+                        if(response.data.rt.rows!=null){
+                            this.noPlanData = response.data.rt.rows;
+                        }else{
+                            this.noPlanData = [];
+                        }
+                        
                     }
                 }else{
                     alert(response.data.msg)
                 }
             })
         },
-        selectItem(item){
+        selectItem(item,index,flag){
+            if(flag){
+                this.selectIndextwo = index;
+            }else{
+                this.selectIndexone = index;
+            }
             console.log(item)
             this.showDetail = false;
             this.itemTitle = item.orderTitle;
@@ -371,273 +389,260 @@ export default {
 #wuliao{
     ::-webkit-scrollbar{width:0px}
     .topHeader{
-    box-sizing: border-box;
-    float: left;
-    width: 100%;
-    overflow: auto;
-    max-height: 800px;
-    .purchaseNav{
-        height: 49px;
-        padding-top: 16px;
-        padding-left: 20px;
-        background: #fafbfc;
         box-sizing: border-box;
-        border-bottom: 1px solid #e6e6e6;
-    }
-    .elselect{
-        overflow: hidden;
-        margin-top:10px;
-        margin-right: 50px;
-        height: 40px;
-        line-height: 40px;
-        .el-select{
-            float: right;
-            margin-left: 10px;
-        }
-        .elselecttitle{
-            float: right;
-        }
-    }
-    .navItem{
-        height: 34px;
-        width: 106px;
         float: left;
-        line-height: 30px;
-        font-size: 14px;
-        text-decoration: none;
-        color: #999;
-    }
-    .navactive{
-        background: #fff;
-        color: #fc3439;
-        font-weight: bold;
-        border-left: 1px solid #e6e6e6;
-        border-right: 1px solid #e6e6e6;
-        border-top: 3px solid #fc3439;
-        box-sizing: border-box;
-    }
-    .pbody{
-        border: 1px solid #e6e6e6;
-        margin: 10px 10px 10px 20px;
-        display: flex;
-        height: calc(100vh - 165px);
-        .el-tabs__nav{
+        width: 100%;
+        overflow: auto;
+        max-height: 800px;
+        .purchaseNav{
+            height: 49px;
+            padding-top: 16px;
+            padding-left: 20px;
+            background: #fafbfc;
+            box-sizing: border-box;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        .elselect{
+            overflow: hidden;
+            margin-top:10px;
+            margin-right: 50px;
             height: 40px;
             line-height: 40px;
-        }
-    }
-    .pbodyleft{
-        width: 405px;
-        height: 100%;
-        border-right: 1px solid #e6e6e6;
-        .el-tabs__content{
-            margin-top: 10px;
-            border-top: 1px solid #e6e6e6;
-        }
-        .leftcontent{
-            .leftcontentul{
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                color: #666;
-                font-size: 12px;
+            .el-select{
+                float: right;
+                margin-left: 10px;
             }
-            .lefttitle{
-                background: #f2f2f2;
-                height: 37px;
-                line-height: 37px;
-                text-align: left;
-            }
-            .lefttitlecontent{
-                height: 37px;
-                line-height: 37px;
-                text-align: left;
-                border-bottom: 1px solid #e6e6e6;
-                cursor: pointer;
-            }
-            .lefttitlelab{
-                display: inline-block;
-                margin-left: 20px;
-            }
-            .lefttitlespan{
-                display: inline-block;
-                margin-left: 87px;
-            }
-            .lefttitlespanone{
-                margin-left: 40px;
+            .elselecttitle{
+                float: right;
             }
         }
-    }
-    .pbodyright{
-        flex: 1;
-        overflow: scroll;
-        .scrolldiv{
-            overflow-y:scroll;
-            height: calc(100vh - 226px); 
-            // margin-bottom: 20px;
-        }
-        .pbodyrighttitle{
-            height: 39px;
-            margin: 0;
-            padding: 0;
-            border-bottom: 1px solid #e6e6e6;
-            text-align: left;
-            line-height: 39px;
-            color: #fc3439;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .jindu{
-            border-bottom: 1px solid #e6e6e6;
-            margin: 0 30px 0 20px;
-            text-align: left;
-            height: 44px;
-            line-height: 44px;
-        }
-        .titleimg{
-           width: 15px;
-           height:16px;
-           display: inline-block;
-           margin-right: 10px;
-           background: url('./images/jindu.png') ;
-           position: relative;
-           top: 2px;
-        }
-        .shebeiimg{
-            width: 14px;
-            height:16px;
-            display: inline-block;
-            margin-right: 10px;
-            background: url('./images/shebei.png') ;
-            position: relative;
-            top: 2px;
-        }
-        .titletext{
-            color: #fc3439;
-            font-size: 16px;
-            font-weight: bold;
-        }
-    }
-    .borderbottom1{
-        margin: 16px 30px 0px 20px;
-    }
-    .huowei{
-        display: flex;
-        margin-bottom: 30px;
-        .huoweileft{
-            width: 74px;
+        .navItem{
+            height: 34px;
+            width: 106px;
+            float: left;
+            line-height: 30px;
             font-size: 14px;
+            text-decoration: none;
             color: #999;
-            text-align: left;
         }
-        .huoweiright{   
-            flex: 1;
-            border: 1px solid #fc3439;
-            .huiweirighttitle{
-                height: 70px;
-                line-height: 70px;
-                margin: 0 20px;
-                text-align: left;
-                border-bottom: 1px solid #e6e6e6;
-                font-size: 14px;
-                color: #fc3439;
-
+        .navactive{
+            background: #fff;
+            color: #fc3439;
+            font-weight: bold;
+            border-left: 1px solid #e6e6e6;
+            border-right: 1px solid #e6e6e6;
+            border-top: 3px solid #fc3439;
+            box-sizing: border-box;
+        }
+        .pbody{
+            border: 1px solid #e6e6e6;
+            margin: 10px 10px 10px 20px;
+            display: flex;
+            min-height: calc(100vh - 165px);
+            .el-tabs__nav{
+                height: 40px;
+                line-height: 40px;
             }
-            .huiweirightimg{
-                list-style: none;
-                padding: 0;
-                margin: 20px 0 20px 0px;
-                overflow: hidden;
-                li{
-                    width: 150px;
-                    height: 108px;
-                    float: left;
+        }
+        .pbodyleft{
+            width: 405px;
+            height: 100%;
+            border-right: 1px solid #e6e6e6;
+            .el-tabs__content{
+                margin-top: 10px;
+                border-top: 1px solid #e6e6e6;
+            }
+            .leftcontent{
+                .leftcontentul{
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    color: #666;
+                    font-size: 12px;
+                }
+                .lefttitle{
+                    background: #f2f2f2;
+                    height: 37px;
+                    line-height: 37px;
+                    text-align: left;
+                }
+                .lefttitlecontent{
+                    height: 37px;
+                    line-height: 37px;
+                    text-align: left;
+                    border-bottom: 1px solid #e6e6e6;
+                    cursor: pointer;
+                }
+                .selectActive{
+                    color: #333;
+                    font-weight: bold;
+                }
+                .lefttitlelab{
+                    display: inline-block;
                     margin-left: 20px;
-                    border: 1px solid #e6e6e6;
+                }
+                .lefttitlespan{
+                    display: inline-block;
+                    margin-left: 87px;
+                }
+                .lefttitlespanone{
+                    margin-left: 40px;
                 }
             }
         }
-    }
-    .tableinfo{
-        height: 32px;
-        border-bottom: 1px solid #e6e6e6;
-        border-left: 1px solid #e6e6e6;
-        border-right: 1px solid #e6e6e6;
-        text-align: left;
-        line-height: 32px;
-        font-size: 12px;
-        .checkqz{
-            margin-left: 10px;
-            color: #999;
-        }
-        .checkpeo{
-            margin-left: 61px;
-            color: #999;
-        }
-        .checktime{
-            margin-left: 61px;
-            color: #999;
-        }
-        .checktext{
-            color: #333;
-        }
-    }
-    .borderbottom{
-        margin: 10px 30px 30px 20px;
-    }
-    .quanxuan{
-        text-align:left;
-        margin: 0 0 13px 0;
-        line-height: 12px;
-        overflow: hidden;
-        .el-checkbox__label{
-            font-size:12px;
-            color: #999;
-        }
-        .btn{
-            border: none;
-            width: 75px;
-            height: 28px;
-            background: #f2f2f2;
-            font-size: 12px;
-            color: #666;
-            float: right;
-            cursor: pointer;
-        }
-    }
-    .huoweixuanz{
-        .huoweilabel{
-            color: #999;
-            font-size: 14px;
-            line-height: 14px;
-        }
-    }
-    .editIcon{
-        float: left;
-        width: 17px;
-        height: 16px;
-        background: url('./images/viewdetail.png')no-repeat 0 0;
-        cursor: pointer;
-        margin-right: 20px;
-    }
-    .UserList{
-        border-collapse: collapse;
-        border: 1px solid #e6e6e6;
-        thead {
-            background: #f2f2f2;
-            th {
-            padding-left: 10px;
-            height: 36px;
-            text-align: left;
-            box-sizing: border-box;
-            border-right: 1px solid #e6e6e6;
-            font-size: 12px;
-            color: #333333;
+        .pbodyright{
+            flex: 1;
+            overflow: scroll;
+            .pbodyrighttitle{
+                height: 39px;
+                margin: 0;
+                padding: 0;
+                border-bottom: 1px solid #e6e6e6;
+                text-align: left;
+                line-height: 39px;
+                color: #fc3439;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .jindu{
+                border-bottom: 1px solid #e6e6e6;
+                margin: 0 30px 0 20px;
+                text-align: left;
+                height: 44px;
+                line-height: 44px;
+            }
+            .titleimg{
+            width: 15px;
+            height:16px;
+            display: inline-block;
+            margin-right: 10px;
+            background: url('./images/jindu.png') ;
+            position: relative;
+            top: 2px;
+            }
+            .shebeiimg{
+                width: 14px;
+                height:16px;
+                display: inline-block;
+                margin-right: 10px;
+                background: url('./images/shebei.png') ;
+                position: relative;
+                top: 2px;
+            }
+            .titletext{
+                color: #fc3439;
+                font-size: 16px;
+                font-weight: bold;
             }
         }
-        tbody {
-            tr {
-            td {
+        .borderbottom1{
+            margin: 16px 30px 0px 20px;
+        }
+        .huowei{
+            display: flex;
+            margin-bottom: 30px;
+            .huoweileft{
+                width: 74px;
+                font-size: 14px;
+                color: #999;
+                text-align: left;
+            }
+            .huoweiright{   
+                flex: 1;
+                border: 1px solid #fc3439;
+                .huiweirighttitle{
+                    height: 70px;
+                    line-height: 70px;
+                    margin: 0 20px;
+                    text-align: left;
+                    border-bottom: 1px solid #e6e6e6;
+                    font-size: 14px;
+                    color: #fc3439;
+
+                }
+                .huiweirightimg{
+                    list-style: none;
+                    padding: 0;
+                    margin: 20px 0 20px 0px;
+                    overflow: hidden;
+                    li{
+                        width: 150px;
+                        height: 108px;
+                        float: left;
+                        margin-left: 20px;
+                        border: 1px solid #e6e6e6;
+                    }
+                }
+            }
+        }
+        .tableinfo{
+            height: 32px;
+            border-bottom: 1px solid #e6e6e6;
+            border-left: 1px solid #e6e6e6;
+            border-right: 1px solid #e6e6e6;
+            text-align: left;
+            line-height: 32px;
+            font-size: 12px;
+            .checkqz{
+                margin-left: 10px;
+                color: #999;
+            }
+            .checkpeo{
+                margin-left: 61px;
+                color: #999;
+            }
+            .checktime{
+                margin-left: 61px;
+                color: #999;
+            }
+            .checktext{
+                color: #333;
+            }
+        }
+        .borderbottom{
+            margin: 10px 30px 30px 20px;
+        }
+        .quanxuan{
+            text-align:left;
+            margin: 0 0 13px 0;
+            line-height: 12px;
+            overflow: hidden;
+            .el-checkbox__label{
+                font-size:12px;
+                color: #999;
+            }
+            .btn{
+                border: none;
+                width: 75px;
+                height: 28px;
+                background: #f2f2f2;
+                font-size: 12px;
+                color: #666;
+                float: right;
+                cursor: pointer;
+            }
+        }
+        .huoweixuanz{
+            .huoweilabel{
+                color: #999;
+                font-size: 14px;
+                line-height: 14px;
+            }
+        }
+        .editIcon{
+            float: left;
+            width: 17px;
+            height: 16px;
+            background: url('./images/viewdetail.png')no-repeat 0 0;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+        .UserList{
+            border-collapse: collapse;
+            border: 1px solid #e6e6e6;
+            thead {
+                background: #f2f2f2;
+                th {
                 padding-left: 10px;
                 height: 36px;
                 text-align: left;
@@ -645,13 +650,25 @@ export default {
                 border-right: 1px solid #e6e6e6;
                 font-size: 12px;
                 color: #333333;
+                }
             }
-            &:hover {
-                background: #fafafa;
-            }
+            tbody {
+                tr {
+                td {
+                    padding-left: 10px;
+                    height: 36px;
+                    text-align: left;
+                    box-sizing: border-box;
+                    border-right: 1px solid #e6e6e6;
+                    font-size: 12px;
+                    color: #333333;
+                }
+                &:hover {
+                    background: #fafafa;
+                }
+                }
             }
         }
-    }
     }
 }
 </style>
