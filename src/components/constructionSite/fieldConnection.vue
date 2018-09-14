@@ -63,10 +63,10 @@
                             </div>
                             <div class="video_body">
                                  <div id="planeDIV" width="200px" height="310px" v-show="!isFullPicture">
-                                    <img width="100%" height="310px" ref="picture" src="../../assets/nosource.png" >
+                                    <img v-show="qjpicShow"  width="100%" height="310px" ref="picture" src="../../assets/nosource.png" >
                                 </div>
                                 <div  id="planeDIV1"  v-show="isFullPicture">
-                                    <img width="100%" height="310px" ref="fullPicture" src="../../assets/nosource.png" >
+                                    <img  width="100%" height="310px" ref="fullPicture" src="../../assets/nopic.jpg" >
                                     <ul>
                                         <li v-for="(item,index) in imgdetial1" :key="index">
                                             <span :class="['round']" @click="clickQjPic(item.index)"  :style="{'top':(20+item.y/2)+'px','left':(item.x/5)+'px'}">
@@ -95,7 +95,7 @@
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
                             <div class="video_body">
-                                <img width="100%" height="310px" src="../../assets/nosource.png" >
+                                <img  v-show="lineLiveImgShow" width="100%" height="310px" src="../../assets/nosource.png" >
                                 <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe>
                             </div>
                             <div class="video_bottom">
@@ -275,6 +275,7 @@ export default {
     name:'fieldConnection',
     data(){
         return{
+            lineLiveImgShow:true,
             mediaUrl:'',//媒体URL
             sendText:'',
             token:'',
@@ -335,6 +336,7 @@ export default {
             mouseToggle2:false,
             mouseToggle3:false,
             mouseToggle4:false,
+            qjpicShow:true,
         }
     },
     filters:{
@@ -574,6 +576,7 @@ export default {
             }).then(response=>{
                 if(response.data.rt.length!=0){
                     this.mediaUrlList1=response.data.rt;
+                    this.lineLiveImgShow=false;
                     this.livePageTotal=this.mediaUrlList1.length;
                     this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
@@ -641,8 +644,9 @@ export default {
                 if(response.data.cd=='0'){
                     // this.getMediaInformation(this.type);
                     this.getMediaInformation1(this.type);
-                    this.getPanoramaMain();//获取全景图主图路径及点位信息
-                    this.getPanoramaPathList();//获取全景图真实路径集合
+                    
+                    // this.getPanoramaMain();//获取全景图主图路径及点位信息
+                    // this.getPanoramaPathList();//获取全景图真实路径集合
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -752,6 +756,9 @@ export default {
                     projectId:this.projId,
                     mediaType:this.type,
                     path:this.mediaUrl,
+                    ugId:'',
+                    fgId:'',
+                    name:''
                 }
             }).then(response=>{
                 if(response.data.cd=='0'){
@@ -900,6 +907,8 @@ export default {
                         this.PanoramaMainList=response.data.rt;
                         this.$refs.fullPicture.src=this.PanoramaMainList.path;
                         this.imgdetial1=this.PanoramaMainList.list;
+                        // this.qjpicShow=false;
+                        // this.qjpicShow=false;
                         }
                     else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -923,6 +932,7 @@ export default {
                     this.picturePageTotal=this.PanoramaPathList.length;
                     this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[0];
                     var source=this.QJFileManageSystemURL+this.PanoramaPathList[0];
+                    this.qjpicShow=false;
                     this.init(source);
                 }else if(response.data.cd == '-1'){
                         alert(response.data.msg)

@@ -59,6 +59,9 @@
                   <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
                   <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button>
                 </template>
+                <template slot="milepost" slot-scope="scope">
+                    {{scope.row.taskType==1?'是':'否'}}
+                </template>
                 <template slot="taskStart" slot-scope="scope">
                   {{scope.row.taskStart | timeChange()}}
                 </template>
@@ -371,7 +374,7 @@
       </div>
       <div class="el-dialog__footer">
         <div slot="footer" class="dialog-footer">
-          <button class="editBtnS">网页预览</button>
+          <button class="editBtnS" @click="labelListConfirm">网页预览</button>
           <button class="editBtnC">打印当前页标签</button>
         </div>
       </div>
@@ -1476,7 +1479,9 @@
           {
             label: '里程碑',
             prop: 'taskType',
-            width: '65px'
+            width: '65px',
+             type: 'template',
+            template: 'milepost',
           },
           {
             label: '计划开始',
@@ -1549,7 +1554,6 @@
             label: '操作',
             prop: 'operator',
             type: 'template',
-            show: true,
             template: 'action',
             width: '130px'
           }
@@ -2547,6 +2551,7 @@
           if (response.data.cd == "0") {
             this.entityRelationList = response.data.rt;
             this.relaList = this.entityRelationList.relaList;
+            console.log(this.relaList)
             //   console.log(JSON.stringify(this.relaList)+'bim');
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
@@ -2595,6 +2600,10 @@
           this.lastNodeName = '无';
         }
         //   this.getTaskUserGroupList();
+      },
+      //网页预览
+      labelListConfirm(){
+        window.open('/#/Cost/getManifestDetailInfoForPage/'+1944+'/'+0)
       },
       addTaskMakeSure() {
         this.loading=true;

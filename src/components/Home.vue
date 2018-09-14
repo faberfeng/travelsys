@@ -18,7 +18,7 @@
                                 <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress"></el-tab-pane>
-                                <el-tab-pane label="设计管理" name="designManager"></el-tab-pane>
+                                <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase"></el-tab-pane>
                                 <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction"></el-tab-pane>
@@ -182,7 +182,7 @@ export default {
              setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
                     app.postMessage({command:"Init",parameter:null},"*");
-            },100)
+            },0)
         },
         callback(e){
             switch(e.data.command){
@@ -347,6 +347,12 @@ export default {
                 //遍历判断
                 if(vm.$route.query.firstView == 'Y'){
                     if(vm.auth.homePage){
+                        // vm.$router.push({
+                        //     path:'/SchedulePlan/personalCalendar'//进度计划；
+                        // })
+                        // this.$router.push({
+                        //     path:'/home/projHome/'+this.projId
+                        // });
                     }else if(vm.auth.progress){
                         vm.$router.push({
                             path:'/SchedulePlan/personalCalendar'//进度计划；
