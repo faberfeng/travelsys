@@ -40,6 +40,10 @@
                                         <span class="item-upload" @click="newFile">新建</span>
                                 </div>
                                 <div class="left_content_body">
+                                    <div style="margin:200px auto" v-show="dataShow">
+                                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                                        <p style="font-size:16px;color:#ccc">暂无数据</p>
+                                    </div>
                                     <ul>
                                         <li v-for="(item,index) in rowsList" :key="index" :class="{'checkpoint':item.id==ischeck}" @click="checkItem(item.id)">
                                             <span :class="{'circle':item.id==ischeck}"></span>
@@ -62,6 +66,10 @@
                         <span>详细</span>
                     </div>
                     <div v-show="!ischeck&&newFileshow">请在左侧内选择联系单</div>
+                    <!-- <div style="margin:180px auto" v-show="dataShow">
+                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                        <p style="font-size:16px;color:#ccc">暂无数据</p>
+                    </div> -->
                     <div v-show="ischeck||!newFileshow" class="box_content">
                         <table>
                             <tbody>
@@ -104,7 +112,7 @@
                         <div class="files" >
                             <span class="text">附件:</span>
                             <span v-show="!(screenLeft.item>0)">
-                                <span class="icon-eye"  @click="viewSpot" >视点</span>
+                                <span class="icon-eye"  @click="viewSpot">视点</span>
                                 <span class="icon-file" @click="showUploadBox_file">文档</span>
                                 <span class="icon-message" @click="getAssociationList" >清单</span>
                                 <span class="icon-image" @click="showUploadBox_img" >图片</span>
@@ -439,6 +447,7 @@ export default {
     name:'fieldMessage',
     data(){
         return{
+            dataShow:true,//空数据
             contactIndexList:'',
             endFileMessage:false,
             allSelectUgId:'',
@@ -664,6 +673,7 @@ export default {
                 if(response.data.rt.rows!=null){
                     this.contactList=response.data.rt;
                     this.rowsList=response.data.rt.rows;
+                    this.dataShow=false;
                     this.rowsListLength=response.data.rt.rows.length;
                     console.log(this.contactList);
                 }else if(response.data.cd=='-1'){
@@ -1046,7 +1056,7 @@ export default {
             vm.uploadshow = true
         },
         viewSpot(){
-            vm.$message({
+            this.$message({
                 type:'success',
                 message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
             })
@@ -1356,6 +1366,16 @@ export default {
 }
 </script>
 <style lang="less">
+    select.inp-search {  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        }
     #edit .bindListHead .bindListHeadRight .el-input__inner {
             width: 130px;
             height: 36px;

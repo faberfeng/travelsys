@@ -48,12 +48,16 @@
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
                 <sendMes :showBox="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
+                 <!-- <div style="margin:200px auto" v-show="dataShow">
+                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                        <p style="font-size:16px;color:#ccc">暂无数据</p>
+                </div> -->
                 <div class="project" v-loading="loading">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
                                     <div class="projectListImg">
-                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/loginimg.png')">
+                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/people.png')">
                                     </div> 
                                     <div class="projectListText">
                                         <span class="action_rightBox">
@@ -229,6 +233,7 @@ export default {
   },
     data(){
         return{
+            dataShow:true,
             loading:true,
             token:'',
             projId:'',
@@ -462,8 +467,10 @@ export default {
             },
         }).then((response)=>{
             if(parseInt(response.data.cd) == 0){
+                this.dataShow=false;
                 vm.CommentList = response.data.rt.rows
                 vm.CommunicationList.forEach((item,key)=>{
+                    
                     if(key == index){
                         item.showFlowChart = false
                         if(reload){

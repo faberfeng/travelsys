@@ -1,5 +1,5 @@
 <template>
-    <div id="home_project">
+    <div id="home_project" v-loading="loading">
         <div class="projectInfo">
             <div class="lunbo-container">
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
@@ -77,6 +77,7 @@ import axios from 'axios';
 export default {
     data(){
         return{
+            loading:false,
             tabShow:1,
             token:'',
             QJFileManageSystemURL:'',
@@ -119,6 +120,7 @@ export default {
             }
         },
         getProjectInfo(){
+            this.loading=true;
             var vm = this
             axios({
                 method:'get',
@@ -134,6 +136,7 @@ export default {
                 }else{
                     this.allData = response.data.rt;
                 }
+                this.loading=false;
             })
         },
         //获取工程概况信息列表

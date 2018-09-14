@@ -8,7 +8,7 @@
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                      <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"></iframe> -->
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="url"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -49,6 +49,7 @@ export default {
     data(){
           window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
+            url:'http://bdms.arctron.cn/genDist/?new='+Math.random(),
             settingsCenter:true,//是否是两边铺满
             header:{
                  userName:'',
@@ -116,6 +117,7 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial(vm.projId);
         this.getInitdata();
+        // window.location.reload()
         
         // this.getInitdata();
     },
@@ -126,6 +128,7 @@ export default {
         }else{
            this.cHeight = document.body.clientHeight;
         }
+        // window.location.reload()
     },
     computed:{
         path(){
@@ -136,9 +139,11 @@ export default {
         webGlbtn(){
             this.webGlShow=!this.webGlShow
             // localStorage.setItem('webGlShow',this.webGlShow)
-            app = this.$refs.iframe1.contentWindow;
             // console.log(app);
-            app.postMessage({command:"Init",parameter:null},"*");
+            setTimeout(()=>{
+                    app = this.$refs.iframe1.contentWindow;
+                    app.postMessage({command:"Init",parameter:null},"*");
+            },100)
         },
         callback(e){
            // console.log(e)

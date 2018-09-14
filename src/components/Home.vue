@@ -7,7 +7,7 @@
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                     <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://bdms.arctron.cn/genDist/index.html"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="url"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -96,6 +96,7 @@ export default {
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
+            url:'http://bdms.arctron.cn/genDist/?new='+Math.random(),
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
             header:{
@@ -160,7 +161,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
-        
+        // this.getInitdata();
     },
     mounted(){
         var height = ''
@@ -178,8 +179,10 @@ export default {
     methods:{
         webGlbtn(){
             this.webGlShow=!this.webGlShow;
-            app = this.$refs.iframe1.contentWindow
-            app.postMessage({command:"Init",parameter:null},"*");
+             setTimeout(()=>{
+                    app = this.$refs.iframe1.contentWindow;
+                    app.postMessage({command:"Init",parameter:null},"*");
+            },100)
         },
         callback(e){
             switch(e.data.command){

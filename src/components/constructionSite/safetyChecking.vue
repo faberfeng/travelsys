@@ -1013,6 +1013,7 @@ export default {
                 url:this.BDMSUrl+'/project2/security/renameCheckPoint'
             }).then(response=>{
                 if(response.data.cd=='0'){
+                    // this.checkPointTdName='';
                     this.getCheckPointsByItemId();
                     this.getCheckPoints();
                 }else if(response.data.cd=='-1'){
@@ -1331,6 +1332,8 @@ export default {
     },
     newTabFile(){
         var name='';
+        // this.checkPointsList=[];
+        // this.getCheckPoints();
         this.checkPointsList.unshift({'name':name,'name1':1});
         console.log(this.checkPointsList);
         this.checkPointsList.forEach((item)=>{

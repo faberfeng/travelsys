@@ -2320,6 +2320,7 @@ export default {
             fileSearchInfo: '', //查询文件名称
             checkAll: false,
             isIndeterminate: false,
+            sharePathNo:'',
             fileList: [], //文件列表
             folderList: [], //文件夹列表
             screenLeft: {
@@ -2445,6 +2446,7 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        vm.shareUrl=vm.$store.state.shareUrl;
         this.WebGlUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
@@ -3019,8 +3021,15 @@ export default {
             },
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
-                vm.sharePath.path = response.data.rt.url
+                // vm.sharePath.path = response.data.rt.url
+                vm.sharePathNo=response.data.rt.shareNo
+                
                 vm.sharePath.password = response.data.rt.password?response.data.rt.password:''
+                if(vm.sharePath.password!=''){
+                    vm.sharePath.path=vm.shareUrl+'/cloud/sharePassword/'+vm.sharePathNo
+                }else {
+                    vm.sharePath.path=vm.shareUrl+'/cloud/share/'+vm.sharePathNo
+                }
             }
         }).catch((err)=>{
             console.log(err)

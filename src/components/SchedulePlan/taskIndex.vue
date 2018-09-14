@@ -403,76 +403,76 @@
     </div>
     <div id="mask" v-if="labelListShow||ListHeaderShow"></div>
     <div id="edit">
-      <el-dialog title="编辑工程任务" :visible.sync="addTaskDialog" @close="addTaskCancle">
-        <div class="editBody">
-          <div class="editBodyone">
-            <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
-          </div>
-          <div class="editBodytwo1">
-            <label class="text1">名称:</label>
-            <div><input class="input1" v-model="taskName" placeholder="请输入任务名称"></div>
-          </div>
-          <div class="editBodytwo1">
-            <div class="editBodytwoLeft">
-              <label class="text1">任务类型:</label>
-              <select v-model="taskType" class="selectGroup">
-                <option v-for="(item,index) in taskTypeList" :key="index" :value="item.value"
-                        v-text="item.label"></option>
-              </select>
+      <el-dialog title="编辑工程任务"  :visible.sync="addTaskDialog" @close="addTaskCancle">
+          <div class="editBody" v-loading="loading" >
+            <div class="editBodyone">
+              <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
             </div>
-            <div class="editBodytwoRight">
-              <label class="text1">任务组别:</label>
-              <select v-model="taskGroup" class="selectGroup">
-                <option value='0'>请选择</option>
-                <option v-for="(item,index) in tgList" :key="index" :value="item.id" v-text="item.tgName"></option>
-              </select>
+            <div class="editBodytwo1">
+              <label class="text1">名称:</label>
+              <div><input class="input1" v-model="taskName" placeholder="请输入任务名称"></div>
             </div>
-          </div>
-          <div class="editBodytwo1">
-            <div class="editBodytwoLeft">
-              <label class="text1">负责群组:</label>
-              <select v-model="taskUserGroup" @change="taskUserGroupChange" class="selectGroup">
-                <option value='0'>请选择负责群组</option>
-                <option v-for="(item,index) in ugList" :key="index" :value="item.ugId" v-text="item.ugName"></option>
-              </select>
-            </div>
-            <div class="editBodytwoRight">
-              <label class="text1">负责人:</label>
-              <select v-model="dutyUserId" class="selectGroup">
-                <option value="0">请选择</option>
-                <option v-for="(item,index) in userGroupUserList" :key="index" :value="item.userId"
-                        v-text="item.userName"></option>
-              </select>
-            </div>
-          </div>
-          <div class="editBodytwo1">
-            <div class="editBodytwoLeft">
-              <label class="text1">优先级:</label>
-              <select v-model="taskPriority" class="selectGroup">
-                <option v-for="(item,index) in taskPriorityList" :key="index" :value="item.value"
-                        v-text="item.label"></option>
-              </select>
-            </div>
-          </div>
-          <div class="editBodytwo1">
-              <div class="startTime">
-                  <label>计划开始:</label>
-                  <el-date-picker v-model="taskStart" type="date"
-                                  placeholder="选择日期">
-                  </el-date-picker>
+            <div class="editBodytwo1">
+              <div class="editBodytwoLeft">
+                <label class="text1">任务类型:</label>
+                <select v-model="taskType" class="selectGroup">
+                  <option v-for="(item,index) in taskTypeList" :key="index" :value="item.value"
+                          v-text="item.label"></option>
+                </select>
               </div>
-              <div class="endTime">
-                  <label>计划结束:</label>
-                  <el-date-picker v-model="taskEnd" type="date"
-                                  placeholder="选择日期">
-                  </el-date-picker>
+              <div class="editBodytwoRight">
+                <label class="text1">任务组别:</label>
+                <select v-model="taskGroup" class="selectGroup">
+                  <option value='0'>请选择</option>
+                  <option v-for="(item,index) in tgList" :key="index" :value="item.id" v-text="item.tgName"></option>
+                </select>
               </div>
+            </div>
+            <div class="editBodytwo1">
+              <div class="editBodytwoLeft">
+                <label class="text1">负责群组:</label>
+                <select v-model="taskUserGroup" @change="taskUserGroupChange" class="selectGroup">
+                  <option value='0'>请选择负责群组</option>
+                  <option v-for="(item,index) in ugList" :key="index" :value="item.ugId" v-text="item.ugName"></option>
+                </select>
+              </div>
+              <div class="editBodytwoRight">
+                <label class="text1">负责人:</label>
+                <select v-model="dutyUserId" class="selectGroup">
+                  <option value="0">请选择</option>
+                  <option v-for="(item,index) in userGroupUserList" :key="index" :value="item.userId"
+                          v-text="item.userName"></option>
+                </select>
+              </div>
+            </div>
+            <div class="editBodytwo1">
+              <div class="editBodytwoLeft">
+                <label class="text1">优先级:</label>
+                <select v-model="taskPriority" class="selectGroup">
+                  <option v-for="(item,index) in taskPriorityList" :key="index" :value="item.value"
+                          v-text="item.label"></option>
+                </select>
+              </div>
+            </div>
+            <div class="editBodytwo1">
+                <div class="startTime">
+                    <label>计划开始:</label>
+                    <el-date-picker v-model="taskStart" type="date"
+                                    placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+                <div class="endTime">
+                    <label>计划结束:</label>
+                    <el-date-picker v-model="taskEnd" type="date"
+                                    placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+            </div>
           </div>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <button class="editBtnS" @click="addTaskMakeSure">确定</button>
-          <button class="editBtnC" @click="addTaskCancle">取消</button>
-        </div>
+          <div slot="footer" class="dialog-footer">
+            <button class="editBtnS" @click="addTaskMakeSure">确定</button>
+            <button class="editBtnC" @click="addTaskCancle">取消</button>
+          </div>
       </el-dialog>
       <el-dialog title="编辑工程任务" :visible.sync="editTaskDialog" @close="editTaskCancle">
         <div class="editBody">
@@ -546,7 +546,7 @@
         </div>
       </el-dialog>
       <el-dialog title="添加前置任务" :visible.sync="addLinkDialog" @close="addLinkCancle">
-        <div class="editBody">
+        <div class="editBody" v-loading="loading">
           <div class="editBodytwo3">
             <zk-table :data="taskIndexData" :columns="columns1" :tree-type="props.treeType"
                       :expand-type="props.expandType" :is-fold="props.isFold" :show-index="props.showIndex"
@@ -834,8 +834,8 @@
           <button class="editBtnC" @click="addVerifyTaskCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="选择关联清单" :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
-        <div class="editBody">
+      <el-dialog title="选择关联清单"  :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
+        <div class="editBody" v-loading="loading">
           <div class="bindListHead">
             <div class="bindListHeadLeft">
               <div>
@@ -1031,7 +1031,7 @@
             <div class="userGroupTab">
               <ul class="userGroupUl">
                 <li class="userGroupLi" v-for="(item,index) in ugList1" :key="index">
-                  <el-checkbox v-model="item.checkFlg" @change="checkFlgChange(index)" :value="item.ugId"></el-checkbox>
+                  <el-checkbox v-model="item.checkFlg"  @change="checkFlgChange(index)" :value="item.ugId"></el-checkbox>
                   <label class="userGroupLiText" v-text="item.ugName"></label>
                 </li>
               </ul>
@@ -1609,7 +1609,6 @@
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
       this.getTaskIndex();
-
       // this.getTaskList();
     },
     mounted() {
@@ -1619,8 +1618,8 @@
       selectUgId: function (val) {
         var vm = this
         this.taskIndexData=[];
+        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         this.getTaskList();
-        // this.cancleSelect();
       },
       'pageDetial_1.currentPage': function (val, oldval) {
         var vm = this
@@ -1853,6 +1852,7 @@
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
+
             this.loading=false;
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
@@ -2381,17 +2381,21 @@
               if(response.data.cd=="0"){
                   this.editTaskUserGroupList=response.data.rt;
                   this.ugList1=this.editTaskUserGroupList.ugList;
-                  var num=this.ugList1[0].ugId;
-                  this.groupIds.push(num.toString());
+                  console.log(this.ugList1);
+                 
+                  // var num=this.ugList1[0].ugId;
+                  // this.groupIds.push(num.toString());
+                  // console.log(this.groupIds)
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
           })
       },
       checkFlgChange(index){
-        //    var groupIdList=[];
         console.log(this.ugList1);
-         var str=this.ugList1[index].ugId;
+        //  var str=this.ugList1[index].ugId;
+        // this.groupIds.push(str.toString());
+
         // this.ugList1.forEach((item)=>{
         //   if(item.checkFlg==true){
         //       this.groupIds.push(item.ugId.toString());
@@ -2399,7 +2403,12 @@
         //     this.groupIds.pop(item.ugId.toString());
         //   }
         // })
-        this.groupIds.push(str.toString());
+        this.groupIds=[];
+         this.ugList1.forEach((item)=>{
+                if(item.checkFlg==true){
+                  this.groupIds.push(item.ugId.toString())
+                }
+            })
         console.log(this.groupIds);
       },
       userGroupTaskMakeSure(){
@@ -2427,6 +2436,7 @@
               if(response.data.cd=="0"){
                   this.userGroupTaskDialog=false;
                    this.taskIndexData=[];
+                    document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
                   this.getTaskList();
                   this.groupFlag=false;
                   this.groupIds=[];
@@ -2587,6 +2597,7 @@
         //   this.getTaskUserGroupList();
       },
       addTaskMakeSure() {
+        this.loading=true;
         if(this.taskName==''){
            this.$message({
             type:"error",
@@ -2655,9 +2666,17 @@
               this.taskName = '';
               this.taskStart = '';
               this.taskEnd = '';
+              this.$message({
+                type:'success',
+                message:'新增任务成功'
+              })
             } else if (response.data.cd == "-1") {
-              alert(response.data.msg)
+              this.$message({
+                type:'error',
+                message:response.data.msg
+              })
             }
+            this.loading=false;
           })
         }
       },
@@ -2740,6 +2759,7 @@
           alert('虚拟场景面板未打开，请打开左侧虚拟场景面板。')
       },
       addLinkMakeSure(){
+        this.loading=true;
           if(this.taskId==this.linkTaskId){
               alert('前置任务不能是当前任务本身')
               return;
@@ -2759,11 +2779,14 @@
               if(response.data.cd=="0"){
                   this.addLinkDialog=false;
                   this.getTask();
+                  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+                  document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
                   this.linkTaskId='';
                   this.linkType='';
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
+              this.loading=false;
           })
 
       },
@@ -2991,7 +3014,8 @@
         this.removeTaskDialog = true;
         this.sortObject = scope;
         this.taskId = this.sortObject.row.taskId;
-        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+        
+        // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
         // if(this.deleteTabObject.row.children){
         //     this.showText=true;
         // }else{
@@ -3025,6 +3049,7 @@
             this.removeTaskDialog = false;
              this.taskIndexData=[];
               document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+              document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
             this.getTaskList();
             this.removeTaskId = '';
             this.$message({
@@ -3200,18 +3225,22 @@
         userGroupTask(){
             if(this.taskInformationList.taskId){
                  this.userGroupTaskDialog=true;
+                 this.groupIds=[];
                 this.editTaskUserGroup();
                 // this.rowClick(row,rowIndex);
                 // this.ugList1.forEach((item)=>{
 
                 // })
             }else{
-                alert("请选择你要修改的任务")
+                this.$message({
+                  type:'info',
+                  message:'请选择你要修改的任务'
+                })
             }
         },
         userGroupTaskCancle(){
             this.userGroupTaskDialog=false;
-
+            this.groupIds=[];
         },
         //导入文件
         exportProject(){
@@ -3220,6 +3249,7 @@
       cancleSelect(){
         document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         this.taskId='';
+        
         this.taskInformationList=[];
         this.lastNodeName='';
         this.taskIndexData=[];
@@ -3230,7 +3260,7 @@
         this.taskName = '';
         this.taskStart = '';
         this.taskEnd = '';
-        this.getTaskIndex();
+        // this.getTaskIndex();
        this.getTaskList();
       },
       exportProjectMakeSure() {
@@ -3383,6 +3413,7 @@
         },
         //添加关联清单确认
         addAssociationListMakeSure(){
+          this.loading=true;
             axios({
                 method:'get',
                 url:this.BDMSUrl+'manifest2/businessBindManifestAndUpdateStatus',
@@ -3415,6 +3446,7 @@
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
+                this.loading=false;
             })
 
       },

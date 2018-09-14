@@ -45,7 +45,7 @@
                     </ul>
                     <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
                     <input type="text" id="copyInput" v-if="fgList.length>0"
-                    :value="checkedItem.sharePassword !=null?'链接：'+this.shareUrl+'cloud/share/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:this.shareUrl+'cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
+                    :value="checkedItem.sharePassword !=null?'链接：'+this.shareUrl+'/cloud/sharePassword/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:this.shareUrl+'/cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
                 </p>
                 <div>
                 <!--文件夹代码-->
@@ -1724,9 +1724,13 @@ export default {
                 password:''
              },**/
             vm.sharePath.show = true
-            vm.sharePath.path = this.shareUrl+'/cloud/share/'+vm.checkedItem.shareNo
-
+            
             vm.sharePath.password = vm.checkedItem.sharePassword !=null?vm.checkedItem.sharePassword:''
+            if(vm.sharePath.password!=''){
+                    vm.sharePath.path = this.shareUrl+'/cloud/sharePassword/'+vm.checkedItem.shareNo
+            }else{
+                vm.sharePath.path = this.shareUrl+'/cloud/share/'+vm.checkedItem.shareNo
+            }
         },
         closeLink(){
             var vm = this

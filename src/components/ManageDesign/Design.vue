@@ -66,7 +66,7 @@
                         </ul>
                     </div>
                     <sendMes :showBox="'true'" :dcid="''" :iscomment="true"  :selectugid="selectUgId" :holderid="value_monomer" v-if="goingToSend" v-on:hide="hideSendMes" v-on:refresh='getCommunicationList'></sendMes>
-                    <div class="project"  v-loading="loading">
+                    <div class="project"  v-loading="loadings">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
@@ -2927,7 +2927,7 @@ export default {
        window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
           CurrentSelectPara:"",//图形引擎选中数据
-          loading:true,//加载loadding
+          loadings:true,//加载loadding
          screenLeft:{
              show:true,
              item:1,
@@ -3535,7 +3535,7 @@ export default {
                     message:response.data.msg
                 })
             }
-            this.loading=false;
+            this.loadings=false;
         }).catch((err)=>{
             console.log(err)
         })
