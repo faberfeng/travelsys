@@ -95,8 +95,10 @@
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
                             <div class="video_body">
+                                
                                 <img  v-show="lineLiveImgShow" width="100%" height="310px" src="../../assets/nosource.png" >
-                                <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe>
+                                <videoPlayer :playsinline="true" id="lineLive" class="vjs-custom-skin videoPlayer" :options="playerOptions"></videoPlayer>
+                                <!-- <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe> -->
                             </div>
                             <div class="video_bottom">
                                 <span class="fullSet" @click="getMedia1(4)"></span>
@@ -263,6 +265,9 @@
 var THREE = require('three');
 import axios from 'axios'
 import data from '../Settings/js/date.js'
+import 'video.js/dist/video-js.css'
+import { videoPlayer } from 'vue-video-player'
+import 'videojs-flash'
 // var source= '';
 var camera, scene, renderer;
 var isUserInteracting = false,
@@ -273,8 +278,27 @@ var isUserInteracting = false,
     var distance = 500;
 export default {
     name:'fieldConnection',
+    components: {
+        videoPlayer
+    },
     data(){
         return{
+            playerOptions: {  
+                // width:'inherit',
+                margin:'0 auto',
+                height: '300',  
+                sources: [{  
+                    type: "rtmp/mp4",  
+                    src: "" 
+                }],  
+                techOrder: ['flash'],  
+                autoplay: true,  
+                controls: true,
+                 muted: false,
+                language: 'en',
+                playbackRates: [0.7, 1.0, 1.5, 2.0],
+                // poster: "./images/baoc.png",
+            },  
             lineLiveImgShow:true,
             mediaUrl:'',//媒体URL
             sendText:'',
@@ -369,6 +393,10 @@ export default {
 
     mounted(){
     //    this.getMediaInformation(4);
+    console.log(document.getElementsByClassName('.video-js'))
+    },
+    beforeUpdate(){
+
     },
     methods:{
         //  initWebSocket(){ const wsuri = "ws://127.0.0.1:8080"; 
@@ -578,7 +606,10 @@ export default {
                     this.mediaUrlList1=response.data.rt;
                     this.lineLiveImgShow=false;
                     this.livePageTotal=this.mediaUrlList1.length;
-                    this.$refs.lineLive.src=this.mediaUrlList1[0].path;
+                    console.log(this.playerOptions)
+                    this.playerOptions.sources[0].src=this.mediaUrlList1[0].path;
+                     console.log(document.getElementsByClassName('.video-js'))
+                    // this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
 
@@ -600,7 +631,7 @@ export default {
         },
         //改变全景直播
         handleLiveCurrentChange(val){
-            this.$refs.lineLive.src=this.BDMSUrl+"?videoPath="+this.mediaUrlList1[val-1].path;
+            this.playerOptions.sources[0].src=this.mediaUrlList1[val-1].path;
         },
         checkItem(num){
             this.isActive=num;
@@ -1311,6 +1342,13 @@ export default {
                                         background: url('./images/site1.png')no-repeat 0 0;
                                     }
                             }
+                            // .videoPlayer{
+                            //     width: 100%;
+                            // }
+                            // .vjs_video_3-dimensions {
+                            //     width: 100%;
+
+                            // }
                         }
                         .video_bottom{
                             position: absolute;
