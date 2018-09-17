@@ -306,7 +306,7 @@ export default {
             }else{
                 this.selectIndexone = index;
             }
-            console.log(item)
+
             this.showDetail = false;
             this.itemTitle = item.orderTitle;
             this.getOrderDetail(item.id);

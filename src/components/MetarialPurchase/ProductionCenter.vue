@@ -533,7 +533,6 @@ export default {
     methods:{
         clickRow(item){
             this.detailTableInfo = item;
-            console.log(this.detailTableInfo)
         },
         //获取品牌
         getProductBrand(){
@@ -742,11 +741,9 @@ export default {
         },
         //编辑
         editData(item){
-            console.log(item);
             this.editOneDay = item;
             this.GenieClassData.forEach(val=>{
                 if(val.classifyCode == item.productTypeCode){
-                    console.log(val)
                     this.producttype = val.classifyName;
                 }
             })
@@ -917,7 +914,6 @@ export default {
                         data:formData
                     }).then(response=>{
                         if(response.data.cd == 0){
-                            console.log(response.data);
                             this.importTypeShow = true;
                             this.codeTypeData = [];
                             this.columns = [];
@@ -991,7 +987,6 @@ export default {
                 },
                 data:form
             }).then((response)=>{
-                console.log(response.data);
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.showColumn = true;
