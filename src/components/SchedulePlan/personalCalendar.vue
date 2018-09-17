@@ -151,7 +151,7 @@
                         <i class="el-icon-plus icon-dropDown1" @click="addword"></i>
                     </h3>
                     <ul class="bindwordUl" :class="[{'show':show.basicInformation}]">
-                        <li class="bindwordLi" v-for="(item,index) in fileLists" :key="index"><span class="bindwordText">{{item.fileName}}</span><span class="icon"><i class="icon-goujian icon-search" @click="searchs(item.filePath)"></i><i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i><i class="icon-goujian icon-delete" @click="deleteword(item.fileId)"></i></span></li>
+                        <li class="bindwordLi" v-for="(item,index) in fileLists" :key="index"><span class="bindwordText">{{item.fileName}}</span><span class="icon"><i class="icon-goujian icon-search" @click="searchs(item.filePath,item.fileName)"></i><i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i><i class="icon-goujian icon-delete" @click="deleteword(item.fileId)"></i></span></li>
                     </ul>
                 </div>
 
@@ -760,6 +760,7 @@ export default {
             vm.userId  = localStorage.getItem('userid')
             vm.BDMSUrl = vm.$store.state.BDMSUrl;
             vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+            vm.GMDUrl=vm.$store.state.GMDUrl
             this.getPersonalCalendar();//进入个人日历页面(获取当前用户所在工程下群组)
             },
     mounted(){
@@ -1600,8 +1601,12 @@ export default {
                         }
                     })
         },
-        searchs(filePath){
-            window.open(this.QJFileManageSystemURL+filePath+"/preview");
+        searchs(filePath,fileName){
+            if(fileName.split('.')[1]=='gmd'||fileName.split('.')[1]=='GMD'){
+                window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany')
+            }else{
+                window.open(this.QJFileManageSystemURL+filePath+"/preview");
+            }
         },
         downLoad(filePath){
             var vm=this

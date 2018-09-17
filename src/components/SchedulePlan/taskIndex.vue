@@ -478,7 +478,7 @@
           </div>
       </el-dialog>
       <el-dialog title="编辑工程任务" :visible.sync="editTaskDialog" @close="editTaskCancle">
-        <div class="editBody">
+        <div class="editBody" v-loading="loading">
           <div class="editBodyone">
             <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
           </div>
@@ -701,7 +701,7 @@
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
-          <button class="editBtnS" @click="addLinkMakeSure">着色状态</button>
+          <button class="editBtnS" style="display:none" @click="addLinkMakeSure">着色状态</button>
           <button class="editBtnC" @click="progressSearchCancle">取消</button>
         </div>
       </el-dialog>
@@ -882,7 +882,7 @@
           </div>
           <div class="bindListTab">
             <label class="searchResultText">查询结果</label>
-            <div class="siteSearch" @click="siteSearch()">场景选择</div>
+            <div class="siteSearch" style="display:none" @click="siteSearch()">场景选择</div>
             <div class="searchTab">
               <table border="1" width='100%'>
                 <thead>
@@ -1199,7 +1199,6 @@
         curUgId: '',//移动任务所选id
         Type: null,
         linkId: '',//前置任务ID
-        taskParId: '',
         groupIds: [],
         searchTaskName: '',//查询任务名称列表
         tableCollapse: '',//是否折叠
@@ -1352,7 +1351,7 @@
         taskType: '',//任务类型
         taskStart: '',//任务开始时间
         taskEnd: '',//任务结束时间
-        taskParId: '',
+        taskParId:'0',
         selectChildren:'',//选中表格是否又子菜单
         linkTaskId: '',//前置任务Id
         removeTaskId: '',//移动任务Id
@@ -1923,21 +1922,8 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex,$event) {
-        // row.path[3].childNodes.forEach((item)=>{
-        //   if(item.style.background){
-        //     item.style.color='black'
-        //   }else{
-        //     item.style.color='black'
-        //     item.style.backgroundColor='white'
-        //     }
-        // })
-        // if(row.path[2].style.background){
-        //   row.path[2].style.color='white';
-        // }else{
-        //   row.path[2].style.color='white';
-        //   row.path[2].style.backgroundColor='#0081c2'
-        // }
-        // console.log(typeof(document.getElementsByClassName(' zk-table__body-row')));
+        console.log(row);
+        // console.log(roeIndex);
         if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
           row.path[4].childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
@@ -1956,14 +1942,8 @@
                 })
               row.path[1].style.backgroundColor='#0081c2'
         }
-          // if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-2-cell"){
-            
-          // }else if(row.path[0]._prevClass=="zk-table__cell-inner"){
-                
-          // }  
           this.selectRowList = rowIndex;
           this.selectRowList.forEach((item, index) => {
-            // console.log(index);
             if (item._isHover == true) {
               this.selectChildren=item.children
               this.taskId = item.taskId
@@ -2345,8 +2325,8 @@
         if (this.taskId == '') {
           this.taskId = -1;
         }
-        if (this.taskParId == '') {
-          this.taskParId = 0;
+        if (this.taskParId =='0') {
+          this.taskParId = '0';
         }
         axios({
           method: 'post',
@@ -2445,7 +2425,7 @@
                   this.groupFlag=false;
                   this.groupIds=[];
                   this.taskId="";
-                  this.taskParId="";
+                  this.taskParId='0';
                   this.taskName="";
                   this.$message({
                         type:'success',
@@ -2592,11 +2572,12 @@
         this.taskGroup = '0';
         this.taskUserGroup = '0';
         this.dutyUserId = '0';
+        this.taskParId ='0';
         if (this.taskInformationList) {
           this.taskParId = this.taskInformationList.taskId;
           this.lastNodeName = this.taskInformationList.taskName;
         } else {
-          this.taskParId = 0;
+          this.taskParId = '0';
           this.lastNodeName = '无';
         }
         //   this.getTaskUserGroupList();
@@ -2606,7 +2587,7 @@
         window.open('/#/Cost/getManifestDetailInfoForPage/'+1944+'/'+0)
       },
       addTaskMakeSure() {
-        this.loading=true;
+        
         if(this.taskName==''){
            this.$message({
             type:"error",
@@ -2641,6 +2622,7 @@
             message:"结束时间不能早于开始时间"
           })
         }else{
+          this.loading=true;
           axios({
             method: 'post',
             url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/add',
@@ -2648,7 +2630,7 @@
               'token': this.token
             },
             params: {
-              currentGroupId: this.taskGroup
+              currentGroupId: this.selectUgId
             },
             data: {
               taskName: this.taskName,//任务名称
@@ -2659,7 +2641,7 @@
               taskType: this.taskType,//任务类型
               taskStart: moment(this.taskStart).format("YYYY-MM-DD"),//任务开始时间
               taskEnd: moment(this.taskEnd).format("YYYY-MM-DD"),//任务结束时间
-              taskParId: this.taskParId,
+              taskParId:this.taskParId,
               id: '',
             }
           }).then(response => {
@@ -2891,6 +2873,7 @@
             message:"结束时间不能早于开始时间"
           })
         }else{
+          this.loading=true;
         axios({
           method: 'post',
           url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/update',
@@ -2921,7 +2904,7 @@
             this.id = '';
             this.taskType = '';
             this.taskUserGroup = '';
-            this.taskParId = '';
+            this.taskParId ='0';
             this.taskPriority = '';
             this.dutyUserId = '';
             this.taskGroup = '';
@@ -2929,6 +2912,7 @@
               type:'success',
               message:'修改工程任务成功'
             })
+            this.loading=false;
           } else {
             alert(response.data.msg)
           }
@@ -2944,7 +2928,7 @@
         this.id = '';
         this.taskType = '';
         this.taskUserGroup = '';
-        this.taskParId = '';
+        this.taskParId = '0';
         this.taskPriority = '';
         this.dutyUserId = '';
         this.taskGroup = '';
@@ -5763,8 +5747,9 @@
                         background:#fafafa;
                         .userGroupUl{
                             margin-top:20px;
-                            margin-left:-220px;
+                            margin-left:10px;
                             .userGroupLi{
+                              text-align: left;
                                 .userGroupLiText{
                                     display: inline-block;
                                     margin-left:5px;

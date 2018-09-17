@@ -47,7 +47,7 @@
                         </p>
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
-                <sendMes :showBox="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
+                <sendMes :showBox="'true'" v-if="goingToSend" :dcid="''" :iscomment="true"  :selectugid="ugId" :holderid="value_monomer" v-on:showNameHide="showHide" :checkTypeName='checkTypeValue' :dirId='checkTypeId'   v-on:hide="hideSendMes" v-on:refresh='getCommunicationList' ></sendMes>
                  <!-- <div style="margin:200px auto" v-show="dataShow">
                         <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
                         <p style="font-size:16px;color:#ccc">暂无数据</p>
@@ -202,13 +202,13 @@
                 </el-dialog>
                 <el-dialog width="400px" title="质量检查状态修改" :visible="dcStatus.show" @close="dcStatusCancle">
                     <div class="editBody">
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo " style="margin-left:1px;">
                             <el-radio v-model="dcStatus.val" label="10">继续整改</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo " style="margin-left:1px;">
                             <el-radio v-model="dcStatus.val" label="11">整改撤销</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo " style="margin-left:1px;">
                             <el-radio v-model="dcStatus.val" label="12">整改完成</el-radio>
                         </div>
                     </div>

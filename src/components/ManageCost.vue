@@ -605,6 +605,7 @@ export default {
         z-index: 10000000;
         color: #7a818a;
         cursor: pointer;
+        font-size:14px;
     }
     .webGlDownBtn{
         width: 12px;

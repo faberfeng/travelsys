@@ -61,7 +61,6 @@ export default {
             localStorage.removeItem('defaultSubProjId')
         }
          this.validateInstance()
-         this.Login()
         if(token != 'undefined'){
             vm.token = token
             //判断是否登陆

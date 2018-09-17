@@ -2436,7 +2436,6 @@ export default {
             isbiaoqianshow:false,
             biaoqianInfo:{},
             deleteInfo:{},
-            WebGlUrl:''
         }
     },
     created(){
@@ -2447,7 +2446,7 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.shareUrl=vm.$store.state.shareUrl;
-        this.WebGlUrl = this.$store.state.GMDUrl;
+        this.GMDUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
     },
@@ -3399,7 +3398,7 @@ export default {
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
         if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
-            window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+            window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }

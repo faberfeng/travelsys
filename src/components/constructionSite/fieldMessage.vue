@@ -610,6 +610,7 @@ export default {
         this.rowsList='',
         this.rowsListLength=0,
         vm.getContactList();
+        // this.delContact();
       },
        'pageDetial_1.currentPage': function (val, oldval) {
         var vm = this
@@ -642,7 +643,7 @@ export default {
                     this.allSelectUgId=response.data.rt.pug.selectUgId;
                     // this.mainSendMsgValue=response.data.rt.pug.selectUgId;
                     // this.copySendMsgValue=response.data.rt.pug.selectUgId;
-                     this.createSendUgId=response.data.rt.pug.selectUgId;
+                    //  this.createSendUgId=response.data.rt.pug.selectUgId;
                    
                     console.log(this.contactIndexList);
                 }else if(response.data.cd=='-1'){
@@ -691,7 +692,11 @@ export default {
                     this.dataShow=false;
                     this.rowsListLength=response.data.rt.rows.length;
                     console.log(this.contactList);
-                }else if(response.data.cd=='-1'){
+                }else if(response.data.rt.rows==null){
+                    this.rowsList=[];
+                    this.rowsListLength=0;
+                }
+                else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
             })
@@ -717,7 +722,7 @@ export default {
             }else{
             vm.$set(vm.qjContactList,'content',this.textarea)
             vm.$set(vm.qjContactList,'copySendUgIds',this.copySendMsgValue)
-            vm.$set(vm.qjContactList,'createSendUgId',this.createSendUgId)
+            vm.$set(vm.qjContactList,'createSendUgId',this.allSelectUgId)
             vm.$set(vm.qjContactList,'id',this.qjContactId)
             vm.$set(vm.qjContactList,'isSend',num)
             vm.$set(vm.qjContactList,'mainSendUgId',this.mainSendMsgValue)
@@ -1194,7 +1199,7 @@ export default {
                     this.fileId=this.rightContactList.fileList;
                     this.attachId=this.rightContactList.attachList;
                     this.relaList=this.rightContactList.manifestMains;
-                     this.qjContactId=this.rightContactList.id;
+                    //  this.qjContactId=this.rightContactList.id;
                      this.sendMsgUserValue=this.rightContactList.createSendUgId;
                      this.sendmessageUser=this.rightContactList.createUserStr;
                      console.log(this.sendmessageUser)
@@ -1273,14 +1278,14 @@ export default {
         delContact(num){
             axios({
             method:'post',
-            url:this.BDMSUrl+'/project/contactList2/delContact',
+            url:this.BDMSUrl+'project/contactList2/delContact',
             headers:{
                 'token':this.token
             },
             params:{
-                projId:this.projId,
+                // projId:this.projId,
                 status:this.screenLeft.item,
-                ugId:this.selectUgId,
+                ugId:this.allSelectUgId,
                 contactId:num
             },
             }).then(response=>{
@@ -1968,7 +1973,7 @@ export default {
                                 float: left;
                                 position: relative;
                                 cursor: pointer;
-                                margin-left: 24px;
+                                margin-left: 18px;
                                 margin-right: 20px;
                                 font-size: 12px;
                                 color: #666666;
