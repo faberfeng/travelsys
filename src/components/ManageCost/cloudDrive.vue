@@ -3241,12 +3241,12 @@ export default {
       handleNodeClick(obj){
           var vm = this
           vm.firstTime++
-          if(!obj.children){
-            vm.$message({
-                type:'info',
-                message:'这个文件夹没有子文件!'
-            })
-          }
+        //   if(!obj.children){
+        //     vm.$message({
+        //         type:'info',
+        //         message:'这个文件夹没有子文件!'
+        //     })
+        //   }
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
         $('#cloudDirveFileTree .el-tree-node').removeClass('is-current_fistload')

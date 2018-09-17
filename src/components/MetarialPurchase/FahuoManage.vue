@@ -462,7 +462,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    console.log(response.data)
                     if(response.data.rt != null){
                         if(response.data.rt.rows != null){
                             this.noPlanData = response.data.rt.rows;
