@@ -72,7 +72,7 @@
                                             <td>{{item.checkUserName | nameChange()}}</td>
                                             <td>{{item.checkRecord.expectCheckStatus|expectCheckStatusChange()}}</td>
                                             <td>
-                                                <button class="printLabelBtn actionBtn"  title="打印标签"></button>
+                                                <button class="printLabelBtn actionBtn" @click.stop="printLabel(item.checkRecord.id)" title="打印标签"></button>
                                                 <!-- @click.stop="printLabel(item.checkRecord.id)" -->
                                                 <button class="checkBtn actionBtn" @click.stop="srCheck(item.checkPoint.id)" title="检查"></button>
                                                 <button class="deleteBtn actionBtn" @click.stop="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
@@ -247,7 +247,7 @@
                         <i class="el-dialog__close el-icon el-icon-close"></i>
                         </button>
                     </div>
-                    <div class="el-dialog__body">
+                    <div class="el-dialog__body"  style="height:280px">
                         <div class="editBody">
                             <ul>
                                 <li v-for="(item,index) in checkPointsForPageSingleList" :key="index" class="item-label clearfix">
@@ -255,7 +255,7 @@
                                     <div class="right">
                                         <p class="item-list clearfix">
                                             <span class="text-left">点位名称：</span>
-                                            <span class="text-right" v-text="testIfIsNull(null,null,item.name)"></span>
+                                            <span class="text-right" v-text="testIfIsNull(null,null,item.checkPoint.name)"></span>
                                         </p>
                                         <p class="item-list clearfix">
                                             <span class="text-left">安全类别：</span>
@@ -462,7 +462,7 @@ export default {
             checkPointsByItemIdList:'',
             pointTotal:'',
             checkPointsForPageList:'',
-            checkPointsForPageSingleList:'',//单个二维码
+            checkPointsForPageSingleList:[],//单个二维码
             checkPointsList:'',
             checkPointsListLength:'',
             checkPointTdName:'',
@@ -904,13 +904,16 @@ export default {
     //打印标签
     printLabel(num){
         this.labelListSingleShow=true;
-        this.checkItemDataList.item.forEach((item)=>{
-            if(item.checkPoint.id==num){
+        this.checkPointsForPageSingleList=[];
+        // this.checkPointsForPageSingleList.push(scope.row)
+        console.log(this.checkPointsByItemIdList)
+        this.checkPointsByItemIdList.forEach((item)=>{
+            if(item.checkRecord.id==num){
                 this.checkPointsForPageSingleList.push(item)
-                console.log(this.checkPointsForPageSingleList);
             }
         })
-        this.getRelaFilesByCrId(num);
+         console.log(this.checkPointsForPageSingleList);
+        // this.getRelaFilesByCrId(num);
     },
     //获取检查记录关联的图片信息
     getRelaFilesByCrId(num){
@@ -2097,7 +2100,7 @@ export default {
                             float: left;
                             width: 300px;
                              font-size: 12px;
-                            line-height: 12px;
+                            line-height: 15px;
                             color: #333333;
                             text-align: left;
                             text-overflow: ellipsis;

@@ -77,6 +77,19 @@
                                     <th>主题：</th>
                                     <td><el-input :disabled="screenLeft.item>0" v-model="projectValue">{{projectValue}}</el-input></td>
                                 </tr>
+                                <tr v-show="screenLeft.item==2">
+                                    <th>发件群组：</th>
+                                    <td>
+                                        <el-select :disabled="screenLeft.item>0" v-model="sendMsgUserValue">
+                                            <el-option  :value="item.ugId" v-for="(item) in  ugList" :key="item.ugId" :label="item.ugName">
+                                            </el-option>
+                                        </el-select>
+                                    </td>
+                                </tr>
+                                <tr v-show="screenLeft.item==2">
+                                    <th>发件人:</th>
+                                    <td><el-input :disabled="screenLeft.item>0" v-model="sendmessageUser">{{sendmessageUser}}</el-input></td>
+                                </tr>
                                 <tr>
                                     <th>主送：</th>
                                     <td>
@@ -449,6 +462,8 @@ export default {
         return{
             dataShow:true,//空数据
             contactIndexList:'',
+            sendmessageUser:'',//发件人
+            sendMsgUserValue:'',//发件群组
             endFileMessage:false,
             allSelectUgId:'',
             selectUgId:'',
@@ -1172,20 +1187,17 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.rightContactList=response.data.rt.rows[0];
-                    console.log(this.rightContactList);
                     this.projectValue=this.rightContactList.subject;
-                    console.log(this.projectValue);
                     this.mainSendMsgValue=this.rightContactList.mainSendUgId;
-                    console.log(this.mainSendMsgValue);
                     this.copySendMsgValue=parseInt(this.rightContactList.copySendUgIds);
                     this.textarea=this.rightContactList.content;
                     this.fileId=this.rightContactList.fileList;
                     this.attachId=this.rightContactList.attachList;
                     this.relaList=this.rightContactList.manifestMains;
                      this.qjContactId=this.rightContactList.id;
-                    console.log(this.relaList);
-                    console.log(JSON.stringify(this.attachId)+'dhfjdh');
-                    // console.log(this.rightContactList);
+                     this.sendMsgUserValue=this.rightContactList.createSendUgId;
+                     this.sendmessageUser=this.rightContactList.createUserStr;
+                     console.log(this.sendmessageUser)
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
                 }
@@ -1921,8 +1933,10 @@ export default {
                     table{
                         tbody{
                             th{
+                                width:80px;
                                 font-size: 14px;
                                 line-height: 14px;
+                                text-align:right;
                                 color:#666;
                             }
                             tr{
@@ -1945,6 +1959,8 @@ export default {
                                 line-height: 14px;
                                 color:#666;
                                 font-weight: bold;
+                                width:70px;
+                                text-align:right;
                             }
                             span{
                                 line-height: 16px;

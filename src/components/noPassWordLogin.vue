@@ -1,5 +1,7 @@
 <template>
-    <div class="main" id="login">   
+    <div class="main" id="login" style="margin:0px auto">
+        <!-- <img src="../assets/huajianlogo.png"  style="background:#ccc;margin:"/>
+        <p style="font-size:30px;color:red">没有进入工程业务的权限</p> -->
     </div>
 </template>
 <script>
@@ -25,7 +27,7 @@ export default {
         var vm = this;
         const token = localStorage.getItem('token') 
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        this.createCookie("BITRIX_SM_LOGIN",13564978306)
+        // this.createCookie("BITRIX_SM_LOGIN",13564978306)
         var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
         if(defaultSubProjId != 'undefined'){
             localStorage.removeItem('defaultSubProjId')
@@ -41,7 +43,15 @@ export default {
         Login(){
             this.login.Password = md5(this.login.Password);
             var formData = new FormData();
-            var str=this.readCookie("BITRIX_SM_LOGIN");
+            var str='';
+             
+            str=this.readCookie("BITRIX_SM_LOGIN");
+            console.log(str);
+           if(str==null){
+                 this.$router.push({
+                        path: '/login'
+                    })
+            }
             console.log(str);
             formData.append('account',str);
             formData.append('isRemember',this.isAuto);
@@ -67,9 +77,9 @@ export default {
                     })
                     sessionStorage.setItem('navigationPath','projectPage');
                 } else if (this.projectData.cd === '10003') {
-                    alert(this.projectData.msg) //密码不正确
+                    // alert(this.projectData.msg) //密码不正确
                 } else if (this.projectData.cd === '10000') {
-                    alert(this.projectData.msg) //账号不存在
+                    // alert(this.projectData.msg) //账号不存在
                 }
             })
         },

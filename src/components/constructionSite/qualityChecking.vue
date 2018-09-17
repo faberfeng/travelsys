@@ -103,7 +103,7 @@
                                                 <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
                                                 <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                                 <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                                <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="item.showResponse?'arrow':''"></span>
+                                                <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,item.dcStatus,false,null)" :class="item.showResponse?'arrow':''"></span>
                                                 <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
                                             </span>
                                         </p>
@@ -451,8 +451,11 @@ export default {
             console.log(err)
         })
       },
-      getComment(val,index,showResponse,reviewCount,reload,event){
+      getComment(val,index,showResponse,reviewCount,dcStatus,reload,event){
         var vm = this
+        // if(dcStatus==8||9){
+        //     return ;
+        // }
         if(reviewCount == 0){
              vm.$message({
                 type:'warning',
@@ -732,7 +735,7 @@ export default {
                         status ="等待整改"
                         break;
                     case 9:
-                        status ="等待整改"
+                        status ="等待检查"
                         break;
                     case 10:
                         status ="继续整改"

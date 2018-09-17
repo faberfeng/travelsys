@@ -308,6 +308,9 @@ export default {
                 if(vm.$route.query.firstView == 'Y'){
                     if(vm.auth.homePage){
                         // console.log('首页')
+                        // this.$router.push({
+                        //     path:'/home/projHome/'+this.projId
+                        // });
                     }else if(vm.auth.progress){
                         vm.$router.push({
                             path:'/SchedulePlan/personalCalendar'//进度计划；
