@@ -571,9 +571,14 @@
                     <button class="editBtnC" @click="customCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="校验结果" :visible="shureToImportshow" @close="createCancle">
+            <el-dialog title="校验结果" :visible="shureToImportshow" @close="notSureToImport">
                 <div class="editBody">
-                    <p v-for="(item,index) in jiapyanResult" :key="index">{{item}}</p>
+                    <div v-if="jianyanFlag">
+                        <p>{{jiapyanResult}}</p>
+                    </div>
+                    <div v-else>
+                        <p v-for="(item,index) in jiapyanResult" :key="index">{{item}}</p>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="sureToImport">确定导入</button>
@@ -774,6 +779,7 @@ export default {
                 total:'',//所有数据
             },
             jiapyanResult:'',
+            jianyanFlag:false,
             shureToImportshow:false,
             checkedResults:{},
             shujugaikuangshow:false,
@@ -1510,8 +1516,11 @@ export default {
                         this.checkedResults = response.data.rt.dataProfiling;
                         if(JSON.stringify(response.data.rt.checkResults)=='{}'){
                             this.jiapyanResult = '所有数据校验通过!';
+                            this.jianyanFlag = true;
                         }else{
-                            this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode;
+                            this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode || response.data.rt.checkResults.verifyProductId;
+                            //verifyProductId
+                            this.jianyanFlag = false;
                         }
                         this.shureToImportshow = true;
                     }else{
