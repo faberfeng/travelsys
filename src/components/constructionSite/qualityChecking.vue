@@ -17,7 +17,7 @@
                 </div>
                 <div id="containerMessage"  v-show="isShowQualityCheckAuth">
                    <div class="ForumSelector">
-                        <span class="name">筛选条件</span>
+                        <!-- <span class="name">筛选条件</span> -->
                         <ul>
                             <li class="selectItem">
                                 <span class="title">状态</span>
@@ -643,13 +643,12 @@ export default {
             }
         },
         nodeClick(obj){
-            if(obj.children.length==0){
-            this.$message({
-                type:'info',
-                message:'这个文件夹没有子文件!'
-            })
-          }
-            console.log(obj);
+        //     if(obj.children.length==0){
+        //     this.$message({
+        //         type:'info',
+        //         message:'这个文件夹没有子文件!'
+        //     })
+        //   }
             this.checkTypeId=obj.id;
             this.checkTypeValue=obj.text;
             var str;
@@ -986,6 +985,7 @@ export default {
                 }
                 >ul{
                     float: left;
+                    margin-left:50px;
                     .selectItem{
                         float: left;
                         .title{
@@ -1014,7 +1014,7 @@ export default {
                 // margin: 15px 0;
                 .item-upload{
                     float: right;
-                    margin-right: 30px;
+                    // margin-right: 30px;
                     background: #fc3439;
                     color: #ffffff;
                     font-size: 12px;

@@ -44,7 +44,7 @@
                     <!-- <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="!(index_1 == val.list.length-1 && displayTyle == 0)"></td> -->
                     <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1"></td>
                     <td >
-                        <button  class="locationBtn actionBtn" title="定位" @click="openLocation"></button>
+                        <button  class="locationBtn actionBtn" title="定位" @click.stop="openLocation(val.list)"></button>
                     </td>
                 </tr>
                 <tr :style="{'backgroundColor':rcStyle.tableTitleBgColor}" v-if="sumary_all">
@@ -521,6 +521,7 @@ import '../ManageCost/js/date.js'
 export default Vue.component('common-list',{
     props:['rcId','isSnapshot','isbaobiao'],
     data(){
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             token:'',
             entId:'',//公司ID
@@ -568,6 +569,8 @@ export default Vue.component('common-list',{
             totalTitleNum:0,
             sumary_all:'',
             displayTyle:'',
+            TraceID:'',
+            HolderPath:[]
         }
     },
     created(){
@@ -605,6 +608,22 @@ export default Vue.component('common-list',{
         },
     },
     methods:{
+        callback(e){
+           // console.log(e)
+                switch(e.data.command){
+                case "EngineReady":
+                    {
+                        // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+                        // let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+                        // app.postMessage({command:"EnterProject",parameter:para},"*");
+                    }
+                    break;
+                case "CurrentSelectedEnt":
+                    // CurrentSelectPara = e.data.parameter;
+                case "ViewpointSubmited":
+                    break;
+            }
+        },
         editReport(){
             var vm = this
             vm.$emit('toedit')
@@ -661,12 +680,28 @@ export default Vue.component('common-list',{
                 console.log(err)
             })
         },
-        openLocation(){
+        openLocation(val){
             var vm  = this
-            vm.$message({
-                type:'info',
-                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-            })
+            if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+                console.log(val);
+                this.TraceID=String(val[7]);
+                this.HolderPath.push({'ID':val[12],'Type':'',"Name":'',"ParentID":''})
+                // this.HolderPath=JSON.parse(scope.row.dHolderPath);
+                // this.GCCode=scope.row.dGCCode;
+                console.log(this.HolderPath)
+                console.log(this.TraceID);
+                const para={"TraceID":'416f551c-878b-4f25-97ec-19056bd13330#4992',"HolderPath":this.HolderPath,"GCCode":''} 
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"LookAtEntities",parameter:para},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                this.HolderPath=[];
+            }
         },
         testIfIsNull(row, column, cellValue, index){
             if(cellValue == null)return '/'
@@ -712,6 +747,7 @@ export default Vue.component('common-list',{
             }).then(response=>{
                 console.log(response.data);
                 if(response.data.cd == 0){
+                    console.log(response.data.rt);
                     vm.rcStyle = response.data.rt.rcStyle
                     vm.dataName = response.data.rt.reportName;
                     this.displayTyle = response.data.rt.rcConfig.displayType;
@@ -757,7 +793,8 @@ export default Vue.component('common-list',{
                                 vm.DatatableList.push({
                                     'list':element.infoList,
                                     'level':element.groupLevel
-                                });                                
+                                });
+                                console.log(vm.DatatableList);                                
                             }else if(element.rowType == 'ROW_SUMMARY'){
                                 
                                 if(element.count != null){
@@ -793,7 +830,7 @@ export default Vue.component('common-list',{
                         vm.DatatableList.forEach((item,index)=>{
                             item.list.splice(titleLength,item.list.length-titleLength);    
                         })
-                        console.log(vm.DatatableList)
+                        // console.log(vm.DatatableList)
                         /**
                          * 查看各个小计数组，
                          * 确定插入总列表的方式

@@ -2,27 +2,38 @@
     <div id="projectNavigation">
         <headerCommon :username="userName"></headerCommon>
         <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
-        <ul id="CTypeList">
-            <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
-                <span  class="Q_title_left"></span>
-                <span v-text="item.name" :class="[item.name == active?'active-title':'','Q_title_name']"></span>
-            </li>
-        </ul>
-        <div class="conpanyContainer">
-            <h1  class="h1-companybox">企业导航</h1>
-            <ul class="companyBox">
-                <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId,index)" >
-                    <input type="hidden" name="companyId" :value="item.companyId">
-                    <input type="hidden" name="type" :value="item.type">
-                    <span class="companyImage">
-                        <span class="companyImage-img" :style="item.imgPath?'background-image:url('+item.imgPath+');':'background-image:url('+require('../assets/bg_logo.png')+');'"></span>
-                    </span>
-                    <div style="padding:15px 20px;">
-                       <span v-text="item.companyName" class="Q_title"></span>
-                        <span class="star"></span>
-                    </div>
+        <div v-show="!noprojectShow" class="noproject">
+            <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
+            <div class="noprojectRight">
+                <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
+                <div class="noprojectRight_bottom">请您联系所参与项目的工程管理员，<br/>以将您的帐号添加到协作名单当中。</div>
+                <div></div>
+            </div>
+        </div>
+        <div v-show="noprojectShow">
+            <ul id="CTypeList">
+                <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
+                    <span  class="Q_title_left"></span>
+                    <span v-text="item.name" :class="[item.name == active?'active-title':'','Q_title_name']"></span>
                 </li>
             </ul>
+            <div class="conpanyContainer">
+                <h1  class="h1-companybox">企业导航</h1>
+
+                <ul class="companyBox">
+                    <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId,index)" >
+                        <input type="hidden" name="companyId" :value="item.companyId">
+                        <input type="hidden" name="type" :value="item.type">
+                        <span class="companyImage">
+                            <span class="companyImage-img" :style="item.imgPath?'background-image:url('+item.imgPath+');':'background-image:url('+require('../assets/bg_logo.png')+');'"></span>
+                        </span>
+                        <div style="padding:15px 20px;">
+                        <span v-text="item.companyName" class="Q_title"></span>
+                            <span class="star"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
          
     </div>
@@ -37,6 +48,7 @@ export default {
     },
     data(){
         return{
+            noprojectShow:false,
             url:'',
             pathInit:'',
             companyList:[],
@@ -114,8 +126,10 @@ export default {
                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
+                    this.noprojectShow=true;
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
                     vm.companyList = response.data.rt.companyList;
+                    this.noprojectShow=true;
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
                     var index = 0
@@ -145,6 +159,7 @@ export default {
                     }
                     vm.companyType = obj.reverse()
                     vm.selectType(index)
+                    this.noprojectShow=true;
                 }
             }).catch(function(error){
                 // vm.$router.push({
@@ -232,6 +247,40 @@ export default {
         clear: both;
         overflow: hidden;
         content: '';
+    }
+    .noproject{
+        width: 950px;
+        height: 450px;
+        // border:1px solid red;
+        position:absolute;
+        top:50%;
+        left:50%;
+        margin-left:-478px;
+        margin-top:-220px;
+    }
+    .noprojectLeft{
+        float: left;
+       margin-top:50px;
+    }
+    .noprojectRight{
+        float: right;
+        width: 420px;
+        height: 170px;
+        margin-top:150px;
+        .noprojectRight_header{
+            font-size:24px;
+            color:#fc3439;
+            font-weight: bold;
+            text-align: left;
+            line-height: 50px;
+        }
+        .noprojectRight_bottom{
+            line-height: 50px;
+            font-size:18px;
+            color:#666666;
+            font-weight: bold;
+            text-align: left;
+        }
     }
     #CTypeList{
         position: fixed;

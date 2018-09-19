@@ -440,7 +440,7 @@
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">单位</span>
-                                <span class="detial-text-value" v-text="checkedItem.unit" :title="checkedItem.unit"></span>
+                                <span class="detial-text-value" v-text="testIfIsNull(null,null,checkedItem.unit)" :title="checkedItem.unit"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">数量</span>
@@ -594,8 +594,6 @@
                 </div>
             </div>
         </div>
-
-
         <div id="mask" v-if="labelListShow || ListHeaderShow || ListHeaderShow1||ListHeaderShow2" ></div>
 </div>       
 </template>
@@ -618,12 +616,17 @@
             background: #fff;
             .el-dialog__body{
                 margin-top: 20px;
+                height: 540px;
+                overflow-y: auto;
             }
             .editBody{
                 margin: 0 20px;
+                overflow-y: auto;
+                height: 540px;
                 .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
                     margin: 0 5px;
                 }
+                
             }
             .item-label{
                 border-bottom: 1px solid #ebebeb;
@@ -1631,7 +1634,8 @@ export default Vue.component('common-list',{
                 name:'业务状态',
                 show:true,
                 prop:'dState_format',
-            }, {
+            }, 
+            {
                 name:'单位',
                 show:true,
                 prop:'unit',
@@ -1641,6 +1645,7 @@ export default Vue.component('common-list',{
                 show:true,
                 prop:'count',
             },
+            
         ],
         //明细施工进度
         detailsHead1:[
@@ -1808,7 +1813,7 @@ export default Vue.component('common-list',{
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.manifestId = vm.mId
-        vm.getIntoList();
+        vm.getIntoLists1();
   }, 
   mounted(){
       var vm = this
@@ -2090,7 +2095,7 @@ export default Vue.component('common-list',{
           var vm = this
           vm.$emit('back')
       },
-      getIntoList(){
+      getIntoLists1(){
         var vm = this
         vm.fullscreenLoading =true
         axios({

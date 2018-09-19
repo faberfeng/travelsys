@@ -1740,17 +1740,18 @@ export default {
         },
         openUrl(id,passwordId){
             var vm = this
+            var routerDataUrl=''
             // localStorage.setItem('projId',id)
             if(passwordId==''){
-            vm.$router.push({
+             routerDataUrl=vm.$router.resolve({
               path:`/cloud/share/${id}`,
             })
             }else{
-                vm.$router.push({
+                routerDataUrl=vm.$router.resolve({
                     path:`/cloud/sharePassword/${id}`,
                 })
             }
-            // window.open(vm.sharePath.path);
+            window.open(routerDataUrl.href,'_blank');
         },
         cancleShare(){
             var vm = this

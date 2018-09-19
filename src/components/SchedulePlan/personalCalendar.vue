@@ -1269,20 +1269,29 @@ export default {
         //新增事件确认
         addEventTextMakeSure(){
             if(this.eventNames==''){
-                alert('事件不能为空')
+                this.$message({
+                    type:'info',
+                    message:'事件不能为空'
+                })
                 return;
-            }else if(this.eventPositions==''){
-                alert('地点不能为空')
-                    return;        
             }else if(this.startTimeValue==''){
-                alert('未选择开始时间')
+                this.$message({
+                    type:'info',
+                    message:'未选择开始时间'
+                })
                 return; 
             }else if(this.endTimeValue==''){
-                alert('未选择结束时间')
+                this.$message({
+                    type:'info',
+                    message:'未选择结束时间'
+                })
                 return; 
             }
             else if(this.startTimeValue>=this.endTimeValue){
-                alert('提示：结束时间必须大于开始时间')
+                this.$message({
+                    type:'info',
+                    message:'提示：结束时间必须大于开始时间'
+                })
                 return;
             }
             
@@ -1290,28 +1299,43 @@ export default {
             if(this.repeatTypeValue!=0){
                 if(this.repeatTypeValue==1){
                     if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/1000 / 60 / 60 / 24 / 7 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于7天")
+                        this.$message({
+                            type:'info',
+                            message:"提示：开始时间与结束时间之差必须小于7天"
+                        })
                         return;
                     }
                 }else if(this.repeatTypeValue==2){
                     if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 31 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于31天")
+                        this.$message({
+                            type:'info',
+                            message:"提示：开始时间与结束时间之差必须小于31天"
+                        })
                         return;
                     }
                 }else if(this.repeatTypeValue==3){
                     if((this.endTimeValue.getTime()-this.startTimeValue.getTime())/ 1000 / 60 / 60 / 24 / 366 >= 1){
-                        alert("提示：开始时间与结束时间之差必须小于366天")
+                        this.$message({
+                            type:'info',
+                            message:"提示：开始时间与结束时间之差必须小于366天"
+                        })
                         return;
                     }
                 }
 
                  if(!this.terminate)
                 {
-                    alert("提示：事件终止日期不能为空")
+                    this.$message({
+                            type:'info',
+                            message:"提示：事件终止日期不能为空"
+                        })
                     return;
                 }
                 else if(this.terminate<this.endTimeValue){
-                    alert("提示：事件终止日期不能小于结束时间")
+                     this.$message({
+                            type:'info',
+                            message:"提示：事件终止日期不能小于结束时间"
+                        })
                     return;
                 }
                 this.terminates=this.dateChange1(this.terminate)  

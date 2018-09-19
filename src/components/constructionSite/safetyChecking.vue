@@ -307,13 +307,13 @@
             <div id="edit">
                 <el-dialog width="400px" title="安全状态修改" :visible="securityStatusShow" @close="srStatusCancle">
                     <div class="editBody">
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo" style="margin-left:1px;">
                             <el-radio v-model="securityStatus" label="1">确认安全</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo" style="margin-left: 1px;">
                             <el-radio v-model="securityStatus"  label="2">需要整改</el-radio>
                         </div>
-                        <div class="editBodytwo imageBody" style="padding-left:-15px;">
+                        <div class="editBodytwo" style="margin-left: 1px;">
                             <el-radio v-model="securityStatus"  label="3">急需整改</el-radio>
                         </div>
                     </div>
@@ -1144,6 +1144,7 @@ export default {
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.addCheckItemNodeShow=true;
+                // this.addCheckItemNodeShow=true;
                 
             }else if(response.data.cd=='-1'){
                 vm.$message({
@@ -1212,7 +1213,7 @@ export default {
         this.parentItemId=this.itemId;
         this.parentItemName=this.itemName;
         this.getManageDept();
-        this.addCheckItemNodeShow=true;
+        
         if(this.parentItemName){
             this.validateAddNode();
         }

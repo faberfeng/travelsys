@@ -75,7 +75,7 @@
                             <tbody>
                                 <tr>
                                     <th>主题：</th>
-                                    <td><el-input :disabled="screenLeft.item>0" v-model="projectValue">{{projectValue}}</el-input></td>
+                                    <td><el-input style="width:217px" :disabled="screenLeft.item>0" v-model="projectValue">{{projectValue}}</el-input></td>
                                 </tr>
                                 <tr v-show="screenLeft.item==2">
                                     <th>发件群组：</th>
@@ -88,7 +88,7 @@
                                 </tr>
                                 <tr v-show="screenLeft.item==2">
                                     <th>发件人:</th>
-                                    <td><el-input :disabled="screenLeft.item>0" v-model="sendmessageUser">{{sendmessageUser}}</el-input></td>
+                                    <td><el-input style="width:217px" :disabled="screenLeft.item>0" v-model="sendmessageUser">{{sendmessageUser}}</el-input></td>
                                 </tr>
                                 <tr>
                                     <th>主送：</th>
@@ -137,6 +137,16 @@
                         </div>
                         <div class="fileitem">   
                             <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
+                                 <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                                    <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                                    <div class="actionbox clearfix">
+                                        <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                        <i class="line"></i>
+                                        <i class="button-search"  @click="preview(val.filePath)"></i>
+                                        <i class="line"></i>
+                                        <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
+                                    </div>
+                                </li>
                                 <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                                     <div class="item-file-box clearfix">
                                         <span  class="item-file-image">
@@ -155,9 +165,11 @@
                                         </span>
                                     </div>
                                 </li>
-                                <li class="item-file" v-for="(val,key) in attachId" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                                <li class="item-file" v-for="(val,key) in attachId" :key="key" style="padding:0;overflow: hidden;">
                                     <img :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                                     <div class="actionbox clearfix">
+                                        <i class="button-relocation" v-show="val.locationInfo!=null" title="定位" @click="relocation1(val.locationInfo)"></i>
+                                        <i class="line"></i>
                                         <i class="button-search"  @click="preview(val.relativePath)"></i>
                                         <i class="line"></i>
                                         <i class="button-download" @click="downLoad(val.relativePath)"></i>
@@ -455,10 +467,12 @@
 <script>
 import moment from 'moment'
 import axios from 'axios'
+var ScreenPara
 import commonList from '../planCost/qingDan.vue'
 export default {
     name:'fieldMessage',
     data(){
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
             dataShow:true,//空数据
             contactIndexList:'',
@@ -579,12 +593,15 @@ export default {
             addAndSendList:'',
             vpList:[],
             qjContactId:0,
-            QJFileManageSystemURL:''
+            QJFileManageSystemURL:'',
+            base64Str:'',
+            elementFilter:'',
+            uploadViewPointList:[]
         }
     },
     created(){
          var vm = this;
-        // vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
@@ -728,7 +745,20 @@ export default {
             vm.$set(vm.qjContactList,'mainSendUgId',this.mainSendMsgValue)
             vm.$set(vm.qjContactList,'projId',this.projId)
             vm.$set(vm.qjContactList,'subject',this.projectValue)
-            console.log(vm.qjContactList);
+            var vpListUid=[];
+            console.log(vm.uploadViewPointList)
+             vm.uploadViewPointList.forEach((item,index)=>{
+                    vpListUid.push({
+                        elementFilter:this.elementFilter,
+                        extension:item.fileExtension,
+                        relativePath:item.filePath,
+                        uuid:item.fileUuid,
+                        name:item.fileName,
+                        projId:this.projId,
+                        subProjId:this.defaultSubProjId,
+                    })
+            })
+            // console.log(vm.qjContactList);
             axios({
             method:'post',
             url:this.BDMSUrl+'/project/contactList2/add',
@@ -740,12 +770,12 @@ export default {
                 fileIdList:this.uploadfileId,
                 manifestIdList:this.manifestIdList,
                 qjContactList:this.qjContactList,
-                vpList:this.vpList
+                vpList:vpListUid
             }
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.addAndSendList=response.data.rt;
-                    console.log(this.addAndSendList);
+                    // console.log(this.addAndSendList);
                     // this.ischeck=0;
                     this.ischeck=this.addAndSendList.id;
                     this.getList();
@@ -1063,6 +1093,7 @@ export default {
             this.uploadAttachId={};
             this.uploadAttachIdList=[];
             this.uploadfileId=[];
+            this.uploadViewPointList=[];
             this.relaList=[];
         },
         showUploadBox_img(){
@@ -1075,11 +1106,54 @@ export default {
             vm.type = 2
             vm.uploadshow = true
         },
+        callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+			case "ViewpointSubmited":
+                ScreenPara = e.data.parameter;
+                this.base64Str=ScreenPara.para2;
+                this.elementFilter=ScreenPara.para1;
+                 var vm = this
+                    axios({
+                        method:'POST',
+                        // /project/contactList2/uploadViewPoint
+                        url:this.BDMSUrl+'project2/dc/uploadViewPoint/1/'+this.projId,
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{"base64":this.base64Str}
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            this.$message({
+                                type:'success',
+                                message:'视点截图成功'
+                            })
+                            this.uploadViewPointList.push(response.data.rt)
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+		    }
+        },
         viewSpot(){
+            if(document.getElementById('webgl').style.display=='none'){
             this.$message({
-                type:'success',
-                message:'虚拟场景面板未打开，请打开左侧虚拟场景面板。'
-            })
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else{
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                 const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"AddViewpoint",parameter:123},"*");
+            }
         },
         fileChanged(file){
             var vm = this
@@ -1161,7 +1235,7 @@ export default {
                             vm.fileId.push(response.data.rt);
                             for (var i = 0; i < vm.fileId.length; i++){
                                 vm.uploadfileId.push(String(vm.fileId[i].fileId));
-                                vm.uploadfileId=Array.from(new Set(vm.uploadfileId));
+                                vm.uploadfileId=Array.from(new Set(vm.uploadfileId));//去重
                             }
                             // vm.$set(vm.uploadfileId, 'fileId', vm.fileId[i].fileId)
                             console.log(vm.uploadfileId); 
@@ -1198,6 +1272,7 @@ export default {
                     this.textarea=this.rightContactList.content;
                     this.fileId=this.rightContactList.fileList;
                     this.attachId=this.rightContactList.attachList;
+                    console.log(this.attachId);
                     this.relaList=this.rightContactList.manifestMains;
                     //  this.qjContactId=this.rightContactList.id;
                      this.sendMsgUserValue=this.rightContactList.createSendUgId;
@@ -1224,6 +1299,27 @@ export default {
                 })
             }
         },
+        //定位
+        relocation(){
+            const app = document.getElementById('webIframe').contentWindow;
+            app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        },
+        relocation1(val){
+            if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+        }else{
+                const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+        },
         deleteFile(index,type){
             var vm = this
             if(type == 1){
@@ -1231,6 +1327,10 @@ export default {
             }else{
                 vm.fileId.splice(index,1)
             }
+        },
+        deleteFile1(index){
+            var vm=this
+            vm.uploadViewPointList.splice(index,1)
         },
         downLoad(filePath){
             //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -1300,6 +1400,7 @@ export default {
                     this.textarea='';
                     this.fileId='';
                     this.attachId='';
+                    this.uploadViewPointList=[];
                     // console.log(this.contactList);
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
@@ -1866,6 +1967,7 @@ export default {
                     }
                 }
             }
+            ::-webkit-scrollbar{width:0px}
             .box-left-content{
                 // margin-top:76px;
                 display: block;
@@ -1887,6 +1989,7 @@ export default {
                  box-shadow:-2px 0px 1px #aaa;
                 
                 // -webkit-box-shadow: 3px 3px 3px #aaaaaa;
+                
                 .cancle{
                     position: absolute;
                     // bottom:0;
@@ -2059,7 +2162,7 @@ export default {
                         display: none !important;
                     }
                     .fileitem{
-                        margin:30px;
+                        margin:30px 0px 30px 65px;
                         .item-file{
                                 float: left;
                                 width: 290px;
@@ -2086,6 +2189,14 @@ export default {
                                     background: rgba(40, 40, 40, .4);
                                     transform: translateY(36px);
                                         transition: all ease .5s;
+                                        .button-relocation{
+                                             float: left;
+                                            margin: 10px 40px;
+                                            width: 16px;
+                                            height: 16px;
+                                            background: url('../planCost/images/location.png') no-repeat 0 0;
+                                            cursor: pointer;
+                                        }
                                         .button-search{
                                             float: left;
                                             margin: 10px 40px;
@@ -2312,7 +2423,7 @@ export default {
                 }
             }
             .box-left{
-                right: 0px;
+                right: -30px;
                 bottom: 0px;
                 width: 0px;
                 transition: all .7s ease;

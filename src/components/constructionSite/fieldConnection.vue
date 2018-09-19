@@ -23,14 +23,23 @@
                                 <span class="fullScreen" @click="fullModule"></span>
                             </div>
                             <div class="video_body">
-                                <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX"></iframe>
-                                
+                                <!-- <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX"></iframe> -->
+                                 <model-obj ref="modelObj" id="mm" :src="modelObjUrl"></model-obj>
+                                 <!-- static/Tile_8.obj -->
                                     <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
                                 
                                 <!-- src="https://site.altizure.cn/s/ryLw2SAxX" -->
                             </div>
                             <div class="video_bottom">
-                                <!-- <span class="fullSet" @click="getMedia(1)"></span> -->
+                                <span class="fullSet" @click="getMedia(1)"></span>
+                                 <el-pagination 
+                                    class="pagination"
+                                    background
+                                    @current-change="handlemodelCurrentChange"
+                                    layout="prev, pager, next"
+                                    :page-size="1"
+                                    :total="modelPageTotal">
+                                </el-pagination>
                             </div>
                         </div>
                         <div class="video_model" @mouseenter="changeActive(2)" @mouseleave="removeActive(2)">
@@ -201,7 +210,7 @@
                             </div>
                         </div>
                         <div class="head"><span class="text">名称:</span>
-                            <div class="tree">
+                            <div class="tree_file">
                                 <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :empty-text="'内容为空'" :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
                                 </el-tree>
                             </div>
@@ -236,7 +245,7 @@
                             </div>
                         </div>
                         <div class="head"><span class="text">名称:</span>
-                            <div class="tree">
+                            <div class="tree_file">
                                 <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="id" :default-expand-all='true' :data="fileTreeList"  :props="defaultProps" @node-click="nodeClick">
                                 </el-tree>
                             </div>
@@ -267,6 +276,7 @@ import axios from 'axios'
 import data from '../Settings/js/date.js'
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
+import { ModelObj } from 'vue-3d-model'
 import 'videojs-flash'
 // var source= '';
 var camera, scene, renderer;
@@ -279,7 +289,7 @@ var isUserInteracting = false,
 export default {
     name:'fieldConnection',
     components: {
-        videoPlayer
+        videoPlayer,ModelObj
     },
     data(){
         return{
@@ -300,6 +310,7 @@ export default {
                 // poster: "./images/baoc.png",
             },  
             lineLiveImgShow:true,
+            modelObjUrl:'',//modeluRl
             mediaUrl:'',//媒体URL
             sendText:'',
             token:'',
@@ -336,6 +347,7 @@ export default {
             livePathUrl:'',
             isFullPicture:false,
             videoPageTotal:0,
+            modelPageTotal:0,
             picturePageTotal:0,
             livePageTotal:0,
             currentPage3:1,
@@ -380,9 +392,12 @@ export default {
         // vm.imgdetial.y = obj.y
         this.getPanoramaMain();//获取全景图主图路径及点位信息
         this.getPanoramaPathList();//获取全景图真实路径集合
+        
         this.getMediaInformation(2);
         this.getMediaInformation1(4);
         this.getUserGroup();
+        this.getMediaInformation(1);
+        
        
         // this.initWebSocket();//现场连线
     },
@@ -393,7 +408,10 @@ export default {
 
     mounted(){
     //    this.getMediaInformation(4);
-    console.log(document.getElementsByClassName('.video-js'))
+    // this.getMediaInformation(1);
+    },
+    watch:{
+        
     },
     beforeUpdate(){
 
@@ -578,6 +596,11 @@ export default {
             }).then(response=>{
                 if(response.data.rt.length != 0){
                     this.mediaUrlList=response.data.rt;
+                    if(type==1){
+                        this.mediaUrlLists=response.data.rt;
+                        this.modelPageTotal=this.mediaUrlLists.length;
+                        this.$refs.modelObj.src=this.mediaUrlLists[0].path;
+                    }
                     if(type==2){
                         this.videoPageTotal=this.mediaUrlList.length;
                         this.$refs.video.src=this.mediaUrlList[0].path;
@@ -608,7 +631,6 @@ export default {
                     this.livePageTotal=this.mediaUrlList1.length;
                     console.log(this.playerOptions)
                     this.playerOptions.sources[0].src=this.mediaUrlList1[0].path;
-                     console.log(document.getElementsByClassName('.video-js'))
                     // this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
@@ -617,7 +639,10 @@ export default {
                 
             })
         },
-
+        //改变模型
+        handlemodelCurrentChange(val){
+            this.$refs.modelObj.src=this.mediaUrlLists[val-1].path;
+        },
         //改变视频
         handleVideoCurrentChange(val){
             this.$refs.video.src=this.mediaUrlList[val-1].path;
@@ -1608,7 +1633,7 @@ export default {
 // .el-input__inner{
 //     width:450px !important;
 // }
-.tree{
+.tree_file{
     height:350px;
     margin:0px 100px;
     overflow-y:auto;

@@ -1474,7 +1474,7 @@ export default Vue.component('common-list',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.manifestId = vm.mId
-        vm.getIntoList();
+        vm.getIntoLists();
   }, 
   mounted(){
       var vm = this
@@ -1683,7 +1683,7 @@ export default Vue.component('common-list',{
           var vm = this
           vm.$emit('back')
       },
-      getIntoList(){
+      getIntoLists(){
         var vm = this
         vm.fullscreenLoading =true
         axios({

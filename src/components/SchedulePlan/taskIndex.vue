@@ -537,7 +537,7 @@
             </div>
             <div class="endTime">
               <label>计划结束:</label>
-              <el-date-picker  v-model="taskEnd" type="date"
+              <el-date-picker   v-model="taskEnd" type="date"
                         placeholder="选择日期">
               </el-date-picker>
             </div>
@@ -1922,8 +1922,17 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex,$event) {
+        var userAgent = navigator.userAgent;//取得浏览器的userAgent字符串
+        //判断是什么浏览器
+        if (userAgent.indexOf("Firefox") > -1) {
+          console.log('ff')
+        } 
+        //判断是否chorme浏览器
+        if (userAgent.indexOf("Chrome") > -1){
+           console.log('chrome')
+        }
         console.log(row);
-        // console.log(roeIndex);
+       
         if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
           row.path[4].childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
@@ -1942,6 +1951,43 @@
                 })
               row.path[1].style.backgroundColor='#0081c2'
         }
+
+        //如何是火狐浏览器，兼容图表选中问题
+        
+        // if(row.target.parentElement._prevClass=="zk-table__body-row"){
+        //   row.target.parentElement.offsetParent.children[1].childNodes.forEach((item)=>{
+        //     item.style.backgroundColor='white'
+        //   })
+        //   row.target.parentElement.style.backgroundColor='#0081c2'
+        // }
+        // if(row.target.parentElement._prevClass="zk-table__cell-inner"){
+        //   console.log('fhd')
+
+        //   row.target.parentElement.offsetParent.parentElement.style.backgroundColor='#0081c2'
+        // }
+        // if(row.target.parentElement.getElementsByTagName=="tr"){
+        //   console.log("ppppp")
+        // }
+        // if(row.target.parentElement._prevClass=="zk-table__body-cell zk-table--border-cell"){
+        //   console.log('1223')
+        //    row.target.parentElement.offsetParent.children[1].childNodes.forEach((item)=>{
+        //     item.style.backgroundColor='white'
+        //   })
+        //   row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+        // }
+          
+          //  row.target.parentElement.offsetParent.children[1].childNodes.forEach((item)=>{
+          //   item.style.backgroundColor='white'
+          //   })
+          //   row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+        
+            // row.target.parentElement.offsetParent.children[1].childNodes.forEach((item)=>{
+            // item.style.backgroundColor='white'
+            // })
+            // row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+            //  row.target.parentElement.style.backgroundColor='#0081c2'
+       
+        console.log(row.target.parentElement)
           this.selectRowList = rowIndex;
           this.selectRowList.forEach((item, index) => {
             if (item._isHover == true) {
@@ -2365,7 +2411,6 @@
               if(response.data.cd=="0"){
                   this.editTaskUserGroupList=response.data.rt;
                   this.ugList1=this.editTaskUserGroupList.ugList;
-                  console.log(this.ugList1);
                  
                   // var num=this.ugList1[0].ugId;
                   // this.groupIds.push(num.toString());
@@ -2376,7 +2421,6 @@
           })
       },
       checkFlgChange(index){
-        console.log(this.ugList1);
         //  var str=this.ugList1[index].ugId;
         // this.groupIds.push(str.toString());
 
@@ -2393,7 +2437,6 @@
                   this.groupIds.push(item.ugId.toString())
                 }
             })
-        console.log(this.groupIds);
       },
       userGroupTaskMakeSure(){
           this.taskId=this.editTaskUserGroupList.taskId;
@@ -2531,7 +2574,7 @@
           if (response.data.cd == "0") {
             this.entityRelationList = response.data.rt;
             this.relaList = this.entityRelationList.relaList;
-            console.log(this.relaList)
+            
             //   console.log(JSON.stringify(this.relaList)+'bim');
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
@@ -2740,9 +2783,7 @@
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.curUgId = item.taskUserGroup
-            console.log(this.curUgId);
             this.removeTaskId = item.taskId
-            console.log(this.removeTaskId)
           }
         })
       },
@@ -5012,6 +5053,7 @@
                   margin-top: 15px;
                   height: 30px;
                   float: left;
+                  // display: inline-block;
 
                 }
                 .endTime {
@@ -5019,6 +5061,7 @@
                   margin-top: 30px;
                   height: 30px;
                   float: left;
+                  // display: inline-block;
 
                 }
                 #edit .el-input__inner {
@@ -5363,7 +5406,7 @@
                   font-size: 14px;
                   line-height: 14px;
                   color: #666666;
-                  margin-left: -432px;
+                  margin-left: -530px;
                 }
                 .siteSearch {
                   width: 70px;
