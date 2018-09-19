@@ -21,7 +21,7 @@
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>
         </p>
-        <table :class="['UserList',rcStyle.tableBorderWidth == '0'?'noBorder':'']" border="1"  :style="{'width':rcStyle.tableWidth+'px'}">
+        <table :class="['UserList',rcStyle.tableBorderWidth == '0'?'noBorder':'']" border="1"  :style="{'width':rcStyle.tableWidth.includes('%')?rcStyle.tableWidth:rcStyle.tableWidth+'px'}">
             <thead :style="{'backgroundColor':rcStyle.tableTitleBgColor,'textAlign':rcStyle.titleAlign,'lineHeight':rcStyle.titleBorderHeight+'px','height':rcStyle.titleBorderHeight+'px'}">
                 <tr v-show="rcStyle.showTitle != 0" :class="['userList-thead',rcStyle.tableBorderWidth == '0'?'noBorder':'']"  :style="{'backgroundColor':rcStyle.titleBgColor,'fontSize':rcStyle.titleFontSize+'px'}">
                     <th rowspan="1" :colspan="4+detailsHead.length-totalTitleNum" v-text="rcStyle.titleName"></th>
@@ -764,7 +764,7 @@ export default Vue.component('common-list',{
                                     this.sumary_all = element.count;
                                     
                                 }
-                                console.log(this.sumary_all)
+                                //console.log(this.sumary_all)
                                 if(element.groupLevel == 1){//单体 的 小计
                                     monomer_summary.push(element);
                                 }else if(element.groupLevel == 2){//分区 的 小计
@@ -793,7 +793,7 @@ export default Vue.component('common-list',{
                         vm.DatatableList.forEach((item,index)=>{
                             item.list.splice(titleLength,item.list.length-titleLength);    
                         })
-                        console.log(vm.DatatableList)
+                        //console.log(vm.DatatableList)
                         /**
                          * 查看各个小计数组，
                          * 确定插入总列表的方式
