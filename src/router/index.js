@@ -89,6 +89,11 @@ const router = new Router({
       component:resolve=>require(['@/components/ManageCost'],resolve),
       children:[
         {
+          path:'/Design/drawingReview',
+          name:'DrawingReview',
+          component:resolve=>require(['@/components/ManageDesign/DrawingReview'],resolve)
+        },
+        {
           path:'/Design/management',
           name:'ManageDesign',
           component:resolve=>require(['@/components/ManageDesign/Design'],resolve)

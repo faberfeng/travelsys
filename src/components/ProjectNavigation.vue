@@ -2,15 +2,18 @@
     <div id="projectNavigation">
         <headerCommon :username="userName"></headerCommon>
         <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
-        <div v-show="!noprojectShow" class="noproject">
+        <div v-show="noprojectShow" class="noproject">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
                 <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
-                <div class="noprojectRight_bottom">请您联系所参与项目的工程管理员，<br/>以将您的帐号添加到协作名单当中。</div>
+                <div class="noprojectRight_bottom">
+                您有以下几种选择：<br/>
+                第一种：退出您自己的账号，采用共同账号winter（密码:123654）体验和学习已经拥有数据的项目。<br/>第二种：如果您的同事已经开通了项目，请联系您的同事，将您的账号添加到工程协作名单中。<br/>第三种：如果您有自己负责的项目，可以点击<a style="display:inline" target="_blank" :href="applyIndexUrl">这里</a>，作为工程管理员申请开通一个新的项目。<br/>如有其它疑问或索取学习资料，请加入BDMS客服QQ群：855923282
+                </div>
                 <div></div>
             </div>
         </div>
-        <div v-show="noprojectShow">
+        <div v-show="!noprojectShow">
             <ul id="CTypeList">
                 <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
                     <span  class="Q_title_left"></span>
@@ -19,7 +22,6 @@
             </ul>
             <div class="conpanyContainer">
                 <h1  class="h1-companybox">企业导航</h1>
-
                 <ul class="companyBox">
                     <li class="company-item" v-for="(item,index) in companyList" :key="index" @click="redirect(item.companyId,index)" >
                         <input type="hidden" name="companyId" :value="item.companyId">
@@ -47,7 +49,8 @@ export default {
       headerCommon
     },
     data(){
-        return{
+       
+        return{ 
             noprojectShow:false,
             url:'',
             pathInit:'',
@@ -58,12 +61,14 @@ export default {
             BDMSUrl:'',
             active:'',
             companyType:{},
+            applyIndexUrl:''
         }
     },
     mounted(){
         var vm = this
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.applyIndexUrl = vm.$store.state.applyIndexUrl
         vm.getProjectList();
         vm.getUserInfo();
     },
@@ -123,13 +128,20 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
+                // if(response.data.cd=='0'){
+                //         this.noprojectShow=false;
+                //     }
+                // if(typeof(response.data.rt.companyList) == 'undefined' && response.data.rt.companyList.length == 0){
+                    
+                // }
+                console.log(response.data.rt.length)
+                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
-                    this.noprojectShow=true;
+                    
                 }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
                     vm.companyList = response.data.rt.companyList;
-                    this.noprojectShow=true;
+                    // this.noprojectShow=false;
                 }else if(typeof(response.data.rt.countQ1) != 'undefined'){
                     var obj = []
                     var index = 0
@@ -159,7 +171,9 @@ export default {
                     }
                     vm.companyType = obj.reverse()
                     vm.selectType(index)
-                    this.noprojectShow=true;
+                    // this.noprojectShow=false;
+                }else if(response.data.rt.length==undefined){
+                        this.noprojectShow=true;
                 }
             }).catch(function(error){
                 // vm.$router.push({
@@ -249,13 +263,13 @@ export default {
         content: '';
     }
     .noproject{
-        width: 950px;
+        width: 1120px;
         height: 450px;
         // border:1px solid red;
         position:absolute;
         top:50%;
         left:50%;
-        margin-left:-478px;
+        margin-left:-570px;
         margin-top:-220px;
     }
     .noprojectLeft{
@@ -264,9 +278,9 @@ export default {
     }
     .noprojectRight{
         float: right;
-        width: 420px;
+        width: 640px;
         height: 170px;
-        margin-top:150px;
+        margin-top:142px;
         .noprojectRight_header{
             font-size:24px;
             color:#fc3439;
@@ -275,8 +289,8 @@ export default {
             line-height: 50px;
         }
         .noprojectRight_bottom{
-            line-height: 50px;
-            font-size:18px;
+            line-height: 28px;
+            font-size:14px;
             color:#666666;
             font-weight: bold;
             text-align: left;

@@ -558,7 +558,9 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.fileTreeList_original=response.data.rt;
+                    console.log(this.fileTreeList_original);
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
+                    console.log(this.fileTreeList)
                 }
             })
 

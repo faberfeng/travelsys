@@ -7,7 +7,7 @@
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                     <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="url"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeUrl"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -96,7 +96,7 @@ export default {
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
-            url:'http://bdms.arctron.cn/genDist/?new='+Math.random(),
+            url:'http://10.252.26.240:8080/genDist/',
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
             header:{
@@ -141,6 +141,7 @@ export default {
             WebGlUrl:'',
             WebGlType:'',
             WebGlName:'',
+            iframeUrl:''
         }
     },
     created(){
@@ -150,6 +151,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
+         vm.iframeUrl=vm.$store.state.iframeWebGlUrl;
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
