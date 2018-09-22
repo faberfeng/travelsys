@@ -2809,8 +2809,9 @@ export default {
                         .editLi{
                             
                             height: 10px;
+                            text-align:left;
+                            margin-left:140px;
                             margin-bottom:20px;
-                            margin-right: 10px;
                             input{
                                 font-size: 12px;
                                 height: 24px;
