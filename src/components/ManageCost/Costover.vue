@@ -148,7 +148,7 @@
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
                                 <i class="icon-goujian icon-detial"></i>
-                                <i class="icon-goujian icon-QRcode"></i>
+                                <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location"></i>
                                 <i class="icon-goujian icon-delete"></i>
                             </p>
@@ -199,6 +199,66 @@
                 </ul>
             </div>
         </div>
+        <div id="edit">
+            <el-dialog title="标签信息预览" :visible.sync="isbiaoqianshow" @close="biaoqianCLose">
+                <div class="editBody">
+                    <ul style="padding:0 20px">
+                        <li class="item-label clearfix">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(biaoqianInfo.pkId, 7)" alt="二维码">
+                            <div class="right">
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单ID：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.pkId"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">清单名称：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mName"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">生成方式：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mGSource_"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">源自业务：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mBSource_"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建用户：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.creator"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">创建时间：</span>
+                                    <span class="text-right">{{new Date(biaoqianInfo.createTime).toLocaleString()}}</span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">变更版本：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.mVersion"></span>
+                                </p>
+                                <p class="item-list clearfix">
+                                    <span class="text-left">明细数量：</span>
+                                    <span class="text-right" v-text="biaoqianInfo.manifestDetailCount"></span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="labelListConfirm">网页预览</button>
+                        <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
+                </div>
+            </el-dialog>
+
+        </div>
+        <form style="visibility:hidden" action="http://bdms.arctron.cn/h2-bim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
+            <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
+            <input type="text" name="mName" :value="biaoqianInfo.mName">
+            <input type="text" name="mGSource" :value="biaoqianInfo.mGSource_">
+            <input type="text" name="mBSource" :value="biaoqianInfo.mBSource_">
+            <input type="text" name="creator" :value="biaoqianInfo.creator">
+            <input type="text" name="createTime" :value="new Date(biaoqianInfo.createTime).toLocaleString()">
+            <input type="text" name="mVersion" :value="biaoqianInfo.mVersion">
+            <input type="text" name="manifestDetailCount" :value="biaoqianInfo.manifestDetailCount">
+        </form>
 </div>
 </template>
 <style scoped lang='less'>
@@ -206,6 +266,49 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    #edit .el-dialog__body{
+        margin-top:20px;
+    }
+    .img_left {
+      float: left;
+      width: 90px;
+      height: 90px;
+      margin: 40px 30px 0 10px;
+    }
+    .right {
+      float: left;
+      width: 400px;
+      margin-top: 20px;
+
+      .item-list {
+        margin-bottom: 14px;
+
+        .text-left {
+          float: left;
+          font-size: 12px;
+          line-height: 12px;
+          width: 80px;
+          color: #999;
+          text-align: left;
+        }
+
+        .text-right {
+          float: left;
+          width: 300px;
+          font-size: 12px;
+          line-height: 12px;
+          color: #333333;
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        &:last-of-type {
+          margin-bottom: 20px;
+        }
+      }
     }
     .show{
         display: block!important;
@@ -997,6 +1100,8 @@ export default {
          checkAll: false,
          isIndeterminate: false,
          fileList:[],//文件列表
+         isbiaoqianshow:false,
+         biaoqianInfo:{},
          screenLeft:{
              show:true,
              item:1,
@@ -1181,6 +1286,47 @@ export default {
         if(!val)return ''
         var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
         return tt; 
+    },
+     addZero(num,size){
+        var len = ('' + num).length;
+        return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
+    },
+    labelListConfirm(){
+
+
+    },
+    printLabelList(){
+
+
+    },
+    //清单二维码
+    viewListQrcode(item){
+        axios({
+            method:'post',
+            url:this.BDMSUrl+'manifest2/getManifestInfoByMId',
+            headers:{
+                token:this.token
+            },
+            params:{
+                mId:item.main.pkId
+            }
+        }).then(response=>{
+            if(response.data.cd == 0){
+                this.isbiaoqianshow = true;
+                this.biaoqianInfo = response.data.rt;
+                Object.assign(this.biaoqianInfo,{
+                    mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
+                    mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
+                })
+            }else{
+                alert(response.data.msg);
+            }
+        })
+
+    },
+    //绑定清单
+    biaoqianCLose(){
+        this.isbiaoqianshow=false;
     },
     /**
     * 预览文件集文件
