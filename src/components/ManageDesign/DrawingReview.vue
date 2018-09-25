@@ -16,10 +16,26 @@
                         设计版本  
                     </router-link>
                 </div>
-            </div>
-            <div class="drawingPic">
-                
-
+                <div class="commentInformation">
+                    <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
+                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
+                        <el-option  class="commentOpt" v-for="item in stageList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                    </el-select>
+                    <label style="font-size:14px; color:#999999;margin-right:4px" >阶段:</label>
+                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="stage" class="commentSel">
+                        <el-option class="commentOpt" v-for="item in stageList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                    </el-select>
+                    <label style="font-size:14px; color:#999999;margin-right:4px">标记:</label>
+                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="isMark" class="commentSel">
+                        <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
+                    </el-select>
+                </div>
+                <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
+                    {{currentPage}} / {{pageCount}}
+                    <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
+                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event"
+            @page-loaded="currentPage = $event" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
+                </div>
             </div>
         </div>
         <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
@@ -28,9 +44,9 @@
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
-                        <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
-                        <span class="item-version-3 " @click="screenLeft.item = 3;">批<br>注</span>
+                        <span class="item-property "  @click="drawingClick">图<br>纸</span>
+                        <span class="item-version " @click="versionClick">版<br>本</span>
+                        <span class="item-version-3 " @click="annotationClick">批<br>注</span>
                     </div>
             </div>
             <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
@@ -55,6 +71,27 @@
                     <!-- <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span> -->
                     </el-tree>
                 </div>
+            </div>
+            <div v-show="screenLeft.show" v-else-if="screenLeft.item == 2" id="box-right">
+                <div class="versionBody">
+                    <div class="versionHead">图纸名称（版本号）</div>
+                        <ul class="versionUl" v-for="(item,index) in drawingVersionList" :key="index" >
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name" >图号</span>
+                                <span class="detial-text-value" v-text="item.drawingId"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传人</span>
+                                <span class="detial-text-value" v-text="item.insertUserName"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传时间</span>
+                                <span class="detial-text-value">{{item.insertTime|timeChange()}}</span>
+                            </li>
+                        </ul>
+
+                </div>
+
             </div>
         </div>
         <div id="edit">
@@ -114,10 +151,18 @@ import axios from 'axios'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
+import moment from 'moment';
+import pdf from 'vue-pdf'
+// import 'js/'
 export default {
+     components: {
+        pdf
+    },
     name:'drwaingReview',
     data(){
         return{
+            currentPage: 0,
+            pageCount: 0,
             screenLeft:{
                 show:true,
                 item:1,
@@ -145,8 +190,63 @@ export default {
             FileTree_original:[],
             FileTree:[],
             DirectoryList:[],
+            drawingVersionList:'',
+            pageNo:'',
+            versionPath:'',//最新图纸路径
+            annotationUserId:'',//批注用户Id
+            stage:'-1',//阶段
+            isMark:'-1',//标记
+            //评审阶段列表
+            stageList:[
+                 {
+                    value:'-1',
+                    label:'全部'
+
+                },
+                {
+                    value:'1',
+                    label:'专业协调'
+                },
+                {
+                    value:'2',
+                    label:'内部校对'
+                },
+                {
+                    value:'3',
+                    label:'内部审核'
+                },
+                {
+                    value:'4',
+                    label:'业主审核'
+                },
+               
+            ],
+            isMarkList:[
+                 {
+                    value:'-1',
+                    label:'全部'
+                },
+                {
+                    value:'0',
+                    label:'否'
+                },
+                {
+                    value:'1',
+                    label:'是'
+                },
+               
+            ]
         }
 
+    },
+    filters: {
+      timeChange(val) {
+        if (val == null) {
+          return;
+        } else {
+          return moment(val).format("YYYY-MM-DD HH:mm");
+        }
+      }
     },
     created(){
         var vm=this;
@@ -158,14 +258,119 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
-        
-        
     },
     mounted(){
         
         
     },
     methods:{
+        drawingClick(){
+            this.screenLeft.item = 1;
+            // this.getDirectory()
+        },
+        versionClick(){
+            this.screenLeft.item = 2;
+            if(this.drawingId){
+                this.getDrawingVersionList();
+            }
+        },
+        annotationClick(){
+            this.screenLeft.item = 3
+        },
+        loadeds(){
+            //  alert('hdjsf')
+            // console.log($event);
+            this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute"
+            
+
+            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
+            
+            if(document.getElementById("abs")){return;}
+
+            let canvas1 = document.createElement("canvas");
+            canvas1.id = "abs";
+            canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+            canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height)
+            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width)
+            canvas1.style.position = "absolute";
+            canvas1.style.left=0;
+            canvas1.style.top=0;
+
+            // canvas.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].width;
+            // canvas.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].height;
+            canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+            canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+            this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+
+            let start = {x:0,y:0};
+            let end = {x:0,y:0};
+            let beginDraw = false;
+
+            let ctx=canvas1.getContext("2d");
+
+            canvas1.onmousedown = (e)=>{
+
+                if(e.button == 0){
+                    beginDraw = true;
+                    start.x = e.layerX;
+                    start.y = e.layerY;
+                }
+
+                if(e.button == 2){
+                    beginDraw = false;
+                }
+
+            }
+
+
+            canvas1.onmouseup = (e)=>{
+                beginDraw = false;
+
+                canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:"r"});
+            }
+
+
+            canvas1.onmousemove = (e)=>{
+                let x =  e.layerX;
+                let y =  e.layerY;
+                
+                // console.log(e);
+
+                if(beginDraw){
+                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+
+                    for(let i = 0;i < canvas1.drawElements.length;i++){
+                        switch(canvas1.drawElements[i].t){
+                            case "r":
+                                ctx.beginPath();
+                                ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
+                                ctx.stroke(); 
+                                break;
+                        }
+                    }
+
+                    // ctx.strokeRect(start.x,start.y,x - start.x,y - start.y);
+
+                    ctx.beginPath();
+                    ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                    ctx.stroke(); 
+                    end.x = x;
+                    end.y = y;
+                }
+            }
+
+            canvas1.drawElements = [];
+
+            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0]);
+
+            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onresize = (e)=>{
+
+            //      console.log(e);
+            //     canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+            //     canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+            // }
+        },
         //获取目录
         getDirectory(){
             var vm=this
@@ -181,6 +386,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
+                    this.getDrawingList()
                     vm.DirectoryList.forEach((item,index) => {
                             // vm.$set(item,'directory',item.code)
                             // vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
@@ -197,6 +403,7 @@ export default {
         },
         //获取图纸列表
         getDrawingList(){
+            // this.getDirectory()
             var vm=this;
             var setting = {
                 data: {
@@ -225,6 +432,7 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                      vm.drawingList=response.data.rt;
+                    //  this.getDirectory()
                     console.log(vm.drawingList)
                     console.log(this.DirectoryList)
                     if(vm.drawingList != null){
@@ -269,11 +477,12 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    drawingId:''
+                    drawingId:this.drawingId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.VersionPath=response.data.rt
+                    this.versionPath=response.data.rt;
+                    console.log(this.versionPath);
                 }
             })
         },
@@ -293,6 +502,13 @@ export default {
           }
          vm.checkFileDir = obj//选中的文件夹
          vm.directoryId=obj.code
+         vm.drawingId=obj.id
+         console.log(vm.directoryId);
+         console.log(vm.drawingId);
+         if(vm.drawingId){
+             this.getMaxVersionPath();
+         }
+         
         //  vm.drawingList.forEach((item)=>{
         //      vm.DirectoryList.forEach((item1)=>{
         //          if(item1.code==item.directory){
@@ -307,6 +523,25 @@ export default {
           }
           console.log(vm.expandedKeys);
         },
+        //获取图纸版本列表
+        getDrawingVersionList(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'dc/drawingReview/getDrawingVersionList',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    drawingId:this.drawingId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.drawingVersionList=response.data.rt;
+                    console.log(this.drawingVersionList);
+                }
+            })
+        },
         //新建文件夹
         addFile(){
             // vm.getDirectory()
@@ -315,7 +550,13 @@ export default {
         },
         //删除文件夹
         deleteFile(){
+            
 
+            
+            // this.$refs.pdfDocument.pdf.getCanvas(function(canvasElt){
+            //        return canvasElt.style.position='absolute'
+
+            // })
         },
         renameFile(){
 
@@ -422,7 +663,7 @@ export default {
                 }
             }
             vm.fileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion+'&pageNo=4'
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -443,6 +684,7 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.fileList = []
+                            vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
@@ -468,6 +710,27 @@ export default {
         }
         li{
             list-style: none;
+        }
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+            width:15px;
+            height: 15px;
+        }
+        /* 滚动槽 */
+        ::-webkit-scrollbar-track {
+            box-shadow:inset 006px rgba(0, 0, 0, .5);
+        -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+            border-radius:10px;
+        }
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+            border-radius:10px;
+            background:rgba(0,0,0,0.1);
+            box-shadow:inset 006px rgba(0, 0, 0, .5);
+        -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+        }
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background:rgba(255,0,0,0.4);
         }
          /*
             修改eleUI树形组件
@@ -529,6 +792,27 @@ export default {
             width: 85%;
             position: relative;
             transition:  all ease .5s;
+            .commentInformation{
+                // float: left;
+                // margin-left:-640px;
+                margin-top:22px;
+                width: 642px;
+                height: 38px;
+            }
+            .drawingPic{
+                    overflow: auto;
+                    position: absolute;
+                    top: 130px;
+                    left: 0;
+                    bottom: 0;
+                    right: 25px;
+                    width: 100%;
+                    height: 800px;
+                #drawPic{
+                    min-width: 700px;
+                    min-height: 500px;
+                }
+            }
         }
         .box-left-avtive{
             width: 98%;
@@ -780,6 +1064,69 @@ export default {
                         background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
                     } 
                 }
+            }
+            #box-right{
+                 padding: 10px 13px 0 40px;
+                 .versionBody{
+                     .versionHead{
+                        font-size:14px;
+                        color:#333333;
+                        font-weight: bold;
+                        height: 28px;
+                        width: 100%;
+                        text-align: left;
+                        margin-left: 1px;
+                        border-bottom: 1px solid #e6e6e6;
+                     }
+                    .versionUl{
+                        // margin-left：20px
+                        // width: 400px;
+                        text-align: left;
+                        width: 100%;
+                        height: 80px;
+                        text-align: left;
+                        border-bottom: 1px solid #e6e6e6;
+                        .detial-item{
+                                font-size: 12px;
+                                line-height: 12px;
+                                margin-top: 16px;
+                                text-align: left;
+                                // width: 200px;
+                                // height: 15px;
+                                .detial-text-name{
+                                    color: #999999;
+                                    width: 65px;
+                                    float: left;
+                                }
+                                .detial-text-value{
+                                    float: left;
+                                    color: #333333;
+                                    max-width: 130px;
+                                    cursor: pointer;
+                                    overflow: hidden;
+                                    // overflow-x: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                }
+                                &:first-of-type{
+                                    margin-top: 18px;
+                                }
+                                .detail-text{
+                                    font-size: 12px;
+                                    line-height: 16px;
+                                    overflow: hidden;
+                                    width: 70px;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                    display: inline-block;
+                                    margin-left: 10px;
+                                    color:#333333;
+                                }
+                            }
+                        }
+
+                 }
+
             }
         }
         .box-right-avtive{

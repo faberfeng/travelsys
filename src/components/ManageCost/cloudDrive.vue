@@ -3397,7 +3397,9 @@ export default {
             return false
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
-        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+        // fileName.split('.')[1] == 'GMD'
+        console.log(fileName.substr(fileName.length-3));
+        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
             window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");

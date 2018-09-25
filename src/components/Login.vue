@@ -81,8 +81,7 @@ export default {
                     'token':this.token
                 },
             }).then((response) => {
-                var str=window.location.href;
-                console.log(str);
+               
             })
         },
         BeforeLogin(){
