@@ -16,10 +16,10 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div class="commentInformation">
+                <div class="commentInformation" v-show="screenLeft.item == 3">
                     <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
-                        <el-option  class="commentOpt" v-for="item in stageList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                        <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
                     </el-select>
                     <label style="font-size:14px; color:#999999;margin-right:4px" >阶段:</label>
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="stage" class="commentSel">
@@ -31,11 +31,23 @@
                     </el-select>
                 </div>
                 <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
-                    {{currentPage}} / {{pageCount}}
+                    
                     <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
-                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event"
-            @page-loaded="currentPage = $event" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
+                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
                 </div>
+                <!-- {{currentPage}} / {{pageCount}} -->
+            </div>
+            <div v-show="screenLeft.item == 3" id="drawingToolsBody">
+                    <ul class="drawingTools">
+                        <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
+                        <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li>
+                        <li><i class="drawingIcon straightLine" @click="straightLine()"><span style="color:#fc3439;font-size:14px;">直线</span></i></li>
+                        <li><i class="drawingIcon circular" @click="circular()"><span style="color:#fc3439;font-size:14px;">圆形</span></i></li>
+                        <li><i class="drawingIcon rectangle" @click="rectangleTool()"><span style="color:#fc3439;font-size:14px;">矩形</span></i></li>
+                        <li><i class="drawingIcon cloudLine" @click="cloudLine()"><span style="color:#fc3439;font-size:14px;">云线</span></i></li>
+                        <li><i class="drawingIcon text"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
+                        <li><i class="drawingIcon appended"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                    </ul>
             </div>
         </div>
         <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
@@ -44,7 +56,7 @@
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property "  @click="drawingClick">图<br>纸</span>
+                        <span class="item-property "  @click="screenLeft.item = 1">图<br>纸</span>
                         <span class="item-version " @click="versionClick">版<br>本</span>
                         <span class="item-version-3 " @click="annotationClick">批<br>注</span>
                     </div>
@@ -60,13 +72,12 @@
                     <el-tree
                         :data="FileTree"
                         ref="fileTree_drawingReview"
-                        node-key="id"
+                        
                         :props="defaultProps"
-                        :default-expanded-keys="expandedKeys"
+                        
                         highlight-current
                         @node-click="handleNodeClick"
                         id="cloudDirveFileTree"
-                        :class="[showAction?'':'noTop']"
                     >
                     <!-- <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span> -->
                     </el-tree>
@@ -161,6 +172,33 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            data: [{
+                    children: [{  
+                        children: [{
+                        label: '三级 1-1-1'
+                        }],
+                        label: '二级 1-1',
+                        }],
+                        label: '一级 1',
+                        }, 
+                        {
+                    children: [{  
+                        children: [{
+                        label: '三级 1-1-1'
+                        }],
+                        label: '二级 1-1',
+                        }],
+                        label: '一级 1',
+                        },
+                        {
+                    children: [{  
+                        children: [{
+                        label: '三级 1-1-1'
+                        }],
+                        label: '二级 1-1',
+                        }],
+                        label: '一级 1',
+                        } ],
             currentPage: 0,
             pageCount: 0,
             screenLeft:{
@@ -179,7 +217,7 @@ export default {
             defaultProps: {
                 children: 'children',
                 label: 'name',
-                isLeaf:'leaf'
+                // isLeaf:'leaf'
             },
             expandedKeys:[],
             checkFileDir:{},
@@ -193,9 +231,11 @@ export default {
             drawingVersionList:'',
             pageNo:'',
             versionPath:'',//最新图纸路径
-            annotationUserId:'',//批注用户Id
+            annotationUserId:-1,//批注用户Id
             stage:'-1',//阶段
             isMark:'-1',//标记
+            rotate:0,
+            annotationInfo:'',
             //评审阶段列表
             stageList:[
                  {
@@ -235,7 +275,11 @@ export default {
                     label:'是'
                 },
                
-            ]
+            ],
+            isDrawing:false,
+            shapeType:'',
+            coordinateInfoList:[],
+            allUserList:''
         }
 
     },
@@ -258,14 +302,111 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
+        this.getAllUser()
+    },
+    watch:{
+        annotationUserId:function(val){
+            this.queryAnnotation()
+        },
+        stage:function(val){
+            this.queryAnnotation()
+        },
+        isMark:function(val){
+            this.queryAnnotation()
+        }
+
     },
     mounted(){
         
         
     },
     methods:{
+        //获取工程中的用户
+        getAllUser(){
+            this.allUserList=''
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getAllUser',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                },
+                
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                   this.allUserList=response.data.rt;
+                   this.allUserList.unshift({userId: -1, userName: "全部", account: "", userPositions: null})
+                    // console.log(this.allUserList);
+                }else{
+                    this.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+
+        },
+        onmouse(){
+            var that=this;
+            var hei=window.innerHeight;//获取窗体高度
+            var oDiv = this.$refs.msgSpan.$el;//vue通过$refs获取元素属性
+            var oTop = this.$refs.msgtop;
+            // that.$refs.msgSpan.$parent.$parent.$parent.$el.style.webkitUserSelect='none';//添加样式控制拖拽时禁止全选动作
+            // that.$refs.msgSpan.$parent.$parent.$parent.$el.style.mozUserSelect='none';//添加样式控制拖拽时禁止全选动作
+            oDiv.onmousedown = function(ev){
+            var disY = ev.clientY - oDiv.offsetTop;
+            var web='-webkit-user-select';
+            // console.log(ev.clientY)
+            // console.log(oDiv.offsetTop)
+            document.onmousemove = function(ev){
+            // var t = ev.clientY-disY;
+            var t = hei-ev.clientY;
+            if(t<=180){
+                oTop.style.height=170+'px';
+            }else{
+                oDiv.style.height = t+'px';
+                oTop.style.height = t - 30 +'px';
+            }
+            };
+            document.onmouseup = function(){
+                document.onmousemove=null; 
+                document.onmouseup=null;
+            // that.$refs.msgSpan.$parent.$parent.$parent.$el.style.webkitUserSelect='';//取消样式控制拖拽时禁止全选动作
+            // that.$refs.msgSpan.$parent.$parent.$parent.$el.style.mozUserSelect='';//取消样式控制拖拽时禁止全选动作
+            };
+        };
+    },
+        //图纸工具栏操作
+        zuoRotate(){
+            this.rotate += 90;
+        },
+        youRotate(){
+            this.rotate -= 90;
+        },
+        straightLine(){
+            this.isDrawing=true;
+            this.shapeType="1";
+        },
+        circular(){
+            this.shapeType="2";
+        },
+        rectangleTool(){
+            this.isDrawing=true;
+            this.shapeType="3";
+        },
+        cloudLine(){
+            this.isDrawing=true;
+            this.shapeType="4";
+        },
         drawingClick(){
             this.screenLeft.item = 1;
+            // this.FileTree_original=[],
+            // this.FileTree=[],
+            // this.DirectoryList=[],
+            // this.drawingList=[],
             // this.getDirectory()
         },
         versionClick(){
@@ -273,6 +414,7 @@ export default {
             if(this.drawingId){
                 this.getDrawingVersionList();
             }
+           
         },
         annotationClick(){
             this.screenLeft.item = 3
@@ -281,12 +423,8 @@ export default {
             //  alert('hdjsf')
             // console.log($event);
             this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute"
-            
-
             // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
-            
             if(document.getElementById("abs")){return;}
-
             let canvas1 = document.createElement("canvas");
             canvas1.id = "abs";
             canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
@@ -296,83 +434,321 @@ export default {
             canvas1.style.position = "absolute";
             canvas1.style.left=0;
             canvas1.style.top=0;
-
             // canvas.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].width;
             // canvas.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].height;
             canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
             canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
             this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
-
             let start = {x:0,y:0};
             let end = {x:0,y:0};
+            var points = [];
             let beginDraw = false;
-
+            var FinishDraw = false;
             let ctx=canvas1.getContext("2d");
-
+            ctx.strokeStyle='rgb(252, 52, 57)';
+            ctx.lineWidth=3;
             canvas1.onmousedown = (e)=>{
-
                 if(e.button == 0){
                     beginDraw = true;
                     start.x = e.layerX;
                     start.y = e.layerY;
+                    if(this.shapeType=="4"){
+                        if(!FinishDraw){
+                            start.x = e.layerX;
+                            start.y = e.layerY;
+                            if(points.length > 0){
+                                if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
+                                            (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
+                                    points.push({x:points[0].x,y:points[0].y});
+                                    FinishDraw = true;
+                                    canvas1.onmousemove(e);
+                                    // this.isDrawing = false;
+                                    beginDraw=false;
+                                    return;
+                                }
+                            }
+                            points.push({x:e.layerX,y:e.layerY});
+                            console.log(points);
+                        }
+                        canvas1.onmousemove(e);
+                    }
+                    
                 }
-
-                if(e.button == 2){
-                    beginDraw = false;
-                }
-
+                // if(e.button == 2){
+                //     FinishDraw = false;
+				// 	points = [];
+                // }
+                
             }
-
-
             canvas1.onmouseup = (e)=>{
-                beginDraw = false;
-
-                canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:"r"});
+                if(this.shapeType!="4"){
+                    this.coordinateInfoList=[];
+                    beginDraw = false;
+                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
+                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
+                    this.addAnnotation();
+                }
+                // beginDraw = false;
+                // console.log(canvas1.drawElements);
+                console.log(this.coordinateInfoList);
             }
-
-
             canvas1.onmousemove = (e)=>{
                 let x =  e.layerX;
                 let y =  e.layerY;
-                
-                // console.log(e);
-
                 if(beginDraw){
                     ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
-
                     for(let i = 0;i < canvas1.drawElements.length;i++){
                         switch(canvas1.drawElements[i].t){
-                            case "r":
+                            case "1":
+                                ctx.beginPath();
+                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
+                                ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
+                                ctx.stroke(); 
+                                break;
+                            case "2":
+                                ctx.beginPath();
+                                ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
+                                ctx.stroke(); 
+                                break;
+                            case "3":
                                 ctx.beginPath();
                                 ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
                                 ctx.stroke(); 
                                 break;
                         }
                     }
-
-                    // ctx.strokeRect(start.x,start.y,x - start.x,y - start.y);
-
-                    ctx.beginPath();
-                    ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                    ctx.stroke(); 
-                    end.x = x;
-                    end.y = y;
+                    switch(this.shapeType){
+                        case "1":
+                        ctx.beginPath();
+                        ctx.moveTo(start.x,start.y);
+                        ctx.lineTo(x,y);
+                        // ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                        ctx.stroke(); 
+                        end.x = x;
+                        end.y = y;
+                        // console.log(start.x,"",start.y);
+                        break;
+                        case "2":
+                        ctx.beginPath();
+                        ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
+                        ctx.stroke(); 
+                        end.x = x;
+                        end.y = y;
+                        break;
+                        case "3":
+                        ctx.beginPath();
+                        ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                        ctx.stroke(); 
+                        end.x = x;
+                        end.y = y;
+                        break;
+                        case "4":
+                        {
+                            ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                            ctx.beginPath();
+                            if(!FinishDraw){
+                                if(points.length > 1){	//	画结束位置
+                                    ctx.rect(points[0].x - 10,points[0].y - 10,20,20);
+                                }
+                            }
+                            ctx.stroke()
+                            this.drawCloudLine(ctx,points,20,FinishDraw,{x:e.layerX,y:e.layerY});
+                        }
+                        break;
+                    } 
                 }
             }
-
             canvas1.drawElements = [];
+        },
+        //添加批注
+        addAnnotation(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationInfo:this.annotationInfo,
+                    drawingVersionId:this.drawingId,
+                    reviewStage:this.stage,
+                    type:this.coordinateInfoList[0].t,
+                    // projectId:vm.projId
+                },
+                data:{
+                     coordinateInfo:JSON.stringify(this.coordinateInfoList)
+                }
 
-            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0]);
+            }).then((response)=>{
+                if(response.data.cd='0'){
+                    alert('hfjd')
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+        //获取批注列表
+        queryAnnotation(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/queryAnnotation',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    drawingVersionId:this.drawingId,
+                    annotationUserId:this.annotationUserId,
+                    stage:this.stage,
+                    isMark:this.isMark
+                    // projectId:vm.projId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    alert("jfkdjk")
+                }else{
+                    alert(response.data.msg);
+                    // this.message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
+                } 
+            })
+        },
+         drawCloudLine(cxt,points,radio,finish,last){
+			var counterclockwise = false;
+			////////////////// 画角 /////////////////////
 
-            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onresize = (e)=>{
+			if(finish){
+				cxt.beginPath();
+				
+				let a1 = this.angle(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
+				let a2 = this.angle(points[0].x,points[0].y,points[1].x,points[1].y); // 
 
-            //      console.log(e);
-            //     canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-            //     canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-            // }
+				let l = this.getLength(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
+				let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
+				l2 /= 2;
+				let a11 = Math.acos(l2 / radio);
+				a11 = Math.abs(a11);
+
+				cxt.arc(points[0].x,points[0].y,radio,a1 + a11,a2 - Math.PI / 4,counterclockwise);
+				cxt.stroke();
+
+			}else{
+				if(points.length > 1){
+					cxt.beginPath();
+					
+					let a1 = this.angle(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
+					let a2 = this.angle(points[points.length-1].x,points[points.length-1].y,last.x,last.y); // 
+
+					let l = this.getLength(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
+					let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
+					l2 /= 2;
+					let a11 = Math.acos(l2 / radio);
+					a11 = Math.abs(a11);
+
+
+					cxt.arc(points[points.length-1].x,points[points.length-1].y,radio,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
+					cxt.stroke();
+				}
+			}
+
+			for(let i = 0; i < points.length - 2;i++){ 
+
+				cxt.beginPath();
+				
+				let a1 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+				let a2 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 2].x,points[i + 2].y); // 
+
+				let l = this.getLength(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+				let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
+				l2 /= 2;
+				let a11 = Math.acos(l2 / radio);
+				a11 = Math.abs(a11);
+
+				cxt.arc(points[i + 1].x,points[i + 1].y,radio,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
+				cxt.stroke();
+			}
+
+			/////////////////////////////////////////////
+
+			/////////////////// 画线 /////////////////////
+
+			for(let i = 0; i < points.length - 1;i++){
+
+				let l = this.getLength(points[i].x,points[i].y,points[i + 1].x,points[i + 1].y);
+				let a1 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+
+				let dir = {x:points[i + 1].x - points[i].x,y:points[i + 1].y - points[i].y};
+				dir = this.normalize(dir);
+
+				let k = radio * 1.5;
+
+				for(let j = 1;j < Math.ceil(l / k);j++){
+
+					cxt.beginPath();
+
+					let item = {x:points[i].x + j*k * dir.x,y:points[i].y + j*k * dir.y};
+					cxt.arc(item.x,item.y,radio,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
+
+					cxt.stroke();
+				}
+			}
+
+			//////////////////////////////////////////////
+
+			///////////////// 画当前线 ////////////////////
+
+			if(points.length > 0){
+
+				let l = this.getLength(	points[points.length-1].x,
+									points[points.length-1].y,last.x,last.y);
+				let a1 = this.angle(last.x,last.y,points[points.length-1].x,points[points.length-1].y);
+
+				let dir = {x:last.x - points[points.length-1].x,y:last.y - points[points.length-1].y};
+				dir = this.normalize(dir);
+
+				let k = radio * 1.5;
+
+				for(let j = 1;j < Math.ceil(l / k);j++){
+
+					cxt.beginPath();
+
+					let item = {x:points[points.length-1].x + j*k * dir.x,y:points[points.length-1].y + j*k * dir.y};
+					cxt.arc(item.x,item.y,radio,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
+
+					cxt.stroke();
+				}
+			}
+			//////////////////////////////////////////////
+			return counterclockwise;
+		},
+		angle(x1,y1,x2,y2){
+			let x = x2 - x1;
+			let y = y2 - y1;
+
+			var angle = Math.atan2( y, x );
+
+			if ( angle < 0 ) angle += 2 * Math.PI;
+
+			return angle;
+		},
+        getLength(x1,y1,x2,y2){
+            return Math.pow((x1 - x2)*(x1 - x2) + 
+                            (y1 - y2)*(y1 - y2),0.5)
+        },
+        normalize(dir){
+            let l = Math.pow(dir.x*dir.x + dir.y*dir.y,0.5);
+
+            return {x:dir.x/l,y:dir.y/l};
         },
         //获取目录
         getDirectory(){
+            console.log(this.data);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
@@ -386,12 +762,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
+                    vm.DirectoryList.forEach((item)=>{
+                        
+
+                    })
+                    
                     this.getDrawingList()
                     vm.DirectoryList.forEach((item,index) => {
                             // vm.$set(item,'directory',item.code)
                             // vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
                         });
-                    console.log(vm.DirectoryList);
+                    // console.log(vm.DirectoryList);
                     vm.showAction = true
                 }else{
                     vm.message({
@@ -432,38 +813,36 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                      vm.drawingList=response.data.rt;
-                    //  this.getDirectory()
                     console.log(vm.drawingList)
                     console.log(this.DirectoryList)
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
-                            // vm.$set(item,'code',item.directory)
                             vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
                         });
                     }
-                    var drawingDirList=this.DirectoryList
-                    // var children=drawingDirList.concat(vm.drawingList)
-                    if(vm.drawingList != null){
-                      var children = vm.drawingList.concat(drawingDirList)
-                    }else{
-                        var children = drawingDirList
-                    }
-                    console.log(children)
-                    vm.FileTree_original = children
-                    vm.FileTree = data.transformTozTreeFormat(setting, children)
-                    console.log(vm.FileTree)
+                    
+                     this.DirectoryList.forEach((item)=>{
+                        this.drawingList.forEach((item1)=>{
+                            if(item.code==item1.directory){
+                                let a=[];
+                                a.push(item1)
+                                vm.$set(item,'children',a)
+                                // console.log(item);
+                            }
+                        })
+                    })
+                    vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
+                    console.log(vm.FileTree);
+                    // var drawingDirList=this.DirectoryList
+                    // if(vm.drawingList != null){
+                    //   var children = vm.drawingList.concat(drawingDirList)
+                    // }else{
+                    //     var children = drawingDirList
+                    // }
+                    // console.log(children)
+                    // vm.FileTree_original = children
+                    // vm.FileTree = data.transformTozTreeFormat(setting, children)
                     // console.log(vm.FileTree)
-                    // console.log(vm.drawingList);
-                    // this.DirectoryList.forEach((item,index)=>{
-                    //     this.drawingList.forEach((item1,index1)=>{
-                    //         if(item.code==item1.directory){
-                    //             item[index].push({
-                    //                 'children':item1[index1]
-                    //             })
-                    //         }
-                    //     })
-                    // })
-
                 }
             })
         },
@@ -489,39 +868,39 @@ export default {
         handleNodeClick(obj){
             var vm=this
             vm.showAction = true
-          if(!obj.isLeaf){
-            vm.IsFolderAction = true
-            if(!obj.children){
-                vm.$message({
-                    type:'info',
-                    message:'这个文件夹没有子文件或图纸!'
-                })
+            if(!obj.isLeaf){
+                vm.IsFolderAction = true
+                if(!obj.children){
+                    vm.$message({
+                        type:'info',
+                        message:'这个文件夹没有子文件或图纸!'
+                    })
+                }
+            }else{
+                vm.IsFolderAction = false
             }
-          }else{
-              vm.IsFolderAction = false
-          }
-         vm.checkFileDir = obj//选中的文件夹
-         vm.directoryId=obj.code
-         vm.drawingId=obj.id
-         console.log(vm.directoryId);
-         console.log(vm.drawingId);
-         if(vm.drawingId){
-             this.getMaxVersionPath();
-         }
+            vm.checkFileDir = obj//选中的文件夹
+            vm.directoryId=obj.code
+            vm.drawingId=obj.id
+            console.log(vm.directoryId);
+            console.log(vm.drawingId);
+            if(vm.drawingId){
+                this.getMaxVersionPath();
+            }
          
-        //  vm.drawingList.forEach((item)=>{
-        //      vm.DirectoryList.forEach((item1)=>{
-        //          if(item1.code==item.directory){
-        //             item1.push({'children':item})
-        //         }
-        //      })
-             
-        //  })
-        //  console.log(vm.DirectoryList);
-         if(vm.expandedKeys.indexOf(vm.checkFileDir.code) == -1){
-            vm.expandedKeys.push(vm.checkFileDir.code)
-          }
-          console.log(vm.expandedKeys);
+            //  vm.drawingList.forEach((item)=>{
+            //      vm.DirectoryList.forEach((item1)=>{
+            //          if(item1.code==item.directory){
+            //             item1.push({'children':item})
+            //         }
+            //      })
+                
+            //  })
+            //  console.log(vm.DirectoryList);
+            if(vm.expandedKeys.indexOf(vm.checkFileDir.code) == -1){
+                vm.expandedKeys.push(vm.checkFileDir.code)
+            }
+            console.log(vm.expandedKeys);
         },
         //获取图纸版本列表
         getDrawingVersionList(){
@@ -544,19 +923,10 @@ export default {
         },
         //新建文件夹
         addFile(){
-            // vm.getDirectory()
-            // vm.getDrawingList()
-            this.getDrawingList()
         },
         //删除文件夹
         deleteFile(){
-            
-
-            
-            // this.$refs.pdfDocument.pdf.getCanvas(function(canvasElt){
-            //        return canvasElt.style.position='absolute'
-
-            // })
+        
         },
         renameFile(){
 
@@ -703,6 +1073,9 @@ export default {
 </script>
 <style lang="less" scope>
     #drwaingReview{
+        i{
+            font-style:normal
+        }
         *{
             margin: 0;
             padding: 0;
@@ -812,6 +1185,95 @@ export default {
                     min-width: 700px;
                     min-height: 500px;
                 }
+            }
+            #drawingToolsBody{
+                position: absolute;
+                bottom: 50px;
+                left:50%;
+                width: 100%;
+                margin-left:-255px;
+                    .drawingTools{
+                        width: 568px;
+                        height: 36px;
+                        background-color:#3b3b3b;
+                        position: relative;
+                            // height: 30px;
+                            .drawingIcon{
+                                width: 80px;
+                                height: 26px;
+                                // line-height: 26px;
+                                cursor: pointer;
+                                position: absolute;
+                            }
+                            .zuoRotate{
+                                left:10px;
+                                top:9px;
+                                background: url('./images/zuox.png')no-repeat 0 0;
+                                // z-index: 10;
+                                //  width: 26px;
+                                // height: 26px;
+                                // cursor: pointer;
+                                &:hover{
+                                    background: url('./images/zuox1.png')no-repeat 0 0;
+                                }
+                            }
+                            .youRotate{
+                                left:50px;
+                                top:9px;
+                                background: url('./images/youx.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/youx1.png')no-repeat 0 0;
+                                }
+                            }
+                            .straightLine{
+                                left:120px;
+                                top:9px;
+                                background: url('./images/zx.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/zx1.png')no-repeat 0 0;
+                                }
+                            }
+                            .circular{
+                                left:190px;
+                                top:9px;
+                                background: url('./images/yx.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/yx1.png')no-repeat 0 0;
+                                }
+                            }
+                            .rectangle{
+                                left:260px;
+                                top:9px;
+                                background: url('./images/jx.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/jx1.png')no-repeat 0 0;
+                                }
+                            }
+                            .cloudLine{
+                                 left:330px;
+                                top:9px;
+                                background: url('./images/yunxian.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/yunxian1.png')no-repeat 0 0;
+                                }
+                            }
+                            .text{
+                                 left:400px;
+                                top:9px;
+                                background: url('./images/wenb.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/wenb1.png')no-repeat 0 0;
+                                }
+                            }
+                            .appended{
+                                left:470px;
+                                top:9px;
+                                background: url('./images/fuz.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/fuz1.png')no-repeat 0 0;
+                                }
+                            }
+                    }
             }
         }
         .box-left-avtive{
