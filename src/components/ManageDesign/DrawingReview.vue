@@ -33,8 +33,8 @@
                 
                 <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
                     <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
-                    <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf>
-                    <!-- <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf> -->
+                    <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
+                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
