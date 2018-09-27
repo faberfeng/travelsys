@@ -46,8 +46,9 @@
                         <li><i class="drawingIcon circular" @click="circular()"><span style="color:#fc3439;font-size:14px;">圆形</span></i></li>
                         <li><i class="drawingIcon rectangle" @click="rectangleTool()"><span style="color:#fc3439;font-size:14px;">矩形</span></i></li>
                         <li><i class="drawingIcon cloudLine" @click="cloudLine()"><span style="color:#fc3439;font-size:14px;">云线</span></i></li>
-                        <li><i class="drawingIcon text"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
-                        <li><i class="drawingIcon appended"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                        <li><i class="drawingIcon text" @click="drawingText()"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
+                        <li><i class="drawingIcon appended" @click="appended()"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                        <img id="fz_img_for_draw" src="./images/fuz1.png" style="display:none"/>
                     </ul>
             </div>
         </div>
@@ -165,6 +166,8 @@ import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
 import moment from 'moment';
 import pdf from 'vue-pdf'
+// import 'three.min.js'
+var THREE = require('three');
 // import 'js/'
 export default {
      components: {
@@ -256,6 +259,7 @@ export default {
             shapeType:'',
             coordinateInfoList:[],
             allUserList:'',
+            beginDraw:false,
             layerID:0 // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
         }
 
@@ -380,6 +384,15 @@ export default {
             this.isDrawing=true;
             this.shapeType="4";
         },
+        drawingText(){
+            this.isDrawing=true;
+            this.shapeType="5";
+        },
+        appended(){
+            this.isDrawing=true;
+            this.shapeType="6";
+            this.beginDraw = true;
+        },
         drawingClick(){
             this.screenLeft.item = 1;
             // this.FileTree_original=[],
@@ -404,11 +417,15 @@ export default {
             this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute"
             // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
             if(document.getElementById("abs")){return;}
+
+            // let fz_img = new Image();
+            // fz_img.src = "./images/fuz1.png";
+
             let canvas1 = document.createElement("canvas");
             let start = {x:0,y:0};
             let end = {x:0,y:0};
             var points = [];
-            let beginDraw = false;
+            this.beginDraw = false;
             var FinishDraw = false;
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
@@ -445,68 +462,16 @@ export default {
                 // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
                 // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
             }
-            canvas1.onmousedown = (e)=>{
-                // this.isDrawing=false;
-                var selectColorID = ctx_select.getImageData( e.layerX,  e.layerY, 1, 1).data;
-                var red = selectColorID[0];
-                var green = selectColorID[1];
-                var blue = selectColorID[2];
-                console.log(selectColorID);
-                if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
-                    for(let i = 0;i < canvas1.drawElements.length;i++){
-                        if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
-                            canvas1.drawElements[i].status = "selected";
-                        }else{
-                            canvas1.drawElements[i].status = "none";
-                        }
-                    }
-                    return;
-                }
-                if(e.button == 0&&this.isDrawing){
-                    beginDraw = true;
-                    start.x = e.layerX;
-                    start.y = e.layerY;
-                    this.layerID++;
-                    console.log(this.layerID);
-                    if(this.shapeType=="4"){
-                        if(!FinishDraw){
-                            start.x = e.layerX;
-                            start.y = e.layerY;
-                            if(points.length > 0){
-                                if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
-                                            (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
-                                    points.push({x:points[0].x,y:points[0].y});
-                                    FinishDraw = true;
-                                    canvas1.onmousemove(e);
-                                    // this.isDrawing = false;
-                                    beginDraw=false;
-                                    return;
-                                }
-                            }
-                            points.push({x:e.layerX,y:e.layerY});
-                            console.log(points);
-                        }
-                        canvas1.onmousemove(e);
-                    }
-                    
-                }
-                // if(e.button == 2){
-                //     FinishDraw = false;
-				// 	points = [];
-                // }
-                
-            }
-            canvas1.onmouseup = (e)=>{
-                if(this.shapeType!="4"){
-                    this.coordinateInfoList=[];
-                    beginDraw = false;
-                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,status:"none"});
-                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID});
-                    this.isDrawing=false;
-                    this.addAnnotation();
-                    // canvas_select.style.display = "block";
-                }
-                // beginDraw = false;
+
+            let input = document.createElement("input");
+            input.style.width = "196px";
+            input.style.height = "28px";
+            input.style.display = "none";
+            input.style.position = "absolute";
+            input.type="text";
+            canvas1.parentNode.appendChild(input);
+
+            canvas1.reflash = (e)=>{
                 // console.log(canvas1.drawElements);
                 ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                 for(let i = 0;i < canvas1.drawElements.length;i++){
@@ -520,15 +485,21 @@ export default {
                             ctx.stroke();
                             //直线选中变样式
                             if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 52, 255)';
+                                ctx.strokeStyle='rgb(0, 0, 0)';
                                 ctx.lineWidth=1;
+                                
                                 ctx.beginPath();
                                 ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
                                 ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
                                 ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+
+
                             }
                             ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
+                            ctx_select.lineWidth=12;
                             ctx_select.beginPath();
                             ctx_select.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
                             ctx_select.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
@@ -539,7 +510,53 @@ export default {
                             ctx.lineWidth=3;
                             ctx.beginPath();
                             ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
-                            ctx.stroke(); 
+                            ctx.stroke();
+                            
+                             //圆形选中变样式
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 0, 0)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+
+                                
+
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+
+                                ctx.setLineDash([12,6]);
+
+                                ctx.beginPath();
+                                ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
+                                ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
+
+                                ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
+                                ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
+
+                                ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
+                                ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
+
+                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
+                                ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
+                                ctx.stroke();
+
+                                ctx.setLineDash([]);
+                            }
+
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+                            
                             break;
                         case "3":
                             ctx.strokeStyle='rgb(252, 52, 57)';
@@ -547,58 +564,400 @@ export default {
                             ctx.beginPath();
                             ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
                             ctx.stroke(); 
+
+                            //矩形选中变样式
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 0, 0)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+                            }
+
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+
                             break;
+                        
+                        case "4":
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            
+                            this.drawCloudLine(ctx,canvas1.drawElements[i].points,20,true,canvas1.drawElements[i].points[canvas1.drawElements[i].points.length - 1]);
+
+                            ctx.stroke(); 
+
+                            //矩形选中变样式
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 0, 0)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+                                ctx.setLineDash([]);
+                                
+
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+                                
+                                ctx.setLineDash([12,6]);
+
+                                ctx.beginPath();
+                                ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
+                                ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
+
+                                ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
+                                ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
+
+                                ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
+                                ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
+
+                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
+                                ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
+                                ctx.stroke();
+
+                                ctx.setLineDash([]);
+                            }
+
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            
+                            ctx_select.moveTo(canvas1.drawElements[i].points[0].x,canvas1.drawElements[i].points[0].y);
+
+                            for(let j = 0; j < canvas1.drawElements[i].points.length - 1;j++){ // 画中间线
+                                
+                                ctx_select.lineTo(canvas1.drawElements[i].points[j + 1].x,canvas1.drawElements[i].points[j + 1].y);
+					        }
+
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+
+                            break;
+
+                        case "5":
+
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            let text_X = canvas1.drawElements[i].e.x - 120;
+                            let text_Y = canvas1.drawElements[i].e.y;
+
+                            if(canvas1.drawElements[i].e.x < canvas1.drawElements[i].s.x){
+                                text_X = canvas1.drawElements[i].e.x + 120;
+                            }
+
+                            ctx.beginPath();
+                            let dir = new THREE.Vector2(text_X - canvas1.drawElements[i].s.x,text_Y - canvas1.drawElements[i].s.y);
+                            let length = dir.length();
+                            dir.normalize();
+
+                            // length -= 16;
+
+                            ctx.moveTo(canvas1.drawElements[i].s.x + dir.x * 16,canvas1.drawElements[i].s.y + dir.y * 16);
+                            ctx.lineTo(canvas1.drawElements[i].s.x  + dir.x * length,canvas1.drawElements[i].s.y  + dir.y * length);
+                            
+                            //执行画线
+                            ctx.stroke();
+
+                            //////////////////////////////////////////////////////////////////////
+
+                            let V = new THREE.Vector2(text_X - canvas1.drawElements[i].s.x,text_Y - canvas1.drawElements[i].s.y);
+                            V.normalize();
+                            let angle = V.angle();
+
+                            let M = new THREE.Matrix4();
+                            M.makeRotationZ(angle);
+
+                            let V1 = new THREE.Vector3(16,8,0);
+                            let V2 = new THREE.Vector3(16,-8,0);
+
+                            V1.applyMatrix4(M);
+                            V2.applyMatrix4(M);
+
+                            // ctx.lineWidth=1;
+                            ctx.beginPath();
+                            
+                            ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y);
+                            ctx.lineTo(canvas1.drawElements[i].s.x + V1.x,canvas1.drawElements[i].s.y + V1.y);
+                            ctx.lineTo(canvas1.drawElements[i].s.x + V2.x,canvas1.drawElements[i].s.y + V2.y);
+                            ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(252, 52, 57)';
+                            ctx.fill();
+
+                            ctx.beginPath();
+                            ctx.moveTo(text_X,text_Y);
+                            ctx.lineTo(canvas1.drawElements[i].e.x,text_Y);
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.moveTo(canvas1.drawElements[i].e.x - 100,text_Y + 16);
+                            ctx.lineTo(canvas1.drawElements[i].e.x + 100,text_Y + 16);
+                            ctx.lineTo(canvas1.drawElements[i].e.x + 100,text_Y - 16);
+                            ctx.lineTo(canvas1.drawElements[i].e.x - 100,text_Y - 16);
+                            ctx.lineTo(canvas1.drawElements[i].e.x - 100,text_Y + 16);
+
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            
+                            if(canvas1.drawElements[i].text){
+                                ctx.fillStyle='rgb(252, 52, 57)';
+                                ctx.font="18px Georgia";
+                                ctx.fillText(canvas1.drawElements[i].text,canvas1.drawElements[i].e.x - 96,text_Y + 6,192);
+                            }
+
+                            //矩形选中变样式
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 0, 0)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+
+                                ctx.rect(canvas1.drawElements[i].e.x - 100 - 5,text_Y + 16 - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x + 100 - 5,text_Y + 16 - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x + 100 - 5,text_Y - 16 - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 100 - 5,text_Y - 16 - 5,10,10);
+                                ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+                            }
+
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.rect(canvas1.drawElements[i].e.x - 100,canvas1.drawElements[i].e.y - 16,200,32);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+                            
+                            break;
+                        case "6":
+
+                            let fz_img = document.getElementById("fz_img_for_draw");
+                            ctx.drawImage(fz_img,canvas1.drawElements[i].e.x - 9,canvas1.drawElements[i].e.y - 9);
+
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 0, 0)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+
+                                ctx.rect(canvas1.drawElements[i].e.x - 12,canvas1.drawElements[i].e.y - 12,4,4);
+                                ctx.rect(canvas1.drawElements[i].e.x - 12,canvas1.drawElements[i].e.y + 8,4,4);
+                                ctx.rect(canvas1.drawElements[i].e.x + 8,canvas1.drawElements[i].e.y + 8,4,4);
+                                ctx.rect(canvas1.drawElements[i].e.x + 8,canvas1.drawElements[i].e.y - 12,4,4);
+                                ctx.stroke();
+
+                                ctx.fillStyle='rgb(255,255,255)';
+                                ctx.fill();
+
+                                // ctx.setLineDash([12,6]);
+
+                                // ctx.beginPath();
+                                // ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
+                                // ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
+
+                                // ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
+                                // ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
+
+                                // ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
+                                // ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
+
+                                // ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
+                                // ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
+                                // ctx.stroke();
+
+                                ctx.setLineDash([]);
+                            }
+
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.rect(canvas1.drawElements[i].e.x - 10,canvas1.drawElements[i].e.y - 10,20,20);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+
+                            break
                     }
                 }
+            }
+
+            canvas1.onmousedown = (e)=>{
+
+                if(input.style.display == "block"){
+                    input.style.display = "none";
+
+                    for(let i = 0;i < canvas1.drawElements.length;i++){
+                        if(canvas1.drawElements[i].ID == this.layerID){
+                            canvas1.drawElements[i].text = input.value;
+                        }
+                    }
+                }
+
+                // this.isDrawing=false;
+                var selectColorID = ctx_select.getImageData( e.layerX,  e.layerY, 1, 1).data;
+                var red = selectColorID[0];
+                var green = selectColorID[1];
+                var blue = selectColorID[2];
+                // console.log(selectColorID);
+
+                if(!this.beginDraw){
+
+                    if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
+                        for(let i = 0;i < canvas1.drawElements.length;i++){
+                            if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
+                                canvas1.drawElements[i].status = "selected";
+                            }else{
+                                canvas1.drawElements[i].status = "none";
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if(e.button == 0&&this.isDrawing){
+                    this.beginDraw = true;
+                    start.x = e.layerX;
+                    start.y = e.layerY;
+                    this.layerID++;
+                    // console.log(this.layerID);
+                    if(this.shapeType=="4"){
+                        if(!FinishDraw){
+                            start.x = e.layerX;
+                            start.y = e.layerY;
+                            if(points.length > 0){
+                                if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
+                                            (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
+                                    points.push({x:points[0].x,y:points[0].y});
+                                    FinishDraw = true;
+                                    canvas1.onmousemove(e);
+                                    // this.isDrawing = false;
+                                    this.beginDraw=false;
+                                    this.isDrawing=false;
+                                    
+                                    start.x = 1000000000;
+                                    start.y = 1000000000;
+
+                                    end.x = -1000000000;
+                                    end.y = -1000000000;
+
+                                    let points_2 = [];
+
+                                    for(let i = 0; i < points.length;i++){
+                                        if(points[i].x > end.x){
+                                            end.x = points[i].x;
+                                        }
+
+                                        if(points[i].x < start.x){
+                                            start.x = points[i].x;
+                                        }
+
+                                        if(points[i].y > end.y){
+                                            end.y = points[i].y;
+                                        }
+
+                                        if(points[i].y < start.y){
+                                            start.y = points[i].y;
+                                        }
+
+                                        points_2.push({x:points[i].x,y:points[i].y});
+
+                                    }
+
+                                    start.x -= 20;
+                                    start.y -= 20;
+                                    end.x += 20;
+                                    end.y += 20;
+
+                                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,status:"none"});
+                                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID});
+
+                                    points = [];
+                                    FinishDraw = false;
+
+                                    return;
+                                }
+                            }
+                            points.push({x:e.layerX,y:e.layerY});
+                            // console.log(points);
+                        }
+                        canvas1.onmousemove(e);
+                    }
+                    
+                }
+                // if(e.button == 2){
+                //     FinishDraw = false;
+				// 	points = [];
+                // }
+                
+            }
+            canvas1.onmouseup = (e)=>{
+                
+
+                if(this.beginDraw){
+
+                    if(this.shapeType!="4"){
+                        this.coordinateInfoList=[];
+                        this.beginDraw = false;
+                        this.isDrawing=false;
+                        canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,status:"none"});
+                        this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID});
+
+                        if(this.shapeType == "5"){
+                            input.value = "标注";
+                            input.style.left = (end.x - 98) + "px";
+                            input.style.top = (end.y - 14) + "px";
+                            input.style.display = "block";
+
+                            console.log(input);
+                        }
+
+                        // this.addAnnotation();
+                        
+                        // canvas_select.style.display = "block";
+                    }else{
+                        
+                    }
+
+
+                    // this.addAnnotation();
+                }
+                
+                canvas1.reflash();
 
                 console.log(this.coordinateInfoList);
             }
             canvas1.onmousemove = (e)=>{
                 let x =  e.layerX;
                 let y =  e.layerY;
-                if(beginDraw&&this.isDrawing){
-                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
-                    for(let i = 0;i < canvas1.drawElements.length;i++){
-                        switch(canvas1.drawElements[i].t){
-                            case "1":
-                                ctx.strokeStyle='rgb(252, 52, 57)';
-                                ctx.lineWidth=3;
-                                ctx.beginPath();
-                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
-                                ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                                ctx.stroke();
-                                if(canvas1.drawElements[i].status == "selected"){
-                                    ctx.strokeStyle='rgb(0, 52, 255)';
-                                    ctx.lineWidth=1;
-                                    ctx.beginPath();
-                                    ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                    ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                    ctx.stroke();
-                                } 
-                                ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ', '+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                                ctx_select.lineWidth=6;
-                                ctx_select.beginPath();
-                                ctx_select.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
-                                ctx_select.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                                ctx_select.stroke();
-                                break;
-                            case "2":
-                                ctx.strokeStyle='rgb(252, 52, 57)';
-                                ctx.lineWidth=3;
-                                ctx.beginPath();
-                                ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
-                                ctx.stroke(); 
-                                break;
-                            case "3":
-                                ctx.strokeStyle='rgb(252, 52, 57)';
-                                ctx.lineWidth=3;
-                                ctx.beginPath();
-                                ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
-                                ctx.stroke(); 
-                                break;
-                        }
-                    }
-
+                if(this.beginDraw&&this.isDrawing){
+                    
+                    canvas1.reflash();
+                    
                     switch(this.shapeType){
                         case "1":
                             ctx.strokeStyle='rgb(252, 52, 57)';
@@ -634,7 +993,6 @@ export default {
                         {
                             ctx.strokeStyle='rgb(252, 52, 57)';
                             ctx.lineWidth=3;
-                            ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                             ctx.beginPath();
                             if(!FinishDraw){
                                 if(points.length > 1){	//	画结束位置
@@ -644,6 +1002,85 @@ export default {
                             ctx.stroke()
                             this.drawCloudLine(ctx,points,20,FinishDraw,{x:e.layerX,y:e.layerY});
                         }
+                        break;
+                        case "5":
+
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            let text_X = e.layerX - 120;
+                            let text_Y = e.layerY;
+
+                            if(e.layerX < start.x){
+                                text_X = e.layerX + 120;
+                            }
+
+                            ctx.beginPath();
+                            let dir = new THREE.Vector2(text_X - start.x,text_Y - start.y);
+                            let length = dir.length();
+                            dir.normalize();
+
+                            // length -= 16;
+
+                            ctx.moveTo(start.x + dir.x * 16,start.y + dir.y * 16);
+                            ctx.lineTo(start.x  + dir.x * length,start.y  + dir.y * length);
+                            
+                            //执行画线
+                            ctx.stroke();
+
+                            //////////////////////////////////////////////////////////////////////
+
+                            let V = new THREE.Vector2(text_X - start.x,text_Y - start.y);
+                            V.normalize();
+                            let angle = V.angle();
+
+                            let M = new THREE.Matrix4();
+                            M.makeRotationZ(angle);
+
+                            let V1 = new THREE.Vector3(16,8,0);
+                            let V2 = new THREE.Vector3(16,-8,0);
+
+                            V1.applyMatrix4(M);
+                            V2.applyMatrix4(M);
+
+                            // ctx.lineWidth=1;
+                            ctx.beginPath();
+                            
+                            ctx.moveTo(start.x,start.y);
+                            ctx.lineTo(start.x + V1.x,start.y + V1.y);
+                            ctx.lineTo(start.x + V2.x,start.y + V2.y);
+                            ctx.lineTo(start.x,start.y);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(252, 52, 57)';
+                            ctx.fill();
+
+                            ctx.beginPath();
+                            ctx.moveTo(text_X,text_Y);
+                            ctx.lineTo(e.layerX,text_Y);
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.moveTo(e.layerX - 100,text_Y + 16);
+                            ctx.lineTo(e.layerX + 100,text_Y + 16);
+                            ctx.lineTo(e.layerX + 100,text_Y - 16);
+                            ctx.lineTo(e.layerX - 100,text_Y - 16);
+                            ctx.lineTo(e.layerX - 100,text_Y + 16);
+
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            
+                            end.x = x;
+                            end.y = y;
+                            
+                        break;
+                        case "6":
+
+                            let fz_img = document.getElementById("fz_img_for_draw");
+                            ctx.drawImage(fz_img,x - 9,y - 9);
+
+                            end.x = x;
+                            end.y = y;
                         break;
                     } 
                 }
