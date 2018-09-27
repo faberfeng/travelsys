@@ -30,10 +30,11 @@
                         <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
                     </el-select>
                 </div>
+                
                 <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
-                    
                     <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
-                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
+                    <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf>
+                    <!-- <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf> -->
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -64,7 +65,7 @@
             <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div v-if="showAction">
                     <p class="clearfix" v-if="IsFolderAction">
-                        <i class="icon-goujian icon-add" title="新建文件夹" @click="addFile"></i>
+                        <!-- <i class="icon-goujian icon-add" title="新建文件夹" @click="addFile"></i> -->
                         <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile"></i>
                         <i class="icon-goujian icon-edit"  title="重命名" @click="renameFile"></i>
                         <i class="icon-goujian icon-upload"  title="上传图纸" @click="uploadFile"></i>
@@ -72,14 +73,14 @@
                     <el-tree
                         :data="FileTree"
                         ref="fileTree_drawingReview"
-                        
                         :props="defaultProps"
-                        
+                        :default-expanded-keys="expandedKeys"
                         highlight-current
                         @node-click="handleNodeClick"
                         id="cloudDirveFileTree"
+                        :class="[showAction?'':'noTop']"
                     >
-                    <!-- <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span> -->
+                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
                 </div>
             </div>
@@ -172,33 +173,8 @@ export default {
     name:'drwaingReview',
     data(){
         return{
-            data: [{
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        }, 
-                        {
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        },
-                        {
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        } ],
+            pageAllCount:0,
+            pdfUrl:'',
             currentPage: 0,
             pageCount: 0,
             screenLeft:{
@@ -217,7 +193,7 @@ export default {
             defaultProps: {
                 children: 'children',
                 label: 'name',
-                // isLeaf:'leaf'
+                isLeaf:'leaf'
             },
             expandedKeys:[],
             checkFileDir:{},
@@ -279,7 +255,8 @@ export default {
             isDrawing:false,
             shapeType:'',
             coordinateInfoList:[],
-            allUserList:''
+            allUserList:'',
+            layerID:0 // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
         }
 
     },
@@ -303,6 +280,7 @@ export default {
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
         this.getAllUser()
+        this.load();
     },
     watch:{
         annotationUserId:function(val){
@@ -391,6 +369,7 @@ export default {
             this.shapeType="1";
         },
         circular(){
+            this.isDrawing=true;
             this.shapeType="2";
         },
         rectangleTool(){
@@ -426,19 +405,6 @@ export default {
             // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
             if(document.getElementById("abs")){return;}
             let canvas1 = document.createElement("canvas");
-            canvas1.id = "abs";
-            canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-            canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height)
-            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width)
-            canvas1.style.position = "absolute";
-            canvas1.style.left=0;
-            canvas1.style.top=0;
-            // canvas.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].width;
-            // canvas.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].height;
-            canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-            canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-            this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
             let start = {x:0,y:0};
             let end = {x:0,y:0};
             var points = [];
@@ -447,11 +413,61 @@ export default {
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
             ctx.lineWidth=3;
+            {   //  建立显示图层
+                
+                canvas1.id = "abs";
+                canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                canvas1.style.position = "absolute";
+                canvas1.style.left=0;
+                canvas1.style.top=0;
+                canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+               
+            }   
+
+            let canvas_select = document.createElement("canvas");
+            let ctx_select=canvas_select.getContext("2d");
+            {   //  建立选择图层
+                
+                canvas_select.id = "canvas_select";
+                canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                canvas_select.style.display = "none";
+
+                canvas_select.style.position = "absolute";
+                canvas_select.style.left=0;
+                canvas_select.style.top=0;
+                canvas_select.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                canvas_select.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                // ctx_select.strokeStyle='rgb(252, 52, 57)';
+                // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
+                // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
+            }
             canvas1.onmousedown = (e)=>{
-                if(e.button == 0){
+                // this.isDrawing=false;
+                var selectColorID = ctx_select.getImageData( e.layerX,  e.layerY, 1, 1).data;
+                var red = selectColorID[0];
+                var green = selectColorID[1];
+                var blue = selectColorID[2];
+                console.log(selectColorID);
+                if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
+                    for(let i = 0;i < canvas1.drawElements.length;i++){
+                        if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
+                            canvas1.drawElements[i].status = "selected";
+                        }else{
+                            canvas1.drawElements[i].status = "none";
+                        }
+                    }
+                    return;
+                }
+                if(e.button == 0&&this.isDrawing){
                     beginDraw = true;
                     start.x = e.layerX;
                     start.y = e.layerY;
+                    this.layerID++;
+                    console.log(this.layerID);
                     if(this.shapeType=="4"){
                         if(!FinishDraw){
                             start.x = e.layerX;
@@ -484,66 +500,140 @@ export default {
                 if(this.shapeType!="4"){
                     this.coordinateInfoList=[];
                     beginDraw = false;
-                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
-                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
+                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,status:"none"});
+                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID});
+                    this.isDrawing=false;
                     this.addAnnotation();
+                    // canvas_select.style.display = "block";
                 }
                 // beginDraw = false;
                 // console.log(canvas1.drawElements);
+                ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                for(let i = 0;i < canvas1.drawElements.length;i++){
+                    switch(canvas1.drawElements[i].t){
+                        case "1":
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
+                            ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
+                            ctx.stroke();
+                            //直线选中变样式
+                            if(canvas1.drawElements[i].status == "selected"){
+                                ctx.strokeStyle='rgb(0, 52, 255)';
+                                ctx.lineWidth=1;
+                                ctx.beginPath();
+                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                ctx.stroke();
+                            }
+                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
+                            ctx_select.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
+                            ctx_select.stroke();
+                            break;
+                        case "2":
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
+                            ctx.stroke(); 
+                            break;
+                        case "3":
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
+                            ctx.stroke(); 
+                            break;
+                    }
+                }
+
                 console.log(this.coordinateInfoList);
             }
             canvas1.onmousemove = (e)=>{
                 let x =  e.layerX;
                 let y =  e.layerY;
-                if(beginDraw){
+                if(beginDraw&&this.isDrawing){
                     ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                     for(let i = 0;i < canvas1.drawElements.length;i++){
                         switch(canvas1.drawElements[i].t){
                             case "1":
+                                ctx.strokeStyle='rgb(252, 52, 57)';
+                                ctx.lineWidth=3;
                                 ctx.beginPath();
                                 ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
                                 ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                                ctx.stroke(); 
+                                ctx.stroke();
+                                if(canvas1.drawElements[i].status == "selected"){
+                                    ctx.strokeStyle='rgb(0, 52, 255)';
+                                    ctx.lineWidth=1;
+                                    ctx.beginPath();
+                                    ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
+                                    ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
+                                    ctx.stroke();
+                                } 
+                                ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ', '+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
+                                ctx_select.lineWidth=6;
+                                ctx_select.beginPath();
+                                ctx_select.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
+                                ctx_select.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
+                                ctx_select.stroke();
                                 break;
                             case "2":
+                                ctx.strokeStyle='rgb(252, 52, 57)';
+                                ctx.lineWidth=3;
                                 ctx.beginPath();
                                 ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
                                 ctx.stroke(); 
                                 break;
                             case "3":
+                                ctx.strokeStyle='rgb(252, 52, 57)';
+                                ctx.lineWidth=3;
                                 ctx.beginPath();
                                 ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
                                 ctx.stroke(); 
                                 break;
                         }
                     }
+
                     switch(this.shapeType){
                         case "1":
-                        ctx.beginPath();
-                        ctx.moveTo(start.x,start.y);
-                        ctx.lineTo(x,y);
-                        // ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                        ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
-                        // console.log(start.x,"",start.y);
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.moveTo(start.x,start.y);
+                            ctx.lineTo(x,y);
+                            // ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
+                            // console.log(start.x,"",start.y);                        
                         break;
                         case "2":
-                        ctx.beginPath();
-                        ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
-                        ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
                         break;
                         case "3":
-                        ctx.beginPath();
-                        ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                        ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
                         break;
                         case "4":
                         {
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
                             ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                             ctx.beginPath();
                             if(!FinishDraw){
@@ -559,6 +649,9 @@ export default {
                 }
             }
             canvas1.drawElements = [];
+        },
+        load(){
+            console.log(this.pageAllCount);
         },
         //添加批注
         addAnnotation(){
@@ -582,7 +675,7 @@ export default {
 
             }).then((response)=>{
                 if(response.data.cd='0'){
-                    alert('hfjd')
+                    // alert('hfjd')
                 }else{
                     vm.message({
                         type:'error',
@@ -762,17 +855,8 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
-                    vm.DirectoryList.forEach((item)=>{
-                        
-
-                    })
-                    
                     this.getDrawingList()
-                    vm.DirectoryList.forEach((item,index) => {
-                            // vm.$set(item,'directory',item.code)
-                            // vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
-                        });
-                    // console.log(vm.DirectoryList);
+                    console.log(vm.DirectoryList);
                     vm.showAction = true
                 }else{
                     vm.message({
@@ -814,25 +898,25 @@ export default {
                 if(response.data.rt.length!=0){
                      vm.drawingList=response.data.rt;
                     console.log(vm.drawingList)
-                    console.log(this.DirectoryList)
+                    // console.log(this.DirectoryList)
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
+                            vm.$set(item,'isLeaf',true)
                             vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
                         });
-                    }
-                    
+                    }  
                      this.DirectoryList.forEach((item)=>{
                         this.drawingList.forEach((item1)=>{
+                            let a=[];
                             if(item.code==item1.directory){
-                                let a=[];
                                 a.push(item1)
+                                console.log(a);
                                 vm.$set(item,'children',a)
-                                // console.log(item);
                             }
                         })
                     })
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
-                    console.log(vm.FileTree);
+                    // console.log(vm.FileTree);
                     // var drawingDirList=this.DirectoryList
                     // if(vm.drawingList != null){
                     //   var children = vm.drawingList.concat(drawingDirList)
@@ -887,7 +971,6 @@ export default {
             if(vm.drawingId){
                 this.getMaxVersionPath();
             }
-         
             //  vm.drawingList.forEach((item)=>{
             //      vm.DirectoryList.forEach((item1)=>{
             //          if(item1.code==item.directory){
@@ -1033,7 +1116,7 @@ export default {
                 }
             }
             vm.fileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion+'&pageNo=4'
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion+'&pageNo=1'
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -1043,6 +1126,8 @@ export default {
                 formData.append('userId',vm.userId);
                 formData.append('modelCode','004');
                 formData.append('returnUrl',returnUrl);
+                // this.$refs.pdfDocument_upload.src=item.file;
+                // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
                         url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
@@ -1054,7 +1139,8 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.fileList = []
-                            vm.getDrawingList()
+                            vm.getDirectory()
+                            // vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
