@@ -3263,12 +3263,14 @@ export default {
           if(vm.expandedKeys.indexOf(data.nodeId) == -1){
             vm.expandedKeys.push(data.nodeId)
           }
+          console.log(vm.expandedKeys)
       },
       nodeClickClose(data,node,self){
           var vm = this
           if(vm.expandedKeys.indexOf(data.nodeId) != -1){
             vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
           }
+          console.log(vm.expandedKeys)
       },
       parseMStatus(mStatus){
             // 施工现场

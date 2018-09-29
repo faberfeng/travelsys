@@ -16,7 +16,7 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div class="commentInformation" v-show="screenLeft.item == 3">
+                <div class="commentInformation">
                     <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                         <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -32,9 +32,13 @@
                 </div>
                 
                 <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
-                    <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
+                    <div id="imgCanvasDiv">
+                        <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="500">
+                            <!-- <img id="drawPic" :src="drawingFileUrl"/> -->
+                        </canvas>
+                    </div>
                     <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
-                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
+                    <pdf v-show="pdfShow" ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="drawingFileUrl1"></pdf>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -59,8 +63,8 @@
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
                         <span class="item-property "  @click="screenLeft.item = 1">图<br>纸</span>
-                        <span class="item-version " @click="versionClick">版<br>本</span>
-                        <span class="item-version-3 " @click="annotationClick">批<br>注</span>
+                        <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
+                        <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
                     </div>
             </div>
             <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
@@ -76,11 +80,16 @@
                     </p>
                     <el-tree
                         :data="FileTree"
+                        node-key="code" 
                         ref="fileTree_drawingReview"
                         :props="defaultProps"
                         :default-expanded-keys="expandedKeys"
+                        :default-checked-keys="checkedKeys"
+                        @node-expand="nodeClick"
+                        @node-collapse="nodeClickClose"
                         highlight-current
                         @node-click="handleNodeClick"
+                        
                         id="cloudDirveFileTree"
                         :class="[showAction?'':'noTop']"
                     >
@@ -91,7 +100,7 @@
             <div v-show="screenLeft.show" v-else-if="screenLeft.item == 2" id="box-right">
                 <div class="versionBody">
                     <div class="versionHead">图纸名称（版本号）</div>
-                        <ul :class="[{'versionUlSel':item.versionId==isSelect},'versionUl']" v-for="(item,index) in drawingVersionList" :key="index" @click="selectVersion(item.versionId)">
+                        <ul :class="[{'versionUlSel':item.id==isSelect},'versionUl']" v-for="(item,index) in drawingVersionList" :key="index" @click="selectVersion(item.id)">
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name" >图号</span>
                                 <span class="detial-text-value" v-text="checkFileDir.name+'-'+item.versionId"></span>
@@ -105,9 +114,34 @@
                                 <span class="detial-text-value">{{item.insertTime|timeChange()}}</span>
                             </li>
                         </ul>
-
                 </div>
-
+            </div>
+            <div v-show="screenLeft.show" v-else-if="screenLeft.item == 3" id="box-right1">
+                <ul class="drawingApendedInfo">
+                    <li class="drawingApendedInfobody" v-for="(item,index) in annotationlist" :key="index">
+                        <!-- :src="shapeImg(item.coordinateInfo.t) -->
+                        <div  class="apendedInfoOne">
+                            <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
+                                <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
+                                <!-- <img id="img1" width="16px" height="16px" src="./images/zx1.png" > -->
+                                <!-- <img id="img2" width="16px" height="16px" src="./images/yx1.png" style="display:none" >
+                                <img id="img3" width="16px" height="16px" src="./images/jx1.png" style="display:none" >
+                                <img id="img4" width="16px" height="16px" src="./images/yunxian1.png" style="display:none" >
+                                <img id="img5" width="16px" height="16px" src="./images/wenb1.png" style="display:none" >
+                                <img id="img6" width="16px" height="16px" src="./images/fuz1.png" style="display:none" > -->
+                            <!-- </form> -->
+                        <label class="userName" v-text="item.updateUserName"></label><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarkValue,item.id)">标记</el-checkbox><div class="downIcon" @click="downIconComment(item.id)"></div></div>
+                        <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|timeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label><div class="commentIcon"></div></div>
+                        <div class="apendedInfoinp"><input placeholder="请输入描述" class="apendedInfoinput" type="text"/></div>
+                        <div class="commentBody" v-show="(item.id==isId)?true:false">
+                            <textarea rows="3" cols="20" type="text" placeholder="请回复" class="commentInfoinput">
+                            </textarea>
+                            <ul>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul> 
             </div>
         </div>
         <div id="edit">
@@ -226,6 +260,42 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            isId:'',//是否ID
+            drawingFileUrl:'',
+            drawingFileUrl1:'',
+            drawingVersionId:'',
+            queryAnnotationList:'',
+            coordinateInfoList_all:'',
+            annotationlist:'',
+            shape:require('./images/zx1.png'),
+            shapeList:[
+                {
+                    val:"1",
+                    imgUrl:require('./images/zx1.png')
+                },
+                {
+                    val:"2",
+                    imgUrl:require('./images/yx1.png')
+                },
+                {
+                    val:"3",
+                    imgUrl:require('./images/jx1.png')
+                },
+                {
+                    val:"4",
+                    imgUrl:require('./images/yunxian1.png')
+                },
+                {
+                    val:"5",
+                    imgUrl:require('./images/wenb1.png')
+                },
+                {
+                    val:"6",
+                    imgUrl:require('./images/fuz1.png')
+                },
+            ],
+            avatars:'',
+            replyList:'',
             isSelect:'',//是否选择版本
             pageAllCount:0,
             pdfUrl:'',
@@ -250,6 +320,7 @@ export default {
                 isLeaf:'leaf'
             },
             expandedKeys:[],
+            checkedKeys:[],
             checkFileDir:{},
             directoryId:'',
             drawingsUploadShow:false,
@@ -259,11 +330,14 @@ export default {
             FileTree:[],
             DirectoryList:[],
             drawingVersionList:'',
+            drawingZxVersionId:'',
             pageNo:'',
             versionPath:'',//最新图纸路径
-            annotationUserId:-1,//批注用户Id
-            stage:'-1',//阶段
-            isMark:'-1',//标记
+            annotationUserId:'',//批注用户Id
+            stage:'1',//阶段
+            isMark:'0',//标记
+            isMarkValue:false,
+            isMarkId:'',
             rotate:0,
             annotationInfo:'',
             updateFileName:'',//更新文件名
@@ -319,20 +393,38 @@ export default {
             isDrawing:false,
             shapeType:'',
             coordinateInfoList:[],
+            coordinateInfoAllList:[],
+            coordinateInfoAllListss:[],
             allUserList:'',
             beginDraw:false,
-            layerID:0 // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
-        }
+            layerID:0, // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
+            pdfShow:false,
+            imgShow:false,
+            commentShow:false,//评论下拉框
+            allList:'',
 
+
+        }
     },
     filters: {
-      timeChange(val) {
-        if (val == null) {
-          return;
-        } else {
-          return moment(val).format("YYYY-MM-DD HH:mm");
+        stageListChange(val){
+            if(val=='1'){
+                return '专业协调'
+            }else if(val=='2'){
+                return '内部校对'
+            }else if(val=='3'){
+                return '内部审核'
+            }else if(val==4){
+                return '业主审核'
+            }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return;
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
         }
-      }
     },
     created(){
         var vm=this;
@@ -345,7 +437,15 @@ export default {
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
         this.getAllUser()
+        this.$nextTick(() => {
+            this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
+        });
         // this.load();
+    },
+    mounted(){
+         window.onresize = ()=> {
+             this.loadeds();
+            }
     },
     watch:{
         annotationUserId:function(val){
@@ -353,6 +453,7 @@ export default {
         },
         stage:function(val){
             this.queryAnnotation()
+            // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
@@ -364,6 +465,51 @@ export default {
         
     },
     methods:{
+        shapeImg(val){
+            // this.shapeList.forEach((item)=>{
+            //     if(item.val==num){
+            //         return item.imgUrl
+            //     }
+            //     console.log()
+            // })
+                if(val==1){
+                    // document.getElementById('img1').style.display="block"
+                    // this.shape=require('./images/zx1.png')
+                    // return './images/zx1.png'
+                    return require('./images/zx1.png')
+                }else if(val==2){
+                    // this.shape=require('./images/yx1.png')
+                    //this.shape='./images/yx1.png'
+                    // return './images/yx1.png'
+                    return require('./images/yx1.png')
+                }else if(val==3){
+                    // this.shape=require('./images/yx1.png')
+                    //  document.getElementById('img3').style.display="block"
+                    //this.shape='./images/jx1.png'
+                    // return './images/jx1.png'
+                    return require('./images/jx1.png')
+                }else if(val==4){
+                    // this.shape=require('./images/yunxian1.png')
+                    //  document.getElementById('img4').style.display="block"
+                     //this.shape='./images/yunxian1.png'
+                    // return './images/yunxian1.png'
+                    return require('./images/yunxian1.png')
+                }else if(val==5){
+                    // this.shape=require('./images/wenb1.png')
+                    //  document.getElementById('img5').style.display="block"
+                    //this.shape='./images/wenb1.png.png'
+                    // return './images/wenb1.png.png'
+                    return require('./images/wenb1.png')
+                }else if(val==6){
+                    // this.shape=require('./images/fuz1.png')
+                    //  document.getElementById('img6').style.display="block"
+                     //this.shape='./images/fuz1.png'
+                    // return './images/fuz1.png'
+                    return require('./images/fuz1.png')
+                }
+                
+
+        },
         //获取工程中的用户
         getAllUser(){
             this.allUserList=''
@@ -377,11 +523,11 @@ export default {
                 params:{
                     projectId:vm.projId
                 },
-                
             }).then((response)=>{
                 if(response.data.cd=='0'){
                    this.allUserList=response.data.rt;
                    this.allUserList.unshift({userId: -1, userName: "全部", account: "", userPositions: null})
+                   this.annotationUserId=parseInt(this.userId);
                     // console.log(this.allUserList);
                 }else{
                     this.message({
@@ -390,8 +536,12 @@ export default {
                     })
                 } 
             })
-
         },
+        //下拉评论
+        downIconComment(val){
+            this.isId=val;
+        },
+       
         onmouse(){
             var that=this;
             var hei=window.innerHeight;//获取窗体高度
@@ -425,6 +575,35 @@ export default {
         //选择版本
         selectVersion(val){
             this.isSelect=val;
+            this.drawingVersionList.forEach((item)=>{
+                if(val==item.id){
+                    this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
+                    this.drawingVersionId=item.id
+                    if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
+                        {   this.pdfShow=true;
+                            this.imgShow=false;
+                            
+                            this.drawingFileUrl1=this.drawingFileUrl;
+                        }else{
+                            this.imgShow=true;
+                            this.pdfShow=false;
+                            var c = document.getElementById("imgCanvas");
+                            console.log(c);
+                            var width=c.width;
+                            var height=c.height;
+                            console.log(width,'',height)
+                            var ctx_img = c.getContext("2d");
+                            ctx_img.clearRect(0,0,width,height);
+                            var img = new Image();
+                            img.onload =function() {
+                                ctx_img.drawImage(img,0, 0);
+                                }
+                            img.src = this.drawingFileUrl;
+                        }
+                }
+                this.queryAnnotation();
+            })
+            // console.log(this.drawingFileUrl);
         },
         //图纸工具栏操作
         zuoRotate(){
@@ -471,21 +650,41 @@ export default {
             if(this.drawingId){
                 this.getDrawingVersionList();
             }
-           
         },
         annotationClick(){
-            this.screenLeft.item = 3
+             this.screenLeft.item = 3
+            this.queryAnnotation()
+        },
+        reloaded(){
+            let canvas1 = document.getElementById("abs");
+            // console.log(canvas1);
+            let start = {x:0,y:0};
+            let end = {x:0,y:0};
+            var points = [];
+            this.beginDraw = false;
+            var FinishDraw = false;
+            let ctx=canvas1.getContext("2d");
+            ctx.strokeStyle='rgb(252, 52, 57)';
+            ctx.lineWidth=3;
+            let canvas_select = document.createElement("canvas");
+            let ctx_select=canvas_select.getContext("2d");
+            
+            this.allList=JSON.parse(this.coordinateInfoList_all)
+            console.log(typeof(this.allList),'0000');
+            this.allList.forEach((item)=>{
+                this.drawingMethodsSave(item,ctx,ctx_select);
+            })
         },
         loadeds(){
+            // alert('dff')
             //  alert('hdjsf')
             // console.log($event);
-            this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute"
             // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
+                // console.log(this.coordinateInfoList_all);
+            
             if(document.getElementById("abs")){return;}
-
             // let fz_img = new Image();
             // fz_img.src = "./images/fuz1.png";
-
             let canvas1 = document.createElement("canvas");
             let start = {x:0,y:0};
             let end = {x:0,y:0};
@@ -495,384 +694,94 @@ export default {
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
             ctx.lineWidth=3;
+            
             {   //  建立显示图层
-                
-                canvas1.id = "abs";
-                canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-                canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-                canvas1.style.position = "absolute";
-                canvas1.style.left=0;
-                canvas1.style.top=0;
-                canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-                canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-                this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
-               
+                if(this.pdfShow==true){
+                    this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute";
+                    canvas1.id = "abs";
+                    canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                    canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                    canvas1.style.position = "absolute";
+                    canvas1.style.left=0;
+                    canvas1.style.top=0;
+                    canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                    canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+                }else if(this.imgShow==true){
+                    canvas1.id ="abs";
+                    var img=document.getElementById("imgCanvas")
+                    var imgDiv=document.getElementById("imgCanvasDiv")
+                    canvas1.width = img.width;
+                    canvas1.height = img.height;
+                    canvas1.style.position = "absolute";
+                    canvas1.style.left=0;
+                    canvas1.style.top=0;
+                    imgDiv.appendChild(canvas1);
+                }
             }   
-
             let canvas_select = document.createElement("canvas");
             let ctx_select=canvas_select.getContext("2d");
+            
+            
             {   //  建立选择图层
-                
-                canvas_select.id = "canvas_select";
-                canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-                canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-                canvas_select.style.display = "none";
-
-                canvas_select.style.position = "absolute";
-                canvas_select.style.left=0;
-                canvas_select.style.top=0;
-                canvas_select.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-                canvas_select.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                if(this.pdfShow==true){
+                    canvas_select.id = "canvas_select";
+                    canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                    canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                    canvas_select.style.display = "none";
+                    canvas_select.style.position = "absolute";
+                    canvas_select.style.left=0;
+                    canvas_select.style.top=0;
+                    canvas_select.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                    canvas_select.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+                }else if(this.imgShow==true){
+                    canvas_select.id = "canvas_select";
+                    var img=document.getElementById("imgCanvas")
+                    var imgDiv=document.getElementById("imgCanvasDiv")
+                    canvas_select.width = img.width;
+                    canvas_select.height = img.height;
+                    canvas_select.style.display = "none";
+                    canvas_select.style.position = "absolute";
+                    canvas_select.style.left=0;
+                    canvas_select.style.top=0;
+                    // imgDiv.appendChild(canvas_select);
+                }
                 // ctx_select.strokeStyle='rgb(252, 52, 57)';
                 // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
                 // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
             }
-
-            let input = document.createElement("input");
-            input.style.width = "196px";
-            input.style.height = "28px";
-            input.style.display = "none";
-            input.style.position = "absolute";
-            input.type="text";
-            canvas1.parentNode.appendChild(input);
-
-            canvas1.reflash = (e)=>{
-                // console.log(canvas1.drawElements);
-                ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
-                for(let i = 0;i < canvas1.drawElements.length;i++){
-                    switch(canvas1.drawElements[i].t){
-                        case "1":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
-                            ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                            ctx.stroke();
-                            //直线选中变样式
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                
-                                ctx.beginPath();
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-
-
-                            }
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=12;
-                            ctx_select.beginPath();
-                            ctx_select.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
-                            ctx_select.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                            ctx_select.stroke();
-                            break;
-                        case "2":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
-                            ctx.stroke();
-                            
-                             //圆形选中变样式
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                ctx.beginPath();
-
-                                
-
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-
-                                ctx.setLineDash([12,6]);
-
-                                ctx.beginPath();
-                                ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
-                                ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
-
-                                ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
-                                ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
-
-                                ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
-                                ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
-
-                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
-                                ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
-                                ctx.stroke();
-
-                                ctx.setLineDash([]);
-                            }
-
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            ctx_select.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
-                            ctx_select.stroke();
-
-                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
-                            ctx_select.fill();
-                            
-                            break;
-                        case "3":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
-                            ctx.stroke(); 
-
-                            //矩形选中变样式
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                ctx.beginPath();
-
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-                            }
-
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            ctx_select.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
-                            ctx_select.stroke();
-
-                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
-                            ctx_select.fill();
-
-                            break;
-                        
-                        case "4":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            
-                            this.drawCloudLine(ctx,canvas1.drawElements[i].points,20,true,canvas1.drawElements[i].points[canvas1.drawElements[i].points.length - 1]);
-
-                            ctx.stroke(); 
-
-                            //矩形选中变样式
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                ctx.beginPath();
-                                ctx.setLineDash([]);
-                                
-
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].s.x - 5,canvas1.drawElements[i].e.y - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y - 5,10,10);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-                                
-                                ctx.setLineDash([12,6]);
-
-                                ctx.beginPath();
-                                ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
-                                ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
-
-                                ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
-                                ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
-
-                                ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
-                                ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
-
-                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
-                                ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
-                                ctx.stroke();
-
-                                ctx.setLineDash([]);
-                            }
-
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            
-                            ctx_select.moveTo(canvas1.drawElements[i].points[0].x,canvas1.drawElements[i].points[0].y);
-
-                            for(let j = 0; j < canvas1.drawElements[i].points.length - 1;j++){ // 画中间线
-                                
-                                ctx_select.lineTo(canvas1.drawElements[i].points[j + 1].x,canvas1.drawElements[i].points[j + 1].y);
-					        }
-
-                            ctx_select.stroke();
-
-                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
-                            ctx_select.fill();
-
-                            break;
-
-                        case "5":
-
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            let text_X = canvas1.drawElements[i].e.x - 120;
-                            let text_Y = canvas1.drawElements[i].e.y;
-
-                            if(canvas1.drawElements[i].e.x < canvas1.drawElements[i].s.x){
-                                text_X = canvas1.drawElements[i].e.x + 120;
-                            }
-
-                            ctx.beginPath();
-                            let dir = new THREE.Vector2(text_X - canvas1.drawElements[i].s.x,text_Y - canvas1.drawElements[i].s.y);
-                            let length = dir.length();
-                            dir.normalize();
-
-                            // length -= 16;
-
-                            ctx.moveTo(canvas1.drawElements[i].s.x + dir.x * 16,canvas1.drawElements[i].s.y + dir.y * 16);
-                            ctx.lineTo(canvas1.drawElements[i].s.x  + dir.x * length,canvas1.drawElements[i].s.y  + dir.y * length);
-                            
-                            //执行画线
-                            ctx.stroke();
-
-                            //////////////////////////////////////////////////////////////////////
-
-                            let V = new THREE.Vector2(text_X - canvas1.drawElements[i].s.x,text_Y - canvas1.drawElements[i].s.y);
-                            V.normalize();
-                            let angle = V.angle();
-
-                            let M = new THREE.Matrix4();
-                            M.makeRotationZ(angle);
-
-                            let V1 = new THREE.Vector3(16,8,0);
-                            let V2 = new THREE.Vector3(16,-8,0);
-
-                            V1.applyMatrix4(M);
-                            V2.applyMatrix4(M);
-
-                            // ctx.lineWidth=1;
-                            ctx.beginPath();
-                            
-                            ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y);
-                            ctx.lineTo(canvas1.drawElements[i].s.x + V1.x,canvas1.drawElements[i].s.y + V1.y);
-                            ctx.lineTo(canvas1.drawElements[i].s.x + V2.x,canvas1.drawElements[i].s.y + V2.y);
-                            ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(252, 52, 57)';
-                            ctx.fill();
-
-                            ctx.beginPath();
-                            ctx.moveTo(text_X,text_Y);
-                            ctx.lineTo(canvas1.drawElements[i].e.x,text_Y);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(canvas1.drawElements[i].e.x - 100,text_Y + 16);
-                            ctx.lineTo(canvas1.drawElements[i].e.x + 100,text_Y + 16);
-                            ctx.lineTo(canvas1.drawElements[i].e.x + 100,text_Y - 16);
-                            ctx.lineTo(canvas1.drawElements[i].e.x - 100,text_Y - 16);
-                            ctx.lineTo(canvas1.drawElements[i].e.x - 100,text_Y + 16);
-
-                            ctx.stroke();
-
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                            
-                            if(canvas1.drawElements[i].text){
-                                ctx.fillStyle='rgb(252, 52, 57)';
-                                ctx.font="18px Georgia";
-                                ctx.fillText(canvas1.drawElements[i].text,canvas1.drawElements[i].e.x - 96,text_Y + 6,192);
-                            }
-
-                            //矩形选中变样式
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                ctx.beginPath();
-
-                                ctx.rect(canvas1.drawElements[i].e.x - 100 - 5,text_Y + 16 - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x + 100 - 5,text_Y + 16 - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x + 100 - 5,text_Y - 16 - 5,10,10);
-                                ctx.rect(canvas1.drawElements[i].e.x - 100 - 5,text_Y - 16 - 5,10,10);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-                            }
-
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            ctx_select.rect(canvas1.drawElements[i].e.x - 100,canvas1.drawElements[i].e.y - 16,200,32);
-                            ctx_select.stroke();
-
-                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
-                            ctx_select.fill();
-                            
-                            break;
-                        case "6":
-
-                            let fz_img = document.getElementById("fz_img_for_draw");
-                            ctx.drawImage(fz_img,canvas1.drawElements[i].e.x - 9,canvas1.drawElements[i].e.y - 9);
-
-                            if(canvas1.drawElements[i].status == "selected"){
-                                ctx.strokeStyle='rgb(0, 0, 0)';
-                                ctx.lineWidth=1;
-                                ctx.beginPath();
-
-                                ctx.rect(canvas1.drawElements[i].e.x - 12,canvas1.drawElements[i].e.y - 12,4,4);
-                                ctx.rect(canvas1.drawElements[i].e.x - 12,canvas1.drawElements[i].e.y + 8,4,4);
-                                ctx.rect(canvas1.drawElements[i].e.x + 8,canvas1.drawElements[i].e.y + 8,4,4);
-                                ctx.rect(canvas1.drawElements[i].e.x + 8,canvas1.drawElements[i].e.y - 12,4,4);
-                                ctx.stroke();
-
-                                ctx.fillStyle='rgb(255,255,255)';
-                                ctx.fill();
-
-                                // ctx.setLineDash([12,6]);
-
-                                // ctx.beginPath();
-                                // ctx.moveTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].s.y);
-                                // ctx.lineTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].s.y);
-
-                                // ctx.moveTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].s.y + 5);
-                                // ctx.lineTo(canvas1.drawElements[i].e.x ,canvas1.drawElements[i].e.y - 5);
-
-                                // ctx.moveTo(canvas1.drawElements[i].e.x - 5,canvas1.drawElements[i].e.y);
-                                // ctx.lineTo(canvas1.drawElements[i].s.x + 5,canvas1.drawElements[i].e.y);
-
-                                // ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - 5);
-                                // ctx.lineTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y + 5);
-                                // ctx.stroke();
-
-                                ctx.setLineDash([]);
-                            }
-
-                            ctx_select.strokeStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            ctx_select.rect(canvas1.drawElements[i].e.x - 10,canvas1.drawElements[i].e.y - 10,20,20);
-                            ctx_select.stroke();
-
-                            ctx_select.fillStyle='rgb(' + canvas1.drawElements[i].ID % 256 +  ','+ parseInt(canvas1.drawElements[i].ID / 256) % 256  + ', 0)';;
-                            ctx_select.fill();
-
-                            break
-                    }
+                let input = document.createElement("input");
+                input.id="absInp"
+                input.style.width = "196px";
+                input.style.height = "28px";
+                input.style.display = "none";
+                input.style.position = "absolute";
+                input.type="text";
+                canvas1.parentNode.appendChild(input);
+                // console.log(this.coordinateInfoAllListss);
+                // this.coordinateInfoList_all.forEach((item)=>{
+                //     this.drawingMethodsSave(item,ctx,ctx_select);
+                
+                // })
+                // this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
+               
+
+                canvas1.reflash = (e)=>{
+                    // console.log(canvas1.drawElements);
+                     canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
+                     console.log(canvas1.drawElements,'reflash')
+                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                    this.coordinateInfoAllList=canvas1.drawElements;
+                    console.log(this.allList)
+                    // console.log(canvas1.drawElements);
+                   canvas1.drawElements.forEach((item)=>{
+                       this.drawingMethodsSave(item,ctx,ctx_select);
+                   })
                 }
-            }
-
             canvas1.onmousedown = (e)=>{
-
+                // canvas1.drawElements.concat(this.allList);
+                // console.log(canvas1.drawElements,'1111');
                 if(input.style.display == "block"){
                     input.style.display = "none";
 
@@ -881,6 +790,7 @@ export default {
                             canvas1.drawElements[i].text = input.value;
                         }
                     }
+                    console.log(canvas1.drawElements);
                 }
 
                 // this.isDrawing=false;
@@ -889,9 +799,7 @@ export default {
                 var green = selectColorID[1];
                 var blue = selectColorID[2];
                 // console.log(selectColorID);
-
                 if(!this.beginDraw){
-
                     if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
                         for(let i = 0;i < canvas1.drawElements.length;i++){
                             if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
@@ -957,9 +865,10 @@ export default {
                                     start.y -= 20;
                                     end.x += 20;
                                     end.y += 20;
-
-                                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,status:"none"});
-                                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID});
+                                    canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
+                                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                    // this.coordinateInfoAllList=canvas1.drawElements;
 
                                     points = [];
                                     FinishDraw = false;
@@ -981,49 +890,333 @@ export default {
                 
             }
             canvas1.onmouseup = (e)=>{
-                
-
                 if(this.beginDraw){
-
                     if(this.shapeType!="4"){
                         this.coordinateInfoList=[];
                         this.beginDraw = false;
                         this.isDrawing=false;
-                        canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,status:"none"});
-                        this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID});
+                        // canvas1.drawElements.concat(this.allList);
+                        canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
+                        console.log(canvas1.drawElements);
+                        canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                        
+                        // this.coordinateInfoAllList=canvas1.drawElements;
+                        // this.coordinateInfoList.push({shapeType:this.shapeType})
 
+                        this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                        // console.log(this.coordinateInfoList);
                         if(this.shapeType == "5"){
                             input.value = "标注";
                             input.style.left = (end.x - 98) + "px";
                             input.style.top = (end.y - 14) + "px";
                             input.style.display = "block";
-
-                            console.log(input);
+                            console.log(input.text);
                         }
-
                         // this.addAnnotation();
-                        
                         // canvas_select.style.display = "block";
                     }else{
                         
                     }
-
-
-                    // this.addAnnotation();
                 }
-                
                 canvas1.reflash();
-
+                this.addAnnotation();
                 console.log(this.coordinateInfoList);
             }
             canvas1.onmousemove = (e)=>{
                 let x =  e.layerX;
                 let y =  e.layerY;
                 if(this.beginDraw&&this.isDrawing){
-                    
                     canvas1.reflash();
-                    
-                    switch(this.shapeType){
+                    this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
+                }
+            }
+            canvas1.drawElements=[];
+            this.coordinateInfoList=[];
+        },
+
+        //绘图方法储存函数
+        drawingMethodsSave(item,ctx,ctx_select){
+            switch(item.t){
+                    case "1":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        ctx.moveTo(item.s.x,item.s.y)
+                        ctx.lineTo(item.e.x,item.e.y)
+                        ctx.stroke();
+                        //直线选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=12;
+                        ctx_select.beginPath();
+                        ctx_select.moveTo(item.s.x,item.s.y)
+                        ctx_select.lineTo(item.e.x,item.e.y)
+                        ctx_select.stroke();
+                        break;
+                    case "2":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        ctx.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
+                        ctx.stroke();
+                        
+                        //圆形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([12,6]);
+                            ctx.beginPath();
+                            ctx.moveTo(item.s.x + 5,item.s.y);
+                            ctx.lineTo(item.e.x - 5,item.s.y);
+                            ctx.moveTo(item.e.x ,item.s.y + 5);
+                            ctx.lineTo(item.e.x ,item.e.y - 5);
+                            ctx.moveTo(item.e.x - 5,item.e.y);
+                            ctx.lineTo(item.s.x + 5,item.e.y);
+                            ctx.moveTo(item.s.x,item.e.y - 5);
+                            ctx.lineTo(item.s.x,item.s.y + 5);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                        }
+
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        
+                        break;
+                    case "3":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        ctx.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
+                        ctx.stroke(); 
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        break;
+                    case "4":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        
+                        this.drawCloudLine(ctx,item.points,20,true,item.points[item.points.length - 1]);
+
+                        ctx.stroke(); 
+
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.setLineDash([]);
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([12,6]);
+                            ctx.beginPath();
+                            ctx.moveTo(item.s.x + 5,item.s.y);
+                            ctx.lineTo(item.e.x - 5,item.s.y);
+                            ctx.moveTo(item.e.x ,item.s.y + 5);
+                            ctx.lineTo(item.e.x ,item.e.y - 5);
+                            ctx.moveTo(item.e.x - 5,item.e.y);
+                            ctx.lineTo(item.s.x + 5,item.e.y);
+                            ctx.moveTo(item.s.x,item.e.y - 5);
+                            ctx.lineTo(item.s.x,item.s.y + 5);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.moveTo(item.points[0].x,item.points[0].y);
+                        for(let j = 0; j < item.points.length - 1;j++){ // 画中间线
+                            ctx_select.lineTo(item.points[j + 1].x,item.points[j + 1].y);
+                        }
+
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+
+                        break;
+
+                    case "5":
+
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        let text_X = item.e.x - 120;
+                        let text_Y = item.e.y;
+
+                        if(item.e.x < item.s.x){
+                            text_X = item.e.x + 120;
+                        }
+
+                        ctx.beginPath();
+                        let dir = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
+                        let length = dir.length();
+                        dir.normalize();
+
+                        // length -= 16;
+
+                        ctx.moveTo(item.s.x + dir.x * 16,item.s.y + dir.y * 16);
+                        ctx.lineTo(item.s.x  + dir.x * length,item.s.y  + dir.y * length);
+                        
+                        //执行画线
+                        ctx.stroke();
+
+                        //////////////////////////////////////////////////////////////////////
+
+                        let V = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
+                        V.normalize();
+                        let angle = V.angle();
+
+                        let M = new THREE.Matrix4();
+                        M.makeRotationZ(angle);
+
+                        let V1 = new THREE.Vector3(16,8,0);
+                        let V2 = new THREE.Vector3(16,-8,0);
+
+                        V1.applyMatrix4(M);
+                        V2.applyMatrix4(M);
+
+                        // ctx.lineWidth=1;
+                        ctx.beginPath();
+                        
+                        ctx.moveTo(item.s.x,item.s.y);
+                        ctx.lineTo(item.s.x + V1.x,item.s.y + V1.y);
+                        ctx.lineTo(item.s.x + V2.x,item.s.y + V2.y);
+                        ctx.lineTo(item.s.x,item.s.y);
+                        ctx.stroke();
+                        ctx.fillStyle='rgb(252, 52, 57)';
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.moveTo(text_X,text_Y);
+                        ctx.lineTo(item.e.x,text_Y);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.moveTo(item.e.x - 100,text_Y + 16);
+                        ctx.lineTo(item.e.x + 100,text_Y + 16);
+                        ctx.lineTo(item.e.x + 100,text_Y - 16);
+                        ctx.lineTo(item.e.x - 100,text_Y - 16);
+                        ctx.lineTo(item.e.x - 100,text_Y + 16);
+
+                        ctx.stroke();
+
+                        ctx.fillStyle='rgb(255,255,255)';
+                        ctx.fill();
+                        
+                        if(item.text){
+                            ctx.fillStyle='rgb(252, 52, 57)';
+                            ctx.font="18px Georgia";
+                            ctx.fillText(item.text,item.e.x - 96,text_Y + 6,192);
+                        }
+
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+
+                            ctx.rect(item.e.x - 100 - 5,text_Y + 16 - 5,10,10);
+                            ctx.rect(item.e.x + 100 - 5,text_Y + 16 - 5,10,10);
+                            ctx.rect(item.e.x + 100 - 5,text_Y - 16 - 5,10,10);
+                            ctx.rect(item.e.x - 100 - 5,text_Y - 16 - 5,10,10);
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+
+                            ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.rect(item.e.x - 100,item.e.y - 16,200,32);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+                        
+                        break;
+                    case "6":
+
+                        let fz_img = document.getElementById("fz_img_for_draw");
+                        ctx.drawImage(fz_img,item.e.x - 9,item.e.y - 9);
+
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+
+                            ctx.rect(item.e.x - 12,item.e.y - 12,4,4);
+                            ctx.rect(item.e.x - 12,item.e.y + 8,4,4);
+                            ctx.rect(item.e.x + 8,item.e.y + 8,4,4);
+                            ctx.rect(item.e.x + 8,item.e.y - 12,4,4);
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([]);
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.rect(item.e.x - 10,item.e.y - 10,20,20);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        break
+            } 
+        },
+        //绘图方法函数
+        drawingMethods(shapeType,ctx,start,end,x,y,FinishDraw,points,e){
+            switch(shapeType){
                         case "1":
                             ctx.strokeStyle='rgb(252, 52, 57)';
                             ctx.lineWidth=3;
@@ -1106,10 +1299,8 @@ export default {
 
                             V1.applyMatrix4(M);
                             V2.applyMatrix4(M);
-
                             // ctx.lineWidth=1;
                             ctx.beginPath();
-                            
                             ctx.moveTo(start.x,start.y);
                             ctx.lineTo(start.x + V1.x,start.y + V1.y);
                             ctx.lineTo(start.x + V2.x,start.y + V2.y);
@@ -1117,46 +1308,40 @@ export default {
                             ctx.stroke();
                             ctx.fillStyle='rgb(252, 52, 57)';
                             ctx.fill();
-
                             ctx.beginPath();
                             ctx.moveTo(text_X,text_Y);
                             ctx.lineTo(e.layerX,text_Y);
                             ctx.stroke();
-
                             ctx.beginPath();
                             ctx.moveTo(e.layerX - 100,text_Y + 16);
                             ctx.lineTo(e.layerX + 100,text_Y + 16);
                             ctx.lineTo(e.layerX + 100,text_Y - 16);
                             ctx.lineTo(e.layerX - 100,text_Y - 16);
                             ctx.lineTo(e.layerX - 100,text_Y + 16);
-
                             ctx.stroke();
-
                             ctx.fillStyle='rgb(255,255,255)';
                             ctx.fill();
-                            
                             end.x = x;
                             end.y = y;
                             
                         break;
                         case "6":
-
                             let fz_img = document.getElementById("fz_img_for_draw");
                             ctx.drawImage(fz_img,x - 9,y - 9);
 
                             end.x = x;
                             end.y = y;
                         break;
-                    } 
-                }
-            }
-            canvas1.drawElements = [];
+                    }
+
+
         },
         load(){
             console.log(this.pageAllCount);
         },
         //添加批注
         addAnnotation(){
+            // console.log(this.coordinateInfoAllList);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
@@ -1166,18 +1351,79 @@ export default {
                 },
                 params:{
                     annotationInfo:this.annotationInfo,
-                    drawingVersionId:this.drawingId,
+                    drawingVersionId:this.drawingVersionId,
                     reviewStage:this.stage,
                     type:this.coordinateInfoList[0].t,
                     // projectId:vm.projId
                 },
                 data:{
-                     coordinateInfo:JSON.stringify(this.coordinateInfoList)
+                     coordinateInfo:JSON.stringify(this.coordinateInfoAllList)
                 }
-
             }).then((response)=>{
                 if(response.data.cd='0'){
-                    // alert('hfjd')
+                    this.queryAnnotation();
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+        //是否增减批注
+        isMarkChange(isMarkValue,MarkId){
+            if(isMarkValue==true){
+                this.isMarkId=MarkId
+                this.addMark();
+            }else if(isMarkValue==false){
+                this.isMarkId=MarkId
+                this.removeMark()
+            }
+            // this.annotationInfo.forEach((item)=>{
+            //     if(item.isMarkValue==val){
+            //         this.isMarkId=item.id
+            //     }
+            // })
+        },
+        //添加批注ID
+        addMark(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/addMark',
+                method:'GET',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:this.isMarkId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    alert('添加批注ID')
+                    
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+        //移除批注Id
+        removeMark(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/removeMark',
+                method:'GET',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:this.isMarkId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    alert('移除批注Id');
                 }else{
                     vm.message({
                         type:'error',
@@ -1196,7 +1442,7 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    drawingVersionId:this.drawingId,
+                    drawingVersionId:this.drawingVersionId,
                     annotationUserId:this.annotationUserId,
                     stage:this.stage,
                     isMark:this.isMark
@@ -1204,9 +1450,25 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    alert("jfkdjk")
+                    this.queryAnnotationList=response.data.rt;
+                    this.annotationlist=response.data.rt.annotationlist;
+                    this.annotationlist.forEach((item)=>{
+                         this.$set(item,'isMarkValue',false)
+                    })
+                    console.log(this.annotationlist);
+                   
+                    var len=this.annotationlist.length;
+                    // console.log(len);
+                    this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
+                    // console.log(this.coordinateInfoList_all);
+
+                    // console.log(this.coordinateInfoList);
+                    this.loadeds();
+                    this.reloaded();
+                    // console.log(this.coordinateInfoAllListss);
+                    // alert("jfkdjk")
                 }else{
-                    alert(response.data.msg);
+                    // alert(response.data.msg);
                     // this.message({
                     //     type:'error',
                     //     message:response.data.msg
@@ -1358,7 +1620,7 @@ export default {
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
                     this.getDrawingList()
-                    console.log(vm.DirectoryList);
+                    // console.log(vm.DirectoryList);
                     vm.showAction = true
                 }else{
                     vm.message({
@@ -1399,12 +1661,13 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                      vm.drawingList=response.data.rt;
-                    console.log(vm.drawingList)
+                    // console.log(vm.drawingList)
                     // console.log(this.DirectoryList)
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
                             vm.$set(item,'isLeaf',true)
                             vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
+                            vm.$set(item,'code',item.id)
                         });
                     }  
                      this.DirectoryList.forEach((item)=>{
@@ -1412,12 +1675,12 @@ export default {
                         this.drawingList.forEach((item1)=>{
                             if(item.code==item1.directory){
                                 a.push(item1)
-                                console.log(a);
                                 vm.$set(item,'children',a)
                             }
                         })
                     })
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
+                    console.log(vm.FileTree);
                     // console.log(vm.FileTree);
                     // var drawingDirList=this.DirectoryList
                     // if(vm.drawingList != null){
@@ -1447,12 +1710,67 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.versionPath=response.data.rt;
-                    console.log(this.versionPath);
+                    this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
+                    if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
+                        {   this.pdfShow=true;
+                            this.imgShow=false;
+                            console.log(document.getElementById("abs"));
+                             if(document.getElementById("abs")){
+                                var parent=this.$refs.pdfDocument.$refs.canvasParent;
+                                console.log(parent)
+                                var child=document.getElementById("abs");
+                                var childInput=document.getElementById('absInp');
+                                parent.removeChild(child);
+                                parent.removeChild(childInput);
+                                var parent1=document.getElementById("imgCanvasDiv");
+                                parent1.removeChild(child);
+                                parent1.removeChild(childInput);
+
+                            }
+                            this.drawingFileUrl1=this.drawingFileUrl;
+                            //删除之前节点abs
+                        }else{
+                            this.imgShow=true;
+                            this.pdfShow=false;
+                            var c = document.getElementById("imgCanvas");
+                            console.log(c);
+                            var width=c.width;
+                            var height=c.height;
+                            var ctx_img = c.getContext("2d");
+                            ctx_img.clearRect(0,0,width,height);
+                            var img = new Image();
+                            img.onload =function() {
+                                ctx_img.drawImage(img,0, 0);
+                                }
+                            img.src = this.drawingFileUrl;
+                            if(document.getElementById("abs")){
+                                var parent=document.getElementById("imgCanvasDiv");
+                                var child=document.getElementById("abs");
+                                var childInput=document.getElementById('absInp');
+                                var parent1=this.$refs.pdfDocument.$refs.canvasParent;
+                                console.log(childInput)
+                                parent.removeChild(child);
+                                parent.removeChild(childInput);
+                                parent1.removeChild(child);
+                                parent1.removeChild(childInput);
+                            }
+                            
+                        }
+                    // console.log(this.versionPath);
                 }
             })
         },
         handleNodeClick(obj){
-            var vm=this
+            if(document.getElementById('abs')){
+                let canvas1=document.getElementById('abs');
+                console.log(canvas1);
+                let ctx=canvas1.getContext("2d")
+                ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+            }
+            var vm=this;
+            vm.checkedKeys=[];
+             vm.checkedKeys.push(obj.code)
+             console.log(vm.checkedKeys)
             vm.showAction = true
             if(!obj.isLeaf){
                 vm.IsFolderAction = true
@@ -1465,27 +1783,37 @@ export default {
             }else{
                 vm.IsFolderAction = false
             }
-            vm.checkFileDir = obj//选中的文件夹
-            console.log(vm.checkFileDir);
+            vm.checkFileDir=obj//选中的文件夹
             vm.directoryId=obj.code
             vm.drawingId=obj.id
-            console.log(vm.directoryId);
-            console.log(vm.drawingId);
             if(vm.drawingId){
                 this.getMaxVersionPath();
+                this.getDrawingVersionList();
+                // this.queryAnnotation();
             }
-            //  vm.drawingList.forEach((item)=>{
-            //      vm.DirectoryList.forEach((item1)=>{
-            //          if(item1.code==item.directory){
-            //             item1.push({'children':item})
-            //         }
-            //      })
-                
-            //  })
-            //  console.log(vm.DirectoryList);
-            if(vm.expandedKeys.indexOf(vm.checkFileDir.code) == -1){
-                vm.expandedKeys.push(vm.checkFileDir.code)
+            // if(vm.expandedKeys.indexOf(vm.checkFileDir.code) == -1){
+            //     vm.expandedKeys.push(vm.checkFileDir.code)
+            // }
+        },
+        nodeClick(data,node,self){
+            var vm = this
+            if(vm.expandedKeys.indexOf(data.code) == -1){
+                vm.expandedKeys.push(data.code)
             }
+            // if(vm.checkedKeys.indexOf(data.code) == -1){
+            //     vm.checkedKeys.push(data.code)
+            // }
+            console.log(vm.expandedKeys);
+        },
+         nodeClickClose(data,node,self){
+            var vm = this
+            if(vm.expandedKeys.indexOf(data.code) != -1){
+                 vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
+            }
+            // if(vm.checkedKeys.indexOf(data.code) != -1){
+            //      vm.checkedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
+            // }
+            
             console.log(vm.expandedKeys);
         },
         //获取图纸版本列表
@@ -1503,7 +1831,11 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.drawingVersionList=response.data.rt;
-                    console.log(this.drawingVersionList);
+                    let listLen=this.drawingVersionList.length;
+                    this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
+                    this.drawingVersionId=this.drawingZxVersionId;
+                    console.log(this.drawingZxVersionId);
+                    // console.log(this.drawingVersionList);
                 }
             })
         },
@@ -1512,7 +1844,44 @@ export default {
         },
         //删除文件夹
         deleteFile(){
-        
+          var vm = this
+            vm.$confirm('此操作将永久删除该图纸, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'get',
+                    url:vm.BDMSUrl+'/dc/drawingReview/deleteDrawing',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        drawingId:vm.checkFileDir.id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            type:'success',
+                            message:'图纸删除成功'
+                        })
+                        // document.getElementById('abs')
+                       vm.getDirectory()
+                    }else if(response.data.cd == -1){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
         },
         editMap(){
              var vm = this
@@ -1604,7 +1973,7 @@ export default {
         },
         confirmUpdateDrawing(){
                 var vm=this;
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.drawingId+'&pageNo=1'
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -1799,8 +2168,6 @@ export default {
                     })
             })
         },
-
-        
     }
 
 }
@@ -2031,8 +2398,8 @@ export default {
             background: #ffffff;
             z-index: 10;
             height: 785px;
-            overflow-y: auto;
-            overflow-x: hidden;
+            // overflow-y: auto;
+            // overflow-x: hidden;
              #center-selection{
                 position: absolute;
                 top: 0;
@@ -2299,9 +2666,9 @@ export default {
                         margin:3px;
                         text-align: left;
                         border-bottom: 1px solid #e6e6e6;
-                        &:hover{
-                         background-color: #fafafa;
-                     }
+                    //     &:hover{
+                    //      background-color: #fafafa;
+                    //  }
                         .detial-item{
                                 font-size: 12px;
                                 line-height: 12px;
@@ -2342,6 +2709,98 @@ export default {
                         }
 
                  }
+
+            }
+            #box-right1{
+                 padding: 10px 13px 0 40px;
+                 ::-webkit-scrollbar{width:0px}
+                .drawingApendedInfo{
+                    width: 100%;
+                    height: 800px;
+                    overflow: auto;
+                    .drawingApendedInfobody{
+                        margin:20px 3px;
+                        position: relative;
+                         .apendedInfoOne{
+                             width: 100%;
+                             height: 30px;
+                             img{
+                                 float: left;
+                                 margin-top:7px;
+                                 margin-right: 2px
+                             }
+                             .userName{
+                                 float: left;
+                                 font-size: 14px;
+                                 color:#333333;
+                                 line-height: 30px;
+                             }
+                             .isMarkCheck{
+                                 float: right;
+                                 line-height: 30px;
+                                 margin-right: 25px;
+                             }
+                             .downIcon{
+                                 position:absolute;
+                                 width: 12px;
+                                 height: 12px;
+                                 background: url('./images/zhank.png')no-repeat 0 0;
+                                 top:9px;
+                                 right:0px;
+
+                             }
+                        }
+                        .apendedInfoTwo{
+                            height: 20px;
+                            .updateTime{
+                                float: left;
+                                font-size: 12px;
+                                 color:#666666;
+                                 line-height: 20px;
+                            }
+                            .reviewStage{
+                                float: left;
+                                margin-left:10px;
+                                font-size: 12px;
+                                 color:#666666;
+                                 line-height: 20px;
+                            }
+                            .commentIcon{
+                                position:absolute;
+                                width: 18px;
+                                height: 18px;
+                                background: url('./images/fuz.png')no-repeat 0 0;
+                                top:32px;
+                                right:14px;
+
+                            }
+                        }
+                        .apendedInfoinp{
+                            .apendedInfoinput{
+                                margin-top:5px;
+                                width: 96%;
+                                height: 18px;
+                                padding-left:4px;
+                                // border-radius: 2px;
+                                // background: #fafafa;
+                                // box-sizing: border-box;
+                                // outline: none;
+
+                            }
+                        }
+                        .commentBody{
+                            transition: all 0.7s ease;
+                            margin-top:10px;
+                            .commentInfoinput{
+                                margin-top:5px;
+                                width: 96%;
+                                height: 30px;
+                                 padding-left:4px;
+                            }
+
+                        }
+                    }
+                }
 
             }
         }
