@@ -150,7 +150,7 @@
                                 <i class="icon-goujian icon-detial"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location"></i>
-                                <i class="icon-goujian icon-delete"></i>
+                                <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
@@ -247,7 +247,17 @@
                         <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
                 </div>
             </el-dialog>
-
+        </div>
+         <div id="inital">
+            <el-dialog  :visible.sync="deleteDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">是否移除清单【{{removelistitem}}】?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteDialog=false">取消</button>
+                </div>
+            </el-dialog>
         </div>
         <form style="visibility:hidden" action="http://bdms.arctron.cn/h2-bim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
             <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
@@ -1063,6 +1073,31 @@
            box-shadow: 0px 1px 8px rgba(252, 52, 57, 0.2);
         }
     }
+    /*删除弹框*/
+    .deleteDialogImg{
+        height: 50px;
+    }
+    #inital{
+        .el-dialog{
+            margin:15vh auto;
+        }
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
+    }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
     width:7px;
@@ -1125,6 +1160,9 @@ export default {
          posType:'',//versionType
         fileCheckedNum:0,//选中的文件数量
         WebGlUrl:'',
+        deleteDialog:false,
+        deleteInfo:{},
+        removelistitem:'',
       }
   },
   created(){
@@ -1299,6 +1337,31 @@ export default {
 
 
     },
+    //删除构件清单
+    deleteList(item){
+        this.deleteDialog = true;
+        this.deleteInfo = item;
+        this.removelistitem= item.main.pkId;
+    },
+    deleteMakeSure(){
+        axios({
+                method:'post',
+                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                headers:{
+                    token:this.token
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getGouJianInfo();
+                    this.deleteDialog = false;
+                }else{  
+                    alert(response.data.msg);
+                }
+            })
+
+
+
+    },
     //清单二维码
     viewListQrcode(item){
         axios({
@@ -1322,8 +1385,43 @@ export default {
                 alert(response.data.msg);
             }
         })
-
     },
+    parseMBSource(mBSource) {
+            switch (mBSource) {
+                case 1:
+                    return "文档管理-关联构件";
+                case 2:
+                    return "进度计划-任务核实";
+                case 3:
+                    return "成本管理-工程量";
+                case 4:
+                    return "成本管理-物料量";
+                case 5:
+                    return "物资采购-订货管理";
+                case 6:
+                    return "讨论主题";
+                case 7:
+                    return "成本管理-报表快照";
+                default:
+                    return "";
+            }
+        },
+        parseMGSource(mGSource) {
+            switch (mGSource) {
+                case 1:
+                    return "选择集";
+                case 2:
+                    return "报表快照";
+                case 3:
+                    return "构件量生成";
+                case 4:
+                    return "外部导入";
+                case 5:
+                    return "构件量生成";
+                default:
+                    return "";
+            }
+        },
     //绑定清单
     biaoqianCLose(){
         this.isbiaoqianshow=false;

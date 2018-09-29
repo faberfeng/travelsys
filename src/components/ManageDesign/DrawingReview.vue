@@ -172,33 +172,6 @@ export default {
     name:'drwaingReview',
     data(){
         return{
-            data: [{
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        }, 
-                        {
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        },
-                        {
-                    children: [{  
-                        children: [{
-                        label: '三级 1-1-1'
-                        }],
-                        label: '二级 1-1',
-                        }],
-                        label: '一级 1',
-                        } ],
             currentPage: 0,
             pageCount: 0,
             screenLeft:{
@@ -302,7 +275,7 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
-        this.getAllUser()
+        // this.getAllUser()
     },
     watch:{
         annotationUserId:function(val){
