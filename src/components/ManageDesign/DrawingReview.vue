@@ -121,22 +121,26 @@
             <div v-show="screenLeft.show" v-else-if="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
                     <div class="drawingApendedHead">{{checkFileDir.drawingName+'('+this.version+')'}}</div>
-                    <li class="drawingApendedInfobody" v-for="(item,index) in annotationlist" :key="index">
+                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
                                 <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
                             <!-- </form> -->
-                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarkValue,item.id)"></el-checkbox><div class="downIcon" @click="downIconComment(item.id)"></div></div>
+                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarkValue,item.id)"></el-checkbox><div class="downIcon" ></div></div>
                         <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label><div class="commentIcon"></div></div>
                         <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
                         <div class="appendedInfotext">{{item.annotationInfo}}</div>
-                        <div class="apendedInfoinp"><input placeholder="请输入描述" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
+                        <div class="apendedInfoinp" v-show="(item.id==isId)?true:false" ><input placeholder="请输入描述" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
                         <div class="commentBody" v-show="(item.id==isId)?true:false">
-                            <textarea rows="3" cols="20" type="text" placeholder="请回复" class="commentInfoinput">
+                            <textarea rows="3" cols="20" type="text" placeholder="请回复" v-model="replayList" class="commentInfoinput">
                             </textarea>
-                            <ul>
-                                <li></li>
+                            <div class="replayBtn" @click="addReply(item.id)">回复</div>
+                            <ul class="replyUl">
+                                <li class="replyLi" v-show="(item.id==item1.annotationId)?true:false" v-for="(item1,index1) in replyList" :key="index1">
+                                    <div class="replyOne"><label class="replyName" v-text="item1.insertUserName"></label><label class="replyTime">{{item1.insertTime|updateTimeChange()}}</label></div>
+                                    <div class="replyTwo" v-text="item1.replyInfo"></div>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -259,6 +263,7 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            isClick:'',
             isId:'',//是否ID
             drawingFileUrl:'',
             drawingFileUrl1:'',
@@ -266,8 +271,10 @@ export default {
             version:'',
             queryAnnotationList:'',
             coordinateInfoList_all:'',
-            annotationlist:'',
+            annotationlist:'',//信息列表
+            replyList:'',//回复列表
             apendedInfoText:'',//标记卡片描述信息
+            replayList:'',
             shapeList:[
                 {
                     val:"1",
@@ -521,6 +528,7 @@ export default {
         //下拉评论
         downIconComment(val){
             this.isId=val;
+            this.isClick=val;
         },
        
         onmouse(){
@@ -1377,6 +1385,28 @@ export default {
                 }
             })
         },
+        //添加回复
+        addReply(val){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'dc/drawingReview/addReply',
+                methods:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:val,
+                    replyInfo:this.replayList
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    console.log('回复成功')
+                    this.queryAnnotation();
+                    this.replayList='';
+                }
+            })
+        },
+        
         //是否增减批注
         isMarkChange(isMarkValue,MarkId){
             if(isMarkValue==true){
@@ -1465,6 +1495,7 @@ export default {
                 else if(response.data.rt.annotationlist.length!=0){
                     this.queryAnnotationList=response.data.rt;
                     this.annotationlist=response.data.rt.annotationlist;
+                    this.replyList=response.data.rt.replyList;
                     this.annotationlist.forEach((item)=>{
                          this.$set(item,'isMarkValue',false)
                     })
@@ -2738,9 +2769,13 @@ export default {
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
                      }
+                     .clickbody{
+                         background: #e2e2e2;
+                     }
                     .drawingApendedInfobody{
                         margin:20px 3px;
                         position: relative;
+                        border-bottom: 1px solid #ccc;
                          .apendedInfoOne{
                              width: 100%;
                              height: 30px;
@@ -2835,11 +2870,53 @@ export default {
                         .commentBody{
                             transition: all 0.7s ease;
                             margin-top:10px;
+                            
                             .commentInfoinput{
                                 margin-top:5px;
                                 width: 96%;
                                 height: 30px;
                                  padding-left:4px;
+                            }
+                            .replayBtn{
+                                background: #fc3439;
+                                margin-left:111px;
+                                color: #fff;
+                                font-size: 12px;
+                                font-weight: normal;
+                                width: 40px;
+                                height: 20px;
+                                border: none;
+                                padding: 0;
+                                cursor: pointer;
+                                border-radius: 2px;
+                            }
+                            .replyUl{
+                                margin-top:8px;
+                                .repluLi{
+                                    margin:3px;
+                                    width:100%;
+                                    .replyOne{
+                                        margin-bottom: 4px;
+                                        .replyName{
+                                            font-size:14px;
+                                            color:#333333;
+                                        }
+                                        .replyTime{
+                                            font-size:12px;
+                                            color:#666666;
+
+                                        }
+
+                                    }
+                                    .replyTwo{
+                                        text-align: left;
+                                        font-size:12px;
+                                            color:#666666;
+
+
+                                    }
+
+                                }
                             }
 
                         }
