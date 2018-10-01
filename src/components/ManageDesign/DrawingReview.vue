@@ -16,7 +16,7 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div class="commentInformation" v-show="screenLeft.item == 3">
+                <div class="commentInformation">
                     <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                         <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -30,10 +30,15 @@
                         <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
                     </el-select>
                 </div>
-                <div @mouseenter="loadeds()" v-show="versionPath" class="drawingPic">
-                    
-                    <!-- <img id="drawPic" :src="this.QJFileManageSystemURL+this.versionPath"/> -->
-                    <pdf ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="this.QJFileManageSystemURL+this.versionPath"></pdf>
+                
+                <div  v-show="versionPath" class="drawingPic">
+                    <div id="imgCanvasDiv">
+                        <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="500">
+                            <!-- <img id="drawPic" :src="drawingFileUrl"/> -->
+                        </canvas>
+                    </div>
+                    <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
+                    <pdf v-show="pdfShow" ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="drawingFileUrl1"></pdf>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -45,8 +50,9 @@
                         <li><i class="drawingIcon circular" @click="circular()"><span style="color:#fc3439;font-size:14px;">圆形</span></i></li>
                         <li><i class="drawingIcon rectangle" @click="rectangleTool()"><span style="color:#fc3439;font-size:14px;">矩形</span></i></li>
                         <li><i class="drawingIcon cloudLine" @click="cloudLine()"><span style="color:#fc3439;font-size:14px;">云线</span></i></li>
-                        <li><i class="drawingIcon text"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
-                        <li><i class="drawingIcon appended"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                        <li><i class="drawingIcon text" @click="drawingText()"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
+                        <li><i class="drawingIcon appended" @click="appended()"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                        <img id="fz_img_for_draw" src="./images/fuz1.png" style="display:none"/>
                     </ul>
             </div>
         </div>
@@ -57,39 +63,49 @@
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
                         <span class="item-property "  @click="screenLeft.item = 1">图<br>纸</span>
-                        <span class="item-version " @click="versionClick">版<br>本</span>
-                        <span class="item-version-3 " @click="annotationClick">批<br>注</span>
+                        <span class="item-version " @click="screenLeft.item = 2">版<br>本</span>
+                        <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
                     </div>
             </div>
             <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div v-if="showAction">
                     <p class="clearfix" v-if="IsFolderAction">
-                        <i class="icon-goujian icon-add" title="新建文件夹" @click="addFile"></i>
-                        <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile"></i>
-                        <i class="icon-goujian icon-edit"  title="重命名" @click="renameFile"></i>
-                        <i class="icon-goujian icon-upload"  title="上传图纸" @click="uploadFile"></i>
+                        <i class="icon-goujian icon-add" title="添加图纸" @click="uploadFile"></i>
+                        <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
+                    </p>
+                    <p class="clearfix" v-else>
+                        <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile()"></i>
+                        <i class="icon-goujian icon-edit"  title="编辑" @click="editMap()"></i>
+                        <i class="icon-goujian icon-update"  title="更新" @click="updateFile()"></i>
                     </p>
                     <el-tree
                         :data="FileTree"
+                        node-key="code" 
                         ref="fileTree_drawingReview"
-                        
                         :props="defaultProps"
-                        
+                        :default-expanded-keys="expandedKeys"
+                        :expand-on-click-node="false"
+                        :default-checked-keys="checkedKeys"
+                        @node-expand="nodeClick"
+                        @node-collapse="nodeClickClose"
                         highlight-current
                         @node-click="handleNodeClick"
+                        
                         id="cloudDirveFileTree"
+                        :class="[showAction?'':'noTop']"
                     >
-                    <!-- <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span> -->
+                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
                 </div>
             </div>
             <div v-show="screenLeft.show" v-else-if="screenLeft.item == 2" id="box-right">
                 <div class="versionBody">
-                    <div class="versionHead">图纸名称（版本号）</div>
-                        <ul class="versionUl" v-for="(item,index) in drawingVersionList" :key="index" >
+                    <div class="versionHead">{{checkFileDir.drawingName}}</div>
+                        <ul :class="[{'versionUlSel':item.id==isSelect},'versionUl']" v-for="(item,index) in drawingVersionList" :key="index" @click="selectVersion(item.id)">
+
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name" >图号</span>
-                                <span class="detial-text-value" v-text="item.drawingId"></span>
+                                <span class="detial-text-value" v-text="checkFileDir.drawingNumber+'-'+item.versionId"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">上传人</span>
@@ -100,9 +116,31 @@
                                 <span class="detial-text-value">{{item.insertTime|timeChange()}}</span>
                             </li>
                         </ul>
-
                 </div>
-
+            </div>
+            <div v-show="screenLeft.show" v-else-if="screenLeft.item == 3" id="box-right1">
+                <ul class="drawingApendedInfo">
+                    <div class="drawingApendedHead">{{checkFileDir.drawingName+'('+this.version+')'}}</div>
+                    <li class="drawingApendedInfobody" v-for="(item,index) in annotationlist" :key="index">
+                        <!-- :src="shapeImg(item.coordinateInfo.t) -->
+                        <div class="apendedInfoOne">
+                            <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
+                                <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
+                            <!-- </form> -->
+                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarkValue,item.id)"></el-checkbox><div class="downIcon" @click="downIconComment(item.id)"></div></div>
+                        <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label><div class="commentIcon"></div></div>
+                        <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
+                        <div class="appendedInfotext">{{item.annotationInfo}}</div>
+                        <div class="apendedInfoinp"><input placeholder="请输入描述" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
+                        <div class="commentBody" v-show="(item.id==isId)?true:false">
+                            <textarea rows="3" cols="20" type="text" placeholder="请回复" class="commentInfoinput">
+                            </textarea>
+                            <ul>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul> 
             </div>
         </div>
         <div id="edit">
@@ -153,7 +191,54 @@
                     <button class="editBtnC" @click="drawingsUploadCancel">关闭</button>
                 </div>
             </el-dialog>
-            
+            <el-dialog title="图纸编辑" :visible="editDrawing.renameshow" @close="editDrawingCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">图号 :</label>
+                        <input type="text" class="inp" v-model="editDrawing.dcode">
+                    </div>
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">图名 :</label>
+                        <input type="text" class="inp" v-model="editDrawing.dname">
+                    </div>
+                    <div class="editBodytwo imageBody" style="position: relative;">
+                        <label class=" imageBodyText">比例 :</label>
+                        <select class="inp-search" v-model="editDrawing.dscale">
+                            <option value="1:20">1:20</option> 
+                            <option value="1:25">1:25</option> 
+                            <option value="1:30">1:30</option>
+                        </select>
+                        <i class="icon-sanjiao" style="top: 16px;left: 330px;"></i>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="confirmDrawing">确定</button>
+                    <button class="editBtnC" @click="editDrawingCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog width="500px" title="更新图纸" :visible="editDrawing.updateshow" @close="updateDrawingCancle">
+                <div class="editBody">
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">图号:</label><label class="editUpDrawingValue" v-text="editDrawing.dcode"></label>
+                    </div>
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">图名:</label><label class="editUpDrawingValue" v-text="editDrawing.dname"></label>
+                    </div>
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">比例:</label><label class="editUpDrawingValue" v-text="editDrawing.dscale"></label>
+                    </div>
+                    <div class="editUpDrawingProject">
+                        <label class="editUpDrawingProjectText">上传文件:</label>
+                        <label class="editUpDrawingProjectText1" v-text="this.updateFileName"></label>
+                        <label class="editUpDrawingProjectBtn" for="drawingsUpdateInfo">浏览</label>
+                        <input class="upInput"  type="file"  @change="fileUpdateChanged($event)" ref="drawingsUpdateInfo"  id="drawingsUpdateInfo">
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="confirmUpdateDrawing">确定</button>
+                    <button class="editBtnC" @click="updateDrawingCancle">取消</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -164,6 +249,8 @@ import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
 import moment from 'moment';
 import pdf from 'vue-pdf'
+// import 'three.min.js'
+var THREE = require('three');
 // import 'js/'
 export default {
      components: {
@@ -172,12 +259,53 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            isId:'',//是否ID
+            drawingFileUrl:'',
+            drawingFileUrl1:'',
+            drawingVersionId:'',
+            version:'',
+            queryAnnotationList:'',
+            coordinateInfoList_all:'',
+            annotationlist:'',
+            apendedInfoText:'',//标记卡片描述信息
+            shapeList:[
+                {
+                    val:"1",
+                    imgUrl:require('./images/zx1.png')
+                },
+                {
+                    val:"2",
+                    imgUrl:require('./images/yx1.png')
+                },
+                {
+                    val:"3",
+                    imgUrl:require('./images/jx1.png')
+                },
+                {
+                    val:"4",
+                    imgUrl:require('./images/yunxian1.png')
+                },
+                {
+                    val:"5",
+                    imgUrl:require('./images/wenb1.png')
+                },
+                {
+                    val:"6",
+                    imgUrl:require('./images/fuz1.png')
+                },
+            ],
+            avatars:'',
+            replyList:'',
+            isSelect:'',//是否选择版本
+            pageAllCount:0,
+            pdfUrl:'',
             currentPage: 0,
             pageCount: 0,
             screenLeft:{
                 show:true,
                 item:1,
             },
+            
             showAction:true,
             IsFolderAction:true,
             defaultSubProjId:'',
@@ -190,9 +318,10 @@ export default {
             defaultProps: {
                 children: 'children',
                 label: 'name',
-                // isLeaf:'leaf'
+                isLeaf:'leaf'
             },
             expandedKeys:[],
+            checkedKeys:[],
             checkFileDir:{},
             directoryId:'',
             drawingsUploadShow:false,
@@ -202,13 +331,26 @@ export default {
             FileTree:[],
             DirectoryList:[],
             drawingVersionList:'',
+            drawingZxVersionId:'',
             pageNo:'',
             versionPath:'',//最新图纸路径
-            annotationUserId:-1,//批注用户Id
-            stage:'-1',//阶段
-            isMark:'-1',//标记
+            annotationUserId:'',//批注用户Id
+            stage:'1',//阶段
+            isMark:'0',//标记
+            isMarkValue:false,
+            isMarkId:'',
             rotate:0,
             annotationInfo:'',
+            updateFileName:'',//更新文件名
+            updateFileList:'',//更新文件
+            editDrawing:{
+                renameshow:false,
+                updateshow:false,
+                dId:'',
+                dcode:'',//这是点位图的旧名称
+                dname:'',//点位图新名称
+                dscale:''
+            },
             //评审阶段列表
             stageList:[
                  {
@@ -252,18 +394,45 @@ export default {
             isDrawing:false,
             shapeType:'',
             coordinateInfoList:[],
-            allUserList:''
-        }
+            coordinateInfoAllList:[],
+            coordinateInfoAllListss:[],
+            allUserList:'',
+            beginDraw:false,
+            layerID:0, // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
+            pdfShow:false,
+            imgShow:false,
+            commentShow:false,//评论下拉框
+            allList:'',
 
+
+        }
     },
     filters: {
-      timeChange(val) {
-        if (val == null) {
-          return;
-        } else {
-          return moment(val).format("YYYY-MM-DD HH:mm");
+        stageListChange(val){
+            if(val=='1'){
+                return '专业协调'
+            }else if(val=='2'){
+                return '内部校对'
+            }else if(val=='3'){
+                return '内部审核'
+            }else if(val==4){
+                return '业主审核'
+            }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return;
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
+        updateTimeChange(val){
+            if (val == null) {
+                return;
+            } else {
+                return moment(val).format("YY-MM-DD HH:mm");
+            }
         }
-      }
     },
     created(){
         var vm=this;
@@ -276,6 +445,16 @@ export default {
         vm.entId = localStorage.getItem('entId')
         this.getDirectory()
         // this.getAllUser()
+        this.getAllUser()
+        this.$nextTick(() => {
+            this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
+        });
+        // this.load();
+    },
+    mounted(){
+         window.onresize = ()=> {
+             this.loadeds();
+            }
     },
     watch:{
         annotationUserId:function(val){
@@ -283,6 +462,7 @@ export default {
         },
         stage:function(val){
             this.queryAnnotation()
+            // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
@@ -294,6 +474,23 @@ export default {
         
     },
     methods:{
+        shapeImg(val){
+                if(val==1){
+                    return require('./images/zx1.png')
+                }else if(val==2){
+                    return require('./images/yx1.png')
+                }else if(val==3){
+                    return require('./images/jx1.png')
+                }else if(val==4){
+                    return require('./images/yunxian1.png')
+                }else if(val==5){
+                    return require('./images/wenb1.png')
+                }else if(val==6){
+                    return require('./images/fuz1.png')
+                }else if(val=undefined){
+                    return;
+                }
+        },
         //获取工程中的用户
         getAllUser(){
             this.allUserList=''
@@ -307,21 +504,25 @@ export default {
                 params:{
                     projectId:vm.projId
                 },
-                
             }).then((response)=>{
                 if(response.data.cd=='0'){
                    this.allUserList=response.data.rt;
                    this.allUserList.unshift({userId: -1, userName: "全部", account: "", userPositions: null})
+                   this.annotationUserId=parseInt(this.userId);
                     // console.log(this.allUserList);
                 }else{
-                    this.message({
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
                 } 
             })
-
         },
+        //下拉评论
+        downIconComment(val){
+            this.isId=val;
+        },
+       
         onmouse(){
             var that=this;
             var hei=window.innerHeight;//获取窗体高度
@@ -351,19 +552,59 @@ export default {
             // that.$refs.msgSpan.$parent.$parent.$parent.$el.style.mozUserSelect='';//取消样式控制拖拽时禁止全选动作
             };
         };
-    },
+        },
+        //选择版本
+        selectVersion(val){
+            this.isSelect=val;
+            //清除批注遗留的canvas；
+            if(document.getElementById('abs')){
+                let canvas1=document.getElementById('abs');
+                let absInp=document.getElementById('absInp');
+                canvas1.parentNode.removeChild(canvas1);
+                absInp.parentNode.removeChild(absInp);
+            }
+            console.log(this.drawingVersionList,"jkdsjdjj");
+            this.drawingVersionList.forEach((item)=>{
+                if(val==item.id){
+                    this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
+                    this.drawingVersionId=item.id;
+                    this.version=item.versionId;
+                    if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
+                        {   this.pdfShow=true;
+                            this.imgShow=false;
+                            this.drawingFileUrl1=this.drawingFileUrl;
+                        }else{
+                            this.imgShow=true;
+                            this.pdfShow=false;
+                            var width=c.width;
+                            var height=c.height;
+                            console.log(width,'',height)
+                            var ctx_img = c.getContext("2d");
+                            ctx_img.clearRect(0,0,width,height);
+                            var img = new Image();
+                            img.onload =function() {
+                                ctx_img.drawImage(img,0, 0);
+                                }
+                            img.src = this.drawingFileUrl;
+                        }
+                }
+            })
+            this.queryAnnotation();
+            // console.log(this.drawingFileUrl);
+        },
         //图纸工具栏操作
         zuoRotate(){
-            this.rotate += 90;
+            this.rotate -= 90;
         },
         youRotate(){
-            this.rotate -= 90;
+            this.rotate += 90;
         },
         straightLine(){
             this.isDrawing=true;
             this.shapeType="1";
         },
         circular(){
+            this.isDrawing=true;
             this.shapeType="2";
         },
         rectangleTool(){
@@ -373,6 +614,15 @@ export default {
         cloudLine(){
             this.isDrawing=true;
             this.shapeType="4";
+        },
+        drawingText(){
+            this.isDrawing=true;
+            this.shapeType="5";
+        },
+        appended(){
+            this.isDrawing=true;
+            this.shapeType="6";
+            this.beginDraw = true;
         },
         drawingClick(){
             this.screenLeft.item = 1;
@@ -387,137 +637,608 @@ export default {
             if(this.drawingId){
                 this.getDrawingVersionList();
             }
-           
         },
         annotationClick(){
-            this.screenLeft.item = 3
+             this.screenLeft.item = 3
+            //  this.biaozhushow=true;
+             this.loadeds()
+            this.queryAnnotation()
         },
-        loadeds(){
-            //  alert('hdjsf')
-            // console.log($event);
-            this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute"
-            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
-            if(document.getElementById("abs")){return;}
-            let canvas1 = document.createElement("canvas");
-            canvas1.id = "abs";
-            canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-            canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height)
-            // console.log(this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width)
-            canvas1.style.position = "absolute";
-            canvas1.style.left=0;
-            canvas1.style.top=0;
-            // canvas.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].width;
-            // canvas.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].height;
-            canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-            canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-            this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+        reloaded(){
+            let canvas1 = document.getElementById("abs");
+            // console.log(canvas1);
             let start = {x:0,y:0};
             let end = {x:0,y:0};
             var points = [];
-            let beginDraw = false;
+            this.beginDraw = false;
             var FinishDraw = false;
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
             ctx.lineWidth=3;
-            canvas1.onmousedown = (e)=>{
-                if(e.button == 0){
-                    beginDraw = true;
-                    start.x = e.layerX;
-                    start.y = e.layerY;
-                    if(this.shapeType=="4"){
-                        if(!FinishDraw){
-                            start.x = e.layerX;
-                            start.y = e.layerY;
-                            if(points.length > 0){
-                                if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
-                                            (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
-                                    points.push({x:points[0].x,y:points[0].y});
-                                    FinishDraw = true;
-                                    canvas1.onmousemove(e);
-                                    // this.isDrawing = false;
-                                    beginDraw=false;
-                                    return;
+            let canvas_select = document.createElement("canvas");
+            let ctx_select=canvas_select.getContext("2d");
+            this.allList=JSON.parse(this.coordinateInfoList_all)
+            console.log(typeof(this.allList),'0000');
+            this.allList.forEach((item)=>{
+                this.drawingMethodsSave(item,ctx,ctx_select);
+            })
+        },
+        //此为可以需要批注，加载canvas等
+        loadeds(){
+            // alert('dff')
+            //  alert('hdjsf')
+            // console.log($event);
+            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
+                // console.log(this.coordinateInfoList_all);
+            
+            if(document.getElementById("abs")){return;}
+            // let fz_img = new Image();
+            // fz_img.src = "./images/fuz1.png";
+            let canvas1 = document.createElement("canvas");
+            let start = {x:0,y:0};
+            let end = {x:0,y:0};
+            var points = [];
+            this.beginDraw = false;
+            var FinishDraw = false;
+            let ctx=canvas1.getContext("2d");
+            ctx.strokeStyle='rgb(252, 52, 57)';
+            ctx.lineWidth=3;
+            
+            {   //  建立显示图层
+                if(this.pdfShow==true){
+                    this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute";
+                    canvas1.id = "abs";
+                    canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                    canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                    canvas1.style.position = "absolute";
+                    canvas1.style.left=0;
+                    canvas1.style.top=0;
+                    canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                    canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+                }else if(this.imgShow==true){
+                    canvas1.id ="abs";
+                    var img=document.getElementById("imgCanvas")
+                    var imgDiv=document.getElementById("imgCanvasDiv")
+                    canvas1.width = img.width;
+                    canvas1.height = img.height;
+                    canvas1.style.position = "absolute";
+                    canvas1.style.left=0;
+                    canvas1.style.top=0;
+                    imgDiv.appendChild(canvas1);
+                }
+            }   
+            let canvas_select = document.createElement("canvas");
+            let ctx_select=canvas_select.getContext("2d");
+            {   //  建立选择图层
+                if(this.pdfShow==true){
+                    canvas_select.id = "canvas_select";
+                    canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                    canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                    canvas_select.style.display = "none";
+                    canvas_select.style.position = "absolute";
+                    canvas_select.style.left=0;
+                    canvas_select.style.top=0;
+                    canvas_select.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                    canvas_select.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+                }else if(this.imgShow==true){
+                    canvas_select.id = "canvas_select";
+                    var img=document.getElementById("imgCanvas")
+                    var imgDiv=document.getElementById("imgCanvasDiv")
+                    canvas_select.width = img.width;
+                    canvas_select.height = img.height;
+                    canvas_select.style.display = "none";
+                    canvas_select.style.position = "absolute";
+                    canvas_select.style.left=0;
+                    canvas_select.style.top=0;
+                    // imgDiv.appendChild(canvas_select);
+                }
+                // ctx_select.strokeStyle='rgb(252, 52, 57)';
+                // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
+                // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
+            }
+                let input = document.createElement("input");
+                input.id="absInp"
+                input.style.width = "196px";
+                input.style.height = "28px";
+                input.style.display = "none";
+                input.style.position = "absolute";
+                input.type="text";
+                canvas1.parentNode.appendChild(input);
+                // console.log(this.coordinateInfoAllListss);
+                // this.coordinateInfoList_all.forEach((item)=>{
+                //     this.drawingMethodsSave(item,ctx,ctx_select);
+                
+                // })
+                // this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
+               
+                canvas1.reflash = (e)=>{
+                    // console.log(canvas1.drawElements);
+                     canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
+                     console.log(canvas1.drawElements,'reflash')
+                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                    this.coordinateInfoAllList=canvas1.drawElements;
+                    console.log(this.allList)
+                    // console.log(canvas1.drawElements);
+                   canvas1.drawElements.forEach((item)=>{
+                       this.drawingMethodsSave(item,ctx,ctx_select);
+                   })
+                }
+                // if(screenLeft.item ==3){
+                //     canvas1.onmousedown();
+                //     canvas1.onmousemove();
+                //     canvas1.onmouseup();
+                // }
+                 
+                    canvas1.onmousedown = (e)=>{
+                        if(input.style.display == "block"){
+                            input.style.display = "none";
+                            for(let i = 0;i < canvas1.drawElements.length;i++){
+                                if(canvas1.drawElements[i].ID == this.layerID){
+                                    canvas1.drawElements[i].text = input.value;
                                 }
                             }
-                            points.push({x:e.layerX,y:e.layerY});
-                            console.log(points);
+                            console.log(canvas1.drawElements);
                         }
-                        canvas1.onmousemove(e);
+
+                        // this.isDrawing=false;
+                        var selectColorID = ctx_select.getImageData( e.layerX,  e.layerY, 1, 1).data;
+                        var red = selectColorID[0];
+                        var green = selectColorID[1];
+                        var blue = selectColorID[2];
+                        // console.log(selectColorID);
+                        if(!this.beginDraw){
+                            if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
+                                for(let i = 0;i < canvas1.drawElements.length;i++){
+                                    if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
+                                        canvas1.drawElements[i].status = "selected";
+                                    }else{
+                                        canvas1.drawElements[i].status = "none";
+                                    }
+                                }
+                                return;
+                            }
+                        }
+
+                        if(e.button == 0&&this.isDrawing){
+                            this.beginDraw = true;
+                            start.x = e.layerX;
+                            start.y = e.layerY;
+                            this.layerID++;
+                            // console.log(this.layerID);
+                            if(this.shapeType=="4"){
+                                if(!FinishDraw){
+                                    start.x = e.layerX;
+                                    start.y = e.layerY;
+                                    if(points.length > 0){
+                                        if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
+                                                    (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
+                                            points.push({x:points[0].x,y:points[0].y});
+                                            FinishDraw = true;
+                                            canvas1.onmousemove(e);
+                                            // this.isDrawing = false;
+                                            this.beginDraw=false;
+                                            this.isDrawing=false;
+                                            
+                                            start.x = 1000000000;
+                                            start.y = 1000000000;
+
+                                            end.x = -1000000000;
+                                            end.y = -1000000000;
+
+                                            let points_2 = [];
+
+                                            for(let i = 0; i < points.length;i++){
+                                                if(points[i].x > end.x){
+                                                    end.x = points[i].x;
+                                                }
+
+                                                if(points[i].x < start.x){
+                                                    start.x = points[i].x;
+                                                }
+
+                                                if(points[i].y > end.y){
+                                                    end.y = points[i].y;
+                                                }
+
+                                                if(points[i].y < start.y){
+                                                    start.y = points[i].y;
+                                                }
+
+                                                points_2.push({x:points[i].x,y:points[i].y});
+
+                                            }
+
+                                            start.x -= 20;
+                                            start.y -= 20;
+                                            end.x += 20;
+                                            end.y += 20;
+                                            canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
+                                            canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                            this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                            // this.coordinateInfoAllList=canvas1.drawElements;
+
+                                            points = [];
+                                            FinishDraw = false;
+
+                                            return;
+                                        }
+                                    }
+                                    points.push({x:e.layerX,y:e.layerY});
+                                    // console.log(points);
+                                }
+                                canvas1.onmousemove(e);
+                            }
+                            
+                        }
+                        // if(e.button == 2){
+                        //     FinishDraw = false;
+                        // 	points = [];
+                        // }
+                        
                     }
-                    
-                }
-                // if(e.button == 2){
-                //     FinishDraw = false;
-				// 	points = [];
-                // }
+                    canvas1.onmouseup = (e)=>{
+                        if(this.beginDraw){
+                            if(this.shapeType!="4"){
+                                this.coordinateInfoList=[];
+                                this.beginDraw = false;
+                                this.isDrawing=false;
+                                canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
+                                console.log(canvas1.drawElements);
+                                canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+
+                                this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                // console.log(this.coordinateInfoList);
+                                if(this.shapeType == "5"){
+                                    input.value = "标注";
+                                    input.style.left = (end.x - 98) + "px";
+                                    input.style.top = (end.y - 14) + "px";
+                                    input.style.display = "block";
+                                    console.log(input.text);
+                                }
+                                // this.addAnnotation();
+                                // canvas_select.style.display = "block";
+                                this.addAnnotation();
+                            }else{
+                                
+                            }
+                        }
+                        canvas1.reflash();
+                        
+                        console.log(this.coordinateInfoList);
+                    }
+                    canvas1.onmousemove = (e)=>{
+                        // alert('触发节点down2')
+                        let x =  e.layerX;
+                        let y =  e.layerY;
+                        if(this.beginDraw&&this.isDrawing){
+                            canvas1.reflash();
+                            this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
+                        }
+                    }
                 
-            }
-            canvas1.onmouseup = (e)=>{
-                if(this.shapeType!="4"){
-                    this.coordinateInfoList=[];
-                    beginDraw = false;
-                    canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
-                    this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType});
-                    this.addAnnotation();
-                }
-                // beginDraw = false;
-                // console.log(canvas1.drawElements);
-                console.log(this.coordinateInfoList);
-            }
-            canvas1.onmousemove = (e)=>{
-                let x =  e.layerX;
-                let y =  e.layerY;
-                if(beginDraw){
-                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
-                    for(let i = 0;i < canvas1.drawElements.length;i++){
-                        switch(canvas1.drawElements[i].t){
-                            case "1":
-                                ctx.beginPath();
-                                ctx.moveTo(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y)
-                                ctx.lineTo(canvas1.drawElements[i].e.x,canvas1.drawElements[i].e.y)
-                                ctx.stroke(); 
-                                break;
-                            case "2":
-                                ctx.beginPath();
-                                ctx.ellipse(canvas1.drawElements[i].s.x + (canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,canvas1.drawElements[i].s.y + (canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,Math.abs(canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x)/2,Math.abs(canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y)/2,0,0,Math.PI*2,true);
-                                ctx.stroke(); 
-                                break;
-                            case "3":
-                                ctx.beginPath();
-                                ctx.rect(canvas1.drawElements[i].s.x,canvas1.drawElements[i].s.y,canvas1.drawElements[i].e.x - canvas1.drawElements[i].s.x,canvas1.drawElements[i].e.y - canvas1.drawElements[i].s.y);
-                                ctx.stroke(); 
-                                break;
-                        }
-                    }
-                    switch(this.shapeType){
-                        case "1":
+            
+            canvas1.drawElements=[];
+            this.coordinateInfoList=[];
+        },
+        //绘图方法储存函数
+        drawingMethodsSave(item,ctx,ctx_select){
+            switch(item.t){
+                    case "1":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
                         ctx.beginPath();
-                        ctx.moveTo(start.x,start.y);
-                        ctx.lineTo(x,y);
-                        // ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                        ctx.moveTo(item.s.x,item.s.y)
+                        ctx.lineTo(item.e.x,item.e.y)
+                        ctx.stroke();
+                        //直线选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=12;
+                        ctx_select.beginPath();
+                        ctx_select.moveTo(item.s.x,item.s.y)
+                        ctx_select.lineTo(item.e.x,item.e.y)
+                        ctx_select.stroke();
+                        break;
+                    case "2":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        ctx.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
+                        ctx.stroke();
+                        
+                        //圆形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([12,6]);
+                            ctx.beginPath();
+                            ctx.moveTo(item.s.x + 5,item.s.y);
+                            ctx.lineTo(item.e.x - 5,item.s.y);
+                            ctx.moveTo(item.e.x ,item.s.y + 5);
+                            ctx.lineTo(item.e.x ,item.e.y - 5);
+                            ctx.moveTo(item.e.x - 5,item.e.y);
+                            ctx.lineTo(item.s.x + 5,item.e.y);
+                            ctx.moveTo(item.s.x,item.e.y - 5);
+                            ctx.lineTo(item.s.x,item.s.y + 5);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                        }
+
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        
+                        break;
+                    case "3":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        ctx.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
                         ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
-                        // console.log(start.x,"",start.y);
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        break;
+                    case "4":
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        ctx.beginPath();
+                        
+                        this.drawCloudLine(ctx,item.points,20,true,item.points[item.points.length - 1]);
+
+                        ctx.stroke(); 
+
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.setLineDash([]);
+                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
+                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([12,6]);
+                            ctx.beginPath();
+                            ctx.moveTo(item.s.x + 5,item.s.y);
+                            ctx.lineTo(item.e.x - 5,item.s.y);
+                            ctx.moveTo(item.e.x ,item.s.y + 5);
+                            ctx.lineTo(item.e.x ,item.e.y - 5);
+                            ctx.moveTo(item.e.x - 5,item.e.y);
+                            ctx.lineTo(item.s.x + 5,item.e.y);
+                            ctx.moveTo(item.s.x,item.e.y - 5);
+                            ctx.lineTo(item.s.x,item.s.y + 5);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.moveTo(item.points[0].x,item.points[0].y);
+                        for(let j = 0; j < item.points.length - 1;j++){ // 画中间线
+                            ctx_select.lineTo(item.points[j + 1].x,item.points[j + 1].y);
+                        }
+
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+
+                        break;
+
+                    case "5":
+
+                        ctx.strokeStyle='rgb(252, 52, 57)';
+                        ctx.lineWidth=3;
+                        let text_X = item.e.x - 120;
+                        let text_Y = item.e.y;
+
+                        if(item.e.x < item.s.x){
+                            text_X = item.e.x + 120;
+                        }
+
+                        ctx.beginPath();
+                        let dir = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
+                        let length = dir.length();
+                        dir.normalize();
+
+                        // length -= 16;
+
+                        ctx.moveTo(item.s.x + dir.x * 16,item.s.y + dir.y * 16);
+                        ctx.lineTo(item.s.x  + dir.x * length,item.s.y  + dir.y * length);
+                        
+                        //执行画线
+                        ctx.stroke();
+
+                        //////////////////////////////////////////////////////////////////////
+
+                        let V = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
+                        V.normalize();
+                        let angle = V.angle();
+
+                        let M = new THREE.Matrix4();
+                        M.makeRotationZ(angle);
+
+                        let V1 = new THREE.Vector3(16,8,0);
+                        let V2 = new THREE.Vector3(16,-8,0);
+
+                        V1.applyMatrix4(M);
+                        V2.applyMatrix4(M);
+
+                        // ctx.lineWidth=1;
+                        ctx.beginPath();
+                        
+                        ctx.moveTo(item.s.x,item.s.y);
+                        ctx.lineTo(item.s.x + V1.x,item.s.y + V1.y);
+                        ctx.lineTo(item.s.x + V2.x,item.s.y + V2.y);
+                        ctx.lineTo(item.s.x,item.s.y);
+                        ctx.stroke();
+                        ctx.fillStyle='rgb(252, 52, 57)';
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.moveTo(text_X,text_Y);
+                        ctx.lineTo(item.e.x,text_Y);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.moveTo(item.e.x - 100,text_Y + 16);
+                        ctx.lineTo(item.e.x + 100,text_Y + 16);
+                        ctx.lineTo(item.e.x + 100,text_Y - 16);
+                        ctx.lineTo(item.e.x - 100,text_Y - 16);
+                        ctx.lineTo(item.e.x - 100,text_Y + 16);
+
+                        ctx.stroke();
+
+                        ctx.fillStyle='rgb(255,255,255)';
+                        ctx.fill();
+                        
+                        if(item.text){
+                            ctx.fillStyle='rgb(252, 52, 57)';
+                            ctx.font="18px Georgia";
+                            ctx.fillText(item.text,item.e.x - 96,text_Y + 6,192);
+                        }
+
+                        //矩形选中变样式
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+
+                            ctx.rect(item.e.x - 100 - 5,text_Y + 16 - 5,10,10);
+                            ctx.rect(item.e.x + 100 - 5,text_Y + 16 - 5,10,10);
+                            ctx.rect(item.e.x + 100 - 5,text_Y - 16 - 5,10,10);
+                            ctx.rect(item.e.x - 100 - 5,text_Y - 16 - 5,10,10);
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                        }
+
+                            ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                            ctx_select.lineWidth=3;
+                            ctx_select.beginPath();
+                            ctx_select.rect(item.e.x - 100,item.e.y - 16,200,32);
+                            ctx_select.stroke();
+
+                            ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                            ctx_select.fill();
+                        
+                        break;
+                    case "6":
+
+                        let fz_img = document.getElementById("fz_img_for_draw");
+                        ctx.drawImage(fz_img,item.e.x - 9,item.e.y - 9);
+
+                        if(item.status == "selected"){
+                            ctx.strokeStyle='rgb(0, 0, 0)';
+                            ctx.lineWidth=1;
+                            ctx.beginPath();
+
+                            ctx.rect(item.e.x - 12,item.e.y - 12,4,4);
+                            ctx.rect(item.e.x - 12,item.e.y + 8,4,4);
+                            ctx.rect(item.e.x + 8,item.e.y + 8,4,4);
+                            ctx.rect(item.e.x + 8,item.e.y - 12,4,4);
+                            ctx.stroke();
+
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            ctx.setLineDash([]);
+                        }
+                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
+                        ctx_select.lineWidth=3;
+                        ctx_select.beginPath();
+                        ctx_select.rect(item.e.x - 10,item.e.y - 10,20,20);
+                        ctx_select.stroke();
+
+                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
+                        ctx_select.fill();
+                        break
+            } 
+        },
+        //绘图方法函数
+        drawingMethods(shapeType,ctx,start,end,x,y,FinishDraw,points,e){
+            switch(shapeType){
+                        case "1":
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.moveTo(start.x,start.y);
+                            ctx.lineTo(x,y);
+                            // ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
+                            // console.log(start.x,"",start.y);                        
                         break;
                         case "2":
-                        ctx.beginPath();
-                        ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
-                        ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
                         break;
                         case "3":
-                        ctx.beginPath();
-                        ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                        ctx.stroke(); 
-                        end.x = x;
-                        end.y = y;
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            ctx.beginPath();
+                            ctx.rect(start.x,start.y,x - start.x,y - start.y);
+                            ctx.stroke(); 
+                            end.x = x;
+                            end.y = y;
                         break;
                         case "4":
                         {
-                            ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
                             ctx.beginPath();
                             if(!FinishDraw){
                                 if(points.length > 1){	//	画结束位置
@@ -528,13 +1249,87 @@ export default {
                             this.drawCloudLine(ctx,points,20,FinishDraw,{x:e.layerX,y:e.layerY});
                         }
                         break;
-                    } 
-                }
-            }
-            canvas1.drawElements = [];
+                        case "5":
+
+                            ctx.strokeStyle='rgb(252, 52, 57)';
+                            ctx.lineWidth=3;
+                            let text_X = e.layerX - 120;
+                            let text_Y = e.layerY;
+
+                            if(e.layerX < start.x){
+                                text_X = e.layerX + 120;
+                            }
+
+                            ctx.beginPath();
+                            let dir = new THREE.Vector2(text_X - start.x,text_Y - start.y);
+                            let length = dir.length();
+                            dir.normalize();
+
+                            // length -= 16;
+
+                            ctx.moveTo(start.x + dir.x * 16,start.y + dir.y * 16);
+                            ctx.lineTo(start.x  + dir.x * length,start.y  + dir.y * length);
+                            
+                            //执行画线
+                            ctx.stroke();
+
+                            //////////////////////////////////////////////////////////////////////
+
+                            let V = new THREE.Vector2(text_X - start.x,text_Y - start.y);
+                            V.normalize();
+                            let angle = V.angle();
+
+                            let M = new THREE.Matrix4();
+                            M.makeRotationZ(angle);
+
+                            let V1 = new THREE.Vector3(16,8,0);
+                            let V2 = new THREE.Vector3(16,-8,0);
+
+                            V1.applyMatrix4(M);
+                            V2.applyMatrix4(M);
+                            // ctx.lineWidth=1;
+                            ctx.beginPath();
+                            ctx.moveTo(start.x,start.y);
+                            ctx.lineTo(start.x + V1.x,start.y + V1.y);
+                            ctx.lineTo(start.x + V2.x,start.y + V2.y);
+                            ctx.lineTo(start.x,start.y);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(252, 52, 57)';
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(text_X,text_Y);
+                            ctx.lineTo(e.layerX,text_Y);
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(e.layerX - 100,text_Y + 16);
+                            ctx.lineTo(e.layerX + 100,text_Y + 16);
+                            ctx.lineTo(e.layerX + 100,text_Y - 16);
+                            ctx.lineTo(e.layerX - 100,text_Y - 16);
+                            ctx.lineTo(e.layerX - 100,text_Y + 16);
+                            ctx.stroke();
+                            ctx.fillStyle='rgb(255,255,255)';
+                            ctx.fill();
+                            end.x = x;
+                            end.y = y;
+                            
+                        break;
+                        case "6":
+                            let fz_img = document.getElementById("fz_img_for_draw");
+                            ctx.drawImage(fz_img,x - 9,y - 9);
+
+                            end.x = x;
+                            end.y = y;
+                        break;
+                    }
+
+
+        },
+        load(){
+            console.log(this.pageAllCount);
         },
         //添加批注
         addAnnotation(){
+            // console.log(this.coordinateInfoAllList);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
@@ -544,18 +1339,98 @@ export default {
                 },
                 params:{
                     annotationInfo:this.annotationInfo,
-                    drawingVersionId:this.drawingId,
+                    drawingVersionId:this.drawingVersionId,
                     reviewStage:this.stage,
                     type:this.coordinateInfoList[0].t,
                     // projectId:vm.projId
                 },
                 data:{
-                     coordinateInfo:JSON.stringify(this.coordinateInfoList)
+                     coordinateInfo:JSON.stringify(this.coordinateInfoAllList)
                 }
-
             }).then((response)=>{
                 if(response.data.cd='0'){
-                    alert('hfjd')
+                    this.queryAnnotation();
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+        //编辑批注文字
+        editAnnotationWord(val){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'dc/drawingReview/editAnnotationWord',
+                methods:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:val,
+                    word:this.apendedInfoText
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.queryAnnotation();
+                }
+            })
+        },
+        //是否增减批注
+        isMarkChange(isMarkValue,MarkId){
+            if(isMarkValue==true){
+                this.isMarkId=MarkId
+                this.addMark();
+            }else if(isMarkValue==false){
+                this.isMarkId=MarkId
+                this.removeMark()
+            }
+            // this.annotationInfo.forEach((item)=>{
+            //     if(item.isMarkValue==val){
+            //         this.isMarkId=item.id
+            //     }
+            // })
+        },
+        //添加批注ID
+        addMark(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/addMark',
+                method:'GET',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:this.isMarkId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    alert('添加批注ID')
+                    
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+        //移除批注Id
+        removeMark(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/removeMark',
+                method:'GET',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    annotationId:this.isMarkId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    alert('移除批注Id');
                 }else{
                     vm.message({
                         type:'error',
@@ -574,22 +1449,38 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    drawingVersionId:this.drawingId,
+                    drawingVersionId:this.drawingVersionId,
                     annotationUserId:this.annotationUserId,
                     stage:this.stage,
                     isMark:this.isMark
                     // projectId:vm.projId
                 },
             }).then((response)=>{
-                if(response.data.cd=='0'){
-                    alert("jfkdjk")
-                }else{
-                    alert(response.data.msg);
-                    // this.message({
+                if(response.data.cd=='-1'){
+                    // this.$message({
                     //     type:'error',
                     //     message:response.data.msg
                     // })
-                } 
+                }
+                else if(response.data.rt.annotationlist.length!=0){
+                    this.queryAnnotationList=response.data.rt;
+                    this.annotationlist=response.data.rt.annotationlist;
+                    this.annotationlist.forEach((item)=>{
+                         this.$set(item,'isMarkValue',false)
+                    })
+                    console.log(this.annotationlist);
+                   
+                    var len=this.annotationlist.length;
+                    // console.log(len);
+                    this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
+                    // console.log(this.coordinateInfoList_all);
+
+                    // console.log(this.coordinateInfoList);
+                    this.loadeds();
+                    this.reloaded();
+                    // console.log(this.coordinateInfoAllListss);
+                    // alert("jfkdjk")
+                }
             })
         },
          drawCloudLine(cxt,points,radio,finish,last){
@@ -721,7 +1612,7 @@ export default {
         },
         //获取目录
         getDirectory(){
-            console.log(this.data);
+            // console.log(this.data);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
@@ -735,16 +1626,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
-                    vm.DirectoryList.forEach((item)=>{
-                        
-
-                    })
-                    
                     this.getDrawingList()
-                    vm.DirectoryList.forEach((item,index) => {
-                            // vm.$set(item,'directory',item.code)
-                            // vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
-                        });
                     // console.log(vm.DirectoryList);
                     vm.showAction = true
                 }else{
@@ -786,26 +1668,27 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                      vm.drawingList=response.data.rt;
-                    console.log(vm.drawingList)
-                    console.log(this.DirectoryList)
+                    // console.log(vm.drawingList)
+                    // console.log(this.DirectoryList)
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
-                            vm.$set(item,'name',item.drawingNumber+'('+item.drawingName+')')
+                            vm.$set(item,'isLeaf',true)
+                            vm.$set(item,'name',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
+                            vm.$set(item,'code',item.id)
                         });
-                    }
-                    
+                    }  
                      this.DirectoryList.forEach((item)=>{
+                         let a=[];
                         this.drawingList.forEach((item1)=>{
                             if(item.code==item1.directory){
-                                let a=[];
                                 a.push(item1)
                                 vm.$set(item,'children',a)
-                                // console.log(item);
                             }
                         })
                     })
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
                     console.log(vm.FileTree);
+                    // console.log(vm.FileTree);
                     // var drawingDirList=this.DirectoryList
                     // if(vm.drawingList != null){
                     //   var children = vm.drawingList.concat(drawingDirList)
@@ -818,6 +1701,11 @@ export default {
                     // console.log(vm.FileTree)
                 }
             })
+        },
+        //去除后缀名
+        deleteLastName(str){
+            var reg = /.w+$/;   
+            return str.replace(reg,'');    
         },
         //获取图纸最新版本路径
         getMaxVersionPath(){
@@ -834,44 +1722,101 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.versionPath=response.data.rt;
-                    console.log(this.versionPath);
+                    this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
+                    if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
+                        {   this.pdfShow=true;
+                            this.imgShow=false;
+                            this.drawingFileUrl1=this.drawingFileUrl;
+                            // console.log(document.getElementById("abs"));
+                            //  if(document.getElementById("abs")){
+                            //     var parent=this.$refs.pdfDocument.$refs.canvasParent;
+                            //     console.log(parent)
+                            //     var child=document.getElementById("abs");
+                            //     var childInput=document.getElementById('absInp');
+                            //     parent.removeChild(child);
+                            //     parent.removeChild(childInput);
+                            //     var parent1=document.getElementById("imgCanvasDiv");
+                            //     parent1.removeChild(child);
+                            //     parent1.removeChild(childInput);
+                            // }
+                            
+                            //删除之前节点abs
+                        }else{
+                            this.imgShow=true;
+                            this.pdfShow=false;
+                            //绘制文件是png和jpg格式的图片
+                            var c = document.getElementById("imgCanvas");//此为之前创建的一个图片框架
+                            console.log(c);
+                            var width=c.width;
+                            var height=c.height;
+                            var ctx_img = c.getContext("2d");
+                            ctx_img.clearRect(0,0,width,height);
+                            var img = new Image();
+                            img.onload =function() {
+                                ctx_img.drawImage(img,0, 0);
+                                }
+                            img.src = this.drawingFileUrl;
+                            // if(document.getElementById("abs")){
+                            //     var parent=document.getElementById("imgCanvasDiv");
+                            //     var child=document.getElementById("abs");
+                            //     var childInput=document.getElementById('absInp');
+                            //     var parent1=this.$refs.pdfDocument.$refs.canvasParent;
+                            //     console.log(childInput)
+                            //     parent.removeChild(child);
+                            //     parent.removeChild(childInput);
+                            //     parent1.removeChild(child);
+                            //     parent1.removeChild(childInput);
+                            // }
+                            
+                        }
+                    // console.log(this.versionPath);
                 }
             })
         },
         handleNodeClick(obj){
-            var vm=this
+            //清除批注遗留的canvas；
+            if(document.getElementById('abs')){
+                let canvas1=document.getElementById('abs');
+                let absInp=document.getElementById('absInp');
+                canvas1.parentNode.removeChild(canvas1);
+                absInp.parentNode.removeChild(absInp);
+            }
+            var vm=this;
+            vm.checkedKeys=[];
+             vm.checkedKeys.push(obj.code)
+            //  console.log(vm.checkedKeys)
             vm.showAction = true
             if(!obj.isLeaf){
                 vm.IsFolderAction = true
-                if(!obj.children){
-                    vm.$message({
-                        type:'info',
-                        message:'这个文件夹没有子文件或图纸!'
-                    })
-                }
             }else{
                 vm.IsFolderAction = false
             }
-            vm.checkFileDir = obj//选中的文件夹
+            
+            vm.checkFileDir=obj//选中的文件夹
+            console.log(vm.checkFileDir);
             vm.directoryId=obj.code
             vm.drawingId=obj.id
-            console.log(vm.directoryId);
-            console.log(vm.drawingId);
-            if(vm.drawingId){
+            if(vm.checkFileDir.id){
+                //清除原来的canvas和inuput
+
+                this.drawingFileUrl1='';
+                this.drawingFileUrl='';
                 this.getMaxVersionPath();
+                this.getDrawingVersionList();
             }
-         
-            //  vm.drawingList.forEach((item)=>{
-            //      vm.DirectoryList.forEach((item1)=>{
-            //          if(item1.code==item.directory){
-            //             item1.push({'children':item})
-            //         }
-            //      })
-                
-            //  })
-            //  console.log(vm.DirectoryList);
-            if(vm.expandedKeys.indexOf(vm.checkFileDir.code) == -1){
-                vm.expandedKeys.push(vm.checkFileDir.code)
+            
+        },
+        nodeClick(data,node,self){
+            var vm = this
+            if(vm.expandedKeys.indexOf(data.code) == -1){
+                vm.expandedKeys.push(data.code)
+            }
+            console.log(vm.expandedKeys);
+        },
+         nodeClickClose(data,node,self){
+            var vm = this
+            if(vm.expandedKeys.indexOf(data.code) != -1){
+                 vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
             }
             console.log(vm.expandedKeys);
         },
@@ -890,28 +1835,183 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.drawingVersionList=response.data.rt;
+
                     console.log(this.drawingVersionList);
+                    let listLen=this.drawingVersionList.length;
+                    this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
+                    this.drawingVersionId=this.drawingZxVersionId;
+                    console.log(this.drawingZxVersionId);
+                    // console.log(this.drawingVersionList);
                 }
             })
         },
-        //新建文件夹
-        addFile(){
-        },
         //删除文件夹
         deleteFile(){
-        
+          var vm = this
+            vm.$confirm('此操作将永久删除该图纸, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'get',
+                    url:vm.BDMSUrl+'/dc/drawingReview/deleteDrawing',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        drawingId:vm.checkFileDir.id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == 0){
+                        vm.$message({
+                            type:'success',
+                            message:'图纸删除成功'
+                        })
+                        this.drawingFileUrl1='';
+                        this.drawingFileUrl='';
+                        this.checkFileDir=[];
+                        // document.getElementById('abs')
+                       vm.getDirectory()
+                    }else if(response.data.cd == -1){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }).catch(() => {
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
         },
-        renameFile(){
+        editMap(){
+             var vm = this
+            vm.editDrawing.renameshow = true
+            vm.editDrawing.dId = vm.checkFileDir.id
+            vm.editDrawing.dcode = vm.checkFileDir.drawingNumber
+            vm.editDrawing.dname = vm.checkFileDir.drawingName
+            vm.editDrawing.dscale = vm.checkFileDir.ratio
 
+        },
+        updateFile(){
+            var vm = this
+            vm.editDrawing.updateshow = true
+            vm.editDrawing.dId = vm.checkFileDir.id
+            vm.editDrawing.dcode = vm.checkFileDir.drawingNumber
+            vm.editDrawing.dname = vm.checkFileDir.drawingName
+            vm.editDrawing.dscale = vm.checkFileDir.ratio
         },
         uploadFile(){
             var vm = this
             vm.drawingsUploadShow = true
         },
+        confirmDrawing(){
+            var vm = this
+            if(vm.editDrawing.dcode == ''){
+                vm.$message({
+                    type:'error',
+                    message:'图号不能为空！'
+                })
+                return false
+            }
+            if(vm.editDrawing.dname == ''){
+                vm.$message({
+                    type:'error',
+                    message:'图名不能为空！'
+                })
+                return false
+            }
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'dc/drawingReview/editDrawing',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    drawingId:vm.editDrawing.dId,//这是图纸ID
+                    drawingNumber:vm.editDrawing.dcode,//这是图纸图号
+                    drawingName:vm.editDrawing.dname,//图纸名称
+                    ratio:vm.editDrawing.dscale//图纸比例
+                }
+            }).then((response)=>{
+                if(response.data.cd == 0){
+                    vm.$message({
+                        type:'success',
+                        message:'图纸修改成功'
+                    })
+                    vm.getDirectory()
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                vm.editDrawing.renameshow = false
+                vm.editDrawing.dId = ''
+                vm.editDrawing.dcode =''
+                vm.editDrawing.dname = ''
+                vm.editDrawing.dscale = ''
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+        editDrawingCancle(){
+            var vm = this
+            vm.editDrawing.renameshow = false
+            vm.editDrawing.dId = ''
+            vm.editDrawing.dcode = ''
+            vm.editDrawing.dname = ''
+            vm.editDrawing.dscale = ''
+        },
         drawingsUploadCancel(){
             var vm = this
             vm.drawingsUploadShow = false
             vm.fileList=[]
+        },
+        updateDrawingCancle(){
+            this.editDrawing.updateshow=false
+            
+        },
+        confirmUpdateDrawing(){
+                var vm=this;
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'
+                returnUrl = encodeURIComponent(returnUrl);
+                var formData = new FormData()
+                formData.append('token',vm.token);
+                formData.append('projId',vm.projId);
+                formData.append('type',1);
+                formData.append('file',vm.updateFileList);
+                formData.append('userId',vm.userId);
+                formData.append('modelCode','004');
+                formData.append('returnUrl',returnUrl);
+                // this.$refs.pdfDocument_upload.src=item.file;
+                // console.log(this.$refs.pdfDocument_upload);
+                axios({
+                        method:'POST',
+                        url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                        headers:{
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        data:formData,
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            vm.editDrawing.updateshow = false
+                            vm.updateFileName=''
+                            vm.updateFileList=''
+                            vm.getDirectory()
+                        }
+                        if(response.data.cd != 0){
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
         },
         //图片尺寸验证  
         verificationPicFile(file) {  
@@ -943,8 +2043,9 @@ export default {
                 }  
             },
         fileChanged(file){
-            var vm = this
-            const list = vm.$refs.drawingsInfo.files
+            var vm = this;
+            const list = vm.$refs.drawingsInfo.files;
+            this.verificationPicFile(list[0]);
             var reader = new FileReader();  
             var dwidth = 0
             var dheight = 0
@@ -971,6 +2072,39 @@ export default {
                     dheight:dheight
                 })
             },0)
+        },
+        fileUpdateChanged(file){
+            var vm = this
+            
+            const list = vm.$refs.drawingsUpdateInfo.files
+            this.updateFileName=list[0].name
+            this.updateFileList=list[0]
+            var reader = new FileReader();  
+            var dwidth = 0
+            var dheight = 0
+            reader.onload = function (e) {  
+                var data = e.target.result;  
+                //加载图片获取图片真实宽度和高度  
+                var image = new Image();  
+                image.onload=function(){  
+                    dwidth = image.width;  
+                    dheight = image.height;  
+                }; 
+                image.src= data;   
+            };  
+            reader.readAsDataURL(list[0])
+            // setTimeout(function(){
+            //       vm.fileList.push({
+            //         file:list[0],//文件
+            //         drawingNo:'',//图号
+            //         proportion:'',//比例
+            //         fileName:list[0].name,//文件名
+            //         drawingName:list[0].name.split('.')[0],//图纸名
+            //         dwidth:dwidth,
+            //         dheight:dheight
+            //     })
+            // },0)
+            // console.log(JSON.stringify(vm.fileList));
         },
         //删除文件
          deleteFileList(index){
@@ -1006,7 +2140,7 @@ export default {
                 }
             }
             vm.fileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion+'&pageNo=4'
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.fileName+'&ratio='+item.proportion+'&pageNo=1'
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -1016,6 +2150,8 @@ export default {
                 formData.append('userId',vm.userId);
                 formData.append('modelCode','004');
                 formData.append('returnUrl',returnUrl);
+                // this.$refs.pdfDocument_upload.src=item.file;
+                // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
                         url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
@@ -1027,7 +2163,8 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.fileList = []
-                            vm.getDrawingList()
+                            vm.getDirectory()
+                            // vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
@@ -1038,8 +2175,6 @@ export default {
                     })
             })
         },
-
-        
     }
 
 }
@@ -1101,7 +2236,10 @@ export default {
       
         .is-leaf:before{
             content: ""!important;
+            width: 12px;
+            
             color: #999999;
+            display:inline-block;
             font-weight: bold;
         }
         .el-tree-node__label::before{
@@ -1270,8 +2408,8 @@ export default {
             background: #ffffff;
             z-index: 10;
             height: 785px;
-            overflow-y: auto;
-            overflow-x: hidden;
+            // overflow-y: auto;
+            // overflow-x: hidden;
              #center-selection{
                 position: absolute;
                 top: 0;
@@ -1491,6 +2629,14 @@ export default {
                         background: url('./images/view1.png')no-repeat 0 0;
                     } 
                 }
+                .icon-update{
+                    float: right;
+                    background: url('./images/update.png')no-repeat 0 0;
+                    margin-right: 10px;
+                    &:hover{
+                        background: url('./images/update1.png')no-repeat 0 0;
+                    }
+                }
                 .icon-delete{
                     float: right;
                     background: url('../ManageCost/images/delete.png')no-repeat 0 0;
@@ -1513,14 +2659,26 @@ export default {
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
                      }
+                     .versionUlSel{
+                         background-color: #e6e6e6;
+                        //  padding:5px;
+                     }
+                    //  .versionUl &:hover{
+                    //      background-color: #999;
+                    //  }
                     .versionUl{
                         // margin-left：20px
                         // width: 400px;
                         text-align: left;
+                        padding: 4px;
                         width: 100%;
-                        height: 80px;
+                        height: 122px;
+                        margin:3px;
                         text-align: left;
                         border-bottom: 1px solid #e6e6e6;
+                    //     &:hover{
+                    //      background-color: #fafafa;
+                    //  }
                         .detial-item{
                                 font-size: 12px;
                                 line-height: 12px;
@@ -1561,6 +2719,132 @@ export default {
                         }
 
                  }
+
+            }
+            #box-right1{
+                 padding: 10px 13px 0 40px;
+                 ::-webkit-scrollbar{width:0px}
+                .drawingApendedInfo{
+                    width: 100%;
+                    height: 800px;
+                    overflow: auto;
+                    .drawingApendedHead{
+                        font-size:14px;
+                        color:#333333;
+                        font-weight: bold;
+                        height: 28px;
+                        width: 100%;
+                        text-align: left;
+                        margin-left: 1px;
+                        border-bottom: 1px solid #e6e6e6;
+                     }
+                    .drawingApendedInfobody{
+                        margin:20px 3px;
+                        position: relative;
+                         .apendedInfoOne{
+                             width: 100%;
+                             height: 30px;
+                             img{
+                                 float: left;
+                                 margin-top:7px;
+                                 margin-right: 2px
+                             }
+                             .userName{
+                                 float: left;
+                                 font-size: 14px;
+                                 color:#333333;
+                                 line-height: 30px;
+                             }
+                             .deleteMark{
+                                 margin-left: 28px;
+                                 margin-top:6px;
+                                 display:inline-block;
+                                background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                }
+                                width: 16px;
+                                height: 16px;
+
+                             }
+                             .isMarkCheck{
+                                 float: right;
+                                 line-height: 30px;
+                                 margin-right: 25px;
+                             }
+                             .downIcon{
+                                 position:absolute;
+                                 width: 12px;
+                                 height: 12px;
+                                 background: url('./images/zhank.png')no-repeat 0 0;
+                                 top:9px;
+                                 right:0px;
+
+                             }
+                        }
+                        .appendedInfotext{
+                            text-align: left;
+                            height: 20px;
+                            font-size:12px;
+                            color:#666666;
+                            line-height: 20px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            width: 100%;
+                            text-overflow: ellipsis
+                        }
+                        .apendedInfoTwo{
+                            height: 20px;
+                            .updateTime{
+                                float: left;
+                                font-size: 12px;
+                                 color:#666666;
+                                 line-height: 20px;
+                            }
+                            .reviewStage{
+                                float: left;
+                                margin-left:10px;
+                                font-size: 12px;
+                                 color:#666666;
+                                 line-height: 20px;
+                            }
+                            .commentIcon{
+                                position:absolute;
+                                width: 18px;
+                                height: 18px;
+                                background: url('./images/fuz.png')no-repeat 0 0;
+                                top:32px;
+                                right:14px;
+
+                            }
+                        }
+                        .apendedInfoinp{
+                            .apendedInfoinput{
+                                margin-top:5px;
+                                width: 96%;
+                                height: 18px;
+                                padding-left:4px;
+                                // border-radius: 2px;
+                                // background: #fafafa;
+                                // box-sizing: border-box;
+                                // outline: none;
+
+                            }
+                        }
+                        .commentBody{
+                            transition: all 0.7s ease;
+                            margin-top:10px;
+                            .commentInfoinput{
+                                margin-top:5px;
+                                width: 96%;
+                                height: 30px;
+                                 padding-left:4px;
+                            }
+
+                        }
+                    }
+                }
 
             }
         }
@@ -1608,118 +2892,102 @@ export default {
                 padding-left: 10px;
             }
             .el-dialog{
-            margin: 0 auto;
-            .upInput{
-                display: none;
-            }
-            /* 上传文件按钮 */
-            .imageBody{
-                text-align: left!important;
-            }
-            .el-radio__label{
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-            .imageBodyText{
-                color: #666;
-                font-size: 14px;
-                line-height: 14px;
-                font-weight: normal;
-                display: inline-block;
-                width: 175px;
-                padding-left: 94px;
-                text-align: left;
-            }
-            .updataImageSpan{
-                overflow: hidden;
-                width: 98px;
-            }
-            .updataImageSpan input{
-                position: absolute;
-                left: 0px;
-                top: 0px;
-                opacity: 0;
-                /* -ms-filter: 'alpha(opacity=0)'; */
-            }
-            .selectionBox{
-                margin: 10px 50px;
-                border:1px solid #cccccc;
-                padding: 20px;
-                p{
-                    text-align: left;
+                margin: 0 auto;
+                .upInput{
+                    display: none;
+                }
+                /* 上传文件按钮 */
+                .imageBody{
+                    text-align: left!important;
+                }
+                .el-radio__label{
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }
+                .imageBodyText{
+                    color: #666;
                     font-size: 14px;
                     line-height: 14px;
-                    color: #666666;
+                    font-weight: normal;
+                    display: inline-block;
+                    width: 175px;
+                    padding-left: 94px;
+                    text-align: left;
                 }
-            }
-            .checkbox-fileItem{
-                float: left;
-                width: 14px;
-                height: 14px;
-                border: 1px solid #cccccc;
-                cursor: pointer;
-                margin-right: 5px;
-                position: relative;
-                &::after{
-                    font-size:12px;
-                    color:#cccccc;
-                    display: block;
+                .updataImageSpan{
+                    overflow: hidden;
+                    width: 98px;
+                }
+                .updataImageSpan input{
                     position: absolute;
-                    right: -30px;
-                    top: 0;
-                    line-height:12px;
-                    content: '';
+                    left: 0px;
+                    top: 0px;
+                    opacity: 0;
+                    /* -ms-filter: 'alpha(opacity=0)'; */
+                }
+                .selectionBox{
+                    margin: 10px 50px;
+                    border:1px solid #cccccc;
+                    padding: 20px;
+                    p{
+                        text-align: left;
+                        font-size: 14px;
+                        line-height: 14px;
+                        color: #666666;
+                    }
+                }
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
+                    cursor: pointer;
+                    margin-right: 5px;
+                    position: relative;
+                    &::after{
+                        font-size:12px;
+                        color:#cccccc;
+                        display: block;
+                        position: absolute;
+                        right: -30px;
+                        top: 0;
+                        line-height:12px;
+                        content: '';
+                    }
+                }
+                .active{
+                    background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                }
+                .yingsheProject{
+                    overflow: hidden;
+                    margin-bottom: 10px;
+                }
+                .yingsheProjectText{
+                    color: #999;
+                    display: block;
+                    float: left;
+                    margin-left: 30px;
+                    font-size: 14px;
+                    line-height: 36px;
+                }
+                .yingsheProjectBtn{
+                    float: right;
+                    margin-right: 30px;
+                    line-height: 36px;
                 }
             }
-            .active{
-                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
-                    border: 1px solid #fc3439;
-            }
-            .yingsheProject{
-                overflow: hidden;
-                margin-bottom: 10px;
-            }
-            .yingsheProjectText{
-                color: #999;
-                display: block;
-                float: left;
-                margin-left: 30px;
-                font-size: 14px;
-                line-height: 36px;
-            }
-            .yingsheProjectBtn{
-                float: right;
-                margin-right: 30px;
-                line-height: 36px;
-            }
-         }
-         .uploadBox .el-dialog__body{
-                margin-top: 21px;
-                .fileContainer{
-                    width: 600px;
-                    margin: 0px 30px;
-                    border-collapse: collapse;
-                    border: 1px solid #e6e6e6;
-                    thead{
-                        background: #f8f8f9;
-                        th{
-                            padding-left: 10px;
-                            height: 36px;
-                            text-align: left;
-                            box-sizing: border-box;
-                            border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
-                            color: #333333;
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                        }
-                    }
-                    tbody{
-                        tr{
-                            td{
-                                padding-left: 5px;
-                                padding-right: 5px;
+            .uploadBox .el-dialog__body{
+                    margin-top: 21px;
+                    .fileContainer{
+                        width: 600px;
+                        margin: 0px 30px;
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                        thead{
+                            background: #f8f8f9;
+                            th{
+                                padding-left: 10px;
                                 height: 36px;
                                 text-align: left;
                                 box-sizing: border-box;
@@ -1729,49 +2997,129 @@ export default {
                                 white-space: nowrap;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
-                                position: relative;
-                                input,select{
-                                    float: left;
-                                    width: 100%;
-                                    height: 32px;
-                                    border: 1px solid #d1d1d1;
-                                    border-radius: 2px;
-                                    background: #fafafa;
-                                    padding-left: 10px;
-                                }
-                                .icon-sanjiao{
-                                    display: block;
-                                    position: absolute;
-                                    width: 12px;
-                                    height: 7px;
-                                    background-image:url('../Settings/images/sanjiao.png');
-                                    background-size: 100% 100%;
-                                    content: '';
-                                    top: 16px;
-                                    right: 11px;
-                                }
                             }
-                            &:hover{
-                                background: #fafafa;
+                        }
+                        tbody{
+                            tr{
+                                td{
+                                    padding-left: 5px;
+                                    padding-right: 5px;
+                                    height: 36px;
+                                    text-align: left;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    position: relative;
+                                    input,select{
+                                        float: left;
+                                        width: 100%;
+                                        height: 32px;
+                                        border: 1px solid #d1d1d1;
+                                        border-radius: 2px;
+                                        background: #fafafa;
+                                        padding-left: 10px;
+                                    }
+                                    .icon-sanjiao{
+                                        display: block;
+                                        position: absolute;
+                                        width: 12px;
+                                        height: 7px;
+                                        background-image:url('../Settings/images/sanjiao.png');
+                                        background-size: 100% 100%;
+                                        content: '';
+                                        top: 16px;
+                                        right: 11px;
+                                    }
+                                }
+                                &:hover{
+                                    background: #fafafa;
+                                }
                             }
                         }
                     }
+                    .actionBtn{
+                        width: 16px;
+                        height: 16px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right: 16px;
+                        margin-top:9px;
+                    }
+                    .editBtn{
+                        background: url('../../assets/edit.png') no-repeat;
+                    }
+                    .deleteBtn{
+                        background: url('../../assets/delete.png') no-repeat;
+                    }
+            }
+            .editBody{
+                .editUpDrawing{
+                    margin-top:10px;
+                    .editUpDrawingText{
+                        display:inline-block;
+                        width: 60px;
+                        font-size: 14px;
+                        color:#666666;
+                        text-align: right;
+                    }
+                    .editUpDrawingValue{
+                        margin-left:40px;
+                        display:inline-block;
+                        width: 120px;
+                        font-size: 14px;
+                        color:#333333;
+                        text-align: left;
+                    }
                 }
-                .actionBtn{
-                    width: 16px;
-                    height: 16px;
-                    border: none;
-                    cursor: pointer;
-                    margin-right: 16px;
-                    margin-top:9px;
+                .editUpDrawingProject{
+                    width: 400px;
+                    margin-left:109px;
+                    margin-top:10px;
+
+                    .editUpDrawingProjectText{
+                        display:inline-block;
+                        
+                        margin-left: -122px;
+                        width: 60px;
+                        font-size: 14px;
+                        color:#666666;
+                        text-align: left;
+                    }
+                    .editUpDrawingProjectText1{
+                        margin-left: 39px;
+                        display: inline-block;
+                        width: 120px;
+                        font-size: 14px;
+                        color: #333333;
+                        text-align: left;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+
+                    }
+                    .editUpDrawingProjectBtn{
+                            margin-top:10px;
+                            margin-left: 100px;
+                            display: block;
+                            width: 80px;
+                            height: 30px;
+                            border: none;
+                            line-height: 30px;
+                            padding: 0;
+                            cursor: pointer;
+                            border-radius: 2px;
+                            background: #e2e2e2;
+                            margin-right: 20px;
+                            color: #8f8f8f;
+                            font-size: 14px;
+                            font-weight: normal;
+                    }
                 }
-                .editBtn{
-                    background: url('../../assets/edit.png') no-repeat;
-                }
-                .deleteBtn{
-                    background: url('../../assets/delete.png') no-repeat;
-                }
-         }
+            }
         }
     }
 
