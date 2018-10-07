@@ -29,9 +29,16 @@
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="isMark" class="commentSel">
                         <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
                     </el-select>
+                    <div class="rotate" v-show="versionPath">
+                        <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
+                        <i class="drawingIcon youRotate" @click="youRotate()"></i>
+                    </div>
                 </div>
-                
-                <div  v-show="versionPath" class="drawingPic">
+                <div class="noImg" v-show="!versionPath">
+                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
+                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
+                </div>
+                <div  v-loading="loading"  v-show="versionPath" class="drawingPic">
                     <div id="imgCanvasDiv">
                         <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="500">
                             <!-- <img id="drawPic" :src="drawingFileUrl"/> -->
@@ -44,8 +51,8 @@
             </div>
             <div v-show="screenLeft.item == 3" id="drawingToolsBody">
                     <ul class="drawingTools">
-                        <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
-                        <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li>
+                        <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
+                        <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
                         <li><i class="drawingIcon straightLine" @click="straightLine()"><span style="color:#fc3439;font-size:14px;">直线</span></i></li>
                         <li><i class="drawingIcon circular" @click="circular()"><span style="color:#fc3439;font-size:14px;">圆形</span></i></li>
                         <li><i class="drawingIcon rectangle" @click="rectangleTool()"><span style="color:#fc3439;font-size:14px;">矩形</span></i></li>
@@ -127,7 +134,7 @@
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
                                 <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
                             <!-- </form> -->
-                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarkValue,item.id)"></el-checkbox><div class="downIcon" ></div></div>
+                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox><div class="downIcon" ></div></div>
                         <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label><div class="commentIcon"></div></div>
                         <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
                         <div class="appendedInfotext">{{item.annotationInfo}}</div>
@@ -312,7 +319,7 @@ export default {
                 show:true,
                 item:1,
             },
-            
+            loading:false,
             showAction:true,
             IsFolderAction:true,
             defaultSubProjId:'',
@@ -344,7 +351,7 @@ export default {
             annotationUserId:'',//批注用户Id
             stage:'1',//阶段
             isMark:'0',//标记
-            isMarkValue:false,
+            // isMarkValue:false,
             isMarkId:'',
             rotate:0,
             annotationInfo:'',
@@ -530,7 +537,6 @@ export default {
             this.isId=val;
             this.isClick=val;
         },
-       
         onmouse(){
             var that=this;
             var hei=window.innerHeight;//获取窗体高度
@@ -1382,6 +1388,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.queryAnnotation();
+                    this.apendedInfoText='';
                 }
             })
         },
@@ -1405,22 +1412,24 @@ export default {
                     this.replayList='';
                 }
             })
+        }, 
+        //是否批注
+        isMarkBoolen(val){
+            if(val==1){
+                return true
+            }else if(val==0){
+                return false;
+            }
         },
-        
         //是否增减批注
-        isMarkChange(isMarkValue,MarkId){
-            if(isMarkValue==true){
+        isMarkChange(isMarkVal,MarkId){
+            if(isMarkVal==0){
                 this.isMarkId=MarkId
                 this.addMark();
-            }else if(isMarkValue==false){
+            }else if(isMarkVal==1){
                 this.isMarkId=MarkId
                 this.removeMark()
             }
-            // this.annotationInfo.forEach((item)=>{
-            //     if(item.isMarkValue==val){
-            //         this.isMarkId=item.id
-            //     }
-            // })
         },
         //添加批注ID
         addMark(){
@@ -1436,7 +1445,8 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    alert('添加批注ID')
+                    this.queryAnnotation();
+                    // alert('添加批注ID')
                     
                 }else{
                     vm.message({
@@ -1460,7 +1470,8 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    alert('移除批注Id');
+                    this.queryAnnotation();
+                    // alert('移除批注Id');
                 }else{
                     vm.message({
                         type:'error',
@@ -1497,9 +1508,13 @@ export default {
                     this.annotationlist=response.data.rt.annotationlist;
                     this.replyList=response.data.rt.replyList;
                     this.annotationlist.forEach((item)=>{
-                         this.$set(item,'isMarkValue',false)
+                        if(item.isMarked==0){
+                            this.$set(item,'isMarkValue',false);
+                        }else if(item.isMarked==1){
+                            this.$set(item,'isMarkValue',true);
+                        }
                     })
-                    console.log(this.annotationlist);
+                    console.log(this.annotationlist,'获取列表');
                    
                     var len=this.annotationlist.length;
                     // console.log(len);
@@ -1657,6 +1672,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     vm.DirectoryList=response.data.rt;
+                    
                     this.getDrawingList()
                     // console.log(vm.DirectoryList);
                     vm.showAction = true
@@ -1697,7 +1713,7 @@ export default {
                     projectId:vm.projId
                 }
             }).then((response)=>{
-                if(response.data.rt.length!=0){
+                if(response.data.cd=='0'){
                      vm.drawingList=response.data.rt;
                     // console.log(vm.drawingList)
                     // console.log(this.DirectoryList)
@@ -1717,6 +1733,7 @@ export default {
                             }
                         })
                     })
+                    console.log(this.DirectoryList,'目录列表');
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
                     console.log(vm.FileTree);
                     // console.log(vm.FileTree);
@@ -1741,6 +1758,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var vm=this;
+            vm.loading=true;
             axios({
                 url:this.BDMSUrl+'dc/drawingReview/getMaxVersionPath',
                 method:'post',
@@ -1758,19 +1776,6 @@ export default {
                         {   this.pdfShow=true;
                             this.imgShow=false;
                             this.drawingFileUrl1=this.drawingFileUrl;
-                            // console.log(document.getElementById("abs"));
-                            //  if(document.getElementById("abs")){
-                            //     var parent=this.$refs.pdfDocument.$refs.canvasParent;
-                            //     console.log(parent)
-                            //     var child=document.getElementById("abs");
-                            //     var childInput=document.getElementById('absInp');
-                            //     parent.removeChild(child);
-                            //     parent.removeChild(childInput);
-                            //     var parent1=document.getElementById("imgCanvasDiv");
-                            //     parent1.removeChild(child);
-                            //     parent1.removeChild(childInput);
-                            // }
-                            
                             //删除之前节点abs
                         }else{
                             this.imgShow=true;
@@ -1787,19 +1792,8 @@ export default {
                                 ctx_img.drawImage(img,0, 0);
                                 }
                             img.src = this.drawingFileUrl;
-                            // if(document.getElementById("abs")){
-                            //     var parent=document.getElementById("imgCanvasDiv");
-                            //     var child=document.getElementById("abs");
-                            //     var childInput=document.getElementById('absInp');
-                            //     var parent1=this.$refs.pdfDocument.$refs.canvasParent;
-                            //     console.log(childInput)
-                            //     parent.removeChild(child);
-                            //     parent.removeChild(childInput);
-                            //     parent1.removeChild(child);
-                            //     parent1.removeChild(childInput);
-                            // }
-                            
                         }
+                        this.loading=false;
                     // console.log(this.versionPath);
                 }
             })
@@ -2313,7 +2307,39 @@ export default {
                 margin-top:22px;
                 width: 642px;
                 height: 38px;
+                .el-input__inner{
+                    height: 30px !important;
+                }
+                .rotate{
+                    float: right;
+                    position: relative;
+                    .drawingIcon{
+                                width: 80px;
+                                height: 26px;
+                                cursor: pointer;
+                                position: absolute;
+                            }
+                            .zuoRotate{
+                                left:30px;
+                                top:9px;
+                                background: url('./images/zuox.png')no-repeat 0 0;
+                                // &:hover{
+                                //     background: url('./images/zuox1.png')no-repeat 0 0;
+                                // }
+                            }
+                            .youRotate{
+                                left:70px;
+                                top:9px;
+                                background: url('./images/youx.png')no-repeat 0 0;
+                                // &:hover{
+                                //     background: url('./images/youx1.png')no-repeat 0 0;
+                                // }
+                            }
+                }
             }
+            .noImg{
+                    margin:150px auto;
+                }
             .drawingPic{
                     overflow: auto;
                     position: absolute;
@@ -2323,6 +2349,7 @@ export default {
                     right: 25px;
                     width: 100%;
                     height: 800px;
+                
                 #drawPic{
                     min-width: 700px;
                     min-height: 500px;
@@ -2333,9 +2360,9 @@ export default {
                 bottom: 50px;
                 left:50%;
                 width: 100%;
-                margin-left:-255px;
+                margin-left:-210px;
                     .drawingTools{
-                        width: 568px;
+                        width: 475px;
                         height: 36px;
                         background-color:#3b3b3b;
                         position: relative;
@@ -2368,7 +2395,7 @@ export default {
                                 }
                             }
                             .straightLine{
-                                left:120px;
+                                left:30px;
                                 top:9px;
                                 background: url('./images/zx.png')no-repeat 0 0;
                                 &:hover{
@@ -2376,7 +2403,7 @@ export default {
                                 }
                             }
                             .circular{
-                                left:190px;
+                                left:100px;
                                 top:9px;
                                 background: url('./images/yx.png')no-repeat 0 0;
                                 &:hover{
@@ -2384,7 +2411,7 @@ export default {
                                 }
                             }
                             .rectangle{
-                                left:260px;
+                                left:170px;
                                 top:9px;
                                 background: url('./images/jx.png')no-repeat 0 0;
                                 &:hover{
@@ -2392,7 +2419,7 @@ export default {
                                 }
                             }
                             .cloudLine{
-                                 left:330px;
+                                 left:240px;
                                 top:9px;
                                 background: url('./images/yunxian.png')no-repeat 0 0;
                                 &:hover{
@@ -2400,7 +2427,7 @@ export default {
                                 }
                             }
                             .text{
-                                 left:400px;
+                                 left:310px;
                                 top:9px;
                                 background: url('./images/wenb.png')no-repeat 0 0;
                                 &:hover{
@@ -2408,7 +2435,7 @@ export default {
                                 }
                             }
                             .appended{
-                                left:470px;
+                                left:380px;
                                 top:9px;
                                 background: url('./images/fuz.png')no-repeat 0 0;
                                 &:hover{
@@ -2892,11 +2919,12 @@ export default {
                             }
                             .replyUl{
                                 margin-top:8px;
-                                .repluLi{
+                                .replyLi{
                                     margin:3px;
                                     width:100%;
                                     .replyOne{
                                         margin-bottom: 4px;
+                                        text-align: left;
                                         .replyName{
                                             font-size:14px;
                                             color:#333333;
