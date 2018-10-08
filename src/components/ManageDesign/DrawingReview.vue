@@ -29,7 +29,7 @@
                     <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="isMark" class="commentSel">
                         <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
                     </el-select>
-                    <div class="rotate" v-show="versionPath">
+                    <div class="rotate" v-show="versionPath&&!annotationlist">
                         <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
                         <i class="drawingIcon youRotate" @click="youRotate()"></i>
                     </div>
@@ -46,7 +46,7 @@
                         </canvas>
                     </div>
                     <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
-                    <pdf v-show="pdfShow" ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="drawingFileUrl1"></pdf>
+                    <pdf v-show="pdfShow" ref="pdfDocument" id="drawingPdf"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event"  :src="drawingFileUrl1"></pdf>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -617,10 +617,15 @@ export default {
         },
         //图纸工具栏操作
         zuoRotate(){
-            this.rotate -= 90;
+            this.rotate=(this.rotate-90)%360;
+            var drawing=document.getElementById('drawingPdf');
+            drawing.style.transform = 'rotate('+this.rotate +'deg)'
+            
         },
         youRotate(){
-            this.rotate += 90;
+            this.rotate=(this.rotate+90)%360;
+            var drawing=document.getElementById('drawingPdf');
+            drawing.style.transform = 'rotate('+this.rotate +'deg)'
         },
         straightLine(){
             this.isDrawing=true;
