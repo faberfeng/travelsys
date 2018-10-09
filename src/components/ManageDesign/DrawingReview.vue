@@ -422,6 +422,7 @@ export default {
             coordinateInfoList:[],
             coordinateInfoAllList:[],
             coordinateInfoAllListss:[],
+            commentShapeType:'',//传递形状类型
             allUserList:'',
             beginDraw:false,
             layerID:0, // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
@@ -668,6 +669,7 @@ export default {
             this.queryAnnotation()
         },
         reloaded(){
+            this.allList='';
             let canvas1 = document.getElementById("abs");
             // console.log(canvas1);
             let start = {x:0,y:0};
@@ -688,6 +690,7 @@ export default {
         },
         //此为可以需要批注，加载canvas等
         loadeds(){
+             this.allList='';
             // alert('dff')
             //  alert('hdjsf')
             // console.log($event);
@@ -761,6 +764,7 @@ export default {
                 // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
                 // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
             }
+                canvas1.drawElements=[];
                 let input = document.createElement("input");
                 input.id="absInp"
                 input.style.width = "196px";
@@ -777,16 +781,22 @@ export default {
                 // this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
                
                 canvas1.reflash = (e)=>{
+                    
                     // console.log(canvas1.drawElements);
                      canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
-                     console.log(canvas1.drawElements,'reflash')
+                    //  console.log(canvas1.drawElements,'reflash')
                     ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                     this.coordinateInfoAllList=canvas1.drawElements;
-                    console.log(this.allList)
+                   
+                    console.log(this.commentShapeType)
+                    // console.log(this.allList,'图纸批注')
+                    
                     // console.log(canvas1.drawElements);
                    canvas1.drawElements.forEach((item)=>{
                        this.drawingMethodsSave(item,ctx,ctx_select);
                    })
+                   this.allList='';
+                   
                 }
                 // if(screenLeft.item ==3){
                 //     canvas1.onmousedown();
@@ -802,7 +812,10 @@ export default {
                                     canvas1.drawElements[i].text = input.value;
                                 }
                             }
-                            console.log(canvas1.drawElements);
+                            console.log(canvas1.drawElements,'输入值');
+                            this.coordinateInfoAllList=canvas1.drawElements;
+                            // this.commentShapeType='5'
+                            // this.addAnnotation();
                         }
 
                         // this.isDrawing=false;
@@ -880,8 +893,8 @@ export default {
                                             canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
                                             canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
                                             this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
-                                            // this.coordinateInfoAllList=canvas1.drawElements;
-
+                                            this.coordinateInfoAllList=canvas1.drawElements;
+                                            this.addAnnotation();
                                             points = [];
                                             FinishDraw = false;
 
@@ -922,13 +935,16 @@ export default {
                                 }
                                 // this.addAnnotation();
                                 // canvas_select.style.display = "block";
+                                canvas1.reflash();
+                                var coordinateLen=this.coordinateInfoAllList.length
+                                this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
+                                console.log(this.commentShapeType);
                                 this.addAnnotation();
                             }else{
                                 
                             }
                         }
-                        canvas1.reflash();
-                        
+                       
                         console.log(this.coordinateInfoList);
                     }
                     canvas1.onmousemove = (e)=>{
@@ -1410,7 +1426,7 @@ export default {
                     annotationInfo:this.annotationInfo,
                     drawingVersionId:this.drawingVersionId,
                     reviewStage:this.stage,
-                    type:this.coordinateInfoList[0].t,
+                    type:this.commentShapeType,
                     // projectId:vm.projId
                 },
                 data:{
