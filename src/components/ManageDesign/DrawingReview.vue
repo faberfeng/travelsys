@@ -795,9 +795,9 @@ export default {
                 canvas1.reflash = (e)=>{
                     
                     // console.log(canvas1.drawElements);
-                     canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
+                    
                     ctx.clearRect(0,0,this.StartWidth,this.StartHeight);
-                     console.log(canvas1.drawElements,'reflash')
+                    //  console.log(canvas1.drawElements,'reflash')
                     // ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                     this.coordinateInfoAllList=canvas1.drawElements;
 
@@ -964,6 +964,7 @@ export default {
                                 }
                                 // this.addAnnotation();
                                 // canvas_select.style.display = "block";
+                                canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
                                 canvas1.reflash();
                                 var coordinateLen=this.coordinateInfoAllList.length
                                 this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
@@ -985,6 +986,7 @@ export default {
                         let x =  layerX_;
                         let y =  layerY_;
                         if(this.beginDraw&&this.isDrawing){
+                            canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
                             canvas1.reflash();
                             this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
                         }
@@ -1059,6 +1061,8 @@ export default {
 
             canvas1.drawElements=[];
             this.coordinateInfoList=[];
+
+            console.log(canvas1);
         },
         //绘图方法储存函数
         drawingMethodsSave(item,ctx,ctx_select){
@@ -2053,10 +2057,12 @@ export default {
         handleNodeClick(obj){
             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
-                let canvas1=document.getElementById('abs');
+                // let canvas1=document.getElementById('abs');
                 let absInp=document.getElementById('absInp');
-                canvas1.parentNode.removeChild(canvas1);
-                absInp.parentNode.removeChild(absInp);
+                // canvas1.parentNode.removeChild(canvas1);
+                document.getElementById('abs').drawElements=[];
+                document.getElementById('abs').reflash();
+                // absInp.parentNode.removeChild(absInp);
             }
             var vm=this;
             vm.checkedKeys=[];
@@ -2459,224 +2465,8 @@ export default {
                         }
                     })
             })
-        },
-        //图片及伸缩
-        init(source){
-                var vm = this
-                var container, mesh;
-                container = document.getElementById('drawingPic');
-                camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );//相机
-                camera.target = new THREE.Vector3( 0, 0, 0 );
-                // camera.target = new THREE.Vector3( cx, cy, cz );
-                // camera.aspect = window.innerWidth / window.innerHeight;
-                // camera.lookAt(camera.target);
-                // camera.updateProjectionMatrix();
-                scene = new THREE.Scene();//场景
-                var geometry = new THREE.SphereGeometry( 500, 60, 40 );//几何体
-                geometry.scale( - 1, 1, 1 );
-                var material = new THREE.MeshBasicMaterial( {
-                    map: new THREE.TextureLoader().load(source)
-                } );//材质
-                mesh = new THREE.Mesh( geometry, material );
-                scene.add( mesh );
-                renderer = new THREE.WebGLRenderer();//渲染器
-                renderer.setPixelRatio( window.devicePixelRatio );
-                renderer.setSize($("#drawingPic").width(),$("#drawingPic").height());
-                // renderer.setSize(window.innerWidth-380,window.innerHeight-1000);
-                container.innerHTML = ''
-                container.appendChild(renderer.domElement);
-                renderer.setClearColor(0xFFFFFF, 1.0);
-                container.addEventListener( 'mousedown', vm.onDocumentMouseDown, false );
-                container.addEventListener( 'mousemove', vm.onDocumentMouseMove, false );
-                container.addEventListener( 'mouseup', vm.onDocumentMouseUp, false );
-                container.addEventListener( 'wheel', vm.onDocumentMouseWheel, false );
-                // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				// document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				// document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-                // document.addEventListener( 'mousewheel', mousewheel, false );
-                // document.addEventListener('mousewheel', vm.mousewheel, false);
-                
-                
-
-                container.addEventListener( 'dragover', function ( event ) {
-
-                    event.preventDefault();
-                    /** @namespace event.dataTransfer */
-                    event.dataTransfer.dropEffect = 'copy';
-
-                }, false );
-
-                container.addEventListener('dragenter', function () {
-                    document.body.style.opacity = 0.5;
-
-                }, false );
-
-                container.addEventListener( 'dragleave', function () {
-
-                    document.body.style.opacity = 1;
-
-                }, false );
-
-               container.addEventListener( 'drop', function ( event ) {
-
-                    event.preventDefault();
-
-                    var reader = new FileReader();
-                    reader.addEventListener( 'load', function ( event ) {
-
-                        material.map.image.src = event.target.result;
-                        material.map.needsUpdate = true;
-
-                    }, false );
-                    reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
-
-                    document.body.style.opacity = 1;
-
-                }, false );
-
-                //
-                window.addEventListener( 'resize', vm.onWindowResize, false );
-                vm.animate();
-            },
-             onWindowResize() {
-
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize($("#drawingPic").width(),$("#drawingPic").height());
-
-            },
-
-            onDocumentMouseDown( event ) {
-
-                event.preventDefault();
-
-                isUserInteracting = true;
-
-                onMouseDownMouseX = event.clientX;
-                onMouseDownMouseY = event.clientY;
-
-                onMouseDownLon = lon;
-                onMouseDownLat = lat;
-
-            },
-
-            onDocumentMouseMove( event ) {
-
-                if ( isUserInteracting === true ) {
-
-                    lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
-                    lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
-
-                }
-
-            },  
-            onDocumentMouseUp() {
-                isUserInteracting = false;
-            },
-            onDocumentMouseWheel(event) {
-                // distance += event.deltaY * 0.05;
-
-                // distance = THREE.Math.clamp( distance, 400, 1000 );
-                var x = event.pageX;
-                var y = event.pageY;
-                var div = $('#drawingPic');// 获取你想要的DIV
-                var y1 = div.offset().top;  // div上面两个的点的y值
-                var y2 = y1 + div.height();// div下面两个点的y值
-                var x1 = div.offset().left;  // div左边两个的点的x值
-                var x2 = x1 + div.width();  // div右边两个点的x的值
-                
-                    if( x < x1 || x > x2 || y < y1 || y > y2){
-                        this.enableMouseWheel();
-                        return;
-                    }else{
-                        this.disabledMouseWheel();
-                // camera.fov += event.deltaY * 0.05;
-                        var explorer =navigator.userAgent ;
-                        if (explorer.indexOf("Firefox") >= 0){
-                            camera.fov += event.deltaY * 1;
-                        } else if (explorer.indexOf("Chrome") >= 0){
-                            camera.fov += event.deltaY * 0.05;
-                        } else if (explorer.indexOf("Ie") >= 0){
-                            camera.fov += event.deltaY * 0.05;
-                        }
-                        if(camera.fov<10) camera.fov=10;
-                        if(camera.fov>130) camera.fov=130;
-                        camera.updateProjectionMatrix();
-                        
-                    }
-                    
-            },
-            disabledMouseWheel() {
-                if (document.addEventListener) {
-                    document.addEventListener('DOMMouseScroll', this.scrollFunc, false);
-                }// W3C
-                window.onmousewheel = document.onmousewheel = this.scrollFunc;// IE/Opera/Chrome
-            },
-            scrollFunc(evt) {
-                evt = evt || window.event;
-                if(evt.preventDefault) {
-                    // Firefox
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                } else {
-                    // IE
-                    evt.cancelBubble=true;
-                    evt.returnValue = false;
-                }
-                return false;
-            },
-            enableMouseWheel(){
-                if (document.addEventListener) {
-                    document.addEventListener('DOMMouseScroll', this.scrollFunc2, false);
-                }// W3C
-                window.onmousewheel = document.onmousewheel = this.scrollFunc2;// IE/Opera/Chrome
-            },
-            scrollFunc2(evt) {
-                evt = evt || window.event;
-                if(evt.preventDefault) {
-                    // Firefox
-                    //evt.preventDefault();
-                    //evt.stopPropagation();
-                } else {
-                    // IE
-                    evt.cancelBubble=false;
-                    evt.returnValue = true;
-                }
-                return true;
-            },
-            animate() {
-                var vm = this
-                requestAnimationFrame( vm.animate );//动画
-                vm.update();
-
-            },
-            update() {
-
-                // if ( isUserInteracting === false ) {
-
-                // lon += 0.1;
-
-                // }
-
-                lat = Math.max( - 85, Math.min( 85, lat ) );
-                phi = THREE.Math.degToRad( 90 - lat );
-                theta = THREE.Math.degToRad( lon );
-                // camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
-
-                camera.target.x = distance * Math.sin( phi ) * Math.cos( theta );
-                camera.target.y = distance * Math.cos( phi );
-                camera.target.z = distance * Math.sin( phi ) * Math.sin( theta );
-
-                camera.lookAt( camera.target );
-
-                /*
-                // distortion
-                camera.position.copy( camera.target ).negate();
-                */
-                renderer.render( scene, camera );
-            }
-
-    }
+        }
+     }
 
 }
 </script>
