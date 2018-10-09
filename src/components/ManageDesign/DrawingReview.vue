@@ -992,8 +992,8 @@ export default {
 
                     document.getElementById('drawingPic').onmousemove = (e)=>{
                         
-                        changeSize_position.x = e.target.offsetWidth / 2;
-                        changeSize_position.y = e.target.offsetHeight / 2;
+                        changeSize_position.x = (e.target.offsetWidth / 2 - e.layerX) / e.target.offsetWidth;
+                        changeSize_position.y = (e.target.offsetHeight / 2 - e.layerY) / e.target.offsetHeight;
 
                     }
 
@@ -1030,9 +1030,26 @@ export default {
 
                         ///////////////////////////// 改变位置 //////////////////////////////////
 
-                        
+                        var drawingPic = document.getElementById('drawingPic');
 
-                        // console.log(document.getElementById('drawingPic'));
+                        if(drawingPic.scrollWidth >= drawingPic.offsetWidth){
+
+                            console.log(drawingPic.offsetHeight," ",drawingPic.offsetWidth);
+                            console.log(drawingPic.scrollHeight," ",drawingPic.scrollWidth," ",drawingPic.scrollTop," ",drawingPic.scrollLeft);
+
+                            if(changeSize_position.x < 0){
+                                drawingPic.scrollLeft = (drawingPic.scrollWidth - drawingPic.offsetWidth);
+                            }else{
+                                drawingPic.scrollLeft = 0;
+                            }
+
+                            if(changeSize_position.y < 0){
+                                drawingPic.scrollTop = (drawingPic.scrollHeight - drawingPic.offsetHeight);
+                            }else{
+                                drawingPic.scrollTop = 0;
+                            }
+
+                        }
 
 
                         /////////////////////////////////////////////////////////////////////////
