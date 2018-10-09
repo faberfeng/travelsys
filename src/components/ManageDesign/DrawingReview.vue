@@ -39,7 +39,7 @@
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
 
-                <div  v-loading="loading" @mouseover="loadeds()"  v-show="versionPath" id="drawingPic">
+                <div  v-loading="loading" @mouseover="loadeds()" v-show="versionPath" id="drawingPic">
                     <!-- @mouseover="loadeds()" -->
                     <div id="imgCanvasDiv">
                         <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="800">
@@ -700,7 +700,7 @@ export default {
         },
         //此为可以需要批注，加载canvas等
         loadeds(){
-             this.allList='';
+            //  this.allList='';
             // alert('dff')
             //  alert('hdjsf')
             // console.log($event);
@@ -776,7 +776,7 @@ export default {
                 // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
                 // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
             }
-                canvas1.drawElements=[];
+                // canvas1.drawElements=[];
                 let input = document.createElement("input");
                 input.id="absInp"
                 input.style.width = "196px";
@@ -797,11 +797,12 @@ export default {
                     // console.log(canvas1.drawElements);
                      canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
                     ctx.clearRect(0,0,this.StartWidth,this.StartHeight);
-                    //  console.log(canvas1.drawElements,'reflash')
+                     console.log(canvas1.drawElements,'reflash')
                     // ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                     this.coordinateInfoAllList=canvas1.drawElements;
+
                    
-                    console.log(this.commentShapeType)
+                    // console.log(this.commentShapeType)
                     // console.log(this.allList,'图纸批注')
                     
                     // console.log(canvas1.drawElements);
@@ -809,7 +810,6 @@ export default {
                        this.drawingMethodsSave(item,ctx,ctx_select);
                    })
                    this.allList='';
-                   
                 }
                 // if(screenLeft.item ==3){
                 //     canvas1.onmousedown();
@@ -1726,8 +1726,10 @@ export default {
                     // console.log(this.coordinateInfoList_all);
 
                     // console.log(this.coordinateInfoList);
-                    this.loadeds();
+                     this.loadeds();
                     this.reloaded();
+                   
+                    
                     // console.log(this.coordinateInfoAllListss);
                     // alert("jfkdjk")
                 }
