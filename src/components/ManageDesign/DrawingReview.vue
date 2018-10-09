@@ -38,14 +38,14 @@
                         <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
-                <div  v-loading="loading"  v-show="versionPath" class="drawingPic">
+                <div  v-loading="loading" @mouseover="loadeds()"  v-show="versionPath" id="drawingPic">
                     <div id="imgCanvasDiv">
-                        <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="500">
+                        <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="800">
                             <!-- <img id="drawPic" :src="drawingFileUrl"/> -->
                         </canvas>
                     </div>
                     <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
-                    <pdf v-show="pdfShow" ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="drawingFileUrl1"></pdf>
+                    <pdf id="pdf_div" v-show="pdfShow" ref="pdfDocument"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="drawingFileUrl1"></pdf>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -424,6 +424,9 @@ export default {
             allUserList:'',
             beginDraw:false,
             layerID:0, // 图层 ID 每次累加保证每个图层都有不同ID（颜色）选取
+            Koeffizent:1.0, // 缩放大小比例参数
+            StartWidth:0,   // 缩放时清空范围
+            StartHeight:0,  // 缩放时清空范围
             pdfShow:false,
             imgShow:false,
             commentShow:false,//评论下拉框
@@ -666,7 +669,7 @@ export default {
         annotationClick(){
              this.screenLeft.item = 3
             //  this.biaozhushow=true;
-             this.loadeds()
+            // this.loadeds()
             this.queryAnnotation()
         },
         reloaded(){
@@ -720,6 +723,8 @@ export default {
                     canvas1.style.top=0;
                     canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
                     canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    this.StartWidth = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
+                    this.StartHeight = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
                     this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
                 }else if(this.imgShow==true){
                     canvas1.id ="abs";
@@ -782,7 +787,7 @@ export default {
                     // console.log(canvas1.drawElements);
                      canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
                      console.log(canvas1.drawElements,'reflash')
-                    ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
+                    ctx.clearRect(0,0,this.StartWidth,this.StartHeight);
                     this.coordinateInfoAllList=canvas1.drawElements;
                     console.log(this.allList)
                     // console.log(canvas1.drawElements);
@@ -795,20 +800,30 @@ export default {
                 //     canvas1.onmousemove();
                 //     canvas1.onmouseup();
                 // }
+
+                    var canvas_start_move = {x:0,y:0};
+                    var canvas_start_position = {top:0,left:0};
+                    var canvas_move_status = "none";
+                    var changeSize_position = {x:0,y:0};
                  
                     canvas1.onmousedown = (e)=>{
+                        
+                        var layerX_ = e.layerX / this.Koeffizent;
+                        var layerY_ = e.layerY / this.Koeffizent;
+
                         if(input.style.display == "block"){
                             input.style.display = "none";
                             for(let i = 0;i < canvas1.drawElements.length;i++){
                                 if(canvas1.drawElements[i].ID == this.layerID){
                                     canvas1.drawElements[i].text = input.value;
+                                    console.log(canvas1.drawElements," ",canvas1.drawElements[i].text);
                                 }
                             }
-                            console.log(canvas1.drawElements);
+                           
                         }
 
                         // this.isDrawing=false;
-                        var selectColorID = ctx_select.getImageData( e.layerX,  e.layerY, 1, 1).data;
+                        var selectColorID = ctx_select.getImageData(layerX_ ,  layerY_, 1, 1).data;
                         var red = selectColorID[0];
                         var green = selectColorID[1];
                         var blue = selectColorID[2];
@@ -827,18 +842,19 @@ export default {
                         }
 
                         if(e.button == 0&&this.isDrawing){
+
                             this.beginDraw = true;
-                            start.x = e.layerX;
-                            start.y = e.layerY;
+                            start.x = layerX_;
+                            start.y = layerY_;
                             this.layerID++;
                             // console.log(this.layerID);
                             if(this.shapeType=="4"){
                                 if(!FinishDraw){
-                                    start.x = e.layerX;
-                                    start.y = e.layerY;
+                                    start.x = layerX_;
+                                    start.y = layerY_;
                                     if(points.length > 0){
-                                        if( Math.pow((points[0].x - e.layerX)*(points[0].x - e.layerX) + 
-                                                    (points[0].y - e.layerY)*(points[0].y - e.layerY),0.5) <= 20){	// 首尾链接算完成
+                                        if( Math.pow((points[0].x - layerX_)*(points[0].x - layerX_) + 
+                                                    (points[0].y - layerY_)*(points[0].y - layerY_),0.5) <= 20){	// 首尾链接算完成
                                             points.push({x:points[0].x,y:points[0].y});
                                             FinishDraw = true;
                                             canvas1.onmousemove(e);
@@ -890,7 +906,7 @@ export default {
                                             return;
                                         }
                                     }
-                                    points.push({x:e.layerX,y:e.layerY});
+                                    points.push({x:layerX_,y:layerY_});
                                     // console.log(points);
                                 }
                                 canvas1.onmousemove(e);
@@ -904,6 +920,10 @@ export default {
                         
                     }
                     canvas1.onmouseup = (e)=>{
+
+                        var layerX_ = e.layerX / this.Koeffizent;
+                        var layerY_ = e.layerY / this.Koeffizent;
+
                         if(this.beginDraw){
                             if(this.shapeType!="4"){
                                 this.coordinateInfoList=[];
@@ -917,8 +937,8 @@ export default {
                                 // console.log(this.coordinateInfoList);
                                 if(this.shapeType == "5"){
                                     input.value = "标注";
-                                    input.style.left = (end.x - 98) + "px";
-                                    input.style.top = (end.y - 14) + "px";
+                                    input.style.left = (end.x  - 98) * this.Koeffizent + "px";
+                                    input.style.top = (end.y - 14) * this.Koeffizent + "px";
                                     input.style.display = "block";
                                     console.log(input.text);
                                 }
@@ -935,14 +955,69 @@ export default {
                     }
                     canvas1.onmousemove = (e)=>{
                         // alert('触发节点down2')
-                        let x =  e.layerX;
-                        let y =  e.layerY;
+
+                        var layerX_ = e.layerX / this.Koeffizent;
+                        var layerY_ = e.layerY / this.Koeffizent;
+
+                        let x =  layerX_;
+                        let y =  layerY_;
                         if(this.beginDraw&&this.isDrawing){
                             canvas1.reflash();
                             this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
                         }
                     }
-                
+
+                    document.getElementById('drawingPic').onmousemove = (e)=>{
+                        
+                        changeSize_position.x = e.target.offsetWidth / 2;
+                        changeSize_position.y = e.target.offsetHeight / 2;
+
+                    }
+
+                    document.getElementById('drawingPic').onmousewheel = (e)=>{
+                        e.preventDefault();
+
+                        if(e.deltaY > 0){
+                            this.Koeffizent *= 0.8;
+                        }else{
+                            
+                            if(this.Koeffizent > 4){
+                                return;
+                            }
+                            this.Koeffizent *= 1.25;
+                        }
+
+                        var pdf_div = document.getElementById('pdf_div');
+
+                        // var drawingPic = document.getElementById('drawingPic');
+
+                        var h = this.$refs.pdfDocument.$refs.canvasParent.children[0].height / this.$refs.pdfDocument.$refs.canvasParent.children[0].width ;
+
+                        pdf_div.style.width = this.Koeffizent * 100 + "%";
+                        pdf_div.style.height = this.Koeffizent * 100 + "%";
+
+                        var annotationLayer = document.getElementsByClassName("annotationLayer");
+                        annotationLayer[0].style.display = "none";
+
+                        canvas1.style.width = pdf_div.offsetWidth + "px";
+                        canvas1.style.height = pdf_div.offsetWidth * h + "px";
+
+                        canvas_select.style.width = pdf_div.offsetWidth + "px";
+                        canvas_select.style.height = pdf_div.offsetWidth * h + "px";
+
+                        ///////////////////////////// 改变位置 //////////////////////////////////
+
+                        
+
+                        // console.log(document.getElementById('drawingPic'));
+
+
+                        /////////////////////////////////////////////////////////////////////////
+
+                        // console.log(this.Koeffizent," ",h);
+                    }
+
+                    
             
             canvas1.drawElements=[];
             this.coordinateInfoList=[];
@@ -1229,6 +1304,10 @@ export default {
         },
         //绘图方法函数
         drawingMethods(shapeType,ctx,start,end,x,y,FinishDraw,points,e){
+
+            var layerX_ = e.layerX / this.Koeffizent;
+            var layerY_ = e.layerY / this.Koeffizent;
+
             switch(shapeType){
                         case "1":
                             ctx.strokeStyle='rgb(252, 52, 57)';
@@ -1271,18 +1350,18 @@ export default {
                                 }
                             }
                             ctx.stroke()
-                            this.drawCloudLine(ctx,points,20,FinishDraw,{x:e.layerX,y:e.layerY});
+                            this.drawCloudLine(ctx,points,20,FinishDraw,{x:layerX_,y:layerY_});
                         }
                         break;
                         case "5":
 
                             ctx.strokeStyle='rgb(252, 52, 57)';
                             ctx.lineWidth=3;
-                            let text_X = e.layerX - 120;
-                            let text_Y = e.layerY;
+                            let text_X = layerX_ - 120;
+                            let text_Y = layerY_;
 
-                            if(e.layerX < start.x){
-                                text_X = e.layerX + 120;
+                            if(layerX_ < start.x){
+                                text_X = layerX_ + 120;
                             }
 
                             ctx.beginPath();
@@ -1323,14 +1402,14 @@ export default {
                             ctx.fill();
                             ctx.beginPath();
                             ctx.moveTo(text_X,text_Y);
-                            ctx.lineTo(e.layerX,text_Y);
+                            ctx.lineTo(layerX_,text_Y);
                             ctx.stroke();
                             ctx.beginPath();
-                            ctx.moveTo(e.layerX - 100,text_Y + 16);
-                            ctx.lineTo(e.layerX + 100,text_Y + 16);
-                            ctx.lineTo(e.layerX + 100,text_Y - 16);
-                            ctx.lineTo(e.layerX - 100,text_Y - 16);
-                            ctx.lineTo(e.layerX - 100,text_Y + 16);
+                            ctx.moveTo(layerX_ - 100,text_Y + 16);
+                            ctx.lineTo(layerX_ + 100,text_Y + 16);
+                            ctx.lineTo(layerX_ + 100,text_Y - 16);
+                            ctx.lineTo(layerX_ - 100,text_Y - 16);
+                            ctx.lineTo(layerX_ - 100,text_Y + 16);
                             ctx.stroke();
                             ctx.fillStyle='rgb(255,255,255)';
                             ctx.fill();
@@ -2633,7 +2712,7 @@ export default {
             .noImg{
                     margin:150px auto;
                 }
-            .drawingPic{
+            #drawingPic{
                     margin:0 auto;
                     overflow: auto;
                     position: absolute;
@@ -2643,7 +2722,8 @@ export default {
                     right: 25px;
                     min-width: 1000px;
                     max-width: 1600px;
-                    height: 800px;
+                    // height: 800px;
+                    // width:800px;
                 
                 #drawPic{
                     min-width: 700px;
