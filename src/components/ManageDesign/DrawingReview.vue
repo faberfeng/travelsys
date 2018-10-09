@@ -16,19 +16,21 @@
                         设计版本  
                     </router-link>
                 </div>
-                <div class="commentInformation">
-                    <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
-                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
-                        <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
-                    </el-select>
-                    <label style="font-size:14px; color:#999999;margin-right:4px" >阶段:</label>
-                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="stage" class="commentSel">
-                        <el-option class="commentOpt" v-for="item in stageList" :key="item.value" :value="item.value" :label="item.label"></el-option>
-                    </el-select>
-                    <label style="font-size:14px; color:#999999;margin-right:4px">标记:</label>
-                    <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="isMark" class="commentSel">
-                        <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
-                    </el-select>
+                <div class="commentInformation" >
+                    <div class="commentTool" v-show="screenLeft.item != 1">
+                        <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
+                        <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
+                            <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
+                        </el-select>
+                        <label style="font-size:14px; color:#999999;margin-right:4px" >阶段:</label>
+                        <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="stage" class="commentSel">
+                            <el-option class="commentOpt" v-for="item in stageList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                        </el-select>
+                        <label style="font-size:14px; color:#999999;margin-right:4px">标记:</label>
+                        <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="isMark" class="commentSel">
+                            <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
+                        </el-select>
+                    </div>
                     <div class="rotate" v-show="versionPath&&!annotationlist">
                         <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
                         <i class="drawingIcon youRotate" @click="youRotate()"></i>
@@ -39,7 +41,8 @@
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
 
-                <div  v-loading="loading" @mouseover="loadeds()" v-show="versionPath" id="drawingPic">
+                <div  v-loading="loading"  @mouseover="loadeds()" v-show="versionPath" id="drawingPic">
+                    
                     <!-- @mouseover="loadeds()" -->
                     <div id="imgCanvasDiv">
                         <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="800">
@@ -115,7 +118,7 @@
 
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name" >图号</span>
-                                <span class="detial-text-value" v-text="checkFileDir.drawingNumber+'-'+item.versionId"></span>
+                                <span class="detial-text-value" v-text="checkFileDir.drawingNumber+letterChange(item.versionId)"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">上传人</span>
@@ -145,9 +148,9 @@
                         <div class="apendedInfoinp" v-show="(item.id==isId)?true:false" ><input v-show="!item.annotationInfo" placeholder="请输入评审文字" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
                         <div class="commentBody" v-show="(item.id==isId)?true:false">
                             <div v-show="item.annotationInfo">
-                                <textarea  rows="3" cols="20" type="text" placeholder="请回复" v-model="replayList" class="commentInfoinput">
+                                <textarea  rows="3" cols="20" type="text" placeholder="请回复" @change="addReply(item.id)" v-model="replayList" class="commentInfoinput">
                                 </textarea>
-                                <div class="replayBtn" @click="addReply(item.id)">回复</div>
+                                <!-- <div class="replayBtn" @click="addReply(item.id)">回复</div> -->
                                 <ul class="replyUl">
                                     <li class="replyLi" v-show="(item.id==item1.annotationId)?true:false" v-for="(item1,index1) in replyList" :key="index1">
                                         <div class="replyOne"><label class="replyName" v-text="item1.insertUserName"></label><label class="replyTime">{{item1.insertTime|updateTimeChange()}}</label></div>
@@ -266,16 +269,8 @@ import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
 import moment from 'moment';
 import pdf from 'vue-pdf'
-// import 'three.min.js'
 var THREE = require('three');
-var camera, scene, renderer;
-var isUserInteracting = false,
-    onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-    lon = 0, onMouseDownLon = 0,
-    lat = 0, onMouseDownLat = 0,
-    phi = 0, theta = 0;
-    var distance = 500;
-// import 'js/'
+var isUserInteracting = false;
 export default {
      components: {
         pdf
@@ -435,11 +430,11 @@ export default {
             imgShow:false,
             commentShow:false,//评论下拉框
             allList:'',
-
-
+            letterList:[' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N']
         }
     },
     filters: {
+        
         stageListChange(val){
             if(val=='1'){
                 return '专业协调'
@@ -503,6 +498,31 @@ export default {
         
     },
     methods:{
+        letterChange(val){
+            if(val==1){
+                return this.letterList[val-1];
+            }else if(val==2){
+                return this.letterList[val-1];
+            }else if(val==3){
+                return this.letterList[val-1];
+            }else if(val==4){
+                return this.letterList[val-1];
+            }else if(val==5){
+                return this.letterList[val-1];
+            }else if(val==6){
+                return this.letterList[val-1];
+            }else if(val==7){
+                 return this.letterList[val-1];
+            }else if(val==8){
+                return this.letterList[val-1];
+            }else if(val==9){
+                return this.letterList[val-1];
+            }else if(val==10){
+                return this.letterList[val-1];
+            }else if(val=11){
+                 return this.letterList[val-1];
+            }
+        },
         shapeImg(val){
                 if(val==1){
                     return require('./images/zx1.png')
@@ -585,14 +605,20 @@ export default {
         //选择版本
         selectVersion(val){
             this.isSelect=val;
-            //清除批注遗留的canvas；
+            // //清除批注遗留的canvas；
+            // if(document.getElementById('abs')){
+            //     let canvas1=document.getElementById('abs');
+            //     let absInp=document.getElementById('absInp');
+            //     canvas1.parentNode.removeChild(canvas1);
+            //     absInp.parentNode.removeChild(absInp);
+            // }
+             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
-                let canvas1=document.getElementById('abs');
                 let absInp=document.getElementById('absInp');
-                canvas1.parentNode.removeChild(canvas1);
-                absInp.parentNode.removeChild(absInp);
+                document.getElementById('abs').drawElements=[];
+                document.getElementById('abs').reflash();
             }
-            console.log(this.drawingVersionList,"jkdsjdjj");
+            // console.log(this.drawingVersionList,"jkdsjdjj");
             this.drawingVersionList.forEach((item)=>{
                 if(val==item.id){
                     this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
@@ -607,7 +633,7 @@ export default {
                             this.pdfShow=false;
                             var width=c.width;
                             var height=c.height;
-                            console.log(width,'',height)
+                            // console.log(width,'',height)
                             var ctx_img = c.getContext("2d");
                             ctx_img.clearRect(0,0,width,height);
                             var img = new Image();
@@ -621,42 +647,92 @@ export default {
             this.queryAnnotation();
             // console.log(this.drawingFileUrl);
         },
+        //获取图纸旋转信息
+        getdrawInfo(){
+
+
+
+        },
         //图纸工具栏操作
         zuoRotate(){
             this.rotate=(this.rotate-90)%360;
-            var drawing=document.getElementById('drawingPdf');
+            var drawing=document.getElementById('abs');
+            var drawing1=document.getElementById('abs').previousSibling;
+            var drawing2=document.getElementById('abs').nextSibling;
+            var drawing3=document.getElementById('canvas_select');
             drawing.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing1.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing2.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing3.style.transform = 'rotate('+this.rotate +'deg)'
             
+            this.updateDrawingRotateInfo();
         },
         youRotate(){
             this.rotate=(this.rotate+90)%360;
-            var drawing=document.getElementById('drawingPdf');
+            var drawing=document.getElementById('abs');
+            var drawing1=document.getElementById('abs').previousSibling;
+            var drawing2=document.getElementById('abs').nextSibling;
+            var drawing3=document.getElementById('canvas_select');
             drawing.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing1.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing2.style.transform = 'rotate('+this.rotate +'deg)'
+            drawing3.style.transform = 'rotate('+this.rotate +'deg)'
+            this.updateDrawingRotateInfo();
         },
         straightLine(){
             this.isDrawing=true;
             this.shapeType="1";
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         circular(){
             this.isDrawing=true;
             this.shapeType="2";
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         rectangleTool(){
             this.isDrawing=true;
             this.shapeType="3";
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         cloudLine(){
             this.isDrawing=true;
             this.shapeType="4";
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         drawingText(){
             this.isDrawing=true;
             this.shapeType="5";
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         appended(){
             this.isDrawing=true;
             this.shapeType="6";
             this.beginDraw = true;
+            if(this.stage=='-1'){
+                this.stage='1';//阶段
+            }
+            this.isMark='0';//标记
+            this.getAllUser();
         },
         drawingClick(){
             this.screenLeft.item = 1;
@@ -693,7 +769,7 @@ export default {
             let canvas_select = document.createElement("canvas");
             let ctx_select=canvas_select.getContext("2d");
             this.allList=JSON.parse(this.coordinateInfoList_all)
-            console.log(typeof(this.allList),'0000');
+            // console.log(typeof(this.allList),'0000');
             this.allList.forEach((item)=>{
                 this.drawingMethodsSave(item,ctx,ctx_select);
             })
@@ -832,11 +908,11 @@ export default {
                             for(let i = 0;i < canvas1.drawElements.length;i++){
                                 if(canvas1.drawElements[i].ID == this.layerID){
                                     canvas1.drawElements[i].text = input.value;
-                                    console.log(canvas1.drawElements," ",canvas1.drawElements[i].text);
+                                    // console.log(canvas1.drawElements," ",canvas1.drawElements[i].text);
                                 }
                             }
 
-                            console.log(canvas1.drawElements,'输入值');
+                            // console.log(canvas1.drawElements,'输入值');
                             this.coordinateInfoAllList=canvas1.drawElements;
                             // this.commentShapeType='5'
                             // this.addAnnotation();
@@ -867,7 +943,6 @@ export default {
                             start.x = layerX_;
                             start.y = layerY_;
                             this.layerID++;
-                            // console.log(this.layerID);
                             if(this.shapeType=="4"){
                                 if(!FinishDraw){
                                     start.x = layerX_;
@@ -927,7 +1002,6 @@ export default {
                                         }
                                     }
                                     points.push({x:layerX_,y:layerY_});
-                                    // console.log(points);
                                 }
                                 canvas1.onmousemove(e);
                             }
@@ -950,7 +1024,7 @@ export default {
                                 this.beginDraw = false;
                                 this.isDrawing=false;
                                 canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
-                                console.log(canvas1.drawElements);
+                                // console.log(canvas1.drawElements);
                                 canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
 
                                 this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
@@ -960,7 +1034,7 @@ export default {
                                     input.style.left = (end.x  - 98) * this.Koeffizent + "px";
                                     input.style.top = (end.y - 14) * this.Koeffizent + "px";
                                     input.style.display = "block";
-                                    console.log(input.text);
+                                    // console.log(input.text);
                                 }
                                 // this.addAnnotation();
                                 // canvas_select.style.display = "block";
@@ -968,14 +1042,14 @@ export default {
                                 canvas1.reflash();
                                 var coordinateLen=this.coordinateInfoAllList.length
                                 this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
-                                console.log(this.commentShapeType);
+                                // console.log(this.commentShapeType);
                                 this.addAnnotation();
                             }else{
                                 
                             }
                         }
                        
-                        console.log(this.coordinateInfoList);
+                        // console.log(this.coordinateInfoList);
                     }
                     canvas1.onmousemove = (e)=>{
                         // alert('触发节点down2')
@@ -1003,10 +1077,15 @@ export default {
                         e.preventDefault();
 
                         if(e.deltaY > 0){
+                            
+                            if(this.Koeffizent < 1){
+                                return
+                            }
                             this.Koeffizent *= 0.8;
+                            
                         }else{
                             
-                            if(this.Koeffizent > 4){
+                            if(this.Koeffizent > 3){
                                 return;
                             }
                             this.Koeffizent *= 1.25;
@@ -1036,8 +1115,8 @@ export default {
 
                         if(drawingPic.scrollWidth >= drawingPic.offsetWidth){
 
-                            console.log(drawingPic.offsetHeight," ",drawingPic.offsetWidth);
-                            console.log(drawingPic.scrollHeight," ",drawingPic.scrollWidth," ",drawingPic.scrollTop," ",drawingPic.scrollLeft);
+                            // console.log(drawingPic.offsetHeight," ",drawingPic.offsetWidth);
+                            // console.log(drawingPic.scrollHeight," ",drawingPic.scrollWidth," ",drawingPic.scrollTop," ",drawingPic.scrollLeft);
 
                             if(changeSize_position.x < 0){
                                 drawingPic.scrollLeft = (drawingPic.scrollWidth - drawingPic.offsetWidth);
@@ -1055,14 +1134,10 @@ export default {
 
 
                         /////////////////////////////////////////////////////////////////////////
-
-                        // console.log(this.Koeffizent," ",h);
                     }
 
             canvas1.drawElements=[];
             this.coordinateInfoList=[];
-
-            console.log(canvas1);
         },
         //绘图方法储存函数
         drawingMethodsSave(item,ctx,ctx_select){
@@ -1470,9 +1545,6 @@ export default {
 
 
         },
-        load(){
-            console.log(this.pageAllCount);
-        },
         //更新图纸旋转信息
         updateDrawingRotateInfo(){
              var vm=this
@@ -1485,13 +1557,12 @@ export default {
                 params:{
                    drawingId:this.checkFileDir.id,
                    rotateInfo:this.rotate,
-                   
                 },
             }).then((response)=>{
-                if(response.data.cd='0'){
-                   
+                if(response.data.cd=='0'){
+                    // alert('更新图纸旋转信息成功');
                 }else{
-                    this.message({
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -1502,19 +1573,22 @@ export default {
         getDrawingRotateInfo(){
              var vm=this
             axios({
-                url:vm.BDMSUrl+'dc/drawingReview/updateDrawingRotateInfo',
+                url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                   drawingId:'',
+                   drawingId:vm.checkFileDir.id,
                 },
             }).then((response)=>{
-                if(response.data.cd='0'){
+                if(response.data.cd=='0'){
                     this.rotate=response.data.rt.rotateInfo;
+                    if(this.rotate!=null){
+                        document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                    }
                 }else{
-                    this.message({
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -1523,7 +1597,6 @@ export default {
         },
         //添加批注
         addAnnotation(){
-            // console.log(this.coordinateInfoAllList);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
@@ -1599,7 +1672,7 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
-                        console.log('回复成功')
+                        // console.log('回复成功')
                         this.queryAnnotation();
                         this.replayList='';
                     }
@@ -1706,6 +1779,15 @@ export default {
         queryAnnotation(){
             var vm=this
             vm.annotationlist='';
+            //清除批注遗留的canvas；
+            if(document.getElementById('abs')){
+                let absInp=document.getElementById('absInp');
+                document.getElementById('abs').drawElements=[];
+                document.getElementById('abs').reflash();
+            }
+            if(this.drawingVersionId==''){
+                return;
+            }else{
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/queryAnnotation',
                 method:'post',
@@ -1738,23 +1820,17 @@ export default {
                             this.$set(item,'isMarkValue',true);
                         }
                     })
-                    console.log(this.annotationlist,'获取列表');
+                    // console.log(this.annotationlist,'获取列表');
                    
                     var len=this.annotationlist.length;
                     this.commentLen=len;
-                    // console.log(len);
                     this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
-                    // console.log(this.coordinateInfoList_all);
-
-                    // console.log(this.coordinateInfoList);
                      this.loadeds();
                     this.reloaded();
-                   
-                    
-                    // console.log(this.coordinateInfoAllListss);
-                    // alert("jfkdjk")
                 }
             })
+            
+            }
         },
          drawCloudLine(cxt,points,radio,finish,last){
 			var counterclockwise = false;
@@ -1885,7 +1961,6 @@ export default {
         },
         //获取目录
         getDirectory(){
-            // console.log(this.data);
             var vm=this
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
@@ -1897,7 +1972,7 @@ export default {
                     projectId:vm.projId
                 }
             }).then((response)=>{
-                if(response.data.cd='0'){
+                if(response.data.cd=='0'){
                     vm.DirectoryList=response.data.rt;
                     this.getDrawingList();
                     // console.log(vm.DirectoryList);
@@ -1941,8 +2016,6 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                      vm.drawingList=response.data.rt;
-                    // console.log(vm.drawingList)
-                    // console.log(this.DirectoryList)
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
                             vm.$set(item,'isLeaf',true)
@@ -1959,10 +2032,10 @@ export default {
                             }
                         })
                     })
-                    console.log(this.DirectoryList,'目录列表');
+                    // console.log(this.DirectoryList,'目录列表');
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
 
-                    console.log(vm.FileTree,'树形图列表');
+                    // console.log(vm.FileTree,'树形图列表');
                     let strId='';
                     let strLen='';
                     vm.FileTree.forEach((item)=>{
@@ -1977,9 +2050,12 @@ export default {
                     //         this.drawingList=item.id;
                     //     }
                     // });
-                     console.log(strId,'初始加载');
-                   this.getDrawingVersionList();
-                    this.getMaxVersionPath();
+                     console.log(this.drawingId,strId,'初始加载');
+                     if(this.drawingId){
+                        this.getDrawingVersionList();
+                        this.getMaxVersionPath();
+                        // this.queryAnnotation()
+                    }
                     this.expandedKeys.push(this.directoryId);
                     
                     // vm.directoryId='';
@@ -2007,6 +2083,7 @@ export default {
         },
         //获取图纸最新版本路径
         getMaxVersionPath(){
+            
             var vm=this;
             vm.loading=true;
             axios({
@@ -2027,7 +2104,13 @@ export default {
                             this.imgShow=false;
                             this.drawingFileUrl1=this.drawingFileUrl;
                             var source=this.drawingFileUrl;
-                            console.log(source);
+                            // this.loadeds();
+                            if(document.getElementById('abs')){
+                                this.getDrawingRotateInfo();
+                            }
+                            // console.log(source);
+                            // this.getDrawingRotateInfo();
+                            // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
                             // this.init(source);
                             //删除之前节点abs
                         }else{
@@ -2035,7 +2118,7 @@ export default {
                             this.pdfShow=false;
                             //绘制文件是png和jpg格式的图片
                             var c = document.getElementById("imgCanvas");//此为之前创建的一个图片框架
-                            console.log(c);
+                           
                             var width=c.width;
                             var height=c.height;
                             var ctx_img = c.getContext("2d");
@@ -2055,14 +2138,12 @@ export default {
             })
         },
         handleNodeClick(obj){
+            this.annotationlist='';
             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
-                // let canvas1=document.getElementById('abs');
                 let absInp=document.getElementById('absInp');
-                // canvas1.parentNode.removeChild(canvas1);
                 document.getElementById('abs').drawElements=[];
                 document.getElementById('abs').reflash();
-                // absInp.parentNode.removeChild(absInp);
             }
             var vm=this;
             vm.checkedKeys=[];
@@ -2076,12 +2157,11 @@ export default {
             }
             
             vm.checkFileDir=obj//选中的文件夹
-            console.log(vm.checkFileDir);
+            // console.log(vm.checkFileDir);
             vm.directoryId=obj.code
             vm.drawingId=obj.id
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
-
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
                 this.getMaxVersionPath();
@@ -2101,7 +2181,7 @@ export default {
             if(vm.expandedKeys.indexOf(data.code) != -1){
                  vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
             }
-            console.log(vm.expandedKeys);
+            // console.log(vm.expandedKeys);
         },
         //获取图纸版本列表
         getDrawingVersionList(){
@@ -2118,12 +2198,11 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.drawingVersionList=response.data.rt;
-
                     console.log(this.drawingVersionList);
                     let listLen=this.drawingVersionList.length;
                     this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
                     this.drawingVersionId=this.drawingZxVersionId;
-                    console.log(this.drawingZxVersionId);
+                    // console.log(this.drawingZxVersionId);
                     // console.log(this.drawingVersionList);
                 }
             })
@@ -2155,12 +2234,19 @@ export default {
                         this.drawingFileUrl1='';
                         this.drawingFileUrl='';
                         this.checkFileDir=[];
-                        //清除批注遗留的canvas；
+                        this.versionPath='';
+                        // //清除批注遗留的canvas；
+                        // if(document.getElementById('abs')){
+                        //     let canvas1=document.getElementById('abs');
+                        //     let absInp=document.getElementById('absInp');
+                        //     canvas1.parentNode.removeChild(canvas1);
+                        //     absInp.parentNode.removeChild(absInp);
+                        // }
+                         //清除批注遗留的canvas；
                         if(document.getElementById('abs')){
-                            let canvas1=document.getElementById('abs');
                             let absInp=document.getElementById('absInp');
-                            canvas1.parentNode.removeChild(canvas1);
-                            absInp.parentNode.removeChild(absInp);
+                            document.getElementById('abs').drawElements=[];
+                            document.getElementById('abs').reflash();
                         }
                         // document.getElementById('abs')
                        vm.getDirectory();
@@ -2266,6 +2352,8 @@ export default {
         },
         updateDrawingCancle(){
             this.editDrawing.updateshow=false
+            vm.updateFileName=''
+            vm.updateFileList=''
             
         },
         confirmUpdateDrawing(){
@@ -2302,6 +2390,7 @@ export default {
                                 message:response.data.msg
                             })
                         }
+                        vm.fileList = [];
                     })
         },
         //图片尺寸验证  
@@ -2462,6 +2551,7 @@ export default {
                                 type:'error',
                                 message:response.data.msg
                             })
+                             vm.fileList = []
                         }
                     })
             })
@@ -2569,16 +2659,29 @@ export default {
             transition:  all ease .5s;
             .commentInformation{
                 // float: left;
-                // margin-left:-640px;
+                // margin-left:-420px;
+                min-width: 1000px;
+                max-width: 1600px;
                 margin-top:22px;
-                width: 642px;
+                // width: 600px;
+                position: relative;
                 height: 38px;
-                .el-input__inner{
-                    height: 30px !important;
+                .commentTool{
+                     position: absolute;
+                     left:30px;
+                     .el-input__inner{
+                        height: 30px !important;
+                    }
+
                 }
                 .rotate{
                     float: right;
-                    position: relative;
+                    // position: relative;
+                    position: absolute;
+                    right: 30px;
+                    top: 0px;
+                    width: 100px;
+                    height: 30px;
                     .drawingIcon{
                                 width: 80px;
                                 height: 26px;
@@ -2610,7 +2713,7 @@ export default {
                     margin:0 auto;
                     overflow: auto;
                     position: absolute;
-                    top: 130px;
+                    top: 115px;
                     left: 0;
                     bottom: 0;
                     right: 25px;
