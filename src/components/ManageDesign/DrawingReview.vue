@@ -1,5 +1,5 @@
 <template>
-    <div id="drwaingReview">
+    <div id="drwaingReview" >
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 <div id="item-box-file">
@@ -17,7 +17,7 @@
                     </router-link>
                 </div>
                 <div class="commentInformation" >
-                    <div class="commentTool" v-show="screenLeft.item != 1">
+                    <div class="commentTool" v-show="screenLeft.item == 3">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                             <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -32,8 +32,8 @@
                         </el-select>
                     </div>
                     <div class="rotate" v-show="versionPath&&!annotationlist">
-                        <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
-                        <i class="drawingIcon youRotate" @click="youRotate()"></i>
+                        <i class="drawingIcon zuoRotate" @click="zuoRotate(drawingFileUrl1)"></i>
+                        <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
                 </div>
                 <div class="noImg" v-show="!versionPath">
@@ -41,7 +41,7 @@
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
 
-                <div  v-loading="loading"  @mouseover="loadeds()" v-show="versionPath" id="drawingPic">
+                <div  v-loading="loading"  v-show="versionPath" id="drawingPic">
                     
                     <!-- @mouseover="loadeds()" -->
                     <div id="imgCanvasDiv">
@@ -50,12 +50,12 @@
                         </canvas>
                     </div>
                     <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
-                    <pdf v-show="pdfShow" ref="pdfDocument" id="drawingPdf"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event"  :src="drawingFileUrl1"></pdf>
+                    <pdf v-show="pdfShow" ref="pdfDocument" id="drawingPdf" @loaded="loadsNew()"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event"  :src="drawingFileUrl1"></pdf>
 
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
-            <div v-show="screenLeft.item == 3" id="drawingToolsBody">
+            <div v-show="screenLeft.item == 3&&!isSelect" id="drawingToolsBody">
                     <ul class="drawingTools">
                         <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
                         <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
@@ -69,13 +69,13 @@
                     </ul>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']" >
             <div id="center-selection">
                     <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property "  @click="screenLeft.item = 1">图<br>纸</span>
+                        <span class="item-property "  @click="drawingClick()">图<br>纸</span>
                         <span class="item-version " @click="screenLeft.item=2">版<br>本</span>
                         <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
                     </div>
@@ -133,31 +133,32 @@
             </div>
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
-                    <div class="drawingApendedHead">{{checkFileDir.drawingName+'('+this.version+')'}}</div>
+                    <div class="drawingApendedHead" v-show="annotationlist">{{checkFileDir.drawingName+'('+checkFileDir.drawingNumber+letterChange(this.version)+')'}}</div>
                     <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
                                 <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
                             <!-- </form> -->
-                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark" @click="deleteAnnotation(item.id)"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox><div class="downIcon" ></div></div>
+                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark" @click.stop="deleteAnnotation(item.id)"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @click.stop="true" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox><div class="downIcon" @click.stop="foldComment(item.id)" ></div></div>
                         <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label></div>
                         <!-- <div class="commentIcon"></div> -->
                         <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
                         <div class="appendedInfotext">{{item.annotationInfo}}</div>
-                        <div class="apendedInfoinp" v-show="(item.id==isId)?true:false" ><input v-show="!item.annotationInfo" placeholder="请输入评审文字" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
+                        <div class="apendedInfoinp" v-show="(item.id==isId)?true:false" ><input v-show="!item.annotationInfo" @click.stop="true" placeholder="请输入评审文字" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
                         <div class="commentBody" v-show="(item.id==isId)?true:false">
-                            <div v-show="item.annotationInfo">
-                                <textarea  rows="3" cols="20" type="text" placeholder="请回复" @change="addReply(item.id)" v-model="replayList" class="commentInfoinput">
-                                </textarea>
-                                <!-- <div class="replayBtn" @click="addReply(item.id)">回复</div> -->
-                                <ul class="replyUl">
-                                    <li class="replyLi" v-show="(item.id==item1.annotationId)?true:false" v-for="(item1,index1) in replyList" :key="index1">
-                                        <div class="replyOne"><label class="replyName" v-text="item1.insertUserName"></label><label class="replyTime">{{item1.insertTime|updateTimeChange()}}</label></div>
-                                        <div class="replyTwo" v-text="item1.replyInfo"></div>
-                                    </li>
-                                </ul>
-                            </div>
+                        
+                                <div v-show="item.annotationInfo">
+                                    <textarea  rows="3" cols="20" type="text" placeholder="请回复" @click.stop="true" @change="addReply(item.id)" v-model="replayList" class="commentInfoinput">
+                                    </textarea>
+                                    <!-- <div class="replayBtn" @click="addReply(item.id)">回复</div> -->
+                                    <ul class="replyUl" v-show="showComment">
+                                        <li class="replyLi" v-show="(item.id==item1.annotationId)?true:false" v-for="(item1,index1) in replyList" :key="index1">
+                                            <div class="replyOne"><label class="replyName" v-text="item1.insertUserName"></label><label class="replyTime">{{item1.insertTime|updateTimeChange()}}</label><label v-show="(replyList.length-1)==index1" class="deleteMark1" @click.stop="deleteComment(item1.id)"></label></div>
+                                            <div class="replyTwo" v-text="item1.replyInfo"></div>
+                                        </li>
+                                    </ul>
+                                </div>
                         </div>
                     </li>
                 </ul> 
@@ -278,7 +279,9 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            showComment:true,//是否折叠评论
             isClick:'',
+            selectShape:'',//选中图纸上的标注
             isId:'',//是否ID
             drawingFileUrl:'',
             drawingFileUrl1:'',
@@ -482,15 +485,18 @@ export default {
     },
     watch:{
         annotationUserId:function(val){
+            this.isSelect='';
             this.queryAnnotation()
         },
         stage:function(val){
+             this.isSelect='';
             this.queryAnnotation()
             // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
-        }
+        },
+       
 
     },
     mounted(){
@@ -521,6 +527,8 @@ export default {
                 return this.letterList[val-1];
             }else if(val=11){
                  return this.letterList[val-1];
+            }else if(val==''){
+                return '';
             }
         },
         shapeImg(val){
@@ -569,8 +577,29 @@ export default {
         },
         //下拉评论
         downIconComment(val){
+             this.allList='';
             this.isId=val;
             this.isClick=val;
+            this.queryAnnotation();
+            // this.allList=JSON.parse(this.coordinateInfoList_all)
+            // console.log(this.allList,'this.allList');
+            //  if(document.getElementById('abs')){
+            //      let can=document.getElementById('abs');
+            //     can.drawElements=Object.assign(can.drawElements,this.allList)
+            //     console.log(can.drawElements);
+            //         {    // 已经选择标注
+            //                     for(let i = 0;i < can.drawElements.length;i++){
+            //                         if(can.drawElements[i].ID ==this.selectShape){ // 如果选中则改变标签状态为 selected
+            //                             can.drawElements[i].status = "selected";
+            //                         }else{
+            //                             can.drawElements[i].status = "none";
+            //                         }
+                                   
+            //                     }
+            //                      can.reflash();
+            //                     return;
+            //         }
+            // }
         },
         onmouse(){
             var that=this;
@@ -650,34 +679,33 @@ export default {
         //获取图纸旋转信息
         getdrawInfo(){
 
-
-
         },
         //图纸工具栏操作
-        zuoRotate(){
-            this.rotate=(this.rotate-90)%360;
-            var drawing=document.getElementById('abs');
-            var drawing1=document.getElementById('abs').previousSibling;
-            var drawing2=document.getElementById('abs').nextSibling;
-            var drawing3=document.getElementById('canvas_select');
-            drawing.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing1.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing2.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing3.style.transform = 'rotate('+this.rotate +'deg)'
-            
-            this.updateDrawingRotateInfo();
+        zuoRotate(val){
+                this.rotate=(this.rotate-90)%360;
+                var drawing=document.getElementById('abs');
+                var drawing1=document.getElementById('abs').previousSibling;
+                var drawing2=document.getElementById('abs').nextSibling;
+                var drawing3=document.getElementById('canvas_select');
+                drawing.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing1.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing2.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing3.style.transform = 'rotate('+this.rotate +'deg)'
+                this.updateDrawingRotateInfo();
         },
-        youRotate(){
-            this.rotate=(this.rotate+90)%360;
-            var drawing=document.getElementById('abs');
-            var drawing1=document.getElementById('abs').previousSibling;
-            var drawing2=document.getElementById('abs').nextSibling;
-            var drawing3=document.getElementById('canvas_select');
-            drawing.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing1.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing2.style.transform = 'rotate('+this.rotate +'deg)'
-            drawing3.style.transform = 'rotate('+this.rotate +'deg)'
-            this.updateDrawingRotateInfo();
+        youRotate(val){
+            console.log(val);
+            console.log(this.$refs.pdfDocument.src,'123');
+                this.rotate=(this.rotate+90)%360;
+                var drawing=document.getElementById('abs');
+                var drawing1=document.getElementById('abs').previousSibling;
+                var drawing2=document.getElementById('abs').nextSibling;
+                var drawing3=document.getElementById('canvas_select');
+                drawing.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing1.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing2.style.transform = 'rotate('+this.rotate +'deg)'
+                drawing3.style.transform = 'rotate('+this.rotate +'deg)'
+                this.updateDrawingRotateInfo();
         },
         straightLine(){
             this.isDrawing=true;
@@ -736,6 +764,7 @@ export default {
         },
         drawingClick(){
             this.screenLeft.item = 1;
+            this.isSelect='';
             // this.FileTree_original=[],
             // this.FileTree=[],
             // this.DirectoryList=[],
@@ -766,13 +795,22 @@ export default {
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
             ctx.lineWidth=3;
-            let canvas_select = document.createElement("canvas");
+            let canvas_select = document.getElementById("canvas_select");
             let ctx_select=canvas_select.getContext("2d");
             this.allList=JSON.parse(this.coordinateInfoList_all)
+            this.layerID=this.allList[this.allList.length-1].ID;
+            console.log(this.layerID);
             // console.log(typeof(this.allList),'0000');
             this.allList.forEach((item)=>{
                 this.drawingMethodsSave(item,ctx,ctx_select);
             })
+        },
+        loadsNew(){
+            var that =  this; 
+            setTimeout(()=>{
+                that.loadeds()
+                },25
+            )
         },
         //此为可以需要批注，加载canvas等
         loadeds(){
@@ -783,7 +821,9 @@ export default {
             // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
                 // console.log(this.coordinateInfoList_all);
             
-            if(document.getElementById("abs")){return;}
+            if(document.getElementById("abs")){
+                this.getDrawingRotateInfo();
+                return;}
             // let fz_img = new Image();
             // fz_img.src = "./images/fuz1.png";
             let canvas1 = document.createElement("canvas");
@@ -795,21 +835,25 @@ export default {
             let ctx=canvas1.getContext("2d");
             ctx.strokeStyle='rgb(252, 52, 57)';
             ctx.lineWidth=3;
-            
+        
             {   //  建立显示图层
                 if(this.pdfShow==true){
                     this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute";
                     canvas1.id = "abs";
                     canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
+                    console.log("前缀1",canvas1.style.width)
                     canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                     console.log("前缀2",canvas1.style.height)
                     canvas1.style.position = "absolute";
                     canvas1.style.left=0;
                     canvas1.style.top=0;
+                    // console.log("前缀11",canvas1.width)
                     canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
                     canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
                     this.StartWidth = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
                     this.StartHeight = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
                     this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
+                    this.getDrawingRotateInfo();
                 }else if(this.imgShow==true){
                     canvas1.id ="abs";
                     var img=document.getElementById("imgCanvas")
@@ -829,6 +873,7 @@ export default {
                     canvas_select.id = "canvas_select";
                     canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
                     canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
+                    console.log("前缀2",canvas_select.style.width);
                     canvas_select.style.display = "none";
                     canvas_select.style.position = "absolute";
                     canvas_select.style.left=0;
@@ -849,8 +894,8 @@ export default {
                     // imgDiv.appendChild(canvas_select);
                 }
                 // ctx_select.strokeStyle='rgb(252, 52, 57)';
-                // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
-                // canvas_select.onclick = (e)=>{canvas_select.style.display = "none";}
+                this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
+                canvas_select.onclick = (e)=>{console.log("canvas_select"); canvas_select.style.display = "none";}
             }
                 // canvas1.drawElements=[];
                 let input = document.createElement("input");
@@ -873,6 +918,7 @@ export default {
                     // console.log(canvas1.drawElements);
                     
                     ctx.clearRect(0,0,this.StartWidth,this.StartHeight);
+                    ctx_select.clearRect(0,0,this.StartWidth,this.StartHeight);
                     //  console.log(canvas1.drawElements,'reflash')
                     // ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
                     this.coordinateInfoAllList=canvas1.drawElements;
@@ -902,7 +948,7 @@ export default {
                         
                         var layerX_ = e.layerX / this.Koeffizent;
                         var layerY_ = e.layerY / this.Koeffizent;
-
+                        canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
                         if(input.style.display == "block"){
                             input.style.display = "none";
                             for(let i = 0;i < canvas1.drawElements.length;i++){
@@ -911,9 +957,15 @@ export default {
                                     // console.log(canvas1.drawElements," ",canvas1.drawElements[i].text);
                                 }
                             }
-
-                            // console.log(canvas1.drawElements,'输入值');
+                            var coordinateLen=this.coordinateInfoAllList.length
+                            this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
+                            console.log(this.commentShapeType);
                             this.coordinateInfoAllList=canvas1.drawElements;
+                            this.addAnnotation();
+
+                            
+                            // console.log(canvas1.drawElements,'输入值');
+                            
                             // this.commentShapeType='5'
                             // this.addAnnotation();
                         }
@@ -923,8 +975,9 @@ export default {
                         var red = selectColorID[0];
                         var green = selectColorID[1];
                         var blue = selectColorID[2];
-                        // console.log(selectColorID);
+                        console.log(selectColorID);
                         if(!this.beginDraw){
+                            console.log('选中');
                             if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
                                 for(let i = 0;i < canvas1.drawElements.length;i++){
                                     if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
@@ -932,7 +985,9 @@ export default {
                                     }else{
                                         canvas1.drawElements[i].status = "none";
                                     }
+                                   
                                 }
+                                 canvas1.reflash();
                                 return;
                             }
                         }
@@ -994,6 +1049,9 @@ export default {
                                             canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
                                             this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
                                             this.coordinateInfoAllList=canvas1.drawElements;
+                                            var coordinateLen=this.coordinateInfoAllList.length
+                                            this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
+                                            console.log(this.commentShapeType);
                                             this.addAnnotation();
                                             points = [];
                                             FinishDraw = false;
@@ -1028,6 +1086,13 @@ export default {
                                 canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
 
                                 this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
+                                 var coordinateLen=this.coordinateInfoAllList.length
+                                this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
+                                // console.log(this.commentShapeType);
+                                if(this.shapeType!= "5"){
+                                    this.addAnnotation();
+                                    // canvas_select.style.display = "block";
+                                }
                                 // console.log(this.coordinateInfoList);
                                 if(this.shapeType == "5"){
                                     input.value = "标注";
@@ -1036,14 +1101,7 @@ export default {
                                     input.style.display = "block";
                                     // console.log(input.text);
                                 }
-                                // this.addAnnotation();
-                                // canvas_select.style.display = "block";
-                                canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
                                 canvas1.reflash();
-                                var coordinateLen=this.coordinateInfoAllList.length
-                                this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
-                                // console.log(this.commentShapeType);
-                                this.addAnnotation();
                             }else{
                                 
                             }
@@ -1275,7 +1333,7 @@ export default {
                             ctx.setLineDash([]);
                         }
                         ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=12;
+                        ctx_select.lineWidth=24;
                         ctx_select.beginPath();
                         ctx_select.moveTo(item.points[0].x,item.points[0].y);
                         for(let j = 0; j < item.points.length - 1;j++){ // 画中间线
@@ -1582,22 +1640,30 @@ export default {
                    drawingId:vm.checkFileDir.id,
                 },
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.rotate=response.data.rt.rotateInfo;
                     if(this.rotate!=null){
                         document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                        document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
+                        document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                        document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
                     }
                 }else{
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
+                    // this.$message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
                 } 
             })
         },
         //添加批注
         addAnnotation(){
+
             var vm=this
+            if(this.shapeType=='5'){
+                this.annotationInfo=this.coordinateInfoAllList[this.coordinateInfoAllList.length-1].text;
+                console.log(this.annotationInfo);
+            }
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
                 method:'post',
@@ -1617,8 +1683,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd='0'){
                     this.queryAnnotation();
+                    this.annotationInfo='';
+                    this.commentShapeType='';
                 }else{
-                    this.message({
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -1674,11 +1742,35 @@ export default {
                     if(response.data.cd=='0'){
                         // console.log('回复成功')
                         this.queryAnnotation();
+                        this.showComment=true;
                         this.replayList='';
                     }
                 })
             }
         }, 
+        //删除回复
+        deleteComment(val){
+            var vm=this;
+                axios({
+                    url:this.BDMSUrl+'dc/drawingReview/deleteReply',
+                    methods:'get',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        replyId:val
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.queryAnnotation();
+                    }else{
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+        },
         //是否批注
         isMarkBoolen(val){
             if(val==1){
@@ -1696,6 +1788,15 @@ export default {
                 this.isMarkId=MarkId
                 this.removeMark()
             }
+        },
+        //是否折叠评论
+        foldComment(id){
+            this.annotationlist.forEach((item)=>{
+                if(item.id==id){
+                    this.showComment=!this.showComment
+                }
+            })
+
         },
         //删除批注卡片
         deleteAnnotation(num){
@@ -1779,6 +1880,7 @@ export default {
         queryAnnotation(){
             var vm=this
             vm.annotationlist='';
+            // vm.isSelect='';
             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
                 let absInp=document.getElementById('absInp');
@@ -1812,21 +1914,53 @@ export default {
                 else if(response.data.rt.annotationlist.length!=0){
                     this.queryAnnotationList=response.data.rt;
                     this.annotationlist=response.data.rt.annotationlist;
+                    console.log(this.annotationlist,'表单信息');
                     this.replyList=response.data.rt.replyList;
-                    this.annotationlist.forEach((item)=>{
-                        if(item.isMarked==0){
-                            this.$set(item,'isMarkValue',false);
-                        }else if(item.isMarked==1){
-                            this.$set(item,'isMarkValue',true);
-                        }
-                    })
-                    // console.log(this.annotationlist,'获取列表');
-                   
                     var len=this.annotationlist.length;
                     this.commentLen=len;
                     this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
                      this.loadeds();
                     this.reloaded();
+                    this.annotationlist.forEach((item,index)=>{
+                        if(item.isMarked==0){
+                            this.$set(item,'isMarkValue',false);
+                        }else if(item.isMarked==1){
+                            this.$set(item,'isMarkValue',true);
+                        }
+                        if(this.isClick){
+                            if(item.id==this.isClick){
+                                this.selectShape=JSON.parse(item.coordinateInfo)[index].ID;
+                                console.log(this.selectShape,'成功');
+                                this.allList=JSON.parse(this.coordinateInfoList_all)
+                                console.log(this.allList,'this.allList');
+                                if(document.getElementById('abs')){
+                                    let can=document.getElementById('abs');
+                                    can.drawElements=Object.assign(can.drawElements,this.allList)
+                                    console.log(can.drawElements);
+                                        {  // 已经选择标注
+                                                    for(let i = 0;i < can.drawElements.length;i++){
+                                                        if(can.drawElements[i].ID ==this.selectShape){ // 如果选中则改变标签状态为 selected
+                                                            can.drawElements[i].status = "selected";
+                                                        }else{
+                                                            can.drawElements[i].status = "none";
+                                                        }
+                                                    
+                                                    }
+                                                    can.reflash();
+                                                    return;
+                                        }
+                                }
+                            }
+                        }
+                    })
+                    var len=this.annotationlist.length;
+                    this.commentLen=len;
+                    this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
+                    this.loadeds();
+                    this.reloaded();
+                    // console.log(this.annotationlist,'获取列表');
+                   
+                    
                 }
             })
             
@@ -2036,27 +2170,32 @@ export default {
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
 
                     // console.log(vm.FileTree,'树形图列表');
-                    let strId='';
-                    let strLen='';
-                    vm.FileTree.forEach((item)=>{
-                        if(item.code==vm.directoryId){
-                            strLen=item.children.length;
-                            strId=item.children[strLen-1].id;
-                        }
-                    });
-                     this.drawingId=strId;
-                    // vm.drawingList.forEach((item)=>{
-                    //     if(item.id==vm.checkFileDir.id){
-                    //         this.drawingList=item.id;
-                    //     }
-                    // });
-                     console.log(this.drawingId,strId,'初始加载');
+                    if(this.drawingId){
+                        vm.drawingList.forEach((item)=>{
+                        if(item.id==vm.checkFileDir.id){
+                            this.drawingList=item.id;
+                            }
+                        });
+                    }else{
+                        let strId='';
+                        let strLen='';
+                        vm.FileTree.forEach((item)=>{
+                            if(item.code==vm.directoryId){
+                                strLen=item.children.length;
+                                strId=item.children[strLen-1].id;
+                            }
+                        });
+                        this.drawingId=strId;
+                    }                   
+                     console.log(this.drawingId,'初始加载');
                      if(this.drawingId){
                         this.getDrawingVersionList();
+                        this.queryAnnotation();
                         this.getMaxVersionPath();
-                        // this.queryAnnotation()
+                        
                     }
                     this.expandedKeys.push(this.directoryId);
+                    console.log(this.expandedKeys);
                     
                     // vm.directoryId='';
                     // vm.expandedKeys=[];
@@ -2104,10 +2243,8 @@ export default {
                             this.imgShow=false;
                             this.drawingFileUrl1=this.drawingFileUrl;
                             var source=this.drawingFileUrl;
-                            // this.loadeds();
-                            if(document.getElementById('abs')){
-                                this.getDrawingRotateInfo();
-                            }
+                            console.log("前缀",this.$refs.pdfDocument.$refs.canvasParent.children[0])
+                           
                             // console.log(source);
                             // this.getDrawingRotateInfo();
                             // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
@@ -2131,6 +2268,8 @@ export default {
                             var source=this.drawingFileUrl;
                             // this.init(source);
                         }
+                        // this.loadeds();
+                        
                         
                     // console.log(this.versionPath);
                 }
@@ -2160,13 +2299,18 @@ export default {
             // console.log(vm.checkFileDir);
             vm.directoryId=obj.code
             vm.drawingId=obj.id
+            // console.log(vm.directoryId,'vm.directoryId')
+            // console.log( vm.drawingId,' vm.drawingId')
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
+                // this.queryAnnotation();
+                // this.loadeds();
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }
+            
             
         },
         nodeClick(data,node,self){
@@ -2201,6 +2345,7 @@ export default {
                     console.log(this.drawingVersionList);
                     let listLen=this.drawingVersionList.length;
                     this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
+                    this.version=this.drawingVersionList[listLen-1].versionId;
                     this.drawingVersionId=this.drawingZxVersionId;
                     // console.log(this.drawingZxVersionId);
                     // console.log(this.drawingVersionList);
@@ -2351,9 +2496,10 @@ export default {
             vm.fileList=[]
         },
         updateDrawingCancle(){
-            this.editDrawing.updateshow=false
-            vm.updateFileName=''
-            vm.updateFileList=''
+            var vm=this;
+            this.editDrawing.updateshow=false;
+            vm.updateFileName='';
+            vm.updateFileList='';
             
         },
         confirmUpdateDrawing(){
@@ -2390,7 +2536,7 @@ export default {
                                 message:response.data.msg
                             })
                         }
-                        vm.fileList = [];
+                        // vm.fileList = [];
                     })
         },
         //图片尺寸验证  
@@ -2668,7 +2814,7 @@ export default {
                 height: 38px;
                 .commentTool{
                      position: absolute;
-                     left:30px;
+                     left:60px;
                      .el-input__inner{
                         height: 30px !important;
                     }
@@ -3111,7 +3257,7 @@ export default {
                     //  }
                         .detial-item{
                                 font-size: 12px;
-                                line-height: 12px;
+                                line-height: 16px;
                                 margin-top: 16px;
                                 text-align: left;
                                 // width: 200px;
@@ -3190,7 +3336,7 @@ export default {
                                  line-height: 30px;
                              }
                              .deleteMark{
-                                 margin-left: 78px;
+                                 margin-left: 103px;
                                  margin-top:6px;
                                  display:inline-block;
                                 background: url('../ManageCost/images/delete.png')no-repeat 0 0;
@@ -3292,8 +3438,11 @@ export default {
                                 border-radius: 2px;
                             }
                             .replyUl{
+                                // transition-duration: 0.7s;
+                                transition: all 0.2s;
                                 margin-top:8px;
                                 .replyLi{
+                                    transition: all 0.2s;
                                     margin:8px;
                                     width:100%;
                                     .replyOne{
@@ -3302,12 +3451,30 @@ export default {
                                         .replyName{
                                             font-size:14px;
                                             color:#333333;
+                                            width: 45px;
+                                            display: inline-block;
+                                            text-align: left;
                                         }
                                         .replyTime{
                                             margin-left:4px;
                                             font-size:12px;
                                             color:#666666;
-
+                                            width: 90px;
+                                            display: inline-block;
+                                            text-align: left;
+                                        }
+                                        .deleteMark1{
+                                            // margin-left: 78px;
+                                            // margin-top:2px;
+                                            display:inline-block;
+                                            background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                            margin-left: 30px;
+                                            &:hover{
+                                                background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                            }
+                                            width: 16px;
+                                            height: 16px;
+                                            // line-height: 16px;
                                         }
 
                                     }
