@@ -134,6 +134,7 @@
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
                     <div class="drawingApendedHead" v-show="annotationlist">{{checkFileDir.drawingName+'('+checkFileDir.drawingNumber+letterChange(this.version)+')'}}</div>
+                    <div @click="exportAnnotation()">导出</div>
                     <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
@@ -487,14 +488,17 @@ export default {
         annotationUserId:function(val){
             this.isSelect='';
             this.queryAnnotation()
+            this.exportAnnotation()
         },
         stage:function(val){
              this.isSelect='';
             this.queryAnnotation()
+            this.exportAnnotation()
             // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
+            this.exportAnnotation()
         },
        
 
@@ -1930,9 +1934,9 @@ export default {
                         if(this.isClick){
                             if(item.id==this.isClick){
                                 this.selectShape=JSON.parse(item.coordinateInfo)[index].ID;
-                                console.log(this.selectShape,'成功');
+                                // console.log(this.selectShape,'成功');
                                 this.allList=JSON.parse(this.coordinateInfoList_all)
-                                console.log(this.allList,'this.allList');
+                                // console.log(this.allList,'this.allList');
                                 if(document.getElementById('abs')){
                                     let can=document.getElementById('abs');
                                     can.drawElements=Object.assign(can.drawElements,this.allList)
@@ -2243,7 +2247,6 @@ export default {
                             this.imgShow=false;
                             this.drawingFileUrl1=this.drawingFileUrl;
                             var source=this.drawingFileUrl;
-                            console.log("前缀",this.$refs.pdfDocument.$refs.canvasParent.children[0])
                            
                             // console.log(source);
                             // this.getDrawingRotateInfo();
@@ -2277,7 +2280,7 @@ export default {
             })
         },
         handleNodeClick(obj){
-            this.annotationlist='';
+            // this.annotationlist='';
             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
                 let absInp=document.getElementById('absInp');
@@ -2305,9 +2308,9 @@ export default {
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
-                // this.queryAnnotation();
                 // this.loadeds();
                 this.getMaxVersionPath();
+                // this.queryAnnotation();
                 this.getDrawingVersionList();
             }
             
@@ -2326,6 +2329,32 @@ export default {
                  vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
             }
             // console.log(vm.expandedKeys);
+        },
+        //导出批注
+        exportAnnotation(){
+             var vm=this;
+             if(this.drawingVersionId==''){
+                return;
+            }else{
+                axios({
+                    url:this.BDMSUrl+'dc/drawingReview/exportAnnotation',
+                    method:'get',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        drawingVersionId:this.drawingVersionId,
+                        annotationUserId:this.annotationUserId,
+                        stage:this.stage,
+                        isMark:this.isMark
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        alert('ll')
+                        
+                    }
+                })
+            }
         },
         //获取图纸版本列表
         getDrawingVersionList(){
