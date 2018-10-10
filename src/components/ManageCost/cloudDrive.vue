@@ -3263,12 +3263,14 @@ export default {
           if(vm.expandedKeys.indexOf(data.nodeId) == -1){
             vm.expandedKeys.push(data.nodeId)
           }
+          console.log(vm.expandedKeys)
       },
       nodeClickClose(data,node,self){
           var vm = this
           if(vm.expandedKeys.indexOf(data.nodeId) != -1){
             vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
           }
+          console.log(vm.expandedKeys)
       },
       parseMStatus(mStatus){
             // 施工现场
@@ -3397,7 +3399,9 @@ export default {
             return false
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
-        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+        // fileName.split('.')[1] == 'GMD'
+        console.log(fileName.substr(fileName.length-3));
+        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
             window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");

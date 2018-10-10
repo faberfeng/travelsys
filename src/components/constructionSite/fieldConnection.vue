@@ -558,7 +558,9 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.fileTreeList_original=response.data.rt;
+                    console.log(this.fileTreeList_original);
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
+                    console.log(this.fileTreeList)
                 }
             })
 
@@ -998,7 +1000,7 @@ export default {
 
         //全景图片渲染
          init(source){
-            var vm = this
+                var vm = this
                 var container, mesh;
                 container = document.getElementById('planeDIV');
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );//相机
@@ -1071,61 +1073,57 @@ export default {
                 }, false );
 
                 //
-
                 window.addEventListener( 'resize', vm.onWindowResize, false );
-
                 vm.animate();
             },
 
-                onWindowResize() {
+            onWindowResize() {
 
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize($("#planeDIV").width(),$("#planeDIV").height());
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize($("#planeDIV").width(),$("#planeDIV").height());
 
-                },
+            },
 
-                onDocumentMouseDown( event ) {
+            onDocumentMouseDown( event ) {
 
-                    event.preventDefault();
+                event.preventDefault();
 
-                    isUserInteracting = true;
+                isUserInteracting = true;
 
-                    onMouseDownMouseX = event.clientX;
-                    onMouseDownMouseY = event.clientY;
+                onMouseDownMouseX = event.clientX;
+                onMouseDownMouseY = event.clientY;
 
-                    onMouseDownLon = lon;
-                    onMouseDownLat = lat;
+                onMouseDownLon = lon;
+                onMouseDownLat = lat;
 
-                },
+            },
 
-                onDocumentMouseMove( event ) {
+            onDocumentMouseMove( event ) {
 
-                    if ( isUserInteracting === true ) {
+                if ( isUserInteracting === true ) {
 
-                        lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
-                        lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
+                    lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
+                    lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
-                    }
+                }
 
-                },  
-                onDocumentMouseUp() {
+            },  
+            onDocumentMouseUp() {
+                isUserInteracting = false;
+            },
+            onDocumentMouseWheel(event) {
+                // distance += event.deltaY * 0.05;
 
-                    isUserInteracting = false;
-
-                },
-                onDocumentMouseWheel(event) {
-                    // distance += event.deltaY * 0.05;
-
-                    // distance = THREE.Math.clamp( distance, 400, 1000 );
-                    var x = event.pageX;
-                    var y = event.pageY;
-                    var div = $('#planeDIV');// 获取你想要的DIV
-                    var y1 = div.offset().top;  // div上面两个的点的y值
-                    var y2 = y1 + div.height();// div下面两个点的y值
-                    var x1 = div.offset().left;  // div左边两个的点的x值
-                    var x2 = x1 + div.width();  // div右边两个点的x的值
-                    
+                // distance = THREE.Math.clamp( distance, 400, 1000 );
+                var x = event.pageX;
+                var y = event.pageY;
+                var div = $('#planeDIV');// 获取你想要的DIV
+                var y1 = div.offset().top;  // div上面两个的点的y值
+                var y2 = y1 + div.height();// div下面两个点的y值
+                var x1 = div.offset().left;  // div左边两个的点的x值
+                var x2 = x1 + div.width();  // div右边两个点的x的值
+                
                     if( x < x1 || x > x2 || y < y1 || y > y2){
                         this.enableMouseWheel();
                         return;
@@ -1145,52 +1143,52 @@ export default {
                         camera.updateProjectionMatrix();
                         
                     }
-                        
-                },
-                disabledMouseWheel() {
-                    if (document.addEventListener) {
-                        document.addEventListener('DOMMouseScroll', this.scrollFunc, false);
-                    }// W3C
-                    window.onmousewheel = document.onmousewheel = this.scrollFunc;// IE/Opera/Chrome
-                },
-                scrollFunc(evt) {
-                    evt = evt || window.event;
-                    if(evt.preventDefault) {
-                        // Firefox
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                    } else {
-                        // IE
-                        evt.cancelBubble=true;
-                        evt.returnValue = false;
-                    }
-                    return false;
-                },
-                enableMouseWheel(){
-                    if (document.addEventListener) {
-                        document.addEventListener('DOMMouseScroll', this.scrollFunc2, false);
-                    }// W3C
-                    window.onmousewheel = document.onmousewheel = this.scrollFunc2;// IE/Opera/Chrome
-                },
-                scrollFunc2(evt) {
-                    evt = evt || window.event;
-                    if(evt.preventDefault) {
-                        // Firefox
-                        //evt.preventDefault();
-                        //evt.stopPropagation();
-                    } else {
-                        // IE
-                        evt.cancelBubble=false;
-                        evt.returnValue = true;
-                    }
-                    return true;
-                },
-                animate() {
-                    var vm = this
-                    requestAnimationFrame( vm.animate );//动画
-                    vm.update();
+                    
+            },
+            disabledMouseWheel() {
+                if (document.addEventListener) {
+                    document.addEventListener('DOMMouseScroll', this.scrollFunc, false);
+                }// W3C
+                window.onmousewheel = document.onmousewheel = this.scrollFunc;// IE/Opera/Chrome
+            },
+            scrollFunc(evt) {
+                evt = evt || window.event;
+                if(evt.preventDefault) {
+                    // Firefox
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                } else {
+                    // IE
+                    evt.cancelBubble=true;
+                    evt.returnValue = false;
+                }
+                return false;
+            },
+            enableMouseWheel(){
+                if (document.addEventListener) {
+                    document.addEventListener('DOMMouseScroll', this.scrollFunc2, false);
+                }// W3C
+                window.onmousewheel = document.onmousewheel = this.scrollFunc2;// IE/Opera/Chrome
+            },
+            scrollFunc2(evt) {
+                evt = evt || window.event;
+                if(evt.preventDefault) {
+                    // Firefox
+                    //evt.preventDefault();
+                    //evt.stopPropagation();
+                } else {
+                    // IE
+                    evt.cancelBubble=false;
+                    evt.returnValue = true;
+                }
+                return true;
+            },
+            animate() {
+                var vm = this
+                requestAnimationFrame( vm.animate );//动画
+                vm.update();
 
-                },
+            },
             update() {
 
                 // if ( isUserInteracting === false ) {
@@ -1214,9 +1212,7 @@ export default {
                 // distortion
                 camera.position.copy( camera.target ).negate();
                 */
-
                 renderer.render( scene, camera );
-
             }
     }
     

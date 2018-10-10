@@ -9,6 +9,9 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 <div id="item-box-file">
+                    <router-link :to="'/Design/drawingReview'" class="label-item">  
+                     图纸评审  
+                    </router-link>
                     <router-link :to="'/Design/management'" class="label-item-active label-item">  
                      设计协调  
                     </router-link>
@@ -501,7 +504,6 @@
         /*
             修改eleUI树形组件
         */
-        
         .el-tree-node:focus .el-tree-node__content{
             background-color: transparent;
         }
@@ -853,23 +855,10 @@
             }
         }
         .box-left-container{
-            // display: block;
-            // position: fixed;
-            // top: 115px;
-            // left: 26px;
-            // bottom: 0;
-            // right: 225px;
-            // z-index: 1001;
-            // transition:  all ease .5s;
-            // overflow: auto;
              display: inline-block;
             width: 85%;
             position: relative;
-            // margin-top:109px;
-            // margin-left:24px;
-            // z-index: 1001;
             transition:  all ease .5s;
-           
             #containerMessage{
                 padding-left:30px; 
                 .header{
@@ -1871,22 +1860,10 @@
         右侧
         */
         .box-right-container{
-            // display: block;
-            // position: fixed;
-            // right: -225px;
-            // bottom: 0;
-            // width: 225px;
-            // top: 116px;
-            // transition: all ease .5s;
-            // background: #ffffff;
-            // z-index: 10;
-            // border-left:none;
-            // z-index: 1000;
-            display: inline-block;
+            // display: inline-block;
             position: relative;
             float: right;
             width: 15%;
-            // margin-top: -763px;
             transition: all ease .5s;
             background: #ffffff;
             z-index: 10;
@@ -1894,14 +1871,6 @@
             overflow-y: auto;
             overflow-x: hidden;
              #center-selection{
-                // position: fixed;
-                // top: 115px;
-                // // bottom: 0;
-                // right: 225px;
-                // width: 25px;
-                // z-index: 100;
-                // transition: all ease .5s;
-                // background: #ffffff;
                 position: absolute;
                 top: 0;
                 bottom: 0;
@@ -2133,7 +2102,6 @@
         .box-right-avtive{
              width: 2%;
             transition: all ease .5s;
-            // border-left: 1px solid #cccccc;
         }
         #box-right{
             padding: 10px 13px 0 10px;
@@ -4336,6 +4304,7 @@ export default {
         }).then((response)=>{
             if(response.data.cd == 0){
                 var drawingList = response.data.rt.drawingList
+                // console.log(drawingList)
                 if(drawingList != null){
                       drawingList.forEach((item,index) => {
                         vm.$set(item,'ddParId',item.ddId)
@@ -4344,13 +4313,16 @@ export default {
                     });
                 }
                 var drawingDirList = response.data.rt.drawingDirList
-                if(drawingList != null){
-                      var children = drawingDirList.concat(drawingList)
-                }else{
-                     var children = drawingDirList
-                }
+                 var children = drawingDirList.concat(drawingList)
+                // if(drawingList != null){
+                //       var children = drawingDirList.concat(drawingList)
+                // }else{
+                //      var children = drawingDirList
+                // }
+                console.log(children);
                 vm.FileTree_original = children
                 vm.FileTree = data.transformTozTreeFormat(setting, children)
+                // console.log(vm.FileTree)
             }
         }).catch((err)=>{
             console.log(err)

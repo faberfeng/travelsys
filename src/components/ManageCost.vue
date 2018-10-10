@@ -8,7 +8,7 @@
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                      <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"></iframe> -->
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="url"  ></iframe>
+                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeUrl"  ></iframe>
                 </div>
             </div>
             <div  class="main">
@@ -49,7 +49,7 @@ export default {
     data(){
           window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
-            url:'http://bdms.arctron.cn/genDist/?new='+Math.random(),
+            url:'http://10.252.26.240:8080/genDist/',
             settingsCenter:true,//是否是两边铺满
             header:{
                  userName:'',
@@ -95,6 +95,7 @@ export default {
             WebGlUrl:'',
             WebGlType:'',
             WebGlName:'',
+            iframeUrl:''
         }
     },
     created(){
@@ -104,6 +105,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
+        vm.iframeUrl=vm.$store.state.iframeWebGlUrl
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
@@ -317,7 +319,8 @@ export default {
                         })
                     }else if(vm.auth.design){
                         vm.$router.push({
-                            path:'/Design/management'//设计管理
+                            path:'/Design/drawingReview' //设计管理
+                            // path:'/Design/management'
                         })
                     }else if(vm.auth.costManagement){
                         vm.$router.push({
@@ -375,7 +378,9 @@ export default {
                 sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.label === '设计管理'){
                 this.$router.push({
-                    path:'/Design/management'
+                    path:'/Design/drawingReview'
+                    // path:'/Design/management'
+                   
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

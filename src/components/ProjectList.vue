@@ -1,85 +1,132 @@
 <template>
 <div class="wrapper">
     <headerCommon :username="userName" :proname="titleName"></headerCommon>
-    <div class="header-bar">
-      <span class="bar-title">工程导航</span>
-      <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
-    </div>
-    <div class="clearfix item-proj-box0" v-if="show0">
-      <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
-          <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
-            <span class="item-title">工程名称</span>
-            <div :class="[item.projName.length>13?'item-name-box-s':'','item-name-box']">
-              <span class="item-name" v-text="item.projName.length>25?item.projName.substr(0,25)+'...':item.projName" :title="item.projName"></span>
+    <div v-show="!noprojectShow" class="noproject">
+            <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
+            <div class="noprojectRight">
+                <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
+                <div class="noprojectRight_bottom">
+                您有以下几种选择：<br/>
+                第一种：退出您自己的账号，采用共同账号winter（密码:123654）体验和学习已经拥有数据的项目。<br/>第二种：如果您的同事已经开通了项目，请联系您的同事，将您的账号添加到工程协作名单中。<br/>第三种：如果您有自己负责的项目，可以点击<a style="display:inline" target="_blank" :href="applyIndexUrl">这里</a>，作为工程管理员申请开通一个新的项目。<br/>如有其它疑问或索取学习资料，请加入BDMS客服QQ群：855923282
+                </div>
+                <div></div>
             </div>
-            <img class="img"  src="../assets/003.png" alt="">
-          </div>
-          <div class="item_body">
-            <div style="height:102px;overflow:hidden;">
-              <p style="margin-bottom:18px" class="clearfix">
-                <span class="body-left">工程账号</span><span class="body-right" v-text="item.projCode"></span>
-              </p>
-              <p style="margin-bottom:18px" class="clearfix">
-                <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
-              </p>
-              <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
-                <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-text="val.viewVal"></span>
-              </p>
+      </div>
+    <div v-show="noprojectShow">
+      <div class="header-bar">
+        <span class="bar-title">工程导航</span>
+        <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
+      </div>
+      <div class="clearfix item-proj-box0" v-if="show0">
+        <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
+            <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
+              <span class="item-title">工程名称</span>
+              <div :class="[item.projName.length>13?'item-name-box-s':'','item-name-box']">
+                <span class="item-name" v-text="item.projName.length>25?item.projName.substr(0,25)+'...':item.projName" :title="item.projName"></span>
+              </div>
+              <img class="img"  src="../assets/003.png" alt="">
             </div>
-            <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'new_s','text-s']"></span>
+            <div class="item_body">
+              <div style="height:102px;overflow:hidden;">
+                <p style="margin-bottom:18px" class="clearfix">
+                  <span class="body-left">工程账号</span><span class="body-right" v-text="item.projCode"></span>
+                </p>
+                <p style="margin-bottom:18px" class="clearfix">
+                  <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
+                </p>
+                <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
+                  <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-text="val.viewVal"></span>
+                </p>
+              </div>
+              <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'new_s','text-s']"></span>
+            </div>
+        </div>
+      </div>
+      <div class="item-proj-box" v-else>
+        <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
+          <span class="proj-state-box">
+            <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
+            <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
+          </span>
+          <img :src="item.imgPath?item.imgPath:require('../assets/bg.png')" class="line-img" alt="">
+          <div class="line-detial-box">
+              <h1 v-text="item.projName"></h1>
+              <div class="line-content-box">
+                <p  class="clearfix line-p">
+                  <span class="body-left-line" style="width:87px;">工程账号:</span><span class="body-left-line" v-text="item.projCode"></span>
+                </p>
+                <p class="clearfix line-p">
+                  <span class="body-left-line" style="width:87px;">工程管理员账号:</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
+                </p>
+                <p class="clearfix line-p">
+                  <span class="body-left-line" style="width:87px;">工程管理员姓名:</span><span class="body-left-line" v-text="item.projAdminName"></span>
+                </p>
+                <p class="clearfix line-p">
+                  <span class="body-left-line" style="width:87px;">工程管理员电话:</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
+                </p>
+                <p class="clearfix line-p">
+                  <span class="body-left-line" style="width:87px;">授权用户数量:</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
+                </p>
+              </div>
+              <div class="line-content-box">
+                <table>
+                  <tbody>
+                    <tr class="line-table" >
+                      <td class="body-left-table">到期日期:</td>
+                      <td class="body-right-table" v-text="item.projExpireTime"></td>
+                    </tr>
+                    <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
+                      <td class="body-left-table" v-text="val.viewKey+':'"></td>
+                      <td  class="body-right-table" v-text="val.viewVal"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
           </div>
+        </div>
       </div>
     </div>
-    <div class="item-proj-box" v-else>
-       <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
-         <span class="proj-state-box">
-           <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
-           <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
-         </span>
-         <img :src="item.imgPath?item.imgPath:require('../assets/bg.png')" class="line-img" alt="">
-         <div class="line-detial-box">
-            <h1 v-text="item.projName"></h1>
-            <div class="line-content-box">
-              <p  class="clearfix line-p">
-                <span class="body-left-line" style="width:87px;">工程账号:</span><span class="body-left-line" v-text="item.projCode"></span>
-              </p>
-              <p class="clearfix line-p">
-                <span class="body-left-line" style="width:87px;">工程管理员账号:</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
-              </p>
-              <p class="clearfix line-p">
-                <span class="body-left-line" style="width:87px;">工程管理员姓名:</span><span class="body-left-line" v-text="item.projAdminName"></span>
-              </p>
-              <p class="clearfix line-p">
-                <span class="body-left-line" style="width:87px;">工程管理员电话:</span><span class="body-left-line" v-text="item.projAdminTelphone"></span>
-              </p>
-              <p class="clearfix line-p">
-                <span class="body-left-line" style="width:87px;">授权用户数量:</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
-              </p>
-            </div>
-            <div class="line-content-box">
-              <table>
-                <tbody>
-                  <tr class="line-table" >
-                    <td class="body-left-table">到期日期:</td>
-                    <td class="body-right-table" v-text="item.projExpireTime"></td>
-                  </tr>
-                  <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
-                    <td class="body-left-table" v-text="val.viewKey+':'"></td>
-                    <td  class="body-right-table" v-text="val.viewVal"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-         </div>
-      </div>
-    </div>
-  </div>
+</div>
 </template>
-<style scoped>
+<style lang="less" scoped>
 *{
   margin: 0;
   padding: 0;
 }
+  .noproject{
+          width: 1120px;
+          height: 450px;
+          // border:1px solid red;
+          position:absolute;
+          top:50%;
+          left:50%;
+          margin-left:-570px;
+          margin-top:-220px;
+      }
+      .noprojectLeft{
+          float: left;
+        margin-top:50px;
+      }
+      .noprojectRight{
+          float: right;
+          width: 640px;
+          height: 170px;
+          margin-top:142px;
+          .noprojectRight_header{
+              font-size:24px;
+              color:#fc3439;
+              font-weight: bold;
+              text-align: left;
+              line-height: 50px;
+          }
+          .noprojectRight_bottom{
+              line-height: 28px;
+              font-size:14px;
+              color:#666666;
+              font-weight: bold;
+              text-align: left;
+          }
+      }
 .header-bar{
   /* margin-top: 92px; */
   margin-top:25px;
@@ -338,6 +385,7 @@ export default {
   name: 'ProjectList',
    data(){
       return {
+        noprojectShow:true,
         show0:true,
         token:'',
         listData:[],
@@ -347,6 +395,7 @@ export default {
         styleTitle:'条形风格',
         BDMSUrl:'',
         titleName:'',
+        applyIndexUrl:'',
       }
   },
   components: {
@@ -356,6 +405,7 @@ export default {
       var vm = this
       vm.token  = localStorage.getItem('token')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
+       vm.applyIndexUrl = vm.$store.state.applyIndexUrl
       var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
       if(defaultSubProjId != 'undefined'){
           localStorage.removeItem('defaultSubProjId')
@@ -413,6 +463,9 @@ export default {
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
                 }
+                if(response.data.rt==null){
+                   this.noprojectShow=false;
+                }
             }).catch((err)=>{
                 console.log(err)
             })
@@ -450,7 +503,7 @@ export default {
         height: 100%;
         min-width: 1200px;
         overflow: hidden;
-        padding-bottom: 100px;
+        padding-bottom: 120px;
     }
     .header{
         height: 68px;

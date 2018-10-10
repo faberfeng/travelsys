@@ -799,7 +799,6 @@ export default Vue.component('common-list',{
                                 
                                 if(element.count != null){
                                     this.sumary_all = element.count;
-                                    
                                 }
                                 //console.log(this.sumary_all)
                                 if(element.groupLevel == 1){//单体 的 小计

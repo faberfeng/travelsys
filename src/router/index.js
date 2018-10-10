@@ -7,6 +7,13 @@ Vue.use(Router)
 
 const router = new Router({
   routes: [
+    //pdf
+    {
+      path:'/pdf',
+      name:'pdf',
+      component:resolve=>require(['@/components/ManageDesign/pdf'],resolve),
+    },
+
     //gantt
     {
       path:'/gantt',
@@ -88,6 +95,11 @@ const router = new Router({
       },
       component:resolve=>require(['@/components/ManageCost'],resolve),
       children:[
+        {
+          path:'/Design/drawingReview',
+          name:'DrawingReview',
+          component:resolve=>require(['@/components/ManageDesign/DrawingReview'],resolve)
+        },
         {
           path:'/Design/management',
           name:'ManageDesign',
