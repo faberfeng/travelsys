@@ -245,10 +245,11 @@ export default {
             color: #333;
             box-sizing: content-box;
         }
+        // 修改chorme 记住密码时，自动填充的背景色的问题
         .input:-webkit-autofill { 
-            // background-color: #FAFFBD; 
-            background-image: none; 
-            // color: #000; 
+            box-shadow: 0 0 0px 1000px white inset;
+            -webkit-box-shadow: 0 0 0px 1000px white inset;//修改背景
+            -webkit-text-fill-color: #333; //修改字体颜色
         }
         .input-placeholder{
             color:#ccc;
@@ -285,10 +286,9 @@ export default {
             
         }
 
-        #lastInput:after{
-
-            content: url('../assets/login-person.png');
-        }
+        // #lastInput:after{
+        //     content: url('../assets/login-person.png');
+        // }
         .autoLogin{
             text-align: left;
             line-height: 12px;
