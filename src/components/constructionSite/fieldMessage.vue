@@ -20,6 +20,9 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
+                <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
+                安全监测  
+                </router-link>
             </div>
             <div class="box-left" v-show="endFileMessage">
                 <div :class="['box_left_text',{'box_left_text_show':!showLeftContent}]">
@@ -1633,13 +1636,6 @@ export default {
             content: '';
         }
         #GroupSelect {
-            // display: block;
-            // width: 168px;
-            // height: 30px;
-            // position: fixed;
-            // top: 77px;
-            // z-index: 1000;
-            // right: 24px;
              display: inline-block;
             float: right;
             margin-top:-40px;
@@ -1675,19 +1671,10 @@ export default {
             }
         }
         .topHeader{
-            // box-sizing: border-box;
-            // position: fixed;
-            // top: 116px;
-            // left: 26px;
-            // bottom:0;
-            // right: 0;
-            // overflow: auto;
             box-sizing: border-box;
             float: left;
             width: 100%;
             height:800px;
-            // overflow-y: auto;
-            // overflow-x:hidden;
         }
         #item-box-file{
             display: block;
