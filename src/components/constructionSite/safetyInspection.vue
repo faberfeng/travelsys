@@ -1,7 +1,10 @@
 <template>
     <div id="safetyInspection">
-        <div class="GroupSelect">
-
+        <div id="GroupSelect">
+             <select v-model="selectUgId" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in ugList" :key="index" v-text="item.ugName"></option>
+            </select>
+            <i class="icon-sanjiao"></i>
         </div>
         <div class="topHeader">
             <div id="item-box-file">
@@ -27,15 +30,32 @@
     </div>
 </template>
 <script>
+import moment from 'moment'
+import axios from 'axios'
 export default {
     name:'safetyInspection',
     data(){
         return{
+            selectUgId:'',
+            ugList:'',
+            token:'',
+            projId:'',
+            QJFileManageSystemURL:'',
+            BDMSUrl:'',
+            userId:'',
+            defaultSubProjId:'',
 
         }
     },
     created(){
-
+        var vm = this;
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        this.token = localStorage.getItem('token');
+        this.projId = localStorage.getItem('projId');
+        vm.userId  = localStorage.getItem('userid');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        this.getAccessUserGroup();
     },
     filters:{
 
@@ -44,6 +64,28 @@ export default {
 
     },
     methods:{
+        getAccessUserGroup(){
+        axios({
+            method:'post',
+            url:this.BDMSUrl+'detectionInfo/getAccessUserGroup',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                projectId:this.projId,
+            },
+            
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    this.ugList=response.data.rt;
+                    this.selectUgId=this.ugList[0].ugId;
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+
+            },
+
 
     }
     
@@ -65,7 +107,7 @@ export default {
             content: '';
         }
         #GroupSelect {
-             display: inline-block;
+            display: inline-block;
             float: right;
             margin-top:-40px;
             margin-right:10px;
