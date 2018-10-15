@@ -2694,7 +2694,6 @@ export default {
             var reader = new FileReader();  
             var dwidth = 0
             var dheight = 0
-
             reader.onload = function (e) {  
                 var data = e.target.result;  
                 //加载图片获取图片真实宽度和高度  
