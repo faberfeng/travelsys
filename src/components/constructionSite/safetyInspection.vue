@@ -101,7 +101,14 @@
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                             </div>
                         </div>
-
+                        <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
+                            <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
+                            <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf>
+                        </div>
+                        <div class="rightBottomCheck">
+                            <el-checkbox v-model="picMark" style="display:block;width:100px;text-align:left"><label>显示照片被标记</label></el-checkbox>
+                            <el-checkbox v-model="spotNum" style="display:block;width:100px;text-align:left;float:left"><label>显示点位读数</label></el-checkbox>
+                        </div>
                     </div>
                 </div>
                 <div class="inspectTable">
@@ -120,6 +127,7 @@
                             <thead>
                             <tr>
                                 <th rowspan="2">序号</th>
+                                <th rowspan="2">监测类型</th>
                                 <th rowspan="2">监测内容</th>
                                 <th rowspan="2">简写</th>
                                 <th rowspan="2">测点数</th>
@@ -138,82 +146,27 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>水平位移</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                <tr v-for="(item,index) in monitorMainTableList" :key="index">
+                                    <td v-text="index+1"></td>
+                                    <td>{{item.type|monitorTypeChange()}}</td>
+                                    <td v-text="item.name"></td>
+                                    <td v-text="item.logogram"></td>
+                                    <td v-text="item.count"></td>
+                                    <td >{{item.latestTime|addSprit()}}</td>
+                                    <td >{{item.recentPointName|addSprit()}}</td>
+                                    <td>{{item.recentVariation|addSprit()}}</td>
+                                    <td>{{item.recentAlert|shifouChange()}}</td>
+                                    <td>{{item.totalPointName|addSprit()}}</td>
+                                    <td>{{item.totalVariation|addSprit()}}</td>
+                                    <td>{{item.totalAlert|shifouChange()}}</td>
                                     <td>
-                                        <button title="编辑" class="editBtn actionBtn"></button>
+                                        <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" class="upmoveBtn actionBtn"></button>
                                         <button title="下移" class="downmoveBtn actionBtn"></button>
                                         <button title="详情" class="detailBtn actionBtn"></button>
                                         <button title="导入" class="exportBtn actionBtn"></button>
                                     </td>
                                 </tr>
-                                <!-- <tr>
-                                    <td>2</td>
-                                    <td>竖向位移</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>水位</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>受力</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                 <tr>
-                                    <td>5</td>
-                                    <td>斜度</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr> -->
                             </tbody>
                         </table>
 
@@ -226,7 +179,15 @@
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
                 <div class="baseMapBody">
                     <ul class="clearfix" style="margin:0px 20px 0px 20px;">
-                        <li class="baseMapBodyLi" style="padding: 0px; overflow: hidden;"><img style="object-fit: contain;" class="baseMapBodyImg"  src="./images/12.jpg"></li>
+                        <li class="baseMapBodyLi" @mouseenter="enter(item.id)" @mouseleave="leave()" @click="selectCurBaseMap(item.id)" style="padding: 0px; overflow: hidden;" v-for="(item,index) in baseMapList" :key="index">
+                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="QJFileManageSystemURL+item.relativeUri">
+                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+item.relativeUri"></pdf>
+                            <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
+                                <label class="baseMapName" v-text="item.name"></label>
+                                <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
+                                <label v-show="item.useCount==0" class="deleteBaseMap" @click.stop="deleteBaseMap(item.id)"></label>
+                            </div>
+                        </li>
                         <li class="uploadBaseBody">
                             <div class="uploadBaseIcon">
                                 <label for="drawingsInfo">
@@ -240,8 +201,30 @@
                 </div>
             </el-dialog>
             <el-dialog title="新增监测内容" :visible="addInspectContentShow" @close="addInspectContentCancle()">
-
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName" placeholder="请输入" /></div>
+                    <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram" placeholder="两个字母" /></div>
+                    <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword" placeholder="与导入Excel表名匹配" /></div>
+                    <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()"><img v-show="monitorBaseMapId" style="object-fit: contain;" class="addbaseMapImg" :src="QJFileManageSystemURL+monitorBaseMapUrl" ><div class="addbaseMapHover" v-show="hoverShow"><label class="hoverTxt" @click="clickChange()">点击更换</label></div></div></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addMonitorItem()" >确定</button>
+                    <button class="editBtnC" @click="addInspectContentCancle()" >取消</button>
+                </div>
             </el-dialog>
+            <el-dialog title="监测内容更名" :visible="editInspectContentShow" @close="editInspectContentCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName1" placeholder="请输入" /></div>
+                    <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram1" placeholder="两个字母" /></div>
+                    <div class="editBodytwo"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword1" placeholder="与导入Excel表名匹配" /></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="renameMonitor()">确定</button>
+                    <button class="editBtnC" @click="editInspectContentCancle()">取消</button>
+                </div>
+            </el-dialog>
+
         </div>
         
     </div>
@@ -249,8 +232,12 @@
 <script>
 import moment from 'moment'
 import axios from 'axios'
+import pdf from 'vue-pdf'
 var echarts = require('echarts');
 export default {
+    components: {
+        pdf
+    },
     name:'safetyInspection',
     data(){
         return{
@@ -272,11 +259,55 @@ export default {
             weatherTime:'',
             editSpotShow:false,
             baseMapShow:false,
+            baseMapMonitor:false,
             addInspectContentShow:false,//增加监测内容弹框
+            editInspectContentShow:false,//编辑监测内容弹框
             fileList:'',
             fileListName:'',
-            pageNo:'',
+            pageNo:1,
+            baseMapList:'',//底图列表数据
             isClick:false,//是否点击
+            hoverShow:false,
+            monitorName:'',//监测名称
+            monitorType:1,//监测类型
+            monitorLogogram:'',
+            monitorKeyword:'',
+            monitorId:'',
+            monitorName1:'',//监测名称
+            monitorLogogram1:'',
+            monitorKeyword1:'',
+            monitorBaseMapId:'',//选择底图ID
+            monitorTypeList:[
+                {
+                    value:1,
+                    label:'水平位移'
+                },
+                {
+                    value:2,
+                    label:'竖向位移'
+                },
+                {
+                    value:3,
+                    label:'水位'
+                },
+                {
+                    value:4,
+                    label:'受力'
+                },
+                {
+                    value:5,
+                    label:'斜度'
+                }
+            ],
+            monitorMainTableList:'',//监测内容总表
+            hoverId:'',//移动底图上的ID
+            curBaseMapUrl:'',//目前底图首页
+            monitorBaseMapUrl:'',//监测底图设置
+            picMark:false,
+            spotNum:false,
+
+
+
 
             
         }
@@ -292,15 +323,49 @@ export default {
         this.getAccessUserGroup();
     },
     filters:{
-
+        monitorTypeChange(val){
+            if(val==1){
+                return '水平位移'
+            }else if(val==2){
+                return '竖向位移'
+            }else if(val==3){
+                return '水位'
+            }else if(val==4){
+                return '受力'
+            }else if(val==5){
+                return '斜度'
+            }
+        },
+        shifouChange(val){
+            if(val==false){
+                return '否'
+            }else if(val==true){
+                return '是'
+            }
+        },
+        addSprit(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val
+            }
+        }
     },
     watch:{
         selectUgId:function(val){
             var vm=this;
             vm.getDetectionSummary();
+            vm.getMonitorMainTable();
         }
     },
     methods:{
+        //判断是否为图片或者pdf
+        // judgeImg(val){
+        //     val.substr(val.length-3)=='jpg'||val.substr(val.length-3)=='png'
+        // },
+        // judgePdf(){
+        //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
+        // },
         //获取可用的群组
         getAccessUserGroup(){
             axios({
@@ -571,9 +636,8 @@ export default {
                 return  require('./images/lightrain.png')
             }else if(val=="大雨"){
                 return  require('./images/heavyrain.png')
-            }else if(val=="多云转小雨"){
+            }else if(val=="多云转小雨"||val=="小雨转多云"){
                 return  require('./images/sunnyandcloudy.png')
-
             }
         },
         //编辑点位
@@ -607,7 +671,7 @@ export default {
             vm.fileList=list[0];
             vm.fileListName=list[0].name;
             console.log(vm.fileListName);
-            var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName;
+            var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
             formData.append('token',vm.token);
@@ -626,7 +690,8 @@ export default {
                     data:formData,
                     }).then((response)=>{
                         if(response.data.cd=='0'){
-                            alert('上传成功');
+                            this.getBaseMapList();
+                            // alert('上传成功');
                             vm.fileList = '';
                         }
                         if(response.data.cd != 0){
@@ -638,10 +703,29 @@ export default {
                         }
                     })
         },
+        //删除底图
+        deleteBaseMap(val){
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'detectionInfo/deleteBaseMap',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:val
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    vm.getBaseMapList()
+                }
+            })
+        },
         //点击获取底图列表
         getBaseMapListBtn(){
             this.baseMapShow=true;
             this.isClick=true;
+            this.getBaseMapList();
         },
         //获取底图列表
         getBaseMapList(){
@@ -657,8 +741,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-
-
+                    this.baseMapList=response.data.rt;
                 }else{
                     vm.$message({
                         type:"error",
@@ -672,6 +755,30 @@ export default {
             this.baseMapShow=false;
             this.isClick=false;
         },
+        //设置底图使用
+        setBaseMapUsed(val){
+             var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/setBaseMapUsed',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId,
+                    id:val
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBaseMapList()
+                }else{
+                    vm.$message({
+                        type:"error",
+                        msg:response.data.msg
+                    })
+                }
+            })
+        },
         //点击新增监测内容
         addMonitorItemBtn(){
              var vm=this;
@@ -680,32 +787,168 @@ export default {
         addInspectContentCancle(){
             var vm=this;
             vm.addInspectContentShow=false;
+            this.monitorName='';
+            this.monitorType=1;
+            this.monitorLogogram='';
+            this.monitorKeyword='';
+            this.monitorBaseMapId='';
         },
         //新增监测内容
         addMonitorItem(){
-            // var vm=this;
-            // axios({
-            //     method:'get',
-            //     url:vm.BDMSUrl+'detectionInfo/addMonitorItem',
-            //     headers:{
-            //         'token':vm.token
-            //     },
-            //     params:{
-            //         userGroupId:vm.selectUgId
-            //     }
-            // }).then((response)=>{
-            //     if(response.data.cd=='0'){
-
-
-            //     }else{
+            var vm=this;
+            // if(this.monitorName==''){
+            //     vm.$message({
+            //         type:'info',
+            //         message:'请输入监测名称'
+            //     })
+            // }else if(this.monitorLogogram==''){
+            //     vm.$message({
+            //         type:'info',
+            //         message:'请输入不重名的简写'
+            //     })
+            // }else if(this.monitorType!=5){
+            //     if(this.monitorKeyword==''){
+            //      vm.$message({
+            //         type:'info',
+            //         message:'请输入不重名的关键字'
+            //     })
+            //     }else if(vm.monitorBaseMapId==''){
             //         vm.$message({
-            //             type:"error",
-            //             msg:response.data.msg
+            //             type:'info',
+            //             message:'请选择底图'
             //         })
             //     }
-            // })
+            // } else{
+                axios({
+                    method:'get',
+                    url:vm.BDMSUrl+'detectionInfo/addMonitorItem',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        name:vm.monitorName,
+                        type:vm.monitorType,
+                        logogram:vm.monitorLogogram,
+                        userGroupId:vm.selectUgId,
+                        keyword:vm.monitorKeyword,
+                        baseMapId:vm.monitorBaseMapId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getMonitorMainTable();
+                        this.addInspectContentShow=false;
+                        this.monitorName='';
+                        this.monitorType=1;
+                        this.monitorLogogram='';
+                        this.monitorKeyword='';
+                        this.monitorBaseMapId='';
+                    }else{
+                        vm.$message({
+                            type:"error",
+                            msg:response.data.msg
+                        })
+                    }
+                })
+            // }
         },
+        //取消编辑监测内容
+        editInspectContentCancle(){
+            var vm=this;
+            this.editInspectContentShow=false;
+            vm.monitorName='';
+            vm.monitorLogogram='';
+            vm.monitorKeyword='';
+            vm.monitorId='';
+        },
+        //重命名监测内容
+        renameMonitor(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'detectionInfo/rename',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:this.monitorId,
+                    name:this.monitorName1,
+                    logogram:this.monitorLogogram1,
+                    keyword:this.monitorKeyword1
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.editInspectContentShow=false;
+                    this.getMonitorMainTable()
+                }
+            })
+        },
+        editMonitorNameBtn(val){
+            var vm=this;
+            console.log(val);
+            this.editInspectContentShow=true;
+            console.log(this.monitorMainTableList);
+            this.monitorMainTableList.forEach((item)=>{
+                if(item.id==val){
+                    this.monitorName1=item.name;
+                    this.monitorLogogram1=item.logogram;
+                    this.monitorKeyword1=item.keyword;
+                    this.monitorId=item.id;
+                    console.log(this.monitorName1);
+                }
+            })
+        },
+        //获取监测内容主表
+        getMonitorMainTable(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'/detectionInfo/getMonitorMainTable',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorMainTableList=response.data.rt;
+                }
+            })
 
+        },
+        enter(val){
+            this.hoverId=val;
+        },
+        leave(){
+            this.hoverId='';
+        },
+        changeActive(){
+            this.hoverShow=true;
+        },
+        removeActive(){
+            this.hoverShow=false;
+        },
+        //点击更换
+        clickChange(){
+            this.baseMapShow=true;
+            this.baseMapMonitor=true;
+            this.getBaseMapList();
+        },
+        //选择当前底图
+        selectCurBaseMap(val){
+            this.baseMapList.forEach((item)=>{
+                if(item.id==val&&!this.baseMapMonitor){
+                    this.curBaseMapUrl=item.relativeUri;
+                    this.setBaseMapUsed(item.id)
+                }else if(item.id==val&&this.baseMapMonitor){
+                    this.monitorBaseMapUrl=item.relativeUri;
+                    this.monitorBaseMapId=item.id;
+                    this.setBaseMapUsed(item.id)
+                }
+            })
+            
+            this.baseMapShow=false;
+        }
         
 
        
@@ -1142,6 +1385,7 @@ export default {
                         border:1px solid #e6e6e6;
                         height: 540px;
                         width: 100%;
+                        position: relative;
                         .operateTool{
                             width: 288px;
                             height: 34px;
@@ -1150,6 +1394,7 @@ export default {
                             margin-top:15px;
                             margin-right:10px;
                             position: relative;
+                            z-index: 10;
                             .operateToolLeft{
                                 width:216px;
                                 height: 34px;
@@ -1158,6 +1403,7 @@ export default {
                                 border:1px solid #ccc;
                                 border-radius:2px;
                                 box-shadow: 1px 1px 2px #888888;
+                                background: #fff;
                                 .move{
                                     display: inline-block;
                                     width: 33%;
@@ -1257,6 +1503,7 @@ export default {
                                 border:1px solid #ccc;
                                 border-radius:2px;
                                 box-shadow: 1px 1px 2px #888888;
+                                background: #fff;
                                 .saveDrawTxt{
                                     font-size:12px;
                                     color:#666666;
@@ -1264,6 +1511,31 @@ export default {
                                 }
                             }
 
+                        }
+                        .planeFigureGround{
+                            z-index: 8;
+                            height: 540px;
+                            width: 100%;
+                            position:absolute;
+                            top:0px;
+                            left: 0px;
+
+                            img{
+                                width: 100%;
+                                height: 100%;
+                                padding:5px;
+                            }
+                            #drawingPdf{
+                                 width: 100%;
+                                height: 530px;
+                                padding:5px;
+                            }
+                        }
+                        .rightBottomCheck{
+                            position: absolute;
+                            bottom:30px;
+                            left:30px;
+                            z-index:11;
                         }
                     }
                 }
@@ -1421,14 +1693,18 @@ export default {
                     content: '';
                 }
                 .baseMapBodyLi{
-                     float: left;
+                    float: left;
                     display: inline-block;
+                    position: relative;
                     width: 164px;
                     height: 122px;
                     // background: #f0f1f4;
                     margin-right: 10px;
                     margin-top:20px;
                     border-radius: 4px;
+                    &:hover{
+                        border:1px solid #ccc;
+                    }
                     .baseMapBodyImg{
                         width: 100%;
                         height: 122px;
@@ -1436,11 +1712,44 @@ export default {
                         padding: 0;
                         border-radius: 2px;
                         cursor: pointer;
-                        // -o-object-fit: contain;
                         object-fit: contain;
-                        // background: #f2f2f2;
                         background: #f0f1f4;
 
+                    }
+                    .baseMapBodyLiBottom{
+                        position: absolute;
+                        width: 100%;
+                        height: 26px;
+                        background-color: #000;
+                        opacity: 0.3;;
+                        bottom: 0px;
+                        left:0px;
+                        .baseMapName{
+                            color:#fff;
+                            font-weight: bold;
+                            float: left;
+                            margin-left:10px;
+                            width: 100px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .baseMapCount{
+                            color:#fff;
+                            font-weight: bold;
+                            float: right;
+                            margin-right: 10px
+
+                        }
+                        .deleteBaseMap{
+                            background: url('./images/delete.png') no-repeat 0 0;
+                            width: 20px;
+                            height: 20px;
+                            display: inline-block;   
+                            float:right;
+                            cursor: pointer;
+                            margin-right:5px;
+                        }
                     }
                 }
                 .uploadBaseBody{
@@ -1465,7 +1774,89 @@ export default {
                     }
                 } 
             }
-
+            .editBodyone,.editBodytwo{
+                text-align: left;
+            }
+            .editInpText{
+                display: inline-block;
+                margin-left: 40px;
+            }
+            .editSelect{
+                width: 220px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .icon-sanjiao {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 174px;
+                right: 293px;
+            }
+            .inpSmall{
+                width: 120px;
+                height: 38px;
+                border: 1px solid #d1d1d1;
+                border-radius: 2px;
+                background: #fafafa;
+                padding-left: 10px;
+            }
+            .addbaseMap{
+                display: inline-block;
+                width: 125px;
+                margin-right: 10px;
+                position: relative;
+                border-radius: 2px;
+                 height: 90px;
+                background: #f0f1f4;
+                border:1px solid #ccc;
+                .addbaseMapImg{
+                    width: 100%;
+                    height: 90px;
+                    margin: 0;
+                    padding: 0;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    object-fit: contain;
+                    background: #f0f1f4;
+                }
+                .addbaseMapHover{
+                    display: inline-block;
+                    position: absolute;
+                    height: 90px;
+                    width: 100%;
+                    background-color: #8c8c8c;
+                    border-radius: 4px;
+                    opacity: 0.5;
+                    top:0;
+                    left:0;
+                    cursor: pointer;
+                    .hoverTxt{
+                        display: inline-block;
+                        margin-left:25%;
+                        margin-top:25%;
+                        font-size: 14px;
+                        color: #fff;
+                    }
+                   
+                }
+            
+            }
+       
         }
        
 
