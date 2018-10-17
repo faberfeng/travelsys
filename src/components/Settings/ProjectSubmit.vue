@@ -956,7 +956,7 @@ export default {
                         projId:this.projId,
                         condition:this.jiLiangCondition,
                         entityNumber:this.projectNumber,
-                         engineeringNumber:this.setMaterialObject.row.number,
+                        engineeringNumber:this.setMaterialObject.row.number,
                         formula:this.jiLiangResult,
                         mappings:arr,
                         type:1
