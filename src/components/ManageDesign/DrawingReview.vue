@@ -76,7 +76,7 @@
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
                         <span class="item-property "  @click="drawingClick()">图<br>纸</span>
-                        <span class="item-version " @click="screenLeft.item=2">版<br>本</span>
+                        <span class="item-version " @click="versionClick()">版<br>本</span>
                         <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
                     </div>
             </div>
@@ -113,12 +113,12 @@
             </div>
             <div v-show="screenLeft.item == 2" id="box-right">
                 <div class="versionBody">
-                    <div class="versionHead">{{checkFileDir.drawingName}}</div>
+                    <div class="versionHead">{{drawingName}}</div>
                         <ul :class="[{'versionUlSel':item.id==isSelect},'versionUl']" v-for="(item,index) in drawingVersionList" :key="index" @click="selectVersion(item.id)">
 
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name" >图号</span>
-                                <span class="detial-text-value" v-text="checkFileDir.drawingNumber+letterChange(item.versionId)"></span>
+                                <span class="detial-text-value" v-text="drawingNumber+letterChange(item.versionId)"></span>
                             </li>
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">上传人</span>
@@ -133,9 +133,9 @@
             </div>
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
-                    <div class="drawingApendedHead" v-show="annotationlist">{{checkFileDir.drawingName+'('+checkFileDir.drawingNumber+letterChange(this.version)+')'}}</div>
-                    <div @click="exportAnnotation()">导出</div>
-                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-for="(item,index) in annotationlist" :key="index">
+                    <div class="drawingApendedHead" >{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}<div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
+                    
+                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
@@ -148,7 +148,6 @@
                         <div class="appendedInfotext">{{item.annotationInfo}}</div>
                         <div class="apendedInfoinp" v-show="(item.id==isId)?true:false" ><input v-show="!item.annotationInfo" @click.stop="true" placeholder="请输入评审文字" class="apendedInfoinput" @change="editAnnotationWord(item.id)" v-model="apendedInfoText" type="text"/></div>
                         <div class="commentBody" v-show="(item.id==isId)?true:false">
-                        
                                 <div v-show="item.annotationInfo">
                                     <textarea  rows="3" cols="20" type="text" placeholder="请回复" @click.stop="true" @change="addReply(item.id)" v-model="replayList" class="commentInfoinput">
                                     </textarea>
@@ -434,7 +433,9 @@ export default {
             imgShow:false,
             commentShow:false,//评论下拉框
             allList:'',
-            letterList:[' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N']
+            letterList:[' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N'],
+            drawingNumber:'',
+            drawingName:'',
         }
     },
     filters: {
@@ -504,8 +505,9 @@ export default {
 
     },
     mounted(){
-        
-        
+    //    window.onresize = () => { 
+    //        this.loadsNew();
+    //    }
     },
     methods:{
         letterChange(val){
@@ -637,6 +639,7 @@ export default {
         },
         //选择版本
         selectVersion(val){
+            // this.isSelect='';
             this.isSelect=val;
             // //清除批注遗留的canvas；
             // if(document.getElementById('abs')){
@@ -686,29 +689,48 @@ export default {
         },
         //图纸工具栏操作
         zuoRotate(val){
+
                 this.rotate=(this.rotate-90)%360;
+                // var drawing4=document.getElementById('drawingPdf');
+               
                 var drawing=document.getElementById('abs');
                 var drawing1=document.getElementById('abs').previousSibling;
                 var drawing2=document.getElementById('abs').nextSibling;
                 var drawing3=document.getElementById('canvas_select');
+                // let ctx=drawing.getContext("2d");
+                // let ctx_select=drawing3.getContext("2d");
+                // ctx.rotate(this.rotate*Math.PI/180);
+                // ctx_select.rotate(this.rotate*Math.PI/180);
                 drawing.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing1.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing2.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing3.style.transform = 'rotate('+this.rotate +'deg)'
+                // drawing4.style.transform = 'rotate('+this.rotate +'deg)'
+                //  this.loadeds();
                 this.updateDrawingRotateInfo();
         },
         youRotate(val){
             console.log(val);
             console.log(this.$refs.pdfDocument.src,'123');
                 this.rotate=(this.rotate+90)%360;
+                // var drawing4=document.getElementById('drawingPdf');
+                // this.loadsNew();
+                 
+                
                 var drawing=document.getElementById('abs');
                 var drawing1=document.getElementById('abs').previousSibling;
                 var drawing2=document.getElementById('abs').nextSibling;
                 var drawing3=document.getElementById('canvas_select');
+                // let ctx=drawing.getContext("2d");
+                // let ctx_select=drawing3.getContext("2d");
+                // ctx.rotate(this.rotate*Math.PI/180);
+                // ctx_select.rotate(this.rotate*Math.PI/180);
                 drawing.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing1.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing2.style.transform = 'rotate('+this.rotate +'deg)'
                 drawing3.style.transform = 'rotate('+this.rotate +'deg)'
+                // drawing4.style.transform = 'rotate('+this.rotate +'deg)'
+                // this.loadeds();
                 this.updateDrawingRotateInfo();
         },
         straightLine(){
@@ -769,6 +791,14 @@ export default {
         drawingClick(){
             this.screenLeft.item = 1;
             this.isSelect='';
+            this.allList='';
+            //清除批注遗留的canvas；
+            if(document.getElementById('abs')){
+                let absInp=document.getElementById('absInp');
+                document.getElementById('abs').drawElements=[];
+                document.getElementById('abs').reflash();
+                // alert('234')
+            }
             // this.FileTree_original=[],
             // this.FileTree=[],
             // this.DirectoryList=[],
@@ -777,12 +807,15 @@ export default {
         },
         versionClick(){
             this.screenLeft.item = 2;
-            if(this.drawingId){
-                this.getDrawingVersionList();
-            }
+            this.isSelect=this.drawingVersionId;
+            this.queryAnnotation();
+            // if(this.drawingId){
+            //     this.getDrawingVersionList();
+            // }
         },
         annotationClick(){
              this.screenLeft.item = 3
+            //  this.isSelect='';
             //  this.biaozhushow=true;
             // this.loadeds()
             this.queryAnnotation()
@@ -818,7 +851,8 @@ export default {
         },
         //此为可以需要批注，加载canvas等
         loadeds(){
-            //  this.allList='';
+             this.allList='';
+            //  this.rotate=0;
             // alert('dff')
             //  alert('hdjsf')
             // console.log($event);
@@ -826,8 +860,9 @@ export default {
                 // console.log(this.coordinateInfoList_all);
             
             if(document.getElementById("abs")){
-                this.getDrawingRotateInfo();
-                return;}
+                    this.getDrawingRotateInfo();
+                    return;
+                }
             // let fz_img = new Image();
             // fz_img.src = "./images/fuz1.png";
             let canvas1 = document.createElement("canvas");
@@ -845,19 +880,21 @@ export default {
                     this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute";
                     canvas1.id = "abs";
                     canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-                    console.log("前缀1",canvas1.style.width)
+                    // console.log("前缀1",canvas1.style.width)
                     canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-                     console.log("前缀2",canvas1.style.height)
+                    //  console.log("前缀2",canvas1.style.height)
                     canvas1.style.position = "absolute";
                     canvas1.style.left=0;
                     canvas1.style.top=0;
                     // console.log("前缀11",canvas1.width)
-                    canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-                    canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-                    this.StartWidth = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-                    this.StartHeight = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
+                    canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth
+                    canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight
+                    this.StartWidth = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth
+                    this.StartHeight = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight
                     this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
-                    this.getDrawingRotateInfo();
+                    if(this.drawingId){
+                        this.getDrawingRotateInfo();
+                    }
                 }else if(this.imgShow==true){
                     canvas1.id ="abs";
                     var img=document.getElementById("imgCanvas")
@@ -949,9 +986,29 @@ export default {
                     var changeSize_position = {x:0,y:0};
                  
                     canvas1.onmousedown = (e)=>{
-                        
+                        // let ex=e.layerX.style.transform='rotate('+this.rotate +'deg)'
+                        // let ey=e.layerY.style.transform='rotate('+this.rotate +'deg)'
                         var layerX_ = e.layerX / this.Koeffizent;
                         var layerY_ = e.layerY / this.Koeffizent;
+
+
+                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
+                        console.log(center);
+                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
+                        V3.x -= center.x;
+                        V3.y -= center.y;
+                        var Matrix = new THREE.Matrix4();
+                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
+                        V3.applyMatrix4(Matrix);
+                        V3.x += center.x;
+                        V3.y += center.y;
+                        layerX_ = V3.x;
+                        layerY_ = V3.y;
+                        console.log(layerX_,'计算的坐标x');
+                        console.log(layerY_,'计算的坐标y');
+
+                        console.log(e.layerX,'坐标x');
+                        console.log(e.layerY,'坐标y');
                         canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
                         if(input.style.display == "block"){
                             input.style.display = "none";
@@ -1079,7 +1136,23 @@ export default {
 
                         var layerX_ = e.layerX / this.Koeffizent;
                         var layerY_ = e.layerY / this.Koeffizent;
-
+                        // var center = {x:canvas1.offsetWidth/2,y:canvas1.offsetHeight/2};
+                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
+                        console.log(center);
+                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
+                        V3.x -= center.x;
+                        V3.y -= center.y;
+                        var Matrix = new THREE.Matrix4();
+                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
+                        V3.applyMatrix4(Matrix);
+                        V3.x += center.x;
+                        V3.y += center.y;
+                        layerX_ = V3.x;
+                        layerY_ = V3.y;
+                        console.log(layerX_,'计算的坐标x up');
+                        console.log(layerY_,'计算的坐标y up');
+                        console.log(e.layerX,'坐标x up');
+                        console.log(e.layerY,'坐标y up');
                         if(this.beginDraw){
                             if(this.shapeType!="4"){
                                 this.coordinateInfoList=[];
@@ -1119,6 +1192,21 @@ export default {
                         var layerX_ = e.layerX / this.Koeffizent;
                         var layerY_ = e.layerY / this.Koeffizent;
 
+                        // var center = {x:canvas1.offsetWidth/2,y:canvas1.offsetHeight/2};
+                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
+                        // console.log(center);
+                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
+                        V3.x -= center.x;
+                        V3.y -= center.y;
+                        var Matrix = new THREE.Matrix4();
+                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
+                        V3.applyMatrix4(Matrix);
+                        V3.x += center.x;
+                        V3.y += center.y;
+                        layerX_ = V3.x;
+                        layerY_ = V3.y;
+                            // console.log(e.layerX,'坐标x move');
+                            // console.log(e.layerY,'坐标y move');
                         let x =  layerX_;
                         let y =  layerY_;
                         if(this.beginDraw&&this.isDrawing){
@@ -1617,7 +1705,7 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                   drawingId:this.checkFileDir.id,
+                   drawingId:this.drawingId,
                    rotateInfo:this.rotate,
                 },
             }).then((response)=>{
@@ -1634,6 +1722,11 @@ export default {
         //获取图纸旋转信息
         getDrawingRotateInfo(){
              var vm=this
+             this.rotate=0;
+            // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
+            // document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
+            // document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
+            // document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
@@ -1641,17 +1734,22 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                   drawingId:vm.checkFileDir.id,
+                   drawingId:this.drawingId,
                 },
             }).then((response)=>{
-                if(response.data.rt){
-                    this.rotate=response.data.rt.rotateInfo;
-                    if(this.rotate!=null){
-                        document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                        document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
-                        document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                        document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
+                if(response.data.cd=='0'){
+                    if(response.data.rt){
+                        this.rotate=response.data.rt.rotateInfo;
                     }
+                    document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                    document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
+                    document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                    document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
+                        // let ctx=document.getElementById('abs').getContext("2d");
+                        // let ctx_select=document.getElementById('canvas_select').getContext("2d");
+                        // ctx.rotate(this.rotate*Math.PI/180);
+                        // ctx_select.rotate(this.rotate*Math.PI/180);
+                    
                 }else{
                     // this.$message({
                     //     type:'error',
@@ -1948,7 +2046,6 @@ export default {
                                                         }else{
                                                             can.drawElements[i].status = "none";
                                                         }
-                                                    
                                                     }
                                                     can.reflash();
                                                     return;
@@ -2172,7 +2269,7 @@ export default {
                     })
                     // console.log(this.DirectoryList,'目录列表');
                     vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
-
+                    console.log(vm.FileTree);
                     // console.log(vm.FileTree,'树形图列表');
                     if(this.drawingId){
                         vm.drawingList.forEach((item)=>{
@@ -2187,6 +2284,8 @@ export default {
                             if(item.code==vm.directoryId){
                                 strLen=item.children.length;
                                 strId=item.children[strLen-1].id;
+                                this.drawingName=item.children[strLen-1].drawingName;
+                                this.drawingNumber=item.children[strLen-1].drawingNumber;
                             }
                         });
                         this.drawingId=strId;
@@ -2194,7 +2293,8 @@ export default {
                      console.log(this.drawingId,'初始加载');
                      if(this.drawingId){
                         this.getDrawingVersionList();
-                        this.queryAnnotation();
+                        // this.queryAnnotation();
+                        this.getDrawingRotateInfo();
                         this.getMaxVersionPath();
                         
                     }
@@ -2281,11 +2381,14 @@ export default {
         },
         handleNodeClick(obj){
             // this.annotationlist='';
+            this.allList='';
+            this.rotate=0;
             //清除批注遗留的canvas；
             if(document.getElementById('abs')){
                 let absInp=document.getElementById('absInp');
                 document.getElementById('abs').drawElements=[];
                 document.getElementById('abs').reflash();
+                // alert('234')
             }
             var vm=this;
             vm.checkedKeys=[];
@@ -2297,20 +2400,20 @@ export default {
             }else{
                 vm.IsFolderAction = false
             }
-            
+
             vm.checkFileDir=obj//选中的文件夹
             // console.log(vm.checkFileDir);
             vm.directoryId=obj.code
             vm.drawingId=obj.id
+            vm.drawingName=obj.drawingName
+            vm.drawingNumber=obj.drawingNumber
             // console.log(vm.directoryId,'vm.directoryId')
             // console.log( vm.drawingId,' vm.drawingId')
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
-                // this.loadeds();
                 this.getMaxVersionPath();
-                // this.queryAnnotation();
                 this.getDrawingVersionList();
             }
             
@@ -2336,24 +2439,7 @@ export default {
              if(this.drawingVersionId==''){
                 return;
             }else{
-                axios({
-                    url:this.BDMSUrl+'dc/drawingReview/exportAnnotation',
-                    method:'get',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        drawingVersionId:this.drawingVersionId,
-                        annotationUserId:this.annotationUserId,
-                        stage:this.stage,
-                        isMark:this.isMark
-                    }
-                }).then((response)=>{
-                    if(response.data.cd=='0'){
-                        alert('ll')
-                        
-                    }
-                })
+                 window.open(this.BDMSUrl+'dc/drawingReview/exportAnnotation?token='+vm.token+'&drawingVersionId='+vm.drawingVersionId+'&annotationUserId='+vm.annotationUserId+'&stage='+vm.stage+'&isMark='+vm.isMark,'_blank');
             }
         },
         //获取图纸版本列表
@@ -2376,6 +2462,7 @@ export default {
                     this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
                     this.version=this.drawingVersionList[listLen-1].versionId;
                     this.drawingVersionId=this.drawingZxVersionId;
+                    // this.isSelect=this.drawingVersionId;
                     // console.log(this.drawingZxVersionId);
                     // console.log(this.drawingVersionList);
                 }
@@ -2409,6 +2496,7 @@ export default {
                         this.drawingFileUrl='';
                         this.checkFileDir=[];
                         this.versionPath='';
+                        this.rotate=0;
                         // //清除批注遗留的canvas；
                         // if(document.getElementById('abs')){
                         //     let canvas1=document.getElementById('abs');
@@ -2533,6 +2621,7 @@ export default {
         },
         confirmUpdateDrawing(){
                 var vm=this;
+                this.annotationlist='';
                 var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
@@ -2557,6 +2646,7 @@ export default {
                             vm.editDrawing.updateshow = false
                             vm.updateFileName=''
                             vm.updateFileList=''
+                            this.rotate=0;
                             vm.getDirectory();
                         }
                         if(response.data.cd != 0){
@@ -2604,7 +2694,6 @@ export default {
             var reader = new FileReader();  
             var dwidth = 0
             var dheight = 0
-
             reader.onload = function (e) {  
                 var data = e.target.result;  
                 //加载图片获取图片真实宽度和高度  
@@ -2668,6 +2757,7 @@ export default {
 
         },
         drawingsUploadConfirm(){
+            this.annotationlist='';
             var vm = this
             for(var i=0;i<vm.fileList.length;i++){
                 // <input  placeholder="请输入" v-model="item.drawingNo" class="calculateInp">
@@ -3342,6 +3432,12 @@ export default {
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        .export{
+                            float: right;
+                            margin-right:10px;
+                            cursor: pointer;
+                            color:#fc3439;
+                        }
                      }
                      .clickbody{
                          background: #e2e2e2;

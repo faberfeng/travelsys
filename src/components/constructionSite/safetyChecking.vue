@@ -14,6 +14,9 @@
                     <router-link :to="'/constructionSite/safetyChecking'" class="label-item label-item-active">  
                     安全检查  
                     </router-link>
+                    <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
+                    安全监测  
+                    </router-link>
                 </div>
                 <div id="project" v-show="showSafetyCheck">
                     <div class="project_left">

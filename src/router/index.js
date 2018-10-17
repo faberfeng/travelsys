@@ -216,6 +216,11 @@ const router = new Router({
           path:'/constructionSite/safetyChecking',
           name:'safetyChecking',
           component:resolve=>require(['@/components/constructionSite/safetyChecking'],resolve)
+        },
+        {
+          path:'/constructionSite/safetyInspection',
+          name:'safetyInspection',
+          component:resolve=>require(['@/components/constructionSite/safetyInspection'],resolve)
         }
       ]
     },
