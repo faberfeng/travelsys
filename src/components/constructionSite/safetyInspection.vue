@@ -59,7 +59,8 @@
                             </li>
                             <li class="overviewFrameLi4">
                                 <label class="alertTxt">现场工况</label>
-                                <p>{{workingCondition}}</p>
+                                <!-- <p>{{workingCondition}}</p> -->
+                                <p class="alertContentTxt">当日天气良好，现场安全设备齐全，人员安排合理，已进行安全措施教育，符合现场作业要求,负责施工现场的总体布署、总平面布置。协调劳务层的施工进度、质量、安全,执行总的施工方案。</p>
                             </li>
                             <!-- <li class="overviewFrameLi"></li> -->
                         </ul>
@@ -80,8 +81,11 @@
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span id="inspectContentSel">
                                 <select class="inspectSel">
-                                    <option>
-                                    </option>
+                                    <option>周边管线水平位移</option>
+                                    <option>围护顶竖向位移</option>
+                                    <option>坑外水位</option>
+                                    <option>立柱内力</option>
+                                    <option>墙体测斜</option>
                                 </select>
                                 <i class="icon-sanjiao"></i>
                             </span>
@@ -104,6 +108,14 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf>
+                        </div>
+                        <div class="leftTopMonitorContent">
+                            <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox>
+                            <el-checkbox v-model="spotNum1" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">围护顶竖向位移</el-checkbox>
+                            <el-checkbox v-model="spotNum2" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">围护顶竖向位移</el-checkbox>
+                            <el-checkbox v-model="spotNum3" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">坑外水位</el-checkbox>
+                            <el-checkbox v-model="spotNum4" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">立柱内力</el-checkbox>
+                            <el-checkbox v-model="spotNum5" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">墙体测斜</el-checkbox>
                         </div>
                         <div class="rightBottomCheck">
                             <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
@@ -165,7 +177,7 @@
                                         <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
                                         <button title="详情" class="detailBtn actionBtn" @click="detail(item.id,item.type,item.name)"></button>
-                                        <button title="导入" class="exportBtn actionBtn" @click="importData()"></button>
+                                        <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -209,7 +221,11 @@
                     <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
                     <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram" placeholder="两个字母" /></div>
                     <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword" placeholder="与导入Excel表名匹配" /></div>
-                    <div class="editBodytwo editBodytwo1" v-show="monitorType==5?false:true"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()"><img v-show="monitorBaseMapId" style="object-fit: contain;" class="addbaseMapImg" :src="QJFileManageSystemURL+monitorBaseMapUrl" ><div class="addbaseMapHover" v-show="hoverShow"><label class="hoverTxt" @click="clickChange()">点击更换</label></div></div></div>
+                    <div class="editBodytwo editBodytwo1" v-show="monitorType==5?false:true"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
+                        <!-- <img v-show="monitorBaseMapId" style="object-fit: contain;" class="addbaseMapImg" :src="QJFileManageSystemURL+monitorBaseMapUrl" > -->
+                        <img v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='jpg'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='png'" class="addbaseMapImg" style="object-fit: contain;" :src="QJFileManageSystemURL+monitorBaseMapUrl">
+                        <pdf v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='pdf'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='PDF'" class="addbaseMapImg" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+monitorBaseMapUrl"></pdf>
+                        <div class="addbaseMapHover" v-show="hoverShow"><label class="hoverTxt" @click="clickChange()">点击更换</label></div></div></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addMonitorItem()" >确定</button>
@@ -238,7 +254,39 @@
                             <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText">使用Excel表名:</label><select class="sheetName"><option></option></select><i class="icon-sanjiao1"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">对应监测内容:</label><label >{{monitorImportName}}</label></div>
+                    <div class="editBodytwo"><label class="editInpText">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" ><label class="editInpText"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:120px;margin-top:-40px;" v-model="unifiedTime" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo"><label class="editInpText"><el-checkbox>保存以上列名匹配为默认</el-checkbox></label></div>
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
+                    <div class="editBodytwo"><label class="editInpText"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="formulaSetting()" >公式设定</button>
+                        <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
+                        <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
+                        <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="监测结果批量导入" :visible="batchImportDataShow" @close="batchImportCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">本地Excel文档:</label>
+                        <span class="updataImageSpan">
+                            <label for="fileInfo">
+                                <button class="upImgBtn" >选择文件</button>
+                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
+                            </label>
+                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                        </span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText">匹配结果:</label><label>文档内表总数</label><label></label><label>匹配到的表数量</label><label></label></div>
+                    <div class="editBodytwo"><label class="editInpText">需要配置的表名:</label><select class="sheetName"><option></option></select><i class="icon-sanjiao1"></i></div>
                     <div class="editBodytwo"><label class="editInpText">对应监测内容:</label></div>
                     <div class="editBodytwo"><label class="editInpText">点位编号列名:</label><select class="spotNumName"><option></option></select><i class="icon-sanjiao2"></i></div>
                     <div class="editBodytwo"><label class="editInpText">采集时间列名:</label><select class="gatherTimeName"><option></option></select><i class="icon-sanjiao3"></i></div>
@@ -254,32 +302,69 @@
                         <button class="editBtnC" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="监测结果批量导入" :visible="batchImportDataShow" @close="batchImportCancle()">
+            <el-dialog title="受力计算公式设定" :visible="formulaSettingShow" @close="formulaSettingCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">本地Excel文档:</label>
-                        <span class="updataImageSpan">
-                            <label for="fileInfo">
-                                <button class="upImgBtn" >选择文件</button>
-                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
-                            </label>
-                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
-                        </span>
+                    <div class="editBodyone">
+                        <el-radio v-model="vibrateRadio" label="1" style="margin-left:50px;">振弦式应变计计算公式：</el-radio>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText">匹配结果:</label><label>文档内表总数</label><label>12</label><label>匹配到的表数量</label><label>45</label></div>
-                    <div class="editBodytwo"><label class="editInpText">需要配置的表名:</label><select class="sheetName"><option></option></select><i class="icon-sanjiao1"></i></div>
-                    <div class="editBodytwo"><label class="editInpText">对应监测内容:</label></div>
-                    <div class="editBodytwo"><label class="editInpText">点位编号列名:</label><select class="spotNumName"><option></option></select><i class="icon-sanjiao2"></i></div>
-                    <div class="editBodytwo"><label class="editInpText">采集时间列名:</label><select class="gatherTimeName"><option></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox>使用统一时间:</el-checkbox></label></div>
-                    <div class="editBodytwo"><label class="editInpText">位移取值列名:</label><select class="gatherTimeName"><option></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo"><label class="editInpText">高层取值列名:</label><select class="gatherTimeName"><option></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox>保存以上列名匹配为默认</el-checkbox></label></div>
-                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea"></textarea></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox>覆盖上一次导入的数据</el-checkbox></label></div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
+                        <input placeholder="请输入" class="editInput"/>
+                        <label>平方毫米</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
+                        <input placeholder="请输入" class="editInput"/>
+                        <label>千帕</label>
+                    </div>
+                    <div class="editBodytwo">
+                       <el-radio v-model="vibrateRadio" label="1" style="margin-left:50px;">混凝土支撑内振弦式钢筋计计算公式：</el-radio>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">钢筋直径(mm)：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editTxt">根数：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">截面积As：</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">钢筋应力计的截面积As'：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                        <label>平方毫米</label>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editTxt">钢筋的牌号：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">对应弹性模量Es：</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">混凝土支撑宽度：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">混凝土支撑高度： ：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">截面积Ac：</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">混凝土的等级：</label>
+                        <input placeholder="请输入" class="editInput"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">对应弹性模量Ec:</label>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" >确定</button>
-                        <button class="editBtnC" >取消</button>
+                    <button class="editBtnS" >确定</button>
+                    <button class="editBtnC" >取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -312,6 +397,7 @@ export default {
             alertPointAmount:'',
             condition:'',
             workingCondition:'',//现场工况
+            inputWorkingCondition:'',
             weatherJson:'',
             weatherIcon:'',
             weatherAir:'',
@@ -322,12 +408,28 @@ export default {
             addInspectContentShow:false,//增加监测内容弹框
             editInspectContentShow:false,//编辑监测内容弹框
             importGatherDataShow:false,//导入采集数据
+            matchKeyWord:'',//匹配关键字
+            monitorImportName:'',//导入监测名称
+            monitorImportType:'',//导入监测类型
+            monitorImportId:'',//监测Id
+            spotNumCol:'',//点位列名
+            timeCol:'',//采集时间列名
+            unifiedTime:null,//使用统一时间
+            distanceCol:'',//位移取值列名
+            altitudeCol:'',//高程取值列名
+            pipeHeightCol:'',//管口标高列名
+            gaugeHeightCol:'',//水位深度列名
+            overwrite:false,//是否覆盖
             batchImportDataShow:false,//批量数据导入
+            formulaSettingShow:false,//公式设定
+            vibrateRadio:'1',//振弦式应变计计算公式
             fileList:'',
             fileListName:'',
             excelSheetInfo:'',//获取导入EXCEL文件的sheet信息
             excelFileList:'',
             excelFileListName:'',
+            sheetIndex:'',//当前表头
+            sheetIndexList:'',//列表
             pageNo:1,
             baseMapList:'',//底图列表数据
             isClick:false,//是否点击
@@ -369,6 +471,12 @@ export default {
             monitorBaseMapUrl:'',//监测底图设置
             picMark:false,
             spotNum:false,
+            spotNum0:false,
+            spotNum1:false,
+            spotNum2:false,
+            spotNum3:false,
+            spotNum4:false,
+            spotNum5:false,
             pitchDetailShow:false,//斜度详情页
             surveyName:'',
 
@@ -421,6 +529,7 @@ export default {
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
+            vm.getBaseMapList();
         }
     },
     methods:{
@@ -491,36 +600,36 @@ export default {
                         this.weatherAir=this.weatherJson.data[0].tem1;
                         this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week
                         console.log(this.weatherJson)
-                        var recentData=[];
-                        var totalData=[];
+                        var recentData=[{name:'报警',value:23},{name:'总数',value:100}];
+                        var totalData=[{name:'报警',value:23},{name:'总数',value:100}];
                         var legendData='';
                         var legendAllData='';
-                        var conditionData=[];//监测工况综述
-                        recentData.push(
-                            {
-                            name:'报警',
-                            value:this.alertPointAmount.recentAlertAmount
-                            },{
-                                name:'总数',
-                                value:this.alertPointAmount.allAmount
-                            }
-                        );
+                        var conditionData=[55,50];//监测工况综述
+                        // recentData.push(
+                        //     {
+                        //     name:'报警',
+                        //     value:this.alertPointAmount.recentAlertAmount
+                        //     },{
+                        //         name:'总数',
+                        //         value:this.alertPointAmount.allAmount
+                        //     }
+                        // );
                         // legendData='报警'+this.alertPointAmount.recentAlertAmount;
                         // legendAllData='总数'+this.alertPointAmount.allAmount;
-                        totalData.push(
-                            {
-                            name:'报警',
-                            value:this.alertPointAmount.totalAlertAmount
-                            },
-                            {
-                                name:'总数',
-                                value:this.alertPointAmount.allAmount
+                        // totalData.push(
+                        //     {
+                        //     name:'报警',
+                        //     value:this.alertPointAmount.totalAlertAmount
+                        //     },
+                        //     {
+                        //         name:'总数',
+                        //         value:this.alertPointAmount.allAmount
                                 
-                            }
-                        );
-                        conditionData.push(
-                            this.condition.acAmount,this.condition.days
-                        )
+                        //     }
+                        // );
+                        // conditionData.push(
+                        //     this.condition.acAmount,this.condition.days
+                        // )
                         var myChart = echarts.init(document.getElementById('overviewPie'))
                         var myChart1 = echarts.init(document.getElementById('overviewPie2'))
                         var myChart2=echarts.init(document.getElementById('conditionLine'))
@@ -822,6 +931,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.baseMapList=response.data.rt;
+                    console.log(this.baseMapList);
+                    if(!this.curBaseMapUrl){
+                        this.curBaseMapUrl=this.baseMapList[5].relativeUri;
+                    }
+                    if(this.monitorBaseMapId){
+                        this.baseMapList.forEach((item)=>{
+                            if(item.id==this.monitorBaseMapId){
+                                this.curBaseMapUrl=item.relativeUri;
+                            }
+                        })
+                    }
                 }else{
                     vm.$message({
                         type:"error",
@@ -944,10 +1064,296 @@ export default {
             vm.monitorKeyword='';
             vm.monitorId='';
         },
+        //确认导入excel数据(需要根据监测类型来判断)
+        importExcelDataMakeSure(){
+            if(this.monitorImportType==1){
+                this.importExcel_1()
+            }else if(this.monitorImportType==2){
+                this.importExcel_2()
+            }else if(this.monitorImportType==3){
+                this.importExcel_3()
+            }
+        },
+        //导入水平位移excel
+        importExcel_1(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/importExcel_1',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    shiftDistanceIndex:vm.distanceCol,//位移下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.distanceCol='';//位移下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite='';//是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //导入EXCEL（竖向位移）
+        importExcel_2(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/importExcel_2',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    elevationIndex:vm.altitudeCol,//高程下班
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.altitudeCol='';//高程下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=''; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //导入EXCEL(水位)
+        importExcel_3(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/importExcel_3',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.pipeHeightCol='';//管口高度
+                    vm.gaugeHeightCol='';//水位下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=''; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //测试导入excel数据(需要根据监测类型来判断)
+        verifyExcelDataBtn(){
+             if(this.monitorImportType==1){
+                this.verifyExcel_1()
+            }else if(this.monitorImportType==2){
+                this.verifyExcel_2()
+            }else if(this.monitorImportType==3){
+                 this.verifyExcel_3()
+            }
+        },
+        //测试导入EXCEL（水平位移）
+        verifyExcel_1(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/verifyExcel_1',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    shiftDistanceIndex:vm.distanceCol,//位移下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.distanceCol='';//位移下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=''; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
+        },
+        //验证导入EXCEL（竖向位移）
+        verifyExcel_2(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/verifyExcel_2',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    elevationIndex:vm.altitudeCol,//高程下班
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.altitudeCol='';//高程下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=''; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //验证导入EXCEL（水位）
+        verifyExcel_3(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/verifyExcel_3',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    vm.pipeHeightCol='';//管口高度
+                    vm.gaugeHeightCol='';//水位下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=''; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //点击公式设定
+        formulaSetting(){
+            this.formulaSettingShow=true;
+        },
+        //取消公式设定
+        formulaSettingCancle(){
+            this.formulaSettingShow=false;
+        },
         //取消导入采集数据
         importGatherDataCancle(){
+            var vm=this;
             this.importGatherDataShow=false;
-
+            this.excelFileListName='';
+            this.monitorImportName='';
+            this.excelFileList='';
+            vm.sheetIndex='';
+            vm.timeCol=''; //采集时间下标
+            vm.distanceCol='';//位移下标
+            vm.monitorImportId='';//监测ID
+            vm.spotNumCol='';//监测点位下标
+            vm.unifiedTime='';//标准时间，不选择可不传
+            vm.overwrite=''; //是否覆盖
+            vm.inputWorkingCondition='';//现场工况
+            vm.pipeHeightCol='';//管口高度
+            vm.gaugeHeightCol='';//水位下标
         },
         //取消批量数据导入
         batchImportCancle(){
@@ -967,7 +1373,7 @@ export default {
             // formData.append('token',vm.token);
             // formData.append('projId',vm.projId);
             // formData.append('type',1);
-            formData.append('file',vm.excelFileList);
+            formData.append('data',vm.excelFileList);
             // formData.append('userId',vm.userId);
             // formData.append('modelCode','006');
             // formData.append('returnUrl',returnUrl);
@@ -975,15 +1381,22 @@ export default {
                     method:'POST',
                     url:vm.BDMSUrl+ 'detectionInfo/getExcelSheetInfo',
                     headers:{
-                        'token':vm.token,
-                        'Content-Type': 'multipart/form-data'
+                        'token':vm.token
                     },
-                    data:{
-                        'data':vm.excelFileList
-                    }
+                    data:formData
                     }).then((response)=>{
                         if(response.data.cd=='0'){
                             this.excelSheetInfo=response.data.rt;
+                            console.log(this.excelSheetInfo);
+                            this.excelSheetInfo.forEach((item)=>{
+                                if(item.name==this.matchKeyWord){
+                                    // console.log(item.index)
+                                    this.getExcelColumnBySheet(item.index);
+                                    this.sheetIndex=item.index;
+                                    console.log(this.sheetIndex);
+                                }
+                            })
+                            
                             vm.excelFileList='';
                         }
                         if(response.data.cd != 0){
@@ -994,6 +1407,30 @@ export default {
                             vm.excelFileList='';
                         }
                     })
+        },
+        //根据sheet获取表头
+        getExcelColumnBySheet(val){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getExcelColumnBySheet',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:val
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.sheetIndexList=response.data.rt;
+                    console.log(this.sheetIndexList);
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.message
+                    })
+                }
+            })
         },
         //重命名监测内容
         renameMonitor(){
@@ -1088,9 +1525,13 @@ export default {
             }
         },
         //单项监测内容导入
-        importData(){
+        importData(val,name,type,id){
             var vm=this;
             vm.importGatherDataShow=true;
+            vm.matchKeyWord=val;
+            vm.monitorImportName=name;
+            vm.monitorImportType=type;
+            vm.monitorImportId=id;
         },
         //获取监测内容主表
         getMonitorMainTable(){
@@ -1325,13 +1766,13 @@ export default {
                                 left:20%;
                                 .alertTxt{
                                         font-size: 16px;
-                                        color: 333333;
+                                        color: #333333;
                                         display: inline-block;
                                         float: left;
                                         margin-top:10px;
                                         margin-left:24px;
-
                                     }
+                               
                                 #overviewPie{
                                     //  position: absolute;
                                     // position: relative;
@@ -1351,7 +1792,7 @@ export default {
                                 left:40%;
                                  .alertTxt{
                                         font-size: 16px;
-                                        color: 333333;
+                                        color: #333333;
                                         display: inline-block;
                                         float: left;
                                         margin-top:10px;
@@ -1376,7 +1817,7 @@ export default {
                                 left:60%;
                                  .alertTxt{
                                         font-size: 16px;
-                                        color: 333333;
+                                        color: #333333;
                                         display: inline-block;
                                         float: left;
                                         margin-top:10px;
@@ -1397,12 +1838,20 @@ export default {
                                 left:80%;
                                 .alertTxt{
                                     font-size: 16px;
-                                    color: 333333;
+                                    color: #333333;
                                     display: inline-block;
                                     float: left;
                                     margin-top:10px;
                                     margin-left:24px;
-
+                                }
+                                 .alertContentTxt{
+                                    display: block;
+                                    height: 100px;
+                                    margin:60px auto;
+                                    width: 90%;
+                                    color:#666666;
+                                    font-size: 14px;
+                                    text-align: left;
                                 }
                             }
                         }
@@ -1726,6 +2175,13 @@ export default {
                                 padding:5px;
                             }
                         }
+                        .leftTopMonitorContent{
+                            position: absolute;
+                            top:30px;
+                            left:30px;
+                            z-index:11;
+
+                        }
                         .rightBottomCheck{
                             position: absolute;
                             bottom:30px;
@@ -1983,10 +2439,6 @@ export default {
             .editInpText1{
                 position: absolute;
                 top:0px;
-                // line-height: 80px;
-                // height: 80px;
-                // margin-top:-10px;
-                // margin-bottom: 20px;
             }
             .editSelect{
                 width: 220px;
@@ -2155,8 +2607,26 @@ export default {
                 height: 60px;
                 left:24%;
             }
-
-       
+            .editTxt{
+                    display: inline-block;
+                    margin-left: 74px;
+                    color: #666;
+                    font-size: 14px;
+                    line-height: 14px;
+                    font-weight: normal;
+                    display: inline-block;
+                    margin-right: 20px;
+                    width: 30%;
+                    text-align: left;
+            }
+            .editInput{
+                width: 130px;
+                height: 32px;
+                border: 1px solid #d1d1d1;
+                border-radius: 2px;
+                background: #fafafa;
+                padding-left: 10px;
+            }
         }
        
 

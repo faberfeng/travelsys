@@ -48,19 +48,19 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>CX-1</td>
+                                <td>QTCX-1</td>
+                                <td>0.00</td>
+                                <td>-10.000</td>
+                                <td>0.500</td>
+                                <td>21</td>
+                                <td>7.500</td>
+                                <td>2</td>
+                                <td>否</td>
+                                <td>1d1h0m</td>
+                                <td>7.500</td>
+                                <td>2</td>
+                                <td>否</td>
                                 <td>
                                     <button title="修改" class="editBtn actionBtn"></button>
                                     <button title="删除" class="deleteBtn actionBtn"></button>
@@ -69,69 +69,68 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>CX-2</td>
+                                <td>QTCX-2</td>
+                                <td>0.01</td>
+                                <td>-14.000</td>
+                                <td>0.400</td>
+                                <td>21</td>
+                                <td>6.500</td>
+                                <td>2</td>
+                                <td>否</td>
+                                <td>1d1h0m</td>
+                                <td>7.500</td>
+                                <td>2</td>
+                                <td>否</td>
+                                <td>
+                                    <button title="修改" class="editBtn actionBtn"></button>
+                                    <button title="删除" class="deleteBtn actionBtn"></button>
+                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
+                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
+                                </td>
                             </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                             <tr>
+                                <td>CX-3</td>
+                                <td>QTCX-3</td>
+                                <td>0.03</td>
+                                <td>-16.020</td>
+                                <td>0.620</td>
+                                <td>24</td>
+                                <td>6.500</td>
+                                <td>2</td>
+                                <td>否</td>
+                                <td>1d1h0m</td>
+                                <td>7.500</td>
+                                <td>2</td>
+                                <td>是</td>
+                                <td>
+                                    <button title="修改" class="editBtn actionBtn"></button>
+                                    <button title="删除" class="deleteBtn actionBtn"></button>
+                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
+                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
+                                </td>
                             </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                             <tr>
+                                <td>CX-4</td>
+                                <td>QTCX-4</td>
+                                <td>0.03</td>
+                                <td>-18.020</td>
+                                <td>0.420</td>
+                                <td>22</td>
+                                <td>6.500</td>
+                                <td>2</td>
+                                <td>否</td>
+                                <td>1d1h0m</td>
+                                <td>7.500</td>
+                                <td>4</td>
+                                <td>是</td>
+                                <td>
+                                    <button title="修改" class="editBtn actionBtn"></button>
+                                    <button title="删除" class="deleteBtn actionBtn"></button>
+                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
+                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
+                                </td>
+                             </tr>
                         </tbody>
                     </table>
                 </div>
@@ -150,130 +149,28 @@
                                         <th colspan="2">最近一次</th>
                                     </tr>
                                     <tr>
-                                        <th></th>
-                                        <th></th>
+                                        <th>05-21 10:00</th>
+                                        <th>05-21 11:00</th>
                                         <th>变化量(mm)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr v-for="(item,index) in indexTailList1" :key="index">
+                                        <td v-text="item.depth"></td>
+                                        <td v-text="item.distance1"></td>
+                                        <td v-text="item.distance2"></td>
+                                        <td v-text="item.changeNum"></td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>05-21 10:00</td>
+                                        <td>05-21 11:00</td>
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>5mm</td>
+                                        <td>6mm</td>
+                                        <td>3mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -307,125 +204,23 @@
                                         <th>变化量(mm)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                               <tbody>
+                                    <tr v-for="(item,index) in indexTailList2" :key="index">
+                                        <td v-text="item.depth"></td>
+                                        <td v-text="item.distance1"></td>
+                                        <td v-text="item.distance2"></td>
+                                        <td v-text="item.changeNum"></td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>05-21 10:00</td>
+                                        <td>05-21 11:00</td>
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>5mm</td>
+                                        <td>6mm</td>
+                                        <td>3mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -436,7 +231,9 @@
                              <label class="tableIcon"></label>
                             <label class="tableTxt">序列CX-02曲线</label>
                         </div>
-                        <div class="fourGraph"></div>
+                        <div class="fourGraph">
+                            <vue-highcharts  :options="optionOnes" ref="lineChartOne"></vue-highcharts>
+                        </div>
                     </div>
                 </div>
 
@@ -468,15 +265,168 @@ export default Vue.component('commonPitch-detail',{
                         label:'手动导入'
                     }
                 ],
+                indexTailList1:[
+                    {
+                        depth:0,
+                        distance1:3,
+                        distance2:4,
+                        changeNum:0.02
+                    },
+                    {
+                    depth:0.5,
+                    distance1:3.95,
+                    distance2:4.01,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:1.0,
+                    distance1:4.6,
+                    distance2:4.9,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:1.5,
+                    distance1:5.4,
+                    distance2:4.7,
+                    changeNum:0.01
+                    },
+                    {
+                    depth:2.0,
+                    distance1:3.9,
+                    distance2:5.4,
+                    changeNum:-0.1
+                    },
+                    {
+                    depth:3,
+                    distance1:5.3,
+                    distance2:4.7,
+                    changeNum:-0.21
+                    },
+                    {
+                    depth:3.5,
+                    distance1:3.6,
+                    distance2:5.4,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:4,
+                    distance1:3.6,
+                    distance2:4.7,
+                    changeNum:-0.03
+                    },
+                    {
+                    depth:4.5,
+                    distance1:5.3,
+                    distance2:4.6,
+                    changeNum:0.11
+                    },
+                    {
+                    depth:5,
+                    distance1:3.9,
+                    distance2:4.6,
+                    changeNum:0.01
+                    },
+                    {
+                    depth:5.5,
+                    distance1:7.3,
+                    distance2:5.4,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:6,
+                    distance1:7.3,
+                    distance2:6.4,
+                    changeNum:0.21
+                    },
+                ],
+                indexTailList2:[
+                    {
+                        depth:0,
+                        distance1:3.6,
+                        distance2:4.5,
+                        changeNum:0.01
+                    },
+                     {
+                    depth:0.5,
+                    distance1:3.95,
+                    distance2:4.01,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:1.0,
+                    distance1:4.6,
+                    distance2:4.9,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:1.5,
+                    distance1:5.4,
+                    distance2:4.7,
+                    changeNum:0.01
+                    },
+                    {
+                    depth:2.0,
+                    distance1:3.9,
+                    distance2:5.4,
+                    changeNum:-0.1
+                    },
+                    {
+                    depth:3,
+                    distance1:5.3,
+                    distance2:4.7,
+                    changeNum:-0.21
+                    },
+                    {
+                    depth:3.5,
+                    distance1:3.6,
+                    distance2:5.4,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:4,
+                    distance1:3.6,
+                    distance2:4.7,
+                    changeNum:-0.03
+                    },
+                    {
+                    depth:4.5,
+                    distance1:5.3,
+                    distance2:4.6,
+                    changeNum:0.11
+                    },
+                    {
+                    depth:5,
+                    distance1:3.9,
+                    distance2:4.6,
+                    changeNum:0.01
+                    },
+                    {
+                    depth:5.5,
+                    distance1:7.3,
+                    distance2:5.4,
+                    changeNum:-0.01
+                    },
+                    {
+                    depth:6,
+                    distance1:7.3,
+                    distance2:6.4,
+                    changeNum:0.21
+                    }
+
+                ],
                  optionOnes:{
                         chart: {
-                            type: 'spline'
+                            type: 'spline',
+                            inverted: true
                         },
                         title: {
                             text: ''
                         },
                         xAxis: {
-                            categories:['1','2','3','4','5','6','7','8']
+                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
+                            // tickInterval: 0.5,
+                            //  tickPositions: [0, 20, 50, 100]
+                            categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.0'],
                         },
                         yAxis: {
                                 title: {
@@ -484,7 +434,8 @@ export default Vue.component('commonPitch-detail',{
                                 },
                                 labels:{
                                     enabled: true
-                                }
+                                },
+                               
                             
                                 },
                                 
@@ -529,12 +480,14 @@ export default Vue.component('commonPitch-detail',{
                         },
                         series:[
                             {
-                                name:'05-23',
-                                data:[12,23,45,34,25,37,45,36]
+                                name:'05-21',
+                                data:[12.21,12.23,12.43,12.64,13.05,13.32,13.14,12.65,12.44,12.38,12.01]
                             },
                             {
-                                name:'05-23',
-                                data:[23,34,54,24,56,12,35,57]
+                                name:'05-21',
+                                data:[12.2,12.3,12.4,12.6,13.0,13.3,13.1,12.6,12.4,12.3,12.1]
+                                //  data:[12.1,12.3,12.5,13.6,13.7,13.8,14.3,14.4,14.5,15.2,15.4,15.6,16.2,16.5,16.6,17.3,17.4,17.5,18.3,18.4,18.5,18.5,18.4,18.3,17.6,17.5,17.4,16.6,16.5,16.4,15.4,15.3,15.2,14.6,14.4,14.1,13.6,13.4,13.1,12.9,12.7,12.6]
+                                // data:[23,34,54,24,56,12,35,57]
                             }
                         ],
             },
@@ -767,13 +720,13 @@ select.autoImport{
             .containerBottom{
                 margin-top:32px;
                 width: 100%;
-                height: 750px;
+                height: 550px;
                 // border:1px solid #ccc;
                 position: relative;
                 .containerBottomOne{
                     position: absolute;
                     width: 25%;
-                    height: 750px;
+                    height: 550px;
                     left:0;
                 //    border-right:1px solid #ccc;
                     .oneHeader{
@@ -842,7 +795,7 @@ select.autoImport{
                 .containerBottomTwo{
                     position: absolute;
                     width: 25%;
-                    height: 750px;
+                    height: 550px;
                     left:25%;
                 //    border-right:1px solid #ccc;
                     .twoHeader{
@@ -870,10 +823,12 @@ select.autoImport{
                     }
                     .twoGraph{
                         // height: 700px;
-                        margin-top:50px;
-                        transform: rotate(90deg);
+                        width: 96%;
+                        margin:0 auto;
+                        margin-top:20px;
+                        // transform: rotate(90deg);
                         border:1px solid #ccc;
-                        padding:5px;
+                        padding: 48px 15px 25px 15px;
                         // width: 100%;
                         
 
@@ -882,7 +837,7 @@ select.autoImport{
                 .containerBottomThree{
                     position: absolute;
                     width: 25%;
-                    height: 750px;
+                    height: 550px;
                     left:50%;
                 //    border-right:1px solid #ccc;
                     .threeHeader{
@@ -949,7 +904,7 @@ select.autoImport{
                 .containerBottomFour{
                      position: absolute;
                     width: 25%;
-                    height: 750px;
+                    height: 650px;
                     left:75%;
                 //    border-right:1px solid #ccc;
                     .fourHeader{
@@ -976,7 +931,11 @@ select.autoImport{
                         }
                     }
                     .fourGraph{
-
+                            width: 96%;
+                            margin: 0 auto;
+                            margin-top: 20px;
+                            border: 1px solid #ccc;
+                            padding: 48px 15px 25px 15px;
                     }
                 }
 
