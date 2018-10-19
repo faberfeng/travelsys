@@ -8,7 +8,7 @@
             <div class="container">
                 <div class="containerHead">
                     <div class="containerHeadLeft">
-                        <span class="addOrder">添加序列</span>
+                        <span class="addOrder" @click="addIndexNum()">添加序列</span>
                         <span class="exportOrder">导出</span>
                     </div>
                     <div class="containerHeadMiddle"></div>
@@ -47,90 +47,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>CX-1</td>
-                                <td>QTCX-1</td>
-                                <td>0.00</td>
-                                <td>-10.000</td>
-                                <td>0.500</td>
-                                <td>21</td>
-                                <td>7.500</td>
-                                <td>2</td>
-                                <td>否</td>
-                                <td>1d1h0m</td>
-                                <td>7.500</td>
-                                <td>2</td>
-                                <td>否</td>
+                            <tr v-for="(item,index) in getPitchBaseInfoList" :key="index">
+                                <td v-text="$options.filters.addSprit(item.name)"></td>
+                                <td v-text="$options.filters.addSprit(item.keyword)"></td>
+                                <td v-text="$options.filters.addSprit(item.initDepth)"></td>
+                                <td v-text="$options.filters.addSprit(item.terminalDepth)"></td>
+                                <td v-text="item.pointDistance"></td>
+                                <td v-text="item.pointAmount"></td>
+                                <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
+                                <td v-text="$options.filters.addSprit(item.maxShift)"></td>
+                                <td>{{item.maxAlert|shifouChange()}}</td>
+                                <td v-text="$options.filters.addSprit(item.maxVariationInterval)"></td>
+                                <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
+                                <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
+                                <td>{{item.maxVariationAlert|shifouChange()}}</td>
                                 <td>
-                                    <button title="修改" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn"></button>
-                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
-                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
+                                    <button title="修改" class="editBtn actionBtn" @click="editPitchSeqBtn(item.id,item.itemId)"></button>
+                                    <button title="删除" class="deleteBtn actionBtn" @click="deletePitchSeq(item.id,item.itemId)"></button>
+                                    <button title="左侧显示" @click="leftDisplay(item.id,item.name)" class="leftLayBtn actionBtn"></button>
+                                    <button title="右侧显示" @click="rightDisplay(item.id,item.name)" class="rightLayBtn actionBtn"></button>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>CX-2</td>
-                                <td>QTCX-2</td>
-                                <td>0.01</td>
-                                <td>-14.000</td>
-                                <td>0.400</td>
-                                <td>21</td>
-                                <td>6.500</td>
-                                <td>2</td>
-                                <td>否</td>
-                                <td>1d1h0m</td>
-                                <td>7.500</td>
-                                <td>2</td>
-                                <td>否</td>
-                                <td>
-                                    <button title="修改" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn"></button>
-                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
-                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>CX-3</td>
-                                <td>QTCX-3</td>
-                                <td>0.03</td>
-                                <td>-16.020</td>
-                                <td>0.620</td>
-                                <td>24</td>
-                                <td>6.500</td>
-                                <td>2</td>
-                                <td>否</td>
-                                <td>1d1h0m</td>
-                                <td>7.500</td>
-                                <td>2</td>
-                                <td>是</td>
-                                <td>
-                                    <button title="修改" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn"></button>
-                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
-                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>CX-4</td>
-                                <td>QTCX-4</td>
-                                <td>0.03</td>
-                                <td>-18.020</td>
-                                <td>0.420</td>
-                                <td>22</td>
-                                <td>6.500</td>
-                                <td>2</td>
-                                <td>否</td>
-                                <td>1d1h0m</td>
-                                <td>7.500</td>
-                                <td>4</td>
-                                <td>是</td>
-                                <td>
-                                    <button title="修改" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn"></button>
-                                    <button title="左侧显示" class="leftLayBtn actionBtn"></button>
-                                    <button title="右侧显示" class="rightLayBtn actionBtn"></button>
-                                </td>
-                             </tr>
                         </tbody>
                     </table>
                 </div>
@@ -138,7 +75,7 @@
                     <div class="containerBottomOne">
                         <div class="oneHeader">
                             <label class="tableIcon"></label>
-                            <label class="tableTxt">序列CX-01详情</label>
+                            <label class="tableTxt">序列{{leftDisplayName}}详情</label>
                         </div>
                         <div class="oneTable">
                             <table class="tableList" border="1" cellspacing="0" width="100%">
@@ -155,11 +92,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item,index) in indexTailList1" :key="index">
-                                        <td v-text="item.depth"></td>
-                                        <td v-text="item.distance1"></td>
-                                        <td v-text="item.distance2"></td>
-                                        <td v-text="item.changeNum"></td>
+                                    <tr v-for="(item,index) in leftDisplayList.recentVariation" :key="index">
+                                        <td></td>
+                                        <td ></td>
+                                        <td ></td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
@@ -179,7 +116,8 @@
                     <div class="containerBottomTwo">
                         <div class="twoHeader">
                             <label class="tableIcon"></label>
-                            <label class="tableTxt">序列CX-01曲线</label>
+                            <label class="tableTxt">序列{{leftDisplayName}}曲线</label>
+                            <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="twoGraph">
                             <vue-highcharts  :options="optionOnes" ref="lineChartOne"></vue-highcharts>
@@ -188,7 +126,7 @@
                     <div class="containerBottomThree">
                         <div class="threeHeader">
                              <label class="tableIcon"></label>
-                            <label class="tableTxt">序列CX-02详情</label>
+                            <label class="tableTxt">序列{{rightDisplayName}}详情</label>
                         </div>
                         <div class="threeTable">
                             <table class="tableList" border="1" cellspacing="0" width="100%">
@@ -205,11 +143,11 @@
                                     </tr>
                                 </thead>
                                <tbody>
-                                    <tr v-for="(item,index) in indexTailList2" :key="index">
-                                        <td v-text="item.depth"></td>
-                                        <td v-text="item.distance1"></td>
-                                        <td v-text="item.distance2"></td>
-                                        <td v-text="item.changeNum"></td>
+                                    <tr v-for="(item,index) in rightDisplayList.recentVariation " :key="index">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
@@ -229,16 +167,86 @@
                     <div class="containerBottomFour">
                         <div class="fourHeader">
                              <label class="tableIcon"></label>
-                            <label class="tableTxt">序列CX-02曲线</label>
+                            <label class="tableTxt">序列{{rightDisplayName}}曲线</label>
+                             <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="fourGraph">
                             <vue-highcharts  :options="optionOnes" ref="lineChartOne"></vue-highcharts>
                         </div>
                     </div>
                 </div>
-
-
             </div>
+        </div>
+        <div id="edit">
+            <el-dialog  width="590px" :visible="addIndexNumShow" title="添加测斜序列" @close="addIndexNumCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editTxt">序列编号:</label>
+                        
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">测点数量:</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">起始高度:</label>
+                        <input placeholder="请输入数值" v-model="initDepth" class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">结束高度:</label>
+                        <input placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">测点间距:</label>
+                        <input placeholder="请输入数值" v-model="pointDistance" class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">关键字:</label>
+                        <input placeholder="请输入Excel对应表名" v-model="keyword" class="inp" style="width:140px !important;height:30px !important"/>
+                    </div>
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addPitchSeq()">确定</button>
+                    <button class="editBtnC" @click="addIndexNumCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog  width="590px" :visible="editIndexNumShow" title="修改测斜序列" @close="editIndexNumCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editTxt">序列编号:</label>
+                        <label>{{indexName}}</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">测点数量:</label>
+                        <label>{{spotNum}}</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">起始高度:</label>
+                        <input placeholder="请输入数值" v-model="initDepth" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">结束高度:</label>
+                        <input placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">测点间距:</label>
+                        <input placeholder="请输入数值" v-model="pointDistance" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
+                        <label>m</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">关键字:</label>
+                        <input placeholder="请输入Excel对应表名" v-model="keyword" class="inp" style="width:140px !important;height:30px !important"/>
+                    </div>
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editPitchSeq()">确定</button>
+                    <button class="editBtnC" @click="editIndexNumCancle()" >取消</button>
+                </div>
+            </el-dialog>
         </div>
 
     </div>
@@ -248,12 +256,18 @@ import Vue from 'vue'
 import axios from 'axios'
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonPitch-detail',{
-        props:['surveyName'],
+        props:['surveyName','itemMonitorId'],
         components:{
             VueHighcharts
         },
         data(){
             return{
+                defaultSubProjId:'',
+                token:'',
+                projId:'',
+                userId:'',
+                BDMSUrl:'',
+                QJFileManageSystemURL:'',
                 importMethod:1,
                 importList:[
                     {
@@ -265,6 +279,24 @@ export default Vue.component('commonPitch-detail',{
                         label:'手动导入'
                     }
                 ],
+                getPitchBaseInfoList:'',//获取斜度基本信息
+                pitchDetailDataList:'',//获取数据详情（下面的图）
+                addIndexNumShow:false,//增加序列
+                editIndexNumShow:false,//修改序列
+                initDepth:'',//起始标高
+                terminalDepth:'',//结束标高
+                pointDistance:'',//点位间隔
+                keyword:'',//关键字
+                indexName:'',//序列编号
+                spotNum:'',//测点数量
+                leftDisplayShow:'',
+                rightDisplayShow:'',
+                leftDisplayName:'',
+                rightDisplayName:'',
+                leftDisplayList:'',
+                rightDisplayList:'',
+                itemseqId:'',
+                seqId:'',
                 indexTailList1:[
                     {
                         depth:0,
@@ -497,9 +529,30 @@ export default Vue.component('commonPitch-detail',{
             }
         },
         created(){
-
+             var vm = this;
+            vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+            this.token = localStorage.getItem('token');
+            this.projId = localStorage.getItem('projId');
+            vm.userId  = localStorage.getItem('userid');
+            vm.BDMSUrl = vm.$store.state.BDMSUrl;
+            vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+            vm.getPitchBaseInfo();
         },
         filters:{
+        shifouChange(val){
+            if(val==false){
+                return '否'
+            }else if(val==true){
+                return '是'
+            }
+        },
+        addSprit(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val
+            }
+        }
 
         },
         watch:{
@@ -510,8 +563,190 @@ export default Vue.component('commonPitch-detail',{
             back(){
                 var vm = this
                 vm.$emit('back')
+            },
+            //添加序列号
+            addIndexNum(){
+                this.addIndexNumShow=true;
+            },
+            addIndexNumCancle(){
+                this.addIndexNumShow=false;
+            },
+            //
+            editIndexNumCancle(){
+                this.editIndexNumShow=false;
+            },
+            //获取斜度基本信息（上面的表）
+            getPitchBaseInfo(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/getPitchBaseInfo',
+                    headers:{
+                        'token':vm.token,
+                    },
+                    params:{
+                        itemId:vm.itemMonitorId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        vm.getPitchBaseInfoList=response.data.rt;
+                        console.log(vm.getPitchBaseInfoList);
+                    }else if(response.data.cd=='-1'){
+                        vm.$message({
+                            type:"error",
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //根据序列ID获取数据详情（下面的图）
+            getPitchDetailDataBySeqId(num){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/getPitchDetailDataBySeqId',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        seqId:num
+                    }
+                }).then((response)=>{
+                    if(response.data.rt){
+                        this.pitchDetailDataList=response.data.rt;
+                        console.log(this.pitchDetailDataList);
+                    }else if(respose.data.cd=='-1'){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            // 添加斜度序列
+            addPitchSeq(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/addPitchSeq',
+                    headers:{
+                        'token':vm.token,
+                    },
+                    params:{
+                        itemId:vm.itemMonitorId,
+                        initDepth:vm.initDepth,
+                        terminalDepth:vm.terminalDepth,
+                        pointDistance:vm.pointDistance,
+                        keyword:vm.keyword
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.addIndexNumShow=false;
+                        this.getPitchBaseInfo();
+                        vm.initDepth='';
+                        vm.terminalDepth='';
+                        vm.pointDistance='';
+                        vm.keyword='';
+                    }else if(response.data.cd=='-1'){
+                        vm.$message({
+                            type:"error",
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //点击修改斜度序列
+            editPitchSeqBtn(val,valItemId){
+                var vm=this;
+                vm.itemseqId=valItemId;
+                vm.seqId=val;
+                this.editIndexNumShow=true;
+                this.getPitchBaseInfoList.forEach((item)=>{
+                    if(item.id==val){
+                        vm.indexName=item.name;
+                        vm.spotNum=item.pointAmount;
+                        vm.initDepth=item.initDepth;
+                        vm.terminalDepth=item.terminalDepth;
+                        vm.pointDistance=item.pointDistance;
+                        vm.keyword=item.keyword;
+                    }
+                })
+            },
+            //修改斜度序列
+            editPitchSeq(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editPitchSeq',
+                    headers:{
+                        'token':vm.token,
+                    },
+                    params:{
+                        itemId:vm.itemseqId,
+                        seqId:vm.seqId,
+                        initDepth:vm.initDepth,
+                        terminalDepth:vm.terminalDepth,
+                        pointDistance:vm.pointDistance,
+                        keyword:vm.keyword
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.addIndexNumShow=false;
+                        this.getPitchBaseInfo();
+                        vm.initDepth='';
+                        vm.terminalDepth='';
+                        vm.pointDistance='';
+                        vm.keyword='';
+                    }else if(response.data.cd=='-1'){
+                        vm.$message({
+                            type:"error",
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //删除斜度序列
+            deletePitchSeq(id,itemId){
+                 var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/deletePitchSeq',
+                    headers:{
+                        'token':vm.token,
+                    },
+                    params:{
+                        itemId:itemId,
+                        seqId:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getPitchBaseInfo();
+                        vm.$message({
+                            type:'info',
+                            message:'序列删除成功'
+                        })
+                    }else if(response.data.cd=='-1'){
+                        vm.$message({
+                            type:"error",
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //左侧显示
+            leftDisplay(id,name){
+                this.getPitchDetailDataBySeqId(id)
+                this.leftDisplayList=this.pitchDetailDataList;
+                this.leftDisplayName=name;
+                console.log(this.leftDisplayList,'左边数据')
+            },
+            //右侧显示
+            rightDisplay(id,name){
+                this.getPitchDetailDataBySeqId(id)
+                this.rightDisplayList=this.pitchDetailDataList;
+                this.rightDisplayName=name;
+                console.log(this.rightDisplayList,'右边数据')
             }
-
         }
     }
 )
@@ -751,6 +986,7 @@ select.autoImport{
                             font-weight: bold;
                             line-height: 30px;
                         }
+                        
                     }
                     .oneTable{
                         width:96%;
@@ -819,6 +1055,14 @@ select.autoImport{
                             float: left;
                             font-weight: bold;
                             line-height: 30px;
+                        }
+                        .editSpot{
+                            display: inline-block;
+                            float: right;
+                            font-size:12px;
+                            color:#336699;
+                            line-height: 30px;
+                            cursor: pointer;
                         }
                     }
                     .twoGraph{
@@ -929,6 +1173,14 @@ select.autoImport{
                             font-weight: bold;
                             line-height: 30px;
                         }
+                        .editSpot{
+                            display: inline-block;
+                            float: right;
+                            font-size:12px;
+                            color:#336699;
+                            line-height: 30px;
+                            cursor: pointer;
+                        }
                     }
                     .fourGraph{
                             width: 96%;
@@ -944,6 +1196,26 @@ select.autoImport{
             }
             
 
+
+        }
+    }
+    #edit{
+        .editTxt{
+            color: #666;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            display: inline-block;
+            margin-right: 20px;
+            width: 30%;
+            text-align: right;
+            display: inline-block;
+            margin-left: 40px;
+        }
+        .editBodyone,.editBodytwo{
+                text-align: left;
+            }
+        .editInput{
 
         }
     }

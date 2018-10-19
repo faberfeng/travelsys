@@ -80,17 +80,13 @@
                         </div>
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span id="inspectContentSel">
-                                <select class="inspectSel">
-                                    <option>周边管线水平位移</option>
-                                    <option>围护顶竖向位移</option>
-                                    <option>坑外水位</option>
-                                    <option>立柱内力</option>
-                                    <option>墙体测斜</option>
+                                <select v-model="drawItemId"  class="inspectSel">
+                                    <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
                                 </select>
                                 <i class="icon-sanjiao"></i>
                             </span>
                             <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
-                            <span class="singleSpot">单点</span>
+                            <span class="singleSpot" @click="drawingSpot()">单点</span>
                             <span class="inputText">文字</span>
                         </div>
                     </div>
@@ -110,12 +106,15 @@
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf>
                         </div>
                         <div class="leftTopMonitorContent">
-                            <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox>
-                            <el-checkbox v-model="spotNum1" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">围护顶竖向位移</el-checkbox>
-                            <el-checkbox v-model="spotNum2" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">围护顶竖向位移</el-checkbox>
-                            <el-checkbox v-model="spotNum3" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">坑外水位</el-checkbox>
-                            <el-checkbox v-model="spotNum4" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">立柱内力</el-checkbox>
-                            <el-checkbox v-model="spotNum5" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">墙体测斜</el-checkbox>
+                            <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
+                            <ul>
+                                <li v-for="(item,index) in monitorMainItemList" :key="index">
+                                    <el-checkbox v-model="spotNum1" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">
+                                        {{item.name}}
+                                    </el-checkbox>
+                                </li>
+                            </ul>
+                            
                         </div>
                         <div class="rightBottomCheck">
                             <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
@@ -188,7 +187,7 @@
                 </div>
             </div>
             <!-- 以下是斜度详情页 -->
-            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName"></commonPitch-detail>
+            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" :itemMonitorId="detailMonitorId"></commonPitch-detail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -221,7 +220,7 @@
                     <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
                     <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram" placeholder="两个字母" /></div>
                     <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword" placeholder="与导入Excel表名匹配" /></div>
-                    <div class="editBodytwo editBodytwo1" v-show="monitorType==5?false:true"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
+                    <div  class="editBodytwo editBodytwo1"  v-show="monitorType==5?false:true&&false"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
                         <!-- <img v-show="monitorBaseMapId" style="object-fit: contain;" class="addbaseMapImg" :src="QJFileManageSystemURL+monitorBaseMapUrl" > -->
                         <img v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='jpg'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='png'" class="addbaseMapImg" style="object-fit: contain;" :src="QJFileManageSystemURL+monitorBaseMapUrl">
                         <pdf v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='pdf'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='PDF'" class="addbaseMapImg" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+monitorBaseMapUrl"></pdf>
@@ -263,12 +262,12 @@
                     <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox>保存以上列名匹配为默认</el-checkbox></label></div>
+                    <div class="editBodytwo"><label class="editInpText"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
                     <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
                     <div class="editBodytwo"><label class="editInpText"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="formulaSetting()" >公式设定</button>
+                        <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
                         <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
                         <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
                         <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
@@ -412,6 +411,7 @@ export default {
             monitorImportName:'',//导入监测名称
             monitorImportType:'',//导入监测类型
             monitorImportId:'',//监测Id
+            getImportColumnList:'',//获得导入列设定数据
             spotNumCol:'',//点位列名
             timeCol:'',//采集时间列名
             unifiedTime:null,//使用统一时间
@@ -419,6 +419,7 @@ export default {
             altitudeCol:'',//高程取值列名
             pipeHeightCol:'',//管口标高列名
             gaugeHeightCol:'',//水位深度列名
+            saveImportColumnValue:false,//保存导入列数据
             overwrite:false,//是否覆盖
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
@@ -466,6 +467,7 @@ export default {
                 }
             ],
             monitorMainTableList:'',//监测内容总表
+            monitorMainItemList:'',//绘制底图内容
             hoverId:'',//移动底图上的ID
             curBaseMapUrl:'',//目前底图首页
             monitorBaseMapUrl:'',//监测底图设置
@@ -478,9 +480,11 @@ export default {
             spotNum4:false,
             spotNum5:false,
             pitchDetailShow:false,//斜度详情页
-            surveyName:'',
-
-
+            surveyName:'',//传递给子组件的name
+            detailMonitorId:'',//传递给子组件的id
+            plotInfo:['123'],//增加测点绘图信息（需要绘图传递，传什么回什么）
+            drawItemId:'',//图纸项目ID
+            monitorPointInfo:'',//所有图纸监测点
             
         }
     },
@@ -530,6 +534,7 @@ export default {
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getBaseMapList();
+            vm.getMonitorItem();
         }
     },
     methods:{
@@ -546,6 +551,7 @@ export default {
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
+            vm.getMonitorItem();
         },
         //获取可用的群组
         getAccessUserGroup(){
@@ -932,8 +938,15 @@ export default {
                 if(response.data.cd=='0'){
                     this.baseMapList=response.data.rt;
                     console.log(this.baseMapList);
+                    //判断是否使用当前图纸
                     if(!this.curBaseMapUrl){
-                        this.curBaseMapUrl=this.baseMapList[5].relativeUri;
+                        this.baseMapList.forEach((item)=>{
+                            if(item.isUsed==1){
+                                this.curBaseMapUrl=item.relativeUri;
+                                this.monitorBaseMapId=item.id;
+                                this.getAllMonitorPoint();
+                            }
+                        })
                     }
                     if(this.monitorBaseMapId){
                         this.baseMapList.forEach((item)=>{
@@ -1063,6 +1076,71 @@ export default {
             vm.monitorLogogram='';
             vm.monitorKeyword='';
             vm.monitorId='';
+        },
+        //保存导入列设定
+        saveImportColumnSetting(){
+            var vm=this;
+            var colData=[];
+            colData.push({'spotNumCol':vm.spotNumCol,'timeCol':vm.timeCol,'distanceCol':vm.distanceCol,'altitudeCol':vm.altitudeCol,'pipeHeightCol':vm.pipeHeightCol,'gaugeHeightCol':vm.gaugeHeightCol,'saveImportColumnValue':vm.saveImportColumnValue})
+            console.log(colData);
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/saveImportColumnSetting',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.monitorImportId,
+                    sheetIndex:vm.sheetIndex,
+                    data:JSON.stringify(colData)
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+                }else{
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获得导入列设定
+        getImportColumnSetting(val){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getImportColumnSetting',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.monitorImportId,
+                    sheetIndex:val
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    vm.getImportColumnList=response.data.rt;
+                    console.log(vm.getImportColumnList);
+                    var importColumnData=null;
+                    importColumnData=JSON.parse(vm.getImportColumnList.data)
+                    console.log(importColumnData);
+                    importColumnData.forEach((item)=>{
+                        vm.spotNumCol=item.spotNumCol;
+                        vm.timeCol=item.timeCol;
+                        vm.distanceCol=item.distanceCol;
+                        vm.altitudeCol=item.altitudeCol;
+                        vm.pipeHeightCol=item.pipeHeightCol;
+                        vm.gaugeHeightCol=item.gaugeHeightCol;
+                        vm.saveImportColumnValue=item.saveImportColumnValue;
+                    })
+                }else if(respose.data.cd=='-1'){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
         },
         //确认导入excel数据(需要根据监测类型来判断)
         importExcelDataMakeSure(){
@@ -1392,6 +1470,7 @@ export default {
                                 if(item.name==this.matchKeyWord){
                                     // console.log(item.index)
                                     this.getExcelColumnBySheet(item.index);
+                                    this.getImportColumnSetting(item.index);
                                     this.sheetIndex=item.index;
                                     console.log(this.sheetIndex);
                                 }
@@ -1520,6 +1599,7 @@ export default {
         //监测内容详情页
         detail(id,type,name){
             this.surveyName=name;
+            this.detailMonitorId=id;
             if(type==5){
                 this.pitchDetailShow=true;
             }
@@ -1548,6 +1628,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    // this.drawItemId=this.monitorMainTableList[0].id;
                 }
             })
 
@@ -1575,6 +1656,7 @@ export default {
             this.baseMapList.forEach((item)=>{
                 if(item.id==val&&!this.baseMapMonitor){
                     this.curBaseMapUrl=item.relativeUri;
+                    this.monitorBaseMapId=item.id;
                     this.setBaseMapUsed(item.id)
                 }else if(item.id==val&&this.baseMapMonitor){
                     this.monitorBaseMapUrl=item.relativeUri;
@@ -1584,7 +1666,79 @@ export default {
             })
             
             this.baseMapShow=false;
+        },
+
+        //添加监测点
+        addMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'detectionInfo/addMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.drawItemId,
+                    baseMapId:vm.monitorBaseMapId
+                },
+                data:{
+                    'plotInfo':vm.plotInfo
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //单点触发绘图
+        drawingSpot(){
+            if(this.drawItemId){
+                this.addMonitorPoint()
+            }
+        },
+        //获取底图中所有的监测点
+        getAllMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.monitorBaseMapId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorPointInfo=response.data.rt;
+                }
+            })
+        },
+        //获取监测内容
+        getMonitorItem(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getMonitorItem',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorMainItemList=response.data.rt;
+                    this.drawItemId=this.monitorMainItemList[0].id;
+                }
+            })
         }
+
         
 
        
@@ -2420,7 +2574,6 @@ export default {
                         .upInput{
                             display: none;
                         }
-
                     }
                 } 
             }
