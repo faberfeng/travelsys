@@ -24,10 +24,10 @@
                 安全监测  
                 </router-link>
             </div>
-            <div id="inspectionBody" v-if="!pitchDetailShow">
+            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow">
                 <div class="textBtnLeft">
                     <label class="recordTxt">导出报告</label>
-                    <label class="exportTxt">巡视记录</label>
+                    <label class="exportTxt" @click="walkThroughBtn()">巡视记录</label>
                 </div>
                 <div class="overviewBody">
                     <div class="overviewHead">
@@ -188,6 +188,8 @@
             </div>
             <!-- 以下是斜度详情页 -->
             <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" :itemMonitorId="detailMonitorId"></commonPitch-detail>
+            <!-- 以下是巡视报告 -->
+            <walkThrough v-if="walkThroughShow" v-on:back="backToH" ></walkThrough>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -375,6 +377,7 @@ import moment from 'moment'
 import axios from 'axios'
 import pdf from 'vue-pdf'
 import commonPitchDetail from './commonPitchDetail.vue' //斜度详情页组件
+import walkThrough from './walkThrough.vue' //巡视报告
 var echarts = require('echarts');
 export default {
     components: {
@@ -480,11 +483,15 @@ export default {
             spotNum4:false,
             spotNum5:false,
             pitchDetailShow:false,//斜度详情页
+            walkThroughShow:false,//巡视报告
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
-            plotInfo:['123'],//增加测点绘图信息（需要绘图传递，传什么回什么）
+            plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
+            pointId:'',//监测点ID
+            pointIds:'',//选中监测点集合
             drawItemId:'',//图纸项目ID
-            monitorPointInfo:'',//所有图纸监测点
+            monitorPointInfo:'',//所有图纸监测点信息
+            monitorWord:'',//监测文字
             
         }
     },
@@ -545,9 +552,16 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+        walkThroughBtn(){
+            var vm=this;
+            vm.walkThroughShow=true;
+
+
+        },
         backToH(){
             var vm=this;
             vm.pitchDetailShow=false;
+            vm.walkThroughShow=false;
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
@@ -827,7 +841,7 @@ export default {
                 return  require('./images/sunnyandcloudy.png')
             }else if(val=="晴"){
                 return  require('./images/sunny.png')
-            }else if(val=="小雨"){
+            }else if(val=="小雨"||val=="小雨转阴"){
                 return  require('./images/lightrain.png')
             }else if(val=="大雨"){
                 return  require('./images/heavyrain.png')
@@ -1672,7 +1686,7 @@ export default {
         addMonitorPoint(){
             var vm=this;
             axios({
-                method:'get',
+                method:'post',
                 url:vm.BDMSUrl+'detectionInfo/addMonitorPoint',
                 headers:{
                     'token':vm.token
@@ -1682,7 +1696,30 @@ export default {
                     baseMapId:vm.monitorBaseMapId
                 },
                 data:{
-                    'plotInfo':vm.plotInfo
+                    plotInfo:vm.plotInfo
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //删除监测点
+        deleteMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'detectionInfo/deleteMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    pointId:vm.pointId,
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1737,8 +1774,82 @@ export default {
                     this.drawItemId=this.monitorMainItemList[0].id;
                 }
             })
+        },
+        //设置监测点状态(故障/修复)
+        editMonitorPointStatus(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   pointId:vm.pointId,
+                   status:vm.monitorStatus //监测点状态(故障为1和正常为0)
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    
+                }
+            })
+        },
+        //编辑监测点位置
+        editMonitorPointPosition(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editMonitorPointPosition',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   pointId:vm.pointId,
+                   plotInfo:vm.plotInfo //编辑坐标信息
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    
+                }
+            })
+        },
+        // 获取测点曲线图数据
+        getMonitorPointChartData(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editMonitorPointPosition',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    pointIds:vm.pointIds
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    
+                }
+            })
+        },
+        //设置监测点文字
+        setMonitorPointWord(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editMonitorPointPosition',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    pointIds:vm.pointId,
+                    word:vm.monitorWord
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    
+                }
+            })
         }
-
         
 
        

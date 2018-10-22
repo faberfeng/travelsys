@@ -2209,6 +2209,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     vm.DirectoryList=response.data.rt;
+                    vm.DirectoryList.forEach((item)=>{
+                        vm.$set(item,'directory',0)
+                    })
+                    console.log(vm.DirectoryList,'directory')
                     this.getDrawingList();
                     // console.log(vm.DirectoryList);
                     vm.showAction = true
@@ -2233,8 +2237,8 @@ export default {
                     },
                     simpleData: {
                         enable: true,
-                        idKey: "directory",
-                        pIdKey: "code",
+                        idKey: "code",
+                        pIdKey: "directory",
                         rootPId: 0
                     }
                 }
@@ -2258,6 +2262,7 @@ export default {
                             vm.$set(item,'code',item.id)
                         });
                     }  
+                    var list=[{'code':0,'name':'图纸','directory':0}]
                      this.DirectoryList.forEach((item)=>{
                          let a=[];
                         this.drawingList.forEach((item1)=>{
@@ -2267,8 +2272,10 @@ export default {
                             }
                         })
                     })
-                    // console.log(this.DirectoryList,'目录列表');
-                    vm.FileTree = data.transformTozTreeFormat(setting, this.DirectoryList)
+                    vm.$set(list[0],'children',this.DirectoryList);
+                    console.log(list,'最新目录');
+                    console.log(this.DirectoryList,'目录列表');
+                    vm.FileTree = data.transformTozTreeFormat(setting,list);
                     console.log(vm.FileTree);
                     // console.log(vm.FileTree,'树形图列表');
                     if(this.drawingId){
