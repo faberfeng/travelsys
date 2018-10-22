@@ -19,7 +19,7 @@
                     检查验收  
                 </router-link>
             </div>
-            <div class="elselect">
+            <div class="elselect" v-if="!showCommonList">
                 <el-select v-model="selectUser" placeholder="请选择" @change="groupChange">
                     <el-option
                     v-for="(item,index) in userGroup"
@@ -30,7 +30,7 @@
                 </el-select>
                 <label class="elselecttitle">群组:</label>
             </div>
-            <div class="pbody">
+            <div class="pbody" v-if="!showCommonList">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="'已订货 '+planData.length" name="0">
@@ -170,7 +170,7 @@
                                         <td v-text="item.updateUserName"></td>
                                         <td>
                                             <span class="biaoqianIcon" :title="'标签'" @click="tips(item)"></span>
-                                            <span class="editdetail" :title="'明细'" @click="viewDeatil(index)"></span>
+                                            <span class="editdetail" :title="'明细'" @click="showDetialList(item,index)"></span>
                                             <span v-if="activeName == 1" class="deleteIcon" :title="'删除'" @click="deleteItem(item)"></span>
                                         </td>
                                     </tr>
@@ -180,6 +180,7 @@
                     </div>
                 </div>
             </div>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'订货管理'"  v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="编辑付款项目" :visible.sync="editfukuan.show" :before-close="editfukuanCancel">
@@ -361,6 +362,8 @@
 </template>
 <script>
 import axios from 'axios';
+import commonList from  './../planCost/qingDan.vue'
+
 export default {
     name:'DinghuoManage',
     data(){
@@ -406,6 +409,7 @@ export default {
             editListTitle:false,
             editTitle:'',
             editTitleObj:{},
+            showCommonList:false,
         }
     },
     created(){
@@ -416,6 +420,14 @@ export default {
         this.getUserGroup();
     },
     methods:{
+        backToH(){
+            this.showCommonList = false;
+        },
+        showDetialList(val,i){
+            console.log(val);
+            this.showCommonList = true;
+            this.checkItem = val;
+        },
         handleClick(){
             this.selectIndexone = '-1';
             this.selectIndextwo = '-1';

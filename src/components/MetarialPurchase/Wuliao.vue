@@ -18,7 +18,7 @@
                     检查验收
                 </router-link>
             </div>
-            <div class="elselect">
+            <div class="elselect" v-if="!showCommonList" >
                 <el-select @change="changeGroup" v-model="selectUser" placeholder="请选择">
                     <el-option
                     v-for="(item,index) in userGroup"
@@ -29,7 +29,7 @@
                 </el-select>
                 <label class="elselecttitle">群组:</label>
             </div>
-            <div class="pbody">
+            <div class="pbody" v-if="!showCommonList">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="'有计划 '+planData.length" name="first">
@@ -283,7 +283,7 @@
                                             <td v-text="item.status"></td>
                                             <td v-text="item.userName"></td>
                                             <td>
-                                                <span class="editIcon" @click="viewDeatil(index)"></span>
+                                                <span class="editIcon" @click="showDetialList(item,index)"></span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -334,6 +334,7 @@
                     </div>
                 </div>
             </div>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'物料跟踪'"  v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="套用模板" :visible.sync="addplantShow" :before-close="addPlanClose">
@@ -365,13 +366,13 @@
 import axios from 'axios';
 import { start_options,end_options,checkLists_flow,end_options1 } from "./constants"
 import StartCom from './components/start.vue'
+import commonList from  './../planCost/qingDan.vue'
 
 // const checkList=['订货下单','厂家发货','抽样检查','到场签收'];
 export default {
     name:'Wuliao',
     components :{
-        StartCom,
-        
+        StartCom,   
     },
     data(){
         return{
@@ -424,6 +425,8 @@ export default {
             end_options1,
             isNew: 0,
             planTemplateId: '',
+            showCommonList:false,
+            checkItem:{},
         }
     },
     created(){
@@ -434,11 +437,24 @@ export default {
         this.planTemplateIndex();
     },
     methods:{
+        backToH(){
+            // var vm = this
+            // vm.showCommonEdit = false
+            this.showCommonList = false;
+            // vm.showCommonData = false
+            // this.getSnapShootList();
+            // this.getRealTimeList();
+        },
+        showDetialList(val,i){
+            console.log(val);
+            // var vm = this
+            this.showCommonList = true;
+            this.checkItem = val;
+        },
         copyflowlist(){
             let arr = [];
             checkLists_flow.map( (item)=>{
                 const data = Object.assign({},item);
-                console.log(data);
                 arr.push(data);
             })
             return arr;
@@ -546,7 +562,6 @@ export default {
                     projId:this.projId
                 }
             }).then(response=>{
-                console.log(response);
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.templateData = response.data.rt;
@@ -560,7 +575,6 @@ export default {
             })
         },
         selectItem(item,index,flag){
-            console.log(item);
             this.showDetail = false;
             if(flag == 1){
                 this.selectIndexone = index;
@@ -597,9 +611,7 @@ export default {
             this.selectValueList = [];
             this.endSelectValueIndexList = [];
             this.checkvalue = [];
-            console.log(this.planTemplateName);
             this.checkLists_flow = this.copyflowlist();
-            console.log("checkLists_flow",this.checkLists_flow)
             this.checkLists_flow.map( ( item,index ) => {
                 item.ischeck = 1;
                 item.isClick = 0;
@@ -616,14 +628,12 @@ export default {
                     item.isClick = 1;
                 }
             });
-            // console.log("this.selectValueList",this.selectValueList);
             this.selectValueList = [].concat(this.selectValueList);
             this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
             
         },
         //保存 计划模板
         savePlanTemplate( type ){
-            // console.log(type);
             let planTemplateId = this.planTemplateId;
             let projId = this.projId;
             let planTemplateName = this.planTemplateName;
@@ -648,7 +658,6 @@ export default {
             }else {
                 form.template.id = null;
             }
-            // console.log("获取",this.checkLists_flow)
             this.checkLists_flow.map( (item,index)=>{
                 if( index >0 ) {
                     if( index === 1 ){
@@ -705,7 +714,6 @@ export default {
                     }
                 }
             })
-            // console.log(form);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/planTemplate/addPlanTemplate',
@@ -723,7 +731,6 @@ export default {
                         this.planTemplateIndex();
                         
                     }else{
-                        console.log("这是一条失败的提示消息")
                         this.$message({
                             message: '保存失败!',
                             type: 'warning'
@@ -747,7 +754,7 @@ export default {
                     }
                 }
             }).catch( err =>{
-                console.log(err);
+                alert(err);
             });
             
         },
@@ -764,14 +771,12 @@ export default {
         getStartPlan(obj){
             const index = obj.index;
             const startPlanDay = obj.startPlanDay;
-            // console.log(index,startPlanDay)
             this.checkLists_flow[index].flowList.startPlan = startPlanDay;
             
         },
         getEndPlan(obj){
             const index = obj.index;
             const endPlanDay = obj.endPlanDay;
-            // console.log(index,endPlanDay)
             this.checkLists_flow[index].flowList.endPlan = endPlanDay;
         },
         handleCheckedCitiesChange(val){
@@ -817,15 +822,10 @@ export default {
                 if(index > 0) {
                     this.start_options[index-1].ischeck=item.ischeck;                   
                     this.startPlanList.push(item.flowList.startPlan);
-                    this.endPlanList.push(item.flowList.endPlan);
-                    // this.selectValueList.push(item.flowList.startCondition);
-                    // this.endSelectValueIndexList.push(item.flowList.endCondition);               
+                    this.endPlanList.push(item.flowList.endPlan);            
                 }                                    
             })
-            // console.log(this.checkLists_flow)
-            // console.log(this.startPlanList,this.endPlanList);
             this.toggleColor(i == 1 ? 2 : 1);
-            // console.log(this.start_options);
         },
         //获取模版详细信息
         getTempDetail(id){
@@ -847,7 +847,6 @@ export default {
                     token:this.token,
                 }
             }).then( res => {
-                console.log("请求checkLists_flow",res.data);
                 let obj= res.data;
                 this.planTemplateName=obj.qjPlanTemplate.planTemplateName;
                 this.planTemplateId = obj.qjPlanTemplate.id;
@@ -871,10 +870,6 @@ export default {
 
                 this.checkvalue = [];
                 this.isClickList = [];
-                //this.selectValueList = [];
-                // this.startPlanList = [];
-                // this.endPlanList = [];
-                console.log(this.checkLists_flow);
                 this.checkLists_flow.map((item,index)=>{
                     item.isClick= 0;                    
                     if(index == 1){
@@ -895,9 +890,6 @@ export default {
                     }
                     
                 })
-                
-                console.log(this.selectValueList);
-                console.log(this.selectValueList,this.endSelectValueIndexList);
                 this.selectValueList = [].concat(this.selectValueList);
                 this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
                 this.startPlanList = [].concat(this.startPlanList);
@@ -931,8 +923,7 @@ export default {
                         this.toggleNewTemp();
                     }else{
                         alert(res.data.msg);
-                    }
-                    // console.log(res)              
+                    }           
                 })
             }).catch(() => {
                 this.$message({
@@ -959,20 +950,11 @@ export default {
                         planId:id
                     }
                 }).then( res =>{
-                    // if(response.data.cd == 0){
-                    //     this.getPlanList(this.selectUser);
-                    //     this.getNoPlanList(this.selectUser);
-                    // }else{
-                    //     alert(response.data.msg);
-                    // }
-                    console.log(res)
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
                     });
-                })
-                // console.log("删除");
-                
+                })              
             }).catch(() => {
                 this.$message({
                     type: 'info',
@@ -1025,7 +1007,6 @@ export default {
             }).then(response=>{
                 if (response.data.cd == 0) {
                     this.planInfo = response.data.rt;
-                    console.log("获取无计划进度",this.planInfo)
                     this.planTemplateName = this.planInfo.orderTitle;
                     this.getCurrentStep(this.planInfo.currtRealStep); //实际进度
                     for (let i = 1; i < 5; i++) {
@@ -1102,7 +1083,6 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.planInfo = response.data.rt;
-                        console.log("获取计划详情",this.planInfo)
                         this.planTemplateName = this.planInfo.orderTitle;
                         this.getCurrentStep(this.planInfo.currtRealStep);//实际进度
                         this.getCurrtPlanStep(this.planInfo.isStart,this.planInfo.currtPlanStep,this.planInfo.currtPlanStepEnd);//计划进度
