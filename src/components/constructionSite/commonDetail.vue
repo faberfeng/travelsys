@@ -3,15 +3,17 @@
         <div class="project">
             <p class="antsLine">
                 施工现场<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
-                <span class="strong">现场巡视记录</span>
-                <span class="leftTime">最新数据：{{projctName}}</span>
+                <span class="strong">{{projctName}}</span>
+                
             </p>
         </div>
     </div>
 </template>
 <script>
+import axios from 'axios'
+import Vue from 'vue'
 export default Vue.component('commonDetail',{
-    props:['projctName'],
+    props:['projctName','itemMonitorId'],
     name:'commonDetail',
     data(){
         return{

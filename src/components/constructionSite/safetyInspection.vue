@@ -191,7 +191,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" :projctName="surveyName" :itemMonitorId="detailMonitorId"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -380,10 +380,11 @@ import axios from 'axios'
 import pdf from 'vue-pdf'
 import commonPitchDetail from './commonPitchDetail.vue' //斜度详情页组件
 import walkThrough from './walkThrough.vue' //巡视报告
+import commonDetail from './commonDetail.vue'//除斜度的详情页
 var echarts = require('echarts');
 export default {
     components: {
-        pdf,commonPitchDetail
+        pdf,commonPitchDetail,commonDetail,walkThrough
     },
     name:'safetyInspection',
     data(){
@@ -1620,6 +1621,8 @@ export default {
             this.detailMonitorId=id;
             if(type==5){
                 this.pitchDetailShow=true;
+            }else{
+                this.commonDetailShow=true;
             }
         },
         //单项监测内容导入
