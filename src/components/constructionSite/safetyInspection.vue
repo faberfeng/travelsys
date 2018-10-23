@@ -24,7 +24,7 @@
                 安全监测  
                 </router-link>
             </div>
-            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow">
+            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
                     <label class="recordTxt">导出报告</label>
                     <label class="exportTxt" @click="walkThroughBtn()">巡视记录</label>
@@ -189,7 +189,9 @@
             <!-- 以下是斜度详情页 -->
             <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" :itemMonitorId="detailMonitorId"></commonPitch-detail>
             <!-- 以下是巡视报告 -->
-            <walkThrough v-if="walkThroughShow" v-on:back="backToH" ></walkThrough>
+            <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
+            <!-- 以下是除斜度的其他详情页 -->
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -483,6 +485,7 @@ export default {
             spotNum4:false,
             spotNum5:false,
             pitchDetailShow:false,//斜度详情页
+            commonDetailShow:false,//公共详情页
             walkThroughShow:false,//巡视报告
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
@@ -562,6 +565,7 @@ export default {
             var vm=this;
             vm.pitchDetailShow=false;
             vm.walkThroughShow=false;
+            vm.commonDetailShow=false;
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
@@ -839,7 +843,7 @@ export default {
                 return  require('./images/cloudy.png')
             }else if(val=="多云转阴"){
                 return  require('./images/sunnyandcloudy.png')
-            }else if(val=="晴"){
+            }else if(val=="晴"||val=="晴转多云"){
                 return  require('./images/sunny.png')
             }else if(val=="小雨"||val=="小雨转阴"){
                 return  require('./images/lightrain.png')

@@ -241,7 +241,8 @@ export default {
                 vm.header.userId = response.data.rt.onlineInfo.userId
                 vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.QJFileManageSystemURL+response.data.rt.onlineInfo.imgUuid:''
                 localStorage.setItem('userImg',vm.header.userImg)
-                 localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
+                localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
+                localStorage.setItem('userName',vm.header.userName)
                 //  console.log(response.data.rt.defaultSubProjId)
                 /*********
                  *要判断导航栏功能； 
