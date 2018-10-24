@@ -844,7 +844,7 @@ export default {
                 return  require('./images/cloudy.png')
             }else if(val=="多云转阴"){
                 return  require('./images/sunnyandcloudy.png')
-            }else if(val=="晴"||val=="晴转多云"){
+            }else if(val=="晴"||val=="晴转多云"||val=="多云转晴"){
                 return  require('./images/sunny.png')
             }else if(val=="小雨"||val=="小雨转阴"){
                 return  require('./images/lightrain.png')

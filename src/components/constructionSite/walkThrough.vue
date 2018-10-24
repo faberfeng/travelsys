@@ -48,11 +48,11 @@
                                 <td :rowspan="item.recentRemarkspan" :class="{'hidden': item.recentRemarkdis}" v-text="item.recentRemark"></td> -->
                                 <td  v-text="item.historyResult"></td>
                                 <td  v-text="item.historyRemark"></td>
-                                <td  v-text="item.recentResult"></td>
-                                <td  v-text="item.recentRemark"></td>
+                                <td  v-text="item.recentResult"><input class="tdInp"/></td>
+                                <td  v-text="item.recentRemark"><input class="tdInp"/></td>
                                 <td>
                                     <button title="修改" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn"></button>
+                                    <button title="删除" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -264,7 +264,8 @@ export default Vue.component('walkThrough',{
         addCheckContentCancle(){
             var vm=this;
             vm.addCheckContentShow=false;
-
+            this.typeId='';
+            this.patrolName='';
         },
         addCheckContentBtn(){
             var vm=this;
@@ -288,6 +289,40 @@ export default Vue.component('walkThrough',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.addCheckContentShow=false;
+                    this.typeId='';
+                    this.patrolName='';
+                    this.getPatrolRecord();
+                    this.$message({
+                        type:'info',
+                        message:'添加巡视内容成功'
+                    })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        // 删除巡视内容
+        deletePatrol(val){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/deletePatrol',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    patrolId:val
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getPatrolRecord()
+                    this.$message({
+                        type:'info',
+                        message:'删除成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -311,7 +346,25 @@ export default Vue.component('walkThrough',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPatrolRecordList=response.data.rt;
-
+                    
+                    // var map = new Map();
+                    // for (var i = 0; i < this.getPatrolRecordList.length;i++){
+                    //     var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
+                    //     if (!map.has(patrolTypeId)) {
+                    //         var array = new Array();
+                    //         array.push(this.getPatrolRecordList[i]);
+                    //         map.set(patrolTypeId, array);
+                    //     }
+                    //     else {
+                    //         var array = map.get(patrolTypeId);
+                    //         array.push(this.getPatrolRecordList[i]);
+                    //         map.set(patrolTypeId, array);
+                    //     }
+                    // }
+                    // map.forEach(function (value, key, mapObject) {
+                    //     console.log(key);
+                    //     console.log(mapObject);
+                    // });                    
                     this.getPatrolRecordList=this.combineCell(this.getPatrolRecordList);
                     console.log(this.getPatrolRecordList);
                 }else if(response.data.cd=='-1'){
@@ -349,10 +402,13 @@ export default Vue.component('walkThrough',{
         },
         //编辑巡视内容弹框
         renamePatrolBtn(id,patrolTypeId,name){
+            console.log(id,'巡视内容ID')
+            console.log(patrolTypeId,'巡视类型ID')
+            console.log(name,'内容')
             var vm=this;
             vm.renameCheckContentShow=true;
-            vm.typeId=id;
-            vm.patrolId=patrolTypeId;
+            vm.typeId=patrolTypeId;
+            vm.patrolId=id;
             vm.lastPatrolName=name
         },
         //取消编辑巡视内容
@@ -385,6 +441,10 @@ export default Vue.component('walkThrough',{
                     vm.patrolId='';
                     vm.newPatrolName='';
                     vm.typeId='';
+                    this.$message({
+                        type:'info',
+                        message:'名称修改成功'
+                    })
                     // this.getPatrolRecordList=response.data.rt;
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -547,6 +607,10 @@ select.eidtInput{
                                     border-right: 1px solid #e6e6e6;
                                     font-size: 12px;
                                     color: #333333;
+                                    .tdInp{
+                                        width: 178px;
+                                        height: 30px;
+                                    }
                                     .actionBtn{
                                             width: 18px;
                                             height: 18px;
