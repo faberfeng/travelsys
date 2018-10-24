@@ -1996,6 +1996,7 @@ export default {
         templateInfos1Data:[],
         templateInfos2Data:[],
         TraceID:'',//追溯ID
+        holderIds:[],//根容器ID
       }
   },
     created(){
@@ -2877,8 +2878,32 @@ export default {
               })
           }
       },
+      //获取容器路径
+      getHolderPath(){
+          var vm=this;
+          axios({
+            method:'POST',
+            url:vm.BDMSUrl+'model2/getHolderPath',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            headers:{
+                'token':vm.token
+            },
+            data:{
+                'holderIds':this.holderIds 
+            }
+        }).then((response)=>{
+            if(parseInt(response.data.cd) == 0){
+
+                 
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+
+      },
       //虚拟场景定位
-      locationSite(traceId,gccode,holderId){
+      locationSite(holderId){
+          this.holderIds.push(holderId);
+          this.getHolderPath()
            if(document.getElementById('webgl').style.display=='none'){
             this.$message({
                 type:'info',

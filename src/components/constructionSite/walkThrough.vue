@@ -13,8 +13,11 @@
                         <span class="addCheckcontent" @click="addCheckContentBtn()">
                             添加巡视内容
                         </span>
-                        <span class="writeNewContent">
+                        <span v-show="!isEditShow" class="writeNewContent" @click="writeNewRecord()">
                             录入新记录
+                        </span>
+                        <span v-show="isEditShow" class="writeNewContent" @click="saveNewRecord()">
+                            保存记录
                         </span>
                     </div>
                 </div>
@@ -48,8 +51,10 @@
                                 <td :rowspan="item.recentRemarkspan" :class="{'hidden': item.recentRemarkdis}" v-text="item.recentRemark"></td> -->
                                 <td  v-text="item.historyResult"></td>
                                 <td  v-text="item.historyRemark"></td>
-                                <td  v-text="item.recentResult"><input class="tdInp"/></td>
-                                <td  v-text="item.recentRemark"><input class="tdInp"/></td>
+                                <td width="180px" >{{item.recentResult}}<input v-show="isEditShow"  placeholder="请输入结果" class="tdInp"/></td>
+                                <td width="180px">{{item.recentRemark}}<input v-show="isEditShow" placeholder="请录入备注" class="tdInp"/></td>
+                                <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
+                                <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
                                     <button title="修改" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
                                     <button title="删除" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
@@ -62,24 +67,25 @@
                     <div class="containerBottomLeft">
                         <div class="containerBottomLeftHead">
                             <label class="LeftBtn"></label>
-                            <label class="LeftBtnTxt">历史巡视总结:</label>
-                            <label class="leftBtnLast">下一次</label>
-                            <label class="leftBtnNext">上一次</label>
+                            <label class="LeftBtnTxt">历史巡视总结:</label><label class="LeftBtnTxtTime">{{historySummaryListTime}}</label>
+                            <label class="leftBtnLast" @click="nextSummary(historySummaryListId)">下一次</label>
+                            <label class="leftBtnNext" @click="lastSummary(historySummaryListId)">上一次</label>
                         </div>
                         <div class="HeadBody">
-                            <textarea class="textareaBody"></textarea>
+                            <textarea class="textareaBody" readonly="readonly" v-model="historySummaryList"></textarea>
                         </div>
                     </div>
                     <div class="containerBottomRight">
                         <div class="containerBottomRightHead">
                             <label class="LeftBtn"></label>
-                            <label class="LeftBtnTxt">最近巡视总结:</label>
-                            <label class="leftBtnNext">录入新巡视</label>
+                            <label class="LeftBtnTxt">最近巡视总结:</label><label class="LeftBtnTxtTime">{{newSummaryListTime}}</label>
+                            <label class="leftBtnNext" @click="writeNewSummary()">录入新巡视</label>
                         </div>
                         <div class="HeadBody">
-                            <textarea class="textareaBody">
+                            <textarea class="textareaBody" :readonly="!excessWordSizeShow" @input="descInput()" v-model="newSummaryList">
                             </textarea>
-                            <label class="submitBtn">保存</label>
+                            <label class="submitBtn" v-show="addSummaryShow" @click="saveSummary()">保存</label>
+                            <label v-show="addSummaryShow" class="wordLength">{{txtVal}}/200</label>
                         </div>
                     </div>
                 </div>
@@ -127,6 +133,7 @@
 <script>
 import axios from 'axios'
 import Vue from 'vue'
+import moment from 'moment'
 export default Vue.component('walkThrough',{
     props:['userSelectId'],
     name:'walkThrough',
@@ -142,11 +149,22 @@ export default Vue.component('walkThrough',{
             renameCheckContentShow:false,//重命名巡视记录
             getPatrolTypesList:'',//监测内容类型
             getPatrolRecordList:'',//获取巡视记录
+            getPatrolRecordLists:[],
             patrolreName:'',
             newPatrolName:'',//新名
             lastPatrolName:'',//原名
-
-
+            isEditShow:false,//是否可以编辑
+            editPatrolList:[],
+            getAllPatrolSummaryList:'',//获取所有巡视总结
+            summaryListLength:'',//巡视总结长度
+            newSummaryList:'',//新增巡视内容
+            newSummaryListTime:'',//时间
+            historySummaryList:'',//历史巡视内容
+            historySummaryListTime:'',//历史时间
+            historySummaryListId:'',
+            addSummaryShow:false,//是否显示保存按钮
+            excessWordSizeShow:false,//是否超过字数
+            txtVal:0,//文本框的字数
         }
 
     },
@@ -169,6 +187,7 @@ export default Vue.component('walkThrough',{
         vm.curTime();
         vm.initPatrolPresupposition();
         vm.getPatrolRecord();
+        vm.getAllPatrolSummary();
     },
     filters:{
 
@@ -272,6 +291,41 @@ export default Vue.component('walkThrough',{
             vm.getPatrolTypes();
             vm.addCheckContentShow=true;
         },
+        writeNewRecord(){
+            var vm=this;
+            vm.isEditShow=true;
+        },
+        saveNewRecord(){
+            var vm=this;
+            vm.isEditShow=false;
+        },
+        //编辑巡视记录内容
+        editPatrolRecord(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/addPatrol',
+                headers:{
+                    'token':vm.token
+                },
+                data:{
+                    list:vm.editPatrolList
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getPatrolRecord();
+                    this.$message({
+                        type:'info',
+                        message:'编辑巡视记录内容成功'
+                    })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         //添加巡视内容
         addPatrol(){
              var vm=this;
@@ -347,24 +401,25 @@ export default Vue.component('walkThrough',{
                 if(response.data.cd=='0'){
                     this.getPatrolRecordList=response.data.rt;
                     
-                    // var map = new Map();
-                    // for (var i = 0; i < this.getPatrolRecordList.length;i++){
-                    //     var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
-                    //     if (!map.has(patrolTypeId)) {
-                    //         var array = new Array();
-                    //         array.push(this.getPatrolRecordList[i]);
-                    //         map.set(patrolTypeId, array);
-                    //     }
-                    //     else {
-                    //         var array = map.get(patrolTypeId);
-                    //         array.push(this.getPatrolRecordList[i]);
-                    //         map.set(patrolTypeId, array);
-                    //     }
-                    // }
-                    // map.forEach(function (value, key, mapObject) {
-                    //     console.log(key);
-                    //     console.log(mapObject);
-                    // });                    
+                    var map = new Map();
+                    for (var i = 0; i < this.getPatrolRecordList.length;i++){
+                        var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
+                        if (!map.has(patrolTypeId)) {
+                            var array = new Array();
+                            array.push(this.getPatrolRecordList[i]);
+                            map.set(patrolTypeId, array);
+                        }
+                        else {
+                            var array = map.get(patrolTypeId);
+                            array.push(this.getPatrolRecordList[i]);
+                            map.set(patrolTypeId, array);
+                        }
+                    }
+                    var list=[];
+                    map.forEach(function (value, key, mapObject) {
+                        console.log(key);
+                        value.concat(value);  
+                    });                
                     this.getPatrolRecordList=this.combineCell(this.getPatrolRecordList);
                     console.log(this.getPatrolRecordList);
                 }else if(response.data.cd=='-1'){
@@ -454,10 +509,143 @@ export default Vue.component('walkThrough',{
                 }
             })
         },
-        
+        //获取所有巡视总结
+        getAllPatrolSummary(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/getAllPatrolSummary',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.userSelectId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getAllPatrolSummaryList=response.data.rt;
+                    this.summaryListLength=this.getAllPatrolSummaryList.length;
+                    this.newSummaryList=this.getAllPatrolSummaryList[this.summaryListLength-1].summary;
+                    this.newSummaryListTime=this.initData(this.getAllPatrolSummaryList[this.summaryListLength-1].insertTime);
+                    this.newSummaryListId=this.getAllPatrolSummaryList[this.summaryListLength-1].id;
+                    if(this.summaryListLength>1){
+                        this.historySummaryList=this.getAllPatrolSummaryList[this.summaryListLength-2].summary;
+                        this.historySummaryListTime=this.initData(this.getAllPatrolSummaryList[this.summaryListLength-2].insertTime);
+                        this.historySummaryListId=this.getAllPatrolSummaryList[this.summaryListLength-2].id;
+                    }
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //时间变化
+        initData(val){
+            if (val == null) {
+                return;
+                } else {
+                return moment(val).format("YY-MM-DD");
+                }
+        },
+        //上一次历史巡视总结记录
+        lastSummary(val){
+            this.getAllPatrolSummaryList.forEach((item,index)=>{
+                if(item.id==val){
+                    if((index-1)<0){
+                         this.$message({
+                            type:'error',
+                            message:'没有更多的历史巡视记录'
+                        })
+                        return;
+                    }else{
+                        this.historySummaryList=this.getAllPatrolSummaryList[index-1].summary;
+                        this.historySummaryListId=this.getAllPatrolSummaryList[index-1].id;
+                    }
+                }
+            })
+        },
+        //下一次历史巡视总结记录
+        nextSummary(val){
+            this.getAllPatrolSummaryList.forEach((item,index)=>{
+                if(item.id==val){
+                    
+                    if((index+1)>(this.getAllPatrolSummaryList.length-1)){
+                        this.$message({
+                            type:'error',
+                            message:'没有更多的历史巡视记录'
+                        })
+                        return;
+                    }else{
+                        this.historySummaryList=this.getAllPatrolSummaryList[index+1].summary;
+                        this.historySummaryListId=this.getAllPatrolSummaryList[index+1].id;
+                    }
+                    console.log(index);
+                }
+            })
+        },
+        //上一次历史巡视总结记录
 
-
-
+        //增加巡视总结记录
+        writeNewSummary(){
+            this.addSummaryShow=true;
+            this.excessWordSizeShow=true;
+            this.newSummaryList='';
+            this.newSummaryListTime=this.nowDate;
+            this.historySummaryList=this.getAllPatrolSummaryList[this.summaryListLength-1].summary;
+            this.historySummaryListTime=this.initData(this.getAllPatrolSummaryList[this.summaryListLength-1].insertTime);
+            this.historySummaryListId=this.getAllPatrolSummaryList[this.summaryListLength-1].id;
+        },
+        //保存巡视总结记录
+        saveSummary(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/addPatroSummary',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.userSelectId,
+                    summaryInfo:this.newSummaryList
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.addSummaryShow=false;
+                    this.excessWordSizeShow=false;
+                    this.getAllPatrolSummary();
+                    this.$message({
+                        type:'success',
+                        message:'录入巡视总结成功'
+                    })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        descInput(){
+            this.txtVal = this.newSummaryList.length;
+            if(this.txtVal>200){
+                this.txtVal=200;
+                this.newSummaryList=this.subWord(this.newSummaryList);
+                // this.excessWordSizeShow=false;
+                this.$message({
+                    type:'info',
+                    message:'巡视情况总结字数不可以超过200'
+                })
+            }
+        },
+        subWord(val){
+            if(val.length>200){
+                return val.substr(0,200)
+            }else{
+                return val
+            }
+        }
     },
 
 }
@@ -599,8 +787,8 @@ select.eidtInput{
                     tbody{
                             tr{
                                 td{
-                                    padding-left: 6px;
-                                    padding-right: 15px;
+                                    // padding-left: 6px;
+                                    // padding-right: 15px;
                                     height: 30px;
                                     text-align: left;
                                     box-sizing: border-box;
@@ -609,7 +797,7 @@ select.eidtInput{
                                     color: #333333;
                                     .tdInp{
                                         width: 178px;
-                                        height: 30px;
+                                        height: 28px;
                                     }
                                     .actionBtn{
                                             width: 18px;
@@ -662,6 +850,12 @@ select.eidtInput{
                             font-weight: bold;
                             line-height: 32px;
                         }
+                        .LeftBtnTxtTime{
+                            color:#666666;
+                            font-size: 14px;
+                            line-height: 32px;
+                            float:left;
+                        }
                         .leftBtnLast{
                             display: inline-block;
                             width: 68px;
@@ -701,6 +895,9 @@ select.eidtInput{
                         .textareaBody{
                             width: 100%;
                             height: 198px;
+                            color:#333333;
+                            font-size: 14px;
+                            padding:10px;
                         }
                     }
                 }
@@ -729,6 +926,12 @@ select.eidtInput{
                             font-weight: bold;
                             line-height: 32px;
                         }
+                        .LeftBtnTxtTime{
+                            color:#666666;
+                            font-size: 14px;
+                            line-height: 32px;
+                            float: left;
+                        }
                         .leftBtnNext{
                             display: inline-block;
                             width: 100px;
@@ -751,7 +954,9 @@ select.eidtInput{
                         .textareaBody{
                             width: 100%;
                             height: 198px;
-                           
+                            color:#333333;
+                            font-size: 14px;
+                            padding:10px;
                         }
                         .submitBtn{
                             display: inline-block;
@@ -767,6 +972,12 @@ select.eidtInput{
                             cursor: pointer;
                             position: absolute;
                             left:5px;
+                            bottom: 10px;
+                        }
+                        .wordLength{
+                            display: inline-block;
+                            position: absolute;
+                            right:5px;
                             bottom: 10px;
                         }
                     }

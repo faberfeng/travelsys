@@ -478,6 +478,7 @@ export default {
         this.getDirectory()
         // this.getAllUser()
         this.getAllUser()
+        this.createDrawingDirectory()
         this.$nextTick(() => {
             this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
         });
@@ -553,6 +554,29 @@ export default {
                 }else if(val=undefined){
                     return;
                 }
+        },
+        //创建/同步图纸目录
+        createDrawingDirectory(){
+            var vm=this;
+             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/createDrawingDirectory',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
         },
         //获取工程中的用户
         getAllUser(){
@@ -2629,7 +2653,7 @@ export default {
         confirmUpdateDrawing(){
                 var vm=this;
                 this.annotationlist='';
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'+'&projectId='+this.projId
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
