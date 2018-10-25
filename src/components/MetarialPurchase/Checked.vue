@@ -908,7 +908,7 @@ export default {
                             params:{  
                                 id:id,
                                 projId:this.projId,
-                                ugId:this.orderInfo.orderUserId,
+                                ugId: this.orderInfo.orderUgId,
                             }
                         }).then( res =>{
                             this.$message({
