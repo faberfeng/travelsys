@@ -19,7 +19,7 @@
                     检查验收  
                 </router-link>
             </div>
-            <div class="elselect">
+            <div class="elselect" v-if="!showCommonList">
                 <el-select v-model="selectUser" placeholder="请选择" @change="groupChange">
                     <el-option
                     v-for="(item,index) in userGroup"
@@ -30,7 +30,7 @@
                 </el-select>
                 <label class="elselecttitle">群组:</label>
             </div>
-            <div class="pbody">
+            <div class="pbody" v-if="!showCommonList">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="'已发货 '+planData.length" name="0">
@@ -155,7 +155,7 @@
                                         <td v-text="item.sendStatus==0?'未发货':'发货'"></td>
                                         <td>
                                             <span class="biaoqianIcon " :title="'标签'" @click="tips(item)"></span>
-                                            <span class="editdetail" :title="'明细'" @click="viewDeatil(index)"></span>
+                                            <span class="editdetail" :title="'明细'" @click="showDetialList(item,index)"></span>
                                             <span v-if="activeName == 1 && item.sendStatus ==0" class="editdetail" :title="'发货'" @click="sendGoods(item)"></span>
                                         </td>
                                     </tr>
@@ -168,6 +168,7 @@
                     </div>
                 </div>
             </div>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'发货管理'"  v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="发货确认" :visible.sync="sendshow" :before-close="sendCancel" width="398px">
@@ -340,6 +341,8 @@
 </template>
 <script>
 import axios from 'axios';
+import commonList from  './../planCost/qingDan.vue'
+
 export default {
     name:'FahuoManage',
     data(){
@@ -375,6 +378,7 @@ export default {
             sendAllGoodsObj:{},
             selectIndexone:'-1',
             selectIndextwo:'-1',
+            showCommonList:false,
         }
     },
     created(){
@@ -385,6 +389,14 @@ export default {
         this.getUserGroup();
     },
     methods:{
+        backToH(){
+            this.showCommonList = false;
+        },
+        showDetialList(val,i){
+            console.log(val);
+            this.showCommonList = true;
+            this.checkItem = val;
+        },
         handleClick(){
             this.selectIndexone = '-1';
             this.selectIndextwo = '-1';
