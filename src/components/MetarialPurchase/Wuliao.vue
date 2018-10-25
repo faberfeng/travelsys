@@ -438,16 +438,10 @@ export default {
     },
     methods:{
         backToH(){
-            // var vm = this
-            // vm.showCommonEdit = false
             this.showCommonList = false;
-            // vm.showCommonData = false
-            // this.getSnapShootList();
-            // this.getRealTimeList();
         },
         showDetialList(val,i){
             console.log(val);
-            // var vm = this
             this.showCommonList = true;
             this.checkItem = val;
         },

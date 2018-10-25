@@ -76,13 +76,11 @@
                         </div>
                         <div class="borderbottom1">   
                             <div class="quanxuan">
-                                <!-- <el-checkbox v-if="!isReceipt">全选</el-checkbox> -->
                                 <button v-if="!isReceipt" class="btn" @click="allCheckOver()" :class=" orderInfo.checkStatus === 2 ? 'content-hidden' : ''">检查完成</button>
                             </div>
                             <table class="UserList" border="1" width="100%">
                                 <thead>
                                     <tr class="userList-thead">
-                                        <!-- <th v-if="!isReceipt"></th> -->
                                         <th>清单编号</th>
                                         <th>清单名称</th>
                                         <th>总数量</th>
@@ -95,7 +93,6 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item,index) of orderDeatilData" :key="index">
-                                        <!-- <td v-if="!isReceipt"><el-checkbox></el-checkbox></td> -->
                                         <td v-text="item.orderDetailCode"></td>
                                         <td v-text="item.title"></td>
                                         <td v-text="item.count"></td>
@@ -105,8 +102,8 @@
                                         <td v-text="item.checkDate_"></td>
                                         <td>
                                             <span class="detailsIcon" @click="showDetialList(item,index)" title="详情"></span>
-                                            <span v-if="!isReceipt" class="editIcon" :class=" item.checkStatus == 2 ? 'content-hidden' : ''" @click="showOver(index)" title="完成"></span>
-                                            <span v-if="!isReceipt" class="backIcon" :class=" [item.checkStatus == 0 ? 'content-hidden' : '',orderInfo.checkStatus == 2 ? 'content-hidden' : '']" @click="showBackOver( index )" title="撤销"></span>
+                                            <span v-if="!isReceipt" class="editIcon" :class=" item.checkStatus == 2 ? 'content-hidden' : ''" @click="showOver(index,item.id)" title="完成"></span>
+                                            <span v-if="!isReceipt" class="backIcon" :class=" [item.checkStatus == 0 ? 'content-hidden' : '',orderInfo.checkStatus == 2 ? 'content-hidden' : '']" @click="showBackOver( index,item.id )" title="撤销"></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -124,14 +121,10 @@
                         <div class="borderbottom1">   
                             <div class="quanxuan huoweixuanz">
                                 <label class="huoweilabel">当前货位：</label>
-                                <el-select v-model="huoweiselect">
-                                    <el-option :value="item.id" v-for="(item,index) of store" :key="index" :label="item.name"></el-option>
-                                    <!-- <el-option value="2">233</el-option>
-                                    <el-option value="3">345</el-option> -->
-                                </el-select>
+                                <el-select disabled :value="stockName + storageName +huoweiName"></el-select>
                             </div>
                             <div class="quanxuan">
-                                <button v-if="!isReceipt" class="btn" :class=" isAllReceiptOver ?'content-hidden':''" @click="AllReceiptOver()">签收订单</button>
+                                <button v-if="!isReceipt" class="btn" :class=" orderInfo.receiptStatus == 1 ?'content-hidden':''" @click="AllReceiptOver()">签收订单</button>
                             </div>
                             <table class="UserList" border="1" width="100%">
                                 <thead>
@@ -157,8 +150,8 @@
                                         <td v-text="item.receiptDate_"></td>
                                         <td>
                                             <span class="detailsIcon" @click="showDetialList(item,index)" title="详情"></span>
-                                            <span v-if="!isReceipt" class="editIcon" :class=" item.receiptStatus == 1 ? 'content-hidden' : ''" @click="showReceipt( index )" title="完成"></span>
-                                            <span v-if="!isReceipt" class="backIcon" :class=" item.receiptStatus == 0 ? 'content-hidden' : ''" @click="showBackReceipt( index )" title="撤销"></span>
+                                            <span v-if="!isReceipt" class="editIcon" :class=" item.receiptStatus == 1 ? 'content-hidden' : ''" @click="showReceipt( index,item.id )" title="完成"></span>
+                                            <span v-if="!isReceipt" class="backIcon" :class=" [item.receiptStatus == 0 ? 'content-hidden' : '',orderInfo.receiptStatus == 1 ? 'content-hidden' : '']" @click="showBackReceipt( index,item.id )" title="撤销"></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -173,10 +166,14 @@
                             <div class="huoweileft">货位选择：</div>
                             <div class="huoweiright">
                                 <div class="huiweirighttitle">
-                                    选择堆场
+                                    <span @click="handleStore()" v-if="selectStatus == 1" :style=" selectStatus == 1 ? 'color:black':'' ">{{stockName}}</span>
+                                    <span v-if="selectStatus == 0">选择堆场</span>
+                                    <span @click="handleHuoJia()" v-if="selectStatus1 == 1">{{storageName}}</span>   
+                                    <span v-if="selectStatus1 == 0">> 选择货架、货位</span>   
+                                    <span>{{huoweiName}}</span>
                                 </div>
-                                <ul class="huiweirightimg">
-                                    <li v-for="(item,index) of store" :key="index">
+                                <ul class="huiweirightimg" v-if="isclickHuoJia == false">
+                                    <li v-for="(item,index) of store" :key="index" @click="clickStock(item,index)" :style=" index == stockSelecct ?'border:1px solid #fc3439 ' : 'border:1px solid #e6e6e6;' ">
                                         <div class="store">
                                             <a class="store_img"><img :src="item.imgPath" alt=""></a>
                                             <div class="store_edit">
@@ -185,16 +182,41 @@
                                                 </a>
                                                 <div v-if="index > 0" class="store_edit_detail">
                                                     <a>
-                                                        <img src="./images/edit.png" alt="">
+                                                        <el-button class="edit" type="text" @click.stop="editName(item,index)"></el-button>
                                                     </a>
                                                     <a>
-                                                        <img src="./images/upload.png" alt="">
+                                                        <el-button class="image" type="text" @click.stop="editImage(item,index)"></el-button>
                                                     </a>
                                                     <a>
-                                                        <img src="./images/delete2.png" alt="">
+                                                        <el-button class="delete" type="text" @click.stop="deleteStock(item,index)"></el-button>
                                                     </a>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </li>
+                                    <li @click="addStore()">
+                                        <div>添加堆场</div>
+                                    </li>
+                                </ul>
+                                <ul class="huojia" v-if="isclickHuoJia == true">
+                                    <li v-for="(item,index) of storage" :key="index" :class=" index == storageSelect ? 'active' :'noactive' "  @click="clickHuoJia(item,index)">{{item.name}} </li>
+                                    <li v-if="isclickHuoJia == true" :style="  isclickHuoJia == false ? 'display:none' : ''">
+                                        <span  @click="showAdd = false" :class="showAdd == true? '' : 'content-hidden'">+添加货架</span>
+                                        <div class="addHuoJia">
+                                            <input class="content" v-model="newhuoJiaName" :class="showAdd == false? '' : 'content-hidden'" />
+                                            <span class="sure"   :class="showAdd == false? '' : 'content-hidden'" @click="addHuoJia()">确定</span>
+                                            <span class="cancel"  :class="showAdd == false? '' : 'content-hidden'" @click="showAdd = true">取消</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <ul class="huowei" v-if="isclickHuoWei == 1">
+                                    <li v-for="(item,index) of huoweiList"  :key="index"  :class=" index == huoweiSelect ? 'active' :'noactive' " @click="clickHuoWei(item,index)">{{item.name}}</li>
+                                    <li>
+                                        <span @click="showAddHuowei = false" :class="showAddHuowei == true ? '' : 'content-hidden'">+添加货位</span>
+                                        <div class="addHuoWei">
+                                            <input class="content" v-model="newhuoWeiName" :class="showAddHuowei == false? '' : 'content-hidden'" />
+                                            <span class="sure"   :class="showAddHuowei == false? '' : 'content-hidden'" @click="addHuoWei()">确定</span>
+                                            <span class="cancel"  :class="showAddHuowei == false? '' : 'content-hidden'" @click="showAddHuowei = true">取消</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -203,8 +225,26 @@
                     </div>
                 </div>
             </div>
-            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'检查验收'"  v-if="showCommonList"></common-list>
+            <common-list :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'检查验收'"  v-if="showCommonList"></common-list>
         </div>
+
+        <el-dialog title="图片上传" :visible.sync="upImg" @close="upImgCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传图片 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectImg" class="upImgBtn">选择图片</button>
+                            <input class="upInput"  type="file" accept="image/*" @change="fileChanged" ref="file" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
+                </div>
+                <p class="err" v-show="showErr">请输入完整信息</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="upImgSure">上传</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
+                </div>
+            </el-dialog>
+
     </div>
 </template>
 <script>
@@ -241,7 +281,41 @@ export default {
             isReceiptOver:false,
             store:[],
             defaultImageUrl:'http://10.252.26.240:8080/qjbim-file/upload/107/public/006/2017/12/13/02661b31-9687-4896-ba8c-b89ae30abd53.jpg',
-
+            stockName:'',
+            stockSelecct:0,
+            storage:[],
+            huoweiList:[],
+            storageName: '',
+            storageSelect: -1,
+            huoweiSelect: -1,
+            huoweiName: '',
+            isclickStock: 0, 
+            isclickHuoJia: false, 
+            isclickHuoWei: 0, 
+            showStore: true,
+            selectStatus:0,
+            selectStatus1:0,
+            warehouseId:149,
+            huoJiaId:"",
+            huoWeiId:"",
+            updeName:'',
+            fileImage:'',
+            dialogVisible: false,
+            imgPath:'',
+            imgIndex:-1,
+            showAdd: true,
+            showAddHuowei: true,
+            imageName: '未选择任何图片',
+            upImg: false,
+            imageType: '2',
+            QJFileManageSystemURL:'',
+            showErr:false,
+            filesList:[],
+            userId:'',
+            newhuoJiaName:'',
+            newhuoWeiName:'',
+            isAdd: false,
+            
         }
     },
     created(){
@@ -249,49 +323,416 @@ export default {
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl;
         this.getUserGroup();
-        this.getStore();
+        this.getStore( this.isAdd );
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
+        this.userId = localStorage.getItem('userid');
     },
     methods:{
+        //编辑图片
+        upImgCancle(){
+            this.upImg = false;
+        },
+        //上传图片确认
+        upImgSure(){
+            let returnUrl = this.BDMSUrl+'project2/receipt/uploadFile?projId='+this.projId+'&id='+this.warehouseId;
+            returnUrl = encodeURIComponent(returnUrl);              
+            let formData = new FormData();
+            formData.append('projId',this.projId);
+            formData.append('type','1');
+            formData.append('userId',this.userId);
+            formData.append('modelCode','011');
+            formData.append('returnUrl',returnUrl)
+            formData.append('token',this.token);
+            formData.append('file',this.filesList[0]);
+            console.log("上传图片文件",formData,formData.get("file"));
+            axios({
+                method:'post',
+                url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                },
+                data:formData
+            }).then(response=>{
+                if(response.data.cd== '0'){
+                    this.upImg = false;
+                    this.imageName = '未选择任何图片';
+                    this.getStore( this.isAdd );
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                       path:'/login'
+                    })
+                }
+            })
+        },
+        selectImg(){
+            this.$refs.file.click();
+        },
+        fileChanged(){
+            const list = this.$refs.file.files;
+            this.imageName = list[0].name;
+            this.filesList = list;
+        },
+        //编辑堆场名字
+        editName( items,i ){
+            this.$prompt('请输入堆场名', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputPattern: /^.{2,9}$/,
+                inputErrorMessage: '堆场名格式不正确'
+            }).then(({ value }) => {
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/receipt/renameWarehouseNode',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        id:items.id,
+                        name:value
+                    }
+                }).then( res =>{
+                    if( res.data.cd== 0 ){
+                        this.$message({
+                            type: 'success',
+                            message: '堆场名修改成功！ ',
+                        });
+                        this.store.map( (item,index) =>{
+                            if( i == index ){
+                                item.name = value;
+                            }
+                        })
+                    }else{
+                        this.$message({
+                            type: 'warring',
+                            message: '修改失败！ ',
+                        });
+                    }
+                }).catch();
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消输入'
+                });       
+            });
+                
+        },
+        //测试
+        handleClose(done) {
+            this.$confirm('确认关闭？')
+            .then(_ => {
+                done();
+            })
+            .catch(_ => {});
+        },
+        test(){
+            this.store.map( (item,index)=>{
+                    if( this.imgIndex == index ){
+                        console.log("要编辑的图片",item);
+                        item.imgPath = this.imgPath;
+                    }
+                });
+            this.dialogVisible = false;
+        },
+        imgOnChange(e){
+            let img = '';
+            console.log(e.target.files);
+            if(e.target.files.length){
+                const file = e.target.files[0];
+                const fileReader = new FileReader();
+                fileReader.readAsDataURL(file);
+                const _this = this;
+                fileReader.onload = function(res){
+                    console.log(this.result);
+                    img = this.result;
+                    _this.imgPath = img;
+                    console.log("要编辑的图片的地址",_this.imgPath);
+                }
+            }
+            
+        },
+        //编辑堆场图片
+        editImage(items,i){
+            console.log("编辑堆场图片id",items.id);
+            this.imgIndex = i;
+            this.warehouseId = items.id;
+            this.dialogVisible = true;
+            this.upImg = true;     
+        },
+        //删除堆场
+        deleteStock(item,index){
+            console.log("删除堆场",item,index);
+            this.warehouseId = item.id;
+            this.$confirm('此操作将永久删除【'+item.name+'】, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/receipt/removeWarehouse',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projId:this.projId,
+                        level:item.level,
+                        warehouseId:this.warehouseId
+                    }
+                }).then( res=>{
+                    console.log("删除堆场",res);
+                    if( res.data.cd == 0 ){
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.getStore( this.isAdd );
+                    }else {
+                        this.$message({
+                            type: 'warring',
+                            message: '删除失败!'
+                        });
+                    }
+                }).catch();
+                
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+        },
+        //添加堆场
+        addStore(){
+            console.log("添加堆场")
+            this.$prompt('请输入堆场名', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputPattern: /^.{2,9}$/,
+                inputErrorMessage: '堆场名格式不正确'
+            }).then(({ value }) => {
+                console.log("请输入堆场名",value);
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/receipt/addWarehouseNode',
+                    headers:{
+                        token:this.token
+                    },
+                    data:{  
+                        level: 1,
+                        name: value,
+                        parId: 0,
+                        projId: this.projId,
+                        whType: 1,
+                    }
+                }).then( res=>{
+                    console.log("添加堆场的结果",res)
+                    if( res.data.cd==0 ){
+                        this.$message({
+                            type: 'success',
+                            message: "堆场添加成功！",
+                        });
+                        this.getStore( this.isAdd );
+                    }else{
+                            this.$message({
+                            type: 'warring',
+                            message: res.data.msg,
+                        });
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消输入'
+                });       
+            });
+        },
+        //添加货架
+        addHuoJia(){
+            this.showAdd = true;
+            this.isAdd = true;
+            console.log("添加货架",this.newhuoJiaName)
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/receipt/addWarehouseNode',
+                headers:{
+                    token:this.token
+                },
+                data:{  
+                    level: 2,
+                    name: this.newhuoJiaName,
+                    parId: this.warehouseId,
+                    projId: this.projId,
+                    whType: 1,
+                }
+            }).then( res=>{
+                console.log("添加货架的结果",res)
+                if( res.data.cd==0 ){
+                    this.$message({
+                        type: 'success',
+                        message: "货架添加成功！",
+                    });
+                    this.getStore( this.isAdd );
+                    this.getHuoJia(this.warehouseId);
+                }else{
+                        this.$message({
+                        type: 'warring',
+                        message: res.data.msg,
+                    });
+                }
+            })
+        },
+        //添加货位
+        addHuoWei(){
+            this.showAddHuowei = true;
+            this.huoweiList = [];
+            this.isAdd = true;
+            console.log("添加货位",this.newhuoWeiName)
+            axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/receipt/addWarehouseNode',
+                    headers:{
+                        token:this.token
+                    },
+                    data:{  
+                        level: 3,
+                        name: this.newhuoWeiName,
+                        parId: this.huoJiaId,
+                        projId: this.projId,
+                        whType: 1,
+                    }
+                }).then( res=>{
+                    console.log("添加货位的结果",res)
+                    if( res.data.cd==0 ){
+                        this.$message({
+                            type: 'success',
+                            message: "货位添加成功！",
+                        });
+                        this.getStore( this.isAdd );
+                        this.getHuoJia(this.warehouseId);
+                        
+                    }else{
+                         this.$message({
+                            type: 'warring',
+                            message: res.data.msg,
+                        });
+                    }
+                })
+            
+        },
         showDetialList(val,i){
             console.log(val);
             this.showCommonList = true;
             this.checkItem = val;
         },
-        
+        //堆场切换
+        clickStock( items,i ){
+            this.storageName = "";
+            this.selectStatus = 1;   
+            this.warehouseId = items.id;    
+            this.showAdd = true;
+            this.showAddHuowei = true;
+            this.isclickHuoWei = 1;  
+            this.storageSelect= -1,       
+            this.store.map( (item,index)=>{
+                if( i == index ){
+                    this.stockName = item.name;
+                    this.stockSelecct = i;
+                    this.getHuoJia( item.id );
+                }
+            }); 
+        },
+        //货架切换
+        clickHuoJia(items,i){
+            this.huoJiaId = items.id;
+            this.huoweiList = [];
+            this.huoweiName = "";
+            this.selectStatus1 = 1;
+            this.showAdd = true;
+            this.showAddHuowei = true;
+            this.huoweiSelect = -1,
+            this.storage.map( (item,index)=>{
+                if( i == index ){
+                    this.storageName = " - "+item.name;
+                    this.storageSelect = i;
+                    if(item.children != null){
+                        this.huoweiList = item.children;
+                        
+                    }
+                }
+            }); 
+            console.log("当前货架",this.storageName);
+        },
+        //货位切换
+        clickHuoWei(items,i){
+            this.huoWeiId = items.id;
+            this.showAdd = true;
+            this.showAddHuowei = true;
+            this.huoweiList.map( (item,index)=>{
+                if( i == index ){
+                    this.huoweiName = " - "+item.name;
+                    this.huoweiSelect = i;
+                }
+            });
+        },
+        //返回堆场
+        handleStore(){
+            this.isclickHuoJia = false;
+            this.storage = [];
+            this.storageName = "";
+            this.huoweiList = [];
+            this.huoweiName = "";
+            this.showAdd = true;
+            this.showAddHuowei = true;
+            this.selectStatus1 = 0;
+            this.isclickHuoWei = 0;
+        },
+        //返回货架
+        handleHuoJia(){
+            this.huoweiList = [];
+            this.huoweiName = "";
+            this.showAdd = true;
+            this.showAddHuowei = true;
+        },
         //检查记录 确认
-        showOver( i ){
+        showOver( i,id ){
             let bill = "清单检测完成确认";
             let status = 2;
             let isSuse = '确认对当前清单内的构件抽检完成：';
             let isCheck = true;
+            let isOver1 = true;
             this.orderDeatilData.map( (item,index)=>{
                 if( i == index){
-                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck );                   
+                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,item.warehouseName,isOver1,id );                   
                 }
             })
         },
         //检查记录 撤销
-        showBackOver( i ){
+        showBackOver( i,id ){
             let bill = "清单取消检测确认";
             let status = 0;
             let isSuse = "确认对当前清单内的构件撤销抽检：";
             let isCheck = true;
+            let isOver1 = false;
             this.orderDeatilData.map( (item,index)=>{
                 if( i == index){
-                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck );
+                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,item.warehouseName,isOver1,id );
                 }
             })
         },
         //签收记录 确认
-        showReceipt( i ){
+        showReceipt( i,id ){
             let bill = "签收清单完成确认";
             let status = 1;
             let isSuse = '确认签收以下清单内所有构件：';
             let isCheck = false;
+            let isOver1 = true;
+            let warehouseName = this.stockName + this.storageName + this.huoweiName;
             this.orderDeatilData.map( (item,index)=>{
                 if( i == index){
-                    if( item.checkStatus == 2 ){
-                        this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,item.warehouseName );
+                    if( item.checkStatus == 2 ){  
+                        this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,warehouseName,isOver1,id );
                     }else{
                         this.$alert('清单【'+item.orderDetailCode+'】在签收之前应进行检查确认！', '提示', {
                             confirmButtonText: '确定',
@@ -299,17 +740,17 @@ export default {
                     }          
                 }
             })
-            console.log("...showReceipt");
         },
         //签收记录 撤销
-        showBackReceipt( i ){
+        showBackReceipt( i,id ){
             let bill = "取消签收清单确认";
             let status = 0;
             let isSuse = '取消签收以下清单内所有构件：';
             let isCheck = false;
+            let isOver1 = false;
             this.orderDeatilData.map( (item,index)=>{
                 if( i == index){
-                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,item.warehouseName );
+                    this.isOver( item.count,item.sampleSize,item.sampleRate,bill,i,status,isSuse,isCheck,item.orderDetailCode,item.title,item.warehouseName,isOver1,id );
                 }
             })
         },
@@ -323,17 +764,74 @@ export default {
                         confirmButtonText: '确定',
                     });
             }else{
-                this.isAllCheckOver = true;
-                this.orderInfo.checkStatus = 2;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/checkResult/checkOrder',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{  
+                        id:this.orderInfo.id,
+                        projId:this.projId,
+                        ugId: this.orderInfo.orderUgId,
+                    }
+                }).then( res =>{
+                    if(res.data.cd == 0){
+                        this.$message({
+                            type: 'success',
+                            message: "全部清单检查完成！",
+                        });
+                        this.orderInfo.checkStatus = 2;
+                        this.orderInfo.checkUgName = this.orderInfo.orderUgName;
+                        this.orderInfo.checkUserName = this.orderInfo.orderUserName;
+                        this.orderInfo.checkDate_ = new Date().toLocaleString();
+                    }else{
+                        this.$message({
+                            type: 'warring',
+                            message: res.data.msg,
+                        });
+                    }
+                })
+                
             }
         },
         //签收 全选确认
         AllReceiptOver(){
             if( this.orderInfo.checkStatus == 2 ){
-                this.orderDeatilData.map( (item,index) =>{
-                    item.receiptStatus = 1;
-                })
-                this.isAllReceiptOver = true;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/receipt/receiptOrder',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        warehouseId: this.warehouseId,
+                        id: this.orderInfo.id,
+                        projId: this.projId,
+                        ugId: this.orderInfo.orderUgId,
+                    }
+                }).then( res =>{
+                    if( res.data.cd == 0 ){
+                        this.$message({
+                            type: 'success',
+                            message: "全部清单签收完成！",
+                        });
+                        this.orderDeatilData.map( (item,index) =>{
+                            item.receiptStatus = 1;
+                        })
+                        this.orderInfo.receiptStatus = 1;
+                        this.orderInfo.receiptUgName = this.orderInfo.orderUgName;
+                        this.orderInfo.receiptUserName = this.orderInfo.orderUserName;
+                        this.orderInfo.receiptDate_ = new Date().toLocaleString();
+                        this.getUserGroup();
+                    }else {
+                        this.$message({
+                            type: 'warring',
+                            message: res.data.msg,
+                        });
+                    }
+                }).catch();
+                
             }else{
                 this.$alert('订单在签收之前应进行检查确认！', '提示', {
                         confirmButtonText: '确定',
@@ -341,7 +839,7 @@ export default {
             }
         },
         //确认弹出框
-        isOver( count,sampleSize,sampleRate,bill,i,status,isSuse,isCheck,orderDetailCode,title,warehouseName ) {
+        isOver( count,sampleSize,sampleRate,bill,i,status,isSuse,isCheck,orderDetailCode,title,warehouseName,isOver1,id ) {
             const h = this.$createElement;
             if( isCheck ){
                 this.$msgbox({
@@ -371,16 +869,63 @@ export default {
                         done();
                     }
                 }
-                }).then(action => {
-                    this.$message({
-                        type: 'success',
-                        message: '保存成功！'
-                    });
-                    this.orderDeatilData.map( (item,index)=>{
-                        if( i == index){
-                            item.checkStatus = status;                       
-                        }
-                    })      
+                }).then( action => {
+                    console.log("isOver1",isOver1);
+                    if( isOver1 == true ){
+                        console.log("111"+action);
+                        axios({
+                            method:'post',
+                            url:this.BDMSUrl+'project2/checkResult/checkOrderDetail',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{  
+                                id:id,
+                                projId:this.projId,
+                            }
+                        }).then( res =>{
+                            this.$message({
+                                type: 'success',
+                                message: res.data.msg,
+                            });
+                            this.orderDeatilData.map( (item,index)=>{
+                                if( i == index){
+                                    item.checkStatus = status;
+                                    item.checkUserName = this.orderInfo.orderUserName;    
+                                    item.checkDate_ = new Date().toLocaleString();                   
+                                }
+                            }) 
+                        }).catch( err =>{
+                            alert(err)
+                        });
+                    }else {
+                        axios({
+                            method:'post',
+                            url:this.BDMSUrl+'project2/checkResult/cancelCheckOrderDetail',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{  
+                                id:id,
+                                projId:this.projId,
+                                ugId:this.orderInfo.orderUserId,
+                            }
+                        }).then( res =>{
+                            this.$message({
+                                type: 'success',
+                                message: res.data.msg,
+                            });
+                            this.orderDeatilData.map( (item,index)=>{
+                                if( i == index){
+                                    item.checkStatus = status;
+                                    item.checkUserName = "";    
+                                    item.checkDate_ = "";                       
+                                }
+                            }) 
+                        }).catch( err =>{
+                            alert(err)
+                        });
+                    }             
             });
             }else {
                 this.$msgbox({
@@ -411,22 +956,77 @@ export default {
                     }
                 }
                 }).then(action => {
-                    this.$message({
-                        type: 'success',
-                        message: '保存成功！'
-                    });
-                    this.orderDeatilData.map( (item,index)=>{
-                        if( i == index){
-                            item.receiptStatus = status;                       
-                        }
-                    })      
-            });
+                    if( isOver1 == true ){
+                        console.log("111"+action);
+                        let warehouseId = this.warehouseId+','+this.huoJiaId+','+this.huoWeiId
+                        axios({
+                            method:'post',
+                            url:this.BDMSUrl+'project2/receipt/receiptOrderDetail',
+                            headers:{
+                                token:this.token
+                            },
+                            params:{   
+                                projId: this.projId,
+                                id: id,
+                                warehouseId: warehouseId,
+                            }
+                        }).then( res =>{
+                            if(res.data.cd == 0){
+                                this.$message({
+                                    type: 'success',
+                                    message: "验收清单成功！",
+                                });
+                                this.orderDeatilData.map( (item,index)=>{
+                                    if( i == index){
+                                        item.warehouseName = warehouseName;
+                                        item.receiptStatus = status;
+                                        item.receiptUserName = this.orderInfo.orderUserName;
+                                        item.receiptDate_ = new Date().toLocaleString();                   
+                                    }
+                                }) 
+                            }else {
+                                this.$message({
+                                    type: 'warring',
+                                    message: "验收清单失败！",
+                                });
+                            }
+                            
+                        }).catch( err =>{
+                            alert(err)
+                        });
+                    }else {
+                        axios({
+                            method:'post',
+                            url:this.BDMSUrl+`project2/receipt/cancelReceiptDetail/${this.projId}/${id}`,
+                            headers:{
+                                token:this.token
+                            },
+                        }).then( res =>{
+                            if(res.data.cd == 0){
+                                this.$message({
+                                    type: 'success',
+                                    message: "撤销验收清单成功！",
+                                });
+                                this.orderDeatilData.map( (item,index)=>{
+                                    if( i == index){
+                                        item.receiptStatus = status;
+                                        item.receiptUserName = "";
+                                        item.receiptDate_ = "";
+                                        item.warehouseName = "";
+                                    }
+                                })
+                            }else{
+                                this.$message({
+                                    type: 'warring',
+                                    message: '撤销验收清单失败！',
+                                });
+                            } 
+                        }).catch( err =>{
+                            alert(err)
+                        });
+                    }                  
+                });
             }
-        },
-         backToH(){
-            // var vm = this
-            // vm.showCommonEdit = false
-            this.showCommonList = false;
         },
         handleClick(){
             this.selectIndexone = '-1';
@@ -458,7 +1058,7 @@ export default {
             })
         },
         //获取堆场信息
-        getStore(){
+        getStore( isAdd ){
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/receipt/getWarehouse',
@@ -471,48 +1071,61 @@ export default {
             }).then( res =>{
                 console.log("获取堆场信息",res);
                 this.store = [];
-                // if(response.data.cd == 0){
-                //     if(response.data.rt != null){
-                //         console.log("获取群组",response.data.rt)
-                //         this.userGroup = response.data.rt.ugList;
-                //         this.selectUser = response.data.rt.selectUgId;
-                //         this.getPlanList(this.selectUser);
-                //         this.getNoPlanList(this.selectUser);
-                //     } 
-                // }else{
-                //     alert(response.data.msg)
-                // }
                 if( res.data.cd == 0 ){
                     if( res.data.rt != null ) {
                         this.store = res.data.rt;
+                        if( isAdd ){
+                            this.store.map( (item,index)=>{
+                                if(item.id == this.warehouseId ){
+                                    this.stockName = item.name;
+                                }
+                            });
+                            // this.stockName = this.store[0].name;
+                        }else {
+                            this.stockName = this.store[0].name;
+                        }
+                        
                         this.store.map( (item,index) =>{
                             if( item.image != null ){
                                 item.imgPath = item.image.filePath;
                             }else{
                                 item.imgPath = this.defaultImageUrl;
                             }
-                            console.log("获取堆场url",item);
+                            let obj = {};
+                            obj.value = item.name;
+                            obj.label = item.name;
                         });
-                        
-                        // this.store.push(res.data.rt.Object.assign({},item));
-                        //  Object.assign(this.orderInfo,{
-                        //     checkDate_:new Date(this.orderInfo.checkDate).toLocaleString(),
-                        //     receiptDate_:new Date(this.orderInfo.receiptDate).toLocaleString(),
-                        // })
-                        // res.data.rt.map( (item)=>{
-                        //     const obj=Object.assign({},item);
-                        //     this.store.push(obj);
-                        // });
-                        // this.store.map( (item) =>{
-                        //     if
-                        //     console.log("获取堆场",item);
-                        // })
-                        
+                            console.log("获取堆场",this.store);                        
                     }
                 }else{
                     alert(res.data.msg)
                 }
             })
+        },
+        //获取货架、货位信息
+        getHuoJia( id ){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/receipt/getCurSelf',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId: this.projId,
+                    warehouseId: id,
+                    pageNo: 1,
+                    pageSize: 20,
+                }
+            }).then((res)=>{
+                this.storage = [];
+                let obj = res.data;
+                if( obj.cd == 0){
+                    this.storage = obj.rt.rows;
+                    console.log("获取货架信息",this.storage);
+                    this.isclickHuoJia = true; 
+                }
+                
+            }).catch();
         },
         //已签收
         getPlanList(ugId){
@@ -618,8 +1231,7 @@ export default {
         },
         //获取订单的清单列表
         getOrderDetail(id){
-            this.orderDeatilData = [];
-            
+            this.orderDeatilData = [];   
             axios({
                 method:'get',
                 url:this.BDMSUrl+'project2/order/getOrderDetail/'+id,
@@ -688,6 +1300,7 @@ export default {
 <style lang="less">
 #wuliao{
     ::-webkit-scrollbar{width:0px}
+    
     .content-hidden {
         display: none;               
     }
@@ -861,7 +1474,9 @@ export default {
                     border-bottom: 1px solid #e6e6e6;
                     font-size: 14px;
                     color: #fc3439;
-
+                    span {
+                        cursor: pointer;
+                    }
                 }
                 .huiweirightimg{
                     list-style: none;
@@ -873,14 +1488,12 @@ export default {
                         height: 160px;
                         float: left;
                         margin-left: 20px;
-                        border: 1px solid #e6e6e6;
-                        
                         .store {
                             display: inline-block;
-                            width:156px;
-                            height:156px;
+                            width:158px;
+                            height:158px;
                             position: relative;
-                            border:2px solid #e6e6e6;
+                            border:1px solid #e6e6e6;
                             z-index:10;
                             .store_img {
                                 display: inline-block;
@@ -892,8 +1505,8 @@ export default {
                                 height:100%;
                                 z-index:1;
                                 img {
-                                    width: 156px;
-                                    height: 156px;
+                                    width: 158px;
+                                    height: 158px;
                                     cursor: pointer;
                                 }
                             }   
@@ -915,21 +1528,155 @@ export default {
                                 }
                                 .store_edit_detail {
                                     position: absolute;
-                                    bottom:10px;
-                                    left:25px;
-                                    width:100px;
-                                    z-index: 3;
+                                    bottom: 0px;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 50px;
+                                    background: rgba(84, 84, 84,0.5);
+                                    z-index: 3; 
                                     display: flex;
                                     justify-content: space-around;
-                                    a img {
+                                    align-items: center;
+                                    a{
+                                        width:16px;
+                                        height:16px;
                                         cursor: pointer;
+                                        .edit {
+                                            width:16px;
+                                            height:16px;
+                                            background: url('./images/edit.png') no-repeat  center center;
+                                        }
+                                        .image {
+                                            width:16px;
+                                            height:16px;
+                                            background: url('./images/upload.png') no-repeat center center;
+                                        }
+                                        .delete {
+                                            width:16px;
+                                            height:16px;
+                                            background: url('./images/delete2.png') no-repeat center center;
+                                        }
                                     }
-                                    // background-color: lightgray;
                                 }
-                            }
-                            
+                            }                           
                         }
-                        
+                    }
+                    li:last-child {
+                        cursor: pointer;
+                        background: #f0f1f4 url('./images/add.png') no-repeat center center;
+                        div {
+                            margin: 100px auto;
+                        }
+                    }
+                }
+                .huojia {
+                    list-style: none;
+                    padding: 0;
+                    margin: 20px;
+                    overflow: hidden;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #e6e6e6;
+                    li {
+                        width: 80px;
+                        height: 35px;
+                        float: left;
+                        margin-right: 20px;
+                        text-align: center;
+                        line-height: 35px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    }
+                    li:last-child{
+                        background: none;
+                        width:200px;
+                        .addHuoJia {
+                            display: flex;
+                            justify-content: space-around;
+                            line-height: 35px;
+                            .content {
+                                width:60px;
+                                height:30px;
+                                border:2px solid #e6e6e6;
+                                line-height: 35px;
+                            }
+                            .sure {
+                                width:50px;
+                                height:35px;
+                                text-align: center;
+                                line-height: 35px;
+                                 background:#fc3439;
+                                color: #fff;
+                            }
+                            .cancel {
+                                width:50px;
+                                height:35px;
+                                text-align: center;
+                                line-height: 35px;
+                                background: #f0f0f0;
+                            }
+                        }
+                    }
+                    .active {
+                        background:#fc3439;
+                        color: #fff;
+                    }
+                    .noactive {
+                        background: #f0f0f0;
+                    }
+                }
+                .huowei {
+                    list-style: none;
+                    padding: 0;
+                    margin: 20px;
+                    overflow: hidden;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #e6e6e6;
+                    li {
+                        width: 80px;
+                        height: 35px;
+                        float: left;
+                        margin-right: 20px;
+                        text-align: center;
+                        line-height: 35px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    }
+                    li:last-child{
+                        background: none;
+                        width:200px;
+                        .addHuoWei {
+                            display: flex;
+                            justify-content: space-around;
+                            line-height: 35px;
+                            .content {
+                                width:60px;
+                                height:30px;
+                                border:2px solid #e6e6e6;
+                                line-height: 35px;
+                            }
+                            .sure {
+                                width:50px;
+                                height:35px;
+                                text-align: center;
+                                line-height: 35px;
+                                 background:#fc3439;
+                                color: #fff;
+                            }
+                            .cancel {
+                                width:50px;
+                                height:35px;
+                                text-align: center;
+                                line-height: 35px;
+                                background: #f0f0f0;
+                            }
+                        }
+                    }
+                    .active {
+                        background:#fc3439;
+                        color: #fff;
+                    }
+                    .noactive {
+                        background: #f0f0f0;
                     }
                 }
             }
@@ -1036,6 +1783,99 @@ export default {
                 }
             }
         }
+    }
+    .editBody{
+        margin: 0 auto;
+    }
+    .editBodytwo{
+        margin-top: 20px;
+    }
+    .imageBody{
+       text-align: left;
+    }
+    .imageBody .imageBodyText{
+        color: #666;
+        font-size: 14px;
+        line-height: 14px;
+        font-weight: normal;
+        display: inline-block;
+        margin-right: 20px;
+        margin-left: 94px;
+        text-align: right;
+   }
+   .updataImageSpan{
+        overflow: hidden;
+        width: 98px;
+    }
+    .updataImageSpan input{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        /* -ms-filter: 'alpha(opacity=0)'; */
+    }
+    .upImgBtn{
+        width: 98px;
+        height: 26px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        background: #f9f9f9;
+        font-size: 14px;
+        font-weight: normal;
+        color: #666;;
+    }
+    .upImgText{
+        font-size:14px;
+        line-height: 14px;
+        display: inline-block;
+        margin-left: 10px;
+        font-weight: normal;
+        color: #999;
+    }
+    .dialog-footer{
+        text-align: center;
+    }
+    // .deleteBtn{
+    //     width: 111px;
+    //     height: 36px;
+    //     border: 1px solid #ccc;
+    //     cursor: pointer;
+    //     border-radius: 2px;
+    // }
+    // .deleteBtn{
+    //     color: #fff;
+    //     background: #fc3439;
+    //     border: none;
+    // }
+    // .deleteBtn:hover{
+    //     background: #ff5257;
+    // }
+    .editBtnS,.editBtnC{
+        width: 111px;
+        height: 36px;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .editBtnS{
+        background: #fc3439;
+        margin-right: 20px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: normal;
+    }
+    .editBtnS:hover{
+        background: #ff5257;
+    }
+    .editBtnC{
+        color: #666;
+        background: #fff;
+        border: 1px solid #ccc;
+    }
+    .editBtnC:hover{
+        background: #e6e6e6;
+        color: #666;
     }
 }
 </style>
