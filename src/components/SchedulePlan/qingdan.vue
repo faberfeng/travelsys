@@ -1920,6 +1920,7 @@ export default Vue.component('common-list',{
                 console.log(scope);
                 this.TraceID=String(scope.row.dTraceId);
                 this.HolderPath=JSON.parse(scope.row.dHolderPath);
+                console.log(this.HolderPath,'holderPath');
                 this.GCCode=scope.row.dGCCode;
                 console.log(this.TraceID);
                 const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode} 

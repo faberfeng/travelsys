@@ -7,7 +7,7 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div style="min-width: 950px;overflow-y: auto;">
+            <div style="min-width: 950px;overflow-y: auto;height:760px">
                 <div id="item-box-file">
                     <router-link :to="'/Drive/costover'" class=" label-item">  
                     最近文档  
@@ -53,7 +53,7 @@
                         -->
                         <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*')">新建点位</span>
                         <ul class="operation" style="margin-right: 10px;">
-                            <li class="item-upload" v-if="!showQuanJing"  @click="uploadfile">上传文件</li>
+                            <li class="item-upload" v-if="!showQuanJing&&systemDrawFile"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
                         </ul>
                         <ul class="operation">
                             <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(true)">剪切</li>
@@ -70,7 +70,7 @@
                     <!--全景图代码-->
                     <div id="planeFigureDiv" v-if="showQuanJing">
                         <div  id="planeDIV">
-                            <img :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
+                            <img v-show="QJ.imageBackground.filePath" :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
                             <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
                             @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xAxial,item.yAxial,item.fileId,item.fileName)"
                             :data-left="item.xAxial" :data-top="item.yAxial"  :id="index+'round'"
@@ -125,6 +125,7 @@
                                     <th style="width:70px;">更新渠道</th>
                                     <th style="width:50px;">类型</th>
                                     <th style="width:40px;">版本</th>
+                                    <th style="width:70px;">大小</th>
                                     <th style="min-width:60px;">上传人</th>
                                     <th style="min-width:150px;">更新时间</th>
                                 </tr>
@@ -146,6 +147,7 @@
                                     <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
                                     <td v-text="splitType(item.icon)"></td>
                                     <td v-text="item.version"></td>
+                                    <td>{{item.fileSize|fileSizeChange()}}M</td>
                                     <td v-text="item.uploadUser"></td>
                                     <td v-text="initData(item.updateTime)"></td>
                                 </tr>
@@ -160,6 +162,7 @@
                                     </td>
                                     <td></td>
                                     <td  v-text="'-'"></td>
+                                    <td v-text="'-'"></td>
                                     <td v-text="'-'"></td>
                                     <td v-text="'-'"></td>
                                     <td v-text="'-'"></td>
@@ -197,6 +200,7 @@
                     ref="fileTree_cloudDrive"
                     node-key="nodeId"
                     :props="defaultProps"
+                    :expand-on-click-node="false"
                     :default-expanded-keys="expandedKeys"
                     highlight-current
                     @node-expand="nodeClick"
@@ -204,7 +208,7 @@
                     @node-click="handleNodeClick"
                     id="cloudDirveFileTree"
                     >
-                     <span :class="['custom-tree-node','el-tree-node__label',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'"></span>
+                     <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'"></span>
                     </el-tree>
                 </div>
             </div>
@@ -240,6 +244,11 @@
                             <span class="detial-text-name">更新时间</span>
                             <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
                         </li>
+                         <li class="detial-item clearfix">
+                            <span class="detial-text-name">文件大小</span>
+                            <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}M</span>
+                        </li>
+
                     </ul>
                     <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="showQuanJing">
                         <li class="detial-item clearfix">
@@ -417,6 +426,7 @@
                 <button class="editBtnC" @click="addfileCancle">取消</button>
             </div>
         </el-dialog>
+
         <el-dialog title="文件夹权限修改" :visible.sync="auth.show" @close="authCancle">
             <div class="editBody">
                  <p style="font-size: 14px; line-height: 1.5em;text-align:left;padding-left:50px;" v-text="'下列勾选的群组可以访问文件夹：'"></p>
@@ -618,6 +628,53 @@
                <button class="editBtnS" @click="labelListConfirm">网页预览</button>
                     <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
             </div>
+        </el-dialog>
+        <el-dialog title="图纸上传" :visible.sync="drawingsUploadShow" @close="drawingsUploadCancel" class="uploadBox">
+                <div class="editBody">
+                    <div class="yingsheProject">
+                        <label class="yingsheProjectText">图纸列表 : </label>
+                        <label class="editBtnS yingsheProjectBtn" for="drawingsInfo">选择文件</label>
+                        <input class="upInput"  type="file"  @change="fileChanged($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                    </div>
+                    <table class="fileContainer" border="1">
+                        <thead>
+                            <tr  class="userList-thead">
+                                <th style="width:20%">图号</th>
+                                <th style="width:27%">图名</th>
+                                <th style="width:12%">比例</th>
+                                <th style="width:19%;max-width:200px;">文件名称</th>
+                                <th style="width:12%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in drawingFileList" :key="index">
+                                <td>
+                                    <input  placeholder="请输入" v-model="item.drawingNo" class="calculateInp">
+                                </td>
+                                <td>
+                                    <input  placeholder="请输入" v-model="item.drawingName" class="calculateInp">
+                                </td>
+                                <td>
+                                    <select v-model="item.proportion" class="inp-search" ref="proportion">
+                                        <option value=""></option>
+                                        <option value="1:20">1:20</option>
+                                        <option value="1:25">1:25</option>
+                                        <option value="1:30">1:30</option>
+                                    </select>
+                                    <i class="icon-sanjiao"></i>
+                                </td>
+                                <td v-text="item.fileName"></td>
+                                <td>
+                                    <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteFileList(index)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="drawingsUploadConfirm">上传</button>
+                    <button class="editBtnC" @click="drawingsUploadCancel">关闭</button>
+                </div>
         </el-dialog>
     </div>
     <div id="inital">
@@ -1073,6 +1130,14 @@
            color: #999999;
            font-weight: bold;
     }
+    .is-leaf:before{
+            content: ""!important;
+            width: 12px;
+            
+            color: #999999;
+            display:inline-block;
+            font-weight: bold;
+    }
     .el-tree-node__label::before{
         display: block;
         position: absolute;
@@ -1082,6 +1147,13 @@
         height: 13px;
         background: url('./images/file.png')no-repeat 0 0;
         content: '';
+    }
+    .fileIcon::before{
+            width: 16px;
+            height: 16px;
+             top: 0px;
+            background-image: url('../ManageDesign/images/zTreeStandard.png');
+            background-position: -110px -32px;
     }
     .el-tree-node__content{
             height: 30px;
@@ -1119,71 +1191,170 @@
     .show{
         display: block!important;
     }
-    #edit .el-dialog{
-        margin: 0 auto;
-        .upInput{
-            display: none;
-        }
-          /* 上传文件按钮 */
-        .imageBody{
-        text-align: left;
-        }
-        .imageBody .imageBodyText{
-                color: #666;
-                font-size: 14px;
-                line-height: 14px;
-                font-weight: normal;
-                display: inline-block;
-                margin-right: 20px;
-                margin-left: 94px;
-                text-align: right;
-        }
-        .updataImageSpan{
-            overflow: hidden;
-            width: 98px;
-        }
-        .updataImageSpan input{
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            opacity: 0;
-            /* -ms-filter: 'alpha(opacity=0)'; */
-        }
-        .selectionBox{
-            margin: 10px 50px;
-            border:1px solid #cccccc;
-            padding: 20px;
-            p{
+    #edit {
+            .el-dialog{
+                margin: 0 auto;
+                .upInput{
+                    display: none;
+                }
+                /* 上传文件按钮 */
+                .imageBody{
                 text-align: left;
-                font-size: 14px;
-                line-height: 14px;
-                color: #666666;
+                }
+                .imageBody .imageBodyText{
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        font-weight: normal;
+                        display: inline-block;
+                        margin-right: 20px;
+                        margin-left: 94px;
+                        text-align: right;
+                }
+                .updataImageSpan{
+                    overflow: hidden;
+                    width: 98px;
+                }
+                .updataImageSpan input{
+                    position: absolute;
+                    left: 0px;
+                    top: 0px;
+                    opacity: 0;
+                    /* -ms-filter: 'alpha(opacity=0)'; */
+                }
+                .selectionBox{
+                    margin: 10px 50px;
+                    border:1px solid #cccccc;
+                    padding: 20px;
+                    p{
+                        text-align: left;
+                        font-size: 14px;
+                        line-height: 14px;
+                        color: #666666;
+                    }
+                }
+                .checkbox-fileItem{
+                    float: left;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid #cccccc;
+                    cursor: pointer;
+                    margin-right: 5px;
+                    position: relative;
+                    &::after{
+                        font-size:12px;
+                        color:#cccccc;
+                        display: block;
+                        position: absolute;
+                        right: -30px;
+                        top: 0;
+                        line-height:12px;
+                        content: '';
+                    }
+                }
+                .active{
+                    background: url('./images/checked.png') no-repeat 1px 2px;
+                        border: 1px solid #fc3439;
+                }
+                .yingsheProject{
+                            overflow: hidden;
+                            margin-bottom: 10px;
+                }
+                .yingsheProjectText{
+                    color: #999;
+                    display: block;
+                    float: left;
+                    margin-left: 30px;
+                    font-size: 14px;
+                    line-height: 36px;
+                }
+                .yingsheProjectBtn{
+                    float: right;
+                    margin-right: 30px;
+                    line-height: 36px;
+                }
+            }
+            .uploadBox .el-dialog__body{
+                    margin-top: 21px;
+                    .fileContainer{
+                        width: 600px;
+                        margin: 0px 30px;
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                        thead{
+                            background: #f8f8f9;
+                            th{
+                                padding-left: 10px;
+                                height: 36px;
+                                text-align: left;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 12px;
+                                color: #333333;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                        }
+                        tbody{
+                            tr{
+                                td{
+                                    padding-left: 5px;
+                                    padding-right: 5px;
+                                    height: 36px;
+                                    text-align: left;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    position: relative;
+                                    input,select{
+                                        float: left;
+                                        width: 100%;
+                                        height: 32px;
+                                        border: 1px solid #d1d1d1;
+                                        border-radius: 2px;
+                                        background: #fafafa;
+                                        padding-left: 10px;
+                                    }
+                                    .icon-sanjiao{
+                                        display: block;
+                                        position: absolute;
+                                        width: 12px;
+                                        height: 7px;
+                                        background-image:url('../Settings/images/sanjiao.png');
+                                        background-size: 100% 100%;
+                                        content: '';
+                                        top: 16px;
+                                        right: 11px;
+                                    }
+                                }
+                                &:hover{
+                                    background: #fafafa;
+                                }
+                            }
+                        }
+                    }
+                    .actionBtn{
+                        width: 16px;
+                        height: 16px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right: 16px;
+                        margin-top:9px;
+                    }
+                    .editBtn{
+                        background: url('../../assets/edit.png') no-repeat;
+                    }
+                    .deleteBtn{
+                        background: url('../../assets/delete.png') no-repeat;
+                    }
             }
         }
-        .checkbox-fileItem{
-            float: left;
-            width: 14px;
-            height: 14px;
-            border: 1px solid #cccccc;
-            cursor: pointer;
-            margin-right: 5px;
-            position: relative;
-            &::after{
-                font-size:12px;
-                color:#cccccc;
-                display: block;
-                position: absolute;
-                right: -30px;
-                top: 0;
-                line-height:12px;
-                content: '';
-            }
-        }
-        .active{
-            background: url('./images/checked.png') no-repeat 1px 2px;
-                border: 1px solid #fc3439;
-        }
-    }
+    
     #GroupSelect{
         // display: block;
         // width: 168px;
@@ -2345,11 +2516,13 @@ export default {
             FileTree: [], //文件夹树形图
             defaultProps: {
                 children: 'children',
-                label: 'nodeName'
+                label: 'nodeName',
+                isLeaf:'leaf'
             },
             selectUgId: '', //选中的群组id
             ugList: [], //群组列表
             showQuanJing: true, //控制全景和非全景的显隐
+            systemDrawFile:true,
             checkFileDir: {}, //选中的文件夹信息
             QJ: {
                 imageBackground: {},
@@ -2434,8 +2607,12 @@ export default {
             deleteDialog:false,
             removelistitem:'',
             isbiaoqianshow:false,
+            drawingsUploadShow:false,//图纸是否上传
             biaoqianInfo:{},
             deleteInfo:{},
+            DirectoryList:'',//获得目录
+            drawingList:'',//获得图纸列表
+            drawingFileList:[],//图纸文件列表
         }
     },
     created(){
@@ -2449,12 +2626,35 @@ export default {
         this.GMDUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
+        vm.getDirectory()
+        vm.createDrawingDirectory()
     },
     mounted(){
         var vm = this 
         setTimeout(function(){
             vm.pointLocationBindClick()
         },1000)
+    },
+    filters:{
+        //保留两位小数点
+         fileSizeChange(val){
+             var x=(val/1048576);
+              var f = parseFloat(x); 
+                if (isNaN(f)) { 
+                    return false; 
+                } 
+                var f = Math.floor(x*100)/100; 
+                var s = f.toString(); 
+                var rs = s.indexOf('.'); 
+                if (rs < 0) { 
+                    rs = s.length; 
+                    s += '.'; 
+                } 
+                while (s.length <= rs + 2) { 
+                    s += '0'; 
+                } 
+                return s; 
+      },
     },
     watch:{
         'show.basicAttributes':function(val){
@@ -2538,6 +2738,132 @@ export default {
                 vm.checkedFile_Folder.folderCheckedNum = 0
           }
       },
+      //创建/同步图纸目录
+        createDrawingDirectory(){
+            var vm=this;
+             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/createDrawingDirectory',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
+    //取消上传图纸
+        drawingsUploadCancel(){
+            var vm=this;
+            vm.drawingsUploadShow=false;
+        },
+    //
+        fileChanged(file){
+            var vm = this;
+            const list = vm.$refs.drawingsInfo.files;
+            // this.verificationPicFile(list[0]);
+            var reader = new FileReader();  
+            var dwidth = 0
+            var dheight = 0
+            reader.onload = function (e) {  
+                var data = e.target.result;  
+                //加载图片获取图片真实宽度和高度  
+                var image = new Image();  
+                image.onload=function(){  
+                    dwidth = image.width;  
+                    dheight = image.height;  
+                }; 
+                image.src= data;   
+            };  
+            reader.readAsDataURL(list[0])
+            setTimeout(function(){
+                  vm.drawingFileList.push({
+                    file:list[0],//文件
+                    drawingNo:'',//图号
+                    proportion:'',//比例
+                    fileName:list[0].name,//文件名
+                    drawingName:list[0].name.split('.')[0],//图纸名
+                    dwidth:dwidth,
+                    dheight:dheight
+                })
+            },0)
+        },
+        deleteFileList(index){
+            var vm = this
+            vm.drawingFileList.splice(index,1)
+        },
+        drawingsUploadConfirm(){
+            var vm = this
+            for(var i=0;i<vm.drawingFileList.length;i++){
+                // <input  placeholder="请输入" v-model="item.drawingNo" class="calculateInp">
+                // <input  placeholder="请输入" v-model="item.drawingName" class="calculateInp">
+                if(vm.drawingFileList[i].drawingNo == ''){
+                    vm.$message({
+                        type:'error',
+                        message:'图号不能为空！'
+                    })
+                    return false
+                }
+                if(vm.drawingFileList[i].drawingName == ''){
+                    vm.$message({
+                        type:'error',
+                        message:'图名不能为空！'
+                    })
+                    return false
+                }
+                if(vm.drawingFileList[i].proportion == ''){
+                    vm.$message({
+                        type:'error',
+                        message:'比例不能为空！'
+                    })
+                    return false
+                }
+            }
+            vm.drawingFileList.forEach((item,index)=>{
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'
+                returnUrl = encodeURIComponent(returnUrl);
+                var formData = new FormData()
+                formData.append('token',vm.token);
+                formData.append('projId',vm.projId);
+                formData.append('type',1);
+                formData.append('file',item.file);
+                formData.append('userId',vm.userId);
+                formData.append('modelCode','004');
+                formData.append('returnUrl',returnUrl);
+                // this.$refs.pdfDocument_upload.src=item.file;
+                // console.log(this.$refs.pdfDocument_upload);
+                axios({
+                        method:'POST',
+                        url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                        headers:{
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        data:formData,
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            vm.drawingsUploadShow = false
+                            vm.drawingFileList = []
+                            // vm.getDrawingList()
+                        }
+                        if(response.data.cd != 0){
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                             vm.drawingFileList = []
+                        }
+                    })
+            })
+        },
        InitselectUgId(val){
             var vm = this 
             for(var i =0;i<vm.ugList.length;i++){
@@ -2554,10 +2880,18 @@ export default {
         vm.getFileTree()
       },
       addFile(){
-        var vm = this
-        vm.fileName.show = true
-        vm.fileName.new = true
-        vm.fileName.title = '新建目录'
+          var vm = this
+          if(this.checkFileDir.isDrawing==1){
+              vm.$message({
+                type: 'error',
+                message: '系统文件，不能操作！'
+            });  
+            return false
+          }else{
+            vm.fileName.show = true
+            vm.fileName.new = true
+            vm.fileName.title = '新建目录'
+          }
       },
       addfileCancle(){
           var vm = this
@@ -2778,8 +3112,10 @@ export default {
       },
       uploadfile(){
         var vm = this
-        if(!vm.showQuanJing){
+        if(!vm.showQuanJing&&vm.checkFileDir.isDrawing==null&&vm.checkFileDir.t31Code==null){
             vm.updateImg('文件上传',false,0,'')//非点位类型是0
+        }else if(vm.checkFileDir.isDrawing==1){
+            vm.drawingsUploadShow=true;
         }
       },
       paste(){
@@ -3249,6 +3585,11 @@ export default {
         //   }
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
+          if(vm.checkFileDir.isDrawing==1&&vm.checkFileDir.t31Code==null){
+              this.systemDrawFile=false;
+          }else{
+              this.systemDrawFile=true;
+          }
         $('#cloudDirveFileTree .el-tree-node').removeClass('is-current_fistload')
           if(obj.holderId){
                vm.showQuanJing = true
@@ -3369,6 +3710,7 @@ export default {
       splitType(val){
           return val.split('.')[0]
       },
+     
       initData(val){
           if(!val)return ''
           var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
@@ -3581,6 +3923,7 @@ export default {
                 vm.checkedItem = {}
                 if(vm.checkedFile_Folder.fileCheckedNum == 1){
                     vm.checkedItem = fileCheckList[0]
+                    console.log(vm.checkedItem);
                     vm.getGouJianInfo()
                     vm.getVersion()
                 }
@@ -3730,6 +4073,80 @@ export default {
             console.log(err)
         })
     },
+    // 获取目录
+     getDirectory(){
+            var vm=this
+            axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    vm.DirectoryList=response.data.rt;
+                    vm.DirectoryList.forEach((item)=>{
+                        vm.$set(item,'nodeParId',1)
+                        vm.$set(item,'nodeId',item.code)
+                        vm.$set(item,'nodeName',item.name)
+                    })
+                    this.getDrawingList();
+                     console.log(vm.DirectoryList,'directory')
+                    // console.log(vm.DirectoryList);
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+    },
+        //获取图纸列表
+        getDrawingList(){
+            // this.getDirectory()
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'dc/drawingReview/getDrawingList',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                     vm.drawingList=response.data.rt;
+                    if(vm.drawingList != null){
+                        vm.drawingList.forEach((item,index) => {
+                            vm.$set(item,'isLeaf',true)
+                            vm.$set(item,'nodeName',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
+                            vm.$set(item,'nodeId',item.id)
+                            vm.$set(item,'nodeParId',item.directory)
+                            // vm.$set(item,'code',item.id)
+                        });
+                    }  
+                    console.log(vm.drawingList,'234');
+                     this.DirectoryList.forEach((item)=>{
+                         let a=[];
+                        this.drawingList.forEach((item1)=>{
+                            if(item.code==item1.directory){
+                                a.push(item1)
+                                vm.$set(item,'children',a)
+                            }
+                        })
+                    })
+                }
+            })
+        },
+         //去除后缀名
+    deleteLastName(str){
+        var reg = /.w+$/;   
+        return str.replace(reg,'');    
+    },
     getFileTree(name){
         var vm = this
         var setting = {
@@ -3754,8 +4171,13 @@ export default {
             },
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
-                vm.FileTree_original = response.data.rt
-                vm.FileTree = data.transformTozTreeFormat(setting, response.data.rt)
+                vm.FileTree_original = response.data.rt;
+                // var list=[{'nodeParId':0,'nodeName':'设计图纸','nodeId':1}]
+                // vm.$set(list[0],'children',vm.DirectoryList)
+                // vm.FileTree_original.push(list[0])
+                // console.log(vm.FileTree_original,'原始数据')
+                vm.FileTree = data.transformTozTreeFormat(setting,vm.FileTree_original)
+                console.log(vm.FileTree,'最终');
                 if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){
@@ -3771,13 +4193,13 @@ export default {
                     vm.checkFileDir = vm.FileTree[0]
                     vm.searchFileGroupInfo()
                 }
-                
             }
 
         }).catch((err)=>{
             console.log(err)
         })
     },
+
     searchFileGroupInfo(val){
         var vm = this
         axios({

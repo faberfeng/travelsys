@@ -61,6 +61,7 @@
                                 <th style="width:70px;">更新渠道</th>
                                 <th style="width:50px;">类型</th>
                                 <th style="width:40px;">版本</th>
+                                <th style="width:70px;">大小</th>
                                 <th style="min-width:60px;">上传人</th>
                                 <th style="min-width:150px;">更新时间</th>
                             </tr>
@@ -82,6 +83,7 @@
                                 <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
                                 <td v-text="splitType(item.icon)"></td>
                                 <td v-text="item.version"></td>
+                                <td>{{item.fileSize|fileSizeChange()}}M</td>
                                 <td v-text="item.uploadUser"></td>
                                 <td v-text="initData(item.updateTime)"></td>
                             </tr>
@@ -130,6 +132,10 @@
                      <li class="detial-item clearfix">
                         <span class="detial-text-name">更新时间</span>
                         <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
+                    </li>
+                    <li class="detial-item clearfix">
+                        <span class="detial-text-name">文件大小</span>
+                        <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}M</span>
                     </li>
                 </ul>
                  <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-else>
@@ -1193,6 +1199,27 @@ export default {
           var vm = this
           vm.getVersion()
       }
+  },
+  filters:{
+      //保留两位小数点
+         fileSizeChange(val){
+             var x=(val/1048576);
+              var f = parseFloat(x); 
+                if (isNaN(f)) { 
+                    return false; 
+                } 
+                var f = Math.floor(x*100)/100; 
+                var s = f.toString(); 
+                var rs = s.indexOf('.'); 
+                if (rs < 0) { 
+                    rs = s.length; 
+                    s += '.'; 
+                } 
+                while (s.length <= rs + 2) { 
+                    s += '0'; 
+                } 
+                return s; 
+      },
   },
   methods:{
        initAll(){
