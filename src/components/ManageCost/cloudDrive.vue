@@ -640,9 +640,10 @@
                         <thead>
                             <tr  class="userList-thead">
                                 <th style="width:20%">图号</th>
-                                <th style="width:27%">图名</th>
+                                <th style="width:25%">图名</th>
                                 <th style="width:12%">比例</th>
-                                <th style="width:19%;max-width:200px;">文件名称</th>
+                                <th style="width:14%">相关空间</th>
+                                <th style="width:17%;max-width:200px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
                         </thead>
@@ -660,6 +661,12 @@
                                         <option value="1:20">1:20</option>
                                         <option value="1:25">1:25</option>
                                         <option value="1:30">1:30</option>
+                                    </select>
+                                    <i class="icon-sanjiao"></i>
+                                </td>
+                                <td>
+                                    <select v-model="getHolderId" class="inp-search">
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-text="val.holderName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -2613,6 +2620,8 @@ export default {
             DirectoryList:'',//获得目录
             drawingList:'',//获得图纸列表
             drawingFileList:[],//图纸文件列表
+            getHoldersList:'',
+            getHolderId:'',
         }
     },
     created(){
@@ -2628,6 +2637,7 @@ export default {
         vm.getIntoCloudD()
         vm.getDirectory()
         vm.createDrawingDirectory()
+        vm.getHolders()
     },
     mounted(){
         var vm = this 
@@ -2738,6 +2748,35 @@ export default {
                 vm.checkedFile_Folder.folderCheckedNum = 0
           }
       },
+       //获取单体分区楼层三个级别的容器信息
+        getHolders(){
+            var vm=this;
+             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getHolders',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getHoldersList=response.data.rt;
+                    this.getHoldersList.push({ 
+                        "holderId": null,
+                        "holderName": "无",
+                        "holderType": ""
+                    })
+                    // this.holderId=null;
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+        },
       //创建/同步图纸目录
         createDrawingDirectory(){
             var vm=this;
@@ -2829,7 +2868,7 @@ export default {
                 }
             }
             vm.drawingFileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -2852,6 +2891,11 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.drawingFileList = []
+                            if(vm.showQuanJing){
+                                vm.searchFileGroupInfo(vm.checkFileDir.nodeId)
+                            }else{
+                                    vm.getInfo()
+                            }
                             // vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
@@ -2884,7 +2928,7 @@ export default {
           if(this.checkFileDir.isDrawing==1){
               vm.$message({
                 type: 'error',
-                message: '系统文件，不能操作！'
+                message: '系统文件，不能操作'
             });  
             return false
           }else{

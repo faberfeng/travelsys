@@ -3147,6 +3147,7 @@ export default {
 			case "ViewpointSubmited":
                 // ScreenPara = e.data.parameter;
                 break;
+            
 		    }
         },
       checkIcon(val){
