@@ -197,12 +197,12 @@
       },
       setPageData:function () {
         sessionStorage.setItem("oldMobile", this.oldMobile);
+      },
+      back: function () {
+        this.$router.back(-1);
       }
-
-    },
-    back: function () {
-      this.$router.back(-1);
     }
+
   }
 </script>
 <style>
