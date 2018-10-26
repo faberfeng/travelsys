@@ -184,7 +184,7 @@ export default {
                 //  console.log(this.GetDrawingBackList,'123')
                 this.getDrawingList();
                 console.log(this.drawList,'多张图纸')
-                // app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                
                 // console.log(app)
                 break;
 		    }
@@ -218,7 +218,29 @@ export default {
                             // console.log(this.drawingWebGlId);
                             this.drawingWebGlName=item.drawingName;
                             this.getMaxVersionPath();
-                            
+                            this.drawList.push({
+                                            name:this.drawingWebGlName,
+                                            type:this.drawingWebGlType,
+                                            source:this.drawingWebGlUrl,
+                                            page:1,
+                                            angle:0
+                                    })
+                            // setTimeout(function(){
+                            //     this.drawList.push({
+                            //                 name:this.drawingWebGlName,
+                            //                 type:this.drawingWebGlType,
+                            //                 source:this.drawingWebGlUrl,
+                            //                 page:1,
+                            //                 angle:0
+                            //         })
+                            //     },0)
+                            // this.drawList.push({
+                            //             name:this.drawingWebGlName,
+                            //             type:this.drawingWebGlType,
+                            //             source:this.drawingWebGlUrl,
+                            //             page:1,
+                            //             angle:0
+                            //     })
                            
                             // list.push({
                             //     id:this.drawingWebGlId,
@@ -226,7 +248,9 @@ export default {
                             // }) 
                         }
                     })
-                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                    app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                   
+                    
                     // let ListJSON1=[{name:this.drawingWebGlName,type:this.drawingWebGlType,source:this.drawingWebGlUrl,page:1,angle:0}]
                     // console.log(ListJSON1,'ListJSON')
                     // console.log(this.drawList,'drawList')
@@ -256,18 +280,10 @@ export default {
             }
             }).then(response=>{
                 if(response.data.rt){
-                    
                     this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // console.log(this.drawingWebGlType,'图纸类型')
                     this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
                     // console.log(this.drawingWebGlUrl,'图纸URl')
-                     this.drawList.push({
-                                name:this.drawingWebGlName,
-                                type:this.drawingWebGlType,
-                                source:this.drawingWebGlUrl,
-                                page:1,
-                                angle:0
-                        })
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
