@@ -3826,6 +3826,7 @@ export default {
             return false
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
+        console.log(filePath);
         window.open(vm.QJFileManageSystemURL + filePath +'');
     },
     downLoadWithURL(url,fileId,fileName){

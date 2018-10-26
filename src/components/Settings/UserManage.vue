@@ -128,8 +128,8 @@
                             <td v-text="val.applyTime"></td>
                             <td v-text="checkChange(val.status)"></td>
                             <td>
-                                <span v-if="(val.status==2||val.status==3)" class="recheckIcon" @click="recheck(val.id)" title="重审"></span>
-                                <span v-if="(val.status==1||val.status==3)" @click="check(val.id)" class="checkIcon" title="审核"></span>
+                                <span v-if="(val.status!=2&&val.status==3)" class="recheckIcon" @click="recheck(val.applyMessage,val.email,val.id,val.userId)" title="重审"></span>
+                                <span v-if="(val.status!=2&&val.status==1)" @click="check(val.applyMessage,val.email,val.id,val.userId)" class="checkIcon" title="审核"></span>
                             </td>
                         </tr>
                     </tbody>
@@ -242,7 +242,7 @@
             </span>
         </el-dialog>
         <el-dialog title="核实用户" :visible.sync="applyuser" :before-close="applyClose">
-            <div  v-if="userDetial.show">
+            <!-- <div  v-if="userDetial.show">
                 <div class="log-head clearfix">
                     <span class="log-head-title">查找用户:</span>
                     <el-radio v-model="userDetial.posType" label="1">邮箱</el-radio>
@@ -252,7 +252,7 @@
                     <input type="text" v-model="userDetial.posName" placeholder="请输入" @keyup.enter="searchUser">
                     <span class="btn" @click="searchUser">查询</span>
                 </div>
-            </div>
+            </div> -->
             <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
@@ -277,6 +277,10 @@
                 <span class="log-head-title">备注信息：</span>
                 <input class="inp-head" v-model="remarkIfo" placeholder="请输入备注"/>
             </div>
+            <div class="log-body clearfix">
+                <span class="log-head-title">留言：</span>
+                <input class="inp-head" v-model="applyMessage" placeholder="申请留言"/>
+            </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">指定岗位:</span>
                 <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
@@ -286,17 +290,17 @@
                     </div>
                 </div>
             </div>
-            <div  class="log-body clearfix">
+            <!-- <div  class="log-body clearfix">
                 <span class="log-head-title">指定群组:</span>
                 <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
                     <div class="position-all">
                         <el-checkbox  v-model="item.checkFlg"   v-for="(item,index) in position_list" :key="index" >{{item.posName}}</el-checkbox>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="PostaddUser">保存</el-button>
-                <el-button type="warning" >拒绝</el-button>
+                <el-button type="primary" @click="PostaddApplyUser(2)">保存</el-button>
+                <el-button type="warning" @click="PostaddApplyUser(3)" >拒绝</el-button>
                 <el-button @click="applyClose">取 消</el-button>
             </span>
         </el-dialog> 
@@ -725,6 +729,7 @@ export default {
           },
           adduser:false,//false
           applyuser:false,//审核数据
+          applyId:'',//申请ID
           edituser:false,
           radio: 'email',
           checked:false,
@@ -756,6 +761,7 @@ export default {
           QJFileManageSystemURL:'',
           applyShow:false,//是否申请
           remarkIfo:'',//备注信息
+          applyMessage:'',//申请留言
       }
   },
   watch:{
@@ -800,12 +806,76 @@ export default {
           }
       },
       //审核
-      check(){
+      check(applyMessage,mail,id,userId){
+          var vm=this;
           this.applyuser=true;
+          this.applyId=id;
+          this.applyMessage=applyMessage;
+          if(userId){//编辑用户
+                vm.userDetial.show = false
+                this.modelUser();
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        params:mail
+                    }
+                }).then((response)=>{
+                    vm.userDetial.info = response.data.rt
+                    // vm.projUserId = response.data.rt.userId
+                    // vm.remarkIfo=response.data.rt.remark
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
+      },
+      modelUser(){
+          var vm=this;
+        axios({//添加用户
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/addProjectUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId: vm.projId,
+                    }
+                    }).then((response)=>{
+                    vm.position_default = response.data.rt.positions[0]
+                    vm.position_list = response.data.rt.positions.slice(1)
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
       },
       //重审核
-      recheck(){
-
+      recheck(applyMessage,mail,id,userId){
+           var vm=this;
+          this.applyuser=true;
+          this.applyId=id;
+          this.applyMessage=applyMessage;
+          if(userId){//编辑用户
+                vm.userDetial.show = false
+                this.modelUser();
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        params:mail
+                    }
+                }).then((response)=>{
+                    vm.userDetial.info = response.data.rt
+                    // vm.projUserId = response.data.rt.userId
+                    // vm.remarkIfo=response.data.rt.remark
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
       },
       //获取项目申请列表
         getApplyList(){
@@ -818,7 +888,7 @@ export default {
                 },
                 params:{
                     // vm.pageDetialApply.currentPage,
-                    page: 0,
+                    page: vm.pageDetialApply.currentPage,
                     rows: vm.pageDetialApply.pagePerNum,
                     name: vm.userApplySearchInfo,
                     projId:vm.projId,
@@ -827,7 +897,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     vm.userApplySearchInfo ='';//搜索完清空
-                    vm.userApplyList = response.data.rt;
+                    vm.userApplyList = response.data.rt.rows;
                     vm.pageDetialApply.total = response.data.rt.total;
                     vm.pageDetialApply.pageNum =  Math.ceil(vm.pageDetialApply.total/vm.pageDetialApply.pagePerNum);
                 }else if(response.data.cd == '-1'){
@@ -1125,11 +1195,29 @@ export default {
         checkApply(){
             var vm=this;
             vm.applyShow=true;
-            this.getApplyList()
+            this.getApplyList();
+             vm.userDetial.posName = ''
+            vm.userDetial.posType = '1'
+            vm.userDetial.show = true
+            vm.userDetial.info = {}
+            vm.remarkIfo='';
+            vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
+
         },
         checkApplyCancle(){
             var vm=this;
             vm.applyShow=false;
+             vm.userDetial.posName = ''
+            vm.userDetial.posType = '1'
+            vm.userDetial.show = true
+            vm.userDetial.info = {}
+            vm.remarkIfo='';
+            vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
+            this.getInfo();
         },
         userClose(){
             var vm = this
@@ -1140,6 +1228,9 @@ export default {
             vm.userDetial.info = {}
             vm.adduser = false
             vm.remarkIfo=''
+             vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
         //     userDetial:{
         //     posName: "",
         //     posType: '1',
@@ -1168,6 +1259,7 @@ export default {
                     hasPosition = true
                 }
             }
+            console.log(isAdmin,posIds,this.remarkIfo,vm.userDetial.info.userId+'',vm.projUserId)
             if(!vm.userDetial.info.userId){
                 vm.$message({
                     type:'warning',
@@ -1213,6 +1305,93 @@ export default {
                         message:'添加用户成功！'
                     })
                     vm.getInfo()
+                 }else{
+                     vm.$message({
+                         type:'error',
+                         message:response.data.msg
+                     })
+                 }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+
+        //审核通过
+        PostaddApplyUser(statusVal){
+            var vm = this
+             var posIds = []
+             var isAdmin = 1
+             var hasPosition = false
+            if(vm.position_default.checkFlg){
+                posIds.push(vm.position_default.id+'')
+                isAdmin = 2
+                hasPosition = true
+            }
+            for(var i=0;i<vm.position_list.length;i++){
+                if(vm.position_list[i].checkFlg){
+                    posIds.push(vm.position_list[i].id+'')
+                    hasPosition = true
+                }
+            }
+            console.log(isAdmin,posIds,this.remarkIfo,vm.userDetial.info.userId+'',vm.projUserId)
+            if(!vm.userDetial.info.userId){
+                vm.$message({
+                    type:'warning',
+                    message:'请选择一个用户！'
+                })
+                return false
+            }
+            if(!hasPosition){
+                vm.$message({
+                    type:'warning',
+                    message:'该用户至少选择一个岗位！'
+                })
+                return false
+            }
+            if(vm.remarkIfo==''){
+                vm.$message({
+                    type:'warning',
+                    message:'请输入备注信息！'
+                })
+                return false
+            }
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'project2/Config/applyPassOrRefuse',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    status:statusVal,
+                    id:this.applyId,
+                    applyMessage:this.applyMessage
+                },
+                data:{
+                    isAdmin:isAdmin,
+                    posIds: posIds,
+                    remark:this.remarkIfo,
+                    projUserId: vm.projUserId,
+                    userId: vm.userDetial.info.userId+''
+                }
+            }).then((response)=>{
+                 if(response.data.cd == 0){
+                    vm.userClose()
+                    if(statusVal==2){
+                        vm.$message({
+                            type:'success',
+                            message:'审核通过！'
+                        })
+                    }else if(statusVal==3){
+                        vm.$message({
+                            type:'info',
+                            message:'审核被拒绝！'
+                        })
+                    }
+                    this.getApplyList()
+                    this.applyuser=false;
+
+                    // vm.getInfo()
                  }else{
                      vm.$message({
                          type:'error',
