@@ -141,7 +141,8 @@ export default {
             WebGlUrl:'',
             WebGlType:'',
             WebGlName:'',
-            iframeUrl:''
+            iframeUrl:'',
+            GetDrawingBackList:'',//有图形传递过来的数据
         }
     },
     created(){
@@ -198,7 +199,11 @@ export default {
 			case "CurrentSelectedEnt":
 				break;
 			case "ViewpointSubmited":
-				break;
+                break;
+            case "GetDrawingList":
+            this.GetDrawingBackList=e.data.parameter;
+            console.log(this.GetDrawingBackList,'图纸')
+                break;
 		    }
         },
 
