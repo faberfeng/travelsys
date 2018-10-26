@@ -70,6 +70,7 @@
                 <div class="pbodyright">
                     <div v-if="showDetail">
                         请在左侧内选择订货单
+                        <button @click="newListBtn" class="newList">新建订单</button>
                     </div>
                     <div v-if="!showDetail" class="scrolldiv">
                         <p class="pbodyrighttitle">
