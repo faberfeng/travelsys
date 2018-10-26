@@ -100,6 +100,16 @@ export default {
             GetDrawingBackList:'',//webgl图纸返回数据
             drawingWebGlUrl:'',//图纸路径
             drawingWebGlId:'',//图纸ID
+            drawingWebGlType:'',//图纸类型
+            ListJSON:'',
+            //图纸列表数量
+            drawsingList:{
+                name:'',
+                type:'',
+                source:'',
+                page:1,
+                angle:0,
+            }
 
         }
     },
@@ -171,6 +181,7 @@ export default {
                  this.GetDrawingBackList=e.data.parameter;
                  console.log(this.GetDrawingBackList,'123')
                 this.getDrawingList();
+                console.log(app)
                 break;
 		    }
         },
@@ -196,14 +207,30 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
+                    var list=[];
                     this.getWebGlDrawingList.forEach((item)=>{
-                        if(this.GetDrawingBackList.HolderID==item.holderId){
+                        if(this.GetDrawingBackList.holderID==item.holderId){
                             this.drawingWebGlId=item.id;
                             console.log(this.drawingWebGlId);
                             this.drawingWebGlName=item.drawingName;
+                            this.getMaxVersionPath();
+                    //         var drawList=[];
+                    //         drawList.push({
+                    //             name:this.drawingWebGlName,
+                    //             type:this.drawingWebGlType,
+                    //             source:this.drawingWebGlUrl,
+                    //             page:1,
+                    //             angle:0
+                    //         })
+                    // console.log(drawList,'drawList')
+                            // list.push({
+                            //     id:this.drawingWebGlId,
+                            //     name:this.drawingWebGlName
+                            // }) 
                         }
                     })
-                    // this.getMaxVersionPath();
+                    // console.log(list,'列表');
+                   
                     console.log(this.getWebGlDrawingList,'图纸列表')
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -213,6 +240,7 @@ export default {
                 }
             })
         },
+
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var vm=this;
@@ -227,8 +255,15 @@ export default {
             }
             }).then(response=>{
                 if(response.data.rt){
-                    this.drawingWebGlUrl=response.data.rt;
+                    
+                    this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
+                    console.log(this.drawingWebGlType,'图纸类型')
+                    this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
                     console.log(this.drawingWebGlUrl,'图纸URl')
+                    
+                    let ListJSON1=[{name:this.drawingWebGlName,type:this.drawingWebGlType,source:this.drawingWebGlUrl,page:1,angle:0}]
+                     app.postMessage({command:"DrawingList", parameter: ListJSON1},"*")
+                    console.log(ListJSON1,'ListJSON')
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -288,6 +323,7 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
+                    // localStorage.setItem('projectName',vm.header.projectName)
                     // console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
                 }

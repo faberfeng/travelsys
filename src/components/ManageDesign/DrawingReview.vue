@@ -2886,6 +2886,7 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.fileList = []
+                            vm.holderId=''
                             vm.getDirectory()
                             // vm.getDrawingList()
                         }

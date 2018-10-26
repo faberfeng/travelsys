@@ -73,6 +73,8 @@
                         <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/15/9'" style="width:235px;height:235px;border-radius:4px;"/>
                     </div>
                     <div style="font-size:18px;color:#333333;margin-top:10px;">打开手机浏览器扫码申请加入</div>
+                    <div style="font-size:16px;color:#999999;margin-top:10px;">{{projectName}}</div>
+                    <div style="font-size:16px;color:#999999;margin-top:5px;">BIM协调管理平台</div>
 
                 </div>
             </el-dialog>
@@ -185,6 +187,7 @@ export default {
             QJFileManageSystemURL:'',
             projectLogoConfig:{},
             fullSreenShow:false,
+            projectName:'',
         }
     },
     created(){
@@ -195,6 +198,7 @@ export default {
         this.token = localStorage.getItem('token');
         this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
+        this.projectName = localStorage.getItem('projectName');
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
