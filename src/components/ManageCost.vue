@@ -109,7 +109,8 @@ export default {
                 source:'',
                 page:1,
                 angle:0,
-            }
+            },
+            drawList:[],
 
         }
     },
@@ -168,7 +169,7 @@ export default {
 			case "EngineReady":
 				{
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                    console.log(Horder,'G')
+                    // console.log(Horder,'G')
 					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
@@ -179,9 +180,12 @@ export default {
                 break;
             case "GetDrawingList":
                  this.GetDrawingBackList=e.data.parameter;
-                 console.log(this.GetDrawingBackList,'123')
+                //  this.drawList=[];
+                //  console.log(this.GetDrawingBackList,'123')
                 this.getDrawingList();
-                console.log(app)
+                console.log(this.drawList,'多张图纸')
+                // app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                // console.log(app)
                 break;
 		    }
         },
@@ -193,7 +197,7 @@ export default {
         },
         //获取图纸列表
         getDrawingList(){
-            console.log(this.GetDrawingBackList,'图纸')
+            // console.log(this.GetDrawingBackList,'图纸')
             var vm=this;
             axios({
             method:'get',
@@ -207,31 +211,28 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
-                    var list=[];
+                    // var drawList=[];
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
                             this.drawingWebGlId=item.id;
-                            console.log(this.drawingWebGlId);
+                            // console.log(this.drawingWebGlId);
                             this.drawingWebGlName=item.drawingName;
                             this.getMaxVersionPath();
-                    //         var drawList=[];
-                    //         drawList.push({
-                    //             name:this.drawingWebGlName,
-                    //             type:this.drawingWebGlType,
-                    //             source:this.drawingWebGlUrl,
-                    //             page:1,
-                    //             angle:0
-                    //         })
-                    // console.log(drawList,'drawList')
+                            
+                           
                             // list.push({
                             //     id:this.drawingWebGlId,
                             //     name:this.drawingWebGlName
                             // }) 
                         }
                     })
+                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                    // let ListJSON1=[{name:this.drawingWebGlName,type:this.drawingWebGlType,source:this.drawingWebGlUrl,page:1,angle:0}]
+                    // console.log(ListJSON1,'ListJSON')
+                    // console.log(this.drawList,'drawList')
+                    // app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // console.log(list,'列表');
-                   
-                    console.log(this.getWebGlDrawingList,'图纸列表')
+                    // console.log(this.getWebGlDrawingList,'图纸列表')
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -257,13 +258,17 @@ export default {
                 if(response.data.rt){
                     
                     this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
-                    console.log(this.drawingWebGlType,'图纸类型')
+                    // console.log(this.drawingWebGlType,'图纸类型')
                     this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
-                    console.log(this.drawingWebGlUrl,'图纸URl')
+                    // console.log(this.drawingWebGlUrl,'图纸URl')
+                     this.drawList.push({
+                                name:this.drawingWebGlName,
+                                type:this.drawingWebGlType,
+                                source:this.drawingWebGlUrl,
+                                page:1,
+                                angle:0
+                        })
                     
-                    let ListJSON1=[{name:this.drawingWebGlName,type:this.drawingWebGlType,source:this.drawingWebGlUrl,page:1,angle:0}]
-                     app.postMessage({command:"DrawingList", parameter: ListJSON1},"*")
-                    console.log(ListJSON1,'ListJSON')
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
