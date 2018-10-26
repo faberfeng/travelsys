@@ -32,6 +32,42 @@ const router = new Router({
       naem:'shareFilePassWord',
       component:resolve=>require(['@/components/ManageCost/shareFilePassWord'],resolve),
     },
+    //移动端申请项目
+    {
+      path:'/applyPage/:id',
+      name:'applyPage',
+      component:resolve=>require(['@/components/mobile/applyPage'],resolve),
+    },
+    {
+      path:'/register',
+      name:'register',
+      component:resolve=>require(['@/components/mobile/register'],resolve),
+    },
+    {
+      path:'/changeMobile',
+      name:'changeMobile',
+      component:resolve=>require(['@/components/mobile/changeMobile'],resolve),
+    },
+    {
+      path:'/applySuccess',
+      name:'applySuccess',
+      component:resolve=>require(['@/components/mobile/applySuccess'],resolve),
+    },
+    {
+      path:'/registerSuccess',
+      name:'registerSuccess',
+      component:resolve=>require(['@/components/mobile/registerSuccess'],resolve),
+    },
+    {
+      path:'/hasExist',
+      name:'hasExist',
+      component:resolve=>require(['@/components/mobile/hasExist'],resolve),
+    },
+    {
+      path:'/hasApply',
+      name:'hasApply',
+      component:resolve=>require(['@/components/mobile/hasApply'],resolve),
+    },
     {
       path: '/',
       redirect:'/login',
