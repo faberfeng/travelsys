@@ -135,6 +135,7 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial(vm.projId);
         this.getInitdata();
+        // this.getDrawingList();
         // window.location.reload()
         
         // this.getInitdata();
@@ -180,7 +181,7 @@ export default {
                 break;
             case "GetDrawingList":
                  this.GetDrawingBackList=e.data.parameter;
-                //  this.drawList=[];
+                 this.drawList=[];
                 //  console.log(this.GetDrawingBackList,'123')
                 this.getDrawingList();
                 console.log(this.drawList,'多张图纸')
@@ -225,27 +226,6 @@ export default {
                                             page:1,
                                             angle:0
                                     })
-                            // setTimeout(function(){
-                            //     this.drawList.push({
-                            //                 name:this.drawingWebGlName,
-                            //                 type:this.drawingWebGlType,
-                            //                 source:this.drawingWebGlUrl,
-                            //                 page:1,
-                            //                 angle:0
-                            //         })
-                            //     },0)
-                            // this.drawList.push({
-                            //             name:this.drawingWebGlName,
-                            //             type:this.drawingWebGlType,
-                            //             source:this.drawingWebGlUrl,
-                            //             page:1,
-                            //             angle:0
-                            //     })
-                           
-                            // list.push({
-                            //     id:this.drawingWebGlId,
-                            //     name:this.drawingWebGlName
-                            // }) 
                         }
                     })
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
@@ -283,6 +263,13 @@ export default {
                     this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // console.log(this.drawingWebGlType,'图纸类型')
                     this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
+                    //  this.drawList.push({
+                    //             name:this.drawingWebGlName,
+                    //             type:this.drawingWebGlType,
+                    //             source:this.drawingWebGlUrl,
+                    //             page:1,
+                    //             angle:0
+                    //     })
                     // console.log(this.drawingWebGlUrl,'图纸URl')
                     
                 }else if(response.data.cd=='-1'){
