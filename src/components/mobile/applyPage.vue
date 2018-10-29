@@ -42,7 +42,7 @@
     data() {
       return {
         projName: '',
-        baseUrl: 'http://10.252.29.12:8079/',
+        baseUrl: 'http://10.252.26.240:8080/',
         mobile: '',
         email: '',
         code: '',
@@ -55,6 +55,7 @@
       }
     },
     created() {
+      this.baseUrl = this.$store.state.BDMSUrl;;
       let url = window.location.href;
       let strs = url.split("/");
       let projId = strs[strs.length - 1];
@@ -256,12 +257,8 @@
   #app {
     width: 100%;
     min-width: 100%;
-    overflow-x: hidden;
   }
 
-  body {
-    overflow-x: hidden;
-  }
 </style>
 <style lang='less'>
   .header {
@@ -294,11 +291,11 @@
 
   .inLineDiv {
     display: inline-block;
-    width: 49.5%;
+    width: 49%;
   }
 
   .inputText {
-    width: 100%;
+    width: 95%;
     height: 2rem;
     padding-left: 1rem;
     border: 0;
@@ -307,7 +304,7 @@
   .lineDiv {
     height: 1rem;
     border-bottom: 1px #EAEAEA solid;
-    width: 92%;
+    width: 90%;
     margin: 0 auto;
     margin-bottom: 1rem;
   }
