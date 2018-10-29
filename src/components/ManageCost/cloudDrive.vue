@@ -683,6 +683,29 @@
                     <button class="editBtnC" @click="drawingsUploadCancel">关闭</button>
                 </div>
         </el-dialog>
+        <!-- <el-dialog width="500px" title="更新图纸" :visible="editDrawing.updateshow" @close="updateDrawingCancle">
+                <div class="editBody">
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">图号:</label><label class="editUpDrawingValue" v-text="editDrawing.dcode"></label>
+                    </div>
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">图名:</label><label class="editUpDrawingValue" v-text="editDrawing.dname"></label>
+                    </div>
+                    <div class="editUpDrawing">
+                        <label class="editUpDrawingText">比例:</label><label class="editUpDrawingValue" v-text="editDrawing.dscale"></label>
+                    </div>
+                    <div class="editUpDrawingProject">
+                        <label class="editUpDrawingProjectText">上传文件:</label>
+                        <label class="editUpDrawingProjectText1" v-text="this.updateFileName"></label>
+                        <label class="editUpDrawingProjectBtn" for="drawingsUpdateInfo">浏览</label>
+                        <input class="upInput"  type="file"  @change="fileUpdateChanged($event)" ref="drawingsUpdateInfo"  id="drawingsUpdateInfo">
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="confirmUpdateDrawing">确定</button>
+                    <button class="editBtnC" @click="updateDrawingCancle">取消</button>
+                </div>
+        </el-dialog> -->
     </div>
     <div id="inital">
         <el-dialog  :visible.sync="deleteDialog" width="398px">
@@ -2623,6 +2646,7 @@ export default {
             drawingFileList:[],//图纸文件列表
             getHoldersList:'',
             getHolderId:'',
+            drawingFgid:'',//删除图纸ID
         }
     },
     created(){
@@ -3496,23 +3520,56 @@ export default {
       },
       updatePoint(){//更新点位
         var vm = this
-        if(vm.checkedRound.checked){
-          vm.updateImg('文件更新',true,vm.checkedRound.ID,'image/*')//点位是1
-        }else if(vm.checkedFile_Folder.file){
-           for(var i=0;i<vm.fileList.length;i++){
-                if(vm.fileList[i].checked){
-                    if(vm.fileList[i].isAutoCreated == 1){
-                        vm.$message({
-                            type:'error',
-                            message:'系统文件，不能操作！'
-                        })
-                        return false
-                    }
-                    vm.updateImg('文件更新',false,vm.fileList[i].fgId,'')//非点位类型是0
-                   break;
-               }
-           }
+        if(vm.showBtn==false){
+            
+        }else {
+            if(vm.checkedRound.checked){
+            vm.updateImg('文件更新',true,vm.checkedRound.ID,'image/*')//点位是1
+            }else if(vm.checkedFile_Folder.file){
+            for(var i=0;i<vm.fileList.length;i++){
+                    if(vm.fileList[i].checked){
+                        if(vm.fileList[i].isAutoCreated == 1){
+                            vm.$message({
+                                type:'error',
+                                message:'系统文件，不能操作！'
+                            })
+                            return false
+                        }
+                        vm.updateImg('文件更新',false,vm.fileList[i].fgId,'')//非点位类型是0
+                    break;
+                }
+                }
+            }
         }
+      },
+      //根据文件组Id获取图纸ID
+      getDrawingIdByFgId(){
+          var vm=this;
+           var fgId = ''
+         if(vm.showQuanJing && vm.checkedRound){
+            fgId =vm.checkedRound.ID
+         }
+         if(!vm.showQuanJing && vm.checkedItem){
+             if(!vm.checkedItem.fgId){
+                 vm.versionItem = {}
+                 return false
+             }
+             fgId = vm.checkedItem.fgId
+         }
+          axios({
+              method:'post',
+              url:this.BDMSUrl+'dc/drawingReview/getDrawingIdByFgId',
+              headers:{
+                  'token':this.token
+              },
+              params:{
+                  fileGroupId:fgId
+              }
+          }).then((response)=>{
+              if(response.data.cd=='0'){
+                  this.drawingFgid=response.data.rt;
+              }
+          })
       },
       deletePoint(){//删除点位
         var vm = this
@@ -3529,10 +3586,15 @@ export default {
                             'token':vm.token
                         },
                         params:{
-                            drawingId:vm.checkFileDir.id
+                            drawingId:vm.drawingFgid
                         }
                     }).then((response)=>{
                         if(response.data.cd == 0){
+                            if(vm.showQuanJing){
+                                    vm.searchFileGroupInfo()
+                            }else{
+                                vm.getInfo()
+                            }
                             vm.$message({
                                 type:'success',
                                 message:'图纸删除成功'
@@ -4022,6 +4084,7 @@ export default {
                     console.log(vm.checkedItem);
                     vm.getGouJianInfo()
                     vm.getVersion()
+                    vm.getDrawingIdByFgId()
                 }
             }else{
                 vm.checkedItem = {}
@@ -4044,6 +4107,7 @@ export default {
                 vm.checkedItem = vm.fileList[val]
                 vm.getGouJianInfo()
                 vm.getVersion()
+                vm.getDrawingIdByFgId()
             }else{
                  vm.checkedFile_Folder.folder = true
                 vm.checkedFile_Folder.folderCheckedNum = 1

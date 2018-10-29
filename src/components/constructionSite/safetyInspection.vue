@@ -80,7 +80,7 @@
                         </div>
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span id="inspectContentSel">
-                                <select v-model="drawItemId"  class="inspectSel">
+                                <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
                                     <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
                                 </select>
                                 <i class="icon-sanjiao"></i>
@@ -494,6 +494,7 @@ export default {
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
             drawItemId:'',//图纸项目ID
+            drawItemType:'',
             monitorPointInfo:'',//所有图纸监测点信息
             monitorWord:'',//监测文字
             
@@ -556,6 +557,15 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+        changeType(){
+            this.monitorMainItemList.forEach((item)=>{
+                if(item.id==this.drawItemId){
+                    this.drawItemType=item.type;
+                }
+               
+            })
+             console.log(this.drawItemType,'type');
+        },
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
@@ -1779,6 +1789,8 @@ export default {
                 if(response.data.cd=='0'){
                     this.monitorMainItemList=response.data.rt;
                     this.drawItemId=this.monitorMainItemList[0].id;
+                    this.drawItemType=this.monitorMainItemList[0].type;
+
                 }
             })
         },

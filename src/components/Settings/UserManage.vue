@@ -125,7 +125,7 @@
                             <td v-text="val.account"></td>
                             <td v-text="val.mobile"></td>
                             <td v-text="val.applyMessage"></td>
-                            <td v-text="val.applyTime"></td>
+                            <td>{{val.applyTime|timeChange()}}</td>
                             <td v-text="checkChange(val.status)"></td>
                             <td>
                                 <span v-if="(val.status!=2&&val.status==3)" class="recheckIcon" @click="recheck(val.applyMessage,val.email,val.id,val.userId)" title="重审"></span>
@@ -707,7 +707,7 @@
 
 <script>
 import axios from 'axios'
-
+import moment from 'moment'
 export default {
   name:'',
   data(){
@@ -782,6 +782,15 @@ export default {
        'pageDetialApply.currentPage':function(newVal,old){
           this.getApplyList()
       }
+  },
+  filters:{
+    timeChange(val) {
+            if (val == null) {
+            return;
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
   },
   created(){
       var vm = this

@@ -213,19 +213,20 @@ export default {
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
                     // var drawList=[];
+                    var drawingWebGlIdList=[];
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
                             this.drawingWebGlId=item.id;
                             // console.log(this.drawingWebGlId);
                             this.drawingWebGlName=item.drawingName;
-                            this.getMaxVersionPath();
-                            this.drawList.push({
-                                            name:this.drawingWebGlName,
-                                            type:this.drawingWebGlType,
-                                            source:this.drawingWebGlUrl,
-                                            page:1,
-                                            angle:0
-                                    })
+                            // this.getMaxVersionPath();
+                            // this.drawList.push({
+                            //                 name:this.drawingWebGlName,
+                            //                 type:this.drawingWebGlType,
+                            //                 source:this.drawingWebGlUrl,
+                            //                 page:1,
+                            //                 angle:0
+                            //         })
                         }
                     })
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
@@ -248,6 +249,7 @@ export default {
 
         //获取图纸最新版本路径
         getMaxVersionPath(){
+            let drawingIdList=[];
             var vm=this;
             axios({
             method:'get',

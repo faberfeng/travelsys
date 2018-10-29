@@ -445,6 +445,7 @@ export default {
             drawingName:'',
             getHoldersList:'',//空间楼层列表
             holderId:'',//容器ID
+            fileGroupId:'',//文件夹ID
         }
     },
     filters: {
@@ -2396,7 +2397,10 @@ export default {
         },
         //获取图纸最新版本路径
         getMaxVersionPath(){
-            
+            var drawingIdList=[];
+
+            drawingIdList.push(this.drawingId);
+            console.log(drawingIdList);
             var vm=this;
             vm.loading=true;
             axios({
@@ -2405,12 +2409,10 @@ export default {
                 headers:{
                     'token':vm.token
                 },
-                params:{
-                    drawingId:this.drawingId
-                }
+                data:drawingIdList
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.versionPath=response.data.rt;
+                    this.versionPath=(response.data.rt)[0].fileUri;
                     this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
                     if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
                         {   this.pdfShow=true;
@@ -2532,6 +2534,8 @@ export default {
                     this.drawingZxVersionId=this.drawingVersionList[listLen-1].id;
                     this.version=this.drawingVersionList[listLen-1].versionId;
                     this.drawingVersionId=this.drawingZxVersionId;
+                    this.fileGroupId=this.drawingVersionList[0].fileGroupId;
+                    console.log(this.fileGroupId,'文件id')
                     // this.isSelect=this.drawingVersionId;
                     // console.log(this.drawingZxVersionId);
                     // console.log(this.drawingVersionList);
@@ -2700,7 +2704,7 @@ export default {
         confirmUpdateDrawing(){
                 var vm=this;
                 this.annotationlist='';
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'+'&projectId='+this.projId
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.checkFileDir.id+'&pageNo=1'+'&projectId='+this.projId+'&fileGroupId='+this.fileGroupId
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
