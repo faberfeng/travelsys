@@ -168,7 +168,7 @@
           },
         }).then((response) => {
           if (response.data.result) {
-            if(response.data.msg === '邮箱不存在'){
+            if(response.data.msg === '账号不存在'){
               this.$router.push({
                 name: 'register',
                 params: {
