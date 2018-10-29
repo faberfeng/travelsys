@@ -5,15 +5,14 @@
     </div>
     <img class="bg" src="../../assets/mobile/red_bg.png"/>
     <div class="cardDiv">
-      <div class="textDiv">以下的邮箱地址在协同平台账号中与所登记的手机号并不匹配</div>
-      <div class="textDiv">{{email}}</div>
+      <div class="textDiv">邮箱{{email}}已经在协同平台中绑定过其他手机号</div>
       <div class="dashedLineDiv"></div>
-      <div class="textDiv">该邮箱地址在协同平台账号中登记的手机号为</div>
+      <div class="textDiv">绑定的号码为</div>
       <div class="textDiv">{{oldMobile | hideMobile}}</div>
     </div>
     <div class="cardDiv">
       <div class="textDiv">选项一</div>
-      <div class="textDivL">如果你是以上手机号的主人，可以通过验证以上手机号申请</div>
+      <div class="textDivL">如果您是[{{oldMobile | hideMobile}}]的机主，如需使用此号码进行申请，请验证此手机号</div>
       <div class="textDivN">
         <div class="codeLabelDiv w4">验证码</div>
         <div class="codeLabelDiv w14 bAll">
