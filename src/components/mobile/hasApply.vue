@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%;overflow-x: hidden;">
     <div class="header">
       <img @click="back" class="backImg" src="../../assets/mobile/back.png"/>
       <div class="headerDiv">BDMS建筑数据管理系统</div>
@@ -106,11 +106,6 @@
   #app {
     width: 100%;
     min-width: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
-    overflow-x: hidden;
   }
 </style>
 <style lang="less">

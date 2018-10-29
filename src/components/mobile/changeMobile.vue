@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%;overflow-x: hidden">
     <div class="header"><img @click="back" class="backImg" src="../../assets/mobile/back.png"/>
       <div class="headerDiv">BDMS建筑数据管理系统</div>
     </div>
@@ -68,7 +68,7 @@
     },
     filters: {
       hideMobile: function (mobile) {
-        if (typeof(mobile) == 'undefined' || mobile.length == 0)
+        if (typeof(mobile) == 'undefined' || mobile == undefined || mobile.length == 0)
           return '';
         return mobile.substring(0, 3) + "****" + mobile.substring(7, 11);
       }
@@ -209,16 +209,11 @@
   #app {
     width: 100%;
     min-width: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
-    overflow-x: hidden;
   }
 </style>
 <style lang="less">
   .header {
-    width: 100%;
+    width: 98%;
     height: 4rem;
     background-color: #fc3439;
     color: #FFFFFF;
@@ -303,6 +298,7 @@
     position: relative;
     top: -7.2rem;
     left: 2rem;
+    width: 88%;
   }
 
   .codeLabelDiv {
