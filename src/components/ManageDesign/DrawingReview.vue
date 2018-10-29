@@ -2801,7 +2801,6 @@ export default {
         },
         fileUpdateChanged(file){
             var vm = this
-            
             const list = vm.$refs.drawingsUpdateInfo.files
             this.updateFileName=list[0].name
             this.updateFileList=list[0]
@@ -2819,18 +2818,6 @@ export default {
                 image.src= data;   
             };  
             reader.readAsDataURL(list[0])
-            // setTimeout(function(){
-            //       vm.fileList.push({
-            //         file:list[0],//文件
-            //         drawingNo:'',//图号
-            //         proportion:'',//比例
-            //         fileName:list[0].name,//文件名
-            //         drawingName:list[0].name.split('.')[0],//图纸名
-            //         dwidth:dwidth,
-            //         dheight:dheight
-            //     })
-            // },0)
-            // console.log(JSON.stringify(vm.fileList));
         },
         //删除文件
          deleteFileList(index){

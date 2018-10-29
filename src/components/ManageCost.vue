@@ -100,7 +100,9 @@ export default {
             GetDrawingBackList:'',//webgl图纸返回数据
             drawingWebGlUrl:'',//图纸路径
             drawingWebGlId:'',//图纸ID
+            drawingWebGlIdList:[],//图纸数组ID
             drawingWebGlType:'',//图纸类型
+            drawingWebGlList:'',
             ListJSON:'',
             //图纸列表数量
             drawsingList:{
@@ -181,10 +183,11 @@ export default {
                 break;
             case "GetDrawingList":
                  this.GetDrawingBackList=e.data.parameter;
+                 console.log(this.GetDrawingBackList,'专业code');
                  this.drawList=[];
                 //  console.log(this.GetDrawingBackList,'123')
                 this.getDrawingList();
-                console.log(this.drawList,'多张图纸')
+                // console.log(this.drawList,'多张图纸')
                 
                 // console.log(app)
                 break;
@@ -213,12 +216,20 @@ export default {
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
                     // var drawList=[];
-                    var drawingWebGlIdList=[];
+                    // var drawingWebGlIdList=[];
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
-                            this.drawingWebGlId=item.id;
-                            // console.log(this.drawingWebGlId);
-                            this.drawingWebGlName=item.drawingName;
+                            if(this.GetDrawingBackList.GCodeList.length!=0){
+                                this.GetDrawingBackList.forEach((item1)=>{
+                                    if(item.GCodeList=item.directory){
+                                        this.drawingWebGlId=item.id;
+                                        this.drawingWebGlIdList.push(this.drawingWebGlId);
+                                    }
+                                })
+                            }else{
+                                this.drawingWebGlId=item.id;
+                                this.drawingWebGlIdList.push(this.drawingWebGlId);
+                            }
                             // this.getMaxVersionPath();
                             // this.drawList.push({
                             //                 name:this.drawingWebGlName,
@@ -229,9 +240,10 @@ export default {
                             //         })
                         }
                     })
-                    app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
-                   
-                    
+                    console.log(this.drawingWebGlIdList,'1345');
+                    if(this.drawingWebGlIdList.length!=0){
+                        this.getMaxVersionPath();
+                     }
                     // let ListJSON1=[{name:this.drawingWebGlName,type:this.drawingWebGlType,source:this.drawingWebGlUrl,page:1,angle:0}]
                     // console.log(ListJSON1,'ListJSON')
                     // console.log(this.drawList,'drawList')
@@ -249,22 +261,36 @@ export default {
 
         //获取图纸最新版本路径
         getMaxVersionPath(){
-            let drawingIdList=[];
             var vm=this;
             axios({
-            method:'get',
+            method:'post',
             headers:{
                 'token':this.token
             },
             url:this.BDMSUrl+'dc/drawingReview/getMaxVersionPath',
-            params:{
-                drawingId:vm.drawingWebGlId
-            }
+            data:this.drawingWebGlIdList
             }).then(response=>{
                 if(response.data.rt){
-                    this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
-                    // console.log(this.drawingWebGlType,'图纸类型')
-                    this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
+                    this.drawingWebGlList=response.data.rt;
+                    console.log(this.drawingWebGlList,'图纸地址');
+                    this.drawingWebGlList.forEach((item)=>{
+                        this.getWebGlDrawingList.forEach((item1)=>{
+                            if(item.drawingId==item1.id){
+                                console.log(item.drawingId,'234');
+                                  this.drawList.push({
+                                        name:item1.drawingName,
+                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        source:this.QJFileManageSystemURL+item.fileUri,
+                                        page:1,
+                                        angle:0
+                                })
+                            }
+                        })
+                    })
+                    console.log(this.drawList,'最后的东西');
+                    app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                    // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
+                    // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
                     //  this.drawList.push({
                     //             name:this.drawingWebGlName,
                     //             type:this.drawingWebGlType,

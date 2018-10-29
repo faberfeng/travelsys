@@ -683,16 +683,16 @@
                     <button class="editBtnC" @click="drawingsUploadCancel">关闭</button>
                 </div>
         </el-dialog>
-        <!-- <el-dialog width="500px" title="更新图纸" :visible="editDrawing.updateshow" @close="updateDrawingCancle">
+        <el-dialog width="500px" title="更新图纸" :visible="updataShow" @close="updateDrawingCancle">
                 <div class="editBody">
+                    <!-- <div class="editUpDrawing">
+                        <label class="editUpDrawingText">图号:</label><label class="editUpDrawingValue" >{{}}</label>
+                    </div> -->
                     <div class="editUpDrawing">
-                        <label class="editUpDrawingText">图号:</label><label class="editUpDrawingValue" v-text="editDrawing.dcode"></label>
+                        <label class="editUpDrawingText">图名:</label><label class="editUpDrawingValue" >{{updateDrawingName}}</label>
                     </div>
                     <div class="editUpDrawing">
-                        <label class="editUpDrawingText">图名:</label><label class="editUpDrawingValue" v-text="editDrawing.dname"></label>
-                    </div>
-                    <div class="editUpDrawing">
-                        <label class="editUpDrawingText">比例:</label><label class="editUpDrawingValue" v-text="editDrawing.dscale"></label>
+                        <label class="editUpDrawingText">比例:</label><label class="editUpDrawingValue">{{updateDrawingRatio}}</label>
                     </div>
                     <div class="editUpDrawingProject">
                         <label class="editUpDrawingProjectText">上传文件:</label>
@@ -705,7 +705,7 @@
                     <button class="editBtnS" @click="confirmUpdateDrawing">确定</button>
                     <button class="editBtnC" @click="updateDrawingCancle">取消</button>
                 </div>
-        </el-dialog> -->
+        </el-dialog>
     </div>
     <div id="inital">
         <el-dialog  :visible.sync="deleteDialog" width="398px">
@@ -1382,6 +1382,70 @@
                     .deleteBtn{
                         background: url('../../assets/delete.png') no-repeat;
                     }
+            }
+             .editBody{
+                .editUpDrawing{
+                    margin-top:10px;
+                    .editUpDrawingText{
+                        display:inline-block;
+                        width: 60px;
+                        font-size: 14px;
+                        color:#666666;
+                        text-align: right;
+                    }
+                    .editUpDrawingValue{
+                        margin-left:40px;
+                        display:inline-block;
+                        width: 120px;
+                        font-size: 14px;
+                        color:#333333;
+                        text-align: left;
+                    }
+                }
+                .editUpDrawingProject{
+                    width: 400px;
+                    margin-left:109px;
+                    margin-top:10px;
+
+                    .editUpDrawingProjectText{
+                        display:inline-block;
+                        
+                        margin-left: -122px;
+                        width: 60px;
+                        font-size: 14px;
+                        color:#666666;
+                        text-align: left;
+                    }
+                    .editUpDrawingProjectText1{
+                        margin-left: 39px;
+                        display: inline-block;
+                        width: 120px;
+                        font-size: 14px;
+                        color: #333333;
+                        text-align: left;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+
+                    }
+                    .editUpDrawingProjectBtn{
+                            margin-top:10px;
+                            margin-left: 100px;
+                            display: block;
+                            width: 80px;
+                            height: 30px;
+                            border: none;
+                            line-height: 30px;
+                            padding: 0;
+                            cursor: pointer;
+                            border-radius: 2px;
+                            background: #e2e2e2;
+                            margin-right: 20px;
+                            color: #8f8f8f;
+                            font-size: 14px;
+                            font-weight: normal;
+                    }
+                }
             }
         }
     
@@ -2647,6 +2711,11 @@ export default {
             getHoldersList:'',
             getHolderId:'',
             drawingFgid:'',//删除图纸ID
+            updateDrawingName:'',
+            updateDrawingRatio:'',
+            updataShow:false,//更新图纸
+            updateFileName:'',//文件名
+            updateFileList:'',//文件列表
         }
     },
     created(){
@@ -3521,7 +3590,8 @@ export default {
       updatePoint(){//更新点位
         var vm = this
         if(vm.showBtn==false){
-            
+            vm.updataShow=true;
+            this.getDrawingList();
         }else {
             if(vm.checkedRound.checked){
             vm.updateImg('文件更新',true,vm.checkedRound.ID,'image/*')//点位是1
@@ -3541,6 +3611,84 @@ export default {
                 }
             }
         }
+      },
+      //
+      updateDrawingCancle(){
+          this.updataShow=false;
+          this.updateDrawingName='';
+            this.updateDrawingRatio='';
+      },
+
+      confirmUpdateDrawing(){
+                var vm=this;
+                var fgId = ''
+                if(vm.showQuanJing && vm.checkedRound){
+                    fgId =vm.checkedRound.ID
+                }
+                if(!vm.showQuanJing && vm.checkedItem){
+                    if(!vm.checkedItem.fgId){
+                        vm.versionItem = {}
+                        return false
+                    }
+                    fgId = vm.checkedItem.fgId
+                }
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/updateVersion?drawingId='+vm.drawingFgid+'&pageNo=1'+'&projectId='+this.projId+'&fileGroupId='+fgId
+                returnUrl = encodeURIComponent(returnUrl);
+                var formData = new FormData()
+                formData.append('token',vm.token);
+                formData.append('projId',vm.projId);
+                formData.append('type',1);
+                formData.append('file',vm.updateFileList);
+                formData.append('userId',vm.userId);
+                formData.append('modelCode','004');
+                formData.append('returnUrl',returnUrl);
+                axios({
+                        method:'POST',
+                        url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                        headers:{
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        data:formData,
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            vm.updataShow=false
+                            if(vm.showQuanJing){
+                                    vm.searchFileGroupInfo()
+                            }else{
+                                vm.getInfo()
+                            }
+                            vm.updateFileName=''
+                            vm.updateFileList=''
+                           
+                        }
+                        if(response.data.cd != 0){
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+
+      },
+      fileUpdateChanged(file){
+          var vm = this
+            const list = vm.$refs.drawingsUpdateInfo.files
+            this.updateFileName=list[0].name
+            this.updateFileList=list[0]
+            var reader = new FileReader();  
+            var dwidth = 0
+            var dheight = 0
+            reader.onload = function (e) {  
+                var data = e.target.result;  
+                //加载图片获取图片真实宽度和高度  
+                var image = new Image();  
+                image.onload=function(){  
+                    dwidth = image.width;  
+                    dheight = image.height;  
+                }; 
+                image.src= data;   
+            };  
+            reader.readAsDataURL(list[0])
       },
       //根据文件组Id获取图纸ID
       getDrawingIdByFgId(){
@@ -4280,25 +4428,21 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                      vm.drawingList=response.data.rt;
-                    if(vm.drawingList != null){
-                        vm.drawingList.forEach((item,index) => {
-                            vm.$set(item,'isLeaf',true)
-                            vm.$set(item,'nodeName',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
-                            vm.$set(item,'nodeId',item.id)
-                            vm.$set(item,'nodeParId',item.directory)
-                            // vm.$set(item,'code',item.id)
-                        });
-                    }  
-                    console.log(vm.drawingList,'234');
-                     this.DirectoryList.forEach((item)=>{
-                         let a=[];
-                        this.drawingList.forEach((item1)=>{
-                            if(item.code==item1.directory){
-                                a.push(item1)
-                                vm.$set(item,'children',a)
-                            }
-                        })
-                    })
+                     vm.drawingList.forEach((item)=>{
+                         if(item.id=this.drawingFgid){
+                             this.updateDrawingName=item.drawingName;
+                             this.updateDrawingRatio=item.ratio;
+                         }
+                     })
+                    // if(vm.drawingList != null){
+                    //     vm.drawingList.forEach((item,index) => {
+                    //         vm.$set(item,'isLeaf',true)
+                    //         vm.$set(item,'nodeName',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
+                    //         vm.$set(item,'nodeId',item.id)
+                    //         vm.$set(item,'nodeParId',item.directory)
+                    //         // vm.$set(item,'code',item.id)
+                    //     });
+                    // }  
                 }
             })
         },
