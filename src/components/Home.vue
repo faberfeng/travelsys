@@ -143,6 +143,23 @@ export default {
             WebGlName:'',
             iframeUrl:'',
             GetDrawingBackList:'',//有图形传递过来的数据
+            getWebGlDrawingList:'',//图纸列表
+            GetDrawingBackList:'',//webgl图纸返回数据
+            drawingWebGlUrl:'',//图纸路径
+            drawingWebGlId:'',//图纸ID
+            drawingWebGlIdList:[],//图纸数组ID
+            drawingWebGlType:'',//图纸类型
+            drawingWebGlList:'',
+            ListJSON:'',
+            //图纸列表数量
+            drawsingList:{
+                name:'',
+                type:'',
+                source:'',
+                page:1,
+                angle:0,
+            },
+            drawList:[],
         }
     },
     created(){
@@ -203,6 +220,8 @@ export default {
             case "GetDrawingList":
             this.GetDrawingBackList=e.data.parameter;
             console.log(this.GetDrawingBackList,'图纸')
+            this.drawList=[];
+            this.getDrawingList();
                 break;
 		    }
         },
@@ -210,6 +229,97 @@ export default {
         changeFrameHeight(){
             var ifm= document.getElementById("webIframe"); 
             ifm.height=document.documentElement.clientHeight;
+        },
+         getDrawingList(){
+            // console.log(this.GetDrawingBackList,'图纸')
+            var vm=this;
+            axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'dc/drawingReview/getDrawingList',
+            params:{
+                projectId:vm.projId
+            }
+            }).then(response=>{
+                if(response.data.rt){
+                    this.getWebGlDrawingList=response.data.rt;
+                    this.getWebGlDrawingList.forEach((item)=>{
+                        if(this.GetDrawingBackList.holderID==item.holderId){
+                            if(this.GetDrawingBackList.GCodeList.length!=0){
+                                this.GetDrawingBackList.forEach((item1)=>{
+                                    if(item.GCodeList=item.directory){
+                                        this.drawingWebGlId=item.id;
+                                        this.drawingWebGlIdList.push(this.drawingWebGlId);
+                                    }
+                                })
+                            }else{
+                                this.drawingWebGlId=item.id;
+                                this.drawingWebGlIdList.push(this.drawingWebGlId);
+                            }
+                        }
+                    })
+                    // console.log(this.drawingWebGlIdList,'1345');
+                    if(this.drawingWebGlIdList.length!=0){
+                        this.getMaxVersionPath();
+                     }
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取图纸最新版本路径
+        getMaxVersionPath(){
+            var vm=this;
+            axios({
+            method:'post',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'dc/drawingReview/getMaxVersionPath',
+            data:this.drawingWebGlIdList
+            }).then(response=>{
+                if(response.data.rt){
+                    this.drawingWebGlList=response.data.rt;
+                    // console.log(this.drawingWebGlList,'图纸地址');
+                    this.drawingWebGlList.forEach((item)=>{
+                        this.getWebGlDrawingList.forEach((item1)=>{
+                            if(item.drawingId==item1.id){
+                                console.log(item.drawingId,'234');
+                                  this.drawList.push({
+                                        name:item1.drawingName,
+                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        source:this.QJFileManageSystemURL+item.fileUri,
+                                        page:1,
+                                        angle:0
+                                })
+                            }
+                        })
+                    })
+                    console.log(this.drawList,'最后的东西');
+                    app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                    // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
+                    // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
+                    //  this.drawList.push({
+                    //             name:this.drawingWebGlName,
+                    //             type:this.drawingWebGlType,
+                    //             source:this.drawingWebGlUrl,
+                    //             page:1,
+                    //             angle:0
+                    //     })
+                    // console.log(this.drawingWebGlUrl,'图纸URl')
+                    
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
         },
         //获取项目模型展示初始化数据
         getInitdata(){

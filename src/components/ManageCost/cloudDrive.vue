@@ -2923,8 +2923,8 @@ export default {
                     file:list[0],//文件
                     drawingNo:'',//图号
                     proportion:'',//比例
-                    fileName:list[0].name,//文件名
-                    drawingName:list[0].name.split('.')[0],//图纸名
+                    fileName:(list[0].name).replace(/\s*/g,""),//文件名
+                    drawingName:(list[0].name).replace(/\s*/g,"").split('.')[0],//图纸名
                     dwidth:dwidth,
                     dheight:dheight
                 })

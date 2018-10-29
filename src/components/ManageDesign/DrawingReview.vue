@@ -236,7 +236,7 @@
                             <option value="1:25">1:25</option> 
                             <option value="1:30">1:30</option>
                         </select>
-                        <i class="icon-sanjiao" style="top: 16px;left: 330px;"></i>
+                        <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -1809,16 +1809,8 @@ export default {
                     document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
                     document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
                     document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
-                        // let ctx=document.getElementById('abs').getContext("2d");
-                        // let ctx_select=document.getElementById('canvas_select').getContext("2d");
-                        // ctx.rotate(this.rotate*Math.PI/180);
-                        // ctx_select.rotate(this.rotate*Math.PI/180);
-                    
                 }else{
-                    // this.$message({
-                    //     type:'error',
-                    //     message:response.data.msg
-                    // })
+                    
                 } 
             })
         },
@@ -2792,8 +2784,8 @@ export default {
                     file:list[0],//文件
                     drawingNo:'',//图号
                     proportion:'',//比例
-                    fileName:list[0].name,//文件名
-                    drawingName:list[0].name.split('.')[0],//图纸名
+                    fileName:(list[0].name).replace(/\s*/g,""),//文件名
+                    drawingName:(list[0].name).replace(/\s*/g,"").split('.')[0],//图纸名
                     dwidth:dwidth,
                     dheight:dheight
                 })
