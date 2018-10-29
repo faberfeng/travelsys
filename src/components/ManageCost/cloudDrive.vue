@@ -56,7 +56,7 @@
                             <li class="item-upload" v-if="!showQuanJing&&systemDrawFile"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
                         </ul>
                         <ul class="operation">
-                            <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(true)">剪切</li>
+                            <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder"  @click="copyfile(true)">剪切</li>
                             <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder" @click="downloadFile" >下载</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li>
@@ -2530,6 +2530,7 @@ export default {
             ugList: [], //群组列表
             showQuanJing: true, //控制全景和非全景的显隐
             systemDrawFile:true,
+            showBtn:true,
             checkFileDir: {}, //选中的文件夹信息
             QJ: {
                 imageBackground: {},
@@ -2635,7 +2636,7 @@ export default {
         this.GMDUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
-        vm.getDirectory()
+        // vm.getDirectory()
         vm.createDrawingDirectory()
         vm.getHolders()
     },
@@ -3259,72 +3260,79 @@ export default {
         var fcIdList = ''
         var msg = ''
         if(val){
-            msg = '剪切'
+                msg = '剪切'
         }else{
-             msg = '复制'    
+            msg = '复制'    
         }
-        if (vm.showQuanJing) {//如果是全景图文件
-            fgIdList = vm.checkedRound.ID
-        } else {
-            for(var i=0;i<vm.fileList.length;i++){
-                if(vm.fileList[i].checked){
-                    if(vm.fileList[i].isAutoCreated == 1 && val){
-                        vm.$message({
-                            type: 'error',
-                            message: '"'+vm.fileList[i].fgName+'"'+'为系统文件，不能操作！'
-                        });  
-                        return false
-                    }
-                    if(fgIdList == ''){
-                         fgIdList = vm.fileList[i].fgId
-                    }else{
-                        fgIdList += ','+vm.fileList[i].fgId
-                    }
-                }
-            }
-            for(var j=0;j<vm.folderList.length;j++){
-                if(vm.folderList[j].checked){
-                     if(vm.folderList[j].isAutoCreated == 1 && val){
-                        vm.$message({
-                            type: 'error',
-                            message:  '"'+vm.folderList[j].nodeName+'"'+'  为系统文件，不能操作！'
-                        });  
-                        return false
-                    }
-                    // 文件夹
-                    if(fcIdList == ''){
-                         fcIdList = vm.folderList[j].nodeId
-                    }else{
-                        fcIdList += ','+vm.folderList[j].nodeId
-                    }
-                }
-            }
-        }
-
-        if(fgIdList != '' || fcIdList != ''){
-            var fileObject = {
-                fgIds: fgIdList,
-                dirId: vm.checkFileDir.nodeId,//当前文件夹ID
-                oldUgId:vm.selectUgId, //ugid是群组ID
-                projId: vm.projId,
-                fcIds: fcIdList
-            };
-            if(val){
-                 fileObject.shear = true
-            }else{
-              fileObject.shear = false   
-            }
-            sessionStorage.setItem("fileObject", JSON.stringify(fileObject)); 
-            vm.$message({
-                type:'success',
-                message:msg+'成功'
-            })
-            vm.checkFilePaste()
-        }else{
+        if(vm.showBtn==false){
             vm.$message({
                 type:'error',
-                message:msg+'失败'
+                message:'当前不支持'+msg+'操作'
             })
+        }else{
+            if (vm.showQuanJing) {//如果是全景图文件
+                fgIdList = vm.checkedRound.ID
+            } else {
+                for(var i=0;i<vm.fileList.length;i++){
+                    if(vm.fileList[i].checked){
+                        if(vm.fileList[i].isAutoCreated == 1 && val){
+                            vm.$message({
+                                type: 'error',
+                                message: '"'+vm.fileList[i].fgName+'"'+'为系统文件，不能操作！'
+                            });  
+                            return false
+                        }
+                        if(fgIdList == ''){
+                            fgIdList = vm.fileList[i].fgId
+                        }else{
+                            fgIdList += ','+vm.fileList[i].fgId
+                        }
+                    }
+                }
+                for(var j=0;j<vm.folderList.length;j++){
+                    if(vm.folderList[j].checked){
+                        if(vm.folderList[j].isAutoCreated == 1 && val){
+                            vm.$message({
+                                type: 'error',
+                                message:  '"'+vm.folderList[j].nodeName+'"'+'  为系统文件，不能操作！'
+                            });  
+                            return false
+                        }
+                        // 文件夹
+                        if(fcIdList == ''){
+                            fcIdList = vm.folderList[j].nodeId
+                        }else{
+                            fcIdList += ','+vm.folderList[j].nodeId
+                        }
+                    }
+                }
+            }
+
+            if(fgIdList != '' || fcIdList != ''){
+                var fileObject = {
+                    fgIds: fgIdList,
+                    dirId: vm.checkFileDir.nodeId,//当前文件夹ID
+                    oldUgId:vm.selectUgId, //ugid是群组ID
+                    projId: vm.projId,
+                    fcIds: fcIdList
+                };
+                if(val){
+                    fileObject.shear = true
+                }else{
+                fileObject.shear = false   
+                }
+                sessionStorage.setItem("fileObject", JSON.stringify(fileObject)); 
+                vm.$message({
+                    type:'success',
+                    message:msg+'成功'
+                })
+                vm.checkFilePaste()
+            }else{
+                vm.$message({
+                    type:'error',
+                    message:msg+'失败'
+                })
+            }
         }
       },
       /**
@@ -3468,16 +3476,23 @@ export default {
       },
       rename(){
         var vm = this
-        for(var i=0;i<vm.fileList.length;i++){
-            if(vm.fileList[i].checked && vm.fileList[i].isAutoCreated == 1){
-                vm.$message({
-                    type:'error',
-                    message:'系统文件，不能操作！'
-                })
-                return false
+        if(vm.showBtn==false){
+            vm.$message({
+                type:'error',
+                message:'当前不支持更名操作'
+            })
+        }else{
+            for(var i=0;i<vm.fileList.length;i++){
+                if(vm.fileList[i].checked && vm.fileList[i].isAutoCreated == 1){
+                    vm.$message({
+                        type:'error',
+                        message:'系统文件，不能操作！'
+                    })
+                    return false
+                }
             }
+            vm.PointFigure.renameshow = true
         }
-        vm.PointFigure.renameshow = true
       },
       updatePoint(){//更新点位
         var vm = this
@@ -3501,53 +3516,84 @@ export default {
       },
       deletePoint(){//删除点位
         var vm = this
-        var fgIdList = []
-        var msg = ''
-        if(vm.showQuanJing){
-            if(vm.checkedRound.ID !=''){
-                fgIdList.push(vm.checkedRound.ID)
-            }
-            msg = '点位'
-        }else{
-            for(var i=0;i<vm.fileList.length;i++){
-                if(vm.fileList[i].checked){
-                     if (vm.fileList[i].isAutoCreated == 1) {
-                        vm.$message({
-                            type:'error',
-                            message:'系统文件，不能操作！'
-                        })
-                        return false
-                    }
-                    fgIdList.push(vm.fileList[i].fgId)
-                }
-            }
-            msg = '文件'
-        }
-        axios({
-            method:'POST',
-            url:vm.BDMSUrl+'project2/doc/delFileGroup',
-            headers:{
-                'token':vm.token
-            },
-            params:{
-                projId:vm.projId,
-            },
-            data:fgIdList
-        }).then((response)=>{
-            if(Math.ceil(response.data.cd) == 0){
-                if(vm.showQuanJing){
-                    vm.searchFileGroupInfo()
-                }else{
-                    vm.getInfo()
-                }
-                vm.$message({
-                    type:'success',
-                    message:msg+'删除成功'
+        if(vm.showBtn==false){
+            vm.$confirm('此操作将永久删除该图纸, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method:'get',
+                        url:vm.BDMSUrl+'/dc/drawingReview/deleteDrawing',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            drawingId:vm.checkFileDir.id
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            vm.$message({
+                                type:'success',
+                                message:'图纸删除成功'
+                            })
+                        }else if(response.data.cd==-1){
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
                 })
+        }else{
+            var fgIdList = []
+            var msg = ''
+            if(vm.showQuanJing){
+                if(vm.checkedRound.ID !=''){
+                    fgIdList.push(vm.checkedRound.ID)
+                }
+                msg = '点位'
+            }else{
+                for(var i=0;i<vm.fileList.length;i++){
+                    if(vm.fileList[i].checked){
+                        if (vm.fileList[i].isAutoCreated == 1) {
+                            vm.$message({
+                                type:'error',
+                                message:'系统文件，不能操作！'
+                            })
+                            return false
+                        }
+                        fgIdList.push(vm.fileList[i].fgId)
+                    }
+                }
+                msg = '文件'
             }
-        }).catch((err)=>{
-            console.log(err)
-        })
+            axios({
+                method:'POST',
+                url:vm.BDMSUrl+'project2/doc/delFileGroup',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                },
+                data:fgIdList
+            }).then((response)=>{
+                if(Math.ceil(response.data.cd) == 0){
+                    if(vm.showQuanJing){
+                        vm.searchFileGroupInfo()
+                    }else{
+                        vm.getInfo()
+                    }
+                    vm.$message({
+                        type:'success',
+                        message:msg+'删除成功'
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }
       },
       updateImg(val,is,index,type){
           var vm = this
@@ -3629,6 +3675,11 @@ export default {
         //   }
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
+          if(vm.checkFileDir.isDrawing==1){
+              this.showBtn=false;
+          }else{
+              this.showBtn=true;
+          }
           if(vm.checkFileDir.isDrawing==1&&vm.checkFileDir.t31Code==null){
               this.systemDrawFile=false;
           }else{
