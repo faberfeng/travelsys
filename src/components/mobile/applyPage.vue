@@ -242,10 +242,10 @@
         this.applyMessage = sessionStorage.getItem("applyMessage");
       },
       setPageData:function () {
-        sessionStorage.setItem("mobile", this.mobile);
-        sessionStorage.setItem("email", this.email);
-        sessionStorage.setItem("code", this.code);
-        sessionStorage.setItem("applyMessage", this.applyMessage);
+        sessionStorage.setItem("mobile", this.mobile == null ? "" : this.mobile);
+        sessionStorage.setItem("email", this.email ? "" : this.email);
+        sessionStorage.setItem("code", this.code ? "" : this.code);
+        sessionStorage.setItem("applyMessage", this.applyMessage ? "" : this.applyMessage);
         sessionStorage.setItem("projName", this.projName);
         sessionStorage.setItem("projId", this.projId);
         sessionStorage.setItem("baseUrl", this.baseUrl);
