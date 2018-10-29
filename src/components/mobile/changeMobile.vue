@@ -156,8 +156,9 @@
                 }
               })
             } else if (response.data.msg === "已经存在") {
+
               this.$router.push({
-                name: 'hasExit',
+                name: 'hasExist',
                 params: {
                   projName: this.projName
                 }

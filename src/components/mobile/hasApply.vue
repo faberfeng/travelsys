@@ -9,10 +9,6 @@
     <div class="pNameDiv">{{projName}}</div>
     <div class="labelDiv">BIM协同管理平台的申请</div>
     <div class="labelDiv">请耐心等待管理员审核</div>
-    <div class="NullDiv"></div>
-    <div>
-      <img src="../../assets/mobile/qrCode.png"/>
-    </div>
     <div class="labelDiv">您可以更改申请留言</div>
     <div>
       <textarea class="textAreaMessage" maxlength="20" placeholder="请输入申请说明" v-model="applyMessage"></textarea>
@@ -20,6 +16,10 @@
     <span class="nameLengthDiv"><span style="color: #D20202;">{{applyMessage | getRemarkLength}}</span>/20</span>
     <div style="margin-top: 1.5rem">
       <el-button type="danger" style="width: 90%" @click="submitInfo">提交</el-button>
+    </div>
+    <div class="NullDiv"></div>
+    <div>
+      <img src="../../assets/mobile/qrCode.png"/>
     </div>
   </div>
 </template>
@@ -37,13 +37,7 @@
       }
     },
     created() {
-      console.log(this.$route.params.projName);
-      this.baseUrl = this.$route.params.baseUrl;
-      this.obj = this.$route.params.obj;
-      this.applyMessage = this.obj.applyMessage;
-      if(this.applyMessage === ''){
-        this.getPageData();
-      }
+      this.getPageData();
     },
     filters: {
       getRemarkLength: function (remark) {
