@@ -4,24 +4,32 @@
       <div class="usermanage">
           <h5 class="subtitle">用户列表
               <span class="subSpan clearfix">
-                  <span class="title-right">
+                  <span v-show="!applyShow" class="title-right">
                      <input type="text" v-model="userSearchInfo" placeholder="输入姓名"  class="title-right-icon" @keyup.enter="getInfo">
                      <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
                   </span>
-                  <span  class="btn" @click="addUser()">添加</span>
+                   <span v-show="applyShow" class="title-right">
+                     <input type="text" v-model="userApplySearchInfo" placeholder="输入姓名"  class="title-right-icon" @keyup.enter="getApplyList">
+                     <span  class="title-right-edit-icon el-icon-search" @click="getApplyList"></span>
+                  </span>
+                  <span v-show="!applyShow"  class="btn" @click="addUser()">添加</span>
+                  <span v-show="applyShow" class="btn2" @click="checkApplyCancle()">返回</span>
+                  <span  class="btn1" @click="checkApply()">查看申请</span>
              </span>
           </h5>
-          <div style="padding:0 20px;box-sizing: border-box;">
+
+          <div v-show="!applyShow" style="padding:0 20px;box-sizing: border-box;">
             <table class="UserList" border="1" width='100%'>
                 <thead>
                     <tr  class="userList-thead">
                         <th width="15%">名称</th>
-                        <th width="20%">账号</th>
+                        <th width="15%">账号</th>
                         <th width="10%">工程管理员</th>
                         <th width="15%;">已被分配到的岗位</th>
-                         <th width="16%">添加时间</th>
-                        <th width="12%;">添加人</th>
-                         <th width="12%">操作</th>
+                         <th width="15%">添加时间</th>
+                        <th width="10%;">添加人</th>
+                        <th width="10%">备注</th>
+                         <th width="10%">操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,6 +42,7 @@
                         </td>
                          <td v-text="val.addTimeStr"></td>
                         <td v-text="val.addUser"></td>
+                        <td v-text="val.remark"></td>
                         <td>
                             <span class="editIcon" @click="addUser(val.id)"></span>
                             <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.id)"></span>
@@ -42,17 +51,17 @@
                 </tbody>
             </table>
            </div>
-           <div class="datagrid-pager pagination">
+           <div v-show="!applyShow" class="datagrid-pager pagination">
                <table cellspacing="0" cellpadding="0" border="0">
                    <tbody>
                        <tr>
                            <td>
                                <select class="pagination-page-list" v-model="pageDetial.pagePerNum">
-                               <option value="10">10</option>
-                               <option value="20">20</option>
-                               <option value="30">30</option>
-                               <option value="40">40</option>
-                               <option value="50">50</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                    <option value="50">50</option>
                                </select>
                             </td>
                             <td>
@@ -97,6 +106,90 @@
                 <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
                 <div style="clear:both;"></div>
             </div>
+        <div v-show="applyShow" style="padding:0 20px;box-sizing: border-box;">
+                <table class="UserList" border="1" width='100%'>
+                    <thead>
+                        <tr  class="userList-thead">
+                            <th width="15%">姓名</th>
+                            <th width="20%">用户名</th>
+                            <th width="10%">手机号</th>
+                            <th width="15%;">申请留言</th>
+                            <th width="16%">申请时间</th>
+                            <th width="12%;">状态</th>
+                            <th width="12%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(val,index) in userApplyList" :key="index">
+                            <td v-text="val.name"></td>
+                            <td v-text="val.account"></td>
+                            <td v-text="val.mobile"></td>
+                            <td v-text="val.applyMessage"></td>
+                            <td>{{val.applyTime|timeChange()}}</td>
+                            <td v-text="checkChange(val.status)"></td>
+                            <td>
+                                <span v-if="(val.status!=2&&val.status==3)" class="recheckIcon" @click="recheck(val.applyMessage,val.email,val.id,val.userId)" title="重审"></span>
+                                <span v-if="(val.status!=2&&val.status==1)" @click="check(val.applyMessage,val.email,val.id,val.userId)" class="checkIcon" title="审核"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+           </div>
+           <div v-show="applyShow" class="datagrid-pager pagination">
+               <table cellspacing="0" cellpadding="0" border="0">
+                   <tbody>
+                       <tr>
+                           <td>
+                               <select class="pagination-page-list" v-model="pageDetialApply.pagePerNum">
+                               <option value="10">10</option>
+                               <option value="20">20</option>
+                               <option value="30">30</option>
+                               <option value="40">40</option>
+                               <option value="50">50</option>
+                               </select>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePageApply(0)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePageApply(-1)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-left:5px;">第</span>
+                            </td>
+                            <td>
+                                  <input class="pagination-num" type="text" v-model="pageDetialApply.currentPage">
+                            </td>
+                            <td>
+                                 <span  class="pagination-title" style="padding-right:5px;">共{{pageDetialApply.pageNum}}页</span>
+                            </td>
+                            <td>
+                                 <div class="pagination-btn-separator"></div>
+                            </td>
+                             <td>
+                                <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePageApply(1)"></a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePageApply(2)"></a>
+                            </td>
+                            <td>
+                                  <div class="pagination-btn-separator"></div>
+                            </td>
+                            <td>
+                                 <a href="javascript:void(0)" @click="getInfo" class="btn-refresh btn-TAB"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetialApply.pagePerNum+',共'+pageDetialApply.total+'记录'"></div>
+                <div style="clear:both;"></div>
+            </div>
       </div>
         <el-dialog :title="title" :visible.sync="adduser" :before-close="userClose">
             <div  v-if="userDetial.show">
@@ -110,7 +203,7 @@
                     <span class="btn" @click="searchUser">查询</span>
                 </div>
             </div>
-            <div  class="log-body clearfix">
+            <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
                     <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
@@ -130,6 +223,10 @@
                     </span>
                 </div>
             </div>
+            <div class="log-body clearfix">
+                <span class="log-head-title">备注信息:</span>
+                <input class="inp-head" v-model="remarkIfo" placeholder="请输入备注"/>
+            </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">指定岗位:</span>
                 <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
@@ -142,6 +239,69 @@
             <span slot="footer" class="dialog-footer">   
                 <el-button type="primary" @click="PostaddUser">保存</el-button>
                 <el-button @click="userClose">取 消</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="核实用户" :visible.sync="applyuser" :before-close="applyClose">
+            <!-- <div  v-if="userDetial.show">
+                <div class="log-head clearfix">
+                    <span class="log-head-title">查找用户:</span>
+                    <el-radio v-model="userDetial.posType" label="1">邮箱</el-radio>
+                    <el-radio v-model="userDetial.posType" label="2">账号</el-radio>
+                </div>
+                <div  class="JobName clearfix">
+                    <input type="text" v-model="userDetial.posName" placeholder="请输入" @keyup.enter="searchUser">
+                    <span class="btn" @click="searchUser">查询</span>
+                </div>
+            </div> -->
+            <div class="log-body clearfix">
+                <span class="log-head-title">用户信息:</span>
+                <div class="clearfix userInfo">
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="info-user">
+                        <p>
+                            <span class="name">姓名:</span>
+                            <span class="detial" v-text="userDetial.info.realName"></span>
+                        </p>
+                        <p>
+                            <span class="name">账号:</span>
+                            <span class="detial" v-text="userDetial.info.account" style="color:#666;font-weight: normal;"></span>
+                        </p>
+                        <p>
+                            <span class="name">邮箱:</span>
+                            <span class="detial" v-text="userDetial.info.email"  style="color:#666;font-weight: normal;"></span>
+                        </p>
+                    </span>
+                </div>
+            </div>
+            <div class="log-body clearfix">
+                <span class="log-head-title">备注信息:</span>
+                <input class="inp-head" v-model="remarkIfo" placeholder="请输入备注"/>
+            </div>
+            <div class="log-body clearfix">
+                <span class="log-head-title">留言:</span>
+                <input class="inp-head" v-model="applyMessage" placeholder="申请留言"/>
+            </div>
+            <div  class="log-body clearfix">
+                <span class="log-head-title">指定岗位:</span>
+                <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
+                    <el-checkbox class="log-head-position" v-model="position_default.checkFlg">工程管理员</el-checkbox>
+                    <div class="position-all">
+                        <el-checkbox  v-model="item.checkFlg"   v-for="(item,index) in position_list" :key="index" >{{item.posName}}</el-checkbox>
+                    </div>
+                </div>
+            </div>
+            <!-- <div  class="log-body clearfix">
+                <span class="log-head-title">指定群组:</span>
+                <div style="width:100%;padding-left:80px;float:left;text-align: left;margin-top: -5px;" class="clearfix">
+                    <div class="position-all">
+                        <el-checkbox  v-model="item.checkFlg"   v-for="(item,index) in position_list" :key="index" >{{item.posName}}</el-checkbox>
+                    </div>
+                </div>
+            </div> -->
+            <span slot="footer" class="dialog-footer">   
+                <el-button type="primary" @click="PostaddApplyUser(2)">保存</el-button>
+                <el-button type="warning" @click="PostaddApplyUser(3)" >拒绝</el-button>
+                <el-button @click="applyClose">取 消</el-button>
             </span>
         </el-dialog> 
   </div>
@@ -200,6 +360,22 @@
                 height: 16px;
                 background: url('../../assets/delete.png')no-repeat 0 0;
                 cursor: pointer;
+            }
+            .recheckIcon{
+                float: left;
+                width: 16px;
+                height: 16px;
+                background: url('../../assets/recheck.png')no-repeat 0 0;
+                cursor: pointer;
+                margin-right: 20px;
+            }
+            .checkIcon{
+                float: left;
+                width: 16px;
+                height: 16px;
+                background: url('../../assets/check.png')no-repeat 0 0;
+                cursor: pointer;
+                margin-right: 20px;
             }
             .UserList{
                 border-collapse: collapse;
@@ -311,7 +487,10 @@
                             font-weight: bold;
                             float: left;
                         }
-                       
+                        .inp-head{
+                            width:100px;
+                            height: 30px;
+                        }
                         .el-radio{
                             float: left;
                             span{
@@ -374,6 +553,18 @@
                             color: #333333;
                             line-height: 14px;
                             font-weight: bold;
+                        }
+                        .inp-head{
+                            width:150px;
+                            height: 26px;
+                            float: left;
+                            margin-left: 81px;
+                            height: 32px;
+                            padding: 0 10px;
+                            box-sizing: border-box;
+                            border-radius: 2px;
+                            border: 1px solid #e0e0e0;
+                            background: #fafafa;
                         }
                          .userInfo{
                             float: right;
@@ -516,7 +707,7 @@
 
 <script>
 import axios from 'axios'
-
+import moment from 'moment'
 export default {
   name:'',
   data(){
@@ -526,7 +717,9 @@ export default {
           },
           title:'添加用户',
           userList:[],//用户列表
+          userApplyList:[],//申请用户列表
           userSearchInfo:'',//岗位类型
+          userApplySearchInfo:'',//查找名称
           jobTree:[],
           jobTree_checked:[],
           jobTree_opend:[],
@@ -535,6 +728,8 @@ export default {
             label: 'authName'
           },
           adduser:false,//false
+          applyuser:false,//审核数据
+          applyId:'',//申请ID
           edituser:false,
           radio: 'email',
           checked:false,
@@ -554,10 +749,19 @@ export default {
               total:'',//所有数据
               pageNum:0//页面数
           },
+          pageDetialApply:{
+              pagePerNum:20,//一页几份数据
+              currentPage:1,//初始查询页数 第一页
+              total:'',//所有数据
+              pageNum:0//页面数
+          },
           projUserId:0,//编辑的用户ID
           token:'',
           BDMSUrl:'',
-          QJFileManageSystemURL:''
+          QJFileManageSystemURL:'',
+          applyShow:false,//是否申请
+          remarkIfo:'',//备注信息
+          applyMessage:'',//申请留言
       }
   },
   watch:{
@@ -570,7 +774,23 @@ export default {
       },
        'pageDetial.currentPage':function(newVal,old){//多重属性用''阔起
           this.getInfo()
+      },
+       'pageDetialApply.pagePerNum':function(newVal,old){
+         this.pageDetialApply.currentPage = 1
+          this.getApplyList()
+      },
+       'pageDetialApply.currentPage':function(newVal,old){
+          this.getApplyList()
       }
+  },
+  filters:{
+    timeChange(val) {
+            if (val == null) {
+            return;
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
   },
   created(){
       var vm = this
@@ -584,6 +804,123 @@ export default {
     //   vm.getJobShuXingTu()
   },
   methods:{
+      //
+      checkChange(val){
+          if(val==1){
+              return '未审核'
+          }else if(val==2){
+              return '已通过'
+          }else if(val==3){
+              return '被拒绝'
+          }
+      },
+      //审核
+      check(applyMessage,mail,id,userId){
+          var vm=this;
+          this.applyuser=true;
+          this.applyId=id;
+          this.applyMessage=applyMessage;
+          if(userId){//编辑用户
+                vm.userDetial.show = false
+                this.modelUser();
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        params:mail
+                    }
+                }).then((response)=>{
+                    vm.userDetial.info = response.data.rt
+                    // vm.projUserId = response.data.rt.userId
+                    // vm.remarkIfo=response.data.rt.remark
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
+      },
+      modelUser(){
+          var vm=this;
+        axios({//添加用户
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/addProjectUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId: vm.projId,
+                    }
+                    }).then((response)=>{
+                    vm.position_default = response.data.rt.positions[0]
+                    vm.position_list = response.data.rt.positions.slice(1)
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+      },
+      //重审核
+      recheck(applyMessage,mail,id,userId){
+           var vm=this;
+          this.applyuser=true;
+          this.applyId=id;
+          this.applyMessage=applyMessage;
+          if(userId){//编辑用户
+                vm.userDetial.show = false
+                this.modelUser();
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        params:mail
+                    }
+                }).then((response)=>{
+                    vm.userDetial.info = response.data.rt
+                    // vm.projUserId = response.data.rt.userId
+                    // vm.remarkIfo=response.data.rt.remark
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
+      },
+      //获取项目申请列表
+        getApplyList(){
+           var vm = this;
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'project2/Config/getApplyList',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    // vm.pageDetialApply.currentPage,
+                    page: vm.pageDetialApply.currentPage,
+                    rows: vm.pageDetialApply.pagePerNum,
+                    name: vm.userApplySearchInfo,
+                    projId:vm.projId,
+                    status:0
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    vm.userApplySearchInfo ='';//搜索完清空
+                    vm.userApplyList = response.data.rt.rows;
+                    vm.pageDetialApply.total = response.data.rt.total;
+                    vm.pageDetialApply.pageNum =  Math.ceil(vm.pageDetialApply.total/vm.pageDetialApply.pagePerNum);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg);
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+                
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
         changePage(val){//分页 0 -1 1 2
             var vm = this 
             var pageNum = Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum)
@@ -606,6 +943,33 @@ export default {
                         break;
                     case 2:
                          vm.pageDetial.currentPage = pageNum
+                        break;
+                }
+            }
+
+        },
+         changePageApply(val){//分页 0 -1 1 2
+            var vm = this 
+            var pageNum = Math.ceil(vm.pageDetialApply.total/vm.pageDetialApply.pagePerNum)
+            if(vm.pageDetialApply.currentPage == 1 && (val == 0 || val == -1)){
+                vm.$message('这已经是第一页!')
+                return false
+            }else if(vm.pageDetialApply.currentPage == pageNum && (val == 1 || val == 2)){
+                vm.$message('这已经是最后一页!')
+                return false
+            }else{
+                switch(val){
+                    case 0:
+                         vm.pageDetialApply.currentPage = 1
+                        break;
+                    case -1:
+                         vm.pageDetialApply.currentPage--
+                        break;
+                    case 1:
+                         vm.pageDetialApply.currentPage++
+                        break;
+                    case 2:
+                         vm.pageDetialApply.currentPage = pageNum
                         break;
                 }
             }
@@ -812,6 +1176,7 @@ export default {
                     vm.position_default = response.data.rt.positions[0]//工程管理员岗位
                     vm.position_list = response.data.rt.positions.slice(1)//可选其他岗位
                     vm.projUserId = response.data.rt.projUserId
+                    vm.remarkIfo=response.data.rt.remark
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -835,6 +1200,34 @@ export default {
                 })
             }
         },
+        //查看申请
+        checkApply(){
+            var vm=this;
+            vm.applyShow=true;
+            this.getApplyList();
+             vm.userDetial.posName = ''
+            vm.userDetial.posType = '1'
+            vm.userDetial.show = true
+            vm.userDetial.info = {}
+            vm.remarkIfo='';
+            vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
+
+        },
+        checkApplyCancle(){
+            var vm=this;
+            vm.applyShow=false;
+             vm.userDetial.posName = ''
+            vm.userDetial.posType = '1'
+            vm.userDetial.show = true
+            vm.userDetial.info = {}
+            vm.remarkIfo='';
+            vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
+            this.getInfo();
+        },
         userClose(){
             var vm = this
             //清空数据
@@ -843,12 +1236,21 @@ export default {
             vm.userDetial.show = true
             vm.userDetial.info = {}
             vm.adduser = false
+            vm.remarkIfo=''
+             vm.position_default={};//工程管理员岗位
+            vm.position_list=[];//可选其他岗位
+            vm.projUserId=0;
         //     userDetial:{
         //     posName: "",
         //     posType: '1',
         //     show:true,
         //     info:{},//具体信息
         //   },
+        },
+        applyClose(){
+            var vm =this
+            vm.applyuser=false
+
         },
         PostaddUser(){
              var vm = this
@@ -866,6 +1268,7 @@ export default {
                     hasPosition = true
                 }
             }
+            console.log(isAdmin,posIds,this.remarkIfo,vm.userDetial.info.userId+'',vm.projUserId)
             if(!vm.userDetial.info.userId){
                 vm.$message({
                     type:'warning',
@@ -877,6 +1280,13 @@ export default {
                 vm.$message({
                     type:'warning',
                     message:'该用户至少选择一个岗位！'
+                })
+                return false
+            }
+            if(vm.remarkIfo==''){
+                vm.$message({
+                    type:'warning',
+                    message:'请输入备注信息！'
                 })
                 return false
             }
@@ -892,6 +1302,7 @@ export default {
                 data:{
                     isAdmin: isAdmin,
                     posIds: posIds,
+                    remark:this.remarkIfo,
                     projUserId: vm.projUserId,
                     userId: vm.userDetial.info.userId+''
                 }
@@ -903,6 +1314,93 @@ export default {
                         message:'添加用户成功！'
                     })
                     vm.getInfo()
+                 }else{
+                     vm.$message({
+                         type:'error',
+                         message:response.data.msg
+                     })
+                 }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+
+        //审核通过
+        PostaddApplyUser(statusVal){
+            var vm = this
+             var posIds = []
+             var isAdmin = 1
+             var hasPosition = false
+            if(vm.position_default.checkFlg){
+                posIds.push(vm.position_default.id+'')
+                isAdmin = 2
+                hasPosition = true
+            }
+            for(var i=0;i<vm.position_list.length;i++){
+                if(vm.position_list[i].checkFlg){
+                    posIds.push(vm.position_list[i].id+'')
+                    hasPosition = true
+                }
+            }
+            console.log(isAdmin,posIds,this.remarkIfo,vm.userDetial.info.userId+'',vm.projUserId)
+            if(!vm.userDetial.info.userId){
+                vm.$message({
+                    type:'warning',
+                    message:'请选择一个用户！'
+                })
+                return false
+            }
+            if(!hasPosition){
+                vm.$message({
+                    type:'warning',
+                    message:'该用户至少选择一个岗位！'
+                })
+                return false
+            }
+            if(vm.remarkIfo==''){
+                vm.$message({
+                    type:'warning',
+                    message:'请输入备注信息！'
+                })
+                return false
+            }
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'project2/Config/applyPassOrRefuse',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projId:vm.projId,
+                    status:statusVal,
+                    id:this.applyId,
+                    applyMessage:this.applyMessage
+                },
+                data:{
+                    isAdmin:isAdmin,
+                    posIds: posIds,
+                    remark:this.remarkIfo,
+                    projUserId: vm.projUserId,
+                    userId: vm.userDetial.info.userId+''
+                }
+            }).then((response)=>{
+                 if(response.data.cd == 0){
+                    vm.userClose()
+                    if(statusVal==2){
+                        vm.$message({
+                            type:'success',
+                            message:'审核通过！'
+                        })
+                    }else if(statusVal==3){
+                        vm.$message({
+                            type:'info',
+                            message:'审核被拒绝！'
+                        })
+                    }
+                    this.getApplyList()
+                    this.applyuser=false;
+
+                    // vm.getInfo()
                  }else{
                      vm.$message({
                          type:'error',
@@ -1048,6 +1546,43 @@ export default {
        letter-spacing: 2px;
        font-weight: normal;
     } 
+    .btn1{
+        float: left;;
+       width: 120px;
+       height: 32px;
+       margin-left:10px;
+       border-radius: 2px;
+       background: #fc3439;
+       color: #ffffff;
+       font-size: 14px;
+       text-align: right;
+       line-height: 32px;
+       cursor: pointer;
+       position: relative;
+       padding: 0 28px;
+       box-sizing: border-box;
+       letter-spacing: 2px;
+       font-weight: normal;
+
+    }
+    .btn2{
+        float: left;;
+       width: 96px;
+       height: 32px;
+       border-radius: 2px;
+       background: #fc3439;
+       color: #ffffff;
+       font-size: 14px;
+       text-align: right;
+       line-height: 32px;
+       cursor: pointer;
+       position: relative;
+       padding: 0 28px;
+       box-sizing: border-box;
+       letter-spacing: 2px;
+       font-weight: normal;
+
+    }
      .btn::after{
          display: block;
          position: absolute;

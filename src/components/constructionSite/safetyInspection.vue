@@ -80,7 +80,7 @@
                         </div>
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span id="inspectContentSel">
-                                <select v-model="drawItemId"  @change="changeType"  class="inspectSel">
+                                <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
                                     <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
                                 </select>
                                 <i class="icon-sanjiao"></i>
@@ -166,12 +166,12 @@
                                     <td v-text="item.name"></td>
                                     <td v-text="item.logogram"></td>
                                     <td v-text="item.count"></td>
-                                    <td >{{item.latestTime|addSprit()}}</td>
+                                    <td >{{item.latestTime|timeChange()}}</td>
                                     <td >{{item.recentPointName|addSprit()}}</td>
-                                    <td>{{item.recentVariation|addSprit()}}</td>
+                                    <td>{{item.recentVariation|addSprit1()}}</td>
                                     <td>{{item.recentAlert|shifouChange()}}</td>
                                     <td>{{item.totalPointName|addSprit()}}</td>
-                                    <td>{{item.totalVariation|addSprit()}}</td>
+                                    <td>{{item.totalVariation|addSprit2()}}</td>
                                     <td>{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
@@ -500,8 +500,7 @@ export default {
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
             monitorPointInfo:'',//所有图纸监测点信息
-            monitorWord:'',//监测文字
-            
+            monitorWord:'',//监测文字       
         }
     },
     created(){
@@ -541,7 +540,28 @@ export default {
             }else {
                 return val
             }
-        }
+        },
+        addSprit1(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.recentVariation
+            }
+        },
+        addSprit2(val){
+             if(val==null){
+                return '/'
+            }else {
+                return val.totalVariation
+            }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
     },
     watch:{
         selectUgId:function(val){
@@ -561,6 +581,7 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+
         //类型改变
         changeType(){
             this.monitorMainItemList.forEach((item)=>{
@@ -571,11 +592,9 @@ export default {
             })
              console.log(this.drawItemType,'type');
         },
-
         picView_status_changed(status){
             console.log(status);
         },
-
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
@@ -1669,6 +1688,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    this.monitorMainTableList.forEach((item)=>{
+                        
+                    })
                     // this.drawItemId=this.monitorMainTableList[0].id;
                 }
             })

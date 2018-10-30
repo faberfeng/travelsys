@@ -24,6 +24,17 @@
                         </div>
                     </div>
                 </li>
+                <li class="pre" id="preQRCode">
+                    <span>加入工程二维码</span>
+                    <div class="QRCode">
+                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/10/5'" style="width:175px;height:175px;"/>
+                    </div>
+                    <div class="QRCode1">
+                         <div class="fulscreen" @click="fullSreen()"><img class="fulscreenImg" src="./images/fullSreen1.png">全屏</div>
+                        <div class="downFile" @click="downQRCode()"><img class="downFileImg" src="./images/downFile1.png">下载</div>
+                    </div>
+                   
+                </li>
             </ul>
         </div>
         
@@ -56,6 +67,17 @@
         </div>
         <!--弹出的对话框-->
         <div id="edit">
+            <el-dialog width="400px" :visible.sync="fullSreenShow" @close="fullSreenCancle()">
+                <div class="qrcodeBody">
+                    <div>
+                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/15/9'" style="width:235px;height:235px;border-radius:4px;"/>
+                    </div>
+                    <div style="font-size:18px;color:#333333;margin-top:10px;">打开手机浏览器扫码申请加入</div>
+                    <div style="font-size:16px;color:#999999;margin-top:10px;">{{projectName}}</div>
+                    <div style="font-size:16px;color:#999999;margin-top:5px;">BIM协调管理平台</div>
+
+                </div>
+            </el-dialog>
             <el-dialog title="新增工程概况信息" :visible.sync="addDialog" @close="addCancle">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="projectUnity"/></div>
@@ -114,6 +136,8 @@
                 </div>
             </el-dialog>
         </div>
+        <!-- <div id="mask" v-if="fullSreenShow" ></div> -->
+        
     </div>
 </template>
 <script>
@@ -162,15 +186,19 @@ export default {
             userId:'',
             QJFileManageSystemURL:'',
             projectLogoConfig:{},
+            fullSreenShow:false,
+            projectName:'',
         }
     },
     created(){
        // var vm = this;
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         this.BDMSUrl = this.$store.state.BDMSUrl+'project2/'
+        this.BDMSUrlQRCode=this.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
+        this.projectName = localStorage.getItem('projectName');
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
@@ -181,6 +209,20 @@ export default {
         }
     },
     methods:{
+        //下载二维码
+        downQRCode(){
+            var vm=this;
+            window.open(vm.BDMSUrlQRCode+'QRCode2/ApplyQr/'+vm.projId+'/27/15');
+        },
+        //全屏
+        fullSreen(){
+            var vm=this;
+            vm.fullSreenShow=true;
+        },
+        fullSreenCancle(){
+            var vm=this;
+            vm.fullSreenShow=false;
+        },
         add(){
             this.addDialog = true;
         },
@@ -625,6 +667,46 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    .pre .QRCode{
+         width: 100%;
+         height: 150px;
+         margin-left: 21px;
+        margin-top:10px;
+        /* display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center; */
+    }
+    .pre .QRCode1{
+        /* width: 100%;
+        height: 50px;
+        margin-left: 21px;
+        margin-top:10px; */
+        /* float: left; */
+        position: absolute;
+        left:124px;
+        bottom: -22px;
+    }
+    .pre .QRCode1 .fulscreen{
+        color:#fc3439;
+        font-size:12px;
+        font-weight: normal;
+        cursor: pointer;
+        display: inline-block;
+        width: 80px;
+    }
+    .pre .QRCode1 .fulscreen .fulscreenImg{
+        margin-top:10px;
+    }
+
+    .pre .QRCode1 .downFile{
+         color:#336699;
+        font-size:12px;
+        font-weight: normal;
+        cursor: pointer;
+        display: inline-block;
+        width: 78px;
+    }
     .pre .imgedit,.pre .imgdelete{
         visibility:hidden;
         position: relative;
@@ -636,6 +718,10 @@ export default {
     }
     #pre{
         height: 100px;
+    }
+    #preQRCode{
+        height: 160px;
+        position: relative;
     }
     #pre span{
         line-height: 20px;
@@ -859,6 +945,10 @@ export default {
     #edit .imageBody{
        text-align: left;
     }
+    #edit .qrcodeBody{
+        height: 420px;
+
+    }
     .imageBody .imageBodyText{
         color: #666;
         font-size: 14px;
@@ -879,5 +969,15 @@ export default {
         top: 0px;
         opacity: 0;
         /* -ms-filter: 'alpha(opacity=0)'; */
+    }
+    #mask{
+        z-index: 3000;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: .5;
+        background: #000;
     }
 </style>

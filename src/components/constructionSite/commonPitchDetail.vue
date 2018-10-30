@@ -847,7 +847,6 @@ select.autoImport{
                     float: right;
                     position:relative;
                     .autoImportTxt{
-                        // display: inline-block;
                         color:#999999;
                         font-size: 12px;
                         width: 60px;

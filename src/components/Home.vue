@@ -141,7 +141,26 @@ export default {
             WebGlUrl:'',
             WebGlType:'',
             WebGlName:'',
-            iframeUrl:''
+            iframeUrl:'',
+            GetDrawingBackList:'',//有图形传递过来的数据
+            getWebGlDrawingList:'',//图纸列表
+            GetDrawingBackList:'',//webgl图纸返回数据
+            drawingWebGlUrl:'',//图纸路径
+            drawingWebGlId:'',//图纸ID
+            drawingWebGlIdList:[],//图纸数组ID
+            drawingWebGlType:'',//图纸类型
+            drawingWebGlList:'',
+            ListJSON:'',
+            //图纸列表数量
+            drawsingList:{
+                name:'',
+                type:'',
+                source:'',
+                page:1,
+                angle:0,
+            },
+            drawList:[],
+            rotate:'',
         }
     },
     created(){
@@ -198,13 +217,139 @@ export default {
 			case "CurrentSelectedEnt":
 				break;
 			case "ViewpointSubmited":
-				break;
+                break;
+            case "GetDrawingList":
+             this.GetDrawingBackList='',
+                this.drawList=[];
+            this.GetDrawingBackList=e.data.parameter;
+            // console.log(this.GetDrawingBackList,'图纸')
+            this.getDrawingList();
+                break;
 		    }
         },
 
         changeFrameHeight(){
             var ifm= document.getElementById("webIframe"); 
             ifm.height=document.documentElement.clientHeight;
+        },
+        //获取图纸列表
+        getDrawingList(){
+            // console.log(this.GetDrawingBackList,'图纸')
+            var vm=this;
+            this.drawingWebGlIdList=[];
+            axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'dc/drawingReview/getDrawingList',
+            params:{
+                projectId:vm.projId
+            }
+            }).then(response=>{
+                if(response.data.rt){
+                    this.getWebGlDrawingList=response.data.rt;
+                    this.getWebGlDrawingList.forEach((item)=>{
+                        if(this.GetDrawingBackList.holderID==item.holderId){
+                            if(this.GetDrawingBackList.GCodeList.length!=0){
+                                
+                                for(var i=0;i<this.GetDrawingBackList.GCodeList.length;i++){
+                                    if((this.GetDrawingBackList.GCodeList)[i]==item.directory){
+                                        this.drawingWebGlId=item.id;
+                                        this.drawingWebGlIdList.push(this.drawingWebGlId);
+                                    }
+                                }
+                            }else{
+                                this.drawingWebGlId=item.id;
+                                this.drawingWebGlIdList.push(this.drawingWebGlId);
+                            }
+                            // console.log(this.drawingWebGlIdList,'drawingWebGlIdList');
+                        }
+                    })
+                   
+                    if(this.drawingWebGlIdList.length!=0){
+                        this.getMaxVersionPath();
+                     }
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取图纸最新版本路径
+        getMaxVersionPath(){
+            var vm=this;
+            this.drawList=[];
+            axios({
+            method:'post',
+            headers:{
+                'token':this.token
+            },
+            url:this.BDMSUrl+'dc/drawingReview/getMaxVersionPath',
+            data:this.drawingWebGlIdList
+            }).then(response=>{
+                if(response.data.rt){
+                    this.drawingWebGlList=response.data.rt;
+                    // console.log(this.drawingWebGlList,'图纸地址');
+                    this.drawingWebGlList.forEach((item)=>{
+                        this.getWebGlDrawingList.forEach((item1)=>{
+                            if(item.drawingId==item1.id){
+                                console.log(item.drawingId,'234');
+                                this.getDrawingRotateInfo(item.drawingId);
+                                  this.drawList.push({
+                                        name:item1.drawingName,
+                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        source:this.QJFileManageSystemURL+item.fileUri,
+                                        page:1,
+                                        angle:0
+                                })
+                            }
+                        })
+                    })
+                    // console.log(this.drawList,'最后的东西');
+                    app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
+                    // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
+                    // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
+                    //  this.drawList.push({
+                    //             name:this.drawingWebGlName,
+                    //             type:this.drawingWebGlType,
+                    //             source:this.drawingWebGlUrl,
+                    //             page:1,
+                    //             angle:0
+                    //     })
+                    // console.log(this.drawingWebGlUrl,'图纸URl')
+                    
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        getDrawingRotateInfo(val){
+            var vm=this;
+             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   drawingId:val,
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    if(response.data.rt){
+                        this.rotate=response.data.rt.rotateInfo;
+                    }
+                }else{
+                    
+                } 
+            })
+
         },
         //获取项目模型展示初始化数据
         getInitdata(){

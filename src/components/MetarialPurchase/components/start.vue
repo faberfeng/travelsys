@@ -67,8 +67,6 @@ export default {
             startValue:'',
             selectValue:array && array.length ? array[ this.selectValueIndex-2 ].label : "",
             endSelectValue:"",
-            //formRules:,
-
         }
     },
     watch:{
@@ -78,15 +76,8 @@ export default {
         endPlan: function( val,oldVal ) {
             this.getEnd();
         },
-        // startValue: function (){
-        //     if( this.start_options[index-1] < this.start_options.length-1 ){
-
-        //     }
-        //     this.start_options[this.start_options.length-1]
-        // }  
     },
     created(){
-        console.log(this.startPlan,this.endPlan)
         this.getStart();
         this.getEnd();
         this.initEndSelectValue();
@@ -94,7 +85,6 @@ export default {
     methods:{
         initEndSelectValue(){
             this.end_options.map( item => {
-                console.log(item)
                 if(item.endCondition === this.endSelectValueIndex){ 
                     this.endSelectValue = item.label;
                 }
@@ -102,14 +92,12 @@ export default {
         },
         initStartSelectValue(){
             this.start_options.map( item =>{
-                console.log(item);
                 if( item.startCondition === this.selectValueIndex ){
                     this.selectValue = item.label;
                 }
             })
         },
         endDayOnChange(val){
-            console.log( val );
             if(val < this.end_options.length - 1){
                 this.mustLast();
                 this.initEndSelectValue();
@@ -117,7 +105,6 @@ export default {
             }
         },
         startDayOnChange(val){
-            console.log(val);
             if(val < this.start_options.length - 1){
                 this.mustLast();
                 this.initStartSelectValue();
@@ -131,7 +118,6 @@ export default {
             this.endPlanDay = this.endPlan;
         },
         handleStart(){
-            //const startPlan = this.startPlanDay;
             let regEx = /^[0-9]*$/;
             if( !regEx.test( this.startPlanDay ) ){
                 this.mustNumber();
