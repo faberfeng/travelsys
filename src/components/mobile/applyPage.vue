@@ -55,7 +55,7 @@
       }
     },
     created() {
-//      this.baseUrl = this.$store.state.BDMSUrl;;
+      this.baseUrl = this.$store.state.BDMSUrl;;
       let url = window.location.href;
       let strs = url.split("/");
       let projId = strs[strs.length - 1];
