@@ -55,7 +55,7 @@
       }
     },
     created() {
-      this.baseUrl = this.$store.state.BDMSUrl;;
+//      this.baseUrl = this.$store.state.BDMSUrl;;
       let url = window.location.href;
       let strs = url.split("/");
       let projId = strs[strs.length - 1];
@@ -217,10 +217,13 @@
                 }
               })
             } else if (response.data.msg === "邮箱未激活") {
-              this.$message({
-                message: "您的账号尚未激活",
-                type: 'warning'
-              });
+              this.$router.push({
+                name: 'registerSuccess',
+                params: {
+                  email: response.data.obj.email,
+                  projName: this.projName
+                }
+              })
             } else {
               this.$message({
                 message: response.data.msg,

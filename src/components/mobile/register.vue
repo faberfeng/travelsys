@@ -8,7 +8,7 @@
     <div class="pNameDivR">请补充以下空缺信息</div>
     <div class="labelDivR">手机号</div>
     <div>
-      <input class="inputText" placeholder="请输入手机号" v-model="mobile"/>
+      <input class="inputText" readonly placeholder="请输入手机号" v-model="mobile"/>
     </div>
     <div class="labelDivR">邮箱</div>
     <div>
@@ -73,9 +73,11 @@
 
     methods: {
       submitInfo: function () {
-        if (this.account === "") { //输入不能为空
+
+        let str = this.checknickname(this.account);
+        if (str != "" ) {
           this.$message({
-            message: '账号不能为空',
+            message: str,
             type: 'warning'
           });
           return false;
@@ -130,6 +132,11 @@
                   projName: this.projName
                 }
               })
+            } else if (response.data.msg === "该账号已被注册") {
+              this.$message({
+                message: "用户名已被使用",
+                type: 'warning'
+              });
             }
           } else {
             this.$message({
@@ -142,7 +149,7 @@
       back: function () {
         this.$router.back(-1);
       },
-      getPageData:function () {
+      getPageData: function () {
         this.mobile = sessionStorage.getItem("mobile");
         this.email = sessionStorage.getItem("email");
         this.code = sessionStorage.getItem("code");
@@ -150,6 +157,26 @@
         this.projId = sessionStorage.getItem("projId");
         this.projName = sessionStorage.getItem("projName");
         this.baseUrl = sessionStorage.getItem("baseUrl");
+      },
+      checknickname: function (a) {
+        var c = /^[\w|\u4E00-\u9FA5]+$/,
+          d = a.TrimString().GetByteCount();
+        if (d == 0) {
+          return "请填写账号。";
+        } else {
+          if (d < 3) {
+            return "不少于1个汉字，或3个字符(数字，字母和下划线)。";
+          } else {
+            if (d > 20) {
+              return "不超过10个汉字，或20个字符(数字，字母和下划线)。";
+            } else {
+              if (!a.match(c)) {
+                return "账号仅可使用汉字、字母、数字或下划线。";
+              }
+            }
+          }
+        }
+        return "";
       }
     },
   }
