@@ -86,7 +86,8 @@
                                 <i class="icon-sanjiao"></i>
                             </span>
                             <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
-                            <span class="singleSpot" @click="drawingSpot()">单点</span>
+                            <span class="singleSpot" @click="drawingOneSpot">单点</span>
+                            <span class="singleSpot" @click="drawingSpots">连续</span>
                             <span class="inputText">文字</span>
                         </div>
                     </div>
@@ -102,8 +103,9 @@
                             </div>
                         </div>
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
-                            <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
-                            <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf>
+                            <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
+                            <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
+                            <picView ref="pic" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -164,12 +166,12 @@
                                     <td v-text="item.name"></td>
                                     <td v-text="item.logogram"></td>
                                     <td v-text="item.count"></td>
-                                    <td >{{item.latestTime|addSprit()}}</td>
+                                    <td >{{item.latestTime|timeChange()}}</td>
                                     <td >{{item.recentPointName|addSprit()}}</td>
-                                    <td>{{item.recentVariation|addSprit()}}</td>
+                                    <td>{{item.recentVariation|addSprit1()}}</td>
                                     <td>{{item.recentAlert|shifouChange()}}</td>
                                     <td>{{item.totalPointName|addSprit()}}</td>
-                                    <td>{{item.totalVariation|addSprit()}}</td>
+                                    <td>{{item.totalVariation|addSprit2()}}</td>
                                     <td>{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
@@ -381,10 +383,12 @@ import pdf from 'vue-pdf'
 import commonPitchDetail from './commonPitchDetail.vue' //斜度详情页组件
 import walkThrough from './walkThrough.vue' //巡视报告
 import commonDetail from './commonDetail.vue'//除斜度的详情页
+import picView from './picView.vue'
+
 var echarts = require('echarts');
 export default {
     components: {
-        pdf,commonPitchDetail,commonDetail,walkThrough
+        pdf,commonPitchDetail,commonDetail,walkThrough,picView
     },
     name:'safetyInspection',
     data(){
@@ -494,10 +498,9 @@ export default {
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
             drawItemId:'',//图纸项目ID
-            drawItemType:'',
+            drawItemType:'',//图纸类型改变
             monitorPointInfo:'',//所有图纸监测点信息
-            monitorWord:'',//监测文字
-            
+            monitorWord:'',//监测文字       
         }
     },
     created(){
@@ -537,7 +540,28 @@ export default {
             }else {
                 return val
             }
-        }
+        },
+        addSprit1(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.recentVariation
+            }
+        },
+        addSprit2(val){
+             if(val==null){
+                return '/'
+            }else {
+                return val.totalVariation
+            }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
     },
     watch:{
         selectUgId:function(val){
@@ -557,6 +581,8 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+
+        //类型改变
         changeType(){
             this.monitorMainItemList.forEach((item)=>{
                 if(item.id==this.drawItemId){
@@ -565,6 +591,9 @@ export default {
                
             })
              console.log(this.drawItemType,'type');
+        },
+        picView_status_changed(status){
+            console.log(status);
         },
         walkThroughBtn(){
             var vm=this;
@@ -1659,6 +1688,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    this.monitorMainTableList.forEach((item)=>{
+                        
+                    })
                     // this.drawItemId=this.monitorMainTableList[0].id;
                 }
             })
@@ -1755,6 +1787,12 @@ export default {
                 this.addMonitorPoint()
             }
         },
+        drawingOneSpot(){
+            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,1);
+        },
+        drawingSpots(){
+            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,2);
+        },
         //获取底图中所有的监测点
         getAllMonitorPoint(){
             var vm=this;
@@ -1790,7 +1828,6 @@ export default {
                     this.monitorMainItemList=response.data.rt;
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
-
                 }
             })
         },
@@ -2260,7 +2297,7 @@ export default {
                                     background-size: 100% 100%;
                                     content: '';
                                     top: 352px;
-                                    right: 283px;
+                                    right: 370px;
                                 }
 
                             }

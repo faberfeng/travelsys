@@ -89,7 +89,11 @@
                 <div class="pbodyright">
                     <div v-if="showDetail">
                         请在左侧内选择跟踪计划单
+                        <div class="newTemplate" :class=" isClick === 3 ?'isChange':''" @click="toggleNewTemp">
+                            <span>新建模板</span>
+                        </div>
                     </div>
+                    
                     <div v-if="!showDetail" class="scrolldiv">
                         <div class="pbodyrighttitle">
                             <div class="title-lt title">
@@ -182,7 +186,9 @@
                             
                             <div class="jindujihua">
                                 <label class="jindujihuatext">实际进度-{{currtRealStep}}</label>
+                                <span :class="planInfo.isStart == 0 ? '' : 'content-hidden'" class="startPlan" @click="StartPlan(planInfo.id)">启动计划</span>
                                 <span class="jiadutext">{{planInfo.result}}</span>
+                                
                             </div>
                             <div class="jihuabody">
                                 <ul class="jihuabodyul">
@@ -427,6 +433,7 @@ export default {
             planTemplateId: '',
             showCommonList:false,
             checkItem:{},
+            planId:'',
         }
     },
     created(){
@@ -437,6 +444,36 @@ export default {
         this.planTemplateIndex();
     },
     methods:{
+        //启动计划
+        StartPlan(){
+            console.log("启动计划");
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'project2/plan/startPlan',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    id:this.planId, 
+                }
+            }).then( res =>{
+                if(res.data.cd == 0){
+                    this.$message({
+                        message: '启动计划成功!',
+                        type: 'success'
+                    });
+                    this.getPlanInfo(this.planId);
+                }else {
+                    this.$message({
+                        message: '启动计划失败!',
+                        type: 'warring'
+                    });
+                }
+            }).catch( err =>{
+                alert(err);
+            });
+        },
         backToH(){
             this.showCommonList = false;
         },
@@ -509,6 +546,7 @@ export default {
                     if(response.data.rt != null){
                         if(response.data.rt.rows != null){
                             this.planData = response.data.rt.rows;
+                            console.log("有计划列表",this.planData)
                         }else{
                             this.planData = [];
                         }
@@ -560,6 +598,7 @@ export default {
                     if(response.data.rt != null){
                         this.templateData = response.data.rt;
                         this.planModel = this.templateData[0].id;
+                        console.log("模板管理",this.templateData);
                     }else{
                         this.templateData =[];
                     }
@@ -579,6 +618,8 @@ export default {
                 
                 this.isTemplate= true;
                 this.showButton= false;
+                this.planId = item.id;
+                console.log("有计划id",this.planId);
             }else if(flag == 2){
                 this.selectIndextwo = index;
                 this.showjindujihua = false;
@@ -592,13 +633,51 @@ export default {
                 this.selectIndexthree = index;
                 this.isTemplate= false;
                 this.showButton= true;
-                this.getTempDetail(item.id);
+                if(item == null){
+                    console.log("item为空");
+                }else {
+                    this.getTempDetail(item.id);
+                }
+                
             }
         },
+        //进入新建模板
+        // toggleNewTempTop(){
+        //     console.log("新建模板this.isClick",this.isClick);
+        //     this.selectItem(null,-1,3);
+        //     this.planTemplateName = '新模板' ;
+        //     this.startPlanList = [];
+        //     this.endPlanList = [];
+        //     this.selectValueList = [];
+        //     this.endSelectValueIndexList = [];
+        //     this.checkvalue = [];
+        //     this.checkLists_flow = this.copyflowlist();
+        //     this.checkLists_flow.map( ( item,index ) => {
+        //         item.ischeck = 1;
+        //         item.isClick = 0;
+        //         if ( index > 0 ) {
+        //             item.flowList.startPlan = 0 ;
+        //             item.flowList.endPlan = 0 ;                    
+        //             this.startPlanList.push(item.flowList.startPlan);
+        //             this.endPlanList.push(item.flowList.endPlan);
+        //             this.selectValueList.push(item.flowList.startCondition);
+        //             this.endSelectValueIndexList.push(item.flowList.endCondition);
+        //             this.checkvalue.push(item.flow);
+        //         }
+        //         if( index === 1 ) {
+        //             item.isClick = 1;
+        //         }
+        //     });
+        //     this.selectValueList = [].concat(this.selectValueList);
+        //     this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
+        // },
         //新建模板
         toggleNewTemp(){
+            // this.showDetail = false;
+            this.selectItem(null,-1,3);
             this.isNew = 1;
             this.isClick = 3;
+            
             this.planTemplateName = '新模板' ;
             this.startPlanList = [];
             this.endPlanList = [];
@@ -1046,6 +1125,7 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.orderDeatilData = response.data.rt.rows;
+                        console.log("获取清单详情",this.orderDeatilData);
                     }
                 }else{
                     alert(response.data.msg);
@@ -1077,6 +1157,7 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.planInfo = response.data.rt;
+                        console.log("获取计划详情",this.planInfo);
                         this.planTemplateName = this.planInfo.orderTitle;
                         this.getCurrentStep(this.planInfo.currtRealStep);//实际进度
                         this.getCurrtPlanStep(this.planInfo.isStart,this.planInfo.currtPlanStep,this.planInfo.currtPlanStepEnd);//计划进度
@@ -1425,6 +1506,19 @@ export default {
         .pbodyright{
             flex: 1;
             overflow-y:scroll;
+            .newTemplate {
+                width: 80px;
+                height: 25px;
+                font-size: 14px;
+                border:1px solid #fc3439;
+                border-radius: 3px;
+                text-align: center;
+                line-height: 25px;
+                cursor: pointer;               
+                color: #fc3439;
+                float: right;
+                margin:20px 20px 0 0;
+            }
             .content-hidden {
                 display: none;               
             }
@@ -1444,6 +1538,7 @@ export default {
                 padding: 0 20px 0 15px;
                 display: flex;
                 justify-content: space-between;
+                
                 .title span {
                     display: inline-block;
                     text-align: left;                   
@@ -1464,12 +1559,13 @@ export default {
                         line-height: 25px;
                         cursor: pointer;
                     }
-                    .isChange {
-                        color: #fff;
-                        background: #fc3439,
-                    }
+                    
                 }
             }
+            .isChange {
+                    color: #fff;
+                    background: #fc3439,
+                }
             .pbodyrighttitle-temp {
                 width: 100%;
                 height:1000px;
@@ -1792,8 +1888,25 @@ export default {
                 }
                 .jiadutext{
                     float: right;
+                    margin-right: 20px;
                     font-size: 12px;
                     color: #666;
+                }
+                .startPlan {
+                    background: #fc3439;
+                    border: none;
+                    border-radius: 2px;
+                    width: 68px;
+                    float: right;
+                    height: 26px;
+                    position: relative;
+                    top: 9px;
+                    // right:10px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    color: #f6f6f6;
+                    text-align: center;
+                    line-height: 26px;
                 }
             }
         }

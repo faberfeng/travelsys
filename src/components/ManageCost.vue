@@ -183,9 +183,10 @@ export default {
 			case "ViewpointSubmited":
                 break;
             case "GetDrawingList":
+                this.GetDrawingBackList='',
+                this.drawList=[];
                  this.GetDrawingBackList=e.data.parameter;
-                 console.log(this.GetDrawingBackList,'专业code');
-                 this.drawList=[];
+                //  console.log(this.GetDrawingBackList,'专业code');
                 this.getDrawingList();
                 break;
 		    }
@@ -200,6 +201,7 @@ export default {
         getDrawingList(){
             // console.log(this.GetDrawingBackList,'图纸')
             var vm=this;
+            this.drawingWebGlIdList=[];
             axios({
             method:'get',
             headers:{
@@ -215,27 +217,21 @@ export default {
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
                             if(this.GetDrawingBackList.GCodeList.length!=0){
-                                console.log(typeof(this.GetDrawingBackList.GCodeList))
+                                
                                 for(var i=0;i<this.GetDrawingBackList.GCodeList.length;i++){
                                     if((this.GetDrawingBackList.GCodeList)[i]==item.directory){
                                         this.drawingWebGlId=item.id;
                                         this.drawingWebGlIdList.push(this.drawingWebGlId);
                                     }
                                 }
-                                // this.GetDrawingBackList.forEach((item1)=>{
-                                //     // console.log(item1);
-                                //     if(item1==item.directory){
-                                //         this.drawingWebGlId=item.id;
-                                //         this.drawingWebGlIdList.push(this.drawingWebGlId);
-                                //     }
-                                // })
                             }else{
                                 this.drawingWebGlId=item.id;
                                 this.drawingWebGlIdList.push(this.drawingWebGlId);
                             }
+                            // console.log(this.drawingWebGlIdList,'drawingWebGlIdList');
                         }
                     })
-                    console.log(this.drawingWebGlIdList,'1345');
+                   
                     if(this.drawingWebGlIdList.length!=0){
                         this.getMaxVersionPath();
                      }
@@ -251,6 +247,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var vm=this;
+            this.drawList=[];
             axios({
             method:'post',
             headers:{
@@ -261,11 +258,11 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.drawingWebGlList=response.data.rt;
-                    console.log(this.drawingWebGlList,'图纸地址');
+                    // console.log(this.drawingWebGlList,'图纸地址');
                     this.drawingWebGlList.forEach((item)=>{
                         this.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
-                                console.log(item.drawingId,'234');
+                                // console.log(item.drawingId,'234');
                                 this.getDrawingRotateInfo(item.drawingId);
                                   this.drawList.push({
                                         name:item1.drawingName,
@@ -277,7 +274,7 @@ export default {
                             }
                         })
                     })
-                    console.log(this.drawList,'最后的东西');
+                    // console.log(this.drawList,'最后的东西');
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
