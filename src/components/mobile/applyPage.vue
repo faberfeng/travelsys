@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="header">BDMS建筑数据管理系统</div>
+    <div class="headerApply">BDMS建筑数据管理系统</div>
     <div class="labelDivT">申请加入</div>
     <div class="pNameDivT" v-text="projName"></div>
     <div class="labelDivT">手机号</div>
@@ -261,7 +261,7 @@
 
 </style>
 <style lang='less'>
-  .header {
+  .headerApply {
     width: 100%;
     height: 4rem;
     background-color: #fc3439;

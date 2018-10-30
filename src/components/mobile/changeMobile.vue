@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%;overflow-x: hidden">
-    <div class="header"><img @click="back" class="backImg" src="../../assets/mobile/back.png"/>
+    <div class="headerApply"><img @click="back" class="backImg" src="../../assets/mobile/back.png"/>
       <div class="headerDiv">BDMS建筑数据管理系统</div>
     </div>
     <img class="bg" src="../../assets/mobile/red_bg.png"/>
@@ -212,7 +212,7 @@
   }
 </style>
 <style lang="less">
-  .header {
+  .headerApply {
     width: 98%;
     height: 4rem;
     background-color: #fc3439;
