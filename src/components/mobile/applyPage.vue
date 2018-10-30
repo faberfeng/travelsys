@@ -220,7 +220,7 @@
               this.$router.push({
                 name: 'registerSuccess',
                 params: {
-                  email: this.email,
+                  email: response.data.obj.email,
                   projName: this.projName
                 }
               })
