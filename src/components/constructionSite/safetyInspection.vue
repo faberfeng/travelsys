@@ -164,12 +164,12 @@
                                     <td v-text="item.name"></td>
                                     <td v-text="item.logogram"></td>
                                     <td v-text="item.count"></td>
-                                    <td >{{item.latestTime|addSprit()}}</td>
+                                    <td >{{item.latestTime|timeChange()}}</td>
                                     <td >{{item.recentPointName|addSprit()}}</td>
-                                    <td>{{item.recentVariation|addSprit()}}</td>
+                                    <td>{{item.recentVariation|addSprit1()}}</td>
                                     <td>{{item.recentAlert|shifouChange()}}</td>
                                     <td>{{item.totalPointName|addSprit()}}</td>
-                                    <td>{{item.totalVariation|addSprit()}}</td>
+                                    <td>{{item.totalVariation|addSprit2()}}</td>
                                     <td>{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
@@ -537,7 +537,28 @@ export default {
             }else {
                 return val
             }
-        }
+        },
+        addSprit1(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.recentVariation
+            }
+        },
+        addSprit2(val){
+             if(val==null){
+                return '/'
+            }else {
+                return val.totalVariation
+            }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
     },
     watch:{
         selectUgId:function(val){
@@ -1659,6 +1680,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    this.monitorMainTableList.forEach((item)=>{
+                        
+                    })
                     // this.drawItemId=this.monitorMainTableList[0].id;
                 }
             })
