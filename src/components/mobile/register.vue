@@ -130,6 +130,11 @@
                   projName: this.projName
                 }
               })
+            }else if(response.data.msg === "该账号已被注册"){
+              this.$message({
+                message: "用户名已被使用",
+                type: 'warning'
+              });
             }
           } else {
             this.$message({
