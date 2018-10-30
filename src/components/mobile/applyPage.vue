@@ -42,7 +42,7 @@
     data() {
       return {
         projName: '',
-        baseUrl: 'http://10.252.26.240:8080/',
+        baseUrl: 'http://10.252.29.13:8079/',
         mobile: '',
         email: '',
         code: '',
@@ -51,11 +51,11 @@
         btnStyle: 'border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;',
         applyMessage: '',
         totalMessage: 20,
-        projId:0
+        projId: 0
       }
     },
     created() {
-      this.baseUrl = this.$store.state.BDMSUrl;;
+//      this.baseUrl = this.$store.state.BDMSUrl;;
       let url = window.location.href;
       let strs = url.split("/");
       let projId = strs[strs.length - 1];
@@ -168,7 +168,7 @@
           },
         }).then((response) => {
           if (response.data.result) {
-            if(response.data.msg === '账号不存在'){
+            if (response.data.msg === '账号不存在') {
               this.$router.push({
                 name: 'register',
                 params: {
@@ -180,21 +180,21 @@
                   baseUrl: this.baseUrl
                 }
               })
-            }else if(response.data.msg === "提交成功"){
+            } else if (response.data.msg === "提交成功") {
               this.$router.push({
                 name: 'applySuccess',
                 params: {
                   projName: this.projName
                 }
               })
-            }else if(response.data.msg === "已经存在"){
+            } else if (response.data.msg === "已经存在") {
               this.$router.push({
                 name: 'hasExist',
                 params: {
                   projName: this.projName
                 }
               })
-            }else if(response.data.msg === "邮箱和手机号不匹配"){
+            } else if (response.data.msg === "邮箱和手机号不匹配") {
               this.$router.push({
                 name: 'changeMobile',
                 params: {
@@ -207,7 +207,7 @@
                   baseUrl: this.baseUrl
                 }
               })
-            }else if(response.data.msg === "已经申请"){
+            } else if (response.data.msg === "已经申请") {
               this.$router.push({
                 name: 'hasApply',
                 params: {
@@ -216,12 +216,12 @@
                   baseUrl: this.baseUrl
                 }
               })
-            }else if(response.data.msg === "邮箱未激活"){
+            } else if (response.data.msg === "邮箱未激活") {
               this.$message({
                 message: "您的账号尚未激活",
                 type: 'warning'
               });
-            }else {
+            } else {
               this.$message({
                 message: response.data.msg,
                 type: 'warning'
@@ -235,17 +235,17 @@
           }
         })
       },
-      getPageData:function () {
+      getPageData: function () {
         this.mobile = sessionStorage.getItem("mobile");
         this.email = sessionStorage.getItem("email");
         this.code = sessionStorage.getItem("code");
         this.applyMessage = sessionStorage.getItem("applyMessage");
       },
-      setPageData:function () {
+      setPageData: function () {
         sessionStorage.setItem("mobile", this.mobile == null ? "" : this.mobile);
-        sessionStorage.setItem("email", this.email ? "" : this.email);
-        sessionStorage.setItem("code", this.code ? "" : this.code);
-        sessionStorage.setItem("applyMessage", this.applyMessage ? "" : this.applyMessage);
+        sessionStorage.setItem("email", this.email == null ? "" : this.email);
+        sessionStorage.setItem("code", this.code == null ? "" : this.code);
+        sessionStorage.setItem("applyMessage", this.applyMessage == null ? "" : this.applyMessage);
         sessionStorage.setItem("projName", this.projName);
         sessionStorage.setItem("projId", this.projId);
         sessionStorage.setItem("baseUrl", this.baseUrl);
