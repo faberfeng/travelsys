@@ -37,7 +37,13 @@
       }
     },
     created() {
-      this.getPageData();
+      this.obj = this.$route.params.obj;
+      this.baseUrl = sessionStorage.getItem("baseUrl");
+      if(this.obj == null){
+        this.getPageData();
+      }else {
+        this.applyMessage = this.obj.applyMessage;
+      }
     },
     filters: {
       getRemarkLength: function (remark) {
