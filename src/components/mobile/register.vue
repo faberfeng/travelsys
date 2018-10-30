@@ -8,7 +8,7 @@
     <div class="pNameDivR">请补充以下空缺信息</div>
     <div class="labelDivR">手机号</div>
     <div>
-      <input class="inputText" placeholder="请输入手机号" v-model="mobile"/>
+      <input class="inputText" readonly placeholder="请输入手机号" v-model="mobile"/>
     </div>
     <div class="labelDivR">邮箱</div>
     <div>
