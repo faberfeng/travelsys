@@ -419,9 +419,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                      this.getItemDutyUserList=response.data.rt;
-                    //  this.inspectorName=this.getItemDutyUserList.inspector;
-                    //  this.calculatorName=this.getItemDutyUserList.calculator;
-                    //  this.observerName=this.getItemDutyUserList.observer;
+                     this.inspectorName=this.getItemDutyUserList.inspectorName;
+                     this.calculatorName=this.getItemDutyUserList.calculatorName;
+                     this.observerName=this.getItemDutyUserList.observerName;
                     // console.log(this.userGroupList)
                     //  this.userGroupList.forEach((item)=>{
                     //      if(this.getItemDutyUserList.inspector==item.userId){
@@ -924,7 +924,7 @@ export default Vue.component('commonDetail',{
                             color: #666666;
                             border-radius: 2px;
                             cursor: pointer;
-                            margin-left: 10px;
+                            margin-left: 30px;
                             margin-right: 100px;
                         }
 

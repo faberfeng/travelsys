@@ -86,9 +86,9 @@
                                 <i class="icon-sanjiao"></i>
                             </span>
                             <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
-                            <span class="singleSpot" @click="drawingOneSpot">单点</span>
-                            <span class="singleSpot" @click="drawingSpots">连续</span>
-                            <span class="inputText" @click="drawingText">文字</span>
+                            <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
+                            <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
+                            <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
                         </div>
                     </div>
                     <div class="planeFigureBody">
@@ -111,7 +111,7 @@
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
                             <ul>
                                 <li v-for="(item,index) in monitorMainItemList" :key="index">
-                                    <el-checkbox v-model="spotNum1" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">
+                                    <el-checkbox v-model="item.spotNum" @change="checkboxChange()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">
                                         {{item.name}}
                                     </el-checkbox>
                                 </li>
@@ -475,6 +475,9 @@ export default {
             pageNo:1,
             baseMapList:'',//底图列表数据
             isClick:false,//是否点击
+            isClick1:false,
+            isClick2:false,
+            isClick3:false,
             hoverShow:false,
             monitorName:'',//监测名称
             monitorType:1,//监测类型
@@ -1043,6 +1046,12 @@ export default {
         saveDraw(){
             var vm=this;
             this.editSpotShow=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+        },
+        checkboxChange(){
+            console.log(this.monitorMainItemList,'checkList')
         },
         //添加底图
         addBaseMap(file){
@@ -1119,6 +1128,9 @@ export default {
         getBaseMapListBtn(){
             this.baseMapShow=true;
             this.isClick=true;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
             this.getBaseMapList();
         },
         //获取底图列表
@@ -1937,15 +1949,29 @@ export default {
         },
         //单点触发绘图
         drawingOneSpot(){
-            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,1);
+            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+            this.monitorMainItemList.forEach((item)=>{
+                if(item.id==this.drawItemId){
+                    item.spotNum=true;
+                }
+            })
+            this.isClick1=true;
+            this.isClick2=false;
+            this.isClick3=false;
         },
         //多点触发绘图
         drawingSpots(){
-            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,2);
+            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
+            this.isClick2=true;
+            this.isClick1=false;
+             this.isClick3=false;
         },
         //添加文本
         drawingText(){
             this.$refs.pic.setDrawStatus("text",0,2);
+            this.isClick2=false;
+            this.isClick1=false;
+             this.isClick3=true;
         },
         //开启移动
         enableMove(){
@@ -1990,8 +2016,12 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainItemList=response.data.rt;
+                    this.monitorMainItemList.forEach((item,index)=>{
+                        this.$set(item,'spotNum',true)
+                    })
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
+                    console.log(this.monitorMainItemList,'monitorMainItemList')
                 }
             })
         },
