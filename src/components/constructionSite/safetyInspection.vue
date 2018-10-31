@@ -60,7 +60,7 @@
                             <li class="overviewFrameLi4">
                                 <label class="alertTxt">现场工况</label>
                                 <!-- <p>{{workingCondition}}</p> -->
-                                <p class="alertContentTxt">当日天气良好，现场安全设备齐全，人员安排合理，已进行安全措施教育，符合现场作业要求,负责施工现场的总体布署、总平面布置。协调劳务层的施工进度、质量、安全,执行总的施工方案。</p>
+                                <p class="alertContentTxt">{{workingCondition}}</p>
                             </li>
                             <!-- <li class="overviewFrameLi"></li> -->
                         </ul>

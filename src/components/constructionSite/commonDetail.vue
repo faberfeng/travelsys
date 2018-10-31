@@ -89,9 +89,9 @@
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label></span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
-                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label>
-                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">计算：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label>
-                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">检核：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label>
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">计算：</label><label style="color:#333;font-size:14px;line-height:62px">{{calculatorName}}</label>
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">检核：</label><label style="color:#333;font-size:14px;line-height:62px">{{inspectorName}}</label>
                         </span>
                         <span class="leftBtnOne" @click="editPersonBtn()">修改</span>
                     </div>
@@ -116,28 +116,52 @@
                     <div class="editBodyone">
                         <label class="editInpText">观测员</label>
                         <select v-model="observerId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">计算员</label>
                         <select v-model="calculatorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">核查员</label>
                         <select v-model="inspectorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
                         </select>
                     </div>
                 </div>
                  <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" >确定</button>
+                    <button class="editBtnS" @click="editPersonMakeSure()" >确定</button>
                     <button class="editBtnC" @click="editPersonCancle()" >取消</button>
                 </div>
-
-
+            </el-dialog>
+            <el-dialog title="修改报警值" width="600px" :visible="editAlertValueShow" @close="editAlertValueCancle()">
+                <div class="editbody">
+                    <div class="editBodyone">
+                        <label class="editInpText" style="width:27% !important">累计报警变化量：</label>
+                        <input placeholder="请输入" v-model="variationAlertTotal" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label>mm   kN</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label>mm/d  kN/d</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label>mm/h  kN/h</label>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editInpText">单次报警变化量：</label>
+                    </div> -->
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editAlertArgumentsMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="editAlertValueCancle()" >取消</button>
+                </div>
             </el-dialog>
         </div>
     </div>
@@ -167,10 +191,18 @@ export default Vue.component('commonDetail',{
             getPointDatasList:'',//数据表格
             pointId:'',//监测id
             editPersonShow:false,
+            editAlertValueShow:false,//编辑报警值
             userGroupList:'',//监测人员列表
             observerId:"",
             calculatorId:'',
             inspectorId:'',
+            observerName:'',
+            calculatorName:'',
+            inspectorName:'',
+            getItemDutyUserList:'',
+            variationAlertTotal:'',//报警变化量（累计）
+            variationAlertDay:'',//报警变化量（天）
+            variationAlertHour:'',//报警变化量（小时）
 
         }
     },
@@ -185,6 +217,7 @@ export default Vue.component('commonDetail',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getPointDatas();
         this.getUserByUserGroup();
+        this.getItemDutyUser();
     },
     filters:{
         addSprit(val){
@@ -223,6 +256,17 @@ export default Vue.component('commonDetail',{
 
     },
     watch:{
+        // calculatorId:function(val){
+
+        // },
+        // observerId:function(val){
+
+        // },
+        // inspectorId:function(val){
+
+        // }
+
+
 
     },
     methods:{
@@ -253,9 +297,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.userGroupList=response.data.rt;
-                    this.observerId=this.userGroupList[0].userName;
-                    this.calculatorId=this.userGroupList[0].userName
-                    this.inspectorId=this.userGroupList[0].userName
+                    this.observerId=this.userGroupList[0].userId;
+                    this.calculatorId=this.userGroupList[0].userId;
+                    this.inspectorId=this.userGroupList[0].userId;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -263,6 +307,12 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
+        },
+        //获取用户名
+        getUserName(){
+            
+
+
         },
         //获取警报参数
         getAlertArguments(){
@@ -287,18 +337,114 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
-        //
+        //编辑警报参数
+        editAlertArgumentsMakeSure(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/editAlertArguments',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    variationAlertTotal:this.variationAlertTotal,
+                    variationAlertDay:this.variationAlertDay,
+                    variationAlertHour:this.variationAlertHour
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.editAlertValueShow=false;
+                    this.getAlertArguments();
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         editAlertValueBtn(){
-
-
+            this.editAlertValueShow=true;
         },
         //编辑相关人员
         editPersonBtn(){
             this.editPersonShow=true;
-            
+            this.getUserByUserGroup();
         },
+        //取消监测项目人员
         editPersonCancle(){
             this.editPersonShow=false;
+        },
+        //编辑项目人员
+        editPersonMakeSure(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/editItemDutyUser',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    observer:this.observerId,
+                    calculator:this.calculatorId,
+                    inspector:this.inspectorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.editPersonShow=false;
+                    this.getItemDutyUser();
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取监测项目相关人员
+        getItemDutyUser(){
+            var vm=this;
+            // this.getUserByUserGroup();
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                     this.getItemDutyUserList=response.data.rt;
+                    //  this.inspectorName=this.getItemDutyUserList.inspector;
+                    //  this.calculatorName=this.getItemDutyUserList.calculator;
+                    //  this.observerName=this.getItemDutyUserList.observer;
+                    // console.log(this.userGroupList)
+                    //  this.userGroupList.forEach((item)=>{
+                    //      if(this.getItemDutyUserList.inspector==item.userId){
+                    //          this.inspectorName=item.userName;
+                    //      }
+                    //      if(this.getItemDutyUserList.calculator==item.userId){
+                    //          this.calculatorName=item.userName;
+                    //      }
+                    //      if(this.getItemDutyUserList.observer==item.userId){
+                    //          this.observerName=item.userName;
+                    //      }
+                    //  })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //取消编辑报警值
+        editAlertValueCancle(){
+            this.editAlertValueShow=false;
         },
         // 获取监测点采集数据（表格）
         getPointDatas(){

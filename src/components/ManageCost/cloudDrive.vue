@@ -208,7 +208,7 @@
                     @node-click="handleNodeClick"
                     id="cloudDirveFileTree"
                     >
-                     <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'',(data.isAutoCreated == 1 && data.holderId != null)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'"></span>
+                     <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'',(data.isAutoCreated == 1 && data.holderId != null || data.isDrawing==1)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="node.label?node.label:'(名称空)'"></span>
                     </el-tree>
                 </div>
             </div>
