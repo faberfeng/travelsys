@@ -161,6 +161,7 @@ export default {
             },
             drawList:[],
             rotate:'',
+            QJFileManageSystemURL:'',
         }
     },
     created(){
@@ -169,6 +170,7 @@ export default {
         vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
+        vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL;
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
          vm.iframeUrl=vm.$store.state.iframeWebGlUrl;
         vm.navigationPath = sessionStorage.getItem('navigationPath');

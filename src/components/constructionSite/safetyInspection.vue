@@ -60,7 +60,7 @@
                             <li class="overviewFrameLi4">
                                 <label class="alertTxt">现场工况</label>
                                 <!-- <p>{{workingCondition}}</p> -->
-                                <p class="alertContentTxt">当日天气良好，现场安全设备齐全，人员安排合理，已进行安全措施教育，符合现场作业要求,负责施工现场的总体布署、总平面布置。协调劳务层的施工进度、质量、安全,执行总的施工方案。</p>
+                                <p class="alertContentTxt">{{workingCondition}}</p>
                             </li>
                             <!-- <li class="overviewFrameLi"></li> -->
                         </ul>
@@ -185,6 +185,27 @@
                         </table>
 
                     </div>
+                    <div class="tableBodyPagination">
+                        <div class="tableBodyPaginationLeft">
+                            <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">最新数据：</label><label style="color:#333;font-size:14px;line-height:62px">{{nowDate}}</label></span>
+                            <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
+                                <el-select v-model="positionValue"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
+                            </span>
+                            <span class="leftTxtOne"><label style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" @click="previewAlert()">发短信报警</label></span>
+                        </div>
+                        <div class="tableBodyPaginationRight">
+                            <el-pagination class="elPagination"
+                                background
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page.sync="currentPage1"
+                                :page-sizes="[10, 20, 30, 40,50]"
+                                :page-size="10"
+                                layout="sizes,prev, pager, next"
+                                :total="50">
+                            </el-pagination>
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -193,7 +214,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" :projctName="surveyName" :itemMonitorId="detailMonitorId"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" :projctName="surveyName" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -372,6 +393,15 @@
                     <button class="editBtnC" >取消</button>
                 </div>
             </el-dialog>
+            <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()">
+                <div class="editBody">
+                    <p>{{alertMessage}}</p>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="sendAlertMessage()">发送</button>
+                    <button class="editBtnC" @click="sendAlertMessageCancle()" >取消</button>
+                </div>
+            </el-dialog>
         </div>
         
     </div>
@@ -433,6 +463,7 @@ export default {
             overwrite:false,//是否覆盖
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
+            sendAlertMessageShow:false,//是否发送报警信息弹窗
             vibrateRadio:'1',//振弦式应变计计算公式
             fileList:'',
             fileListName:'',
@@ -494,13 +525,20 @@ export default {
             walkThroughShow:false,//巡视报告
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
+            itemType:'',//传递给子组件的监测类型
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
             monitorPointInfo:'',//所有图纸监测点信息
-            monitorWord:'',//监测文字       
+            monitorWord:'',//监测文字 
+            currentPage1:1,//改变页面数 
+            positionList:'',//岗位列表    
+            alertMessage:'',//预览报警短信数据
+            positionValue:'',//岗位值
+            nowDate:'',//当前时间
+
         }
     },
     created(){
@@ -512,6 +550,8 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.getAccessUserGroup();
+        this.getPositionList();
+        this.curTime()
     },
     filters:{
         monitorTypeChange(val){
@@ -571,6 +611,10 @@ export default {
             vm.ugCompany();
             vm.getBaseMapList();
             vm.getMonitorItem();
+        },
+        positionValue:function(val){
+            var vm=this;
+            vm.getPositionList();
         }
     },
     methods:{
@@ -581,7 +625,104 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
-
+        //当前时间
+        curTime(){
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+             this.nowDate = year + "-" + month + "-" + day;
+        },
+        handleSizeChange(val){
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val){
+            console.log(`当前页: ${val}`);
+        },
+        //
+        sendAlertMessage(){
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/sendAlertMessage',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    userGroupId:this.selectUgId,
+                    position:this.positionValue
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.alertMessage=response.data.rt;
+                    this.sendAlertMessageShow=false;
+                    this.$message({
+                        type:"success",
+                        message:response.data.msg
+                    })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //预览报警短信
+        previewAlert(){
+             var vm=this;
+             this.sendAlertMessageShow=true;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/previewAlertMessage',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    userGroupId:this.selectUgId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.alertMessage=response.data.rt;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取岗位列表
+        getPositionList(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getPositionList',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.positionList=response.data.rt;
+                    this.positionValue=this.positionList[0].id;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         //类型改变
         changeType(){
             this.monitorMainItemList.forEach((item)=>{
@@ -1473,6 +1614,9 @@ export default {
         formulaSettingCancle(){
             this.formulaSettingShow=false;
         },
+        sendAlertMessageCancle(){
+            this.sendAlertMessageShow=false;
+        },
         //取消导入采集数据
         importGatherDataCancle(){
             var vm=this;
@@ -1658,6 +1802,7 @@ export default {
         detail(id,type,name){
             this.surveyName=name;
             this.detailMonitorId=id;
+            this.itemType=type;
             if(type==5){
                 this.pitchDetailShow=true;
             }else{
@@ -2634,6 +2779,40 @@ export default {
 
                                     }
                                 }
+                            }
+                        }
+                    }
+                    .tableBodyPagination{
+                        display: block;
+                        height: 62px;
+                        width: auto;
+                        border-left: 1px solid #d4d4d4;
+                        border-right: 1px solid #d4d4d4;
+                        border-bottom: 1px solid #d4d4d4;
+                        box-sizing: border-box;
+                        background: #fafafa;
+                        position: relative;
+                        .tableBodyPaginationLeft{
+                            position: absolute;
+                            left: 50px;
+                            bottom: 0px;
+                            .leftTxtOne{
+                                .el-select{
+                                    .el-input__inner{
+                                        border:none;
+                                        width: 100px;
+                                        color:#333333;
+                                        height: 38px;
+                                    }
+                                }
+                            }
+                        }
+                        .tableBodyPaginationRight{
+                            position: absolute;
+                            right: 2px;
+                            bottom: 10px;
+                            .el-pagination .el-select .el-input .el-input__inner{
+                                    height: 28px !important;
                             }
                         }
                     }
