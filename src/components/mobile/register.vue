@@ -89,6 +89,14 @@
           });
           return false;
         }
+
+        if (this.pwd.length == 0) { //输入不能为空
+          this.$message({
+            message: '密码不能为空',
+            type: 'warning'
+          });
+          return false;
+        }
         if (!isNaN(this.pwd)) { //输入不能为空
           this.$message({
             message: '密码不能全是数字',
