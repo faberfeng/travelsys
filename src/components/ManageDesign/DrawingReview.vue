@@ -175,10 +175,10 @@
                     <table class="fileContainer" border="1">
                         <thead>
                             <tr  class="userList-thead">
-                                <th style="width:20%">图号</th>
-                                <th style="width:25%">图名</th>
+                                <th style="width:15%">图号</th>
+                                <th style="width:15%">图名</th>
                                 <th style="width:12%">比例</th>
-                                <th style="width:14%">相关空间</th>
+                                <th style="width:29%">相关空间</th>
                                 <th style="width:17%;max-width:200px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
@@ -202,7 +202,7 @@
                                 </td>
                                 <td>
                                     <select v-model="holderId" class="inp-search">
-                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-text="val.holderName"></option>
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -235,6 +235,13 @@
                             <option value="1:20">1:20</option> 
                             <option value="1:25">1:25</option> 
                             <option value="1:30">1:30</option>
+                        </select>
+                        <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
+                    </div>
+                    <div class="editBodytwo imageBody" style="position: relative;">
+                        <label class=" imageBodyText">相关空间：</label>
+                        <select class="inp-search" v-model="holderId">
+                            <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option> 
                         </select>
                         <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
                     </div>
@@ -581,11 +588,22 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getHoldersList=response.data.rt;
-                    this.getHoldersList.push({ 
+                    this.getHoldersList.unshift({ 
                         "holderId": null,
                         "holderName": "无",
                         "holderType": ""
                     })
+                     this.getHoldersList.forEach((item)=>{
+                         if(item.holderType==7){
+                             item.holderName='&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==8){
+                             item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==9){
+                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                     })
                     // this.holderId=null;
                 }else{
                     this.$message({
@@ -2601,7 +2619,7 @@ export default {
             vm.editDrawing.dcode = vm.checkFileDir.drawingNumber
             vm.editDrawing.dname = vm.checkFileDir.drawingName
             vm.editDrawing.dscale = vm.checkFileDir.ratio
-
+            vm.holderId=vm.checkFileDir.holderId
         },
         updateFile(){
             var vm = this
@@ -2649,7 +2667,8 @@ export default {
                     drawingId:vm.editDrawing.dId,//这是图纸ID
                     drawingNumber:vm.editDrawing.dcode,//这是图纸图号
                     drawingName:vm.editDrawing.dname,//图纸名称
-                    ratio:vm.editDrawing.dscale//图纸比例
+                    ratio:vm.editDrawing.dscale,//图纸比例
+                    holderId:vm.holderId
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
