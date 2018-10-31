@@ -88,15 +88,15 @@
                             <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
                             <span class="singleSpot" @click="drawingOneSpot">单点</span>
                             <span class="singleSpot" @click="drawingSpots">连续</span>
-                            <span class="inputText">文字</span>
+                            <span class="inputText" @click="drawingText">文字</span>
                         </div>
                     </div>
                     <div class="planeFigureBody">
                         <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft">
-                                <span class="move"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
+                                <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
                                 <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                                <span class="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
+                                <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
                             <div class="operateToolRight">
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
@@ -995,7 +995,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.baseMapList=response.data.rt;
-                    console.log(this.baseMapList);
+                    // console.log(this.baseMapList);
                     //判断是否使用当前图纸
                     if(!this.curBaseMapUrl){
                         this.baseMapList.forEach((item)=>{
@@ -1720,11 +1720,14 @@ export default {
                 if(item.id==val&&!this.baseMapMonitor){
                     this.curBaseMapUrl=item.relativeUri;
                     this.monitorBaseMapId=item.id;
-                    this.setBaseMapUsed(item.id)
+                    this.setBaseMapUsed(item.id);
+                    this.getAllMonitorPoint();
+
                 }else if(item.id==val&&this.baseMapMonitor){
                     this.monitorBaseMapUrl=item.relativeUri;
                     this.monitorBaseMapId=item.id;
-                    this.setBaseMapUsed(item.id)
+                    this.setBaseMapUsed(item.id);
+                    this.getAllMonitorPoint();
                 }
             })
             
@@ -1781,17 +1784,31 @@ export default {
                 }
             })
         },
-        //单点触发绘图
+        //单点触发绘图(废)
         drawingSpot(){
             if(this.drawItemId){
                 this.addMonitorPoint()
             }
         },
+        //单点触发绘图
         drawingOneSpot(){
             this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,1);
         },
+        //多点触发绘图
         drawingSpots(){
             this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,2);
+        },
+        //添加文本
+        drawingText(){
+            this.$refs.pic.setDrawStatus("text",0,2);
+        },
+        //开启移动
+        enableMove(){
+            this.$refs.pic.setMoveStatus();
+        },
+        //删除点
+        deleteDraw(){
+            this.$refs.pic.deleteDraw();
         },
         //获取底图中所有的监测点
         getAllMonitorPoint(){
@@ -1806,8 +1823,10 @@ export default {
                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
+                console.log(response);
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
+                    
                 }
             })
         },

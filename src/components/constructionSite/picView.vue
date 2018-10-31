@@ -3,7 +3,8 @@
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" ></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
-            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @mousedown="oncanvasmousedown"></canvas>
+            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
+            <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
             <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
                 <input ref="number_input_input"  type = "text" style="position:absolute;left:2px;height:30px;top:2px;width:120px"/>
                 <button @click="create_Multiple_points" style="right:2px;height:30px;top:2px;width:60px;position:absolute" >确定</button>
@@ -34,16 +35,22 @@ export default {
     mounted(){
         
         this.drawStatus = "none";
-        this.moveElement = false;
+        this.editStatus = "normal";
         this.ResolutionScale = 1.0;
         this.drawCount = 1;
         this.drawList = [];
+        this.startMove = false;
+        this.drawtype_move = true;
+        this.drawtype_move = true;
+        this.drawtype_level = true;
+        this.drawtype_force = true;
+        this.drawtype_slanting = true;
 
         this.$refs.picView.style.width = this.$refs.picView.parentNode.offsetWidth + "px";
         this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
         this.old_para = "";
 
-        this.drawID = 0;
+        this.drawID = 1;
 
         setInterval(()=>{
 
@@ -60,7 +67,10 @@ export default {
                     this.$refs.picView.style.left = "0px";
                     this.$refs.picView.style.top = "0px";
                     this.url = this.para.source;
+                    
 
+                    this.ResolutionScale = this.PDFscale; 
+                    
                     this.old_para = this.para.source;
                 }
             }else{
@@ -81,7 +91,7 @@ export default {
 
 
             
-        },1000);
+        },500);
         
 
     },
@@ -95,7 +105,6 @@ export default {
     methods:{
         init(div,source,type,page_No,angle){
             
-
             this.scale_list = [0.3,0.5,0.75,0.8,1.0,1.5,2.0,3.0];
             this.scale_list_index = 4;
             this.scale = this.scale_list[this.scale_list_index];
@@ -108,7 +117,10 @@ export default {
             this.image = new Image();
             this.canvas;
             this.drawCanvas = this.$refs.drawCanvas;
+            this.drawCanvasSelect = this.$refs.drawCanvasSelect;
             this.drawcontext = this.drawCanvas.getContext('2d');
+            this.drawcontextSelect = this.drawCanvasSelect.getContext('2d');
+            this.SelectedList = [];
 
             if(page_No == undefined){
                 page_No = 1;
@@ -141,13 +153,10 @@ export default {
 
                         // this.$refs.pdfDocument.src = source;
                         // this.$refs.pdfDocument.page = 1;
-                        let a = setTimeout(()=>{
-                            this.ResolutionScale = this.$refs.pdfDocument.pdf.getResolutionScale();
-                            console.log(this.$refs.pdfDocument);
-                            console.log(this.ResolutionScale);
-                        },1000);
+                        this.ResolutionScale = this.sub_div.offsetWidth / 1024.0;
+                        this.PDFscale = this.ResolutionScale;
                         this.type = type;
-                        
+                        this.Refresh();
                     }
                     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,6 +199,8 @@ export default {
                                 this.canvas.width = this.imageSize.width;
                                 this.drawCanvas.height = this.imageSize.height;
                                 this.drawCanvas.width = this.imageSize.width;
+                                this.drawCanvasSelect.height = this.imageSize.height;
+                                this.drawCanvasSelect.width = this.imageSize.width;
                                 
                             }else{
                                 this.sub_div.height = this.imageSize.width;
@@ -198,6 +209,8 @@ export default {
                                 this.canvas.width = this.imageSize.height;
                                 this.drawCanvas.height = this.imageSize.width;
                                 this.drawCanvas.width = this.imageSize.height;
+                                this.drawCanvasSelect.height = this.imageSize.width;
+                                this.drawCanvasSelect.width = this.imageSize.height;
                             }
 
                             this.context.rotate(this.angle*Math.PI/180);
@@ -234,10 +247,12 @@ export default {
                 this.oldImageSize = {width:this.$refs.pdfDocument.$refs.canvasParent.offsetWidth,height:this.$refs.pdfDocument.$refs.canvasParent.offsetHeight};
                 this.drawCanvas.height = this.$refs.picView.offsetHeight;
                 this.drawCanvas.width = this.$refs.picView.offsetWidth;
+                this.drawCanvasSelect.height = this.$refs.picView.offsetHeight;
+                this.drawCanvasSelect.width = this.$refs.picView.offsetWidth;
                 clearInterval(timer);
             },200);
 
-            this.$refs.pdfDocument.$el.style.position = "";
+            this.$refs.pdfDocument.$el.style.position = ""; //  防抖
 
             this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
             
@@ -247,8 +262,9 @@ export default {
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
             if(e.button == 0){
-                if(this.moveElement){   //  移动标记
-
+                this.lastPostion = {x:X,y:Y};
+                if(this.editStatus == "move"){   //  移动标记
+                    this.startMove = true;
                 }else{  //  绘制标记
                     if(this.drawCount > 0){
                         this.drawCount--;
@@ -256,27 +272,98 @@ export default {
                         let find = false;
 
                         for(let i = 0;i < this.drawList.length;i++){
-                            if(this.drawList[i].SID == this.drawID){
+                            if(this.drawList[i].SID == this.drawID ){
                                 find = true;
-                                this.drawList[i].position.push({x:X,y:Y});
+                                if(this.drawList[i].type == "text"){
+                                    this.drawList[i].position.push({x:X,y:Y});
+                                }
                             }
                         }
 
-                        if(find == false){this.drawList.push({SID:this.drawID,type:this.drawtype,position:[{x:X,y:Y}],count:1});}
-                                
+                        if(find == false){
+                            // this.drawList.push({status:"normal",Selected:false,SID:this.drawID,type:this.drawtype,position:[{x:X,y:Y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"});
+                            this.drawList.push(this.create(this.drawtype,{x:X,y:Y}));
+                        }else{
+                            
+                            this.$refs.number_input_input.value = "6";
+                            this.$refs.number_input.style.display = "block";
+                        }
+
                         if(this.drawCount == 0){
                             if(this.drawList[this.drawList.length - 1].position.length == 2){
-                                this.$refs.number_input.style.left = this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale + "px";
-                                this.$refs.number_input.style.top  = this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale + "px"
+                                if(this.drawList[this.drawList.length - 1].type == "text"){
+                                    this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
+                                    this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
+                                    this.$refs.number_input_input.value = "";
+                                }
+                                // this.$refs.number_input_input.value = "6";
                                 this.$refs.number_input.style.display = "block";
                             }
+
                             this.drawID++;
                         }
 
                         this.Refresh();
+                    }else{ // 选取元素
+                        var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
+                        var red = selectColorID[0];
+                        var green = selectColorID[1];
+                        var blue = selectColorID[2];
+
+                        var SID = red + green * 256 + blue * 256 *256;
+
+                        // console.log(SID);
+
+                        this.SelectedList = [];
+
+                        for(let i = 0; i < this.drawList.length;i++){
+                            this.drawList[i].Selected = false;
+                            if(this.drawList[i].SID == SID){
+                                this.SelectedList.push(this.drawList[i]);
+                            }
+                        }
+
+                        for(let i = 0; i < this.SelectedList.length;i++){
+                            this.SelectedList[i].Selected = true;
+                        }
+
                     }
                 }
             }
+        },
+        oncanvasmousemove(e){
+            
+            let X = e.layerX / this.ResolutionScale / this.scale;
+            let Y = e.layerY / this.ResolutionScale / this.scale;
+            if(this.drawList.length > 0){
+                if(this.drawList[this.drawList.length-1].type == "text" && this.drawList[this.drawList.length-1].position.length != 2){
+                    this.drawList[this.drawList.length-1].TempPostion = {x:X,y:Y};
+                }
+            }
+
+            if(this.startMove){
+                for(let i = 0;i < this.SelectedList.length;i++){
+                    if(this.SelectedList[i].type == "text"){
+                        let dist = {x:this.SelectedList[i].position[1].x - this.SelectedList[i].position[0].x,y:this.SelectedList[i].position[1].y - this.SelectedList[i].position[0].y};
+
+                        this.SelectedList[i].position[0].x = X;
+                        this.SelectedList[i].position[0].y = Y;
+
+                        this.SelectedList[i].position[1].x = X + dist.x;
+                        this.SelectedList[i].position[1].y = Y + dist.y;
+
+                    }else{
+                        this.SelectedList[i].position[0].x = X;
+                        this.SelectedList[i].position[0].y = Y;
+                    }
+                }
+            }
+
+            this.Refresh();
+        },
+        oncanvasmouseup(e){
+            this.startMove = false;
+            this.editStatus = "normal";
         },
         onmousemove(e){
             if(this.status == "start_move"){
@@ -291,9 +378,6 @@ export default {
             e.preventDefault();
         },
         onmousedown(e){
-            // console.log(e);
-
-            // 
 
             if(e.button == 1){
                 e.preventDefault();
@@ -346,11 +430,15 @@ export default {
                             this.sub_div.style.width = this.imageSize.width + "px";
                             this.drawCanvas.height = this.imageSize.height;
                             this.drawCanvas.width = this.imageSize.width;
+                            this.drawCanvasSelect.height = this.imageSize.height;
+                            this.drawCanvasSelect.width = this.imageSize.width;
                         }else{
                             this.sub_div.style.height = this.imageSize.width + "px";
                             this.sub_div.style.width = this.imageSize.height + "px";
                             this.drawCanvas.height = this.imageSize.width;
                             this.drawCanvas.width = this.imageSize.height;
+                            this.drawCanvasSelect.height = this.imageSize.width;
+                            this.drawCanvasSelect.width = this.imageSize.height;
                         }
 
                         this.position_calculate();
@@ -379,6 +467,8 @@ export default {
                             this.canvas.width = this.imageSize.width;
                             this.drawCanvas.height = this.imageSize.height;
                             this.drawCanvas.width = this.imageSize.width;
+                            this.drawCanvasSelect.height = this.imageSize.height;
+                            this.drawCanvasSelect.width = this.imageSize.width;
                         }else{
                             this.sub_div.style.height = this.imageSize.width + "px";
                             this.sub_div.style.width  = this.imageSize.height + "px";
@@ -386,6 +476,8 @@ export default {
                             this.canvas.width = this.imageSize.height;
                             this.drawCanvas.height = this.imageSize.width;
                             this.drawCanvas.width = this.imageSize.height;
+                            this.drawCanvasSelect.height = this.imageSize.width;
+                            this.drawCanvasSelect.width = this.imageSize.height;
                         }
 
                         this.position_calculate();
@@ -428,11 +520,15 @@ export default {
                         this.sub_div.style.width = this.imageSize.width + "px";
                         this.drawCanvas.height = this.imageSize.height;
                         this.drawCanvas.width = this.imageSize.width;
+                        this.drawCanvasSelect.height = this.imageSize.height;
+                        this.drawCanvasSelect.width = this.imageSize.width;
                     }else{
                         this.sub_div.style.height = this.imageSize.width + "px";
                         this.sub_div.style.width = this.imageSize.height + "px";
                         this.drawCanvas.height = this.imageSize.width;
                         this.drawCanvas.width = this.imageSize.height;
+                        this.drawCanvasSelect.height = this.imageSize.width;
+                        this.drawCanvasSelect.width = this.imageSize.height;
                     }
 
                     this.position_calculate();
@@ -461,6 +557,8 @@ export default {
                             this.canvas.width = this.imageSize.width;
                             this.drawCanvas.height = this.imageSize.height;
                             this.drawCanvas.width = this.imageSize.width;
+                            this.drawCanvasSelect.height = this.imageSize.height;
+                            this.drawCanvasSelect.width = this.imageSize.width;
                         }else{
                             this.sub_div.style.height = this.imageSize.width + "px";
                             this.sub_div.style.width  = this.imageSize.height + "px";
@@ -468,6 +566,8 @@ export default {
                             this.canvas.width = this.imageSize.height;
                             this.drawCanvas.height = this.imageSize.width;
                             this.drawCanvas.width = this.imageSize.height;
+                            this.drawCanvasSelect.height = this.imageSize.width;
+                            this.drawCanvasSelect.width = this.imageSize.height;
                         }
 
                         this.position_calculate();
@@ -512,12 +612,367 @@ export default {
             this.sub_div.style.top = (this.sub_div.offsetTop - Vector_D.y) + "px";
 
         },
+        Refresh(){
+            
+            this.drawcontext.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
+            this.drawcontextSelect.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
+
+            for(let i = 0;i < this.drawList.length;i++){
+
+                let color = {r:0,g:170,b:0};
+                let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
+
+                let pointsArray = [];
+                if(this.drawList[i].position.length == 2){
+                    let dir = new THREE.Vector2(this.drawList[i].position[1].x - this.drawList[i].position[0].x,this.drawList[i].position[1].y - this.drawList[i].position[0].y);
+                    let length = dir.length();
+                    dir.normalize();
+
+                    length /= this.drawList[i].count;
+
+                    for(let j = 1; j < this.drawList[i].count;j++){
+                        pointsArray.push({x:this.drawList[i].position[0].x + dir.x * length * j,y:this.drawList[i].position[0].y + dir.y * length * j});
+                    }
+                }
+
+                switch(this.drawList[i].type){
+                    case "move":
+                        if(this.drawtype_move){
+                            for(let j = 0;j<this.drawList[i].position.length;j++){
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                            }
+                            for(let j = 0;j<pointsArray.length;j++){
+                                this.drawMove(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
+                            };
+                        }
+                        break;
+                    case "level":
+                        if(this.drawtype_level){
+                            for(let j = 0;j<this.drawList[i].position.length;j++){
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                            }
+                            for(let j = 0;j<pointsArray.length;j++){
+                                this.drawLevel(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
+                            };
+                        }
+                        break;
+                    case "force":
+                        if(this.drawtype_force){
+                            for(let j = 0;j<this.drawList[i].position.length;j++){
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected);
+                                this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],1.0,10,colorId);
+                            }
+                            for(let j = 0;j<pointsArray.length;j++){
+                                this.drawForce(this.drawcontext,pointsArray[j],1.0,10,color,this.drawList[i].Selected);
+                                this.drawForce(this.drawcontextSelect,pointsArray[j],1.0,10,colorId);
+                            };
+                        }
+                        break;
+                    case "slanting":
+                        if(this.drawtype_slanting){
+                            for(let j = 0;j<this.drawList[i].position.length;j++){
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                            }
+                            for(let j = 0;j<pointsArray.length;j++){
+                                this.drawSlanting(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
+                            };
+                        }
+                        break;
+                    case "text":
+                        if(this.drawList[i].position.length < 2){
+                            this.drawText(this.drawcontext,this.drawList[i].position[0],this.drawList[i].TempPostion,this.drawList[i].text,1.0,color,false,this.drawList[i].Selected);
+                            this.drawText(this.drawcontextSelect,this.drawList[i].position[0],this.drawList[i].TempPostion,this.drawList[i].text,1.0,colorId,true);
+                        }else{
+                            this.drawText(this.drawcontext,this.drawList[i].position[0],this.drawList[i].position[1],this.drawList[i].text,1.0,color,false,this.drawList[i].Selected);
+                            this.drawText(this.drawcontextSelect,this.drawList[i].position[0],this.drawList[i].position[1],this.drawList[i].text,1.0,colorId,true);
+                        }
+                        break;
+                }
+            }
+
+            if(this.lastPostion){
+                this.$refs.number_input.style.left = this.lastPostion.x * this.ResolutionScale * this.scale + "px";
+                this.$refs.number_input.style.top  = this.lastPostion.y * this.ResolutionScale * this.scale + "px";
+            }
+
+            if(this.drawList.length > 0){
+                if(this.drawList[this.drawList.length - 1].position.length == 2){
+                    if(this.drawList[this.drawList.length - 1].type == "text"){
+                        this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
+                        this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
+                    }
+                }
+            }
+        },
+        drawMove(drawcontext,position,scale,radius,color,isSelected){
+            
+            var color_="";
+            if(!isSelected){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }else{
+                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+            }
+            drawcontext.lineWidth=1;
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                0,
+                2*Math.PI);
+            drawcontext.stroke();
+            drawcontext.fill();
+        },
+        drawLevel(drawcontext,position,scale,radius,color,isSelected){
+
+            var color_="";
+            if(!isSelected){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }else{
+                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+            }
+            drawcontext.lineWidth=1;
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale ,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                0,
+                Math.PI);
+            drawcontext.stroke();
+            drawcontext.fill();
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale ,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                Math.PI,
+                2 * Math.PI);
+            drawcontext.stroke();
+        },
+        drawForce(drawcontext,position,scale,radius,color,isSelected){
+            var color_="";
+            if(!isSelected){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }else{
+                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+            }
+            drawcontext.lineWidth=1;
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.fillRect(
+            position.x * this.ResolutionScale * this.scale - radius * scale,
+            position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
+            radius * scale * 2,
+            radius * 0.75 * scale * 2);
+        },
+        drawSlanting(drawcontext,position,scale,radius,color,isSelected){
+            var color_="";
+            if(!isSelected){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }else{
+                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+            }
+            drawcontext.lineWidth=1;
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                Math.PI / 2,
+                Math.PI);
+            drawcontext.lineTo(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale);
+            drawcontext.stroke();
+            drawcontext.fill();
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                Math.PI / 2 * 3,
+                2 * Math.PI);
+            drawcontext.lineTo(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale);
+            drawcontext.stroke();
+            drawcontext.fill();
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale ,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale,
+                0,
+                2 * Math.PI);
+            this.drawcontext.stroke();
+        },
+        drawText(drawcontext,position_start,position_end,text,scale,color,select,isSelected){
+            var color_="";
+            if(!isSelected){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }else{
+                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+            }
+            drawcontext.lineWidth=3;
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            let start = {x:position_start.x * this.ResolutionScale * this.scale,y:position_start.y * this.ResolutionScale * this.scale};
+            let end = {x:position_end.x * this.ResolutionScale * this.scale,y:position_end.y * this.ResolutionScale * this.scale};
+
+            let end2 = {x:end.x,y:end.y};
+
+            if(end.x < start.x){
+                end2.x += 60;
+            }else{
+                end2.x -= 60;
+            }
+
+            drawcontext.beginPath();
+            let dir = new THREE.Vector2(end2.x - start.x,end2.y - start.y);
+            let length = dir.length();
+            dir.normalize();
+
+            // length -= 16;
+
+            drawcontext.moveTo(start.x + dir.x * 16    ,start.y + dir.y * 16);
+            drawcontext.lineTo(start.x + dir.x * length,start.y + dir.y * length);
+            
+            //执行画线
+            drawcontext.stroke();
+
+            //////////////////////////////////////////////////////////////////////
+
+            let V = new THREE.Vector2(end2.x - start.x,end2.y - start.y);
+            V.normalize();
+            let angle = V.angle();
+
+            let M = new THREE.Matrix4();
+            M.makeRotationZ(angle);
+
+            let V1 = new THREE.Vector3(16,8,0);
+            let V2 = new THREE.Vector3(16,-8,0);
+
+            V1.applyMatrix4(M);
+            V2.applyMatrix4(M);
+
+            // ctx.lineWidth=1;
+            drawcontext.beginPath();
+            
+            drawcontext.moveTo(start.x         ,start.y);
+            drawcontext.lineTo(start.x + V1.x  ,start.y + V1.y);
+            drawcontext.lineTo(start.x + V2.x  ,start.y + V2.y);
+            drawcontext.lineTo(start.x         ,start.y);
+            drawcontext.stroke();
+            drawcontext.fillStyle=color_;
+            drawcontext.fill();
+
+            drawcontext.beginPath();
+            drawcontext.moveTo(end2.x,end2.y);
+            drawcontext.lineTo(end.x,end2.y);
+            drawcontext.stroke();
+
+            drawcontext.beginPath();
+            drawcontext.moveTo(end.x - 50,end2.y + 16);
+            drawcontext.lineTo(end.x + 50,end2.y + 16);
+            drawcontext.lineTo(end.x + 50,end2.y - 16);
+            drawcontext.lineTo(end.x - 50,end2.y - 16);
+            drawcontext.lineTo(end.x - 50,end2.y + 16);
+
+            drawcontext.stroke();
+
+            if(select == false){
+                drawcontext.fillStyle='rgb(255,255,255)';
+            }
+            drawcontext.fill();
+            
+            if(select == false){
+                if(text){
+                    drawcontext.fillStyle='rgb(0, 0, 0)';
+                    drawcontext.font="18px Georgia";
+                    drawcontext.fillText(text,end.x - 46,end2.y + 6,92);
+                }
+            }
+
+            
+        },
+        create_Multiple_points(){
+            this.$refs.number_input.style.display = "none";
+            if(this.drawList.length > 0){
+                if(this.drawList[this.drawList.length - 1].type == "text"){
+                    this.drawList[this.drawList.length - 1].text = this.$refs.number_input_input.value;
+                }else{
+                    
+                    let count = 6;
+                    try{
+                        count = parseInt(this.$refs.number_input_input.value);
+                    }catch(e){
+                        count = 6;
+                    }
+
+                    if(isNaN(count)){
+                        count = 6;
+                    }
+                    // this.drawList[this.drawList.length - 1].count = count;
+
+                    // 平均添加点
+
+                    let dir = new THREE.Vector2(this.lastPostion.x - this.drawList[this.drawList.length - 1].position[0].x,this.lastPostion.y - this.drawList[this.drawList.length - 1].position[0].y);
+                    let length = dir.length();
+                    dir.normalize();
+
+                    length /= count;
+                    let lastPointPosition = {x:this.drawList[this.drawList.length - 1].position[0].x,y:this.drawList[this.drawList.length - 1].position[0].y}
+
+                    for(let j = 1; j < count + 1;j++){
+                        // pointsArray.push({x:this.drawList[i].position[0].x + dir.x * length * j,y:this.drawList[i].position[0].y + dir.y * length * j});
+                        let newPosition = {
+                                            x:lastPointPosition.x + dir.x * length * j,
+                                            y:lastPointPosition.y + dir.y * length * j
+                                            };
+                        let temp_type = this.drawList[this.drawList.length - 1].type;
+                        // this.drawList.push({status:"normal",Selected:false,SID:this.drawID,type:temp_type,position:[{x:newPosition.x,y:newPosition.y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"});
+                        this.drawList.push(this.create(temp_type,newPosition));
+                        this.drawID++;
+                    }
+                    
+                }
+            }
+
+            this.Refresh();
+        },
+        pageSize(w,h){
+            // console.log(w,h);
+            this.$refs.pdfDocument.$el.style.position = ""; //  防抖
+        },
         setDrawStatus(status,drawtype,count){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
             this.moveElement = false;
-            this.drawCount = count
+            this.drawCount = count;
+            this.editStatus = "normal";
+            this.startMove = false;
 
             switch(drawtype){
                 case 1: //  位移
@@ -537,166 +992,60 @@ export default {
                     break;
             }
 
-            this.create_Multiple_points();
+            if(status == "text"){
+                this.drawtype = "text";
+            }
 
         },
-        Refresh(){
-            console.log(this.drawList)
-            for(let i = 0;i < this.drawList.length;i++){
+        setMoveStatus(){
+            this.editStatus = "move";
+        },
+        deleteDraw(){
+            if(this.SelectedList.length > 0){
+                let temp = this.drawList;
+                this.drawList = [];
 
-                let color = "#00CC00";
+                for(let i = 0;i < temp.length;i++){
+                    let find = false;
 
-                let pointsArray = [];
-                if(this.drawList[i].position.length == 2){
-                    let dir = new THREE.Vector2(this.drawList[i].position[1].x - this.drawList[i].position[0].x,this.drawList[i].position[1].y - this.drawList[i].position[0].y);
-                    let length = dir.length();
-                    dir.normalize();
+                    for(let j = 0;j < this.SelectedList.length;j++){
+                        if(this.SelectedList[j].SID == temp[i].SID){
+                            find = true;
+                        }
+                    }
 
-                    length /= this.drawList[i].count;
-
-                    for(let j = 1; j < this.drawList[i].count;j++){
-                        pointsArray.push({x:this.drawList[i].position[0].x + dir.x * length * j,y:this.drawList[i].position[0].y + dir.y * length * j});
+                    if(find == false){
+                        this.drawList.push(temp[i]);
                     }
                 }
 
-                switch(this.drawList[i].type){
-                    case "move":
-                        for(let j = 0;j<this.drawList[i].position.length;j++){this.drawMove(this.drawList[i].position[j],1.0,7.5,color);}
-                        for(let j = 0;j<pointsArray.length;j++){this.drawMove(pointsArray[j],1.0,7.5,color);};
-                        break;
-                    case "level":
-                        for(let j = 0;j<this.drawList[i].position.length;j++){this.drawLevel(this.drawList[i].position[j],1.0,7.5,color);}
-                        for(let j = 0;j<pointsArray.length;j++){this.drawLevel(pointsArray[j],1.0,7.5,color);};
-                        break;
-                    case "force":
-                        for(let j = 0;j<this.drawList[i].position.length;j++){this.drawForce(this.drawList[i].position[j],1.0,10,color);}
-                        for(let j = 0;j<pointsArray.length;j++){this.drawForce(pointsArray[j],1.0,10,color);};
-                        break;
-                    case "slanting":
-                        for(let j = 0;j<this.drawList[i].position.length;j++){this.drawSlanting(this.drawList[i].position[j],1.0,7.5,color);}
-                        for(let j = 0;j<pointsArray.length;j++){this.drawSlanting(pointsArray[j],1.0,7.5,color);};
-                        break;
-                }
-            }
-
-            if(this.drawList.length > 0)
-            if(this.drawList[this.drawList.length - 1].position.length == 2){
-                this.$refs.number_input.style.left = this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale + "px";
-                this.$refs.number_input.style.top  = this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale + "px"
+                this.Refresh();
             }
         },
-        drawMove(position,scale,radius,color){
-
-            this.drawcontext.fillStyle=color;
-            this.drawcontext.strokeStyle=color;
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                2*Math.PI);
-            this.drawcontext.stroke();
-            this.drawcontext.fill();
+        create(type,position){
+            let item = {status:"normal",Selected:false,SID:this.drawID,type:type,position:[{x:position.x,y:position.y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"};
+            return item;
         },
-        drawLevel(position,scale,radius,color){
-
-            this.drawcontext.fillStyle=color;
-            this.drawcontext.strokeStyle=color;
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                Math.PI);
-            this.drawcontext.stroke();
-            this.drawcontext.fill();
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI,
-                2 * Math.PI);
-            this.drawcontext.stroke();
-        },
-        drawForce(position,scale,radius,color){
-
-            this.drawcontext.fillStyle=color;
-            this.drawcontext.strokeStyle=color;
-
-            this.drawcontext.fillRect(
-            position.x * this.ResolutionScale * this.scale - radius * scale,
-            position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
-            radius * scale * 2,
-            radius * 0.75 * scale * 2);
-        },
-        drawSlanting(position,scale,radius,color){
-            this.drawcontext.fillStyle=color;
-            this.drawcontext.strokeStyle=color;
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI / 2,
-                Math.PI);
-            this.drawcontext.lineTo(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale);
-            this.drawcontext.stroke();
-            this.drawcontext.fill();
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI / 2 * 3,
-                2 * Math.PI);
-            this.drawcontext.lineTo(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale);
-            this.drawcontext.stroke();
-            this.drawcontext.fill();
-
-            this.drawcontext.beginPath();
-            this.drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                2 * Math.PI);
-            this.drawcontext.stroke();
-        },
-        create_Multiple_points(){
-            this.$refs.number_input.style.display = "none";
-
-            if(this.drawList.length > 0){
-                let count = 6;
-                try{
-                    count = parseInt(this.$refs.number_input_input.value);
-                    
-                }catch(e){
-                    count = 6;
-                }
-
-                if(isNaN(count)){
-                    count = 6;
-                }
-
-                this.drawList[this.drawList.length - 1].count = count;
+        enableType(drawtype,status){
+            switch(drawtype){
+                case 1: //  位移
+                    this.drawtype_move = status;
+                    break;
+                case 2: //  位移
+                    this.drawtype_move = status;
+                    break;
+                case 3: //  水位
+                    this.drawtype_level = status;
+                    break;
+                case 4: //  力
+                    this.drawtype_force = status;
+                    break;
+                case 5: //  倾斜
+                    this.drawtype_slanting = status;
+                    break;
             }
 
             this.Refresh();
-        },
-        pageSize(w,h){
-            console.log(w,h);
         }
     }
 }
