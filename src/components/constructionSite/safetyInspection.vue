@@ -120,7 +120,7 @@
                         </div>
                         <div class="rightBottomCheck">
                             <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
-                            <el-checkbox v-model="spotNum" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
+                            <el-checkbox v-model="displaySpotNum" @change="displaySpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                         </div>
                     </div>
                 </div>
@@ -214,7 +214,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" :projctName="surveyName" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:importDataShow="importDataShow" :projctName="surveyName" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -271,7 +271,7 @@
             </el-dialog>
             <el-dialog title="导入采集数据" :visible="importGatherDataShow" @close="importGatherDataCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">本地Excel文档:</label>
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">本地Excel文档:</label>
                         <span class="updataImageSpan">
                             <label for="fileInfo">
                                 <button class="upImgBtn" >选择文件</button>
@@ -280,18 +280,18 @@
                             <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
-                    <div class="editBodytwo"><label class="editInpText">对应监测内容:</label><label >{{monitorImportName}}</label></div>
-                    <div class="editBodytwo"><label class="editInpText">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
-                    <div class="editBodytwo"><label class="editInpText">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" ><label class="editInpText"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:120px;margin-top:-40px;" v-model="unifiedTime" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
-                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
-                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
-                    <div class="editBodytwo"><label class="editInpText"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao4"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
@@ -516,6 +516,7 @@ export default {
             curBaseMapUrl:'',//目前底图首页
             monitorBaseMapUrl:'',//监测底图设置
             picMark:false,
+            displaySpotNum:false,
             spotNum:false,
             spotNum0:false,
             spotNum1:false,
@@ -628,6 +629,10 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+        importDataShow(val){
+            console.log(val);
+            this.importGatherDataShow=val;
+        },
         //当前时间
         curTime(){
             var date = new Date();
@@ -1053,6 +1058,9 @@ export default {
         checkboxChange(){
             console.log(this.monitorMainItemList,'checkList')
         },
+        displaySpot(){
+            console.log(this.displaySpotNum);
+        },
         //添加底图
         addBaseMap(file){
             var vm=this;
@@ -1392,7 +1400,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite='';//是否覆盖
+                    vm.overwrite=false;//是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1432,7 +1440,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=''; //是否覆盖
+                    vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1475,7 +1483,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=''; //是否覆盖
+                    vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1524,7 +1532,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=''; //是否覆盖
+                    vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1565,7 +1573,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=''; //是否覆盖
+                    vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1608,7 +1616,7 @@ export default {
                     vm.monitorImportId='';//监测ID
                     vm.spotNumCol='';//监测点位下标
                    vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=''; //是否覆盖
+                    vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
@@ -1642,7 +1650,7 @@ export default {
             vm.monitorImportId='';//监测ID
             vm.spotNumCol='';//监测点位下标
             vm.unifiedTime='';//标准时间，不选择可不传
-            vm.overwrite=''; //是否覆盖
+            vm.overwrite=false; //是否覆盖
             vm.inputWorkingCondition='';//现场工况
             vm.pipeHeightCol='';//管口高度
             vm.gaugeHeightCol='';//水位下标
@@ -3095,7 +3103,7 @@ export default {
                 background-size: 100% 100%;
                 content: '';
                 top: 165px;
-                right: 135px;
+                right: 121px;
             }
             .spotNumName{
                 width: 375px;
@@ -3121,7 +3129,7 @@ export default {
                 background-size: 100% 100%;
                 content: '';
                 top: 263px;
-                right: 135px;
+                right: 121px;
             }
             .gatherTimeName{
                 width: 375px;
@@ -3147,13 +3155,35 @@ export default {
                 background-size: 100% 100%;
                 content: '';
                 top: 315px;
-                right: 135px;
+                right: 121px;
+            }
+            .icon-sanjiao4 {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 430px;
+                right: 121px;
+            }
+            .icon-sanjiao5 {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 481px;
+                right: 121px;
             }
             .spotTextArea{
                 position: absolute;
                 width: 375px;
                 height: 60px;
-                left:24%;
+                left:27%;
             }
             .editTxt{
                     display: inline-block;
