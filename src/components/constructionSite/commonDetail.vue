@@ -26,7 +26,7 @@
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==2" class="import">导入</span>
+                        <span v-show="importMethod==2" class="import" @click="handExportExcel()">导入</span>
                         <span v-show="importMethod==1" class="import">配置</span>
                 </div>
             </div>
@@ -163,6 +163,37 @@
                     <button class="editBtnC" @click="editAlertValueCancle()" >取消</button>
                 </div>
             </el-dialog>
+            <!-- <el-dialog title="导入采集数据" :visible="importGatherDataShow" @close="importGatherDataCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">本地Excel文档:</label>
+                        <span class="updataImageSpan">
+                            <label for="fileInfo">
+                                <button class="upImgBtn" >选择文件</button>
+                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
+                            </label>
+                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                        </span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao4"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
+                        <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
+                        <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
+                        <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
+                </div>
+            </el-dialog> -->
         </div>
     </div>
 </template>
@@ -186,7 +217,7 @@ export default Vue.component('commonDetail',{
                     label:'手动导入'
                 }
             ],
-            currentPage2:5,
+            currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             getPointDatasList:'',//数据表格
             pointId:'',//监测id
@@ -308,11 +339,13 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //手动导入数据
+        handExportExcel(){
+            this.$emit('importDataShow',true)
+        },
         //获取用户名
         getUserName(){
             
-
-
         },
         //获取警报参数
         getAlertArguments(){
@@ -419,9 +452,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                      this.getItemDutyUserList=response.data.rt;
-                    //  this.inspectorName=this.getItemDutyUserList.inspector;
-                    //  this.calculatorName=this.getItemDutyUserList.calculator;
-                    //  this.observerName=this.getItemDutyUserList.observer;
+                     this.inspectorName=this.getItemDutyUserList.inspectorName;
+                     this.calculatorName=this.getItemDutyUserList.calculatorName;
+                     this.observerName=this.getItemDutyUserList.observerName;
                     // console.log(this.userGroupList)
                     //  this.userGroupList.forEach((item)=>{
                     //      if(this.getItemDutyUserList.inspector==item.userId){
@@ -924,7 +957,7 @@ export default Vue.component('commonDetail',{
                             color: #666666;
                             border-radius: 2px;
                             cursor: pointer;
-                            margin-left: 10px;
+                            margin-left: 30px;
                             margin-right: 100px;
                         }
 
