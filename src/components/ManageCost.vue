@@ -265,7 +265,7 @@ export default {
                                 // console.log(item.drawingId,'234');
                                 this.getDrawingRotateInfo(item.drawingId);
                                   this.drawList.push({
-                                        name:item1.drawingName,
+                                        name:item1.drawingNumber+'('+item1.drawingName+')',
                                         type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
                                         source:this.QJFileManageSystemURL+item.fileUri,
                                         page:1,

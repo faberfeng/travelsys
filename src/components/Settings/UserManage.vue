@@ -273,12 +273,12 @@
                     </span>
                 </div>
             </div>
-            <div class="log-body clearfix">
+            <div class="log-body clearfix" style="display:none">
                 <span class="log-head-title">备注信息:</span>
                 <input class="inp-head" v-model="remarkIfo" placeholder="请输入备注"/>
             </div>
             <div class="log-body clearfix">
-                <span class="log-head-title">留言:</span>
+                <span class="log-head-title">申请留言:</span>
                 <input class="inp-head" v-model="applyMessage" placeholder="申请留言"/>
             </div>
             <div  class="log-body clearfix">

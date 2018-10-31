@@ -248,6 +248,22 @@
                             <span class="detial-text-name">文件大小</span>
                             <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}M</span>
                         </li>
+                        <li v-show="!showBtn" class="detial-item clearfix">
+                            <span class="detial-text-name">图号</span>
+                            <span class="detial-text-value" v-text="updateDrawingNumber"></span>
+                        </li>
+                        <li v-show="!showBtn" class="detial-item clearfix">
+                            <span class="detial-text-name">图名</span>
+                            <span class="detial-text-value" v-text="updateDrawingName"></span>
+                        </li>
+                        <li v-show="!showBtn" class="detial-item clearfix">
+                            <span class="detial-text-name">比例</span>
+                            <span class="detial-text-value" v-text="updateDrawingRatio"></span>
+                        </li>
+                        <li v-show="!showBtn" class="detial-item clearfix">
+                            <span class="detial-text-name">相关空间</span>
+                            <span class="detial-text-value" v-text="updateDrawingHolderId"></span>
+                        </li>
 
                     </ul>
                     <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="showQuanJing">
@@ -275,6 +291,7 @@
                             <span class="detial-text-name">更新时间</span>
                             <span class="detial-text-value" v-text="initData(checkedRound.updateTime)"></span>
                         </li>
+                        
                     </ul>
                     <h3 class="header-attribute" style="margin-top: 30px;">
                         <i class="trrangle"></i>
@@ -363,6 +380,7 @@
                                     <span class="user-name" v-text="item.uploadUserName"></span>
                                     <span class="version-number" v-text="'版本-'+item.version"></span>
                                     <p class="version-des">上传了新文档</p>
+                                    <!-- <p class="version-des1">{{updateDrawingNumber+'('+updateDrawingName+')'}}</p> -->
                                 </div>
                             </div>
                             <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFromExplorer == 1?'浏览器':'手机端')+'更新'}}</p>
@@ -639,10 +657,10 @@
                     <table class="fileContainer" border="1">
                         <thead>
                             <tr  class="userList-thead">
-                                <th style="width:20%">图号</th>
-                                <th style="width:25%">图名</th>
+                                <th style="width:15%">图号</th>
+                                <th style="width:15%">图名</th>
                                 <th style="width:12%">比例</th>
-                                <th style="width:14%">相关空间</th>
+                                <th style="width:29%">相关空间</th>
                                 <th style="width:17%;max-width:200px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
@@ -666,7 +684,7 @@
                                 </td>
                                 <td>
                                     <select v-model="getHolderId" class="inp-search">
-                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-text="val.holderName"></option>
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -1392,6 +1410,18 @@
                         font-size: 14px;
                         color:#666666;
                         text-align: right;
+                         /*
+                        溢出隐藏
+                        */
+                        overflow: hidden;
+                        /*
+                        显示省略号
+                        */
+                        text-overflow: ellipsis;
+                        /*
+                        不换行
+                        */
+                        white-space: nowrap;
                     }
                     .editUpDrawingValue{
                         margin-left:40px;
@@ -1400,6 +1430,18 @@
                         font-size: 14px;
                         color:#333333;
                         text-align: left;
+                        /*
+                        溢出隐藏
+                        */
+                        overflow: hidden;
+                        /*
+                        显示省略号
+                        */
+                        text-overflow: ellipsis;
+                        /*
+                        不换行
+                        */
+                        white-space: nowrap;
                     }
                 }
                 .editUpDrawingProject{
@@ -2345,7 +2387,7 @@
             .detial-text-value{
                 float: left;
                 color: #333333;
-                max-width: 100px;
+                max-width: 150px;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -2523,6 +2565,17 @@
                     color: #666666;
                     background: #fafafa;
                     margin-top: 6px;
+                }
+                .version-des1{
+                    font-size: 12px;
+                    line-height: 18px;
+                    padding: 3px 10px;
+                    color: #666666;
+                    background: #fafafa;
+                    margin-top: 6px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
             }
             .item-date{
@@ -2713,6 +2766,8 @@ export default {
             drawingFgid:'',//删除图纸ID
             updateDrawingName:'',
             updateDrawingRatio:'',
+            updateDrawingNumber:'',
+            updateDrawingHolderId:'',
             updataShow:false,//更新图纸
             updateFileName:'',//文件名
             updateFileList:'',//文件列表
@@ -2857,12 +2912,22 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getHoldersList=response.data.rt;
-                    this.getHoldersList.push({ 
+                   this.getHoldersList.unshift({ 
                         "holderId": null,
                         "holderName": "无",
                         "holderType": ""
                     })
-                    // this.holderId=null;
+                     this.getHoldersList.forEach((item)=>{
+                         if(item.holderType==7){
+                             item.holderName='&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==8){
+                             item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==9){
+                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                     })
                 }else{
                     this.$message({
                         type:'error',
@@ -3617,6 +3682,8 @@ export default {
           this.updataShow=false;
           this.updateDrawingName='';
             this.updateDrawingRatio='';
+            this.updateDrawingNumber='';
+            this.updateDrawingHolderId='';
       },
 
       confirmUpdateDrawing(){
@@ -3659,6 +3726,10 @@ export default {
                             }
                             vm.updateFileName=''
                             vm.updateFileList=''
+                            this.updateDrawingName='';
+                            this.updateDrawingRatio='';
+                            this.updateDrawingNumber='';
+                            this.updateDrawingHolderId='';
                            
                         }
                         if(response.data.cd != 0){
@@ -3716,6 +3787,7 @@ export default {
           }).then((response)=>{
               if(response.data.cd=='0'){
                   this.drawingFgid=response.data.rt;
+                  this.getDrawingList();
               }
           })
       },
@@ -4429,9 +4501,11 @@ export default {
                 if(response.data.cd=='0'){
                      vm.drawingList=response.data.rt;
                      vm.drawingList.forEach((item)=>{
-                         if(item.id=this.drawingFgid){
+                         if(item.id==this.drawingFgid){
                              this.updateDrawingName=item.drawingName;
                              this.updateDrawingRatio=item.ratio;
+                             this.updateDrawingNumber=item.drawingNumber;
+                             this.updateDrawingHolderId=item.holderId;
                          }
                      })
                     // if(vm.drawingList != null){

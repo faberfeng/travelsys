@@ -202,7 +202,7 @@ import axios from 'axios'
 import moment from 'moment'
 import Vue from 'vue'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId'],
+    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord'],
     name:'commonDetail',
     data(){
         return{
@@ -234,6 +234,8 @@ export default Vue.component('commonDetail',{
             variationAlertTotal:'',//报警变化量（累计）
             variationAlertDay:'',//报警变化量（天）
             variationAlertHour:'',//报警变化量（小时）
+            commonMonitorMainItemList:'',//监测内容
+
 
         }
     },
@@ -311,6 +313,30 @@ export default Vue.component('commonDetail',{
         },
         handleCurrentChange(val){
             console.log(`当前页: ${val}`);
+        },
+         //获取监测内容
+        getMonitorItem(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getMonitorItem',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.userGroupId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.commonMonitorMainItemList=response.data.rt;
+                    this.commonMonitorMainItemList.forEach((item,index)=>{
+                        this.$set(item,'spotNum',true)
+                    })
+                    // this.drawItemId=this.commonMonitorMainItemList[0].id;
+                    // this.drawItemType=this.commonMonitorMainItemList[0].type;
+                    console.log(this.commonMonitorMainItemList,'monitorMainItemList')
+                }
+            })
         },
         //获取群组中的用户
         getUserByUserGroup(){

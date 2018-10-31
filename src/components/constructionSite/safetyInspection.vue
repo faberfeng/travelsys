@@ -177,7 +177,7 @@
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.id,item.type,item.name)"></button>
+                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name)"></button>
                                         <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
@@ -214,7 +214,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:importDataShow="importDataShow" :projctName="surveyName" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:importDataShow="importDataShow" :projctName="surveyName" :itemMonitorKeyWord="itemSubmitKeyWord" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -530,6 +530,7 @@ export default {
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
+            itemSubmitKeyWord:'',//传递给子组件的监测关键字
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
@@ -1819,10 +1820,11 @@ export default {
             })
         },
         //监测内容详情页
-        detail(id,type,name){
+        detail(keyword,id,type,name){
             this.surveyName=name;
             this.detailMonitorId=id;
             this.itemType=type;
+            this.itemSubmitKeyWord=keyword;
             if(type==5){
                 this.pitchDetailShow=true;
             }else{
