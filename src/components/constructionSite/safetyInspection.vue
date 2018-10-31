@@ -105,7 +105,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                            <picView ref="pic" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -745,6 +745,13 @@ export default {
         picView_status_changed(status){
             console.log(status);
         },
+        drawFinish(){
+            // console.log("finish");
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick=false;
+        },
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
@@ -1057,7 +1064,11 @@ export default {
             this.isClick3=false;
         },
         checkboxChange(){
-            console.log(this.monitorMainItemList,'checkList')
+            // console.log(this.monitorMainItemList,'checkList');
+
+            for(let i = 0; i < this.monitorMainItemList.length;i++){
+                this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].id,this.monitorMainItemList[i].spotNum);
+            }
         },
         displaySpot(){
             console.log(this.displaySpotNum);
@@ -1974,14 +1985,14 @@ export default {
             this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
             this.isClick2=true;
             this.isClick1=false;
-             this.isClick3=false;
+            this.isClick3=false;
         },
         //添加文本
         drawingText(){
-            this.$refs.pic.setDrawStatus("text",0,2);
+            this.$refs.pic.setDrawStatus("text",0,0,2);
             this.isClick2=false;
             this.isClick1=false;
-             this.isClick3=true;
+            this.isClick3=true;
         },
         //开启移动
         enableMove(){
