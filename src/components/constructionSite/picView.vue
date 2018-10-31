@@ -323,6 +323,12 @@ export default {
 
                         // console.log(SID);
 
+                        if(SID > 0){
+                            this.$emit('status_changed',true);
+                        }else{
+                            this.$emit('status_changed',false);
+                        }
+
                         this.SelectedList = [];
 
                         for(let i = 0; i < this.drawList.length;i++){
@@ -396,7 +402,7 @@ export default {
                 this.start.y = e.screenY;
                 this.status = "start_move";
             }
-            // this.$emit('status_changed',this.status);
+            
         },
         onmouseup(e){
             // console.log(e);
@@ -679,6 +685,14 @@ export default {
                 }
 
                 let color = {r:0,g:170,b:0};
+
+                if(this.drawList[i].isBroken){
+                    color = {r:170,g:0,b:0};
+                }
+
+                if(this.drawList[i].isAlert){
+                    color = {r:170,g:170,b:0}
+                }
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
                 let pointsArray = [];
@@ -1231,6 +1245,16 @@ export default {
         enableLabel(status){
             this.displayLabel = status;
             this.Refresh();
+        },
+        changeBroken(){
+            if(this.SelectedList.length > 0){
+
+                for(let j = 0;j < this.SelectedList.length;j++){
+                    this.SelectedList[j].isBroken = 0;
+                }
+
+                this.Refresh();
+            }
         }
     }
 }

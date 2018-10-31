@@ -95,7 +95,7 @@
                         <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
-                                <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                                <span class="fault" @click="changeBroken" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
                             <div class="operateToolRight">
@@ -2025,6 +2025,10 @@ export default {
         //删除点
         deleteDraw(){
             this.$refs.pic.deleteDraw();
+        },
+        //修复故障
+        changeBroken(){
+            this.$refs.pic.changeBroken();
         },
         //获取底图中所有的监测点
         getAllMonitorPoint(){
