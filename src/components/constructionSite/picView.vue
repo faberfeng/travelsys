@@ -323,6 +323,12 @@ export default {
 
                         // console.log(SID);
 
+                        if(SID > 0){
+                            this.$emit('status_changed',true);
+                        }else{
+                            this.$emit('status_changed',false);
+                        }
+
                         this.SelectedList = [];
 
                         for(let i = 0; i < this.drawList.length;i++){
@@ -396,7 +402,7 @@ export default {
                 this.start.y = e.screenY;
                 this.status = "start_move";
             }
-            // this.$emit('status_changed',this.status);
+            
         },
         onmouseup(e){
             // console.log(e);
@@ -679,6 +685,14 @@ export default {
                 }
 
                 let color = {r:0,g:170,b:0};
+
+                if(this.drawList[i].isBroken){
+                    color = {r:170,g:0,b:0};
+                }
+
+                if(this.drawList[i].isAlert){
+                    color = {r:170,g:170,b:0}
+                }
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
                 let pointsArray = [];
@@ -698,11 +712,11 @@ export default {
                     case "move":
                         if(this.drawtype_move){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
-                                this.drawMove(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawMove(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
                             };
                         }
@@ -710,11 +724,11 @@ export default {
                     case "level":
                         if(this.drawtype_level){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
-                                this.drawLevel(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawLevel(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
                             };
                         }
@@ -722,7 +736,7 @@ export default {
                     case "force":
                         if(this.drawtype_force){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],1.0,10,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
@@ -734,7 +748,7 @@ export default {
                     case "slanting":
                         if(this.drawtype_slanting){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
@@ -769,7 +783,7 @@ export default {
                 }
             }
         },
-        drawMove(drawcontext,position,scale,radius,color,isSelected,data){
+        drawMove(drawcontext,position,scale,radius,color,isSelected,data,pointName){
             
             var color_="";
             if(!isSelected){
@@ -791,14 +805,21 @@ export default {
             drawcontext.stroke();
             drawcontext.fill();
 
-            if(this.displayLabel)
-            if(data){
-                drawcontext.fillStyle=color_;
-                drawcontext.font="12px Georgia";
-                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            if(this.displayLabel){
+                if(data){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                }
+
+                if(pointName){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                }
             }
         },
-        drawLevel(drawcontext,position,scale,radius,color,isSelected,data){
+        drawLevel(drawcontext,position,scale,radius,color,isSelected,data,pointName){
 
             var color_="";
             if(!isSelected){
@@ -829,14 +850,21 @@ export default {
                 2 * Math.PI);
             drawcontext.stroke();
 
-            if(this.displayLabel)
-            if(data){
-                drawcontext.fillStyle=color_;
-                drawcontext.font="12px Georgia";
-                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            if(this.displayLabel){
+                if(data){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                }
+
+                if(pointName){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                }
             }
         },
-        drawForce(drawcontext,position,scale,radius,color,isSelected,data){
+        drawForce(drawcontext,position,scale,radius,color,isSelected,data,pointName){
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -853,14 +881,21 @@ export default {
             radius * scale * 2,
             radius * 0.75 * scale * 2);
 
-            if(this.displayLabel)
-            if(data){
-                drawcontext.fillStyle=color_;
-                drawcontext.font="12px Georgia";
-                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            if(this.displayLabel){
+                if(data){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                }
+
+                if(pointName){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                }
             }
         },
-        drawSlanting(drawcontext,position,scale,radius,color,isSelected,data){
+        drawSlanting(drawcontext,position,scale,radius,color,isSelected,data,pointName){
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -906,11 +941,18 @@ export default {
                 2 * Math.PI);
             this.drawcontext.stroke();
 
-            if(this.displayLabel)
-            if(data){
-                drawcontext.fillStyle=color_;
-                drawcontext.font="12px Georgia";
-                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            if(this.displayLabel){
+                if(data){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                }
+
+                if(pointName){
+                    drawcontext.fillStyle=color_;
+                    drawcontext.font="12px Georgia";
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                }
             }
         },
         drawText(drawcontext,position_start,position_end,text,scale,color,select,isSelected){
@@ -1193,7 +1235,7 @@ export default {
         loadPoints(list){
             this.drawList = [];
             this.SelectedList = [];
-            // console.log(list);
+            console.log(list);
 
             for(let i = 0;i < list.length;i++){
                 
@@ -1217,7 +1259,6 @@ export default {
                             text:plotInfo.text,
                             display:true,
                             data:"none",
-                            pointName:"new point",
                             typeNum:list[i].type                               //  type
                         };
                 this.drawList.push(item);
@@ -1231,6 +1272,16 @@ export default {
         enableLabel(status){
             this.displayLabel = status;
             this.Refresh();
+        },
+        changeBroken(){
+            if(this.SelectedList.length > 0){
+
+                for(let j = 0;j < this.SelectedList.length;j++){
+                    this.SelectedList[j].isBroken = 0;
+                }
+
+                this.Refresh();
+            }
         }
     }
 }
