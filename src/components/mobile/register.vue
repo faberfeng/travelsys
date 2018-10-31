@@ -159,24 +159,36 @@
         this.baseUrl = sessionStorage.getItem("baseUrl");
       },
       checknickname: function (a) {
+        if (/[\u4e00-\u9fa5]/.test(a)) {
+          return "用户名不能包含汉字";
+        }
         var c = /^[\w|\u4E00-\u9FA5]+$/,
-          d = a.TrimString().GetByteCount();
+          d = this.getByteCount(this.trimString(a));
         if (d == 0) {
-          return "请填写账号。";
+          return "请填写用户名。";
         } else {
           if (d < 3) {
-            return "不少于1个汉字，或3个字符(数字，字母和下划线)。";
+            return "不少于3个字符(数字，字母和下划线)。";
           } else {
             if (d > 20) {
-              return "不超过10个汉字，或20个字符(数字，字母和下划线)。";
+              return "不超过20个字符(数字，字母和下划线)。";
             } else {
               if (!a.match(c)) {
-                return "账号仅可使用汉字、字母、数字或下划线。";
+                return "账号仅可使用字母、数字或下划线。";
               }
             }
           }
         }
         return "";
+      },
+      trimString:function (a) {
+        return a.replace(/(^\s*)|(\s*$)/g, "");
+      },
+      getByteCount:function (str) {
+        var a = str.replace(/(<.*?>)/ig, "");
+        a = a.replace(/([\u0391-\uFFE5])/ig, "11");
+        var c = a.length;
+        return c;
       }
     },
   }
