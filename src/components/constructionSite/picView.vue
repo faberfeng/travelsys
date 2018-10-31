@@ -282,7 +282,8 @@ export default {
 
                         if(find == false){
                             // this.drawList.push({status:"normal",Selected:false,SID:this.drawID,type:this.drawtype,position:[{x:X,y:Y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"});
-                            this.drawList.push(this.create(this.drawtype,{x:X,y:Y}));
+                            this.drawList.push(this.create(this.drawtype,this.drawItemId,{x:X,y:Y}));
+                            this.$emit('finish',null);
                         }else{
                             
                             this.$refs.number_input_input.value = "6";
@@ -619,6 +620,10 @@ export default {
 
             for(let i = 0;i < this.drawList.length;i++){
 
+                if(this.drawList[i].display==false){
+                    continue;
+                }
+
                 let color = {r:0,g:170,b:0};
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
@@ -921,6 +926,7 @@ export default {
             if(this.drawList.length > 0){
                 if(this.drawList[this.drawList.length - 1].type == "text"){
                     this.drawList[this.drawList.length - 1].text = this.$refs.number_input_input.value;
+                    // this.$emit('finish',null);
                 }else{
                     
                     let count = 6;
@@ -952,9 +958,11 @@ export default {
                                             };
                         let temp_type = this.drawList[this.drawList.length - 1].type;
                         // this.drawList.push({status:"normal",Selected:false,SID:this.drawID,type:temp_type,position:[{x:newPosition.x,y:newPosition.y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"});
-                        this.drawList.push(this.create(temp_type,newPosition));
+                        this.drawList.push(this.create(temp_type,this.drawItemId,newPosition));
                         this.drawID++;
                     }
+
+                    // this.$emit('finish',null);
                     
                 }
             }
@@ -965,7 +973,7 @@ export default {
             // console.log(w,h);
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
         },
-        setDrawStatus(status,drawtype,count){
+        setDrawStatus(status,drawtype,drawItemId,count){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
@@ -973,6 +981,8 @@ export default {
             this.drawCount = count;
             this.editStatus = "normal";
             this.startMove = false;
+            this.drawItemId = drawItemId;
+            this.drawtypeNum = drawtype;
 
             switch(drawtype){
                 case 1: //  位移
@@ -995,6 +1005,8 @@ export default {
             if(status == "text"){
                 this.drawtype = "text";
             }
+
+            this.$refs.number_input.style.display = "none";
 
         },
         setMoveStatus(){
@@ -1022,27 +1034,53 @@ export default {
                 this.Refresh();
             }
         },
-        create(type,position){
-            let item = {status:"normal",Selected:false,SID:this.drawID,type:type,position:[{x:position.x,y:position.y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"};
+        create(type,ItemId,position){
+            let item = {
+                            data:"",                                    //  data
+                            ItemId:ItemId,                              //  itemId
+                            ID_out:-1,                                  //  id
+                            isAlert:0,                                  //  isAlert
+                            isBroken:0,                                 //  isBroken
+                            itemName:"",                                //  itemName
+                            pointName:"",                               //  pointName
+                            status:"normal",
+                            Selected:false,
+                            SID:this.drawID,
+                            type:type,
+                            position:[{x:position.x,y:position.y}],
+                            count:1,
+                            TempPostion:{x:position.x,y:position.y},
+                            text:"文本",
+                            display:true,
+                            data:"none",
+                            pointName:"new point",
+                            typeNum:this.drawtypeNum                    //  type
+                        };
             return item;
         },
-        enableType(drawtype,status){
-            switch(drawtype){
-                case 1: //  位移
-                    this.drawtype_move = status;
-                    break;
-                case 2: //  位移
-                    this.drawtype_move = status;
-                    break;
-                case 3: //  水位
-                    this.drawtype_level = status;
-                    break;
-                case 4: //  力
-                    this.drawtype_force = status;
-                    break;
-                case 5: //  倾斜
-                    this.drawtype_slanting = status;
-                    break;
+        enableType(drawtype,drawItemId,status){
+            // switch(drawtype){
+            //     case 1: //  位移
+            //         this.drawtype_move = status;
+            //         break;
+            //     case 2: //  位移
+            //         this.drawtype_move = status;
+            //         break;
+            //     case 3: //  水位
+            //         this.drawtype_level = status;
+            //         break;
+            //     case 4: //  力
+            //         this.drawtype_force = status;
+            //         break;
+            //     case 5: //  倾斜
+            //         this.drawtype_slanting = status;
+            //         break;
+            // }
+
+            for(let i = 0; i < this.drawList.length;i++){
+                if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
+                    this.drawList[i].display = status;
+                }
             }
 
             this.Refresh();
