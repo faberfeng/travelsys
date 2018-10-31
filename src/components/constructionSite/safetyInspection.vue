@@ -93,7 +93,7 @@
                     </div>
                     <div class="planeFigureBody">
                         <div class="operateTool" v-show="editSpotShow">
-                            <div class="operateToolLeft">
+                            <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
                                 <span class="fault" @click="changeBroken" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
@@ -177,7 +177,7 @@
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name)"></button>
+                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId)"></button>
                                         <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
@@ -199,10 +199,10 @@
                                 @size-change="handleSizeChange"
                                 @current-change="handleCurrentChange"
                                 :current-page.sync="currentPage1"
-                                :page-sizes="[10, 20, 30, 40,50]"
-                                :page-size="10"
+                                :page-sizes="[6, 12, 18,24,30]"
+                                :page-size="1"
                                 layout="sizes,prev, pager, next"
-                                :total="50">
+                                :total="monitorMainTableListLength">
                             </el-pagination>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:importDataShow="importDataShow" :projctName="surveyName" :itemMonitorKeyWord="itemSubmitKeyWord" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn" v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -442,6 +442,7 @@ export default {
             weatherAir:'',
             weatherTime:'',
             editSpotShow:false,
+            toolShow:false,
             baseMapShow:false,
             baseMapMonitor:false,
             addInspectContentShow:false,//增加监测内容弹框
@@ -511,6 +512,7 @@ export default {
                 }
             ],
             monitorMainTableList:'',//监测内容总表
+            monitorMainTableListLength:0,//监测内容总表长度
             monitorMainItemList:'',//绘制底图内容
             hoverId:'',//移动底图上的ID
             curBaseMapUrl:'',//目前底图首页
@@ -531,6 +533,7 @@ export default {
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
             itemSubmitKeyWord:'',//传递给子组件的监测关键字
+            itemSubmitbaseMapId:'',
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
@@ -743,7 +746,8 @@ export default {
              console.log(this.drawItemType,'type');
         },
         picView_status_changed(status){
-            console.log(status);
+            this.toolShow=status;
+            // console.log(status);
         },
         drawFinish(){
             // console.log("finish");
@@ -767,6 +771,7 @@ export default {
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getMonitorItem();
+            vm.getAllMonitorPoint();
         },
         //获取可用的群组
         getAccessUserGroup(){
@@ -821,36 +826,37 @@ export default {
                         this.weatherAir=this.weatherJson.data[0].tem1;
                         this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week
                         console.log(this.weatherJson)
-                        var recentData=[{name:'报警',value:23},{name:'总数',value:100}];
-                        var totalData=[{name:'报警',value:23},{name:'总数',value:100}];
+                        var recentData=[];
+                        var totalData=[];
                         var legendData='';
                         var legendAllData='';
-                        var conditionData=[55,50];//监测工况综述
-                        // recentData.push(
-                        //     {
-                        //     name:'报警',
-                        //     value:this.alertPointAmount.recentAlertAmount
-                        //     },{
-                        //         name:'总数',
-                        //         value:this.alertPointAmount.allAmount
-                        //     }
-                        // );
-                        // legendData='报警'+this.alertPointAmount.recentAlertAmount;
-                        // legendAllData='总数'+this.alertPointAmount.allAmount;
-                        // totalData.push(
-                        //     {
-                        //     name:'报警',
-                        //     value:this.alertPointAmount.totalAlertAmount
-                        //     },
-                        //     {
-                        //         name:'总数',
-                        //         value:this.alertPointAmount.allAmount
+                        var conditionData=[];//监测工况综述
+                        recentData.push(
+                            {
+                            name:'报警',
+                            value:this.alertPointAmount.recentAlertAmount
+                            },{
+                                name:'总数',
+                                value:this.alertPointAmount.allAmount
+                            }
+                        );
+                        legendData='报警'+this.alertPointAmount.recentAlertAmount;
+                        legendAllData='总数'+this.alertPointAmount.allAmount;
+                        totalData.push(
+                            {
+                            name:'报警',
+                            value:this.alertPointAmount.totalAlertAmount
+                            },
+                            {
+                                name:'总数',
+                                value:this.alertPointAmount.allAmount
                                 
-                        //     }
-                        // );
-                        // conditionData.push(
-                        //     this.condition.acAmount,this.condition.days
-                        // )
+                            }
+                        );
+                        conditionData.push(
+                            this.condition.acAmount,this.condition.days
+                        )
+                        console.log()
                         var myChart = echarts.init(document.getElementById('overviewPie'))
                         var myChart1 = echarts.init(document.getElementById('overviewPie2'))
                         var myChart2=echarts.init(document.getElementById('conditionLine'))
@@ -1210,7 +1216,7 @@ export default {
                             }
                         })
                     }
-                }else{
+                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
                         msg:response.data.msg
@@ -1239,7 +1245,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getBaseMapList()
-                }else{
+                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
                         msg:response.data.msg
@@ -1314,7 +1320,7 @@ export default {
                         this.monitorLogogram='';
                         this.monitorKeyword='';
                         this.monitorBaseMapId='';
-                    }else{
+                    }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
                             msg:response.data.msg
@@ -1561,15 +1567,16 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.importGatherDataShow=false;
-                    vm.sheetIndex='';
-                    vm.timeCol=''; //采集时间下标
-                    vm.distanceCol='';//位移下标
-                    vm.monitorImportId='';//监测ID
-                    vm.spotNumCol='';//监测点位下标
-                   vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=false; //是否覆盖
-                   vm.inputWorkingCondition='';//现场工况
+                    
+                    // this.importGatherDataShow=false;
+                //     vm.sheetIndex='';
+                //     vm.timeCol=''; //采集时间下标
+                //     vm.distanceCol='';//位移下标
+                //     vm.monitorImportId='';//监测ID
+                //     vm.spotNumCol='';//监测点位下标
+                //    vm.unifiedTime='';//标准时间，不选择可不传
+                //     vm.overwrite=false; //是否覆盖
+                //    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
                         type:'error',
@@ -1602,15 +1609,15 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.importGatherDataShow=false;
-                    vm.sheetIndex='';
-                    vm.timeCol=''; //采集时间下标
-                    vm.altitudeCol='';//高程下标
-                    vm.monitorImportId='';//监测ID
-                    vm.spotNumCol='';//监测点位下标
-                   vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=false; //是否覆盖
-                   vm.inputWorkingCondition='';//现场工况
+                    // this.importGatherDataShow=false;
+                //     vm.sheetIndex='';
+                //     vm.timeCol=''; //采集时间下标
+                //     vm.altitudeCol='';//高程下标
+                //     vm.monitorImportId='';//监测ID
+                //     vm.spotNumCol='';//监测点位下标
+                //    vm.unifiedTime='';//标准时间，不选择可不传
+                //     vm.overwrite=false; //是否覆盖
+                //    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
                         type:'error',
@@ -1644,16 +1651,16 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.importGatherDataShow=false;
-                    vm.sheetIndex='';
-                    vm.timeCol=''; //采集时间下标
-                    vm.pipeHeightCol='';//管口高度
-                    vm.gaugeHeightCol='';//水位下标
-                    vm.monitorImportId='';//监测ID
-                    vm.spotNumCol='';//监测点位下标
-                   vm.unifiedTime='';//标准时间，不选择可不传
-                    vm.overwrite=false; //是否覆盖
-                   vm.inputWorkingCondition='';//现场工况
+                    // this.importGatherDataShow=false;
+                //     vm.sheetIndex='';
+                //     vm.timeCol=''; //采集时间下标
+                //     vm.pipeHeightCol='';//管口高度
+                //     vm.gaugeHeightCol='';//水位下标
+                //     vm.monitorImportId='';//监测ID
+                //     vm.spotNumCol='';//监测点位下标
+                //    vm.unifiedTime='';//标准时间，不选择可不传
+                //     vm.overwrite=false; //是否覆盖
+                //    vm.inputWorkingCondition='';//现场工况
                 }else {
                     vm.$message({
                         type:'error',
@@ -1855,11 +1862,12 @@ export default {
             })
         },
         //监测内容详情页
-        detail(keyword,id,type,name){
+        detail(keyword,id,type,name,baseMapId){
             this.surveyName=name;
             this.detailMonitorId=id;
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
+            this.itemSubmitbaseMapId=baseMapId
             if(type==5){
                 this.pitchDetailShow=true;
             }else{
@@ -1890,8 +1898,8 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    this.monitorMainTableListLength=response.data.rt.length;
                     this.monitorMainTableList.forEach((item)=>{
-                        
                     })
                     // this.drawItemId=this.monitorMainTableList[0].id;
                 }

@@ -10,7 +10,7 @@
             <div class="projectBodyHead">
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
-                    <span class="headLeftBtn">底图</span>
+                    <span class="headLeftBtn" @click="baseMapEmit()">底图</span>
                     <span class="headLeftBtn">单点</span>
                     <span class="headLeftBtn">连续</span>
                     <span class="headLeftBtn">文字</span>
@@ -37,6 +37,14 @@
                         <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
                         <span class="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
+                    <div class="operateToolRight">
+                        <label class="saveDrawTxt">保存</label>
+                    </div>
+                </div>
+                <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
+                            <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
+                            <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
+                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
                 </div>
                 
             </div>
@@ -201,8 +209,13 @@
 import axios from 'axios'
 import moment from 'moment'
 import Vue from 'vue'
+import picView from './picView.vue'
+import pdf from 'vue-pdf'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord'],
+    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId'],
+    components:{
+            pdf,picView
+    },
     name:'commonDetail',
     data(){
         return{
@@ -251,6 +264,7 @@ export default Vue.component('commonDetail',{
         this.getPointDatas();
         this.getUserByUserGroup();
         this.getItemDutyUser();
+        this.getAllMonitorPoint();
     },
     filters:{
         addSprit(val){
@@ -268,9 +282,9 @@ export default Vue.component('commonDetail',{
             }
         },
         timeStamp(StatusMinute){	
-            var day=parseInt(StatusMinute/60/60/24);
-            var hour=parseInt(StatusMinute/60/60%24);
-            var min= parseInt(StatusMinute/60%60);
+            var day=parseInt(StatusMinute/1000/60/60/24);
+            var hour=parseInt(StatusMinute/1000/60/60%24);
+            var min= parseInt(StatusMinute/1000/60%60);
             StatusMinute="";
             if (day > 0)
             {
@@ -308,11 +322,41 @@ export default Vue.component('commonDetail',{
             var vm = this
             vm.$emit('back')
         },
+        //底图选择
+        baseMapEmit(){
+            var vm=this;
+            vm.$emit('baseMapEmit')
+        },
         handleSizeChange(val){
             console.log(`每页 ${val} 条`);
         },
         handleCurrentChange(val){
             console.log(`当前页: ${val}`);
+        },
+         //获取底图中所有的监测点
+        getAllMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.itemSubmitbaseMapId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorPointInfo=response.data.rt;
+                    this.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            })
+        },
+        drawFinish(){
+
+        },
+        picView_status_changed(){
+
         },
         //获取底图列表
         // getBaseMapList(){
@@ -929,22 +973,41 @@ export default Vue.component('commonDetail',{
                                 }
 
                             }
-                            // .operateToolRight{
-                            //     float: right;
-                            //     width: 62px;
-                            //     height: 34px;
-                            //     margin-left:10px;
-                            //     border:1px solid #ccc;
-                            //     border-radius:2px;
-                            //     box-shadow: 1px 1px 2px #888888;
-                            //     background: #fff;
-                            //     .saveDrawTxt{
-                            //         font-size:12px;
-                            //         color:#666666;
-                            //         line-height: 32px;
-                            //     }
-                            // }
+                            .operateToolRight{
+                                float: right;
+                                width: 62px;
+                                height: 34px;
+                                margin-left:10px;
+                                border:1px solid #ccc;
+                                border-radius:2px;
+                                box-shadow: 1px 1px 2px #888888;
+                                background: #fff;
+                                .saveDrawTxt{
+                                    font-size:12px;
+                                    color:#666666;
+                                    line-height: 32px;
+                                }
+                            }
 
+                        }
+                        .planeFigureGround{
+                            z-index: 8;
+                            height: 540px;
+                            width: 100%;
+                            position:absolute;
+                            top:0px;
+                            left: 0px;
+
+                            img{
+                                width: 100%;
+                                height: 100%;
+                                padding:5px;
+                            }
+                            #drawingPdf{
+                                 width: 100%;
+                                height: 530px;
+                                padding:5px;
+                            }
                         }
 
             }
