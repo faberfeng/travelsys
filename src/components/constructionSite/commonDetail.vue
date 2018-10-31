@@ -314,6 +314,47 @@ export default Vue.component('commonDetail',{
         handleCurrentChange(val){
             console.log(`当前页: ${val}`);
         },
+        //获取底图列表
+        // getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.selectUgId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             if(!this.curBaseMapUrl){
+        //                 this.baseMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //             }
+        //             if(this.monitorBaseMapId){
+        //                 this.baseMapList.forEach((item)=>{
+        //                     if(item.id==this.monitorBaseMapId){
+        //                         this.curBaseMapUrl=item.relativeUri;
+        //                     }
+        //                 })
+        //             }
+        //         }else{
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
          //获取监测内容
         getMonitorItem(){
             var vm=this;
