@@ -37,7 +37,7 @@ export default {
         this.drawStatus = "none";
         this.editStatus = "normal";
         this.ResolutionScale = 1.0;
-        this.drawCount = 1;
+        this.drawCount = 0;
         this.drawList = [];
         this.startMove = false;
         this.drawtype_move = true;
@@ -72,6 +72,7 @@ export default {
                     this.ResolutionScale = this.PDFscale; 
                     
                     this.old_para = this.para.source;
+                    this.size_R();
                 }
             }else{
                 this.para.type = "PNG";
@@ -92,6 +93,10 @@ export default {
 
             
         },500);
+
+        setInterval(()=>{
+            this.Refresh();
+        },1000)
         
 
     },
@@ -104,6 +109,7 @@ export default {
     },
     methods:{
         init(div,source,type,page_No,angle){
+
             
             this.scale_list = [0.3,0.5,0.75,0.8,1.0,1.5,2.0,3.0];
             this.scale_list_index = 4;
@@ -121,6 +127,7 @@ export default {
             this.drawcontext = this.drawCanvas.getContext('2d');
             this.drawcontextSelect = this.drawCanvasSelect.getContext('2d');
             this.SelectedList = [];
+            this.displayLabel = false;
 
             if(page_No == undefined){
                 page_No = 1;
@@ -156,6 +163,7 @@ export default {
                         this.ResolutionScale = this.sub_div.offsetWidth / 1024.0;
                         this.PDFscale = this.ResolutionScale;
                         this.type = type;
+                        // this.$emit('load_points',null);
                         this.Refresh();
                     }
                     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,6 +416,48 @@ export default {
             this.Refresh();
             
         },
+        size_R(){
+            switch(this.type){
+
+                case "PDF":
+                    this.scale_before = this.scale;
+
+                    this.start_canvas.x = this.sub_div.offsetLeft;
+                    this.start_canvas.y = this.sub_div.offsetTop;
+                    this.start_canvas.w = this.sub_div.offsetWidth;
+                    this.start_canvas.h = this.sub_div.offsetHeight;
+
+                   {
+                        this.scale = this.scale_list[this.scale_list_index];
+
+                        this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                        if(this.angle == 0 || this.angle == 180){
+                            this.sub_div.style.height = this.imageSize.height + "px";
+                            this.sub_div.style.width = this.imageSize.width + "px";
+                            this.drawCanvas.height = this.imageSize.height;
+                            this.drawCanvas.width = this.imageSize.width;
+                            this.drawCanvasSelect.height = this.imageSize.height;
+                            this.drawCanvasSelect.width = this.imageSize.width;
+                        }else{
+                            this.sub_div.style.height = this.imageSize.width + "px";
+                            this.sub_div.style.width = this.imageSize.height + "px";
+                            this.drawCanvas.height = this.imageSize.width;
+                            this.drawCanvas.width = this.imageSize.height;
+                            this.drawCanvasSelect.height = this.imageSize.width;
+                            this.drawCanvasSelect.width = this.imageSize.height;
+                        }
+
+                        
+                    }
+                    break;
+                case "PNG":
+
+
+                    break;
+
+            }
+        },
         size_big(){
 
             switch(this.type){
@@ -482,7 +532,7 @@ export default {
                         }
 
                         this.position_calculate();
-
+                        this.context = this.canvas.getContext('2d');
                         this.context.rotate(this.angle*Math.PI/180);
 
                         switch(this.angle){
@@ -572,7 +622,7 @@ export default {
                         }
 
                         this.position_calculate();
-
+                        this.context = this.canvas.getContext('2d');
                         this.context.rotate(this.angle*Math.PI/180);
 
                         switch(this.angle){
@@ -614,6 +664,10 @@ export default {
 
         },
         Refresh(){
+
+            if(!this.drawcontext){
+                return;
+            }
             
             this.drawcontext.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
             this.drawcontextSelect.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
@@ -644,11 +698,11 @@ export default {
                     case "move":
                         if(this.drawtype_move){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
-                                this.drawMove(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawMove(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
                             };
                         }
@@ -656,11 +710,11 @@ export default {
                     case "level":
                         if(this.drawtype_level){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
-                                this.drawLevel(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawLevel(this.drawcontext,pointsArray[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawMove(this.drawcontextSelect,pointsArray[j],1.0,7.5,colorId);
                             };
                         }
@@ -668,7 +722,7 @@ export default {
                     case "force":
                         if(this.drawtype_force){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected);
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],1.0,10,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
@@ -680,7 +734,7 @@ export default {
                     case "slanting":
                         if(this.drawtype_slanting){
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
                             }
                             for(let j = 0;j<pointsArray.length;j++){
@@ -715,7 +769,7 @@ export default {
                 }
             }
         },
-        drawMove(drawcontext,position,scale,radius,color,isSelected){
+        drawMove(drawcontext,position,scale,radius,color,isSelected,data){
             
             var color_="";
             if(!isSelected){
@@ -736,8 +790,15 @@ export default {
                 2*Math.PI);
             drawcontext.stroke();
             drawcontext.fill();
+
+            if(this.displayLabel)
+            if(data){
+                drawcontext.fillStyle=color_;
+                drawcontext.font="12px Georgia";
+                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            }
         },
-        drawLevel(drawcontext,position,scale,radius,color,isSelected){
+        drawLevel(drawcontext,position,scale,radius,color,isSelected,data){
 
             var color_="";
             if(!isSelected){
@@ -767,8 +828,15 @@ export default {
                 Math.PI,
                 2 * Math.PI);
             drawcontext.stroke();
+
+            if(this.displayLabel)
+            if(data){
+                drawcontext.fillStyle=color_;
+                drawcontext.font="12px Georgia";
+                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            }
         },
-        drawForce(drawcontext,position,scale,radius,color,isSelected){
+        drawForce(drawcontext,position,scale,radius,color,isSelected,data){
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -784,8 +852,15 @@ export default {
             position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
             radius * scale * 2,
             radius * 0.75 * scale * 2);
+
+            if(this.displayLabel)
+            if(data){
+                drawcontext.fillStyle=color_;
+                drawcontext.font="12px Georgia";
+                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            }
         },
-        drawSlanting(drawcontext,position,scale,radius,color,isSelected){
+        drawSlanting(drawcontext,position,scale,radius,color,isSelected,data){
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -830,6 +905,13 @@ export default {
                 0,
                 2 * Math.PI);
             this.drawcontext.stroke();
+
+            if(this.displayLabel)
+            if(data){
+                drawcontext.fillStyle=color_;
+                drawcontext.font="12px Georgia";
+                drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale);
+            }
         },
         drawText(drawcontext,position_start,position_end,text,scale,color,select,isSelected){
             var color_="";
@@ -946,7 +1028,7 @@ export default {
                     let dir = new THREE.Vector2(this.lastPostion.x - this.drawList[this.drawList.length - 1].position[0].x,this.lastPostion.y - this.drawList[this.drawList.length - 1].position[0].y);
                     let length = dir.length();
                     dir.normalize();
-
+                    count--;
                     length /= count;
                     let lastPointPosition = {x:this.drawList[this.drawList.length - 1].position[0].x,y:this.drawList[this.drawList.length - 1].position[0].y}
 
@@ -1083,6 +1165,71 @@ export default {
                 }
             }
 
+            this.Refresh();
+        },
+        saveList(){
+            var output = [];
+
+            for(let i = 0; i < this.drawList.length;i++){
+                var item = {};
+
+                item.data = this.drawList[i].data;
+                item.itemId = this.drawList[i].ItemId;
+                item.id = this.drawList[i].ID_out;
+                item.isAlert = this.drawList[i].isAlert;
+                item.isBroken = this.drawList[i].isBroken;
+                item.itemName = this.drawList[i].itemName;
+                item.pointName = this.drawList[i].pointName;
+                item.type = this.drawList[i].typeNum;
+                item.plotInfo = JSON.stringify(this.drawList[i]);
+                
+                if(item.type == 5){continue;}
+
+                output.push(item);
+            }
+
+            return output;
+        },
+        loadPoints(list){
+            this.drawList = [];
+            this.SelectedList = [];
+            // console.log(list);
+
+            for(let i = 0;i < list.length;i++){
+                
+                let plotInfo = JSON.parse(list[i].plotInfo);
+
+                let item = {
+                            data:list[i].data,                                  //  data
+                            ItemId:list[i].itemId,                              //  itemId
+                            ID_out:list[i].id,                                  //  id
+                            isAlert:list[i].isAlert,                            //  isAlert
+                            isBroken:list[i].isBroken,                          //  isBroken
+                            itemName:list[i].itemName,                          //  itemName
+                            pointName:list[i].pointName,                        //  pointName
+                            status:"normal",
+                            Selected:false,
+                            SID:this.drawID,
+                            type:plotInfo.type,
+                            position:plotInfo.position,
+                            count:1,
+                            TempPostion:plotInfo.TempPostion,
+                            text:plotInfo.text,
+                            display:true,
+                            data:"none",
+                            pointName:"new point",
+                            typeNum:list[i].type                               //  type
+                        };
+                this.drawList.push(item);
+
+                this.drawID++;
+
+            }
+            this.Refresh();
+            
+        },
+        enableLabel(status){
+            this.displayLabel = status;
             this.Refresh();
         }
     }

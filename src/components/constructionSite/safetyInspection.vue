@@ -105,7 +105,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -1061,6 +1061,29 @@ export default {
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
+
+            var list = this.$refs.pic.saveList();
+            // console.log(list);
+
+            axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.monitorBaseMapId
+                    },
+                    data:list
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getAllMonitorPoint();
+                    }else{
+                        console.log(response);
+                    }
+                })
+
+
         },
         checkboxChange(){
             // console.log(this.monitorMainItemList,'checkList');
@@ -1070,7 +1093,8 @@ export default {
             }
         },
         displaySpot(){
-            console.log(this.displaySpotNum);
+            // console.log(this.displaySpotNum);
+            this.$refs.pic.enableLabel(this.displaySpotNum);
         },
         //添加底图
         addBaseMap(file){
@@ -1987,7 +2011,7 @@ export default {
         },
         //添加文本
         drawingText(){
-            this.$refs.pic.setDrawStatus("text",0,0,2);
+            this.$refs.pic.setDrawStatus("text",10000,10000,2);
             this.isClick2=false;
             this.isClick1=false;
             this.isClick3=true;
@@ -2013,10 +2037,9 @@ export default {
                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
-                console.log(response);
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
-                    
+                    this.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
             })
         },
