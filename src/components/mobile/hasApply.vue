@@ -47,7 +47,7 @@
     },
     filters: {
       getRemarkLength: function (remark) {
-        if (typeof(remark) == 'undefined')
+        if (typeof(remark) == 'undefined' || remark == undefined || remark == null)
           return 0;
         return remark.length;
       }
