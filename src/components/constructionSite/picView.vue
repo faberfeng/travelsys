@@ -1,5 +1,5 @@
 <template>
-    <div ref="picViewOutSide" style="background-color:rgba(192,192,192,1);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
+    <div ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" ></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
@@ -45,6 +45,7 @@ export default {
         this.drawtype_level = true;
         this.drawtype_force = true;
         this.drawtype_slanting = true;
+        this.Refresh_timer = null;
 
         this.$refs.picView.style.width = this.$refs.picView.parentNode.offsetWidth + "px";
         this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
@@ -59,6 +60,15 @@ export default {
             if(this.para.type == "pdf"){
                 this.para.type = "PDF";
                 if(this.para.source != this.old_para){
+
+                    if(this.Refresh_timer){
+                        clearInterval(this.Refresh_timer);
+                    }
+
+                    this.Refresh_timer=setInterval(()=>{
+                        this.Refresh();
+                    },1000)
+
                     this.$refs.pdfDocument.$el.style.display = "block";
                     this.$refs.picViewImage.style.display = "none";
                     this.$refs.pdfDocument.$el.style.position = "relative";
@@ -75,6 +85,15 @@ export default {
                     this.size_R();
                 }
             }else{
+
+                if(this.Refresh_timer){
+                    clearInterval(this.Refresh_timer);
+                }
+
+                this.Refresh_timer=setInterval(()=>{
+                    this.Refresh();
+                },1000)
+                
                 this.para.type = "PNG";
                 if(this.para.source != this.old_para){
                     this.$refs.pdfDocument.$el.style.display = "none";
@@ -94,9 +113,7 @@ export default {
             
         },500);
 
-        setInterval(()=>{
-            this.Refresh();
-        },1000)
+        
         
 
     },
@@ -299,14 +316,34 @@ export default {
                         }
 
                         if(this.drawCount == 0){
-                            if(this.drawList[this.drawList.length - 1].position.length == 2){
-                                if(this.drawList[this.drawList.length - 1].type == "text"){
-                                    this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
-                                    this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
-                                    this.$refs.number_input_input.value = "";
+                            if(this.drawList[this.drawList.length - 1].position.length == 2){   // 两个点完成绘制的
+                                switch(this.drawList[this.drawList.length - 1].type){
+
+                                    case "text":
+                                        this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
+                                        this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
+                                        this.$refs.number_input_input.value = "";
+                                        this.$refs.number_input.style.display = "block";
+                                        break;
+                                    case "move":
+                                        this.$refs.number_input_input.value = "6";
+                                        this.$refs.number_input.style.display = "block";
+                                        break;
+                                    case "level":
+                                        this.$refs.number_input_input.value = "6";
+                                        this.$refs.number_input.style.display = "block";
+                                        break;
+                                    case "force":
+                                        this.$refs.number_input_input.value = "6";
+                                        this.$refs.number_input.style.display = "block";
+                                        break;
+                                    case "slanting":
+                                        this.$refs.number_input_input.value = "6";
+                                        this.$refs.number_input.style.display = "block";
+                                        break;
                                 }
-                                // this.$refs.number_input_input.value = "6";
-                                this.$refs.number_input.style.display = "block";
+                                 
+                                
                             }
 
                             this.drawID++;
@@ -323,11 +360,6 @@ export default {
 
                         // console.log(SID);
 
-                        if(SID > 0){
-                            this.$emit('status_changed',true);
-                        }else{
-                            this.$emit('status_changed',false);
-                        }
 
                         this.SelectedList = [];
 
@@ -340,6 +372,12 @@ export default {
 
                         for(let i = 0; i < this.SelectedList.length;i++){
                             this.SelectedList[i].Selected = true;
+                        }
+
+                        if(SID > 0){
+                            this.$emit('status_changed',true,this.SelectedList[i]);
+                        }else{
+                            this.$emit('status_changed',false,this.SelectedList[i]);
                         }
 
                     }
@@ -409,17 +447,18 @@ export default {
             this.status = "none";
         },
         onwheel(e){
-
-            e.preventDefault();
-            // console.log(e);
             
-            if(e.deltaY < 0){
-                this.size_big();
-            }else if(e.deltaY > 0){
-                this.size_small();
+            if(e.shiftKey){
+                e.preventDefault();
+                
+                if(e.deltaY < 0){
+                    this.size_big();
+                }else if(e.deltaY > 0){
+                    this.size_small();
 
+                }
+                this.Refresh();
             }
-            this.Refresh();
             
         },
         size_R(){
@@ -1275,11 +1314,9 @@ export default {
         },
         changeBroken(){
             if(this.SelectedList.length > 0){
-
                 for(let j = 0;j < this.SelectedList.length;j++){
                     this.SelectedList[j].isBroken = 0;
                 }
-
                 this.Refresh();
             }
         }
