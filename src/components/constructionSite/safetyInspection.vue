@@ -1076,8 +1076,8 @@ export default {
                                             name:'',
                                             type:'bar',
                                             tooltip:{show:false},
-                                            barMinHeight:100,  //最小柱高
-                                            barMinHeight:200,//最大柱高
+                                            barMinHeight:10,  //最小柱高
+                                            barMaxHeight:100,//最大柱高
                                             barWidth: 16,  //柱宽度
                                             barMaxWidth:50,   //最大柱宽度
                                             data:conditionData,

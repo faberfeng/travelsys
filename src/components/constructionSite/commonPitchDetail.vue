@@ -57,7 +57,7 @@
                                 <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxShift)"></td>
                                 <td>{{item.maxAlert|shifouChange()}}</td>
-                                <td v-text="$options.filters.addSprit(item.maxVariationInterval)"></td>
+                                <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
                                 <td>{{item.maxVariationAlert|shifouChange()}}</td>
@@ -77,8 +77,8 @@
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}详情</label>
                         </div>
-                        <div class="oneTable">
-                            <table class="tableList" border="1" cellspacing="0" width="100%">
+                        <div class="oneTable" >
+                            <table class="tableList" id="tableListid" border="1" cellspacing="0" width="100%">
                                 <thead>
                                     <tr>
                                         <th rowspan="2">深度(m)</th>
@@ -107,7 +107,8 @@
                                     <tr>
                                         <td>5mm</td>
                                         <td>6mm</td>
-                                        <td>3mm/d</td>
+                                        <!-- {{(leftDisplayList.recentVariation)[index].recentVariation|totalVariation}} -->
+                                        <td>mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -120,7 +121,7 @@
                             <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="twoGraph">
-                            <vue-highcharts  :options="optionOnesLeft" ref="lineChartOne"></vue-highcharts>
+                            <vue-highcharts id="leftHightchart" style="min-height:1900px" :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                         </div>
                     </div>
                     <div class="containerBottomThree" v-show="rightShow">
@@ -137,28 +138,29 @@
                                         <th colspan="2">最近一次</th>
                                     </tr>
                                     <tr>
-                                        <th></th>
-                                        <th></th>
+                                        <th>{{time|timeChange}}</th>
+                                        <th>{{time1|timeChange}}</th>
                                         <th>变化量(mm)</th>
                                     </tr>
                                 </thead>
                                <tbody>
-                                    <tr v-for="(item,index) in rightDisplayList.recentVariation " :key="index">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr v-for="(item,index) in rightDisplayList.recentVariation" :key="index">
+                                        <td>{{rightDisplayListValue1[index].depth}}</td>
+                                        <td >{{rightDisplayListValue1[index].shift}}</td>
+                                        <td >{{rightDisplayListValue2[index].shift}}</td>
+                                        <td>{{(rightDisplayList.recentVariation)[index].recentVariation|addSprit}}</td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
-                                        <td>05-21 10:00</td>
-                                        <td>05-21 11:00</td>
+                                        <td>{{time2|timeChange}}</td>
+                                        <td>{{time3|timeChange}}</td>
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
                                         <td>5mm</td>
                                         <td>6mm</td>
-                                        <td>3mm/d</td>
+                                        <!-- {{(rightDisplayList.recentVariation)[index].totalVariation|addSprit}} -->
+                                        <td>mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -171,7 +173,7 @@
                              <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="fourGraph">
-                            <vue-highcharts  :options="optionOnesRight" ref="lineChartOne"></vue-highcharts>
+                            <vue-highcharts style="min-height:1900px" :options="optionOnesRight" ref="lineRightChartOne"></vue-highcharts>
                         </div>
                     </div>
                 </div>
@@ -300,10 +302,22 @@ export default Vue.component('commonPitch-detail',{
                 leftDisplayList:'',
                 leftDisplayListValue:'',
                 leftDisplayListValue1:[],
+                leftDisplayListValueXdata:[],
+                leftDisplayListValueYdata1:[],
+                leftDisplayListValueYdata2:[],
+                rightDisplayListValueXdata:[],
+                rightDisplayListValueYdata1:[],
+                rightDisplayListValueYdata2:[],
+                lineHeight:'',
                 leftDisplayListValue2:[],
+                rightDisplayListValue1:[],
+                rightDisplayListValue2:[],
                 time:'',
                 time1:'',
+                time2:'',
+                time3:'',
                 rightDisplayList:'',
+                rightDisplayListValue:[],
                 itemseqId:'',
                 seqId:'',
                 show:false,
@@ -362,14 +376,14 @@ export default Vue.component('commonPitch-detail',{
                             },
                         },
                         series:[
-                            {
-                                name:'05-21',
-                                data:[]
-                            },
-                            {
-                                name:'05-21',
-                                data:[]
-                            }
+                            // {
+                            //     name:this.time,
+                            //     data:[]
+                            // },
+                            // {
+                            //     name:this.time1,
+                            //     data:[]
+                            // }
                         ],
                 },
                 optionOnesRight:{
@@ -382,9 +396,14 @@ export default Vue.component('commonPitch-detail',{
                         },
                         xAxis: {
                             // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
-                            // tickInterval: 0.5,
+                            tickInterval: 1,
                             //  tickPositions: [0, 20, 50, 100]
                             categories:[],
+                            // tickLength:200,
+                            
+
+                            // tickPixelInterval:10,
+
                         },
                         yAxis: {
                                 title: {
@@ -393,6 +412,9 @@ export default Vue.component('commonPitch-detail',{
                                 labels:{
                                     enabled: true
                                 },
+                                // tickLength:200,
+                            //     tickLength:'200px',
+                            // tickWidth:'200px',
                                
                             
                                 },
@@ -427,14 +449,14 @@ export default Vue.component('commonPitch-detail',{
                             },
                         },
                         series:[
-                            {
-                                name:'05-21',
-                                data:[]
-                            },
-                            {
-                                name:'05-21',
-                                data:[]
-                            }
+                            // {
+                            //     name:'05-21',
+                            //     data:[]
+                            // },
+                            // {
+                            //     name:'05-21',
+                            //     data:[]
+                            // }
                         ],
                 },
 
@@ -474,12 +496,42 @@ export default Vue.component('commonPitch-detail',{
             return moment(val).format("MM-DD HH:mm");
             }
         },
+        timeStamp(StatusMinute){	
+            if(StatusMinute==null){
+                return '/'
+            }else {
+                var day=parseInt(StatusMinute/1000/60/60/24);
+                var hour=parseInt(StatusMinute/1000/60/60%24);
+                var min= parseInt(StatusMinute/1000/60%60);
+                StatusMinute="";
+                if (day > 0)
+                {
+                    StatusMinute= day + "d";
+                } 
+                if (hour>0)
+                {
+                    StatusMinute += hour + "h";
+                } 
+                if (min>0)
+                {
+                    StatusMinute += parseFloat(min) + "m";
+                }
+                    return StatusMinute;
+            }
+        },
 
         },
         watch:{
 
         },
         methods:{
+            timeChangeMethod(val) {
+                if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("MM-DD HH:mm");
+                }
+            },
             //返回
             back(){
                 var vm = this
@@ -515,7 +567,8 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
-                        console.log(vm.getPitchBaseInfoList);
+                        this.getPitchDetailDataBySeqId(vm.getPitchBaseInfoList[0].id)
+                        console.log(vm.getPitchBaseInfoList[0].id);
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
@@ -662,9 +715,13 @@ export default Vue.component('commonPitch-detail',{
             leftDisplay(id,name){
                 this.leftDisplayListValue1=[];
                 this.leftDisplayListValue2=[];
+                this.leftDisplayListValueXdata=[];
+                this.leftDisplayListValueYdata1=[];
+                this.leftDisplayListValueYdata2=[];
+               
+                this.getPitchDetailDataBySeqId(id)
                 this.totalShow=true;
                 this.leftShow=true;
-                this.getPitchDetailDataBySeqId(id)
                 if(this.pitchDetailDataList){
                     this.leftDisplayList=this.pitchDetailDataList;
                     this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
@@ -674,33 +731,86 @@ export default Vue.component('commonPitch-detail',{
                         // console.log(array[index].acquisitionTime,'array');
                         if(array[index].acquisitionTime==this.time){
                             this.leftDisplayListValue1.push(array[index])
-                            // this.show=true;
-                            // console.log('报错')
+                            this.leftDisplayListValueXdata.push(array[index].depth)
+                            this.leftDisplayListValueYdata1.push(array[index].shift)
+
                         }else if(array[index].acquisitionTime==this.time1){
                             this.leftDisplayListValue2.push(array[index])
+                            this.leftDisplayListValueYdata2.push(array[index].shift)
                         }
                     })
-                    // if(this.show==true){
-                    //     for(let i=0;i<(length/2);i++){
-                    //         this.leftDisplayListValue1.push(this.leftDisplayListValue[i])
-                    //     }
-                    //     for(let a=(length/2);a<length;a++){
-                    //         this.leftDisplayListValue2.push(this.leftDisplayListValue[a])
-                    //     }
-                    // }
                     this.leftDisplayName=name;
+                    // console.log(document.getElementById('leftHightchart'),'tuxing')
+                    
+                    // setTimeout(()=>{
+                    //     document.getElementById('leftHightchart').style.minHeight=document.getElementById('tableListid').clientHeight
+                    //     console.log(document.getElementById('tableListid').clientHeight);
+                    // },100)
+                    // console.log(this.lineHeight,'this.lineHeight')
+                    // =this.lineHeight;
+                    let lineLeftChart=this.$refs.lineLeftChartOne;
+                    // document.getElementById('leftHightchart').style.minHeight='1950px'
+                    lineLeftChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        lineLeftChart.removeSeries();
+                        lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
+                        lineLeftChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.leftDisplayListValueYdata2});
+                        lineLeftChart.hideLoading();
+                        lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                    },20)
                     console.log(this.leftDisplayListValue1,'数据1')
                     console.log(this.leftDisplayListValue2,'数据2')
                     console.log(this.leftDisplayList,'左边数据')
+                    console.log(this.leftDisplayListValueXdata,'苏醒')
+                    console.log(this.leftDisplayListValueYdata1,'DATA1')
+                    console.log(this.leftDisplayListValueYdata2,'data2');
                 }
             },
             //右侧显示
             rightDisplay(id,name){
+                this.rightDisplayListValue1=[];
+                this.rightDisplayListValue2=[];
+                this.rightDisplayListValueXdata=[],
+                this.rightDisplayListValueYdata1=[],
+                this.rightDisplayListValueYdata2=[],
+                this.getPitchDetailDataBySeqId(id)
                 this.totalShow=true;
                 this.rightShow=true;
-                this.getPitchDetailDataBySeqId(id)
-                this.rightDisplayList=this.pitchDetailDataList;
-                this.rightDisplayName=name;
+                if(this.pitchDetailDataList){
+                    this.rightDisplayList=this.pitchDetailDataList;
+                    this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
+                    this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
+                    this.time3=(this.rightDisplayList.recent2PitchData)[1].acquisitionTime;
+                    this.rightDisplayListValue.forEach((item,index,array)=>{
+                        // console.log(array[index].acquisitionTime,'array');
+                        if(array[index].acquisitionTime==this.time2){
+                            this.rightDisplayListValue1.push(array[index])
+                            this.rightDisplayListValueXdata.push(array[index].depth)
+                            this.rightDisplayListValueYdata1.push(array[index].shift)
+                        }else if(array[index].acquisitionTime==this.time3){
+                            this.rightDisplayListValue2.push(array[index])
+                            this.rightDisplayListValueXdata.push(array[index].depth)
+                            this.rightDisplayListValueYdata2.push(array[index].shift)
+                        }
+                    })
+                    this.rightDisplayName=name;
+                    let lineRightChart=this.$refs.lineRightChartOne;
+                    // document.getElementById('leftHightchart').style.minHeight='1950px'
+                    lineRightChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        lineRightChart.removeSeries();
+                        lineRightChart.addSeries({name:this.timeChangeMethod(this.time),data:this.rightDisplayListValueYdata1});
+                        lineRightChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.rightDisplayListValueYdata2});
+                        lineRightChart.hideLoading();
+                        lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
+                    },20)
+                    // console.log(this.leftDisplayListValue1,'数据1')
+                    // console.log(this.leftDisplayListValue2,'数据2')
+                    // console.log(this.leftDisplayList,'左边数据')
+                }
+
+                
+                
                 console.log(this.rightDisplayList,'右边数据')
             }
         }
