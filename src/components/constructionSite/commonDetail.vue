@@ -868,7 +868,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -891,7 +891,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -914,7 +914,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -937,7 +937,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){

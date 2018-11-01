@@ -86,22 +86,22 @@
                                         <th colspan="2">最近一次</th>
                                     </tr>
                                     <tr>
-                                        <th>05-21 10:00</th>
-                                        <th>05-21 11:00</th>
+                                        <th>{{time|timeChange}}</th>
+                                        <th>{{time1|timeChange}}</th>
                                         <th>变化量(mm)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item,index) in leftDisplayList.recentVariation" :key="index">
-                                        <td></td>
-                                        <td ></td>
-                                        <td ></td>
-                                        <td></td>
+                                        <td>{{leftDisplayListValue1[index].depth}}</td>
+                                        <td >{{leftDisplayListValue1[index].shift}}</td>
+                                        <td >{{leftDisplayListValue2[index].shift}}</td>
+                                        <td>{{(leftDisplayList.recentVariation)[index].recentVariation|addSprit}}</td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
-                                        <td>05-21 10:00</td>
-                                        <td>05-21 11:00</td>
+                                        <td>{{time|timeChange}}</td>
+                                        <td>{{time1|timeChange}}</td>
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
@@ -254,6 +254,7 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+import moment from 'moment'
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonPitch-detail',{
         props:['surveyName','itemMonitorId','itemMonitorType','itemMonitorKeyWord'],
@@ -297,158 +298,15 @@ export default Vue.component('commonPitch-detail',{
                 leftDisplayName:'',
                 rightDisplayName:'',
                 leftDisplayList:'',
+                leftDisplayListValue:'',
+                leftDisplayListValue1:[],
+                leftDisplayListValue2:[],
+                time:'',
+                time1:'',
                 rightDisplayList:'',
                 itemseqId:'',
                 seqId:'',
-                indexTailList1:[
-                    {
-                        depth:0,
-                        distance1:3,
-                        distance2:4,
-                        changeNum:0.02
-                    },
-                    {
-                    depth:0.5,
-                    distance1:3.95,
-                    distance2:4.01,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:1.0,
-                    distance1:4.6,
-                    distance2:4.9,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:1.5,
-                    distance1:5.4,
-                    distance2:4.7,
-                    changeNum:0.01
-                    },
-                    {
-                    depth:2.0,
-                    distance1:3.9,
-                    distance2:5.4,
-                    changeNum:-0.1
-                    },
-                    {
-                    depth:3,
-                    distance1:5.3,
-                    distance2:4.7,
-                    changeNum:-0.21
-                    },
-                    {
-                    depth:3.5,
-                    distance1:3.6,
-                    distance2:5.4,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:4,
-                    distance1:3.6,
-                    distance2:4.7,
-                    changeNum:-0.03
-                    },
-                    {
-                    depth:4.5,
-                    distance1:5.3,
-                    distance2:4.6,
-                    changeNum:0.11
-                    },
-                    {
-                    depth:5,
-                    distance1:3.9,
-                    distance2:4.6,
-                    changeNum:0.01
-                    },
-                    {
-                    depth:5.5,
-                    distance1:7.3,
-                    distance2:5.4,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:6,
-                    distance1:7.3,
-                    distance2:6.4,
-                    changeNum:0.21
-                    },
-                ],
-                indexTailList2:[
-                    {
-                        depth:0,
-                        distance1:3.6,
-                        distance2:4.5,
-                        changeNum:0.01
-                    },
-                     {
-                    depth:0.5,
-                    distance1:3.95,
-                    distance2:4.01,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:1.0,
-                    distance1:4.6,
-                    distance2:4.9,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:1.5,
-                    distance1:5.4,
-                    distance2:4.7,
-                    changeNum:0.01
-                    },
-                    {
-                    depth:2.0,
-                    distance1:3.9,
-                    distance2:5.4,
-                    changeNum:-0.1
-                    },
-                    {
-                    depth:3,
-                    distance1:5.3,
-                    distance2:4.7,
-                    changeNum:-0.21
-                    },
-                    {
-                    depth:3.5,
-                    distance1:3.6,
-                    distance2:5.4,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:4,
-                    distance1:3.6,
-                    distance2:4.7,
-                    changeNum:-0.03
-                    },
-                    {
-                    depth:4.5,
-                    distance1:5.3,
-                    distance2:4.6,
-                    changeNum:0.11
-                    },
-                    {
-                    depth:5,
-                    distance1:3.9,
-                    distance2:4.6,
-                    changeNum:0.01
-                    },
-                    {
-                    depth:5.5,
-                    distance1:7.3,
-                    distance2:5.4,
-                    changeNum:-0.01
-                    },
-                    {
-                    depth:6,
-                    distance1:7.3,
-                    distance2:6.4,
-                    changeNum:0.21
-                    }
-
-                ],
+                show:false,
                  optionOnesLeft:{
                         chart: {
                             type: 'spline',
@@ -608,7 +466,14 @@ export default Vue.component('commonPitch-detail',{
             }else {
                 return val
             }
-        }
+        },
+        timeChange(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD HH:mm");
+            }
+        },
 
         },
         watch:{
@@ -795,12 +660,39 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
+                this.leftDisplayListValue1=[];
+                this.leftDisplayListValue2=[];
                 this.totalShow=true;
                 this.leftShow=true;
                 this.getPitchDetailDataBySeqId(id)
-                this.leftDisplayList=this.pitchDetailDataList;
-                this.leftDisplayName=name;
-                console.log(this.leftDisplayList,'左边数据')
+                if(this.pitchDetailDataList){
+                    this.leftDisplayList=this.pitchDetailDataList;
+                    this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
+                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                    this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
+                    this.leftDisplayListValue.forEach((item,index,array)=>{
+                        // console.log(array[index].acquisitionTime,'array');
+                        if(array[index].acquisitionTime==this.time){
+                            this.leftDisplayListValue1.push(array[index])
+                            // this.show=true;
+                            // console.log('报错')
+                        }else if(array[index].acquisitionTime==this.time1){
+                            this.leftDisplayListValue2.push(array[index])
+                        }
+                    })
+                    // if(this.show==true){
+                    //     for(let i=0;i<(length/2);i++){
+                    //         this.leftDisplayListValue1.push(this.leftDisplayListValue[i])
+                    //     }
+                    //     for(let a=(length/2);a<length;a++){
+                    //         this.leftDisplayListValue2.push(this.leftDisplayListValue[a])
+                    //     }
+                    // }
+                    this.leftDisplayName=name;
+                    console.log(this.leftDisplayListValue1,'数据1')
+                    console.log(this.leftDisplayListValue2,'数据2')
+                    console.log(this.leftDisplayList,'左边数据')
+                }
             },
             //右侧显示
             rightDisplay(id,name){
