@@ -16,9 +16,9 @@
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
-                    <label>测试总数：80</label>
-                    <label>报警：22</label>
-                    <label>故障：2</label>
+                    <label>测试总数： </label>
+                    <label>报警： </label>
+                    <label>故障： </label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -45,6 +45,10 @@
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
                     <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                </div>
+                <div class="rightBottomCheck">
+                        <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                        <el-checkbox v-model="displaySpotNum" @change="displaySubmitSpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                 </div>
                 
             </div>
@@ -73,7 +77,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in getPointDatasList" :key="index"> 
+                            <tr v-for="(item,index) in getPointDatasList1" :key="index"> 
                                 <td>{{item.pointName|addSprit()}}</td>
                                 <td>{{item.initAcquisitionTime|timeChange()}}</td>
                                 <td>{{item.initData|addSprit()}}</td>
@@ -109,10 +113,10 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page.sync="currentPage2"
-                            :page-sizes="[10, 20, 30, 40,50]"
-                            :page-size="10"
+                            :page-sizes="[10]"
+                            :page-size="1"
                             layout="sizes,prev, pager, next"
-                            :total="50">
+                            :total="getPointDatasListLength">
                         </el-pagination>
                     </div>
                 </div>
@@ -235,6 +239,7 @@ import moment from 'moment'
 import Vue from 'vue'
 import picView from './picView.vue'
 import pdf from 'vue-pdf'
+import data from '../Settings/js/date';
 export default Vue.component('commonDetail',{
     props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId'],
     components:{
@@ -243,6 +248,8 @@ export default Vue.component('commonDetail',{
     name:'commonDetail',
     data(){
         return{
+            picMark:false,
+            displaySpotNum:false,
             importMethod:1,
             importList:[
                 {
@@ -257,6 +264,8 @@ export default Vue.component('commonDetail',{
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             getPointDatasList:'',//数据表格
+            getPointDatasList1:[],
+            getPointDatasListLength:0,//数据表格长度
             pointId:'',//监测id
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
@@ -283,6 +292,8 @@ export default Vue.component('commonDetail',{
             isClick3:false,
             toolShow:false,
             saveDrawShow:false,
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -359,9 +370,13 @@ export default Vue.component('commonDetail',{
         setTimeout(() => {
             this.displayInspectSpot()
         }, 200);
-        console.log(12);
+        // console.log(12);
     },
     methods:{
+        displaySubmitSpot(){
+            this.$refs.pic.enableLabel(this.displaySpotNum);
+
+        },
         //显示当前监测内容监测点
         displayInspectSpot(){
             // console.log(this.commonMonitorMainItemList);
@@ -429,10 +444,61 @@ export default Vue.component('commonDetail',{
             this.$refs.pic.changeBroken();
         },
         handleSizeChange(val){
-            console.log(`每页 ${val} 条`);
+            this.pageSize=val;
+            this.getPointDatasList1=[];
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9*(this.pageSize);
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(`每页 ${val} 条`);
         },
         handleCurrentChange(val){
-            console.log(`当前页: ${val}`);
+            this.getPointDatasList1=[];
+            this.pageNum=val;
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9;
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(this.getPointDatasList1,'this.getPointDatasList1');
+            // console.log(`当前页: ${val}`);
         },
          //获取底图中所有的监测点
         getAllMonitorPoint(){
@@ -461,7 +527,7 @@ export default Vue.component('commonDetail',{
             this.saveDrawShow=true;
         },
         picView_status_changed(val){
-            console.log(val);
+            // console.log(val);
             this.toolShow=val;
         },
         enter(val){
@@ -543,7 +609,7 @@ export default Vue.component('commonDetail',{
                     // }
                     // this.drawItemId=this.commonMonitorMainItemList[0].id;
                     // this.drawItemType=this.commonMonitorMainItemList[0].type;
-                    console.log(this.commonMonitorMainItemList,'monitorMainItemList')
+                    // console.log(this.commonMonitorMainItemList,'monitorMainItemList')
                 }
             })
         },
@@ -604,8 +670,12 @@ export default Vue.component('commonDetail',{
                         })
                         this.saveDrawShow=false;
                         this.getAllMonitorPoint();
-                    }else{
-                        console.log(response);
+                    }else if(response.data.cd=='-1'){
+                        
+                         this.$message({
+                            type:'success',
+                            message:response.data.msg
+                        })
                     }
                 })
         },
@@ -756,7 +826,17 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
-                    console.log(this.getPointDatasList,'123');
+                    this.getPointDatasListLength=response.data.rt.length;
+                    if(this.getPointDatasListLength<11){
+                        for(var i=0;i<this.getPointDatasListLength-1;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }
+                    // console.log(this.getPointDatasList1,'123');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -769,7 +849,7 @@ export default Vue.component('commonDetail',{
         getCurve(pointId){
             this.pointId=pointId;
             if(this.itemMonitorType==1){
-                this.getPointVerticalShiftChartData()
+                this.getPointHorizontalShiftChartData()
             }else if(this.itemMonitorType==2){
                 this.getPointVerticalShiftChartData()
             }else if(this.itemMonitorType==3){
@@ -1163,6 +1243,12 @@ export default Vue.component('commonDetail',{
                                 height: 530px;
                                 padding:5px;
                             }
+                        }
+                        .rightBottomCheck{
+                            position: absolute;
+                            bottom:30px;
+                            left:30px;
+                            z-index:11;
                         }
 
             }

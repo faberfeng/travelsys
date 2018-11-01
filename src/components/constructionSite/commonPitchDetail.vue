@@ -18,7 +18,7 @@
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==2" class="import">导入</span>
+                        <span v-show="importMethod==2" @click="importExcelData()" class="import">导入</span>
                         <span v-show="importMethod==1" class="import">配置</span>
                     </div>
                 </div>
@@ -71,8 +71,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="containerBottom">
-                    <div class="containerBottomOne">
+                <div class="containerBottom" v-show="totalShow">
+                    <div class="containerBottomOne" v-show="leftShow">
                         <div class="oneHeader">
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}详情</label>
@@ -113,17 +113,17 @@
                             </table>
                         </div>
                     </div>
-                    <div class="containerBottomTwo">
+                    <div class="containerBottomTwo" v-show="leftShow">
                         <div class="twoHeader">
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}曲线</label>
                             <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="twoGraph">
-                            <vue-highcharts  :options="optionOnes" ref="lineChartOne"></vue-highcharts>
+                            <vue-highcharts  :options="optionOnesLeft" ref="lineChartOne"></vue-highcharts>
                         </div>
                     </div>
-                    <div class="containerBottomThree">
+                    <div class="containerBottomThree" v-show="rightShow">
                         <div class="threeHeader">
                              <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{rightDisplayName}}详情</label>
@@ -164,14 +164,14 @@
                             </table>
                         </div>
                     </div>
-                    <div class="containerBottomFour">
+                    <div class="containerBottomFour" v-show="rightShow">
                         <div class="fourHeader">
                              <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{rightDisplayName}}曲线</label>
                              <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="fourGraph">
-                            <vue-highcharts  :options="optionOnes" ref="lineChartOne"></vue-highcharts>
+                            <vue-highcharts  :options="optionOnesRight" ref="lineChartOne"></vue-highcharts>
                         </div>
                     </div>
                 </div>
@@ -256,12 +256,15 @@ import Vue from 'vue'
 import axios from 'axios'
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonPitch-detail',{
-        props:['surveyName','itemMonitorId'],
+        props:['surveyName','itemMonitorId','itemMonitorType','itemMonitorKeyWord'],
         components:{
             VueHighcharts
         },
         data(){
             return{
+                leftShow:false,
+                rightShow:false,
+                totalShow:false,
                 defaultSubProjId:'',
                 token:'',
                 projId:'',
@@ -446,7 +449,7 @@ export default Vue.component('commonPitch-detail',{
                     }
 
                 ],
-                 optionOnes:{
+                 optionOnesLeft:{
                         chart: {
                             type: 'spline',
                             inverted: true
@@ -458,7 +461,7 @@ export default Vue.component('commonPitch-detail',{
                             // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
                             // tickInterval: 0.5,
                             //  tickPositions: [0, 20, 50, 100]
-                            categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.0'],
+                            categories:[],
                         },
                         yAxis: {
                                 title: {
@@ -470,16 +473,6 @@ export default Vue.component('commonPitch-detail',{
                                
                             
                                 },
-                                
-                        // labels: {
-                        //     formatter: function () {
-                        //         return this.value;
-                        //     }
-                        // },  
-                        // tooltip: {
-                        //     crosshairs: true,
-                        //     shared: true
-                        // },
                         credits: {
                             enabled: false
                         },
@@ -513,16 +506,79 @@ export default Vue.component('commonPitch-detail',{
                         series:[
                             {
                                 name:'05-21',
-                                data:[12.21,12.23,12.43,12.64,13.05,13.32,13.14,12.65,12.44,12.38,12.01]
+                                data:[]
                             },
                             {
                                 name:'05-21',
-                                data:[12.2,12.3,12.4,12.6,13.0,13.3,13.1,12.6,12.4,12.3,12.1]
-                                //  data:[12.1,12.3,12.5,13.6,13.7,13.8,14.3,14.4,14.5,15.2,15.4,15.6,16.2,16.5,16.6,17.3,17.4,17.5,18.3,18.4,18.5,18.5,18.4,18.3,17.6,17.5,17.4,16.6,16.5,16.4,15.4,15.3,15.2,14.6,14.4,14.1,13.6,13.4,13.1,12.9,12.7,12.6]
-                                // data:[23,34,54,24,56,12,35,57]
+                                data:[]
                             }
                         ],
-            },
+                },
+                optionOnesRight:{
+                        chart: {
+                            type: 'spline',
+                            inverted: true
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
+                            // tickInterval: 0.5,
+                            //  tickPositions: [0, 20, 50, 100]
+                            categories:[],
+                        },
+                        yAxis: {
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[
+                            {
+                                name:'05-21',
+                                data:[]
+                            },
+                            {
+                                name:'05-21',
+                                data:[]
+                            }
+                        ],
+                },
 
 
 
@@ -563,6 +619,10 @@ export default Vue.component('commonPitch-detail',{
             back(){
                 var vm = this
                 vm.$emit('back')
+            },
+            importExcelData(){
+                this.$emit('importExcelData',true,this.itemMonitorId,this.surveyName,this.itemMonitorType,this.itemMonitorKeyWord)
+
             },
             //添加序列号
             addIndexNum(){
@@ -735,6 +795,8 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
+                this.totalShow=true;
+                this.leftShow=true;
                 this.getPitchDetailDataBySeqId(id)
                 this.leftDisplayList=this.pitchDetailDataList;
                 this.leftDisplayName=name;
@@ -742,6 +804,8 @@ export default Vue.component('commonPitch-detail',{
             },
             //右侧显示
             rightDisplay(id,name){
+                this.totalShow=true;
+                this.rightShow=true;
                 this.getPitchDetailDataBySeqId(id)
                 this.rightDisplayList=this.pitchDetailDataList;
                 this.rightDisplayName=name;
