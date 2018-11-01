@@ -11,9 +11,9 @@
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
                     <span class="headLeftBtn" @click="baseMapEmit()">底图</span>
-                    <span class="headLeftBtn">单点</span>
-                    <span class="headLeftBtn">连续</span>
-                    <span class="headLeftBtn">文字</span>
+                    <span class="headLeftBtn" @click="spotClick()">单点</span>
+                    <span class="headLeftBtn" @click="spotAllClick()">连续</span>
+                    <span class="headLeftBtn" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
                     <label>测试总数：80</label>
@@ -202,6 +202,30 @@
                         <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
                 </div>
             </el-dialog> -->
+            <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
+                <div class="baseMapBody">
+                    <ul class="clearfix" style="margin:0px 20px 0px 20px;">
+                        <li class="baseMapBodyLi" @mouseenter="enter(item.id)" @mouseleave="leave()" @click="selectCurBaseMap(item.id)" style="padding: 0px; overflow: hidden;" v-for="(item,index) in baseCommonMapList" :key="index">
+                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="QJFileManageSystemURL+item.relativeUri">
+                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+item.relativeUri"></pdf>
+                            <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
+                                <label class="baseMapName" v-text="item.name"></label>
+                                <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
+                                <label v-show="item.useCount==0" class="deleteBaseMap" @click.stop="deleteBaseMap(item.id)"></label>
+                            </div>
+                        </li>
+                        <li class="uploadBaseBody">
+                            <div class="uploadBaseIcon">
+                                <label for="drawingsInfo">
+                                    <img style=" cursor: pointer"  src="./images/upload.png">
+                                    <p>上传新底图</p>
+                                </label>
+                                <input class="upInput"  type="file"  @change="addBaseMap($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -248,6 +272,11 @@ export default Vue.component('commonDetail',{
             variationAlertDay:'',//报警变化量（天）
             variationAlertHour:'',//报警变化量（小时）
             commonMonitorMainItemList:'',//监测内容
+            curCommonBaseMapUrl:'',//监测地址
+            baseCommonMapList:'',
+            monitorBaseMapId:'',
+            baseMapShow:false,//底图显示
+            hoverId:'',
 
 
         }
@@ -265,6 +294,7 @@ export default Vue.component('commonDetail',{
         this.getUserByUserGroup();
         this.getItemDutyUser();
         this.getAllMonitorPoint();
+        // this.getBaseMapList();
     },
     filters:{
         addSprit(val){
@@ -303,6 +333,10 @@ export default Vue.component('commonDetail',{
 
     },
     watch:{
+        userGroupId:function(val){
+            // this.getBaseMapList()
+            // this.getMonitorItem()
+        },
         // calculatorId:function(val){
 
         // },
@@ -317,6 +351,10 @@ export default Vue.component('commonDetail',{
 
     },
     methods:{
+        //
+        baseMapCancle(){
+            this.baseMapShow=false;
+        },
         //返回
         back(){
             var vm = this
@@ -324,8 +362,26 @@ export default Vue.component('commonDetail',{
         },
         //底图选择
         baseMapEmit(){
+            // this.baseMapShow=true;
+            // this.isClick=true;
+            // this.isClick1=false;
+            // this.isClick2=false;
+            // this.isClick3=false;
+            // this.getBaseMapList();
             var vm=this;
             vm.$emit('baseMapEmit')
+        },
+        //单点
+        spotClick(){
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
+        },
+        //连续
+        spotAllClick(){
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
+        },
+        //文字
+        drawingTxtClick(){
+            this.$refs.pic.setDrawStatus("text",10000,10000,2);
         },
         handleSizeChange(val){
             console.log(`每页 ${val} 条`);
@@ -358,47 +414,62 @@ export default Vue.component('commonDetail',{
         picView_status_changed(){
 
         },
+        enter(val){
+            this.hoverId=val;
+        },
+        leave(){
+            this.hoverId='';
+
+        },
+        //删除当前底图
+        deleteBaseMap(){
+
+        },
+        //选择当前底图
+        selectCurBaseMap(){
+
+        },
         //获取底图列表
-        // getBaseMapList(){
-        //     var vm=this;
-        //     axios({
-        //         method:'post',
-        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
-        //         headers:{
-        //             'token':vm.token
-        //         },
-        //         params:{
-        //             userGroupId:vm.selectUgId
-        //         }
-        //     }).then((response)=>{
-        //         if(response.data.cd=='0'){
-        //             this.baseMapList=response.data.rt;
-        //             // console.log(this.baseMapList);
-        //             //判断是否使用当前图纸
-        //             if(!this.curBaseMapUrl){
-        //                 this.baseMapList.forEach((item)=>{
-        //                     if(item.isUsed==1){
-        //                         this.curBaseMapUrl=item.relativeUri;
-        //                         this.monitorBaseMapId=item.id;
-        //                         this.getAllMonitorPoint();
-        //                     }
-        //                 })
-        //             }
-        //             if(this.monitorBaseMapId){
-        //                 this.baseMapList.forEach((item)=>{
-        //                     if(item.id==this.monitorBaseMapId){
-        //                         this.curBaseMapUrl=item.relativeUri;
-        //                     }
-        //                 })
-        //             }
-        //         }else{
-        //             vm.$message({
-        //                 type:"error",
-        //                 msg:response.data.msg
-        //             })
-        //         }
-        //     })
-        // },
+        getBaseMapList(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.userGroupId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.baseCommonMapList=response.data.rt;
+                    // console.log(this.baseMapList);
+                    //判断是否使用当前图纸
+                    if(!this.curCommonBaseMapUrl){
+                        this.baseCommonMapList.forEach((item)=>{
+                            if(item.isUsed==1){
+                                this.curCommonBaseMapUrl=item.relativeUri;
+                                this.monitorBaseMapId=item.id;
+                                this.getAllMonitorPoint();
+                            }
+                        })
+                    }
+                    if(this.monitorBaseMapId){
+                        this.baseCommonMapList.forEach((item)=>{
+                            if(item.id==this.monitorBaseMapId){
+                                this.curCommonBaseMapUrl=item.relativeUri;
+                            }
+                        })
+                    }
+                }else{
+                    vm.$message({
+                        type:"error",
+                        msg:response.data.msg
+                    })
+                }
+            })
+        },
          //获取监测内容
         getMonitorItem(){
             var vm=this;
@@ -1126,6 +1197,94 @@ export default Vue.component('commonDetail',{
                 color: #333333;
                 font-size: 14px;
                 outline: none;
+            }
+            .baseMapBody{
+                height: 460px;
+                .clearfix{
+                    clear: both;
+                    overflow: hidden;
+                    content: '';
+                }
+                .baseMapBodyLi{
+                    float: left;
+                    display: inline-block;
+                    position: relative;
+                    width: 164px;
+                    height: 122px;
+                    // background: #f0f1f4;
+                    margin-right: 10px;
+                    margin-top:20px;
+                    border-radius: 4px;
+                    &:hover{
+                        border:1px solid #ccc;
+                    }
+                    .baseMapBodyImg{
+                        width: 100%;
+                        height: 122px;
+                        margin: 0;
+                        padding: 0;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        object-fit: contain;
+                        background: #f0f1f4;
+
+                    }
+                    .baseMapBodyLiBottom{
+                        position: absolute;
+                        width: 100%;
+                        height: 26px;
+                        background-color: #000;
+                        opacity: 0.3;;
+                        bottom: 0px;
+                        left:0px;
+                        .baseMapName{
+                            color:#fff;
+                            font-weight: bold;
+                            float: left;
+                            margin-left:10px;
+                            width: 100px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .baseMapCount{
+                            color:#fff;
+                            font-weight: bold;
+                            float: right;
+                            margin-right: 10px
+
+                        }
+                        .deleteBaseMap{
+                            background: url('./images/delete.png') no-repeat 0 0;
+                            width: 20px;
+                            height: 20px;
+                            display: inline-block;   
+                            float:right;
+                            cursor: pointer;
+                            margin-right:5px;
+                        }
+                    }
+                }
+                .uploadBaseBody{
+                    float: left;
+                    display: inline-block;
+                    width: 164px;
+                    height: 122px;
+                    margin-top:20px;
+                    background: #f0f1f4;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    &:hover{
+                        border:1px dashed #0d6cb2;
+                    }
+                    .uploadBaseIcon{
+                        // cursor: pointer;
+                        margin:25px auto;
+                        .upInput{
+                            display: none;
+                        }
+                    }
+                } 
             }
         }
     }

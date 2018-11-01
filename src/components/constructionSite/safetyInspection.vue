@@ -214,7 +214,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn" v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -1314,6 +1314,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getMonitorMainTable();
+                        this.getMonitorItem();
                         this.addInspectContentShow=false;
                         this.monitorName='';
                         this.monitorType=1;
@@ -1323,7 +1324,7 @@ export default {
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
-                            msg:response.data.msg
+                            message:response.data.msg
                         })
                     }
                 })
