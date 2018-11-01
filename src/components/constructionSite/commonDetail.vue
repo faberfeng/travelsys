@@ -10,10 +10,10 @@
             <div class="projectBodyHead">
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
-                    <span class="headLeftBtn" @click="baseMapEmit()">底图</span>
-                    <span class="headLeftBtn" @click="spotClick()">单点</span>
-                    <span class="headLeftBtn" @click="spotAllClick()">连续</span>
-                    <span class="headLeftBtn" @click="drawingTxtClick()">文字</span>
+                    <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span>
+                    <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
+                    <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
+                    <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
                     <label>测试总数：80</label>
@@ -32,13 +32,13 @@
             </div>
             <div class="projectBodyCenter">
                 <div class="operateTool">
-                    <div class="operateToolLeft">
-                        <span class="move"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
-                        <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                        <span class="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
+                    <div class="operateToolLeft" v-show="toolShow">
+                        <span class="move" @click="enableMoveCommon"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
+                        <span class="fault" @click="changeBrokenCommon"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                        <span class="deleteDraw" @click="deleteDrawCommon"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
-                    <div class="operateToolRight">
-                        <label class="saveDrawTxt">保存</label>
+                    <div class="operateToolRight" v-show="saveDrawShow">
+                        <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                     </div>
                 </div>
                 <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
@@ -277,8 +277,12 @@ export default Vue.component('commonDetail',{
             monitorBaseMapId:'',
             baseMapShow:false,//底图显示
             hoverId:'',
-
-
+            isClick:false,
+            isClick1:false,
+            isClick2:false,
+            isClick3:false,
+            toolShow:false,
+            saveDrawShow:false,
         }
     },
     created(){
@@ -294,6 +298,7 @@ export default Vue.component('commonDetail',{
         this.getUserByUserGroup();
         this.getItemDutyUser();
         this.getAllMonitorPoint();
+        this.getMonitorItem()
         // this.getBaseMapList();
     },
     filters:{
@@ -335,7 +340,7 @@ export default Vue.component('commonDetail',{
     watch:{
         userGroupId:function(val){
             // this.getBaseMapList()
-            // this.getMonitorItem()
+            
         },
         // calculatorId:function(val){
 
@@ -350,8 +355,22 @@ export default Vue.component('commonDetail',{
 
 
     },
+    mounted(){
+        setTimeout(() => {
+            this.displayInspectSpot()
+        }, 200);
+        console.log(12);
+    },
     methods:{
-        //
+        //显示当前监测内容监测点
+        displayInspectSpot(){
+            // console.log(this.commonMonitorMainItemList);
+             for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+            }
+            this.$refs.pic.enableType(this.itemMonitorType,this.itemMonitorId,true);
+            // console.log('触发')
+        },
         baseMapCancle(){
             this.baseMapShow=false;
         },
@@ -363,25 +382,51 @@ export default Vue.component('commonDetail',{
         //底图选择
         baseMapEmit(){
             // this.baseMapShow=true;
-            // this.isClick=true;
-            // this.isClick1=false;
-            // this.isClick2=false;
-            // this.isClick3=false;
+            this.isClick=true;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
             // this.getBaseMapList();
             var vm=this;
             vm.$emit('baseMapEmit')
         },
         //单点
         spotClick(){
+            this.isClick=false;
+            this.isClick1=true;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
         },
         //连续
         spotAllClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=true;
+            this.isClick3=false;
+            this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
         },
         //文字
         drawingTxtClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=true;
             this.$refs.pic.setDrawStatus("text",10000,10000,2);
+        },
+         //开启移动
+        enableMoveCommon(){
+            this.$refs.pic.setMoveStatus();
+        },
+        //删除点
+        deleteDrawCommon(){
+            this.$refs.pic.deleteDraw();
+        },
+        //修复故障
+        changeBrokenCommon(){
+            this.$refs.pic.changeBroken();
         },
         handleSizeChange(val){
             console.log(`每页 ${val} 条`);
@@ -409,10 +454,15 @@ export default Vue.component('commonDetail',{
             })
         },
         drawFinish(){
-
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick=false;
+            this.saveDrawShow=true;
         },
-        picView_status_changed(){
-
+        picView_status_changed(val){
+            console.log(val);
+            this.toolShow=val;
         },
         enter(val){
             this.hoverId=val;
@@ -430,46 +480,46 @@ export default Vue.component('commonDetail',{
 
         },
         //获取底图列表
-        getBaseMapList(){
-            var vm=this;
-            axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    userGroupId:vm.userGroupId
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.baseCommonMapList=response.data.rt;
-                    // console.log(this.baseMapList);
-                    //判断是否使用当前图纸
-                    if(!this.curCommonBaseMapUrl){
-                        this.baseCommonMapList.forEach((item)=>{
-                            if(item.isUsed==1){
-                                this.curCommonBaseMapUrl=item.relativeUri;
-                                this.monitorBaseMapId=item.id;
-                                this.getAllMonitorPoint();
-                            }
-                        })
-                    }
-                    if(this.monitorBaseMapId){
-                        this.baseCommonMapList.forEach((item)=>{
-                            if(item.id==this.monitorBaseMapId){
-                                this.curCommonBaseMapUrl=item.relativeUri;
-                            }
-                        })
-                    }
-                }else{
-                    vm.$message({
-                        type:"error",
-                        msg:response.data.msg
-                    })
-                }
-            })
-        },
+        // getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.userGroupId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseCommonMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             if(!this.curCommonBaseMapUrl){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //             }
+        //             if(this.monitorBaseMapId){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.id==this.monitorBaseMapId){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                     }
+        //                 })
+        //             }
+        //         }else{
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
          //获取监测内容
         getMonitorItem(){
             var vm=this;
@@ -486,8 +536,11 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.commonMonitorMainItemList=response.data.rt;
                     this.commonMonitorMainItemList.forEach((item,index)=>{
-                        this.$set(item,'spotNum',true)
+                        this.$set(item,'spotNum',false)
                     })
+                    // for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                    //     this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+                    // }
                     // this.drawItemId=this.commonMonitorMainItemList[0].id;
                     // this.drawItemType=this.commonMonitorMainItemList[0].type;
                     console.log(this.commonMonitorMainItemList,'monitorMainItemList')
@@ -523,11 +576,38 @@ export default Vue.component('commonDetail',{
         },
         //手动导入数据
         handExportExcel(){
-            this.$emit('importDataShow',true)
+            this.$emit('importDataShow',true,this.itemMonitorId,this.projctName,this.itemMonitorType,this.itemMonitorKeyWord)
         },
         //获取用户名
         getUserName(){
             
+        },
+        saveDraw(){
+            var vm=this;
+            var list = this.$refs.pic.saveList();
+            // console.log(list);
+            axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.itemSubmitbaseMapId
+                    },
+                    data:list
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.$message({
+                            type:'success',
+                            message:'保存监测点成功'
+                        })
+                        this.saveDrawShow=false;
+                        this.getAllMonitorPoint();
+                    }else{
+                        console.log(response);
+                    }
+                })
         },
         //获取警报参数
         getAlertArguments(){
@@ -800,6 +880,10 @@ export default Vue.component('commonDetail',{
         margin:0;
         padding: 0;
         box-sizing: border-box;
+    }
+    .isClickStyle{
+         color: #ffffff !important;
+        background: #fc3439 !important;
     }
     i{
         font-style:normal

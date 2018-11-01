@@ -174,6 +174,7 @@
                                     <td>{{item.totalVariation|addSprit2()}}</td>
                                     <td>{{item.totalAlert|shifouChange()}}</td>
                                     <td>
+                                        <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
@@ -295,8 +296,8 @@
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
-                        <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
-                        <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
+                        <button v-show="testShow" class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
+                        <button v-show="!testShow" class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
                         <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -546,6 +547,7 @@ export default {
             alertMessage:'',//预览报警短信数据
             positionValue:'',//岗位值
             nowDate:'',//当前时间
+            testShow:true,//是否测试
 
         }
     },
@@ -633,9 +635,14 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
-        importDataShow(val){
-            console.log(val);
-            this.importGatherDataShow=val;
+        importDataShow(valShow,valid,valname,valtype,valKeyword){
+            var vm=this;
+            console.log(valShow);
+            this.importGatherDataShow=valShow;
+            vm.matchKeyWord=valKeyword;
+            vm.monitorImportName=valname;
+            vm.monitorImportType=valtype;
+            vm.monitorImportId=valid;
         },
         //当前时间
         curTime(){
@@ -1084,9 +1091,17 @@ export default {
                     data:list
                 }).then((response)=>{
                     if(response.data.cd=='0'){
+                        this.$message({
+                            type:'success',
+                            message:'保存监测点成功'
+                        })
                         this.getAllMonitorPoint();
-                    }else{
-                        console.log(response);
+                    }else if(response.data.cd=='-1'){
+                       
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
                     }
                 })
 
@@ -1445,6 +1460,12 @@ export default {
                    vm.unifiedTime='';//标准时间，不选择可不传
                     vm.overwrite=false;//是否覆盖
                    vm.inputWorkingCondition='';//现场工况
+                   this.getMonitorMainTable();
+                    this.getMonitorItem();
+                    this.$message({
+                        type:'success',
+                        message:'采集数据导入成功'
+                    })
                 }else {
                     vm.$message({
                         type:'error',
@@ -1485,6 +1506,12 @@ export default {
                    vm.unifiedTime='';//标准时间，不选择可不传
                     vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
+                   this.getMonitorMainTable();
+                    this.getMonitorItem();
+                    this.$message({
+                        type:'success',
+                        message:'采集数据导入成功'
+                    })
                 }else {
                     vm.$message({
                         type:'error',
@@ -1528,6 +1555,12 @@ export default {
                    vm.unifiedTime='';//标准时间，不选择可不传
                     vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
+                   this.getMonitorMainTable();
+                    this.getMonitorItem();
+                    this.$message({
+                        type:'success',
+                        message:'采集数据导入成功'
+                    })
                 }else {
                     vm.$message({
                         type:'error',
@@ -1568,6 +1601,11 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.$message({
+                        type:'info',
+                        message:response.data.rt
+                    })
+                    this.testShow=false;
                     
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
@@ -1578,7 +1616,7 @@ export default {
                 //    vm.unifiedTime='';//标准时间，不选择可不传
                 //     vm.overwrite=false; //是否覆盖
                 //    vm.inputWorkingCondition='';//现场工况
-                }else {
+                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
@@ -1610,6 +1648,11 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.$message({
+                        type:'info',
+                        message:response.data.rt
+                    })
+                    this.testShow=false;
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
                 //     vm.timeCol=''; //采集时间下标
@@ -1619,7 +1662,7 @@ export default {
                 //    vm.unifiedTime='';//标准时间，不选择可不传
                 //     vm.overwrite=false; //是否覆盖
                 //    vm.inputWorkingCondition='';//现场工况
-                }else {
+                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
@@ -1652,6 +1695,11 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.$message({
+                        type:'info',
+                        message:response.data.rt
+                    })
+                    this.testShow=false;
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
                 //     vm.timeCol=''; //采集时间下标
@@ -1662,7 +1710,7 @@ export default {
                 //    vm.unifiedTime='';//标准时间，不选择可不传
                 //     vm.overwrite=false; //是否覆盖
                 //    vm.inputWorkingCondition='';//现场工况
-                }else {
+                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
@@ -1795,9 +1843,50 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.editInspectContentShow=false;
-                    this.getMonitorMainTable()
+                    this.getMonitorMainTable();
+                    this.getAllMonitorPoint();
+                     vm.getMonitorItem();
                 }
             })
+        },
+        //删除
+        deleteMonitorNameBtn(val){
+            var vm=this;
+            vm.$confirm('此操作将相关历史录入数据将会被永久删除，用户请谨慎操作 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/deleteMonitorItem',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:val
+                }
+            }).then((response)=>{
+                if(Math.ceil(response.data.cd) == 0){
+                   this.getMonitorMainTable();
+                   this.getAllMonitorPoint();
+                    vm.getMonitorItem();
+                }else if(response.data.cd == -1){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }).catch(() => {
+          vm.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+
         },
         editMonitorNameBtn(val){
             var vm=this;
@@ -2843,6 +2932,9 @@ export default {
                                             cursor: pointer;
                                             margin-left: 10px;
 
+                                        }
+                                        .deleteBtn{
+                                            background: url('../../assets/delete.png') no-repeat 0 0;
                                         }
                                         .editBtn{
                                             background: url('./images/overviewedit.png') no-repeat 0 0;
