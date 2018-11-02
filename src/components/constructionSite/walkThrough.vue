@@ -716,7 +716,7 @@ export default Vue.component('walkThrough',{
                 if(response.data.cd=='0'){
                     this.addSummaryShow=false;
                     this.excessWordSizeShow=false;
-                    this.saveShow=true;
+                    // this.saveShow=true;
                     this.getAllPatrolSummary();
                     this.$message({
                         type:'success',

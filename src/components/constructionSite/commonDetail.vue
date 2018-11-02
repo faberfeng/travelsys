@@ -37,7 +37,7 @@
                         <span class="fault" @click="changeBrokenCommon"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
                         <span class="deleteDraw" @click="deleteDrawCommon"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
-                    <div class="operateToolRight" v-show="saveDrawShow">
+                    <div class="operateToolRight" v-show="saveDrawShow" >
                         <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                     </div>
                 </div>
@@ -529,6 +529,7 @@ export default Vue.component('commonDetail',{
         picView_status_changed(val){
             // console.log(val);
             this.toolShow=val;
+            this.saveDrawShow=val;
         },
         enter(val){
             this.hoverId=val;

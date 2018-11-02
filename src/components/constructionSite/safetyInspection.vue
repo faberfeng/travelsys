@@ -362,20 +362,20 @@
                     <div v-show="useFormulaValue=='2'">
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋直径(mm)：</label>
-                            <input placeholder="请输入" v-model="barDiameterValue" class="editInput"/>
+                            <input placeholder="请输入" v-model="barDiameterValue" @change="asMethod()" class="editInput"/>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">根数：</label>
-                            <input placeholder="请输入" v-model="barCountValue" @change="asMethod()" class="editInput"/>
+                            <input placeholder="请输入" v-model="barCountValue"  class="editInput"/>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">截面积As：{{asValueArea}}</label>
                         </div>
-                        <div class="editBodytwo">
+                        <!-- <div class="editBodytwo">
                             <label class="editTxt">钢筋应力计的截面积As'：</label>
                             <input placeholder="请输入" class="editInput"/>
                             <label>平方毫米</label>
-                        </div>
+                        </div> -->
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋的牌号：</label>
                             <input placeholder="请输入" v-model="barGradeValue" class="editInput"/>
@@ -389,10 +389,10 @@
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土支撑高度： ：</label>
-                            <input placeholder="请输入" v-model="concreteHeightValue" class="editInput"/>
+                            <input placeholder="请输入" v-model="concreteHeightValue" @change="acMethod()" class="editInput"/>
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">截面积Ac：</label>
+                            <label class="editTxt">截面积Ac：{{acValueArea}}</label>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土的等级：</label>
@@ -420,8 +420,9 @@
             <el-dialog title="导出监测报告" :visible="exportrEportsShow" @close="exportrEportsCancle()">
                 <div class="editEportBody">
                     <div class="editEportBodyone">
+                        <!-- <div class="">
 
-
+                        </div> -->
                     </div>
                     <div class="editEportBodytwo">
                         
@@ -519,6 +520,9 @@ export default {
             EsValue:'',//钢支撑/钢立柱的弹性模量
             barDiameterValue:'',//钢筋直径
             asValueArea:'',//as面积
+            acValueArea:'',//ac面积
+            ecList:[],
+            esList:[],
             barCountValue:'',//钢筋根数
             concreteWidthValue:'',//混凝土宽度
             concreteHeightValue:'',//混凝土高度
@@ -698,8 +702,13 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+        //as计算公式
         asMethod(){
-            this.asValueArea=3.14*(this.barDiameterValue)*(this.barCountValue)/4
+            this.asValueArea=3.14*(this.barDiameterValue)*(this.barDiameterValue)/4
+        },
+        //
+        acMethod(){
+            this.acValueArea=(this.concreteWidthValue)*(this.concreteHeightValue)-(this.asValueArea)*(this.barCountValue);
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
@@ -1909,11 +1918,20 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                    this.testShow=false;
+                    if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
+                    
                     
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
@@ -1956,11 +1974,19 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                    this.testShow=false;
+                    if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
                 //     vm.timeCol=''; //采集时间下标
@@ -2003,11 +2029,19 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                    this.testShow=false;
+                   if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
                 //     vm.timeCol=''; //采集时间下标
@@ -2054,11 +2088,19 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                    this.testShow=false;
+                   if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
                     // this.importGatherDataShow=false;
                 //     vm.sheetIndex='';
                 //     vm.timeCol=''; //采集时间下标
@@ -2104,11 +2146,19 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                   this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                     this.testShow=false;
+                  if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
                 }else {
                     vm.$message({
                         type:'error',
@@ -2147,11 +2197,19 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                   this.$message({
-                        type:'info',
-                        message:response.data.rt
-                    })
-                     this.testShow=false;
+                   if(response.data.rt==''){
+                        this.testShow=false;
+                        this.$message({
+                            type:'error',
+                            message:'测试导入数据成功'
+                        })
+
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:response.data.rt
+                        })
+                    }
                 }else {
                     vm.$message({
                         type:'error',
@@ -3868,6 +3926,7 @@ export default {
             .editEportBody{
                 margin:0 auto;
                 .editEportBodyone{
+
 
                 }
             }
