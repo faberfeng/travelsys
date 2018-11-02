@@ -121,7 +121,7 @@
                             <label class="editSpot">编辑标记</label>
                         </div>
                         <div class="twoGraph">
-                            <vue-highcharts id="leftHightchart" style="min-height:1900px" :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                            <vue-highcharts id="leftHightchart" style="min-height:1900px"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                         </div>
                     </div>
                     <div class="containerBottomThree" v-show="rightShow">
@@ -713,6 +713,7 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
+                
                 this.leftDisplayListValue1=[];
                 this.leftDisplayListValue2=[];
                 this.leftDisplayListValueXdata=[];
@@ -740,18 +741,20 @@ export default Vue.component('commonPitch-detail',{
                         }
                     })
                     this.leftDisplayName=name;
+                    //  document.getElementById('leftHightchart').style.minHeight=document.getElementById('tableListid').clientHeight+'px'
                     // console.log(document.getElementById('leftHightchart'),'tuxing')
                     
-                    // setTimeout(()=>{
-                    //     document.getElementById('leftHightchart').style.minHeight=document.getElementById('tableListid').clientHeight
-                    //     console.log(document.getElementById('tableListid').clientHeight);
-                    // },100)
+                    setTimeout(()=>{
+                       
+                        console.log(document.getElementById('tableListid').clientHeight);
+                    },20)
                     // console.log(this.lineHeight,'this.lineHeight')
                     // =this.lineHeight;
                     let lineLeftChart=this.$refs.lineLeftChartOne;
                     // document.getElementById('leftHightchart').style.minHeight='1950px'
                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                     setTimeout(()=>{
+                       
                         lineLeftChart.removeSeries();
                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.leftDisplayListValueYdata2});
