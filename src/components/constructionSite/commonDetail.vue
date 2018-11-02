@@ -10,15 +10,15 @@
             <div class="projectBodyHead">
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
-                    <span class="headLeftBtn" @click="baseMapEmit()">底图</span>
-                    <span class="headLeftBtn" @click="spotClick()">单点</span>
-                    <span class="headLeftBtn" @click="spotAllClick()">连续</span>
-                    <span class="headLeftBtn" @click="drawingTxtClick()">文字</span>
+                    <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span>
+                    <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
+                    <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
+                    <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
-                    <label>测试总数：80</label>
-                    <label>报警：22</label>
-                    <label>故障：2</label>
+                    <label>测试总数： </label>
+                    <label>报警： </label>
+                    <label>故障： </label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -32,19 +32,23 @@
             </div>
             <div class="projectBodyCenter">
                 <div class="operateTool">
-                    <div class="operateToolLeft">
-                        <span class="move"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
-                        <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                        <span class="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
+                    <div class="operateToolLeft" v-show="toolShow">
+                        <span class="move" @click="enableMoveCommon"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
+                        <span class="fault" @click="changeBrokenCommon"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                        <span class="deleteDraw" @click="deleteDrawCommon"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
-                    <div class="operateToolRight">
-                        <label class="saveDrawTxt">保存</label>
+                    <div class="operateToolRight" v-show="saveDrawShow">
+                        <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                     </div>
                 </div>
                 <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
                     <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                </div>
+                <div class="rightBottomCheck">
+                        <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                        <el-checkbox v-model="displaySpotNum" @change="displaySubmitSpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                 </div>
                 
             </div>
@@ -73,7 +77,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in getPointDatasList" :key="index"> 
+                            <tr v-for="(item,index) in getPointDatasList1" :key="index"> 
                                 <td>{{item.pointName|addSprit()}}</td>
                                 <td>{{item.initAcquisitionTime|timeChange()}}</td>
                                 <td>{{item.initData|addSprit()}}</td>
@@ -109,10 +113,10 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page.sync="currentPage2"
-                            :page-sizes="[10, 20, 30, 40,50]"
-                            :page-size="10"
+                            :page-sizes="[10]"
+                            :page-size="1"
                             layout="sizes,prev, pager, next"
-                            :total="50">
+                            :total="getPointDatasListLength">
                         </el-pagination>
                     </div>
                 </div>
@@ -235,6 +239,7 @@ import moment from 'moment'
 import Vue from 'vue'
 import picView from './picView.vue'
 import pdf from 'vue-pdf'
+import data from '../Settings/js/date';
 export default Vue.component('commonDetail',{
     props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId'],
     components:{
@@ -243,6 +248,8 @@ export default Vue.component('commonDetail',{
     name:'commonDetail',
     data(){
         return{
+            picMark:false,
+            displaySpotNum:false,
             importMethod:1,
             importList:[
                 {
@@ -257,6 +264,8 @@ export default Vue.component('commonDetail',{
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             getPointDatasList:'',//数据表格
+            getPointDatasList1:[],
+            getPointDatasListLength:0,//数据表格长度
             pointId:'',//监测id
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
@@ -277,8 +286,14 @@ export default Vue.component('commonDetail',{
             monitorBaseMapId:'',
             baseMapShow:false,//底图显示
             hoverId:'',
-
-
+            isClick:false,
+            isClick1:false,
+            isClick2:false,
+            isClick3:false,
+            toolShow:false,
+            saveDrawShow:false,
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -294,6 +309,7 @@ export default Vue.component('commonDetail',{
         this.getUserByUserGroup();
         this.getItemDutyUser();
         this.getAllMonitorPoint();
+        this.getMonitorItem()
         // this.getBaseMapList();
     },
     filters:{
@@ -335,7 +351,7 @@ export default Vue.component('commonDetail',{
     watch:{
         userGroupId:function(val){
             // this.getBaseMapList()
-            // this.getMonitorItem()
+            
         },
         // calculatorId:function(val){
 
@@ -350,8 +366,26 @@ export default Vue.component('commonDetail',{
 
 
     },
+    mounted(){
+        setTimeout(() => {
+            this.displayInspectSpot()
+        }, 200);
+        // console.log(12);
+    },
     methods:{
-        //
+        displaySubmitSpot(){
+            this.$refs.pic.enableLabel(this.displaySpotNum);
+
+        },
+        //显示当前监测内容监测点
+        displayInspectSpot(){
+            // console.log(this.commonMonitorMainItemList);
+             for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+            }
+            this.$refs.pic.enableType(this.itemMonitorType,this.itemMonitorId,true);
+            // console.log('触发')
+        },
         baseMapCancle(){
             this.baseMapShow=false;
         },
@@ -363,31 +397,108 @@ export default Vue.component('commonDetail',{
         //底图选择
         baseMapEmit(){
             // this.baseMapShow=true;
-            // this.isClick=true;
-            // this.isClick1=false;
-            // this.isClick2=false;
-            // this.isClick3=false;
+            this.isClick=true;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
             // this.getBaseMapList();
             var vm=this;
             vm.$emit('baseMapEmit')
         },
         //单点
         spotClick(){
+            this.isClick=false;
+            this.isClick1=true;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
         },
         //连续
         spotAllClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=true;
+            this.isClick3=false;
+            this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
         },
         //文字
         drawingTxtClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=true;
             this.$refs.pic.setDrawStatus("text",10000,10000,2);
         },
+         //开启移动
+        enableMoveCommon(){
+            this.$refs.pic.setMoveStatus();
+        },
+        //删除点
+        deleteDrawCommon(){
+            this.$refs.pic.deleteDraw();
+        },
+        //修复故障
+        changeBrokenCommon(){
+            this.$refs.pic.changeBroken();
+        },
         handleSizeChange(val){
-            console.log(`每页 ${val} 条`);
+            this.pageSize=val;
+            this.getPointDatasList1=[];
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9*(this.pageSize);
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(`每页 ${val} 条`);
         },
         handleCurrentChange(val){
-            console.log(`当前页: ${val}`);
+            this.getPointDatasList1=[];
+            this.pageNum=val;
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9;
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(this.getPointDatasList1,'this.getPointDatasList1');
+            // console.log(`当前页: ${val}`);
         },
          //获取底图中所有的监测点
         getAllMonitorPoint(){
@@ -409,10 +520,15 @@ export default Vue.component('commonDetail',{
             })
         },
         drawFinish(){
-
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick=false;
+            this.saveDrawShow=true;
         },
-        picView_status_changed(){
-
+        picView_status_changed(val){
+            // console.log(val);
+            this.toolShow=val;
         },
         enter(val){
             this.hoverId=val;
@@ -430,46 +546,46 @@ export default Vue.component('commonDetail',{
 
         },
         //获取底图列表
-        getBaseMapList(){
-            var vm=this;
-            axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    userGroupId:vm.userGroupId
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.baseCommonMapList=response.data.rt;
-                    // console.log(this.baseMapList);
-                    //判断是否使用当前图纸
-                    if(!this.curCommonBaseMapUrl){
-                        this.baseCommonMapList.forEach((item)=>{
-                            if(item.isUsed==1){
-                                this.curCommonBaseMapUrl=item.relativeUri;
-                                this.monitorBaseMapId=item.id;
-                                this.getAllMonitorPoint();
-                            }
-                        })
-                    }
-                    if(this.monitorBaseMapId){
-                        this.baseCommonMapList.forEach((item)=>{
-                            if(item.id==this.monitorBaseMapId){
-                                this.curCommonBaseMapUrl=item.relativeUri;
-                            }
-                        })
-                    }
-                }else{
-                    vm.$message({
-                        type:"error",
-                        msg:response.data.msg
-                    })
-                }
-            })
-        },
+        // getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.userGroupId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseCommonMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             if(!this.curCommonBaseMapUrl){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //             }
+        //             if(this.monitorBaseMapId){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.id==this.monitorBaseMapId){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                     }
+        //                 })
+        //             }
+        //         }else{
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
          //获取监测内容
         getMonitorItem(){
             var vm=this;
@@ -486,11 +602,14 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.commonMonitorMainItemList=response.data.rt;
                     this.commonMonitorMainItemList.forEach((item,index)=>{
-                        this.$set(item,'spotNum',true)
+                        this.$set(item,'spotNum',false)
                     })
+                    // for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                    //     this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+                    // }
                     // this.drawItemId=this.commonMonitorMainItemList[0].id;
                     // this.drawItemType=this.commonMonitorMainItemList[0].type;
-                    console.log(this.commonMonitorMainItemList,'monitorMainItemList')
+                    // console.log(this.commonMonitorMainItemList,'monitorMainItemList')
                 }
             })
         },
@@ -523,11 +642,42 @@ export default Vue.component('commonDetail',{
         },
         //手动导入数据
         handExportExcel(){
-            this.$emit('importDataShow',true)
+            this.$emit('importDataShow',true,this.itemMonitorId,this.projctName,this.itemMonitorType,this.itemMonitorKeyWord)
         },
         //获取用户名
         getUserName(){
             
+        },
+        saveDraw(){
+            var vm=this;
+            var list = this.$refs.pic.saveList();
+            // console.log(list);
+            axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.itemSubmitbaseMapId
+                    },
+                    data:list
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.$message({
+                            type:'success',
+                            message:'保存监测点成功'
+                        })
+                        this.saveDrawShow=false;
+                        this.getAllMonitorPoint();
+                    }else if(response.data.cd=='-1'){
+                        
+                         this.$message({
+                            type:'success',
+                            message:response.data.msg
+                        })
+                    }
+                })
         },
         //获取警报参数
         getAlertArguments(){
@@ -676,7 +826,17 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
-                    console.log(this.getPointDatasList,'123');
+                    this.getPointDatasListLength=response.data.rt.length;
+                    if(this.getPointDatasListLength<11){
+                        for(var i=0;i<this.getPointDatasListLength-1;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }
+                    // console.log(this.getPointDatasList1,'123');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -689,7 +849,7 @@ export default Vue.component('commonDetail',{
         getCurve(pointId){
             this.pointId=pointId;
             if(this.itemMonitorType==1){
-                this.getPointVerticalShiftChartData()
+                this.getPointHorizontalShiftChartData()
             }else if(this.itemMonitorType==2){
                 this.getPointVerticalShiftChartData()
             }else if(this.itemMonitorType==3){
@@ -708,7 +868,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -731,7 +891,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -754,7 +914,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -777,7 +937,7 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -800,6 +960,10 @@ export default Vue.component('commonDetail',{
         margin:0;
         padding: 0;
         box-sizing: border-box;
+    }
+    .isClickStyle{
+         color: #ffffff !important;
+        background: #fc3439 !important;
     }
     i{
         font-style:normal
@@ -1079,6 +1243,12 @@ export default Vue.component('commonDetail',{
                                 height: 530px;
                                 padding:5px;
                             }
+                        }
+                        .rightBottomCheck{
+                            position: absolute;
+                            bottom:30px;
+                            left:30px;
+                            z-index:11;
                         }
 
             }

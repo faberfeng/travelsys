@@ -42,17 +42,19 @@
                             <!-- <tr>
                                 <td rowspan="4"></td>
                             </tr> -->
-                            <tr v-for="(item,index) in getPatrolRecordList" :key="index">
+                            <tr v-for="(item,index) in getPatrolRecordLists" :key="index">
                                 <td :rowspan="item.patrolTypeNamespan" :class="{'hidden': item.patrolTypeNamedis}">{{item.patrolTypeName}}</td>
                                 <td :rowspan="item.patrolNamespan" :class="{'hidden': item.patrolNamedis}" v-text="item.patrolName"></td>
                                 <!-- <td :rowspan="item.historyResultspan" :class="{'hidden': item.historyResultdis}" v-text="item.historyResult"></td>
                                 <td :rowspan="item.historyRemarkspan" :class="{'hidden': item.historyRemarkdis}" v-text="item.historyRemark"></td>
                                 <td :rowspan="item.recentResultspan" :class="{'hidden': item.recentResultdis}" v-text="item.recentResult"></td>
                                 <td :rowspan="item.recentRemarkspan" :class="{'hidden': item.recentRemarkdis}" v-text="item.recentRemark"></td> -->
-                                <td  v-text="item.historyResult"></td>
-                                <td  v-text="item.historyRemark"></td>
-                                <td width="180px" >{{item.recentResult}}<input v-show="isEditShow"  placeholder="请输入结果" class="tdInp"/></td>
-                                <td width="180px">{{item.recentRemark}}<input v-show="isEditShow" placeholder="请录入备注" class="tdInp"/></td>
+                                <td v-show="saveShow" v-text="item.historyResult"></td>
+                                <td v-show="saveShow" v-text="item.historyRemark"></td>
+                                <!-- <td v-show="saveShow"  v-text="item.recentResult"></td>
+                                <td v-show="saveShow" v-text="item.recentRemark"></td> -->
+                                <td width="180px" ><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
+                                <td width="180px"><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
                                 <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
                                 <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
@@ -141,7 +143,7 @@ export default Vue.component('walkThrough',{
         return{
             nowDate:'',//当前时间
             userName:'',
-            userSelectId:'',
+            // userSelectId:'',
             typeId:'',//巡视类型ID
             patrolId:'',//巡视内容ID
             patrolName:'',//巡视内容名称
@@ -149,7 +151,7 @@ export default Vue.component('walkThrough',{
             renameCheckContentShow:false,//重命名巡视记录
             getPatrolTypesList:'',//监测内容类型
             getPatrolRecordList:'',//获取巡视记录
-            getPatrolRecordLists:[],
+            getPatrolRecordLists:'',
             patrolreName:'',
             newPatrolName:'',//新名
             lastPatrolName:'',//原名
@@ -165,6 +167,8 @@ export default Vue.component('walkThrough',{
             addSummaryShow:false,//是否显示保存按钮
             excessWordSizeShow:false,//是否超过字数
             txtVal:0,//文本框的字数
+            saveShow:true,
+            checkList:[]
         }
 
     },
@@ -297,23 +301,27 @@ export default Vue.component('walkThrough',{
         },
         saveNewRecord(){
             var vm=this;
-            vm.isEditShow=false;
-        },
-        //编辑巡视记录内容
-        editPatrolRecord(){
-            var vm=this;
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'detectionInfo/addPatrol',
+            this.getPatrolRecordLists.forEach((item)=>{
+                this.checkList.push(
+                    {
+                        "id":item.id,
+                        "remark":document.getElementById('inputRemark'+item.id).value,
+                        "result":document.getElementById('inputResult'+item.id).value
+                    }
+                )
+            })
+            console.log(this.checkList,'this.checkList')
+             axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/editPatrolRecord',
                 headers:{
                     'token':vm.token
                 },
-                data:{
-                    list:vm.editPatrolList
-                }
+                data:vm.checkList
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPatrolRecord();
+                    vm.isEditShow=false;
                     this.$message({
                         type:'info',
                         message:'编辑巡视记录内容成功'
@@ -325,6 +333,11 @@ export default Vue.component('walkThrough',{
                     })
                 }
             })
+        },
+        //编辑巡视记录内容
+        editPatrolRecord(){
+            var vm=this;
+           
         },
         //添加巡视内容
         addPatrol(){
@@ -385,6 +398,10 @@ export default Vue.component('walkThrough',{
                 }
             })
         },
+        //添加巡视类型
+        addPatrolType(){
+
+        },
         //获取巡视记录
         getPatrolRecord(){
              var vm=this;
@@ -417,11 +434,16 @@ export default Vue.component('walkThrough',{
                     }
                     var list=[];
                     map.forEach(function (value, key, mapObject) {
-                        console.log(key);
-                        value.concat(value);  
-                    });                
-                    this.getPatrolRecordList=this.combineCell(this.getPatrolRecordList);
-                    console.log(this.getPatrolRecordList);
+                        // console.log(key);
+                        for(var i=0;i<value.length;i++){
+                            list.push(value[i])
+                        } 
+                        console.log(value);
+                    }); 
+                    console.log(list,'list')               
+                    this.getPatrolRecordList=this.combineCell(list);
+                    this.getPatrolRecordLists=this.getPatrolRecordList;
+                    console.log(this.getPatrolRecordLists);
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -600,6 +622,7 @@ export default Vue.component('walkThrough',{
         //保存巡视总结记录
         saveSummary(){
             var vm=this;
+            
             axios({
                 method:'get',
                 url:this.BDMSUrl+'detectionInfo/addPatroSummary',
