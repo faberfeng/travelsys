@@ -26,7 +26,7 @@
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
-                    <label class="recordTxt">导出报告</label>
+                    <label class="recordTxt" @click="exportrEports()">导出报告</label>
                     <label class="exportTxt" @click="walkThroughBtn()">巡视记录</label>
                 </div>
                 <div class="overviewBody">
@@ -286,19 +286,26 @@
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
                     <div class="editBodytwo" v-show="monitorImportType!=5"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:17% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
                     <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao4"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">斜度位移取值列名:</label><select class="gatherTimeName" v-model="shiftIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
                     <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">斜度深度取值列名:</label><select class="gatherTimeName" v-model="depthIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="frequencyShow">按频率取值受力</el-checkbox></label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4&&!frequencyShow"><label class="editInpText" style="width:18% !important;">受力取值列名:</label><select class="gatherTimeName" v-model="forceIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4&&frequencyShow"><label class="editInpText" style="width:18% !important;">率定系数列名:</label><select class="gatherTimeName" v-model="kIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4&&frequencyShow"><label class="editInpText" style="width:18% !important;">初始频率列名:</label><select class="gatherTimeName" v-model="f0IndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4&&frequencyShow"><label class="editInpText" style="width:18% !important;">本次频率列名:</label><select class="gatherTimeName" v-model="fnIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==4&&frequencyShow"><label class="editInpText" style="width:18% !important;">受力计算公式:</label><select class="gatherTimeName" v-model="useFormulaNum"><option v-for="(item,index) in useFormulaList" :value="item.value" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
                     <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
+
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
+                        <button class="editBtnS" v-show="monitorImportType==4&&frequencyShow" @click="formulaSetting()" >公式设定</button>
                         <button v-show="testShow" class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
                         <button v-show="!testShow" class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
                         <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
@@ -333,63 +340,67 @@
                 </div>
             </el-dialog>
             <el-dialog title="受力计算公式设定" :visible="formulaSettingShow" @close="formulaSettingCancle()">
-                <div class="editBody">
+                <div class="editBody" style="overflow:auto;height:600px">
                     <div class="editBodyone">
-                        <el-radio v-model="vibrateRadio" label="1" style="margin-left:50px;">振弦式应变计计算公式：</el-radio>
+                        <el-radio v-model="useFormulaValue" label="1" style="margin-left:50px;">振弦式应变计计算公式：</el-radio>
+                    </div>
+                    <div v-show="useFormulaValue=='1'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
+                            <input placeholder="请输入" v-model="AsValue" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
+                            <input placeholder="请输入" v-model="EsValue" class="editInput"/>
+                            <label>千帕</label>
+                        </div>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
-                        <input placeholder="请输入" class="editInput"/>
-                        <label>平方毫米</label>
+                       <el-radio v-model="useFormulaValue" label="2" style="margin-left:50px;">混凝土支撑内振弦式钢筋计计算公式：</el-radio>
                     </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
-                        <input placeholder="请输入" class="editInput"/>
-                        <label>千帕</label>
-                    </div>
-                    <div class="editBodytwo">
-                       <el-radio v-model="vibrateRadio" label="1" style="margin-left:50px;">混凝土支撑内振弦式钢筋计计算公式：</el-radio>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">钢筋直径(mm)：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                     <div class="editBodytwo">
-                        <label class="editTxt">根数：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">截面积As：</label>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">钢筋应力计的截面积As'：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                        <label>平方毫米</label>
-                    </div>
-                     <div class="editBodytwo">
-                        <label class="editTxt">钢筋的牌号：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">对应弹性模量Es：</label>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">混凝土支撑宽度：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">混凝土支撑高度： ：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">截面积Ac：</label>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">混凝土的等级：</label>
-                        <input placeholder="请输入" class="editInput"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt">对应弹性模量Ec:</label>
+                    <div v-show="useFormulaValue=='2'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋直径(mm)：</label>
+                            <input placeholder="请输入" v-model="barDiameterValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">根数：</label>
+                            <input placeholder="请输入" v-model="barCountValue" @change="asMethod()" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积As：{{asValueArea}}</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋应力计的截面积As'：</label>
+                            <input placeholder="请输入" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋的牌号：</label>
+                            <input placeholder="请输入" v-model="barGradeValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Es：</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑宽度：</label>
+                            <input placeholder="请输入" v-model="concreteWidthValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑高度： ：</label>
+                            <input placeholder="请输入" v-model="concreteHeightValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积Ac：</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土的等级：</label>
+                            <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Ec:</label>
+                        </div>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -404,6 +415,21 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="sendAlertMessage()">发送</button>
                     <button class="editBtnC" @click="sendAlertMessageCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="导出监测报告" :visible="exportrEportsShow" @close="exportrEportsCancle()">
+                <div class="editEportBody">
+                    <div class="editEportBodyone">
+
+
+                    </div>
+                    <div class="editEportBodytwo">
+                        
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" >保存设置</button>
+                    <button class="editBtnC" >生成</button>
                 </div>
             </el-dialog>
         </div>
@@ -466,12 +492,38 @@ export default {
             altitudeCol:'',//高程取值列名
             pipeHeightCol:'',//管口标高列名
             gaugeHeightCol:'',//水位深度列名
+            forceIndexCol:'',//受力下标
+            kIndexCol:'',//率定系数下标
+            f0IndexCol:'',//
+            fnIndexCol:'',//
             depthIndexCol:'',//深度下标
             shiftIndexCol:'',//位移下标
             saveImportColumnValue:false,//保存导入列数据
+            frequencyShow:false,//是否按频率取值受力
             overwrite:false,//是否覆盖
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
+            useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
+            useFormulaNum:1,
+            useFormulaList:[
+                {
+                    value:1,
+                    name:"振弦式应变计计算公式"
+                },
+                {
+                    value:2,
+                    name:"混凝土支撑内振弦式钢筋计计算公式"
+                }
+            ],
+            AsValue:'',//钢支撑/钢立柱的截面积
+            EsValue:'',//钢支撑/钢立柱的弹性模量
+            barDiameterValue:'',//钢筋直径
+            asValueArea:'',//as面积
+            barCountValue:'',//钢筋根数
+            concreteWidthValue:'',//混凝土宽度
+            concreteHeightValue:'',//混凝土高度
+            concreteLevelValue:'',//混凝土等级
+            barGradeValue:'',//钢筋牌号
             sendAlertMessageShow:false,//是否发送报警信息弹窗
             vibrateRadio:'1',//振弦式应变计计算公式
             fileList:'',
@@ -540,6 +592,7 @@ export default {
             pitchDetailShow:false,//斜度详情页
             commonDetailShow:false,//公共详情页
             walkThroughShow:false,//巡视报告
+            exportrEportsShow:false,//导出报告
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
@@ -645,6 +698,9 @@ export default {
         // judgePdf(){
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
+        asMethod(){
+            this.asValueArea=3.14*(this.barDiameterValue)*(this.barCountValue)/4
+        },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
             console.log(valShow);
@@ -825,8 +881,12 @@ export default {
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
-
-
+        },
+        exportrEports(){
+            this.exportrEportsShow=true;
+        },
+        exportrEportsCancle(){
+            this.exportrEportsShow=false;
         },
         backToH(){
             var vm=this;
@@ -1417,7 +1477,7 @@ export default {
         saveImportColumnSetting(){
             var vm=this;
             var colData=[];
-            colData.push({'spotNumCol':vm.spotNumCol,'timeCol':vm.timeCol,'distanceCol':vm.distanceCol,'altitudeCol':vm.altitudeCol,'pipeHeightCol':vm.pipeHeightCol,'gaugeHeightCol':vm.gaugeHeightCol,'saveImportColumnValue':vm.saveImportColumnValue,'depthIndexCol':vm.depthIndexCol,'shiftIndexCol':vm.shiftIndexCol})
+            colData.push({'spotNumCol':vm.spotNumCol,'timeCol':vm.timeCol,'distanceCol':vm.distanceCol,'altitudeCol':vm.altitudeCol,'pipeHeightCol':vm.pipeHeightCol,'gaugeHeightCol':vm.gaugeHeightCol,'saveImportColumnValue':vm.saveImportColumnValue,'depthIndexCol':vm.depthIndexCol,'shiftIndexCol':vm.shiftIndexCol,'forceIndexCol':vm.forceIndexCol,'kIndexCol':vm.kIndexCol,'f0IndexCol':vm.f0IndexCol,'fnIndex':vm.fnIndex,'useFormulaNum':vm.useFormulaNum})
             console.log(colData);
             axios({
                 method:'post',
@@ -1470,6 +1530,11 @@ export default {
                         vm.gaugeHeightCol=item.gaugeHeightCol;
                         vm.shiftIndexCol=item.shiftIndexCol;
                         vm.depthIndexCol=item.depthIndexCol;
+                        vm.forceIndexCol=item.forceIndexCol;
+                        vm.kIndexCol=item.kIndexCol;
+                        vm.useFormulaNum=item.useFormulaNum;
+                        vm.f0IndexCol=item.f0IndexCol;
+                        vm.fnIndexCol=item.fnIndexCol;
                         vm.saveImportColumnValue=item.saveImportColumnValue;
                     })
                 }else if(response.data.cd=='-1'){
@@ -1490,6 +1555,12 @@ export default {
                 this.importExcel_3()
             }else if(this.monitorImportType==5){
                  this.importExcel_5()
+            }else if(this.monitorImportType==4){
+                if(this.frequencyShow==false){
+                    this.importExcel_4_2();
+                }else if(this.frequencyShow==true){
+                    this.importExcel_4();
+                }
             }
         },
         //导入水平位移excel
@@ -1686,6 +1757,116 @@ export default {
                 }
             })
         },
+        //导入EXCEL（受力）（已计算）
+        importExcel_4_2(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/importExcel_4_2',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    // pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    // gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    forceIndex:vm.forceIndexCol,//受力下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    // vm.pipeHeightCol='';//管口高度
+                    // vm.gaugeHeightCol='';//水位下标
+                    vm.forceIndexCol='';//受力下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                   vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.overwrite=false; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                   this.getMonitorMainTable();
+                    this.getMonitorItem();
+                    this.$message({
+                        type:'success',
+                        message:'采集数据导入成功'
+                    })
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //导入EXCEL（受力）（已计算）
+        importExcel_4(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/importExcel_4',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    // pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    // gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    // forceIndex:vm.forceIndexCol,//受力下标
+                    useFormula:vm.useFormulaNum,//计算公式
+                    kIndex:vm.kIndexCol,//率定系数下标
+                    f0Index:vm.f0IndexCol,//初始频率下标
+                    fnIndex:vm.fnIndexCol,//本次频率下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importGatherDataShow=false;
+                    vm.sheetIndex='';
+                    vm.timeCol=''; //采集时间下标
+                    // vm.pipeHeightCol='';//管口高度
+                    // vm.gaugeHeightCol='';//水位下标
+                    vm.forceIndexCol='';//受力下标
+                    vm.monitorImportId='';//监测ID
+                    vm.spotNumCol='';//监测点位下标
+                    vm.unifiedTime='';//标准时间，不选择可不传
+                    vm.kIndexCol='';
+                    vm.f0IndexCol='';
+                    vm.fnIndexCol='';
+                    vm.useFormulaNum='';
+                    vm.overwrite=false; //是否覆盖
+                   vm.inputWorkingCondition='';//现场工况
+                   this.getMonitorMainTable();
+                    this.getMonitorItem();
+                    this.$message({
+                        type:'success',
+                        message:'采集数据导入成功'
+                    })
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         //
         //测试导入excel数据(需要根据监测类型来判断)
         verifyExcelDataBtn(){
@@ -1697,6 +1878,13 @@ export default {
                  this.verifyExcel_3()
             }else if(this.monitorImportType==5){
                  this.verifyExcel_5()
+            }else if(this.monitorImportType==4){
+                if(this.frequencyShow==false){
+                    this.verifyExcel_4_2()
+                }else if(this.frequencyShow==true){
+                    this.verifyExcel_4()
+                }
+                
             }
         },
         //测试导入EXCEL（水平位移）
@@ -1889,6 +2077,89 @@ export default {
                 }
             })
         },
+      
+        //验证受力（已计算）
+        verifyExcel_4_2(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/verifyExcel_4_2',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    // pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    // gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    forceIndex:vm.forceIndexCol,//受力下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                   this.$message({
+                        type:'info',
+                        message:response.data.rt
+                    })
+                     this.testShow=false;
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //
+        verifyExcel_4(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/verifyExcel_4',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    sheetIndex:vm.sheetIndex,
+                    acquisitionTimeIndex:vm.timeCol, //采集时间下标
+                    // shiftDistanceIndex:vm.distanceCol,//位移下标
+                    // elevationIndex:vm.altitudeCol,//高程下班
+                    // pipeHeightIndex:vm.pipeHeightCol,//管口高度
+                    // gaugeHeightIndex:vm.gaugeHeightCol,//水位下标
+                    // forceIndex:vm.forceIndexCol,//受力下标
+                    useFormula:vm.useFormulaNum,//计算公式
+                    kIndex:vm.kIndexCol,//率定系数下标
+                    f0Index:vm.f0IndexCol,//初始频率下标
+                    fnIndex:vm.fnIndexCol,//本次频率下标
+                    itemId:vm.monitorImportId,//监测ID
+                    pointIndex:vm.spotNumCol,//监测点位下标
+                    commonTime:vm.unifiedTime,//标准时间，不选择可不传
+                    overwrite:vm.overwrite, //是否覆盖
+                    workingCondition:vm.inputWorkingCondition,//现场工况
+                    userGroupId:vm.selectUgId //
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                   this.$message({
+                        type:'info',
+                        message:response.data.rt
+                    })
+                     this.testShow=false;
+                }else {
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         //点击公式设定
         formulaSetting(){
             this.formulaSettingShow=true;
@@ -1896,6 +2167,31 @@ export default {
         //取消公式设定
         formulaSettingCancle(){
             this.formulaSettingShow=false;
+        },
+        //设置受力公式
+        setFormula(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/setFormula',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+
+
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
         },
         sendAlertMessageCancle(){
             this.sendAlertMessageShow=false;
@@ -2936,7 +3232,7 @@ export default {
                                    margin-top:3px;
                                     position: absolute;
                                     border-right:1px dashed #ccc;
-                                     
+                                     cursor: pointer;
                                     left:0%;
                                     .moveIcon{
                                         background: url('./images/move.png') no-repeat 0 0;
@@ -2969,6 +3265,7 @@ export default {
                                     position: absolute;
                                     border-right:1px dashed #ccc;
                                     left:33%;
+                                    cursor: pointer;
                                     .faultIcon{
                                         background: url('./images/falut.png') no-repeat 0 0;
                                         width: 54px;
@@ -2997,6 +3294,7 @@ export default {
                                     margin-top:3px;
                                     position: absolute;
                                     left:72%;
+                                    cursor: pointer;
                                     .deleteDrawIcon{
                                         background: url('./images/delete.png') no-repeat 0 0;
                                         width: 54px;
@@ -3006,7 +3304,7 @@ export default {
                                         margin-top: 2px;
                                         cursor: pointer;
                                         &:hover{
-                                            background:url('./images/delete.png') no-repeat 0 0;
+                                            background:url('../../assets/delete.png') no-repeat 0 0;
                                         }
                                     }
                                     .deleteDrawTxt{
@@ -3033,6 +3331,7 @@ export default {
                                     font-size:12px;
                                     color:#666666;
                                     line-height: 32px;
+                                    cursor: pointer;
                                 }
                             }
 
@@ -3565,6 +3864,12 @@ export default {
                 border-radius: 2px;
                 background: #fafafa;
                 padding-left: 10px;
+            }
+            .editEportBody{
+                margin:0 auto;
+                .editEportBodyone{
+
+                }
             }
         }
        

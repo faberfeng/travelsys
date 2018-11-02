@@ -23,7 +23,7 @@
                 <thead>
                     <tr  class="userList-thead">
                         <th width="15%">名称</th>
-                        <th width="15%">账号</th>
+                        <th width="15%">用户名</th>
                         <th width="10%">工程管理员</th>
                         <th width="15%;">已被分配到的岗位</th>
                          <th width="15%">添加时间</th>
@@ -299,7 +299,7 @@
                 </div>
             </div> -->
             <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="PostaddApplyUser(2)">保存</el-button>
+                <el-button type="primary" @click="PostaddApplyUser(2)">通过</el-button>
                 <el-button type="warning" @click="PostaddApplyUser(3)" >拒绝</el-button>
                 <el-button @click="applyClose">取 消</el-button>
             </span>
@@ -855,6 +855,12 @@ export default {
                     }).then((response)=>{
                     vm.position_default = response.data.rt.positions[0]
                     vm.position_list = response.data.rt.positions.slice(1)
+                    console.log(vm.position_list,'123');
+                    vm.position_list[0].checkFlg = true;
+                    // this.position_list.forEach((item,index)=>{
+                    //     item.checkFlg=true;
+                    // })
+                    console.log(vm.position_list,'vm.position_list ');
                     }).catch((err)=>{
                         console.log(err)
                     })
@@ -1175,6 +1181,10 @@ export default {
                     vm.userDetial.positions = response.data.rt.positions
                     vm.position_default = response.data.rt.positions[0]//工程管理员岗位
                     vm.position_list = response.data.rt.positions.slice(1)//可选其他岗位
+                    // this.position_list.forEach((item)=>{
+                    //     item.checkFlg=true;
+                    // })
+                    vm.position_list[0].checkFlg=true;
                     vm.projUserId = response.data.rt.projUserId
                     vm.remarkIfo=response.data.rt.remark
                 }).catch((err)=>{
@@ -1195,6 +1205,11 @@ export default {
                 }).then((response)=>{
                 vm.position_default = response.data.rt.positions[0]
                 vm.position_list = response.data.rt.positions.slice(1)
+                vm.position_list[0].checkFlg=true;
+                console.log(vm.position_list,'666')
+                // this.position_list.forEach((item)=>{
+                //         item.checkFlg=true;
+                //     })
                 }).catch((err)=>{
                     console.log(err)
                 })
@@ -1283,13 +1298,13 @@ export default {
                 })
                 return false
             }
-            if(vm.remarkIfo==''){
-                vm.$message({
-                    type:'warning',
-                    message:'请输入备注信息！'
-                })
-                return false
-            }
+            // if(vm.remarkIfo==''){
+            //     vm.$message({
+            //         type:'warning',
+            //         message:'请输入备注信息！'
+            //     })
+            //     return false
+            // }
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/Config/saveProjectUser',
@@ -1357,13 +1372,13 @@ export default {
                 })
                 return false
             }
-            if(vm.remarkIfo==''){
-                vm.$message({
-                    type:'warning',
-                    message:'请输入备注信息！'
-                })
-                return false
-            }
+            // if(vm.remarkIfo==''){
+            //     vm.$message({
+            //         type:'warning',
+            //         message:'请输入备注信息！'
+            //     })
+            //     return false
+            // }
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'project2/Config/applyPassOrRefuse',
@@ -1379,7 +1394,7 @@ export default {
                 data:{
                     isAdmin:isAdmin,
                     posIds: posIds,
-                    remark:this.remarkIfo,
+                    remark:this.applyMessage,
                     projUserId: vm.projUserId,
                     userId: vm.userDetial.info.userId+''
                 }
