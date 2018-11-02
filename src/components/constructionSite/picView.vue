@@ -1,15 +1,19 @@
 <template>
     <div ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
+        
+        
+        
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" ></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
             <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
-            <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
-                <input ref="number_input_input"  type = "text" style="position:absolute;left:2px;height:30px;top:2px;width:120px"/>
-                <button @click="create_Multiple_points" style="right:2px;height:30px;top:2px;width:60px;position:absolute" >确定</button>
-            </div>
-            <input type="text"/>
+            
+        </div>
+
+        <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
+            <input ref="number_input_input"  type = "text" style="position:absolute;left:2px;height:30px;top:2px;width:120px"/>
+            <button @click="create_Multiple_points" style="right:2px;height:30px;top:2px;width:60px;position:absolute" >确定</button>
         </div>
         
     </div>
@@ -82,8 +86,9 @@ export default {
 
                     this.ResolutionScale = this.PDFscale; 
                     
+                    
                     this.old_para = this.para.source;
-                    this.size_R();
+                    
                 }
             }else{
 
@@ -99,6 +104,7 @@ export default {
                     this.$refs.picView.style.top = "0px";
                     this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
                     this.old_para = this.para.source;
+                    
                 }
             }
             // console.log(this.para);
@@ -119,6 +125,7 @@ export default {
     },
     watch:{
         para: (newVal,oldVal)=>{
+            // console.log(newVal);
         }
     },
     methods:{
@@ -142,6 +149,7 @@ export default {
             this.drawcontextSelect = this.drawCanvasSelect.getContext('2d');
             this.SelectedList = [];
             this.displayLabel = false;
+            this.baseColor={r:0,g:170,b:0};
 
             if(page_No == undefined){
                 page_No = 1;
@@ -162,7 +170,7 @@ export default {
                 this.angle += 360;
             }
 
-            while(this.angle > 360){
+            while(this.angle >= 360){
                 this.angle -= 360;
             }
 
@@ -215,8 +223,8 @@ export default {
                             this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
 
                             if(this.angle == 0 || this.angle == 180){
-                                this.sub_div.height = this.imageSize.height;
-                                this.sub_div.width = this.imageSize.width;
+                                this.sub_div.style.height = this.imageSize.height + "px";
+                                this.sub_div.style.width = this.imageSize.width + "px";
                                 this.canvas.height = this.imageSize.height;
                                 this.canvas.width = this.imageSize.width;
                                 this.drawCanvas.height = this.imageSize.height;
@@ -225,8 +233,8 @@ export default {
                                 this.drawCanvasSelect.width = this.imageSize.width;
                                 
                             }else{
-                                this.sub_div.height = this.imageSize.width;
-                                this.sub_div.width = this.imageSize.height;
+                                this.sub_div.style.height = this.imageSize.width + "px";
+                                this.sub_div.style.width  = this.imageSize.height + "px";
                                 this.canvas.height = this.imageSize.width;
                                 this.canvas.width = this.imageSize.height;
                                 this.drawCanvas.height = this.imageSize.width;
@@ -266,7 +274,10 @@ export default {
 
             var timer = setInterval(()=>{
                 this.sub_div.style.height = this.$refs.pdfDocument.$refs.canvasParent.offsetHeight + "px";
-                this.oldImageSize = {width:this.$refs.pdfDocument.$refs.canvasParent.offsetWidth,height:this.$refs.pdfDocument.$refs.canvasParent.offsetHeight};
+                this.oldImageSize = {
+                                        width:this.$refs.pdfDocument.$refs.canvasParent.offsetWidth,
+                                        height:this.$refs.pdfDocument.$refs.canvasParent.offsetHeight
+                                    };
                 this.drawCanvas.height = this.$refs.picView.offsetHeight;
                 this.drawCanvas.width = this.$refs.picView.offsetWidth;
                 this.drawCanvasSelect.height = this.$refs.picView.offsetHeight;
@@ -277,7 +288,12 @@ export default {
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
 
             this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
+            this.size_R();  // 初始时修改尺寸
             
+        },
+        setNumber_inputPostion(position){
+            this.$refs.number_input.style.left = (this.sub_div.offsetLeft   + position.x * this.ResolutionScale * this.scale - 50) + "px";
+            this.$refs.number_input.style.top  = (this.sub_div.offsetTop    + position.y * this.ResolutionScale * this.scale - 16) + "px";
         },
         oncanvasmousedown(e){
             // console.log(e.layerX / this.ResolutionScale / this.scale,e.layerY / this.ResolutionScale / this.scale);
@@ -296,8 +312,34 @@ export default {
                         for(let i = 0;i < this.drawList.length;i++){
                             if(this.drawList[i].SID == this.drawID ){
                                 find = true;
-                                if(this.drawList[i].type == "text"){
-                                    this.drawList[i].position.push({x:X,y:Y});
+                                switch(this.drawList[i].type){
+                                    case "text":
+                                        this.drawList[i].position.push({x:X,y:Y});
+                                        break;
+                                    case "line":
+                                        this.drawList[i].position.push({x:X,y:Y});
+                                        break;
+                                    case "circular":
+                                        this.drawList[i].position.push({x:X,y:Y});
+                                        break;
+                                    case "rectangle":
+                                        this.drawList[i].position.push({x:X,y:Y});
+                                        break;
+                                    case "cloud":
+
+                                        if(this.drawList[i].position.length > 2){
+                                            let dist = new THREE.Vector2(X - this.drawList[i].position[0].x,Y - this.drawList[i].position[0].y).length();
+                                            if(dist < 10){
+                                                this.drawList[i].position.push({x:this.drawList[i].position[0].x,y:this.drawList[i].position[0].y});
+                                                this.drawCount = 0;
+                                                this.drawFinish();
+                                            }else{
+                                                this.drawList[i].position.push({x:X,y:Y});
+                                            }
+                                        }else{
+                                            this.drawList[i].position.push({x:X,y:Y});
+                                        }
+                                        break;
                                 }
                             }
                         }
@@ -305,11 +347,17 @@ export default {
                         if(find == false){
                             // this.drawList.push({status:"normal",Selected:false,SID:this.drawID,type:this.drawtype,position:[{x:X,y:Y}],count:1,ID_out:-1,edited:true,TempPostion:{x:0,y:0},text:"文本"});
                             this.drawList.push(this.create(this.drawtype,this.drawItemId,{x:X,y:Y}));
-                            this.$emit('finish',null);
+                            
+                            if(this.drawMaxCount == 1){
+                                this.drawFinish();
+                            }
                         }else{
                             
-                            this.$refs.number_input_input.value = "6";
-                            this.$refs.number_input.style.display = "block";
+                            // if(this.drawtype == "move" || this.drawtype == "move" || this.drawtype == "move" || this.drawtype == "move")
+                            // {
+                            //     this.$refs.number_input_input.value = "6";
+                            //     this.$refs.number_input.style.display = "block";
+                            // }
                         }
 
                         if(this.drawCount == 0){
@@ -318,8 +366,6 @@ export default {
                                 switch(this.drawList[this.drawList.length - 1].type){
 
                                     case "text":
-                                        this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
-                                        this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
                                         this.$refs.number_input_input.value = "";
                                         this.$refs.number_input.style.display = "block";
                                         break;
@@ -338,6 +384,9 @@ export default {
                                     case "slanting":
                                         this.$refs.number_input_input.value = "6";
                                         this.$refs.number_input.style.display = "block";
+                                        break;
+                                    default:
+                                        this.drawFinish();
                                         break;
                                 }
                                  
@@ -383,6 +432,8 @@ export default {
                         }else{
                             this.$emit('status_changed',false,this.SelectedList);
                         }
+
+                        this.Refresh();
 
                     }
                 }
@@ -503,6 +554,48 @@ export default {
                     }
                     break;
                 case "PNG":
+
+                    this.scale_before = this.scale;
+
+                    this.start_canvas.x = this.sub_div.offsetLeft;
+                    this.start_canvas.y = this.sub_div.offsetTop;
+                    this.start_canvas.w = this.sub_div.offsetWidth;
+                    this.start_canvas.h = this.sub_div.offsetHeight;
+
+
+                    this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                    if(this.angle == 0 || this.angle == 180){
+                        this.sub_div.style.height = this.imageSize.height + "px";
+                        this.sub_div.style.width  = this.imageSize.width + "px";
+                        this.canvas.height = this.imageSize.height;
+                        this.canvas.width = this.imageSize.width;
+                        this.drawCanvas.height = this.imageSize.height;
+                        this.drawCanvas.width = this.imageSize.width;
+                        this.drawCanvasSelect.height = this.imageSize.height;
+                        this.drawCanvasSelect.width = this.imageSize.width;
+                    }else{
+                        this.sub_div.style.height = this.imageSize.width + "px";
+                        this.sub_div.style.width  = this.imageSize.height + "px";
+                        this.canvas.height = this.imageSize.width;
+                        this.canvas.width = this.imageSize.height;
+                        this.drawCanvas.height = this.imageSize.width;
+                        this.drawCanvas.width = this.imageSize.height;
+                        this.drawCanvasSelect.height = this.imageSize.width;
+                        this.drawCanvasSelect.width = this.imageSize.height;
+                    }
+
+                    this.position_calculate();
+                    this.context = this.canvas.getContext('2d');
+                    this.context.rotate(this.angle*Math.PI/180);
+
+                    switch(this.angle){
+                        case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);
+                        case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);
+                        case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);
+                        case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);
+                    }
+                    
 
 
                     break;
@@ -723,14 +816,34 @@ export default {
             this.drawcontext.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
             this.drawcontextSelect.clearRect(0,0,this.sub_div.offsetWidth,this.sub_div.offsetHeight);
 
+            if(this.drawing){   //  单点
+                let color = this.baseColor;
+                switch(this.drawtype){
+                    case "move":
+                        this.drawMove(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        break;
+                    case "level":
+                        this.drawLevel(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        break;
+                    case "force":
+                        this.drawForce(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        break;
+                    case "slanting":
+                        this.drawSlanting(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        break;
+                    case "Mark":
+                        this.drawMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor);
+                        break;
+                }
+            }
+
             for(let i = 0;i < this.drawList.length;i++){
 
                 if(this.drawList[i].display==false){
                     continue;
                 }
 
-                let color = {r:0,g:170,b:0};
-
+                let color = this.baseColor;
                 if(this.drawList[i].isBroken){
                     color = {r:170,g:0,b:0};
                 }
@@ -743,9 +856,9 @@ export default {
                 switch(this.drawList[i].type){
                     case "move":
                             if(this.drawing){
-                                this.drawMove(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
-                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount){
-                                    this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
+                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
+                                    this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion);
+                                    this.drawMove(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
                                 }
                             }
 
@@ -758,9 +871,10 @@ export default {
                         break;
                     case "level":
                             if(this.drawing){
-                                this.drawLevel(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
-                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount){
+                                
+                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
+                                    this.drawLevel(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
@@ -771,9 +885,10 @@ export default {
                         break;
                     case "force":
                             if(this.drawing){
-                                this.drawForce(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
-                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount){
+                                
+                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
+                                    this.drawForce(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
@@ -784,9 +899,10 @@ export default {
                         break;
                     case "slanting":
                             if(this.drawing){
-                                this.drawSlanting(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
-                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount){
+                                
+                                if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
+                                    this.drawSlanting(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
@@ -796,7 +912,7 @@ export default {
                         
                         break;
                     case "text":
-                        if(this.drawing){
+                        if(this.drawing && this.drawList[i].position.length == 1){
                             this.drawMove(this.drawcontext,this.lastMovePostion,1.0,3.5,color,false,"","");
                         }
                         if(this.drawList[i].position.length < 2){
@@ -807,27 +923,346 @@ export default {
                             this.drawText(this.drawcontextSelect,this.drawList[i].position[0],this.drawList[i].position[1],this.drawList[i].text,1.0,colorId,true);
                         }
                         break;
+                    case "line":
+
+                        if(this.drawing){
+                            if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
+                                this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion,2,1,this.baseColor);
+                            }
+                        }
+                        if(this.drawList[i].position.length == 2){
+                            this.drawLine(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
+                            this.drawLine(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                        }
+                        break;
+                    case "circular":
+
+                        if(this.drawing){
+                            if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
+                                this.drawcircular(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion,2,1,this.baseColor);
+                            }
+                        }
+                        if(this.drawList[i].position.length == 2){
+                            this.drawcircular(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
+                            this.drawcircular(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                        }
+                        break;
+                    case "rectangle":
+
+                        if(this.drawing){
+                            if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
+                                this.drawrectangle(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion,2,1,this.baseColor);
+                            }
+                        }
+                        if(this.drawList[i].position.length == 2){
+                            this.drawrectangle(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
+                            this.drawrectangle(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                        }
+                        break;
+                    case "Mark":
+                        
+                        this.drawMark(this.drawcontext      ,this.drawList[i].position[this.drawList[i].position.length - 1],false,1,this.baseColor,this.drawList[i].Selected);
+                        this.drawMark(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],true,1,colorId);
+                        
+                        break;
+                    case "cloud":
+
+                        var points = [];
+                        var last = {x:this.lastMovePostion.x * this.ResolutionScale * this.scale,y:this.lastMovePostion.y * this.ResolutionScale * this.scale};
+
+                        for(var k = 0;k < this.drawList[i].position.length;k++){
+                            points.push({x:this.drawList[i].position[k].x * this.ResolutionScale * this.scale,y:this.drawList[i].position[k].y * this.ResolutionScale * this.scale});
+                        }
+
+                        this.drawCloud(this.drawcontext,points,last,15,2,1,this.baseColor,this.drawList[i].Selected);
+                        this.drawCloud(this.drawcontextSelect,points,last,15,5,1,colorId);
+
+                        if(this.drawList[i].position.length > 2){   // 画封闭点位置
+
+                            if(this.drawList[i].position[0].x == this.drawList[i].position[this.drawList[i].position.length - 1].x && this.drawList[i].position[0].y == this.drawList[i].position[this.drawList[i].position.length - 1].y){
+
+                            }else{
+                                this.drawcontext.lineWidth=2;
+                                this.drawcontext.fillStyle="rgb(0,192,0)";
+                                this.drawcontext.strokeStyle="rgb(0,192,0)";
+
+                                this.drawcontext.beginPath();
+                                this.drawcontext.arc(
+                                    this.drawList[i].position[0].x * this.ResolutionScale * this.scale,
+                                    this.drawList[i].position[0].y * this.ResolutionScale * this.scale,
+                                    10,
+                                    0,
+                                    2*Math.PI);
+                                this.drawcontext.stroke();
+                                this.drawcontext.fill();
+                            }
+                        }
+
+                        break;
                 }
             }
 
             if(this.lastPostion){
-                this.$refs.number_input.style.left = this.lastPostion.x * this.ResolutionScale * this.scale + "px";
-                this.$refs.number_input.style.top  = this.lastPostion.y * this.ResolutionScale * this.scale + "px";
-            }
-
-            if(this.drawList.length > 0){
-                if(this.drawList[this.drawList.length - 1].position.length == 2){
-                    if(this.drawList[this.drawList.length - 1].type == "text"){
-                        this.$refs.number_input.style.left = (this.drawList[this.drawList.length - 1].position[1].x * this.ResolutionScale * this.scale - 50) + "px";
-                        this.$refs.number_input.style.top  = (this.drawList[this.drawList.length - 1].position[1].y * this.ResolutionScale * this.scale - 16) + "px";
+                if(this.drawList.length > 0){
+                    if(this.drawList[this.drawList.length - 1].position[1]){
+                        this.setNumber_inputPostion(this.drawList[this.drawList.length - 1].position[1]);
+                    }else{
+                        this.setNumber_inputPostion(this.lastPostion);
                     }
                 }
             }
         },
-        drawLine(drawcontext,Start,End){
+        drawCloud(drawcontext,points,last,radius,Width,scale,color,isSelected){
             var color_='rgb(0,0,0)';
-            
+
+            if(color){
+                if(!isSelected){
+                    color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                }else{
+                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                }
+            }
+
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            if(Width){
+                drawcontext.lineWidth = Width;
+            }else{
+                drawcontext.lineWidth=3;
+            }
+
+            var finish = false;
+
+            if(points[0].x == points[points.length-1].x && points[0].y == points[points.length-1].y && points.length > 3){
+                finish = true;
+            }
+
+            ////////////////// 画角 /////////////////////
+
+            var counterclockwise = false;
+
+			if(finish){
+				drawcontext.beginPath();
+				
+				let a1 = this.getAngle(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
+				let a2 = this.getAngle(points[0].x,points[0].y,points[1].x,points[1].y); // 
+
+				let l = this.getLength(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
+				let l2 = l - parseInt(l / (radius * 1.5))*(radius * 1.5);
+				l2 /= 2;
+				let a11 = Math.acos(l2 / radius);
+				a11 = Math.abs(a11);
+
+				drawcontext.arc(points[0].x,points[0].y,radius,a1 + a11,a2 - Math.PI / 4,counterclockwise);
+				drawcontext.stroke();
+
+			}else{
+				if(points.length > 1){
+					drawcontext.beginPath();
+					
+					let a1 = this.getAngle(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
+					let a2 = this.getAngle(points[points.length-1].x,points[points.length-1].y,last.x,last.y); // 
+
+					let l = this.getLength(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
+					let l2 = l - parseInt(l / (radius * 1.5))*(radius * 1.5);
+					l2 /= 2;
+					let a11 = Math.acos(l2 / radius);
+					a11 = Math.abs(a11);
+
+
+					drawcontext.arc(points[points.length-1].x,points[points.length-1].y,radius,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
+					drawcontext.stroke();
+				}
+			}
+
+			for(let i = 0; i < points.length - 2;i++){ 
+
+				drawcontext.beginPath();
+				
+				let a1 = this.getAngle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+				let a2 = this.getAngle(points[i + 1].x,points[i + 1].y,points[i + 2].x,points[i + 2].y); // 
+
+				let l = this.getLength(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+				let l2 = l - parseInt(l / (radius * 1.5))*(radius * 1.5);
+				l2 /= 2;
+				let a11 = Math.acos(l2 / radius);
+				a11 = Math.abs(a11);
+
+				drawcontext.arc(points[i + 1].x,points[i + 1].y,radius,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
+				drawcontext.stroke();
+			}
+
+			/////////////////////////////////////////////
+
+			/////////////////// 画线 /////////////////////
+
+			for(let i = 0; i < points.length - 1;i++){
+
+				let l = this.getLength(points[i].x,points[i].y,points[i + 1].x,points[i + 1].y);
+				let a1 = this.getAngle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
+
+				let dir = {x:points[i + 1].x - points[i].x,y:points[i + 1].y - points[i].y};
+				dir = this.normalize(dir);
+
+				let k = radius * 1.5;
+
+				for(let j = 1;j < Math.ceil(l / k);j++){
+
+					drawcontext.beginPath();
+
+					let item = {x:points[i].x + j*k * dir.x,y:points[i].y + j*k * dir.y};
+					drawcontext.arc(item.x,item.y,radius,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
+
+					drawcontext.stroke();
+				}
+			}
+
+			//////////////////////////////////////////////
+
+			///////////////// 画当前线 ////////////////////
+
+			if(points.length > 0 && !finish){
+
+				let l = this.getLength(	points[points.length-1].x,points[points.length-1].y,last.x,last.y);
+				let a1 = this.getAngle(last.x,last.y,points[points.length-1].x,points[points.length-1].y);
+
+				let dir = {x:last.x - points[points.length-1].x,y:last.y - points[points.length-1].y};
+				dir = this.normalize(dir);
+
+				let k = radius * 1.5;
+
+				for(let j = 1;j < Math.ceil(l / k);j++){
+
+					drawcontext.beginPath();
+
+					let item = {x:points[points.length-1].x + j*k * dir.x,y:points[points.length-1].y + j*k * dir.y};
+					drawcontext.arc(item.x,item.y,radius,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
+
+					drawcontext.stroke();
+				}
+			}
+			//////////////////////////////////////////////
+
+        },
+        drawMark(drawcontext,position,select,scale,color,isSelected){
+            var color_='rgb(0,0,0)';
+
+            if(color){
+                if(!isSelected){
+                    color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                }else{
+                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                }
+            }
+
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
             drawcontext.lineWidth=3;
+
+            drawcontext.beginPath();
+
+            if(select){
+                drawcontext.rect(
+                    (position.x - 18) * this.ResolutionScale * this.scale,
+                    (position.y - 15) * this.ResolutionScale * this.scale,
+                    36 * this.ResolutionScale * this.scale,
+                    30 * this.ResolutionScale * this.scale);
+                drawcontext.fill();
+            }else{
+                let fz_img = document.getElementById("fz_img_for_draw");
+                drawcontext.drawImage(fz_img,(position.x - 9)* this.ResolutionScale * this.scale,(position.y - 9)* this.ResolutionScale * this.scale);
+
+                if(isSelected){
+                    drawcontext.rect(
+                    (position.x - 18) * this.ResolutionScale * this.scale,
+                    (position.y - 15) * this.ResolutionScale * this.scale,
+                    36 * this.ResolutionScale * this.scale,
+                    30 * this.ResolutionScale * this.scale);
+                    // drawcontext.fill();
+                }
+            }
+
+            drawcontext.stroke();
+
+        },
+        drawrectangle(drawcontext,Start,End,radius,scale,color,isSelected){
+            var color_='rgb(0,0,0)';
+
+            if(color){
+                if(!isSelected){
+                    color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                }else{
+                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                }
+            }
+
+            if(radius){
+                drawcontext.lineWidth = radius;
+            }else{
+                drawcontext.lineWidth=3;
+            }
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.beginPath();
+
+            drawcontext.rect(
+                Start.x * this.ResolutionScale * this.scale,
+                Start.y * this.ResolutionScale * this.scale,
+                (End.x - Start.x) * this.ResolutionScale * this.scale,
+                (End.y - Start.y) * this.ResolutionScale * this.scale);
+
+            drawcontext.stroke();
+
+        },
+        drawcircular(drawcontext,Start,End,radius,scale,color,isSelected){
+            var color_='rgb(0,0,0)';
+
+            if(color){
+                if(!isSelected){
+                    color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                }else{
+                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                }
+            }
+
+            if(radius){
+                drawcontext.lineWidth = radius;
+            }else{
+                drawcontext.lineWidth=3;
+            }
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+
+            drawcontext.beginPath();
+
+            drawcontext.ellipse(
+                (Start.x + (End.x - Start.x)/2) * this.ResolutionScale * this.scale,
+                (Start.y + (End.y - Start.y)/2) * this.ResolutionScale * this.scale,
+                Math.abs(End.x - Start.x)/2 * this.ResolutionScale * this.scale,
+                Math.abs(End.y - Start.y)/2 * this.ResolutionScale * this.scale,
+                0,0,Math.PI*2,true);
+
+            drawcontext.stroke();
+
+        },
+        drawLine(drawcontext,Start,End,radius,scale,color,isSelected){
+            var color_='rgb(0,0,0)';
+
+            if(color){
+                if(!isSelected){
+                    color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                }else{
+                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                }
+            }
+
+            if(radius){
+                drawcontext.lineWidth = radius;
+            }else{
+                drawcontext.lineWidth=3;
+            }
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
@@ -1106,7 +1541,7 @@ export default {
             if(this.drawList.length > 0){
                 if(this.drawList[this.drawList.length - 1].type == "text"){
                     this.drawList[this.drawList.length - 1].text = this.$refs.number_input_input.value;
-                    // this.$emit('finish',null);
+                    this.drawFinish();
                 }else{
                     
                     let count = 6;
@@ -1142,18 +1577,22 @@ export default {
                         this.drawID++;
                     }
 
-                    // this.$emit('finish',null);
+                    this.drawFinish();
                     
                 }
             }
 
             this.Refresh();
         },
+        drawFinish(){
+            this.sub_div.style.cursor = "default";
+            this.$emit('finish',null);
+        },
         pageSize(w,h){
             // console.log(w,h);
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
         },
-        setDrawStatus(status,drawtype,drawItemId,count){
+        setDrawStatus(status,drawtype,drawItemId,count,color){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
@@ -1165,6 +1604,10 @@ export default {
             this.drawtypeNum = drawtype;
             this.drawMaxCount = count;
             this.drawing = true;
+            if(color){
+                this.baseColor = color;
+            }
+            this.sub_div.style.cursor = "crosshair";
 
             switch(drawtype){
                 case 1: //  位移
@@ -1182,11 +1625,28 @@ export default {
                 case 5: //  倾斜
                     this.drawtype = "slanting";
                     break;
+                case 101: // 线段
+                    this.drawtype = "line";
+                    break;
+                case 102: // 椭圆
+                    this.drawtype = "circular";
+                    break;
+                case 103: // 方块
+                    this.drawtype = "rectangle";
+                    break;
+                case 104: // 云线
+                    this.drawtype = "cloud";
+                    break;
+                case 105: // 标记
+                    this.drawtype = "Mark";
+                    break;
             }
 
             if(status == "text"){
                 this.drawtype = "text";
             }
+
+            // console.log(this.drawtype);
 
             this.$refs.number_input.style.display = "none";
 
@@ -1337,6 +1797,46 @@ export default {
                     this.SelectedList[j].isBroken = 0;
                 }
                 this.Refresh();
+            }
+        },
+        getAngle(x1,y1,x2,y2){
+			let x = x2 - x1;
+			let y = y2 - y1;
+
+			var angle = Math.atan2( y, x );
+
+			if ( angle < 0 ) angle += 2 * Math.PI;
+
+			return angle;
+		},
+        getLength(x1,y1,x2,y2){
+            return Math.pow((x1 - x2)*(x1 - x2) + 
+                            (y1 - y2)*(y1 - y2),0.5)
+        },
+        normalize(dir){
+            let l = Math.pow(dir.x*dir.x + dir.y*dir.y,0.5);
+
+            return {x:dir.x/l,y:dir.y/l};
+        },
+        rotation(angle){
+            this.angle = angle;
+            while(this.angle < 0){
+                this.angle += 360;
+            }
+
+            while(this.angle >= 360){
+                this.angle -= 360;
+            }
+
+            switch(this.type){
+                case "PDF":
+                    this.$refs.pdfDocument.rotate = this.angle;
+                    this.size_R();
+                    break;
+                default:
+                    this.size_R();
+                    break;
+                    
             }
         }
     }
