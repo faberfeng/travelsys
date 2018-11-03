@@ -16,9 +16,9 @@
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
-                    <label>测试总数： </label>
-                    <label>报警： </label>
-                    <label>故障： </label>
+                    <label>测试总数：{{itemSubmitCount}} </label>
+                    <label>报警：{{isAlert}}</label>
+                    <label>故障：{{isBroken}}</label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -58,39 +58,59 @@
                         <thead>
                             <tr>
                                 <th rowspan="2">测点编号</th>
-                                <th colspan="2">初始采集</th>
-                                <th colspan="2">上次采集</th>
-                                <th colspan="2">本次采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">初始采集</th>
+                                <th v-show="itemMonitorType==3" colspan="3">初始采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">上次采集</th>
+                                 <th v-show="itemMonitorType==3" colspan="3">上次采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">本次采集</th>
+                                <th v-show="itemMonitorType==3" colspan="3">本次采集</th>
                                 <th colspan="3">变化量</th>
                                 <th rowspan="2">操作</th>
                             </tr>
                             <tr>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>变化时间</th>
-                                <th>本次(mm)</th>
-                                <th>累计(mm)</th>
+                                <th v-show="itemMonitorType!=4">本次(mm)</th>
+                                <th v-show="itemMonitorType==4">本次(kN)</th>
+                                <th v-show="itemMonitorType!=4">累计(mm)</th>
+                                <th v-show="itemMonitorType==4">累计(kN)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(item,index) in getPointDatasList1" :key="index"> 
                                 <td>{{item.pointName|addSprit()}}</td>
                                 <td>{{item.initAcquisitionTime|timeChange()}}</td>
-                                <td>{{item.initData|addSprit()}}</td>
+                                <td >{{item.initData|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.initPipeHeight|addSprit()}}</td>
                                 <td>{{item.lastAcquisitionTime|timeChange()}}</td>
-                                <td>{{item.lastData|addSprit()}}</td>
+                                <td >{{item.lastData|addSprit()}}</td>
+                                 <td v-show="itemMonitorType==3">{{item.lastPipeHeight|addSprit()}}</td>
                                 <td>{{item.latestAcquisitionTime|timeChange()}}</td>
                                 <td>{{item.latestData|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSprit()}}</td>
                                 <td>{{item.variationTime|timeStamp()}}</td>
                                 <td>{{item.recentVariation|addSprit()}}</td>
                                 <td>{{item.totalVariation|addSprit()}}</td>
                                 <td>
                                     <button title="定位" class="location actionBtn"></button>
-                                    <button title="曲线" @click="getCurve(item.pointId)" class="curve actionBtn"></button>
+                                    <button title="曲线" @click="getCurve(item.pointId,item.pointName)" class="curve actionBtn"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -98,7 +118,11 @@
                 </div>
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
-                        <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label></span>
+                        <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
@@ -154,17 +178,17 @@
                     <div class="editBodyone">
                         <label class="editInpText" style="width:27% !important">累计报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertTotal" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm   kN</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm/d  kN/d</label>
+                        <label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">kN/d</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm/h  kN/h</label>
+                        <label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label>
                     </div>
                     <!-- <div class="editBodytwo">
                         <label class="editInpText">单次报警变化量：</label>
@@ -230,6 +254,11 @@
                     </ul>
                 </div>
             </el-dialog>
+            <el-dialog title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()">
+                    <div>
+                        <vue-highcharts id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                    </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -240,10 +269,11 @@ import Vue from 'vue'
 import picView from './picView.vue'
 import pdf from 'vue-pdf'
 import data from '../Settings/js/date';
+import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId'],
+    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId','itemSubmitCount'],
     components:{
-            pdf,picView
+            pdf,picView,VueHighcharts
     },
     name:'commonDetail',
     data(){
@@ -263,12 +293,20 @@ export default Vue.component('commonDetail',{
             ],
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
+            changeAlertDay:'',
+            changeAlertHour:'',
+            changeAlertTotal:'',
             getPointDatasList:'',//数据表格
             getPointDatasList1:[],
             getPointDatasListLength:0,//数据表格长度
             pointId:'',//监测id
+            pointName:'',//监测名称
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
+            spotChangeLineShow:false,//取消点位改变曲线
+            acquisitionTimeXlist:[],
+            acquisitionTimeYlist:'',
+            elevationYlist:[],
             userGroupList:'',//监测人员列表
             observerId:"",
             calculatorId:'',
@@ -293,7 +331,63 @@ export default Vue.component('commonDetail',{
             toolShow:false,
             saveDrawShow:false,
             pageSize:10,
-            pageNum:1
+            monitorPointInfo:'',
+            isAlert:'',
+            isBroken:'',
+            pageNum:1,
+            optionSpotChangeLine:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            }
         }
     },
     created(){
@@ -309,7 +403,8 @@ export default Vue.component('commonDetail',{
         this.getUserByUserGroup();
         this.getItemDutyUser();
         this.getAllMonitorPoint();
-        this.getMonitorItem()
+        this.getMonitorItem();
+        this.getAlertArguments();
         // this.getBaseMapList();
     },
     filters:{
@@ -515,6 +610,8 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
+                    this.isAlert=this.monitorPointInfo[0].isAlert;
+                    this.isBroken=this.monitorPointInfo[0].isBroken;
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
             })
@@ -695,6 +792,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getAlertArgumentsList=response.data.rt;
+                    this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
+                    this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
+                    this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -722,6 +822,10 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.editAlertValueShow=false;
                     this.getAlertArguments();
+                    this.$message({
+                        type:'success',
+                        message:'修改报警值成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -812,6 +916,10 @@ export default Vue.component('commonDetail',{
         editAlertValueCancle(){
             this.editAlertValueShow=false;
         },
+        //取消曲线点位改变
+        spotChangeLineCancle(){
+            this.spotChangeLineShow=false;
+        },
         // 获取监测点采集数据（表格）
         getPointDatas(){
             var vm=this;
@@ -847,8 +955,9 @@ export default Vue.component('commonDetail',{
             })
         },
         //点击获得曲线
-        getCurve(pointId){
+        getCurve(pointId,name){
             this.pointId=pointId;
+            this.pointName=name;
             if(this.itemMonitorType==1){
                 this.getPointHorizontalShiftChartData()
             }else if(this.itemMonitorType==2){
@@ -858,6 +967,14 @@ export default Vue.component('commonDetail',{
             }else if(this.itemMonitorType==4){
                 this.getPointForceChartData()
             }
+            this.spotChangeLineShow=true;
+        },
+        timeChangeMethod(val) {
+                if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("MM-DD");
+                }
         },
         //获取30天曲线图（受力）
         getPointForceChartData(){
@@ -873,6 +990,21 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
+                    console.log(this.elevationYlist,'this.elevationYlist')
+                     let spotChangeLineChart=this.$refs.spotChangeLine;
+                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },20)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -896,6 +1028,21 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
+                    console.log(this.elevationYlist,'this.elevationYlist')
+                     let spotChangeLineChart=this.$refs.spotChangeLine;
+                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },20)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -919,6 +1066,21 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
+                    console.log(this.elevationYlist,'this.elevationYlist')
+                     let spotChangeLineChart=this.$refs.spotChangeLine;
+                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },20)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -942,7 +1104,21 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
+                    console.log(this.elevationYlist,'this.elevationYlist')
+                     let spotChangeLineChart=this.$refs.spotChangeLine;
+                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    setTimeout(()=>{
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },20)
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',

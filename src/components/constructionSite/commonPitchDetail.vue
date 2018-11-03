@@ -330,9 +330,6 @@ export default Vue.component('commonPitch-detail',{
                             text: ''
                         },
                         xAxis: {
-                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
-                            // tickInterval: 0.5,
-                            //  tickPositions: [0, 20, 50, 100]
                             categories:[],
                         },
                         yAxis: {
@@ -375,16 +372,7 @@ export default Vue.component('commonPitch-detail',{
                                 }
                             },
                         },
-                        series:[
-                            // {
-                            //     name:this.time,
-                            //     data:[]
-                            // },
-                            // {
-                            //     name:this.time1,
-                            //     data:[]
-                            // }
-                        ],
+                        series:[],
                 },
                 optionOnesRight:{
                         chart: {
@@ -395,9 +383,7 @@ export default Vue.component('commonPitch-detail',{
                             text: ''
                         },
                         xAxis: {
-                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
                             tickInterval: 1,
-                            //  tickPositions: [0, 20, 50, 100]
                             categories:[],
                             // tickLength:200,
                             
@@ -412,11 +398,6 @@ export default Vue.component('commonPitch-detail',{
                                 labels:{
                                     enabled: true
                                 },
-                                // tickLength:200,
-                            //     tickLength:'200px',
-                            // tickWidth:'200px',
-                               
-                            
                                 },
                         credits: {
                             enabled: false
@@ -448,16 +429,7 @@ export default Vue.component('commonPitch-detail',{
                                 }
                             },
                         },
-                        series:[
-                            // {
-                            //     name:'05-21',
-                            //     data:[]
-                            // },
-                            // {
-                            //     name:'05-21',
-                            //     data:[]
-                            // }
-                        ],
+                        series:[],
                 },
 
 
@@ -745,13 +717,9 @@ export default Vue.component('commonPitch-detail',{
                     // console.log(document.getElementById('leftHightchart'),'tuxing')
                     
                     setTimeout(()=>{
-                       
                         console.log(document.getElementById('tableListid').clientHeight);
                     },20)
-                    // console.log(this.lineHeight,'this.lineHeight')
-                    // =this.lineHeight;
                     let lineLeftChart=this.$refs.lineLeftChartOne;
-                    // document.getElementById('leftHightchart').style.minHeight='1950px'
                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                     setTimeout(()=>{
                        
