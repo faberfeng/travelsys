@@ -685,13 +685,11 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
-                
                 this.leftDisplayListValue1=[];
                 this.leftDisplayListValue2=[];
                 this.leftDisplayListValueXdata=[];
                 this.leftDisplayListValueYdata1=[];
                 this.leftDisplayListValueYdata2=[];
-               
                 this.getPitchDetailDataBySeqId(id)
                 this.totalShow=true;
                 this.leftShow=true;
@@ -814,7 +812,7 @@ select.autoImport{
     margin: 0 20px 20px!important;
     .project{
         width: 100%;
-        max-height: 800px;
+        max-height: 2000px;
         .antsLine{
                 padding: 10px 10px 15px 0px;
                 font-size: 12px;
@@ -991,13 +989,13 @@ select.autoImport{
             .containerBottom{
                 margin-top:32px;
                 width: 100%;
-                height: 550px;
+                height: 2000px;
                 // border:1px solid #ccc;
                 position: relative;
                 .containerBottomOne{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:0;
                 //    border-right:1px solid #ccc;
                     .oneHeader{
@@ -1067,7 +1065,7 @@ select.autoImport{
                 .containerBottomTwo{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:25%;
                 //    border-right:1px solid #ccc;
                     .twoHeader{
@@ -1117,7 +1115,7 @@ select.autoImport{
                 .containerBottomThree{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:50%;
                 //    border-right:1px solid #ccc;
                     .threeHeader{
@@ -1184,7 +1182,7 @@ select.autoImport{
                 .containerBottomFour{
                      position: absolute;
                     width: 25%;
-                    height: 650px;
+                    height: 2000px;
                     left:75%;
                 //    border-right:1px solid #ccc;
                     .fourHeader{

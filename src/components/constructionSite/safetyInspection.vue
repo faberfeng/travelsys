@@ -379,7 +379,7 @@
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋的牌号：</label>
                             <select class="eidtSelect" @change="esChange()" v-model="barGradeValue">
-                                <option  v-for="(item,index) in esList"  :value="item.value" :key="index" v-text="item.name"></option>
+                                <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
                             </select>
                             <i class="sanjiaoicon"></i>
                             <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
@@ -401,7 +401,7 @@
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土的等级：</label>
                             <select placeholder="请选择" class="eidtSelect" v-model="concreteLevelValue">
-                                <option v-for="(item,index) in ecList" :value="item.value" @change="ecChange(item.name)" :key="index" v-text="item.name"></option>
+                                <option v-for="(item,index) in ecList" :value="item.name" @change="ecChange(item.name)" :key="index" v-text="item.name"></option>
                             </select>
                              <i class="sanjiaoicon1"></i>
                             <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
@@ -1008,8 +1008,9 @@ export default {
             })
           
         },
-        picView_status_changed(status){
+        picView_status_changed(status,list){
             this.toolShow=status;
+            console.log(list);
             // console.log(status);
         },
         drawFinish(){
@@ -1347,6 +1348,7 @@ export default {
                     },
                     params:{
                         baseMapId:vm.monitorBaseMapId
+                        
                     },
                     data:list
                 }).then((response)=>{
@@ -1544,7 +1546,7 @@ export default {
             this.monitorType=1;
             this.monitorLogogram='';
             this.monitorKeyword='';
-            this.monitorBaseMapId='';
+            // this.monitorBaseMapId='';
         },
         //新增监测内容
         addMonitorItem(){
@@ -1595,7 +1597,7 @@ export default {
                         this.monitorType=1;
                         this.monitorLogogram='';
                         this.monitorKeyword='';
-                        this.monitorBaseMapId='';
+                        // this.monitorBaseMapId='';
                         this.$message({
                             type:'success',
                             message:'新增监测内容成功'
@@ -1726,7 +1728,8 @@ export default {
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                    baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1772,7 +1775,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1820,7 +1824,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1872,7 +1877,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1924,7 +1930,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1979,7 +1986,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2050,20 +2058,21 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     if(response.data.rt==''){
                         this.testShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'测试导入数据成功'
                         })
 
-                    }else{
+                    }else if(response.data.cd=='-1'){
                         this.$message({
-                            type:'info',
+                            type:'error',
                             message:response.data.rt
                         })
                     }
@@ -2106,7 +2115,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2161,7 +2171,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2220,7 +2231,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2278,7 +2290,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2329,7 +2342,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                    baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2757,24 +2771,25 @@ export default {
         //点击更换
         clickChange(){
             this.baseMapShow=true;
-            this.baseMapMonitor=true;
+            // this.baseMapMonitor=true;
             this.getBaseMapList();
         },
         //选择当前底图
         selectCurBaseMap(val){
             this.baseMapList.forEach((item)=>{
-                if(item.id==val&&!this.baseMapMonitor){
+                if(item.id==val){
                     this.curBaseMapUrl=item.relativeUri;
                     this.monitorBaseMapId=item.id;
                     this.setBaseMapUsed(item.id);
                     this.getAllMonitorPoint();
 
-                }else if(item.id==val&&this.baseMapMonitor){
-                    this.monitorBaseMapUrl=item.relativeUri;
-                    this.monitorBaseMapId=item.id;
-                    this.setBaseMapUsed(item.id);
-                    this.getAllMonitorPoint();
                 }
+                // else if(item.id==val&&this.baseMapMonitor){
+                //     this.monitorBaseMapUrl=item.relativeUri;
+                //     this.monitorBaseMapId=item.id;
+                //     this.setBaseMapUsed(item.id);
+                //     this.getAllMonitorPoint();
+                // }
             })
             
             this.baseMapShow=false;
@@ -3784,6 +3799,7 @@ export default {
         #edit{
             .baseMapBody{
                 height: 460px;
+                overflow: auto;
                 .clearfix{
                     clear: both;
                     overflow: hidden;
@@ -4066,7 +4082,7 @@ export default {
                 background-image: url('../Settings/images/sanjiao.png');
                 background-size: 100% 100%;
                 content: '';
-                top: 481px;
+                top: 476px;
                 right: 121px;
             }
             .spotTextArea{

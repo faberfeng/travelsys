@@ -255,8 +255,8 @@
                 </div>
             </el-dialog>
             <el-dialog title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()">
-                    <div>
-                        <vue-highcharts id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                    <div v-if="spotChangeLineShow">
+                        <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
             </el-dialog>
         </div>
@@ -347,12 +347,15 @@ export default Vue.component('commonDetail',{
                             categories:[],
                         },
                         yAxis: {
+                            min:4268.5,
+                            max:43403.3542,
                                 title: {
                                     text: '数量'
                                 },
                                 labels:{
                                     enabled: true
                                 },
+                                // tickPixelInterval:1000
                                
                             
                                 },
@@ -919,6 +922,8 @@ export default Vue.component('commonDetail',{
         //取消曲线点位改变
         spotChangeLineCancle(){
             this.spotChangeLineShow=false;
+             this.optionSpotChangeLine.yAxis.min='';
+             this.optionSpotChangeLine.yAxis.max='';
         },
         // 获取监测点采集数据（表格）
         getPointDatas(){
@@ -937,7 +942,7 @@ export default Vue.component('commonDetail',{
                     this.getPointDatasList=response.data.rt;
                     this.getPointDatasListLength=response.data.rt.length;
                     if(this.getPointDatasListLength<11){
-                        for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        for(var i=0;i<this.getPointDatasListLength;i++){
                             this.getPointDatasList1.push(this.getPointDatasList[i])
                         }
                     }else{
@@ -945,7 +950,7 @@ export default Vue.component('commonDetail',{
                             this.getPointDatasList1.push(this.getPointDatasList[i])
                         }
                     }
-                    // console.log(this.getPointDatasList1,'123');
+                    console.log(this.getPointDatasList1,'123');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -967,7 +972,7 @@ export default Vue.component('commonDetail',{
             }else if(this.itemMonitorType==4){
                 this.getPointForceChartData()
             }
-            this.spotChangeLineShow=true;
+    
         },
         timeChangeMethod(val) {
                 if (val == null) {
@@ -979,6 +984,8 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（受力）
         getPointForceChartData(){
             var vm=this;
+            this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointForceChartData',
@@ -995,16 +1002,20 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
-                    console.log(this.elevationYlist,'this.elevationYlist')
-                     let spotChangeLineChart=this.$refs.spotChangeLine;
-                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
                     setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
                         spotChangeLineChart.removeSeries();
                         spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },20)
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -1017,6 +1028,8 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（水位）
         getPointGaugeChartData(){
             var vm=this;
+            this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointGaugeChartData',
@@ -1033,16 +1046,20 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
-                    console.log(this.elevationYlist,'this.elevationYlist')
-                     let spotChangeLineChart=this.$refs.spotChangeLine;
-                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                     var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
                     setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
                         spotChangeLineChart.removeSeries();
                         spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },20)
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -1055,6 +1072,8 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（水平位移）
         getPointHorizontalShiftChartData(){
              var vm=this;
+             this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointHorizontalShiftChartData',
@@ -1071,16 +1090,20 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
-                    console.log(this.elevationYlist,'this.elevationYlist')
-                     let spotChangeLineChart=this.$refs.spotChangeLine;
-                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                     var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
                     setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
                         spotChangeLineChart.removeSeries();
                         spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },20)
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -1093,6 +1116,11 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（垂直位移）
         getPointVerticalShiftChartData(){
              var vm=this;
+             this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
+             this.optionSpotChangeLine.yAxis.min='';
+             this.optionSpotChangeLine.yAxis.max='';
+             console.log(this.optionSpotChangeLine.yAxis.min);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointVerticalShiftChartData',
@@ -1104,21 +1132,26 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+
                     this.getPointList=response.data.rt;
                     this.getPointList.forEach((item)=>{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist')
-                    console.log(this.elevationYlist,'this.elevationYlist')
-                     let spotChangeLineChart=this.$refs.spotChangeLine;
-                    spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
                     setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
                         spotChangeLineChart.removeSeries();
                         spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },20)
+                    },200)
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1127,6 +1160,24 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        getMaxValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m<val[i]){
+                    m=val[i]
+                }
+            }
+            return m
+        },
+        getMinValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m>val[i]){
+                    m=val[i]
+                }
+            }
+            return m
+        }
 
 
     }
