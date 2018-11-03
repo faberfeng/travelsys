@@ -27,7 +27,7 @@
                             </div>
                             <div class="video_body">
                                 <!-- <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX"></iframe> -->
-                                 <model-obj ref="modelObj" id="mm" :src="modelObjUrl"></model-obj>
+                                 <model-obj ref="modelObj" id="mm" ></model-obj>
                                  <!-- static/Tile_8.obj -->
                                     <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
                                 
@@ -313,7 +313,7 @@ export default {
                 // poster: "./images/baoc.png",
             },  
             lineLiveImgShow:true,
-            modelObjUrl:'',//modeluRl
+            // modelObjUrl:'',//modeluRl
             mediaUrl:'',//媒体URL
             sendText:'',
             token:'',

@@ -27,7 +27,7 @@
                             <tr>
                                 <th rowspan="2">分类</th>
                                 <th rowspan="2">巡视监测内容</th>
-                                <th colspan="2"><label class="left">上一次</label><label class="middle">历史巡视</label><label class="right">下一次</label></th>
+                                <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
                                 <th colspan="2">最近巡视(今天)</th>
                                 <th rowspan="2">操作</th>
                             </tr>
@@ -49,12 +49,14 @@
                                 <td :rowspan="item.historyRemarkspan" :class="{'hidden': item.historyRemarkdis}" v-text="item.historyRemark"></td>
                                 <td :rowspan="item.recentResultspan" :class="{'hidden': item.recentResultdis}" v-text="item.recentResult"></td>
                                 <td :rowspan="item.recentRemarkspan" :class="{'hidden': item.recentRemarkdis}" v-text="item.recentRemark"></td> -->
-                                <td v-show="saveShow" v-text="item.historyResult"></td>
-                                <td v-show="saveShow" v-text="item.historyRemark"></td>
-                                <!-- <td v-show="saveShow"  v-text="item.recentResult"></td>
-                                <td v-show="saveShow" v-text="item.recentRemark"></td> -->
-                                <td width="180px" ><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
-                                <td width="180px"><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
+                                <td v-show="hasTodayRecordBoolen" v-text="item.historyResult"></td>
+                                <td v-show="hasTodayRecordBoolen" v-text="item.historyRemark"></td>
+                                <td v-show="saveShow"  v-text="item.recentResult"></td>
+                                <td v-show="saveShow" v-text="item.recentRemark"></td>
+                                <!-- <td v-show="saveShow"  v-text="item.todayResult"></td>
+                                <td v-show="saveShow" v-text="item.todayRemark"></td> -->
+                                <td width="180px" ><label v-show="!isEditShow">{{item.todayResult}}</label><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
+                                <td width="180px"><label v-show="!isEditShow">{{item.todayRemark}}</label><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
                                 <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
                                 <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
@@ -152,6 +154,9 @@ export default Vue.component('walkThrough',{
             getPatrolTypesList:'',//监测内容类型
             getPatrolRecordList:'',//获取巡视记录
             getPatrolRecordLists:'',
+            userGroupIdList:[],
+            historyTime:'',//巡视时间
+            hasTodayRecordBoolen:false,
             patrolreName:'',
             newPatrolName:'',//新名
             lastPatrolName:'',//原名
@@ -167,7 +172,7 @@ export default Vue.component('walkThrough',{
             addSummaryShow:false,//是否显示保存按钮
             excessWordSizeShow:false,//是否超过字数
             txtVal:0,//文本框的字数
-            saveShow:true,
+            saveShow:false,
             checkList:[]
         }
 
@@ -258,6 +263,74 @@ export default Vue.component('walkThrough',{
                     })
                 }
             })
+        },
+        //获取下一次历史记录
+        getNextHistoryRecord(){
+            var vm=this;
+            if(this.historyTime==null){
+                this.$message({
+                    type:'info',
+                    message:'没有更多的历史记录'
+                })
+            }else {
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getPreviousHistoryRecord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userGroupId:this.userSelectId,
+                        currentHistoryDate:this.historyTime,
+                    },
+                    data:{
+                        patrolId:this.userGroupIdList
+                        }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            }
+        },
+        //获取上一次历史记录
+        getPreviousHistoryRecord(){
+            var vm=this;
+            if(this.historyTime==null){
+                this.$message({
+                    type:'info',
+                    message:'没有更多的历史记录'
+                })
+            }else {
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getPreviousHistoryRecord',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userGroupId:this.userSelectId,
+                        currentHistoryDate:this.historyTime,
+                    },
+                    data:{
+                        patrolId:this.userGroupIdList
+                        }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            }
         },
         //获取巡视类型
         getPatrolTypes(){
@@ -416,8 +489,8 @@ export default Vue.component('walkThrough',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.getPatrolRecordList=response.data.rt;
-                    
+                    this.getPatrolRecordList=response.data.rt.patrolInfos;
+                    this.hasTodayRecordBoolen=response.data.rt.hasTodayRecord;
                     var map = new Map();
                     for (var i = 0; i < this.getPatrolRecordList.length;i++){
                         var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
@@ -442,7 +515,13 @@ export default Vue.component('walkThrough',{
                     }); 
                     console.log(list,'list')               
                     this.getPatrolRecordList=this.combineCell(list);
+
                     this.getPatrolRecordLists=this.getPatrolRecordList;
+                    this.getPatrolRecordLists.forEach((item)=>{
+                        this.userGroupIdList.push(item.id);
+                    })
+                    this.historyTime=this.getPatrolRecordLists[0].historyDate;
+                    console.log(this.userGroupIdList,'this.userGroupIdList');
                     console.log(this.getPatrolRecordLists);
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -453,30 +532,30 @@ export default Vue.component('walkThrough',{
             })
         },
         //获取上一次历史记录
-        getPreviousHistoryRecord(){
-             var vm=this;
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'detectionInfo/getPreviousHistoryRecord',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    userGroupId:this.userSelectId,
-                    currentHistoryDate:'',
-                    patrolId:'',
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    // this.getPatrolRecordList=response.data.rt;
-                }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-            })
-        },
+        // getPreviousHistoryRecord(){
+        //      var vm=this;
+        //     axios({
+        //         method:'get',
+        //         url:this.BDMSUrl+'detectionInfo/getPreviousHistoryRecord',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:this.userSelectId,
+        //             currentHistoryDate:'',
+        //             patrolId:'',
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             // this.getPatrolRecordList=response.data.rt;
+        //         }else if(response.data.cd=='-1'){
+        //             this.$message({
+        //                 type:'error',
+        //                 message:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
         //编辑巡视内容弹框
         renamePatrolBtn(id,patrolTypeId,name){
             console.log(id,'巡视内容ID')
@@ -637,6 +716,7 @@ export default Vue.component('walkThrough',{
                 if(response.data.cd=='0'){
                     this.addSummaryShow=false;
                     this.excessWordSizeShow=false;
+                    // this.saveShow=true;
                     this.getAllPatrolSummary();
                     this.$message({
                         type:'success',
