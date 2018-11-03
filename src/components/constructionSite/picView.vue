@@ -1,8 +1,6 @@
 <template>
     <div ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
         
-        
-        
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" ></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
@@ -291,7 +289,10 @@ export default {
             this.size_R();  // 初始时修改尺寸
             
         },
-        setNumber_inputPostion(position){
+        setNumber_inputPostion(position_){
+
+            var position = this.rotate_XY_display(position_);
+
             this.$refs.number_input.style.left = (this.sub_div.offsetLeft   + position.x * this.ResolutionScale * this.scale - 50) + "px";
             this.$refs.number_input.style.top  = (this.sub_div.offsetTop    + position.y * this.ResolutionScale * this.scale - 16) + "px";
         },
@@ -299,6 +300,13 @@ export default {
             // console.log(e.layerX / this.ResolutionScale / this.scale,e.layerY / this.ResolutionScale / this.scale);
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
+
+            var position_temp = this.rotate_XY(X,Y);
+            X = position_temp.x;
+            Y = position_temp.y;
+
+            
+
             if(e.button == 0){
                 this.lastPostion = {x:X,y:Y};
                 if(this.editStatus == "move"){   //  移动标记
@@ -443,6 +451,11 @@ export default {
             
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
+
+            var position_temp = this.rotate_XY(X,Y);
+            X = position_temp.x;
+            Y = position_temp.y;
+
             if(this.drawList.length > 0){
                 if(this.drawList[this.drawList.length-1].type == "text" && this.drawList[this.drawList.length-1].position.length != 2){
                     this.drawList[this.drawList.length-1].TempPostion = {x:X,y:Y};
@@ -504,7 +517,7 @@ export default {
             this.status = "none";
         },
         onwheel(e){
-            
+
             if(e.shiftKey){
                 e.preventDefault();
                 
@@ -590,10 +603,10 @@ export default {
                     this.context.rotate(this.angle*Math.PI/180);
 
                     switch(this.angle){
-                        case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);
-                        case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);
-                        case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);
-                        case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);
+                        case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                        case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                        case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                        case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
                     }
                     
 
@@ -680,10 +693,10 @@ export default {
                         this.context.rotate(this.angle*Math.PI/180);
 
                         switch(this.angle){
-                            case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);
-                            case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);
-                            case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);
-                            case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);
+                            case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                            case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                            case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                            case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
                         }
                     }
 
@@ -770,10 +783,10 @@ export default {
                         this.context.rotate(this.angle*Math.PI/180);
 
                         switch(this.angle){
-                            case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);
-                            case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);
-                            case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);
-                            case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);
+                            case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                            case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                            case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                            case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
                         }
                     }
 
@@ -968,10 +981,14 @@ export default {
                     case "cloud":
 
                         var points = [];
-                        var last = {x:this.lastMovePostion.x * this.ResolutionScale * this.scale,y:this.lastMovePostion.y * this.ResolutionScale * this.scale};
+                        var last_temp = this.rotate_XY_display(this.lastMovePostion);
+                        var last = {x:last_temp.x * this.ResolutionScale * this.scale,y:last_temp.y * this.ResolutionScale * this.scale};
 
                         for(var k = 0;k < this.drawList[i].position.length;k++){
-                            points.push({x:this.drawList[i].position[k].x * this.ResolutionScale * this.scale,y:this.drawList[i].position[k].y * this.ResolutionScale * this.scale});
+
+                            var Position_temp = this.rotate_XY_display(this.drawList[i].position[k]);
+
+                            points.push({x:Position_temp.x * this.ResolutionScale * this.scale,y:Position_temp.y * this.ResolutionScale * this.scale});
                         }
 
                         this.drawCloud(this.drawcontext,points,last,15,2,1,this.baseColor,this.drawList[i].Selected);
@@ -986,10 +1003,12 @@ export default {
                                 this.drawcontext.fillStyle="rgb(0,192,0)";
                                 this.drawcontext.strokeStyle="rgb(0,192,0)";
 
+                                var position_ = this.rotate_XY_display(this.drawList[i].position[0]);
+
                                 this.drawcontext.beginPath();
                                 this.drawcontext.arc(
-                                    this.drawList[i].position[0].x * this.ResolutionScale * this.scale,
-                                    this.drawList[i].position[0].y * this.ResolutionScale * this.scale,
+                                    position_.x * this.ResolutionScale * this.scale,
+                                    position_.y * this.ResolutionScale * this.scale,
                                     10,
                                     0,
                                     2*Math.PI);
@@ -1145,8 +1164,9 @@ export default {
 			//////////////////////////////////////////////
 
         },
-        drawMark(drawcontext,position,select,scale,color,isSelected){
+        drawMark(drawcontext,position_,select,scale,color,isSelected){
             var color_='rgb(0,0,0)';
+            var position = this.rotate_XY_display(position_);
 
             if(color){
                 if(!isSelected){
@@ -1164,21 +1184,21 @@ export default {
 
             if(select){
                 drawcontext.rect(
-                    (position.x - 18) * this.ResolutionScale * this.scale,
-                    (position.y - 15) * this.ResolutionScale * this.scale,
-                    36 * this.ResolutionScale * this.scale,
-                    30 * this.ResolutionScale * this.scale);
+                    (position.x * this.ResolutionScale * this.scale - 18),
+                    (position.y * this.ResolutionScale * this.scale - 15),
+                    36 ,
+                    30 );
                 drawcontext.fill();
             }else{
                 let fz_img = document.getElementById("fz_img_for_draw");
-                drawcontext.drawImage(fz_img,(position.x - 9)* this.ResolutionScale * this.scale,(position.y - 9)* this.ResolutionScale * this.scale);
+                drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
 
                 if(isSelected){
                     drawcontext.rect(
-                    (position.x - 18) * this.ResolutionScale * this.scale,
-                    (position.y - 15) * this.ResolutionScale * this.scale,
-                    36 * this.ResolutionScale * this.scale,
-                    30 * this.ResolutionScale * this.scale);
+                    (position.x * this.ResolutionScale * this.scale - 18),
+                    (position.y * this.ResolutionScale * this.scale - 15),
+                    36,
+                    30);
                     // drawcontext.fill();
                 }
             }
@@ -1186,7 +1206,9 @@ export default {
             drawcontext.stroke();
 
         },
-        drawrectangle(drawcontext,Start,End,radius,scale,color,isSelected){
+        drawrectangle(drawcontext,Start_,End_,radius,scale,color,isSelected){
+            var Start = this.rotate_XY_display(Start_);
+            var End = this.rotate_XY_display(End_)
             var color_='rgb(0,0,0)';
 
             if(color){
@@ -1216,7 +1238,9 @@ export default {
             drawcontext.stroke();
 
         },
-        drawcircular(drawcontext,Start,End,radius,scale,color,isSelected){
+        drawcircular(drawcontext,Start_,End_,radius,scale,color,isSelected){
+            var Start = this.rotate_XY_display(Start_);
+            var End = this.rotate_XY_display(End_)
             var color_='rgb(0,0,0)';
 
             if(color){
@@ -1247,8 +1271,10 @@ export default {
             drawcontext.stroke();
 
         },
-        drawLine(drawcontext,Start,End,radius,scale,color,isSelected){
+        drawLine(drawcontext,Start_,End_,radius,scale,color,isSelected){
             var color_='rgb(0,0,0)';
+            var Start = this.rotate_XY_display(Start_);
+            var End = this.rotate_XY_display(End_)
 
             if(color){
                 if(!isSelected){
@@ -1274,8 +1300,8 @@ export default {
             drawcontext.stroke();
 
         },
-        drawMove(drawcontext,position,scale,radius,color,isSelected,data,pointName){
-            
+        drawMove(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+            var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1310,8 +1336,8 @@ export default {
                 }
             }
         },
-        drawLevel(drawcontext,position,scale,radius,color,isSelected,data,pointName){
-
+        drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+            var position_ = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1355,7 +1381,8 @@ export default {
                 }
             }
         },
-        drawForce(drawcontext,position,scale,radius,color,isSelected,data,pointName){
+        drawForce(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+            var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1386,7 +1413,8 @@ export default {
                 }
             }
         },
-        drawSlanting(drawcontext,position,scale,radius,color,isSelected,data,pointName){
+        drawSlanting(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+            var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1446,7 +1474,11 @@ export default {
                 }
             }
         },
-        drawText(drawcontext,position_start,position_end,text,scale,color,select,isSelected){
+        drawText(drawcontext,position_start_,position_end_,text,scale,color,select,isSelected){
+            
+            var position_start = this.rotate_XY_display(position_start_);
+            var position_end = this.rotate_XY_display(position_end_)
+
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1776,7 +1808,6 @@ export default {
                             TempPostion:plotInfo.TempPostion,
                             text:plotInfo.text,
                             display:true,
-                            data:"none",
                             typeNum:list[i].type                               //  type
                         };
                 this.drawList.push(item);
@@ -1838,6 +1869,60 @@ export default {
                     break;
                     
             }
+        },
+        rotate_XY(x,y){
+            var X = x;
+            var Y = y;
+
+            var Temp_Size = {width:this.oldImageSize.width,height:this.oldImageSize.height};
+            if(this.type == "PDF"){
+                Temp_Size = {width:1024,height:1024 * (this.oldImageSize.height / this.oldImageSize.width)};
+            }
+
+            switch(this.angle){
+                case 0: 	break;
+                case 90: 	X -= Temp_Size.height;break;
+                case 180: 	X -= Temp_Size.width; Y+=Temp_Size.height;break;
+                case 270: 	Y -= Temp_Size.width;break;
+            }
+
+            var m = new THREE.Matrix4();
+            m.makeRotationZ(-this.angle / 180 * Math.PI);
+            var V = new THREE.Vector3(X,Y,0);
+
+            V.applyMatrix4(m);
+
+            X=V.x;
+            Y=V.y;
+
+            return {x:X,y:Y};
+        },
+        rotate_XY_display(position){
+            var X = position.x;
+            var Y = position.y;
+
+            var m = new THREE.Matrix4();
+            m.makeRotationZ(this.angle / 180 * Math.PI);
+            var V = new THREE.Vector3(X,Y,0);
+
+            V.applyMatrix4(m);
+
+            X=V.x;
+            Y=V.y;
+
+            var Temp_Size = {width:this.oldImageSize.width,height:this.oldImageSize.height};
+            if(this.type == "PDF"){
+                Temp_Size = {width:1024,height:1024 * (this.oldImageSize.height / this.oldImageSize.width)};
+            }
+
+            switch(this.angle){
+                case 0: 	break;
+                case 90: 	X +=Temp_Size.height;break;
+                case 180: 	X +=Temp_Size.width; Y+=Temp_Size.height;break;
+                case 270: 	Y +=Temp_Size.width;break;
+            }
+            
+            return {x:X,y:Y};
         }
     }
 }
