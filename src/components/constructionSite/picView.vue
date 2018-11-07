@@ -4,7 +4,7 @@
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" :rotate="R"></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
-            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
+            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @dblclick="Select_item" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
             <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
         </div>
@@ -33,7 +33,11 @@ export default {
         return{
             url:'',
             R:0,
-            baseColor:{r:0,g:170,b:0}
+            baseColor:{r:0,g:170,b:0},
+            Max_Select:10000,
+            Max_type:1000,
+            Selected_typeNum_List:[],
+            userData:{}
         }
     },
     destroyed(){
@@ -91,7 +95,7 @@ export default {
                         this.R = 0;
                     }
                     
-                    this.url = this.para.source + "?random=" + Math.random();;
+                    this.url = this.para.source + "?random=" + Math.random();
 
                     if(this.sub_div){
                         this.ResolutionScale = this.PDFscale;
@@ -137,6 +141,11 @@ export default {
         }
     },
     methods:{
+        Select_item(){
+            if(this.drawList[0].type == "Select_img_Mark"){
+                this.$emit('Image_Mark',this.drawList[0]);
+            }
+        },
         init(div,source,type,page_No,angle){
 
             
@@ -309,8 +318,6 @@ export default {
             X = position_temp.x;
             Y = position_temp.y;
 
-            
-
             if(e.button == 0){
                 this.lastPostion = {x:X,y:Y};
                 if(this.editStatus == "move"){   //  移动标记
@@ -374,6 +381,8 @@ export default {
 
                         if(this.drawCount == 0){
                             
+                            this.userData = {};
+
                             if(this.drawMaxCount == 2){   // 两个点完成绘制的
                                 switch(this.drawList[this.drawList.length - 1].type){
 
@@ -406,7 +415,7 @@ export default {
                             }
 
                             if(this.drawMaxCount == 1){
-                                
+
                             }
 
                             this.drawing = false;
@@ -427,30 +436,113 @@ export default {
 
                         if(SID < 1){
                             this.SelectedList = [];
+                            this.Selected_typeNum_List = [];
                         }
 
-                        for(let i = 0; i < this.drawList.length;i++){
-                            this.drawList[i].Selected = false;
-                            if(this.drawList[i].SID == SID){
+                        //////////////// Select_img_Mark 特例 /////////////////
+
+                        {
+                            var find_Select_img_Mark = false;
+                            for(let i = 0; i < this.drawList.length;i++){
+                                if(this.drawList[i].SID == SID){
+                                    if(this.drawList[i].type == "Select_img_Mark"){
+                                        find_Select_img_Mark = true;
+                                    }
+                                }
+                            }
+
+                            if(find_Select_img_Mark){
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    this.drawList[i].Selected = false;
+                                }
+                                
+                                this.SelectedList = [];
+                                this.Selected_typeNum_List = [];
                                 this.SelectedList.push(this.drawList[i]);
+                    
+
+                                this.SelectedList[0].Selected = true;
                             }
                         }
 
-                        for(let i = 0; i < this.SelectedList.length;i++){
-                            this.SelectedList[i].Selected = true;
-                        }
+                        ///////////////////////////////////////////////////////
 
-                        if(SID > 0){
-                            this.$emit('status_changed',true,this.SelectedList);
-                        }else{
-                            this.$emit('status_changed',false,this.SelectedList);
-                        }
+                        if(this.SelectedList.length < this.Max_Select){
 
-                        this.Refresh();
+                            for(let i = 0; i < this.drawList.length;i++){
+                                this.drawList[i].Selected = false;
+                                if(this.drawList[i].SID == SID){
+                                    // this.SelectedList.push(this.drawList[i]);
+                                    var find = false;
+                                    for(let j = 0;j < this.SelectedList.length;j++){
+                                        if(this.SelectedList[j].SID == SID){
+                                            find = true;
+                                        }
+                                    }
+
+                                    var typeNum_enable = true;
+
+                                    if(this.Selected_typeNum_List.length >= this.Max_type){
+                                        
+                                        typeNum_enable = false;
+
+                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                typeNum_enable = true;
+                                            }
+                                        }
+
+                                        
+                                    }else{
+                                        let find_type = false;
+
+                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                find_type = true;
+                                            }
+                                        }
+                                        if(!find_type){this.Selected_typeNum_List.push(this.drawList[i].typeNum);}
+                                    }
+
+                                    if(!find && typeNum_enable){
+                                        this.SelectedList.push(this.drawList[i]);
+                                    }
+                                }
+                            }
+
+                            for(let i = 0; i < this.SelectedList.length;i++){
+                                this.SelectedList[i].Selected = true;
+                            }
+
+                            if(SID > 0){
+                                this.$emit('status_changed',true,this.SelectedList);
+                            }else{
+                                this.$emit('status_changed',false,this.SelectedList);
+                            }
+
+                            this.Refresh();
+                        }
 
                     }
                 }
             }
+        },
+        Selected2(id){
+
+            this.SelectedList = [];
+            
+            for(let i = 0; i < this.drawList.length;i++){
+                this.drawList[i].Selected = false;
+                if(this.drawList[i].ID_out == id){
+                    this.SelectedList.push(this.drawList[i]);
+                }
+            }
+
+            for(let i = 0; i < this.SelectedList.length;i++){
+                this.SelectedList[i].Selected = true;
+            }
+
         },
         oncanvasmousemove(e){
             
@@ -852,6 +944,9 @@ export default {
                     case "Mark":
                         this.drawMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor);
                         break;
+                    case "Select_img_Mark":
+                        this.drawSelectImgMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor,false,this.userData);
+                        break;
                 }
             }
 
@@ -867,7 +962,7 @@ export default {
                 }
 
                 if(this.drawList[i].isAlert){
-                    color = {r:170,g:170,b:0}
+                    color = {r:250,g:250,b:0}
                 }
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
@@ -1023,6 +1118,12 @@ export default {
                         }
 
                         break;
+                    case "Select_img_Mark":
+                        
+                        this.drawSelectImgMark(this.drawcontext      ,this.drawList[i].position[this.drawList[i].position.length - 1],false,1,this.baseColor,this.drawList[i].Selected,this.drawList[i].userData);
+                        this.drawSelectImgMark(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],true,1,colorId,false,this.drawList[i].userData);
+                        
+                        break;
                 }
             }
 
@@ -1169,6 +1270,41 @@ export default {
 			//////////////////////////////////////////////
 
         },
+        drawSelectImgMark(drawcontext,position_,select,scale,userData,isSelected){
+            var color_='rgb(0,0,0)';
+            var position = this.rotate_XY_display(position_);
+
+            if(color){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }
+
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+            drawcontext.lineWidth=3;
+
+            drawcontext.beginPath();
+            let fz_img = document.getElementById(userData.DrawImg);
+            if(select){
+                drawcontext.rect(
+                    (position.x * this.ResolutionScale * this.scale - fz_img.offsetWidth / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.offsetHeight/ 2),
+                    fz_img.offsetWidth ,
+                    fz_img.offsetHeight );
+                drawcontext.fill();
+            }else{
+                
+                if(isSelected){
+                    let fz_img = document.getElementById(userData.SelectImg);                    
+                }else{
+                    let fz_img = document.getElementById(userData.DrawImg);
+                }
+
+                drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
+            }
+
+            drawcontext.stroke();
+
+        },
         drawMark(drawcontext,position_,select,scale,color,isSelected){
             var color_='rgb(0,0,0)';
             var position = this.rotate_XY_display(position_);
@@ -1186,24 +1322,25 @@ export default {
             drawcontext.lineWidth=3;
 
             drawcontext.beginPath();
+            let fz_img = document.getElementById("fz_img_for_draw");
 
             if(select){
                 drawcontext.rect(
-                    (position.x * this.ResolutionScale * this.scale - 18),
-                    (position.y * this.ResolutionScale * this.scale - 15),
-                    36 ,
-                    30 );
+                    (position.x * this.ResolutionScale * this.scale - fz_img.width / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.height / 2),
+                    fz_img.width ,
+                    fz_img.height );
                 drawcontext.fill();
             }else{
-                let fz_img = document.getElementById("fz_img_for_draw");
+                
                 drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
 
                 if(isSelected){
                     drawcontext.rect(
-                    (position.x * this.ResolutionScale * this.scale - 18),
-                    (position.y * this.ResolutionScale * this.scale - 15),
-                    36,
-                    30);
+                    (position.x * this.ResolutionScale * this.scale - fz_img.width / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.height / 2),
+                    fz_img.width ,
+                    fz_img.height );
                     // drawcontext.fill();
                 }
             }
@@ -1342,7 +1479,7 @@ export default {
             }
         },
         drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
-            var position_ = this.rotate_XY_display(position_);
+            var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1629,7 +1766,7 @@ export default {
             // console.log(w,h);
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
         },
-        setDrawStatus(status,drawtype,drawItemId,count,color){
+        setDrawStatus(status,drawtype,drawItemId,count,color,userData){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
@@ -1677,6 +1814,15 @@ export default {
                 case 105: // 标记
                     this.drawtype = "Mark";
                     break;
+                case 10001: // 图标
+                    this.drawtype = "Select_img_Mark";
+                    break;
+            }
+
+            if(userData){
+                this.userData = userData;
+            }else{
+                this.userData = {};
             }
 
             if(status == "text"){
@@ -1733,7 +1879,8 @@ export default {
                             display:true,
                             data:"none",
                             pointName:"new point",
-                            typeNum:this.drawtypeNum                    //  type
+                            typeNum:this.drawtypeNum,                    //  type,
+                            userData:this.userData
                         };
             return item;
         },
@@ -1790,6 +1937,7 @@ export default {
         loadPoints(list){
             this.drawList = [];
             this.SelectedList = [];
+            this.drawID = 0;
             // console.log(list);
 
             for(let i = 0;i < list.length;i++){
@@ -1824,7 +1972,40 @@ export default {
             
         },
         loadPoints2(list){
-            console.log(list);
+            this.drawList= [];
+            this.drawID = 0;
+            // console.log(list);
+            this.baseColor = {r:255,g:0,b:0};
+            for(let i = 0; i < list.length;i++){
+                var listItem = JSON.parse(list[i].coordinateInfo);
+
+                let item = {
+                            data:listItem.data,                                  //  data
+                            ItemId:listItem.itemId,                              //  itemId
+                            ID_out:list[i].id,                                  //  id
+                            isAlert:listItem.isAlert,                            //  isAlert
+                            isBroken:listItem.isBroken,                          //  isBroken
+                            itemName:listItem.itemName,                          //  itemName
+                            pointName:listItem.pointName,                        //  pointName
+                            status:"normal",
+                            Selected:false,
+                            SID:this.drawID,
+                            type:listItem.type,
+                            position:listItem.position,
+                            count:1,
+                            TempPostion:listItem.TempPostion,
+                            text:listItem.text,
+                            display:true,
+                            typeNum:listItem.type                               //  type
+                        };
+                this.drawList.push(item);
+
+                this.drawID++;
+            }
+        },
+        clearAll(){
+            this.drawList= [];
+            this.drawID = 0;
         },
         enableLabel(status){
             this.displayLabel = status;
@@ -1962,7 +2143,7 @@ export default {
                 big_side_is_width_inside = !big_side_is_width_inside;
             }
 
-            
+
 
         }
     }
