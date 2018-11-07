@@ -330,9 +330,6 @@ export default Vue.component('commonPitch-detail',{
                             text: ''
                         },
                         xAxis: {
-                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
-                            // tickInterval: 0.5,
-                            //  tickPositions: [0, 20, 50, 100]
                             categories:[],
                         },
                         yAxis: {
@@ -375,16 +372,7 @@ export default Vue.component('commonPitch-detail',{
                                 }
                             },
                         },
-                        series:[
-                            // {
-                            //     name:this.time,
-                            //     data:[]
-                            // },
-                            // {
-                            //     name:this.time1,
-                            //     data:[]
-                            // }
-                        ],
+                        series:[],
                 },
                 optionOnesRight:{
                         chart: {
@@ -395,9 +383,7 @@ export default Vue.component('commonPitch-detail',{
                             text: ''
                         },
                         xAxis: {
-                            // categories:['0.0','1.0','1.5','2.0','2.5','3.0','3.5','4.0','4.5','5.5','6.5','7','7.5','8','8.5','9','9.5','10','10.5','11','11.5','12','12.5','13'],
                             tickInterval: 1,
-                            //  tickPositions: [0, 20, 50, 100]
                             categories:[],
                             // tickLength:200,
                             
@@ -412,11 +398,6 @@ export default Vue.component('commonPitch-detail',{
                                 labels:{
                                     enabled: true
                                 },
-                                // tickLength:200,
-                            //     tickLength:'200px',
-                            // tickWidth:'200px',
-                               
-                            
                                 },
                         credits: {
                             enabled: false
@@ -448,16 +429,7 @@ export default Vue.component('commonPitch-detail',{
                                 }
                             },
                         },
-                        series:[
-                            // {
-                            //     name:'05-21',
-                            //     data:[]
-                            // },
-                            // {
-                            //     name:'05-21',
-                            //     data:[]
-                            // }
-                        ],
+                        series:[],
                 },
 
 
@@ -713,13 +685,11 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
-                
                 this.leftDisplayListValue1=[];
                 this.leftDisplayListValue2=[];
                 this.leftDisplayListValueXdata=[];
                 this.leftDisplayListValueYdata1=[];
                 this.leftDisplayListValueYdata2=[];
-               
                 this.getPitchDetailDataBySeqId(id)
                 this.totalShow=true;
                 this.leftShow=true;
@@ -745,13 +715,9 @@ export default Vue.component('commonPitch-detail',{
                     // console.log(document.getElementById('leftHightchart'),'tuxing')
                     
                     setTimeout(()=>{
-                       
                         console.log(document.getElementById('tableListid').clientHeight);
                     },20)
-                    // console.log(this.lineHeight,'this.lineHeight')
-                    // =this.lineHeight;
                     let lineLeftChart=this.$refs.lineLeftChartOne;
-                    // document.getElementById('leftHightchart').style.minHeight='1950px'
                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                     setTimeout(()=>{
                        
@@ -846,7 +812,7 @@ select.autoImport{
     margin: 0 20px 20px!important;
     .project{
         width: 100%;
-        max-height: 800px;
+        max-height: 2000px;
         .antsLine{
                 padding: 10px 10px 15px 0px;
                 font-size: 12px;
@@ -1023,13 +989,13 @@ select.autoImport{
             .containerBottom{
                 margin-top:32px;
                 width: 100%;
-                height: 550px;
+                height: 2000px;
                 // border:1px solid #ccc;
                 position: relative;
                 .containerBottomOne{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:0;
                 //    border-right:1px solid #ccc;
                     .oneHeader{
@@ -1099,7 +1065,7 @@ select.autoImport{
                 .containerBottomTwo{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:25%;
                 //    border-right:1px solid #ccc;
                     .twoHeader{
@@ -1149,7 +1115,7 @@ select.autoImport{
                 .containerBottomThree{
                     position: absolute;
                     width: 25%;
-                    height: 550px;
+                    height: 2000px;
                     left:50%;
                 //    border-right:1px solid #ccc;
                     .threeHeader{
@@ -1216,7 +1182,7 @@ select.autoImport{
                 .containerBottomFour{
                      position: absolute;
                     width: 25%;
-                    height: 650px;
+                    height: 2000px;
                     left:75%;
                 //    border-right:1px solid #ccc;
                     .fourHeader{

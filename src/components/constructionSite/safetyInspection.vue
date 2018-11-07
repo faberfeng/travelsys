@@ -178,7 +178,7 @@
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId)"></button>
+                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count)"></button>
                                         <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
@@ -190,7 +190,7 @@
                         <div class="tableBodyPaginationLeft">
                             <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">最新数据：</label><label style="color:#333;font-size:14px;line-height:62px">{{nowDate}}</label></span>
                             <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
-                                <el-select v-model="positionValue"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
+                                <el-select v-model="positionValue" @change="positionChange()"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
                             </span>
                             <span class="leftTxtOne"><label style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" @click="previewAlert()">发短信报警</label></span>
                         </div>
@@ -215,7 +215,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -378,10 +378,14 @@
                         </div> -->
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋的牌号：</label>
-                            <input placeholder="请输入" v-model="barGradeValue" class="editInput"/>
+                            <select class="eidtSelect" @change="esChange()" v-model="barGradeValue">
+                                <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
+                            </select>
+                            <i class="sanjiaoicon"></i>
+                            <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Es：</label>
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{barGradeValue}}</label>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土支撑宽度：</label>
@@ -396,20 +400,25 @@
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土的等级：</label>
-                            <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/>
+                            <select placeholder="请选择" class="eidtSelect" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name" @change="ecChange(item.name)" :key="index" v-text="item.name"></option>
+                            </select>
+                             <i class="sanjiaoicon1"></i>
+                            <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Ec:</label>
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{concreteLevelValue}}</label>
                         </div>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" >确定</button>
-                    <button class="editBtnC" >取消</button>
+                    <button class="editBtnS" @click="setFormula()">确定</button>
+                    <button class="editBtnC" @click="formulaSettingCancle()" >取消</button>
                 </div>
             </el-dialog>
             <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()">
                 <div class="editBody">
+                    <p>以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
                     <p>{{alertMessage}}</p>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -505,29 +514,106 @@ export default {
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
             useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
-            useFormulaNum:1,
+            useFormulaNum:"1",
             useFormulaList:[
                 {
-                    value:1,
+                    value:"1",
                     name:"振弦式应变计计算公式"
                 },
                 {
-                    value:2,
+                    value:"2",
                     name:"混凝土支撑内振弦式钢筋计计算公式"
                 }
             ],
-            AsValue:'',//钢支撑/钢立柱的截面积
-            EsValue:'',//钢支撑/钢立柱的弹性模量
-            barDiameterValue:'',//钢筋直径
+            AsValue:null,//钢支撑/钢立柱的截面积
+            EsValue:null,//钢支撑/钢立柱的弹性模量
+            barDiameterValue:null,//钢筋直径
             asValueArea:'',//as面积
             acValueArea:'',//ac面积
-            ecList:[],
-            esList:[],
-            barCountValue:'',//钢筋根数
-            concreteWidthValue:'',//混凝土宽度
-            concreteHeightValue:'',//混凝土高度
-            concreteLevelValue:'',//混凝土等级
-            barGradeValue:'',//钢筋牌号
+            ecList:[
+                {
+                    name:'C15',
+                    value:22000
+                },
+                {
+                    name:'C20',
+                    value:25500
+                },
+                {
+                    name:'C25',
+                    value:28000
+                },
+                {
+                    name:'C30',
+                    value:30000
+                },
+                {
+                    name:'C35',
+                    value:31500
+                },
+                {
+                    name:'C40',
+                    value:32500
+                },
+                {
+                    name:'C45',
+                    value:33500
+                },
+                {
+                    name:'C50',
+                    value:34500
+                },
+                {
+                    name:'C55',
+                    value:35500
+                },
+                {
+                    name:'C60',
+                    value:36000
+                },
+                {
+                    name:'C65',
+                    value:36500
+                },
+                {
+                    name:'C70',
+                    value:37000
+                },
+                {
+                    name:'C75',
+                    value:37500
+                },
+                {
+                    name:'C80',
+                    value:38000
+                },
+            ],
+            //钢筋的牌号
+            esList:[
+                {
+                    name:'HPB235',
+                    value:210000
+                },
+                {
+                    name:'HRB335',
+                    value:200000
+                },
+                 {
+                    name:'HRB400',
+                    value:200000
+                },
+                 {
+                    name:'RRB400',
+                    value:200000
+                },
+            ],
+            ecValue:'',
+            esValue:'',
+            barCountValue:null,//钢筋根数
+            concreteWidthValue:null,//混凝土宽度
+            concreteHeightValue:null,//混凝土高度
+            concreteLevelValue:null,//混凝土等级
+            barGradeValue:null,//钢筋牌号
             sendAlertMessageShow:false,//是否发送报警信息弹窗
             vibrateRadio:'1',//振弦式应变计计算公式
             fileList:'',
@@ -602,6 +688,7 @@ export default {
             itemType:'',//传递给子组件的监测类型
             itemSubmitKeyWord:'',//传递给子组件的监测关键字
             itemSubmitbaseMapId:'',
+            itemSubmitCount:'',
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
             pointIds:'',//选中监测点集合
@@ -611,8 +698,10 @@ export default {
             monitorWord:'',//监测文字 
             currentPage1:1,//改变页面数 
             positionList:'',//岗位列表    
-            alertMessage:'',//预览报警短信数据
+            positionListLength:'',//岗位人数
+            alertMessage:null,//预览报警短信数据
             positionValue:'',//岗位值
+            positionListName:'',//名称
             nowDate:'',//当前时间
             testShow:true,//是否测试
 
@@ -692,6 +781,7 @@ export default {
         positionValue:function(val){
             var vm=this;
             vm.getPositionList();
+            vm.getPositionUserCount();
         }
     },
     methods:{
@@ -709,6 +799,16 @@ export default {
         //
         acMethod(){
             this.acValueArea=(this.concreteWidthValue)*(this.concreteHeightValue)-(this.asValueArea)*(this.barCountValue);
+        },
+        ecChange(name){
+            console.log(name,'name');
+            this.ecValue=name;
+        },
+         esChange(){
+            //  this.ecList.forEach((item)=>{
+            //      if()
+            //  })
+            this.esValue=name;
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
@@ -802,7 +902,7 @@ export default {
                     position:this.positionValue
                 }
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     // this.alertMessage=response.data.rt;
                     this.sendAlertMessageShow=false;
                     this.$message({
@@ -814,6 +914,13 @@ export default {
                         type:'error',
                         message:response.data.msg
                     })
+                }
+            })
+        },
+        positionChange(){
+            this.positionList.forEach((item)=>{
+                if(item.id==this.positionValue){
+                    this.positionListName=item.posName;
                 }
             })
         },
@@ -832,7 +939,7 @@ export default {
                     userGroupId:this.selectUgId
                 }
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt!=[]){
                     this.alertMessage=response.data.rt;
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -858,6 +965,31 @@ export default {
                 if(response.data.cd=='0'){
                     this.positionList=response.data.rt;
                     this.positionValue=this.positionList[0].id;
+                    this.positionListName=this.positionList[0].posName;
+                    // this.positionListLength=response.data.rt.length;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取岗位用户数
+        getPositionUserCount(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getPositionUserCount',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    positionId:this.positionValue
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.positionListLength=response.data.rt;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -876,8 +1008,9 @@ export default {
             })
           
         },
-        picView_status_changed(status){
+        picView_status_changed(status,list){
             this.toolShow=status;
+            console.log(list);
             // console.log(status);
         },
         drawFinish(){
@@ -1215,6 +1348,7 @@ export default {
                     },
                     params:{
                         baseMapId:vm.monitorBaseMapId
+                        
                     },
                     data:list
                 }).then((response)=>{
@@ -1412,7 +1546,7 @@ export default {
             this.monitorType=1;
             this.monitorLogogram='';
             this.monitorKeyword='';
-            this.monitorBaseMapId='';
+            // this.monitorBaseMapId='';
         },
         //新增监测内容
         addMonitorItem(){
@@ -1463,7 +1597,11 @@ export default {
                         this.monitorType=1;
                         this.monitorLogogram='';
                         this.monitorKeyword='';
-                        this.monitorBaseMapId='';
+                        // this.monitorBaseMapId='';
+                        this.$message({
+                            type:'success',
+                            message:'新增监测内容成功'
+                        })
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
@@ -1590,7 +1728,8 @@ export default {
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                    baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1636,7 +1775,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1684,7 +1824,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1736,7 +1877,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1788,7 +1930,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId, //
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1843,7 +1986,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1914,20 +2058,21 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     if(response.data.rt==''){
                         this.testShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'测试导入数据成功'
                         })
 
-                    }else{
+                    }else if(response.data.cd=='-1'){
                         this.$message({
-                            type:'info',
+                            type:'error',
                             message:response.data.rt
                         })
                     }
@@ -1970,7 +2115,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2025,7 +2171,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2084,7 +2231,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2142,7 +2290,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                     baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2193,7 +2342,8 @@ export default {
                     commonTime:vm.unifiedTime,//标准时间，不选择可不传
                     overwrite:vm.overwrite, //是否覆盖
                     workingCondition:vm.inputWorkingCondition,//现场工况
-                    userGroupId:vm.selectUgId //
+                    userGroupId:vm.selectUgId,
+                    baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2221,10 +2371,22 @@ export default {
         //点击公式设定
         formulaSetting(){
             this.formulaSettingShow=true;
+            this.useFormulaValue=this.useFormulaNum;
         },
         //取消公式设定
         formulaSettingCancle(){
             this.formulaSettingShow=false;
+            this.AsValue=null;
+            this.EsValue=null;
+            this.barDiameterValue=null;
+            this.barCountValue=null;
+            this.concreteWidthValue=null;
+            this.concreteHeightValue=null;
+            this.concreteLevel=null;
+            this.barGradeValue=null;
+            this.acValueArea='';
+            this.asValueArea='';
+
         },
         //设置受力公式
         setFormula(){
@@ -2236,11 +2398,34 @@ export default {
                     'token':vm.token
                 },
                 params:{
-
+                    itemId:vm.monitorImportId,
+                    useFormula:vm.useFormulaValue,
+                    As:vm.AsValue,
+                    Es:vm.EsValue,
+                    barDiameter:vm.barDiameterValue,
+                    barCount:vm.barCountValue,
+                    concreteWidth:vm.concreteWidthValue,
+                    concreteHeight:vm.concreteHeightValue,
+                    concreteLevel:vm.concreteLevelValue,
+                    barGrade:vm.barGradeValue
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-
+                    this.$message({
+                        type:'success',
+                        message:'公式设定成功'
+                    })
+                    this.formulaSettingShow=false;
+                    this.AsValue=null;
+                    this.EsValue=null;
+                    this.barDiameterValue=null;
+                    this.barCountValue=null;
+                    this.concreteWidthValue=null;
+                    this.concreteHeightValue=null;
+                    this.concreteLevel=null;
+                    this.barGradeValue=null;
+                    this.acValueArea='';
+                    this.asValueArea='';
 
                 }else if(response.data.cd=='-1'){
                     vm.$message({
@@ -2485,12 +2670,13 @@ export default {
             })
         },
         //监测内容详情页
-        detail(keyword,id,type,name,baseMapId){
+        detail(keyword,id,type,name,baseMapId,count){
             this.surveyName=name;
             this.detailMonitorId=id;
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
-            this.itemSubmitbaseMapId=baseMapId
+            this.itemSubmitbaseMapId=baseMapId;
+            this.itemSubmitCount=count;
             if(type==5){
                 this.pitchDetailShow=true;
             }else{
@@ -2585,24 +2771,25 @@ export default {
         //点击更换
         clickChange(){
             this.baseMapShow=true;
-            this.baseMapMonitor=true;
+            // this.baseMapMonitor=true;
             this.getBaseMapList();
         },
         //选择当前底图
         selectCurBaseMap(val){
             this.baseMapList.forEach((item)=>{
-                if(item.id==val&&!this.baseMapMonitor){
+                if(item.id==val){
                     this.curBaseMapUrl=item.relativeUri;
                     this.monitorBaseMapId=item.id;
                     this.setBaseMapUsed(item.id);
                     this.getAllMonitorPoint();
 
-                }else if(item.id==val&&this.baseMapMonitor){
-                    this.monitorBaseMapUrl=item.relativeUri;
-                    this.monitorBaseMapId=item.id;
-                    this.setBaseMapUsed(item.id);
-                    this.getAllMonitorPoint();
                 }
+                // else if(item.id==val&&this.baseMapMonitor){
+                //     this.monitorBaseMapUrl=item.relativeUri;
+                //     this.monitorBaseMapId=item.id;
+                //     this.setBaseMapUsed(item.id);
+                //     this.getAllMonitorPoint();
+                // }
             })
             
             this.baseMapShow=false;
@@ -3612,6 +3799,7 @@ export default {
         #edit{
             .baseMapBody{
                 height: 460px;
+                overflow: auto;
                 .clearfix{
                     clear: both;
                     overflow: hidden;
@@ -3894,7 +4082,7 @@ export default {
                 background-image: url('../Settings/images/sanjiao.png');
                 background-size: 100% 100%;
                 content: '';
-                top: 481px;
+                top: 476px;
                 right: 121px;
             }
             .spotTextArea{
@@ -3922,6 +4110,50 @@ export default {
                 border-radius: 2px;
                 background: #fafafa;
                 padding-left: 10px;
+            }
+            .eidtSelect{
+                // width: 130px;
+                // height: 32px;
+                // border: 1px solid #d1d1d1;
+                // border-radius: 2px;
+                // background: #fafafa;
+                // padding-left: 10px;
+                width: 130px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                 background: #fafafa;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+                
+            }
+            .sanjiaoicon{
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 356px;
+                right: 244px;
+            }
+            .sanjiaoicon1{
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 600px;
+                right: 244px;
             }
             .editEportBody{
                 margin:0 auto;

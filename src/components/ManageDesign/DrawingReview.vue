@@ -2367,7 +2367,7 @@ export default {
                         border-bottom: 1px solid #e6e6e6;
                      }
                      .versionUlSel{
-                         background-color: #e6e6e6;
+                         background-color: #f6f6f6;
                         //  padding:5px;
                      }
                     //  .versionUl &:hover{
@@ -2429,7 +2429,7 @@ export default {
 
             }
             #box-right1{
-                 padding: 10px 13px 0 40px;
+                 padding: 10px 15px 0 30px;
                  ::-webkit-scrollbar{width:0px}
                 .drawingApendedInfo{
                     width: 100%;
@@ -2452,7 +2452,7 @@ export default {
                         }
                      }
                      .clickbody{
-                         background: #e2e2e2;
+                         background: #f6f6f6;
                      }
                     .drawingApendedInfobody{
                         margin:20px 3px;
