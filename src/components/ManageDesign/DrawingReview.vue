@@ -32,7 +32,7 @@
                         </el-select>
                     </div>
                     <!-- <div class="rotate" v-show="versionPath&&!annotationlist"> -->
-                    <div class="rotate">
+                    <div v-show="versionPath" class="rotate">
                         <i class="drawingIcon zuoRotate" @click="zuoRotate(drawingFileUrl1)"></i>
                         <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
@@ -42,7 +42,7 @@
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
 
-                <div  id="drawingPic" style="overflow:hidden;border:1px solid rgba(0,0,0,0.2);left:20px">
+                <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
                     <picView ref="pic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="{angle:rotate,type:drawingFileUrl1.substr(drawingFileUrl1.length-3),source:drawingFileUrl1}" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
@@ -127,7 +127,7 @@
                 <ul class="drawingApendedInfo">
                     <div class="drawingApendedHead" >{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}<div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
                     
-                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
+                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click.stop="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
@@ -338,6 +338,7 @@ export default {
                 item:1,
             },
             loading:false,
+            drawingLoading:false,
             showAction:true,
             IsFolderAction:true,
             defaultSubProjId:'',
@@ -752,14 +753,11 @@ export default {
         },
         //图纸工具栏操作
         zuoRotate(val){
-
                 this.$refs.pic.rotation(this.$refs.pic.angle - 90);
                 this.rotate = this.$refs.pic.angle;
                 this.updateDrawingRotateInfo();
         },
         youRotate(val){
-
-
                 this.$refs.pic.rotation(this.$refs.pic.angle + 90);
                 this.rotate = this.$refs.pic.angle;
                 this.updateDrawingRotateInfo();
@@ -770,11 +768,9 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
-
-
-
             this.$refs.pic.setDrawStatus('none',101,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
+             this.annotationUserId=parseInt(this.userId);
         },
         circular(){
             this.isDrawing=true;
@@ -785,6 +781,7 @@ export default {
 
             this.$refs.pic.setDrawStatus('none',102,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
+            this.annotationUserId=parseInt(this.userId);
         },
         rectangleTool(){
             this.isDrawing=true;
@@ -795,6 +792,7 @@ export default {
 
             this.$refs.pic.setDrawStatus('none',103,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
+            this.annotationUserId=parseInt(this.userId);
         },
         cloudLine(){
             this.isDrawing=true;
@@ -805,6 +803,7 @@ export default {
 
             this.$refs.pic.setDrawStatus('none',104,0,10000,{r:255,g:0,b:0});
             this.isMark='0';//标记
+            this.annotationUserId=parseInt(this.userId);
         },
         drawingText(){
             this.isDrawing=true;
@@ -815,6 +814,7 @@ export default {
 
             this.$refs.pic.setDrawStatus('text',10000,10000,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
+            this.annotationUserId=parseInt(this.userId);
         },
         appended(){
             this.isDrawing=true;
@@ -825,6 +825,7 @@ export default {
             }
             this.$refs.pic.setDrawStatus('none',105,0,1,{r:255,g:0,b:0});
             this.isMark='0';//标记
+            this.annotationUserId=parseInt(this.userId);
         },
         drawingClick(){
             this.$refs.pic.clearAll();
@@ -1304,7 +1305,9 @@ export default {
                     }else{
                         let strId='';
                         let strLen='';
-                        vm.FileTree.forEach((item)=>{
+                        console.log(vm.FileTree,'vm.FileTree');
+                        console.log(vm.directoryId,'vm.directoryId');
+                        vm.FileTree[0].children.forEach((item)=>{
                             if(item.code==vm.directoryId){
                                 strLen=item.children.length;
                                 strId=item.children[strLen-1].id;
@@ -1335,7 +1338,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var drawingIdList=[];
-
+            this.drawingLoading=true;
             drawingIdList.push(this.drawingId);
             console.log(drawingIdList);
             var vm=this;
@@ -1348,10 +1351,11 @@ export default {
                 },
                 data:drawingIdList
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.versionPath=(response.data.rt)[0].fileUri;
-                    this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
+                    this.drawingFileUrl1=this.QJFileManageSystemURL+this.versionPath;
                     this.getDrawingRotateInfo();
+                    this.drawingLoading=false;
 
                     // if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
                     //     {   this.pdfShow=true;
@@ -1391,6 +1395,7 @@ export default {
             })
         },
         handleNodeClick(obj){
+             this.drawingLoading=true;
             // this.annotationlist='';
             this.allList='';
             this.rotate=0;
@@ -1424,6 +1429,7 @@ export default {
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
+               
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }
@@ -1504,7 +1510,7 @@ export default {
                             type:'success',
                             message:'图纸删除成功'
                         })
-                        this.loading=false;
+                        // this.loading=false;
                         this.drawingFileUrl1='';
                         this.drawingFileUrl='';
                         this.checkFileDir=[];
@@ -1565,7 +1571,7 @@ export default {
                     type:'error',
                     message:'系统文件，不能操作'
                 })
-            }else{
+            }else if(vm.checkFileDir.code){
                 vm.drawingsUploadShow = true
             }
             
@@ -1819,7 +1825,8 @@ export default {
                             vm.fileList = []
                             vm.holderId=''
                             vm.getDirectory()
-                            // vm.getDrawingList()
+                            // this.getMaxVersionPath();
+                            vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
