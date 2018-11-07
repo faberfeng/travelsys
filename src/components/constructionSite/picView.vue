@@ -2,11 +2,11 @@
     <div ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
         
         <div ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
-            <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" ></pdf>
+            <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" :rotate="R"></pdf>
             <canvas ref="picViewImage"  style="position:absolute;top:0px;left:0px"></canvas>
-            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
+            <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @dblclick="Select_item" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
-            
+            <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
         </div>
 
         <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
@@ -32,6 +32,12 @@ export default {
     data(){
         return{
             url:'',
+            R:0,
+            baseColor:{r:0,g:170,b:0},
+            Max_Select:10000,
+            Max_type:1000,
+            Selected_typeNum_List:[],
+            userData:{}
         }
     },
     destroyed(){
@@ -54,13 +60,13 @@ export default {
         this.Refresh_timer = null;
         this.drawing = false;
         this.lastMovePostion = {x:0,y:0};
+        this.PDFsize = {width:0,height:0};
 
         this.$refs.picView.style.width = this.$refs.picView.parentNode.offsetWidth + "px";
         this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
         this.old_para = "";
 
         this.drawID = 1;
-
 
         this.Refresh_timer = setInterval(()=>{
 
@@ -70,7 +76,9 @@ export default {
                 this.para.type = "PDF";
                 if(this.para.source != this.old_para){
 
-                    
+                    this.drawList = [];
+
+                    this.$refs.loading.style.display = "block";
 
                     this.$refs.pdfDocument.$el.style.display = "block";
                     this.$refs.picViewImage.style.display = "none";
@@ -79,27 +87,39 @@ export default {
                     this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
                     this.$refs.picView.style.left = "0px";
                     this.$refs.picView.style.top = "0px";
-                    this.url = this.para.source;
-                    
 
-                    this.ResolutionScale = this.PDFscale; 
+
+                    if(this.para.angle != undefined){
+
+                        this.angle = parseInt(this.para.angle);
+                        this.R = 0;
+                    }
                     
+                    this.url = this.para.source + "?random=" + Math.random();;
+
+                    if(this.sub_div){
+                        this.ResolutionScale = this.PDFscale;
+                        // this.sub_div.style.height = this.PDFsize.height + "px";
+                        // this.sub_div.style.width = this.PDFsize.width + "px";
+                    }
                     
                     this.old_para = this.para.source;
                     
                 }
             }else{
 
-
-
                 this.para.type = "PNG";
                 if(this.para.source != this.old_para){
+                    this.drawList = [];
                     this.$refs.pdfDocument.$el.style.display = "none";
                     this.$refs.picViewImage.style.display = "block";
                     this.$refs.picView.style.width = this.$refs.picView.parentNode.offsetWidth + "px";
                     this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
                     this.$refs.picView.style.left = "0px";
                     this.$refs.picView.style.top = "0px";
+                    if(this.para.angle){
+                        this.angle = parseInt(this.para.angle);
+                    }
                     this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
                     this.old_para = this.para.source;
                     
@@ -111,12 +131,6 @@ export default {
 
             
         },500);
-
-        
-
-        
-        
-
     },
     filters:{
 
@@ -127,6 +141,11 @@ export default {
         }
     },
     methods:{
+        Select_item(){
+            if(this.drawList[0].type == "Select_img_Mark"){
+                this.$emit('Image_Mark',this.drawList[0]);
+            }
+        },
         init(div,source,type,page_No,angle){
 
             
@@ -147,7 +166,6 @@ export default {
             this.drawcontextSelect = this.drawCanvasSelect.getContext('2d');
             this.SelectedList = [];
             this.displayLabel = false;
-            this.baseColor={r:0,g:170,b:0};
 
             if(page_No == undefined){
                 page_No = 1;
@@ -157,20 +175,7 @@ export default {
                 page_No = 1;
             }
 
-            if(angle == undefined){
-                angle = 0;
-            }
-
-            this.angle = angle;
             this.page_No = page_No;
-
-            while(this.angle < 0){
-                this.angle += 360;
-            }
-
-            while(this.angle >= 360){
-                this.angle -= 360;
-            }
 
             switch(type){
                 case "PDF":
@@ -195,7 +200,7 @@ export default {
 
                     {
                         
-
+                        this.$refs.loading.style.display = "none";
                         this.sub_div = this.$refs.picView;
                         this.sub_div.style.position = "absolute";
                         this.canvas = this.$refs.picViewImage;
@@ -216,7 +221,6 @@ export default {
 
                             this.ResolutionScale = 1.0 * this.sub_div.offsetWidth / this.image.width;
 
-                            this.context = this.canvas.getContext('2d');
                             this.oldImageSize = {width:this.sub_div.offsetWidth,height:this.sub_div.offsetWidth * (this.image.height / this.image.width)};
                             this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
 
@@ -241,13 +245,14 @@ export default {
                                 this.drawCanvasSelect.width = this.imageSize.height;
                             }
 
+                            this.context = this.canvas.getContext('2d');
                             this.context.rotate(this.angle*Math.PI/180);
 
                             switch(this.angle){
-                                case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);
-                                case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);
-                                case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);
-                                case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);
+                                case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                                case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                                case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                                case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
                             }
 
                             // div.appendChild(this.Main_div);
@@ -261,16 +266,17 @@ export default {
 				break;
             }
             
-            
+            this.$emit('load_points',null);
+
             this.Refresh();
         },
         load(){
-            // console.log(this.$refs.pdfDocument);
             
             this.Main_div = this.$refs.picViewOutSide;
             this.sub_div = this.$refs.picView;
 
             var timer = setInterval(()=>{
+                
                 this.sub_div.style.height = this.$refs.pdfDocument.$refs.canvasParent.offsetHeight + "px";
                 this.oldImageSize = {
                                         width:this.$refs.pdfDocument.$refs.canvasParent.offsetWidth,
@@ -280,13 +286,20 @@ export default {
                 this.drawCanvas.width = this.$refs.picView.offsetWidth;
                 this.drawCanvasSelect.height = this.$refs.picView.offsetHeight;
                 this.drawCanvasSelect.width = this.$refs.picView.offsetWidth;
+                this.PDFsize = {width:this.oldImageSize.width,height:this.oldImageSize.height};
+
+                this.R = this.angle;
+                this.size_R();  // 初始时修改尺寸
+
+                this.$refs.loading.style.display = "none";
+                
                 clearInterval(timer);
-            },200);
+            },1000);
 
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
 
             this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
-            this.size_R();  // 初始时修改尺寸
+            
             
         },
         setNumber_inputPostion(position_){
@@ -304,8 +317,6 @@ export default {
             var position_temp = this.rotate_XY(X,Y);
             X = position_temp.x;
             Y = position_temp.y;
-
-            
 
             if(e.button == 0){
                 this.lastPostion = {x:X,y:Y};
@@ -370,6 +381,8 @@ export default {
 
                         if(this.drawCount == 0){
                             
+                            this.userData = {};
+
                             if(this.drawMaxCount == 2){   // 两个点完成绘制的
                                 switch(this.drawList[this.drawList.length - 1].type){
 
@@ -402,7 +415,7 @@ export default {
                             }
 
                             if(this.drawMaxCount == 1){
-                                
+
                             }
 
                             this.drawing = false;
@@ -421,27 +434,95 @@ export default {
 
                         // console.log(SID);
 
+                        if(SID < 1){
+                            this.SelectedList = [];
+                            this.Selected_typeNum_List = [];
+                        }
 
-                        this.SelectedList = [];
+                        //////////////// Select_img_Mark 特例 /////////////////
 
-                        for(let i = 0; i < this.drawList.length;i++){
-                            this.drawList[i].Selected = false;
-                            if(this.drawList[i].SID == SID){
+                        {
+                            var find_Select_img_Mark = false;
+                            for(let i = 0; i < this.drawList.length;i++){
+                                if(this.drawList[i].SID == SID){
+                                    if(this.drawList[i].type == "Select_img_Mark"){
+                                        find_Select_img_Mark = true;
+                                    }
+                                }
+                            }
+
+                            if(find_Select_img_Mark){
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    this.drawList[i].Selected = false;
+                                }
+                                
+                                this.SelectedList = [];
+                                this.Selected_typeNum_List = [];
                                 this.SelectedList.push(this.drawList[i]);
+                    
+
+                                this.SelectedList[0].Selected = true;
                             }
                         }
 
-                        for(let i = 0; i < this.SelectedList.length;i++){
-                            this.SelectedList[i].Selected = true;
-                        }
+                        ///////////////////////////////////////////////////////
 
-                        if(SID > 0){
-                            this.$emit('status_changed',true,this.SelectedList);
-                        }else{
-                            this.$emit('status_changed',false,this.SelectedList);
-                        }
+                        if(this.SelectedList.length < this.Max_Select){
 
-                        this.Refresh();
+                            for(let i = 0; i < this.drawList.length;i++){
+                                this.drawList[i].Selected = false;
+                                if(this.drawList[i].SID == SID){
+                                    // this.SelectedList.push(this.drawList[i]);
+                                    var find = false;
+                                    for(let j = 0;j < this.SelectedList.length;j++){
+                                        if(this.SelectedList[j].SID == SID){
+                                            find = true;
+                                        }
+                                    }
+
+                                    var typeNum_enable = true;
+
+                                    if(this.Selected_typeNum_List.length >= this.Max_type){
+                                        
+                                        typeNum_enable = false;
+
+                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                typeNum_enable = true;
+                                            }
+                                        }
+
+                                        
+                                    }else{
+                                        let find_type = false;
+
+                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                find_type = true;
+                                            }
+                                        }
+                                        if(!find_type){this.Selected_typeNum_List.push(this.drawList[i].typeNum);}
+                                    }
+
+                                    if(!find && typeNum_enable){
+                                        this.SelectedList.push(this.drawList[i]);
+                                    }
+                                }
+                            }
+
+                            for(let i = 0; i < this.SelectedList.length;i++){
+                                this.SelectedList[i].Selected = true;
+                            }
+
+                            if(SID > 0){
+                                this.$emit('status_changed',true,this.SelectedList);
+                            }else{
+                                this.$emit('status_changed',false,this.SelectedList);
+                            }
+
+                            this.Refresh();
+                        }
 
                     }
                 }
@@ -847,6 +928,9 @@ export default {
                     case "Mark":
                         this.drawMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor);
                         break;
+                    case "Select_img_Mark":
+                        this.drawSelectImgMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor,false,this.userData);
+                        break;
                 }
             }
 
@@ -862,7 +946,7 @@ export default {
                 }
 
                 if(this.drawList[i].isAlert){
-                    color = {r:170,g:170,b:0}
+                    color = {r:250,g:250,b:0}
                 }
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
@@ -1018,6 +1102,12 @@ export default {
                         }
 
                         break;
+                    case "Select_img_Mark":
+                        
+                        this.drawSelectImgMark(this.drawcontext      ,this.drawList[i].position[this.drawList[i].position.length - 1],false,1,this.baseColor,this.drawList[i].Selected,this.drawList[i].userData);
+                        this.drawSelectImgMark(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],true,1,colorId,false,this.drawList[i].userData);
+                        
+                        break;
                 }
             }
 
@@ -1164,6 +1254,41 @@ export default {
 			//////////////////////////////////////////////
 
         },
+        drawSelectImgMark(drawcontext,position_,select,scale,userData,isSelected){
+            var color_='rgb(0,0,0)';
+            var position = this.rotate_XY_display(position_);
+
+            if(color){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }
+
+            drawcontext.fillStyle=color_;
+            drawcontext.strokeStyle=color_;
+            drawcontext.lineWidth=3;
+
+            drawcontext.beginPath();
+            let fz_img = document.getElementById(userData.DrawImg);
+            if(select){
+                drawcontext.rect(
+                    (position.x * this.ResolutionScale * this.scale - fz_img.offsetWidth / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.offsetHeight/ 2),
+                    fz_img.offsetWidth ,
+                    fz_img.offsetHeight );
+                drawcontext.fill();
+            }else{
+                
+                if(isSelected){
+                    let fz_img = document.getElementById(userData.SelectImg);                    
+                }else{
+                    let fz_img = document.getElementById(userData.DrawImg);
+                }
+
+                drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
+            }
+
+            drawcontext.stroke();
+
+        },
         drawMark(drawcontext,position_,select,scale,color,isSelected){
             var color_='rgb(0,0,0)';
             var position = this.rotate_XY_display(position_);
@@ -1181,24 +1306,25 @@ export default {
             drawcontext.lineWidth=3;
 
             drawcontext.beginPath();
+            let fz_img = document.getElementById("fz_img_for_draw");
 
             if(select){
                 drawcontext.rect(
-                    (position.x * this.ResolutionScale * this.scale - 18),
-                    (position.y * this.ResolutionScale * this.scale - 15),
-                    36 ,
-                    30 );
+                    (position.x * this.ResolutionScale * this.scale - fz_img.width / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.height / 2),
+                    fz_img.width ,
+                    fz_img.height );
                 drawcontext.fill();
             }else{
-                let fz_img = document.getElementById("fz_img_for_draw");
+                
                 drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
 
                 if(isSelected){
                     drawcontext.rect(
-                    (position.x * this.ResolutionScale * this.scale - 18),
-                    (position.y * this.ResolutionScale * this.scale - 15),
-                    36,
-                    30);
+                    (position.x * this.ResolutionScale * this.scale - fz_img.width / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.height / 2),
+                    fz_img.width ,
+                    fz_img.height );
                     // drawcontext.fill();
                 }
             }
@@ -1337,7 +1463,7 @@ export default {
             }
         },
         drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
-            var position_ = this.rotate_XY_display(position_);
+            var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1618,13 +1744,13 @@ export default {
         },
         drawFinish(){
             this.sub_div.style.cursor = "default";
-            this.$emit('finish',null);
+            this.$emit('finish',this.drawList);
         },
         pageSize(w,h){
             // console.log(w,h);
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
         },
-        setDrawStatus(status,drawtype,drawItemId,count,color){
+        setDrawStatus(status,drawtype,drawItemId,count,color,userData){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
@@ -1672,6 +1798,15 @@ export default {
                 case 105: // 标记
                     this.drawtype = "Mark";
                     break;
+                case 10001: // 图标
+                    this.drawtype = "Select_img_Mark";
+                    break;
+            }
+
+            if(userData){
+                this.userData = userData;
+            }else{
+                this.userData = {};
             }
 
             if(status == "text"){
@@ -1728,7 +1863,8 @@ export default {
                             display:true,
                             data:"none",
                             pointName:"new point",
-                            typeNum:this.drawtypeNum                    //  type
+                            typeNum:this.drawtypeNum,                    //  type,
+                            userData:this.userData
                         };
             return item;
         },
@@ -1818,6 +1954,9 @@ export default {
             this.Refresh();
             
         },
+        loadPoints2(list){
+            console.log(list);
+        },
         enableLabel(status){
             this.displayLabel = status;
             this.Refresh();
@@ -1861,7 +2000,7 @@ export default {
 
             switch(this.type){
                 case "PDF":
-                    this.$refs.pdfDocument.rotate = this.angle;
+                    this.R = this.angle;
                     this.size_R();
                     break;
                 default:
@@ -1874,7 +2013,7 @@ export default {
             var X = x;
             var Y = y;
 
-            var Temp_Size = {width:this.oldImageSize.width,height:this.oldImageSize.height};
+            var Temp_Size = {width:this.oldImageSize.width / this.ResolutionScale,height:this.oldImageSize.height / this.ResolutionScale};
             if(this.type == "PDF"){
                 Temp_Size = {width:1024,height:1024 * (this.oldImageSize.height / this.oldImageSize.width)};
             }
@@ -1882,7 +2021,7 @@ export default {
             switch(this.angle){
                 case 0: 	break;
                 case 90: 	X -= Temp_Size.height;break;
-                case 180: 	X -= Temp_Size.width; Y+=Temp_Size.height;break;
+                case 180: 	X -= Temp_Size.width; Y-=Temp_Size.height;break;
                 case 270: 	Y -= Temp_Size.width;break;
             }
 
@@ -1910,7 +2049,11 @@ export default {
             X=V.x;
             Y=V.y;
 
-            var Temp_Size = {width:this.oldImageSize.width,height:this.oldImageSize.height};
+            if(this.oldImageSize == undefined){
+                return {x:X,y:Y};
+            }
+
+            var Temp_Size = {width:this.oldImageSize.width / this.ResolutionScale,height:this.oldImageSize.height / this.ResolutionScale};
             if(this.type == "PDF"){
                 Temp_Size = {width:1024,height:1024 * (this.oldImageSize.height / this.oldImageSize.width)};
             }
@@ -1923,6 +2066,35 @@ export default {
             }
             
             return {x:X,y:Y};
+        },
+        print_priority_points(width,height){
+
+        },
+        print_priority_pic(width,height){
+            var min_side_outside = Math.min(width,height);
+            var max_side_inside = Math.max(this.oldImageSize.width,this.oldImageSize.height);
+            var big_side_is_width_inside = true;
+            var big_side_is_width_outside = true;
+
+            if(this.oldImageSize.width > this.oldImageSize.height){
+                big_side_is_width_inside = true;
+            }else{
+                big_side_is_width_inside = false;
+            }
+
+            if(width > height){
+                var big_side_is_width_outside = true;
+            }else{
+                var big_side_is_width_outside = false;
+            }
+            
+            if(this.angle == 90 || this.angle == 270)
+            {
+                big_side_is_width_inside = !big_side_is_width_inside;
+            }
+
+
+
         }
     }
 }

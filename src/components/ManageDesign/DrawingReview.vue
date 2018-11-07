@@ -1104,6 +1104,7 @@ export default {
                             this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
                             console.log(this.commentShapeType);
                             this.coordinateInfoAllList=canvas1.drawElements;
+                            console.log(this.coordinateInfoAllList,'this.coordinateInfoAllList')
                             this.addAnnotation();
 
                             
@@ -1834,7 +1835,7 @@ export default {
         },
         //添加批注
         addAnnotation(){
-
+            console.log(this.coordinateInfoAllList,'12345')
             var vm=this
             if(this.shapeType=='5'){
                 this.annotationInfo=this.coordinateInfoAllList[this.coordinateInfoAllList.length-1].text;
