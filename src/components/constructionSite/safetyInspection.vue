@@ -437,7 +437,7 @@
                             <div class="timeSel">
                                  <el-date-picker
                                     v-model="consultValue"
-                                    type="datetime"
+                                    type="datetime" style="width:550px !important"
                                     placeholder="选择日期时间">
                                 </el-date-picker>
                             </div>
@@ -445,7 +445,7 @@
                              <div class="timeSel">
                                  <el-date-picker
                                     v-model="userValue"
-                                    type="datetime"
+                                    type="datetime" style="width:550px !important"
                                     placeholder="选择日期时间">
                                 </el-date-picker>
                             </div>
@@ -456,7 +456,7 @@
                             <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">封面</label></el-checkbox>
                             <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
                         </div>
-                        <div class="imgBody">
+                        <div v-show="isShow" class="imgBody">
                             <div class="imgBodyLeft"></div>
                             <div class="imgBodyRight"></div>
                         </div>
@@ -464,21 +464,21 @@
                      <div class="editEportBodytwo" style="height:140px;">
                         <div class="head">
                             <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">概述</label></el-checkbox>
-                            <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
+                            <span class="groundSpan" @click="retract1"><img class="groundEdit"   :src="retractImg1"/>{{retractText1}}</span>
                         </div>
-                        <div class="textBody">
+                        <div class="textBody" v-show="isShow1">
                             <label>综述及建议：</label>
                             <div class="areaBody">
-                                <textarea v-model="suggestList" placeholder="请输入"></textarea>
+                                <textarea v-model="suggestList" style="padding:5px;" placeholder="请输入"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="editEportBodytwo" style="height:150px;">
                         <div class="head">
                             <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">测点详情：</label></el-checkbox>
-                            <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
+                            <span class="groundSpan" @click="retract2"><img class="groundEdit"   :src="retractImg2"/>{{retractText2}}</span>
                         </div>
-                        <div class="selectMap">
+                        <div class="selectMap" v-show="isShow2">
                             <div class="map_txt">
                                 <el-checkbox class="map_check" v-model="showBaseImg"><label>每一页都展示底图</label></el-checkbox>
                                <div class="map_check1"><label style="margin-right:20px;">底图位置:</label> <el-radio v-model="pageTop">页面上部</el-radio><el-radio v-model="pageBottom">页面底部</el-radio></div>
@@ -492,7 +492,7 @@
                     <div class="editEportBodytwo" style="height:140px;">
                         <div class="head">
                             <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">生成二维码：</label></el-checkbox>
-                            <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
+                            <span class="groundSpan" @click="retract3"><img class="groundEdit"   :src="retractImg3"/>{{retractText3}}</span>
                         </div>
                         <div class="qrcodeBody">
                             <img /><label></label>
@@ -760,6 +760,15 @@ export default {
             retractImg:shouqiImg,
             retractText:'收起',//展开与伸缩
             isShow:true,
+            retractImg1:shouqiImg,
+            retractText1:'收起',//展开与伸缩
+            isShow1:true,
+            retractImg2:shouqiImg,
+            retractText2:'收起',//展开与伸缩
+            isShow2:true,
+            retractImg3:shouqiImg,
+            retractText3:'收起',//展开与伸缩
+            isShow3:true,
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
@@ -3097,6 +3106,39 @@ export default {
                 this.retractText = '收起';
                 this.isShow = true;
             }
+        },
+         retract1(){
+             if(this.retractImg1 === shouqiImg){
+                this.retractImg1 = zhankaiImg;
+                this.retractText1 = '展开';
+                this.isShow1 = false;
+            }else{
+                this.retractImg1 = shouqiImg;
+                this.retractText1 = '收起';
+                this.isShow1 = true;
+            }
+        },
+         retract2(){
+             if(this.retractImg2 === shouqiImg){
+                this.retractImg2 = zhankaiImg;
+                this.retractText2 = '展开';
+                this.isShow2 = false;
+            }else{
+                this.retractImg2 = shouqiImg;
+                this.retractText2 = '收起';
+                this.isShow2 = true;
+            }
+        },
+        retract3(){
+             if(this.retractImg3 === shouqiImg){
+                this.retractImg3 = zhankaiImg;
+                this.retractText3 = '展开';
+                this.isShow3 = false;
+            }else{
+                this.retractImg3 = shouqiImg;
+                this.retractText3 = '收起';
+                this.isShow3 = true;
+            }
         }
         
 
@@ -4249,6 +4291,8 @@ export default {
             .editEportBody{
                 margin:0 auto;
                 width: 92%;
+                height: 600px;
+                overflow: auto;
                 .editEportBodyone{
                    
                     .oneTxt{
@@ -4270,15 +4314,10 @@ export default {
                             text-align: left;
                             color:#666666;
                             .label1{
-                                margin-left:85px;
-                            }
-                            
-
+                                margin-left:30px;
+                            }  
                         }
                     }
-
-
-
                 }
                 .editEportBodytwo{
                     margin-top:20px;
