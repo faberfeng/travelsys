@@ -93,10 +93,8 @@ export default {
 
                         this.angle = parseInt(this.para.angle);
                         this.R = 0;
-                    }
-                    
-                    this.url = this.para.source + "?random=" + Math.random();;
-
+                    }         
+                    this.url = this.para.source + "?random=" + Math.random();
                     if(this.sub_div){
                         this.ResolutionScale = this.PDFscale;
                         // this.sub_div.style.height = this.PDFsize.height + "px";
@@ -527,6 +525,22 @@ export default {
                     }
                 }
             }
+        },
+        Selected2(id){
+
+            this.SelectedList = [];
+            
+            for(let i = 0; i < this.drawList.length;i++){
+                this.drawList[i].Selected = false;
+                if(this.drawList[i].ID_out == id){
+                    this.SelectedList.push(this.drawList[i]);
+                }
+            }
+
+            for(let i = 0; i < this.SelectedList.length;i++){
+                this.SelectedList[i].Selected = true;
+            }
+
         },
         oncanvasmousemove(e){
             
@@ -1921,6 +1935,7 @@ export default {
         loadPoints(list){
             this.drawList = [];
             this.SelectedList = [];
+            this.drawID = 0;
             // console.log(list);
 
             for(let i = 0;i < list.length;i++){
@@ -1956,6 +1971,41 @@ export default {
         },
         loadPoints2(list){
             console.log(list);
+            this.drawList= [];
+            this.drawID = 0;
+            // console.log(list);
+            this.baseColor = {r:255,g:0,b:0};
+            for(let i = 0; i < list.length;i++){
+                var listItem = JSON.parse(list[i].coordinateInfo);
+
+                let item = {
+                            data:listItem.data,                                  //  data
+                            ItemId:listItem.itemId,                              //  itemId
+                            ID_out:list[i].id,                                  //  id
+                            isAlert:listItem.isAlert,                            //  isAlert
+                            isBroken:listItem.isBroken,                          //  isBroken
+                            itemName:listItem.itemName,                          //  itemName
+                            pointName:listItem.pointName,                        //  pointName
+                            status:"normal",
+                            Selected:false,
+                            SID:this.drawID,
+                            type:listItem.type,
+                            position:listItem.position,
+                            count:1,
+                            TempPostion:listItem.TempPostion,
+                            text:listItem.text,
+                            display:true,
+                            typeNum:listItem.type                               //  type
+                        };
+                this.drawList.push(item);
+
+                this.drawID++;
+            }
+        },
+        clearAll(){
+            this.drawList= [];
+            this.drawID = 0;
+
         },
         enableLabel(status){
             this.displayLabel = status;
