@@ -107,7 +107,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists" @Image_Mark="add()"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -978,6 +978,9 @@ export default {
                 }
             }
            
+        },
+        add(val){
+           console.log(val,'val');
         },
         //
         sendAlertMessage(){
@@ -3000,7 +3003,7 @@ export default {
         },
         //上传图片编辑
         setSpotPic(){
-            this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:255,g:0,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+            this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
         },
         //编辑照片标记
         editPhotoTag(){
