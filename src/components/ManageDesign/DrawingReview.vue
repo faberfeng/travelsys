@@ -43,7 +43,7 @@
                 </div>
 
                 <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
-                    <picView ref="pic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
+                    <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -133,7 +133,11 @@
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
                                 <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo).typeNum)" >
                             <!-- </form> -->
-                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark" @click.stop="deleteAnnotation(item.id)"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @click.stop="true" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox><div class="downIcon" @click.stop="foldComment(item.id)" ></div></div>
+                            <label class="userName" v-text="item.updateUserName"></label>
+                            <div class="deleteMark" @click.stop="deleteAnnotation(item.id)"></div>
+                            <el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @click.stop="true" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox>
+                            <div class="downIcon" @click.stop="foldComment(item.id)" ></div>
+                        </div>
                         <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label></div>
                         <!-- <div class="commentIcon"></div> -->
                         <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
@@ -527,8 +531,14 @@ export default {
             // console.log(e);
             this.addAnnotation(e[e.length - 1]);
         },
+        loadPic(){
+             this.$refs.pic.Max_Select = 1;
+        },
         picView_status_changed(a,b){
             console.log(a,b);
+            if(a==true){
+                this.isClick=b[0].ID_out;
+            }
         },
         letterChange(val){
             if(val==1){
@@ -1090,8 +1100,8 @@ export default {
                     this.queryAnnotation();
                     // alert('添加批注ID')
                     
-                }else{
-                    this.message({
+                }else if(response.data.cd=='-1'){
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -2471,6 +2481,7 @@ export default {
                          .apendedInfoOne{
                              width: 100%;
                              height: 30px;
+                             position: relative;
                              img{
                                  float: left;
                                  margin-top:7px;
@@ -2483,8 +2494,11 @@ export default {
                                  line-height: 30px;
                              }
                              .deleteMark{
-                                 margin-left: 103px;
-                                 margin-top:6px;
+                                 position: absolute;
+                                 top:6px;
+                                 right: 40px;
+                                //  margin-left: 103px;
+                                //  margin-top:6px;
                                  display:inline-block;
                                 background: url('../ManageCost/images/delete.png')no-repeat 0 0;
                                 margin-right: 10px;
@@ -2506,16 +2520,16 @@ export default {
                                  height: 12px;
                                  background: url('./images/zhank.png')no-repeat 0 0;
                                  top:9px;
-                                 right:4px;
+                                 right:6px;
 
                              }
                         }
                         .appendedInfotext{
                             text-align: left;
-                            height: 20px;
+                            height: 24px;
                             font-size:12px;
                             color:#666666;
-                            line-height: 20px;
+                            line-height: 24px;
                             white-space: nowrap;
                             overflow: hidden;
                             width: 100%;
@@ -2569,7 +2583,8 @@ export default {
                                 margin-top:5px;
                                 width: 96%;
                                 height: 30px;
-                                 padding-left:4px;
+                                padding-left:4px;
+                                padding-top:4px;
                             }
                             .replayBtn{
                                 background: #fc3439;

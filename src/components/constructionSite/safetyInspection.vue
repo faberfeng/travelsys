@@ -76,7 +76,7 @@
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">上传图片</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
-                            <span class="drawLineBtn">多点对比</span>
+                            <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
                             <img id="fz_img_for_site1" src="./images/site1.png" style="display:none"/>
                         </div>
@@ -107,7 +107,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists" @Image_Mark="add()"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl,angle:0}"  @Image_Mark="add"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -428,6 +428,29 @@
                     <button class="editBtnC" @click="sendAlertMessageCancle()" >取消</button>
                 </div>
             </el-dialog>
+             <el-dialog title="上传标记图片" :visible="uploadshow" @close="upImgCancle">
+                <div class="editBody">
+                    <!-- <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">文件说明 :</label>
+                        <input type="text" class="inp" v-model="des">
+                    </div> -->
+                    <div class="editBodytwo imageBody" style="margin-left:31px">
+                        <label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectImg">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput"  type="file"  @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
+                </div>
+                <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addPhotoTag">上传</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
+                </div>
+            </el-dialog>
             <el-dialog title="导出监测报告" :visible="exportrEportsShow" @close="exportrEportsCancle()">
                 <div class="editEportBody">
                     <div class="editEportBodyone">
@@ -507,6 +530,11 @@
                     <button class="editBtnC" >生成</button>
                 </div>
             </el-dialog>
+             <el-dialog title="测点变化曲线" :visible="moreSpotShow" @close="moreSpotCancle()">
+                    <div v-if="moreSpotShow">
+                        <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                    </div>
+            </el-dialog>
         </div>
         
     </div>
@@ -517,15 +545,15 @@ import zhankaiImg  from '../../assets/arrow-down.png';
 import moment from 'moment'
 import axios from 'axios'
 import pdf from 'vue-pdf'
+import VueHighcharts from 'vue2-highcharts'
 import commonPitchDetail from './commonPitchDetail.vue' //斜度详情页组件
 import walkThrough from './walkThrough.vue' //巡视报告
 import commonDetail from './commonDetail.vue'//除斜度的详情页
 import picView from './picView.vue'
-
 var echarts = require('echarts');
 export default {
     components: {
-        pdf,commonPitchDetail,commonDetail,walkThrough,picView
+        pdf,commonPitchDetail,commonDetail,walkThrough,picView,VueHighcharts
     },
     name:'safetyInspection',
     data(){
@@ -682,6 +710,9 @@ export default {
             concreteLevelValue:null,//混凝土等级
             barGradeValue:null,//钢筋牌号
             sendAlertMessageShow:false,//是否发送报警信息弹窗
+            uploadshow:false,//是否上传图片
+            filesList:[],
+            imageName:'未选择任何文件',
             vibrateRadio:'1',//振弦式应变计计算公式
             fileList:'',
             fileListName:'',
@@ -697,6 +728,7 @@ export default {
             isClick2:false,
             isClick3:false,
             hoverShow:false,
+            setSpotPicShow:false,//是否为上传图片标记
             monitorName:'',//监测名称
             monitorType:1,//监测类型
             monitorLogogram:'',
@@ -751,6 +783,8 @@ export default {
             commonDetailShow:false,//公共详情页
             walkThroughShow:false,//巡视报告
             exportrEportsShow:false,//导出报告
+            moreSpotShow:false,//多点对比显示
+            moreSpotChangeLineShow:false,
             consultValue:'',
             userValue:'',
             coverChecked:false,
@@ -780,7 +814,7 @@ export default {
             itemSubmitCount:'',
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
-            pointIds:'',//选中监测点集合
+            pointIds:[],//选中监测点集合
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
             monitorPointInfo:'',//所有图纸监测点信息
@@ -795,6 +829,66 @@ export default {
             testShow:true,//是否测试
             spotPicInfo:[],//图片编辑绘图信息
             paramsLists:{},
+            photoId:null,//图片ID
+            spotPicInfoList:'',
+            optionMoreSpotChangeLine:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                            min:4268.5,
+                            max:43403.3542,
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                                // tickPixelInterval:1000
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            },
+            acquisitionTimeXlist:[],
+            elevationYlist:[],
 
         }
     },
@@ -1105,14 +1199,145 @@ export default {
         picView_status_changed(status,list){
             this.toolShow=status;
             console.log(list);
+            this.pointIds=[];
+            list.forEach((item)=>{
+                 this.pointIds.push(item.ID_out);
+            })
+            console.log(this.pointIds,'this.pointIds');
+            // pointIds
             // console.log(status);
         },
+        //多点对比
+        moreSpotLine(){
+             var vm=this;
+             this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getMonitorPointChartData',
+                headers:{
+                    'token':vm.token
+                },
+                data:vm.pointIds
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.moreSpotLineList=response.data.rt.verticalShiftData;
+                     this.moreSpotLineList.forEach((item)=>{
+                         item.list.forEach((item1)=>{
+                              this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                this.elevationYlist.push(item1.elevation)
+                         })
+                    })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                    console.log(this.elevationYlist,'this.elevationYlist');
+                    // var min=this.getMinValue(this.elevationYlist);
+                    //  var max=this.getMaxValue(this.elevationYlist)
+                    // var middle=(min+max)/2;
+                    // this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                    //  this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                    // //  this.spotChangeLineShow=true;
+                    // setTimeout(()=>{
+                    //     let spotChangeLineChart=this.$refs.spotChangeLine;
+                    //     spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                    //     spotChangeLineChart.removeSeries();
+                    //     spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                    //     spotChangeLineChart.hideLoading();
+                    //     spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    // },200)
+
+                    
+                }
+            })
+
+
+        },
+         timeChangeMethod(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD");
+            }
+        },
+        moreSpotCancle(){
+            this.moreSpotShow=false;
+        },
         drawFinish(){
+            var vm=this;
             // console.log("finish");
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
             this.isClick=false;
+            if(this.setSpotPicShow==true){
+                // this.uploadshow=true;
+                var list1 = this.$refs.pic.saveList();
+                  console.log(list1,'list1');  
+                this.spotPicInfo.push({
+                    "coordinateInfo":JSON.stringify(list1.pop()),
+                    "operationType":1,
+                    "photoId":this.photoId,
+                });
+                console.log(this.spotPicInfo,'this.spotPicInfo')
+                 axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.monitorBaseMapId
+                    },
+                    data:this.spotPicInfo
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.uploadshow=true;
+                    this.getTagList();
+                }
+            })
+              
+            }
+        },
+        //获取图片列表
+         getTagList(){
+             var vm=this;
+             axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getTagList',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.monitorBaseMapId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.spotPicInfoList=response.data.rt;
+                     var alist=[];
+                     this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
+                    this.spotPicInfoList.forEach((item)=>{
+                        alist.push(
+                            {
+                                'data':null,
+                                'id':item.id,
+                                'isAlert':null,
+                                'isBroken':null,
+                                'itemId':null,
+                                'itemName':null,
+                                'plotInfo':item.coordinateInfo,
+                                'pointName':null,
+                                'type':null,
+                            }
+                        )
+                    })
+                    alist.forEach((item)=>{
+                        this.monitorPointInfo.push(item)
+                    })
+                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
+
+                    // console.log(alist,'spotPicInfoList');
+                    vm.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            })
         },
         walkThroughBtn(){
             var vm=this;
@@ -1410,7 +1635,7 @@ export default {
                 return  require('./images/sunnyandcloudy.png')
             }else if(val=="晴"||val=="晴转多云"||val=="多云转晴"){
                 return  require('./images/sunny.png')
-            }else if(val=="小雨"||val=="小雨转阴"){
+            }else if(val=="小雨"||val=="小雨转阴"||val=="小雨转晴"){
                 return  require('./images/lightrain.png')
             }else if(val=="大雨"||val=="小雨转中雨"){
                 return  require('./images/heavyrain.png')
@@ -1589,7 +1814,7 @@ export default {
                         })
                     }
                     var a=vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3);
-                this.paramsLists={type:'pdf',source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
+                this.paramsLists={type:vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3),source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
                 console.log(this.paramsLists,'this.paramsLists');
                 console.log(a,'1323')
                 }else if(response.data.cd=='-1'){
@@ -3003,6 +3228,7 @@ export default {
         },
         //上传图片编辑
         setSpotPic(){
+            this.setSpotPicShow=true;
             this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
         },
         //编辑照片标记
@@ -3025,41 +3251,117 @@ export default {
             })
         },
         //获取图片列表
-        getTagList(){
-             axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    baseMapId:vm.monitorBaseMapId
-                },
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.spotPicInfo=response.data.rt;
-                    // this.monitorPointInfo=response.data.rt;
-                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
-                }
-            })
+        // getTagList(){
+        //      axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             baseMapId:vm.monitorBaseMapId
+        //         },
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.spotPicInfo=response.data.rt;
+        //             // this.monitorPointInfo=response.data.rt;
+        //             // this.$refs.pic.loadPoints(this.monitorPointInfo);
+        //         }
+        //     })
+        // },
+         selectImg(){
+             this.$refs.file.click()
         },
+        fileChanged(file){
+            var vm = this
+            vm.filesList = vm.$refs.file.files[0] //[]
+            vm.imageName = vm.filesList.name
+           
+        },
+        //取消上传图片
+        upImgCancle(){
+            this.uploadshow=false;
+        },
+
         //上传照片
         addPhotoTag(){
+            var vm=this;
+            if(vm.filesList == null){
+               vm.$message({
+                   type:'error',
+                   message:'请选择文件！'
+               })
+               return false
+           }
+            var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData = new FormData()
+            formData.append('token',vm.token);
+            formData.append('projId',vm.projId);
+             formData.append('type',1);
+            formData.append('file',vm.filesList);
+            formData.append('userId',vm.userId);
+            formData.append('modelCode','006');
+            formData.append('returnUrl',returnUrl);
             axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                method:'POST',
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
                 headers:{
-                    'token':vm.token
+                    'Content-Type': 'multipart/form-data'
                 },
-                // params:{
-                //     baseMapId:vm.monitorBaseMapId
-                // },
+                data:formData,
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.spotPicInfo=response.data.rt;
+                    vm.imageName ='未选择任何文件'
+                    vm.filesList = null;
+                    vm.uploadshow=false;
                     // this.monitorPointInfo=response.data.rt;
                     // this.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
+            }).catch((err)=>{
+                vm.des = ''
+                vm.imageName ='未选择任何文件'
+                console.log(err)
+            })
+        },
+        //更换图片标记
+        updateTagFile(){
+             var vm=this;
+            if(vm.filesList == null){
+               vm.$message({
+                   type:'error',
+                   message:'请选择文件！'
+               })
+               return false
+           }
+            var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
+            returnUrl = encodeURIComponent(returnUrl);
+            var formData = new FormData()
+            formData.append('token',vm.token);
+            formData.append('projId',vm.projId);
+             formData.append('type',1);
+            formData.append('file',vm.filesList);
+            formData.append('userId',vm.userId);
+            formData.append('modelCode','002');
+            formData.append('returnUrl',returnUrl);
+            axios({
+                method:'POST',
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                },
+                data:formData,
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    vm.imageName ='未选择任何文件'
+                    vm.filesList = null
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            }).catch((err)=>{
+                vm.des = ''
+                vm.imageName ='未选择任何文件'
+                console.log(err)
             })
         },
         //开启移动
@@ -3092,6 +3394,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    // this.getTagList();
                 }
             })
         },
@@ -3682,7 +3985,7 @@ export default {
                         margin-top:15px !important;
                         margin:0 auto;
                         border:1px solid #e6e6e6;
-                        height: 540px;
+                        height: 600px;
                         width: 100%;
                         position: relative;
                         .operateTool{
@@ -4030,6 +4333,35 @@ export default {
             }
         }
         #edit{
+
+            .upInput{
+                    display: none;
+                }
+            /* 上传文件按钮 */
+            .imageBody{
+                text-align: left;
+            }
+            .imageBody .imageBodyText{
+                    color: #666;
+                    font-size: 14px;
+                    line-height: 14px;
+                    font-weight: normal;
+                    display: inline-block;
+                    margin-right: 20px;
+                    margin-left: 94px;
+                    text-align: right;
+            }
+            .updataImageSpan{
+                overflow: hidden;
+                width: 98px;
+            }
+            .updataImageSpan input{
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                opacity: 0;
+                /* -ms-filter: 'alpha(opacity=0)'; */
+            }
             .baseMapBody{
                 height: 460px;
                 overflow: auto;
