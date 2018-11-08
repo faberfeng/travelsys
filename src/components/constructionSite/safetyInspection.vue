@@ -105,7 +105,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl,angle:0}"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -429,13 +429,76 @@
             <el-dialog title="导出监测报告" :visible="exportrEportsShow" @close="exportrEportsCancle()">
                 <div class="editEportBody">
                     <div class="editEportBodyone">
-                        <!-- <div class="">
-
-                        </div> -->
+                        <div class="oneTxt">
+                            时间段设置：
+                        </div>
+                        <div class="timeInp">
+                            <div class="timeTxt"><label class="label1">参考以下时间之前最近的数据：</label></div>
+                            <div class="timeSel">
+                                 <el-date-picker
+                                    v-model="consultValue"
+                                    type="datetime" style="width:550px !important"
+                                    placeholder="选择日期时间">
+                                </el-date-picker>
+                            </div>
+                             <div class="timeTxt" style="margin-top:10px;"><label class="label1">使用以下时间之前最近的数据：</label></div>
+                             <div class="timeSel">
+                                 <el-date-picker
+                                    v-model="userValue"
+                                    type="datetime" style="width:550px !important"
+                                    placeholder="选择日期时间">
+                                </el-date-picker>
+                            </div>
+                        </div>
                     </div>
-                    <div class="editEportBodytwo">
-                        
+                    <div class="editEportBodytwo" style="height:100px;">
+                        <div class="head">
+                            <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">封面</label></el-checkbox>
+                            <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
+                        </div>
+                        <div v-show="isShow" class="imgBody">
+                            <div class="imgBodyLeft"></div>
+                            <div class="imgBodyRight"></div>
+                        </div>
                     </div>
+                     <div class="editEportBodytwo" style="height:140px;">
+                        <div class="head">
+                            <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">概述</label></el-checkbox>
+                            <span class="groundSpan" @click="retract1"><img class="groundEdit"   :src="retractImg1"/>{{retractText1}}</span>
+                        </div>
+                        <div class="textBody" v-show="isShow1">
+                            <label>综述及建议：</label>
+                            <div class="areaBody">
+                                <textarea v-model="suggestList" style="padding:5px;" placeholder="请输入"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editEportBodytwo" style="height:150px;">
+                        <div class="head">
+                            <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">测点详情：</label></el-checkbox>
+                            <span class="groundSpan" @click="retract2"><img class="groundEdit"   :src="retractImg2"/>{{retractText2}}</span>
+                        </div>
+                        <div class="selectMap" v-show="isShow2">
+                            <div class="map_txt">
+                                <el-checkbox class="map_check" v-model="showBaseImg"><label>每一页都展示底图</label></el-checkbox>
+                               <div class="map_check1"><label style="margin-right:20px;">底图位置:</label> <el-radio v-model="pageTop">页面上部</el-radio><el-radio v-model="pageBottom">页面底部</el-radio></div>
+                            </div>
+                            <div class="map_txt" style="margin-top:15px;">
+                                 <el-checkbox class="map_check" v-model="showBaseImg"><label>优化布局测点标记</label></el-checkbox>
+                                <div class="map_check1"><label style="margin-right:20px;">优先方式:</label> <el-radio v-model="pointPriority" label="1">测点顺序优先</el-radio><el-radio v-model="picPriority">图面清晰优先</el-radio></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editEportBodytwo" style="height:140px;">
+                        <div class="head">
+                            <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">生成二维码：</label></el-checkbox>
+                            <span class="groundSpan" @click="retract3"><img class="groundEdit"   :src="retractImg3"/>{{retractText3}}</span>
+                        </div>
+                        <div class="qrcodeBody">
+                            <img /><label></label>
+                        </div>
+                    </div>
+                    
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" >保存设置</button>
@@ -447,6 +510,8 @@
     </div>
 </template>
 <script>
+import shouqiImg from '../../assets/arrow-top.png';
+import zhankaiImg  from '../../assets/arrow-down.png';
 import moment from 'moment'
 import axios from 'axios'
 import pdf from 'vue-pdf'
@@ -683,6 +748,27 @@ export default {
             commonDetailShow:false,//公共详情页
             walkThroughShow:false,//巡视报告
             exportrEportsShow:false,//导出报告
+            consultValue:'',
+            userValue:'',
+            coverChecked:false,
+            showBaseImg:false,
+            pointPriority:'1',//测点优先
+            pageTop:'',//页面头部
+            pageBottom:'',//页面顶部
+            picPriority:'',//图形清晰优先
+            suggestList:'',//综述和建议
+            retractImg:shouqiImg,
+            retractText:'收起',//展开与伸缩
+            isShow:true,
+            retractImg1:shouqiImg,
+            retractText1:'收起',//展开与伸缩
+            isShow1:true,
+            retractImg2:shouqiImg,
+            retractText2:'收起',//展开与伸缩
+            isShow2:true,
+            retractImg3:shouqiImg,
+            retractText3:'收起',//展开与伸缩
+            isShow3:true,
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
@@ -1318,7 +1404,7 @@ export default {
                 return  require('./images/sunny.png')
             }else if(val=="小雨"||val=="小雨转阴"){
                 return  require('./images/lightrain.png')
-            }else if(val=="大雨"){
+            }else if(val=="大雨"||val=="小雨转中雨"){
                 return  require('./images/heavyrain.png')
             }else if(val=="多云转小雨"||val=="小雨转多云"){
                 return  require('./images/sunnyandcloudy.png')
@@ -2892,6 +2978,8 @@ export default {
         //获取底图中所有的监测点
         getAllMonitorPoint(){
             var vm=this;
+            this.$refs.pic.Max_Select = 8;
+            this.$refs.pic.Max_type = 2;
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
@@ -3006,6 +3094,51 @@ export default {
                     
                 }
             })
+        },
+        //触发是否展开与伸缩
+        retract(){
+             if(this.retractImg === shouqiImg){
+                this.retractImg = zhankaiImg;
+                this.retractText = '展开';
+                this.isShow = false;
+            }else{
+                this.retractImg = shouqiImg;
+                this.retractText = '收起';
+                this.isShow = true;
+            }
+        },
+         retract1(){
+             if(this.retractImg1 === shouqiImg){
+                this.retractImg1 = zhankaiImg;
+                this.retractText1 = '展开';
+                this.isShow1 = false;
+            }else{
+                this.retractImg1 = shouqiImg;
+                this.retractText1 = '收起';
+                this.isShow1 = true;
+            }
+        },
+         retract2(){
+             if(this.retractImg2 === shouqiImg){
+                this.retractImg2 = zhankaiImg;
+                this.retractText2 = '展开';
+                this.isShow2 = false;
+            }else{
+                this.retractImg2 = shouqiImg;
+                this.retractText2 = '收起';
+                this.isShow2 = true;
+            }
+        },
+        retract3(){
+             if(this.retractImg3 === shouqiImg){
+                this.retractImg3 = zhankaiImg;
+                this.retractText3 = '展开';
+                this.isShow3 = false;
+            }else{
+                this.retractImg3 = shouqiImg;
+                this.retractText3 = '收起';
+                this.isShow3 = true;
+            }
         }
         
 
@@ -4157,9 +4290,116 @@ export default {
             }
             .editEportBody{
                 margin:0 auto;
+                width: 92%;
+                height: 600px;
+                overflow: auto;
                 .editEportBodyone{
+                   
+                    .oneTxt{
+                        height: 30px;
+                        text-align: left;
+                        line-height: 30px;
+                        font-size: 14px;
+                        color: #666666;
+                        font-weight: bold;
+                        border-bottom: 1px solid #ccc;
+                    }
+                    .timeInp{
+                        width: 100%;
+                        margin-top:10px;
+                        .timeTxt{
+                            height: 30px;
+                            line-height: 30px;
+                            font-size: 14px;
+                            text-align: left;
+                            color:#666666;
+                            .label1{
+                                margin-left:30px;
+                            }  
+                        }
+                    }
+                }
+                .editEportBodytwo{
+                    margin-top:20px;
+                    .head{
+                         height: 30px;
+                          border-bottom: 1px solid #ccc;
+                         .elCheck{
+                             float: left;
+                            //  text-align: left;
+                            line-height: 30px;
+                             font-size: 16px;
+                         }
+                         .groundSpan{     
+                            color: #336699;
+                            font-size: 14px;
+                            font-weight: normal;
+                            cursor: pointer;
+                            float: right;
+                            .groundEdit{
+                                 display: inline-block;
+                                margin-right: 10px;
+                            }
+                         }
+                    }
+                    .imgBody{
+                        width: 90%;
+                        margin:15px auto;
+                        .imgBodyLeft{
+                            float: left;
+                            width: 49%;
+                            height: 60px;
+                            border:1px solid #ccc;
+                            border-radius: 3px;
+                        }
+                        .imgBodyRight{
+                            float: right;
+                            height: 60px;
+                             width: 49%;
+                             border:1px solid #ccc;
+                             border-radius: 3px;
+                        }
+                    }
+                    .textBody{
+                        width: 90%;
+                         margin:15px auto;
+                        label{
+                            color:#333333;
+                            font-size: 14px;
+                            height: 30px;
+                            line-height: 30px;
+                            text-align: left;
+                            float:left;
+                        }
+                        .areaBody{
+                            textarea{
+                                height: 70px;
+                                width: 100%;
+                                border-radius: 2px;
+                            }
+                        }
+                    }
+                    .selectMap{
+                         width: 90%;
+                         margin:15px auto; 
+                        .map_txt{
+                            .map_check{
+                                display: block;
+                                text-align: left;
+                                // float: left;
+                            }
+                            .map_check1{
+                                 display: block;
+                                text-align: left;
+                                margin-left:20px;
 
-
+                            }
+                        }
+                    }
+                    .qrcodeBody{
+                        width: 90%;
+                        margin:15px auto; 
+                    }
                 }
             }
         }

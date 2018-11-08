@@ -93,10 +93,8 @@ export default {
 
                         this.angle = parseInt(this.para.angle);
                         this.R = 0;
-                    }
-                    
+                    }         
                     this.url = this.para.source + "?random=" + Math.random();
-
                     if(this.sub_div){
                         this.ResolutionScale = this.PDFscale;
                         // this.sub_div.style.height = this.PDFsize.height + "px";
@@ -1972,6 +1970,7 @@ export default {
             
         },
         loadPoints2(list){
+            console.log(list);
             this.drawList= [];
             this.drawID = 0;
             // console.log(list);
@@ -2006,6 +2005,7 @@ export default {
         clearAll(){
             this.drawList= [];
             this.drawID = 0;
+
         },
         enableLabel(status){
             this.displayLabel = status;
