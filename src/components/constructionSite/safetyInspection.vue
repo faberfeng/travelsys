@@ -74,9 +74,11 @@
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span>
-                            <span class="uploadPicBtn">上传图片</span>
+                            <span class="uploadPicBtn" @click="setSpotPic()">上传图片</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn">多点对比</span>
+                            <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
+                            <img id="fz_img_for_site1" src="./images/site1.png" style="display:none"/>
                         </div>
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span id="inspectContentSel">
@@ -790,6 +792,7 @@ export default {
             positionListName:'',//名称
             nowDate:'',//当前时间
             testShow:true,//是否测试
+            spotPicInfo:[],//图片编辑绘图信息
 
         }
     },
@@ -1424,6 +1427,8 @@ export default {
             this.isClick3=false;
 
             var list = this.$refs.pic.saveList();
+            
+            // var list1=this.
             // console.log(list);
 
             axios({
@@ -2963,6 +2968,67 @@ export default {
             this.isClick1=false;
             this.isClick3=true;
         },
+        //上传图片编辑
+        setSpotPic(){
+            this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:255,g:0,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+        },
+        //编辑照片标记
+        editPhotoTag(){
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.monitorBaseMapId
+                },
+                data:vm.spotPicInfo
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            })
+        },
+        //获取图片列表
+        getTagList(){
+             axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.monitorBaseMapId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.spotPicInfo=response.data.rt;
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            })
+        },
+        //上传照片
+        addPhotoTag(){
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                headers:{
+                    'token':vm.token
+                },
+                // params:{
+                //     baseMapId:vm.monitorBaseMapId
+                // },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.spotPicInfo=response.data.rt;
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                }
+            })
+        },
         //开启移动
         enableMove(){
             this.$refs.pic.setMoveStatus();
@@ -3139,7 +3205,8 @@ export default {
                 this.retractText3 = '收起';
                 this.isShow3 = true;
             }
-        }
+        },
+
         
 
        

@@ -43,7 +43,7 @@
                 </div>
 
                 <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
-                    <picView ref="pic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="{angle:rotate,type:drawingFileUrl1.substr(drawingFileUrl1.length-3),source:drawingFileUrl1}" ></picView>
+                    <picView ref="pic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -446,6 +446,7 @@ export default {
             getHoldersList:'',//空间楼层列表
             holderId:'',//容器ID
             fileGroupId:'',//文件夹ID
+            paraList:{},
         }
     },
     filters: {
@@ -501,17 +502,17 @@ export default {
         annotationUserId:function(val){
             this.isSelect='';
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
         },
         stage:function(val){
              this.isSelect='';
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
             // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
         },
        
 
@@ -889,6 +890,7 @@ export default {
         getDrawingRotateInfo(){
              var vm=this
              this.rotate=0;
+             console.log(this.drawingFileUrl,'this.drawingFileUrl');
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
@@ -901,16 +903,16 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     if(response.data.rt){
-                        
                         if(isNaN(response.data.rt.rotateInfo)){
                             this.rotate = 0;
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                       
                         console.log(this.rotate);
-                        this.drawingFileUrl1=this.drawingFileUrl;
+                        // this.drawingFileUrl1=this.drawingFileUrl;
                     }
+                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                // this.paraList={angle:this.rotate,type:this.drawingFileUrl1.substr(this.drawingFileUrl1.length-3),source:this.drawingFileUrl1};
                 }else{
                     
                 } 
@@ -1352,9 +1354,11 @@ export default {
                 data:drawingIdList
             }).then((response)=>{
                 if(response.data.rt){
-                    this.versionPath=(response.data.rt)[0].fileUri;
-                    this.drawingFileUrl1=this.QJFileManageSystemURL+this.versionPath;
-                    this.getDrawingRotateInfo();
+                    vm.versionPath=(response.data.rt)[0].fileUri;
+                    vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
+                    vm.getDrawingRotateInfo();
+                    // vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                    // console.log(vm.paraList,'this.paraList');
                     this.drawingLoading=false;
 
                     // if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
@@ -1423,13 +1427,14 @@ export default {
             vm.drawingId=obj.id
             vm.drawingName=obj.drawingName
             vm.drawingNumber=obj.drawingNumber
+             
             // console.log(vm.directoryId,'vm.directoryId')
             // console.log( vm.drawingId,' vm.drawingId')
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
-               
+              this.getDrawingRotateInfo();
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }

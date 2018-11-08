@@ -71,6 +71,7 @@ export default {
         this.Refresh_timer = setInterval(()=>{
 
             if(this.para.type == "")return;
+            console.log(this.para,'this.para.type')
 
             if(this.para.type == "pdf"){
                 this.para.type = "PDF";
@@ -1272,9 +1273,9 @@ export default {
             var color_='rgb(0,0,0)';
             var position = this.rotate_XY_display(position_);
 
-            if(color){
-                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            }
+            // if(color){
+            //     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            // }
 
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
