@@ -143,8 +143,8 @@ export default {
     },
     methods:{
         Select_item(){
-            if(this.drawList[0].type == "Select_img_Mark"){
-                this.$emit('Image_Mark',this.drawList[0]);
+            if(this.SelectedList[0].type == "Select_img_Mark"){
+                this.$emit('Image_Mark',this.SelectedList[0]);
             }
         },
         init(div,source,type,page_No,angle){
