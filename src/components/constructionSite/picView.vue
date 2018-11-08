@@ -71,7 +71,7 @@ export default {
         this.Refresh_timer = setInterval(()=>{
 
             if(this.para.type == "")return;
-            console.log(this.para,'this.para.type')
+            // console.log(this.para,'this.para.type')
 
             if(this.para.type == "pdf"){
                 this.para.type = "PDF";

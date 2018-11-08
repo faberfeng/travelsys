@@ -107,7 +107,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl,angle:0}"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -706,6 +706,7 @@ export default {
             monitorLogogram1:'',
             monitorKeyword1:'',
             monitorBaseMapId:'',//选择底图ID
+            rotate:0,//旋转角度
             monitorTypeList:[
                 {
                     value:1,
@@ -793,6 +794,7 @@ export default {
             nowDate:'',//当前时间
             testShow:true,//是否测试
             spotPicInfo:[],//图片编辑绘图信息
+            paramsLists:{},
 
         }
     },
@@ -1439,7 +1441,6 @@ export default {
                     },
                     params:{
                         baseMapId:vm.monitorBaseMapId
-                        
                     },
                     data:list
                 }).then((response)=>{
@@ -1584,6 +1585,10 @@ export default {
                             }
                         })
                     }
+                    var a=vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3);
+                this.paramsLists={type:'pdf',source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
+                console.log(this.paramsLists,'this.paramsLists');
+                console.log(a,'1323')
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -1591,6 +1596,31 @@ export default {
                     })
                 }
             })
+        },
+        //更新底图旋转信息
+        updateBaseMapRotate(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/setBaseMapUsed',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   baseMapId:vm.monitorBaseMapId,
+                   rotate:vm.rotate
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.getBaseMapList()
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:"error",
+                        msg:response.data.msg
+                    })
+                }
+            })
+
         },
         //取消底图列表
         baseMapCancle(){
