@@ -2008,7 +2008,7 @@ export default {
         },
         clearAll(){
             this.drawList= [];
-            this.drawID = 0;
+            this.drawID = 1;
         },
         enableLabel(status){
             this.displayLabel = status;
