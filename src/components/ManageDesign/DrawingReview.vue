@@ -1352,7 +1352,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.versionPath=(response.data.rt)[0].fileUri;
-                    this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
+                    this.drawingFileUrl1=this.QJFileManageSystemURL+this.versionPath;
                     this.getDrawingRotateInfo();
 
                     // if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')

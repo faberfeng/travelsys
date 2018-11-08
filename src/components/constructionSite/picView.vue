@@ -137,7 +137,7 @@ export default {
     },
     watch:{
         para: (newVal,oldVal)=>{
-            // console.log(newVal);
+            console.log(newVal);
         }
     },
     methods:{
