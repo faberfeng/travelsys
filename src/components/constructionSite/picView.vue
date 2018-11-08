@@ -1817,6 +1817,9 @@ export default {
                 case 10001: // 图标
                     this.drawtype = "Select_img_Mark";
                     break;
+                case 10000: // 文字
+                    this.drawtype = "text";
+                    break;
             }
 
             if(userData){
@@ -1825,9 +1828,9 @@ export default {
                 this.userData = {};
             }
 
-            if(status == "text"){
-                this.drawtype = "text";
-            }
+            // if(status == "text"){
+            //     this.drawtype = "text";
+            // }
 
             // console.log(this.drawtype);
 
