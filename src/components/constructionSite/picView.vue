@@ -94,8 +94,10 @@ export default {
 
                         this.angle = parseInt(this.para.angle);
                         this.R = 0;
-                    }         
+                    }
+                    
                     this.url = this.para.source + "?random=" + Math.random();
+
                     if(this.sub_div){
                         this.ResolutionScale = this.PDFscale;
                         // this.sub_div.style.height = this.PDFsize.height + "px";
@@ -1816,6 +1818,9 @@ export default {
                 case 10001: // 图标
                     this.drawtype = "Select_img_Mark";
                     break;
+                case 10000: // 文字
+                    this.drawtype = "text";
+                    break;
             }
 
             if(userData){
@@ -1824,9 +1829,9 @@ export default {
                 this.userData = {};
             }
 
-            if(status == "text"){
-                this.drawtype = "text";
-            }
+            // if(status == "text"){
+            //     this.drawtype = "text";
+            // }
 
             // console.log(this.drawtype);
 
@@ -1936,7 +1941,7 @@ export default {
         loadPoints(list){
             this.drawList = [];
             this.SelectedList = [];
-            this.drawID = 0;
+            this.drawID = 1;
             // console.log(list);
 
             for(let i = 0;i < list.length;i++){
@@ -1971,9 +1976,8 @@ export default {
             
         },
         loadPoints2(list){
-            console.log(list);
             this.drawList= [];
-            this.drawID = 0;
+            this.drawID = 1;
             // console.log(list);
             this.baseColor = {r:255,g:0,b:0};
             for(let i = 0; i < list.length;i++){
@@ -2005,8 +2009,7 @@ export default {
         },
         clearAll(){
             this.drawList= [];
-            this.drawID = 0;
-
+            this.drawID = 1;
         },
         enableLabel(status){
             this.displayLabel = status;
