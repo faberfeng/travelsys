@@ -460,7 +460,7 @@ export default {
                                 
                                 this.SelectedList = [];
                                 this.Selected_typeNum_List = [];
-                                this.SelectedList.push(this.drawList[i]);
+                                this.SelectedList.push(this.drawList[this.drawList.length - 1]);
                     
 
                                 this.SelectedList[0].Selected = true;
@@ -1271,13 +1271,13 @@ export default {
 			//////////////////////////////////////////////
 
         },
-        drawSelectImgMark(drawcontext,position_,select,scale,userData,isSelected){
+        drawSelectImgMark(drawcontext,position_,select,scale,color,isSelected,userData){
             var color_='rgb(0,0,0)';
             var position = this.rotate_XY_display(position_);
 
-            // if(color){
-            //     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            // }
+            if(color){
+                color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+            }
 
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
@@ -1287,17 +1287,17 @@ export default {
             let fz_img = document.getElementById(userData.DrawImg);
             if(select){
                 drawcontext.rect(
-                    (position.x * this.ResolutionScale * this.scale - fz_img.offsetWidth / 2),
-                    (position.y * this.ResolutionScale * this.scale - fz_img.offsetHeight/ 2),
-                    fz_img.offsetWidth ,
-                    fz_img.offsetHeight );
+                    (position.x * this.ResolutionScale * this.scale - fz_img.width / 2),
+                    (position.y * this.ResolutionScale * this.scale - fz_img.height/ 2),
+                    fz_img.width ,
+                    fz_img.height );
                 drawcontext.fill();
             }else{
                 
                 if(isSelected){
-                    let fz_img = document.getElementById(userData.SelectImg);                    
+                    fz_img = document.getElementById(userData.SelectImg);                    
                 }else{
-                    let fz_img = document.getElementById(userData.DrawImg);
+                    fz_img = document.getElementById(userData.DrawImg);
                 }
 
                 drawcontext.drawImage(fz_img,position.x* this.ResolutionScale * this.scale - 9,position.y* this.ResolutionScale * this.scale - 9);
