@@ -1992,7 +1992,8 @@ export default {
                             TempPostion:plotInfo.TempPostion,
                             text:plotInfo.text,
                             display:true,
-                            typeNum:list[i].type                               //  type
+                            typeNum:list[i].type,                               //  type
+                            userData:plotInfo.userData
                         };
                 this.drawList.push(item);
 
