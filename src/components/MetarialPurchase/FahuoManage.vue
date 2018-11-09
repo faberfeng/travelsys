@@ -156,7 +156,7 @@
                                         <td>
                                             <span class="biaoqianIcon " :title="'标签'" @click="tips(item)"></span>
                                             <span class="editdetail" :title="'明细'" @click="showDetialList(item,index)"></span>
-                                            <span v-if="activeName == 1 && item.sendStatus ==0" class="editdetail" :title="'发货'" @click="sendGoods(item)"></span>
+                                            <span v-if="activeName == 1 && item.sendStatus ==0" class="sureSend" :title="'发货'" @click="sendGoods(item)"></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -168,7 +168,7 @@
                     </div>
                 </div>
             </div>
-            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'发货管理'"  v-if="showCommonList"></common-list>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'发货管理'" :isShowFahuo="isShowFaHuo" :faHuoObj='DingDanObj' :isFahuo="isFaHuo" v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="发货确认" :visible.sync="sendshow" :before-close="sendCancel" width="398px">
@@ -379,6 +379,10 @@ export default {
             selectIndexone:'-1',
             selectIndextwo:'-1',
             showCommonList:false,
+            showWuZi:true,
+            isShowFaHuo:true,
+            isFaHuo:true,
+            DingDanObj:{},
         }
     },
     created(){
@@ -396,6 +400,14 @@ export default {
             console.log(val);
             this.showCommonList = true;
             this.checkItem = val;
+            this.DingDanObj = {};
+            Object.assign(this.DingDanObj,{
+                                orderCode:this.orderInfo.orderCode,
+                                orderTitle:this.orderInfo.orderTitle,
+                                checkItem:this.checkItem,
+                                orderId:this.orderInfo.id,
+                            })
+            console.log("订货管理到清单",this.DingDanObj); 
         },
         handleClick(){
             this.selectIndexone = '-1';
@@ -489,8 +501,10 @@ export default {
         selectItem(item,index,flag){
             if(flag){
                 this.selectIndextwo = index;
+                this.isFaHuo = false;
             }else{
                 this.selectIndexone = index;
+                this.isFaHuo = true;
             }
             this.showDetail = false;
 
@@ -1006,7 +1020,7 @@ export default {
             float: left;
             width: 12px;
             height: 12px;
-            background: url('./images/viewdetail.png')no-repeat 0 0;
+            background: url('./images/editdetail.png')no-repeat 0 0;
             cursor: pointer;
             margin-right: 20px;
         }
@@ -1014,7 +1028,15 @@ export default {
             float: left;
             width: 10px;
             height: 12px;
-            background: url('./images/editdetail.png')no-repeat 0 0;
+            background: url('./images/viewdetail.png')no-repeat 0 0;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+        .sureSend{
+            float: left;
+            width: 15px;
+            height: 15px;
+            background: url('./images/1-2.png')no-repeat 0 0;
             cursor: pointer;
             margin-right: 20px;
         }

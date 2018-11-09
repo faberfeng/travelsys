@@ -71,16 +71,15 @@
                                 <ul class="leftcontentul leftcontentul-template">
                                     <li class="lefttitle-template">
                                         <div class="lefttitlelab-template"><label>模板名称</label></div>
-                                        <div class="lefttitlespan-template"><span>使用次数</span></div>
+                                        <!-- <div class="lefttitlespan-template"><span>使用次数</span></div> -->
                                     </li>
                                     <li :class="[selectIndexthree == index ?'selectActive':'','lefttitlecontent']" class="lefttitlecontent-template" v-for="(item,index) in templateData" :key="index" @click="selectItem(item,index,3)">                   <div class="lefttitlelab-template"><label>{{item.planTemplateName}}</label></div>                  <div class="lefttitlespan-template">
-                                            <span class="lt">{{item.isCheck}}</span>
+                                            <!-- <span class="lt">{{item.isCheck}}</span> -->
                                             <span class="rt">
                                                 <i @click="deletePlanTemplate(item.id)" title="删除模板" class="deleteIcon"></i>
                                             </span>
                                         </div>                                     
-                                    </li>
-                                    
+                                    </li> 
                                 </ul>
                             </div>
                         </el-tab-pane>
@@ -124,7 +123,7 @@
                             <div v-if="showjindujihua">
                                 <div class="jindujihua">
                                     <label class="jindujihuatext">计划进度-{{currtPlanStep}}</label>
-                                    <button class="jiadubutton" v-if="planInfo.relaType == 1">链接任务</button>
+                                    <!-- <button class="jiadubutton" v-if="planInfo.relaType == 1">链接任务</button> -->
                                 </div>
                                 <div class="jihuabody">
                                     <ul class="jihuabodyul">
@@ -444,6 +443,13 @@ export default {
         this.planTemplateIndex();
     },
     methods:{
+        handleClick(){
+            this.selectIndexone = '-1';
+            this.selectIndextwo = '-1';
+            this.selectIndexthree = '-1';
+            this.showDetail = true;
+            console.log("切换");
+        },
         //启动计划
         StartPlan(){
             console.log("启动计划");
@@ -495,11 +501,11 @@ export default {
             confirmButtonText: '确定',
             });
         },
-        handleClick(){
-            this.selectIndexone = '-1';
-            this.selectIndextwo = '-1';
-            this.selectIndexthree = '-1';
-        },
+        // handleClick1(){
+        //     this.selectIndexone = '-1';
+        //     this.selectIndextwo = '-1';
+        //     this.selectIndexthree = '-1';
+        // },
         changeGroup(){
             this.getPlanList(this.selectUser);
             this.getNoPlanList(this.selectUser);
@@ -637,47 +643,14 @@ export default {
                     console.log("item为空");
                 }else {
                     this.getTempDetail(item.id);
-                }
-                
+                }  
             }
         },
-        //进入新建模板
-        // toggleNewTempTop(){
-        //     console.log("新建模板this.isClick",this.isClick);
-        //     this.selectItem(null,-1,3);
-        //     this.planTemplateName = '新模板' ;
-        //     this.startPlanList = [];
-        //     this.endPlanList = [];
-        //     this.selectValueList = [];
-        //     this.endSelectValueIndexList = [];
-        //     this.checkvalue = [];
-        //     this.checkLists_flow = this.copyflowlist();
-        //     this.checkLists_flow.map( ( item,index ) => {
-        //         item.ischeck = 1;
-        //         item.isClick = 0;
-        //         if ( index > 0 ) {
-        //             item.flowList.startPlan = 0 ;
-        //             item.flowList.endPlan = 0 ;                    
-        //             this.startPlanList.push(item.flowList.startPlan);
-        //             this.endPlanList.push(item.flowList.endPlan);
-        //             this.selectValueList.push(item.flowList.startCondition);
-        //             this.endSelectValueIndexList.push(item.flowList.endCondition);
-        //             this.checkvalue.push(item.flow);
-        //         }
-        //         if( index === 1 ) {
-        //             item.isClick = 1;
-        //         }
-        //     });
-        //     this.selectValueList = [].concat(this.selectValueList);
-        //     this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
-        // },
         //新建模板
         toggleNewTemp(){
-            // this.showDetail = false;
             this.selectItem(null,-1,3);
             this.isNew = 1;
             this.isClick = 3;
-            
             this.planTemplateName = '新模板' ;
             this.startPlanList = [];
             this.endPlanList = [];
@@ -805,7 +778,7 @@ export default {
                         
                     }else{
                         this.$message({
-                            message: '保存失败!',
+                            message: res.data.msg,
                             type: 'warning'
                         });
                         return;
@@ -1564,16 +1537,13 @@ export default {
             }
             .isChange {
                     color: #fff;
-                    background: #fc3439,
+                    background: #fc3439;
                 }
             .pbodyrighttitle-temp {
                 width: 100%;
                 height:1000px;
                 // background: orchid;
                 padding: 20px;
-                .temp-content {
-
-                }
                 .content-form {
                     padding-right:30px;
                 }
