@@ -502,16 +502,18 @@ export default {
                     
 
                                 this.SelectedList[0].Selected = true;
+
+                                if(SID > 0){
+                                    this.$emit('status_changed',true,this.SelectedList);
+                                }else{
+                                    this.$emit('status_changed',false,this.SelectedList);
+                                }
+
+                                this.Refresh();
+                                return;
                             }
 
-                            if(SID > 0){
-                                this.$emit('status_changed',true,this.SelectedList);
-                            }else{
-                                this.$emit('status_changed',false,this.SelectedList);
-                            }
-
-                            this.Refresh();
-                            return;
+                            
                         }
 
                         ///////////////////////////////////////////////////////
