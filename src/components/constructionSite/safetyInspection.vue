@@ -1214,10 +1214,11 @@ export default {
             this.toolShow=status;
             console.log(list);
             this.pointIds=[];
+
             list.forEach((item)=>{
                  this.pointIds.push(item.ID_out);
             })
-            this.editSpotShow=status;
+            // this.editSpotShow=status;
             // pointIds
             // console.log(status);
         },
