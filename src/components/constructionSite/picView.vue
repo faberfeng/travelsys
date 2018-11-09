@@ -492,11 +492,26 @@ export default {
                                 
                                 this.SelectedList = [];
                                 this.Selected_typeNum_List = [];
-                                this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+                                // this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    if(this.drawList[i].SID == SID){
+                                        this.SelectedList.push(this.drawList[i]);
+                                    }
+                                }
                     
 
                                 this.SelectedList[0].Selected = true;
                             }
+
+                            if(SID > 0){
+                                this.$emit('status_changed',true,this.SelectedList);
+                            }else{
+                                this.$emit('status_changed',false,this.SelectedList);
+                            }
+
+                            this.Refresh();
+                            return;
                         }
 
                         ///////////////////////////////////////////////////////
