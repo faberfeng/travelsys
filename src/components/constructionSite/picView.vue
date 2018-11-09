@@ -440,6 +440,33 @@ export default {
                             this.Selected_typeNum_List = [];
                         }
 
+                        /////////////////  Max_Select 为1特例 ////////////////
+
+                        if(this.Max_Select == 1){ 
+
+                            this.SelectedList = [];
+                            this.Selected_typeNum_List = [];
+
+                             for(let i = 0; i < this.drawList.length;i++){
+                                this.drawList[i].Selected = false;
+                                if(this.drawList[i].SID == SID){
+                                    this.SelectedList.push(this.drawList[i]);
+                                }
+                             }
+
+                             this.SelectedList[0].Selected = true;
+                        
+                            if(SID > 0){
+                                this.$emit('status_changed',true,this.SelectedList);
+                            }else{
+                                this.$emit('status_changed',false,this.SelectedList);
+                            }
+
+                            this.Refresh();
+                            return;
+                        
+                        }
+
                         //////////////// Select_img_Mark 特例 /////////////////
 
                         {
