@@ -1217,7 +1217,7 @@ export default {
             list.forEach((item)=>{
                  this.pointIds.push(item.ID_out);
             })
-            
+            this.editSpotShow=status;
             // pointIds
             // console.log(status);
         },
@@ -1308,7 +1308,6 @@ export default {
                         this.getTagList();
                     }
                 })
-              
             }
         },
 
@@ -3413,6 +3412,31 @@ export default {
         //删除点
         deleteDraw(){
             this.$refs.pic.deleteDraw();
+            //  var list1 = this.$refs.pic.saveList();
+            //       console.log(list1,'list1');  
+            //     this.spotPicInfo.push({
+            //         "coordinateInfo":JSON.stringify(list1.pop()),
+            //         "operationType":2,
+            //         "photoId":this.photoId,
+            //     });
+            //     console.log(this.spotPicInfo,'this.spotPicInfo')
+            //         axios({
+            //             method:'post',
+            //             url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+            //             headers:{
+            //                 'token':vm.token
+            //             },
+            //             params:{
+            //                 baseMapId:vm.monitorBaseMapId
+            //             },
+            //             data:this.spotPicInfo
+            //     }).then((response)=>{
+            //         if(response.data.cd=='0'){
+            //             this.uploadshow=true;
+            //             this.getTagList();
+            //         }
+            //     })
+
         },
         //修复故障
         changeBroken(){
