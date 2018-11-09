@@ -75,7 +75,7 @@
                     </div>
             </div>
             <div v-show="screenLeft.item == 1"  class="screenRight_1">
-                <div v-if="showAction">
+                <div >
                     <p class="clearfix" v-if="IsFolderAction">
                         <i class="icon-goujian icon-add" title="添加图纸" @click="uploadFile"></i>
                         <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
@@ -99,9 +99,9 @@
                         @node-click="handleNodeClick"
                         :check-strictly="true"
                         id="cloudDirveFileTree"
-                        :class="[showAction?'':'noTop']"
+                        
                     >
-                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
+                    <span :class="['custom-tree-node','elselect','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
                 </div>
             </div>
@@ -543,6 +543,9 @@ export default {
                 this.isClick=b[0].ID_out;
                 this.isId=b[0].ID_out;
                 // this.drawingShow=true;
+            }else if(a==false){
+                this.isClick='';
+                this.isId='';
             }
         },
         letterChange(val){
@@ -900,7 +903,7 @@ export default {
             console.log(this.drawingVersionList);
              setTimeout(()=>{
                 this.queryAnnotation();
-            },200)
+            },500)
             // this.queryAnnotation();
         },
         //更新图纸旋转信息
@@ -1277,7 +1280,7 @@ export default {
                     console.log(vm.DirectoryList,'directory')
                     this.getDrawingList();
                     // console.log(vm.DirectoryList);
-                    vm.showAction = true
+                    // vm.showAction = true
                 }else{
                     vm.message({
                         type:'error',
@@ -1932,6 +1935,9 @@ export default {
         .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
                 background-color: #dfdfdf;
         }
+        // .el-tree--highlight-current .el-tree-node.is-current .elselect{
+        //         background-color: #000;
+        // }
         .el-tree-node__label{
             font-size: 12px;
             color: #666666;
@@ -1969,6 +1975,9 @@ export default {
             background-image: url('./images/zTreeStandard.png');
             background-position: -110px -32px;
         }
+        // .elselect{
+        //     background: #333333;
+        // }
         .el-tree-node__content{
                 height: 30px;
         }
@@ -1976,6 +1985,9 @@ export default {
             color: #333333;
             font-weight: bold;
         }
+        // .is-current .el-tree-node__content {
+        //     background: #333333;
+        // }
         .clearfix{
             clear: both;
             overflow: hidden;

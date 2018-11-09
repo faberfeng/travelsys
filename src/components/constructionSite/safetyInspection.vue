@@ -578,6 +578,7 @@ export default {
             weatherTime:'',
             editSpotShow:false,
             toolShow:false,
+            picMarkName:'',
             baseMapShow:false,
             baseMapMonitor:false,
             addInspectContentShow:false,//增加监测内容弹框
@@ -830,6 +831,7 @@ export default {
             spotPicInfo:[],//图片编辑绘图信息
             paramsLists:{},
             photoId:null,//图片ID
+            photoIdList:null,
             spotPicInfoList:'',
             optionMoreSpotChangeLine:{
                         chart: {
@@ -1214,10 +1216,18 @@ export default {
             this.toolShow=status;
             console.log(list);
             this.pointIds=[];
-
+            this.picMarkName=list[0].type;
+            this.photoIdList=list[0].ID_out.replace("img","");
+            console.log(this.photoIdList,'this.photoIdList');
+            if(this.picMarkName!="Select_img_Mark"){
             list.forEach((item)=>{
                  this.pointIds.push(item.ID_out);
             })
+            }
+            if(this.picMarkName=="Select_img_Mark"){
+                this.editSpotShow=status;
+            }
+            
             // this.editSpotShow=status;
             // pointIds
             // console.log(status);
@@ -1325,9 +1335,9 @@ export default {
                     baseMapId:vm.monitorBaseMapId
                 },
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
-                    console.log(this.spotPicInfoList,'this.spotPicInfoList');
+                    // console.log(this.spotPicInfoList,'this.spotPicInfoList');
                      var alist=[];
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
                     this.spotPicInfoList.forEach((item)=>{
@@ -1352,7 +1362,6 @@ export default {
                         )
                         // alist.push(JSON.parse(item.coordinateInfo));
                     })
-                    console.log(alist,'dfg');
                     alist.forEach((item)=>{
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
@@ -1682,10 +1691,8 @@ export default {
             this.isClick3=false;
 
             var list = this.$refs.pic.saveList();
-            
             // var list1=this.
             // console.log(list);
-
             axios({
                     method:'POST',
                     url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
@@ -3352,6 +3359,7 @@ export default {
                     vm.filesList = null;
                     vm.uploadshow=false;
                     this.getTagList();
+                    // this.getAllMonitorPoint();
                     this.$message({
                         type:'success',
                         message:'点位图片上传成功'
@@ -3412,31 +3420,51 @@ export default {
         },
         //删除点
         deleteDraw(){
-            this.$refs.pic.deleteDraw();
-            //  var list1 = this.$refs.pic.saveList();
-            //       console.log(list1,'list1');  
-            //     this.spotPicInfo.push({
-            //         "coordinateInfo":JSON.stringify(list1.pop()),
-            //         "operationType":2,
-            //         "photoId":this.photoId,
-            //     });
-            //     console.log(this.spotPicInfo,'this.spotPicInfo')
-            //         axios({
-            //             method:'post',
-            //             url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-            //             headers:{
-            //                 'token':vm.token
-            //             },
-            //             params:{
-            //                 baseMapId:vm.monitorBaseMapId
-            //             },
-            //             data:this.spotPicInfo
-            //     }).then((response)=>{
-            //         if(response.data.cd=='0'){
-            //             this.uploadshow=true;
-            //             this.getTagList();
-            //         }
-            //     })
+            var vm=this;
+            if(this.picMarkName!="Select_img_Mark")
+            {
+                 this.$refs.pic.deleteDraw();
+            }
+            if(this.picMarkName=="Select_img_Mark"){
+                // var list1 = this.$refs.pic.saveList();
+                //     console.log(list1,'list1');  
+                    this.spotPicInfo=[];
+                    this.spotPicInfo.push({
+                        "coordinateInfo":null,
+                        "operationType":2,
+                        "photoId":this.photoIdList,
+                    });
+                    // console.log(this.spotPicInfo,'this.spotPicInfo')
+                        axios({
+                            method:'post',
+                            url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                baseMapId:vm.monitorBaseMapId
+                            },
+                            data:this.spotPicInfo
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            // this.uploadshow=true;
+                            this.$message({
+                                type:'success',
+                                message:'删除点位图片成功'
+                            })
+                            setTimeout(()=>{
+                                this.getTagList();
+                            },200)
+                            this.getAllMonitorPoint();
+                           this.picShowMark();
+                        }else if(response.data.cd=='-1'){
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
 
         },
         //修复故障
