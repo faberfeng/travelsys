@@ -1268,34 +1268,34 @@ export default {
             this.isClick2=false;
             this.isClick3=false;
             this.isClick=false;
-            // if(this.setSpotPicShow==true){
-            //     // this.uploadshow=true;
-            //     var list1 = this.$refs.pic.saveList();
-            //       console.log(list1,'list1');  
-            //     this.spotPicInfo.push({
-            //         "coordinateInfo":JSON.stringify(list1.pop()),
-            //         "operationType":1,
-            //         "photoId":this.photoId,
-            //     });
-            //     console.log(this.spotPicInfo,'this.spotPicInfo')
-            //      axios({
-            //         method:'post',
-            //         url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-            //         headers:{
-            //             'token':vm.token
-            //         },
-            //         params:{
-            //             baseMapId:vm.monitorBaseMapId
-            //         },
-            //         data:this.spotPicInfo
-            // }).then((response)=>{
-            //     if(response.data.cd=='0'){
-            //         this.uploadshow=true;
-            //         this.getTagList();
-            //     }
-            // })
+            if(this.setSpotPicShow==true){
+                // this.uploadshow=true;
+                var list1 = this.$refs.pic.saveList();
+                  console.log(list1,'list1');  
+                this.spotPicInfo.push({
+                    "coordinateInfo":JSON.stringify(list1.pop()),
+                    "operationType":1,
+                    "photoId":this.photoId,
+                });
+                console.log(this.spotPicInfo,'this.spotPicInfo')
+                    axios({
+                        method:'post',
+                        url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            baseMapId:vm.monitorBaseMapId
+                        },
+                        data:this.spotPicInfo
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.uploadshow=true;
+                        this.getTagList();
+                    }
+                })
               
-            // }
+            }
         },
         //获取图片列表
          getTagList(){
@@ -1315,26 +1315,28 @@ export default {
                      var alist=[];
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
                     this.spotPicInfoList.forEach((item)=>{
-                        alist.push(
-                            {
-                                'data':null,
-                                'id':item.id,
-                                'isAlert':null,
-                                'isBroken':null,
-                                'itemId':null,
-                                'itemName':null,
-                                'plotInfo':item.coordinateInfo,
-                                'pointName':null,
-                                'type':null,
-                            }
-                        )
+                        // alist.push(
+                        //     {
+                        //         'data':null,
+                        //         'id':item.id,
+                        //         'isAlert':null,
+                        //         'isBroken':null,
+                        //         'itemId':null,
+                        //         'itemName':null,
+                        //         'plotInfo':item.coordinateInfo,
+                        //         'pointName':null,
+                        //         'type':null,
+                        //     }
+                        // )
+                        alist.push(JSON.parse(item.coordinateInfo));
                     })
+                    // console.log(alist,'dfg');
                     alist.forEach((item)=>{
                         this.monitorPointInfo.push(item)
                     })
                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
 
-                    // console.log(alist,'spotPicInfoList');
+                    // // console.log(alist,'spotPicInfoList');
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
             })
