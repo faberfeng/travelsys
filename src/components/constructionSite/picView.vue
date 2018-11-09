@@ -451,10 +451,9 @@ export default {
                                 this.drawList[i].Selected = false;
                                 if(this.drawList[i].SID == SID){
                                     this.SelectedList.push(this.drawList[i]);
+                                    this.SelectedList[0].Selected = true;
                                 }
                              }
-
-                             this.SelectedList[0].Selected = true;
                         
                             if(SID > 0){
                                 this.$emit('status_changed',true,this.SelectedList);
@@ -1073,7 +1072,7 @@ export default {
                         }
                         if(this.drawList[i].position.length == 2){
                             this.drawLine(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
-                            this.drawLine(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                            this.drawLine(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],9,1,colorId);
                         }
                         break;
                     case "circular":
@@ -1085,7 +1084,7 @@ export default {
                         }
                         if(this.drawList[i].position.length == 2){
                             this.drawcircular(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
-                            this.drawcircular(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                            this.drawcircular(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],9,1,colorId);
                         }
                         break;
                     case "rectangle":
@@ -1097,7 +1096,7 @@ export default {
                         }
                         if(this.drawList[i].position.length == 2){
                             this.drawrectangle(this.drawcontext,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],2,1,this.baseColor,this.drawList[i].Selected);
-                            this.drawrectangle(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],5,1,colorId);
+                            this.drawrectangle(this.drawcontextSelect,this.drawList[i].position[this.drawList[i].position.length - 1],this.drawList[i].position[this.drawList[i].position.length - 2],9,1,colorId);
                         }
                         break;
                     case "Mark":
@@ -1120,7 +1119,7 @@ export default {
                         }
 
                         this.drawCloud(this.drawcontext,points,last,15,2,1,this.baseColor,this.drawList[i].Selected);
-                        this.drawCloud(this.drawcontextSelect,points,last,15,5,1,colorId);
+                        this.drawCloud(this.drawcontextSelect,points,last,15,9,1,colorId);
 
                         if(this.drawList[i].position.length > 2){   // 画封闭点位置
 
@@ -1168,22 +1167,25 @@ export default {
         drawCloud(drawcontext,points,last,radius,Width,scale,color,isSelected){
             var color_='rgb(0,0,0)';
 
+            if(Width){
+                drawcontext.lineWidth = Width;
+            }else{
+                drawcontext.lineWidth=3;
+            }
+
             if(color){
                 if(!isSelected){
                     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                 }else{
-                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                    drawcontext.lineWidth=7;
+                    color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
                 }
             }
 
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            if(Width){
-                drawcontext.lineWidth = Width;
-            }else{
-                drawcontext.lineWidth=3;
-            }
+            
 
             var finish = false;
 
@@ -1334,20 +1336,20 @@ export default {
 
         },
         drawMark(drawcontext,position_,select,scale,color,isSelected){
-            var color_='rgb(0,0,0)';
             var position = this.rotate_XY_display(position_);
-
+            var color_='rgb(0,0,0)';
+            drawcontext.lineWidth=3;
             if(color){
                 if(!isSelected){
                     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                 }else{
-                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                    drawcontext.lineWidth=7;
+                    color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
                 }
             }
 
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
-            drawcontext.lineWidth=3;
 
             drawcontext.beginPath();
             let fz_img = document.getElementById("fz_img_for_draw");
@@ -1380,20 +1382,17 @@ export default {
             var Start = this.rotate_XY_display(Start_);
             var End = this.rotate_XY_display(End_)
             var color_='rgb(0,0,0)';
+            drawcontext.lineWidth=radius;
 
             if(color){
                 if(!isSelected){
                     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                 }else{
-                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                    drawcontext.lineWidth=7;
+                    color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
                 }
             }
 
-            if(radius){
-                drawcontext.lineWidth = radius;
-            }else{
-                drawcontext.lineWidth=3;
-            }
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
@@ -1412,20 +1411,17 @@ export default {
             var Start = this.rotate_XY_display(Start_);
             var End = this.rotate_XY_display(End_)
             var color_='rgb(0,0,0)';
+            drawcontext.lineWidth=radius;
 
             if(color){
                 if(!isSelected){
                     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                 }else{
-                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                    drawcontext.lineWidth=7;
+                    color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
                 }
             }
 
-            if(radius){
-                drawcontext.lineWidth = radius;
-            }else{
-                drawcontext.lineWidth=3;
-            }
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
@@ -1442,23 +1438,20 @@ export default {
 
         },
         drawLine(drawcontext,Start_,End_,radius,scale,color,isSelected){
-            var color_='rgb(0,0,0)';
             var Start = this.rotate_XY_display(Start_);
             var End = this.rotate_XY_display(End_)
 
+            var color_='rgb(0,0,0)';
+            drawcontext.lineWidth=radius;
             if(color){
                 if(!isSelected){
                     color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                 }else{
-                    color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                    drawcontext.lineWidth=7;
+                    color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
                 }
             }
 
-            if(radius){
-                drawcontext.lineWidth = radius;
-            }else{
-                drawcontext.lineWidth=3;
-            }
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
@@ -1476,7 +1469,7 @@ export default {
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
-                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
             }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
@@ -1512,7 +1505,7 @@ export default {
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
-                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
             }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
@@ -1557,7 +1550,7 @@ export default {
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
-                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
             }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
@@ -1589,7 +1582,7 @@ export default {
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
-                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
             }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
@@ -1653,7 +1646,7 @@ export default {
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
-                color_ = 'rgb(' + (color.r + 50) / 2 + ',' + (color.g + 50) / 2 + ',' + (color.b + 255) / 2 + ')';
+                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
             }
             drawcontext.lineWidth=3;
             drawcontext.fillStyle=color_;
