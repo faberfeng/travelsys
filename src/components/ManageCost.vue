@@ -269,7 +269,7 @@ export default {
                                         type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
                                         source:this.QJFileManageSystemURL+item.fileUri,
                                         page:1,
-                                        angle:0
+                                        angle:this.rotate
                                 })
                             }
                         })
@@ -317,7 +317,7 @@ export default {
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                        console.log(this.rotate);
+                        console.log(this.rotate,'获取角度');
                     }
                     // console.log(vm.drawingWebGlList,'vm.drawingWebGlList');
                     //   vm.drawingWebGlList.forEach((item)=>{

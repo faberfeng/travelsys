@@ -1078,7 +1078,14 @@ export default {
            console.log(val,'val');
            vm.spotPicInfoList.forEach((item)=>{
                 if(item.id+'img'==val.ID_out){
-                    window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
+                    if(item.filePath==null){
+                        this.$message({
+                            type:'info',
+                            message:'该点位不存在图片,请删除重新上传'
+                        })
+                    }else{
+                         window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
+                    }
                 }
             })
             // console.log(this.pointIds,'this.pointIds');
@@ -3344,7 +3351,12 @@ export default {
                     vm.imageName ='未选择任何文件'
                     vm.filesList = null;
                     vm.uploadshow=false;
-                    this.addPhotoTag();
+                    this.getTagList();
+                    this.$message({
+                        type:'success',
+                        message:'点位图片上传成功'
+                    })
+                    // this.addPhotoTag();
                     // this.monitorPointInfo=response.data.rt;
                     // this.$refs.pic.loadPoints(this.monitorPointInfo);
                 }

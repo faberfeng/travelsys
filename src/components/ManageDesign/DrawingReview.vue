@@ -17,7 +17,7 @@
                     </router-link>
                 </div>
                 <div class="commentInformation" >
-                    <div class="commentTool" v-show="screenLeft.item == 3">
+                    <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                             <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -49,7 +49,7 @@
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
-            <div v-show="screenLeft.item == 3||screenLeft.item == 2&&!isSelect" id="drawingToolsBody">
+            <div v-show="screenLeft.item == 3" id="drawingToolsBody">
                     <ul class="drawingTools">
                         <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
                         <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
@@ -292,6 +292,7 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            drawingShow:false,
             showComment:true,//是否折叠评论
             isClick:'',
             selectShape:'',//选中图纸上的标注
@@ -506,12 +507,12 @@ export default {
     },
     watch:{
         annotationUserId:function(val){
-            this.isSelect='';
+            // this.isSelect='';
             this.queryAnnotation()
             // this.exportAnnotation()
         },
         stage:function(val){
-             this.isSelect='';
+            //  this.isSelect='';
             this.queryAnnotation()
             // this.exportAnnotation()
             // this.addAnnotation()
@@ -540,6 +541,8 @@ export default {
             console.log(a,b);
             if(a==true){
                 this.isClick=b[0].ID_out;
+                this.isId=b[0].ID_out;
+                // this.drawingShow=true;
             }
         },
         letterChange(val){
@@ -563,9 +566,9 @@ export default {
                 return this.letterList[val-1];
             }else if(val==10){
                 return this.letterList[val-1];
-            }else if(val=11){
+            }else if(val==11){
                  return this.letterList[val-1];
-            }else if(val==''){
+            }else if(val==null){
                 return '';
             }
         },
@@ -716,6 +719,7 @@ export default {
         },
         //选择版本
         selectVersion(val){
+            var vm=this;
             // this.isSelect='';
             this.isSelect=val;
             // //清除批注遗留的canvas；
@@ -726,38 +730,43 @@ export default {
             //     absInp.parentNode.removeChild(absInp);
             // }
              //清除批注遗留的canvas；
-            if(document.getElementById('abs')){
-                let absInp=document.getElementById('absInp');
-                document.getElementById('abs').drawElements=[];
-                document.getElementById('abs').reflash();
-            }
+            // if(document.getElementById('abs')){
+            //     let absInp=document.getElementById('absInp');
+            //     document.getElementById('abs').drawElements=[];
+            //     document.getElementById('abs').reflash();
+            // }
             // console.log(this.drawingVersionList,"jkdsjdjj");
             this.drawingVersionList.forEach((item)=>{
                 if(val==item.id){
                     this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
                     this.drawingVersionId=item.id;
                     this.version=item.versionId;
-                    if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
-                        {   this.pdfShow=true;
-                            this.imgShow=false;
-                            this.drawingFileUrl1=this.drawingFileUrl;
-                        }else{
-                            this.imgShow=true;
-                            this.pdfShow=false;
-                            var width=c.width;
-                            var height=c.height;
-                            // console.log(width,'',height)
-                            var ctx_img = c.getContext("2d");
-                            ctx_img.clearRect(0,0,width,height);
-                            var img = new Image();
-                            img.onload =function() {
-                                ctx_img.drawImage(img,0, 0);
-                                }
-                            img.src = this.drawingFileUrl;
-                        }
+                    console.log(this.version,'this.version');
+
+                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                    // if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
+                    //     {   this.pdfShow=true;
+                    //         this.imgShow=false;
+                    //         this.drawingFileUrl1=this.drawingFileUrl;
+                    //     }else{
+                    //         this.imgShow=true;
+                    //         this.pdfShow=false;
+                    //         var width=c.width;
+                    //         var height=c.height;
+                    //         // console.log(width,'',height)
+                    //         var ctx_img = c.getContext("2d");
+                    //         ctx_img.clearRect(0,0,width,height);
+                    //         var img = new Image();
+                    //         img.onload =function() {
+                    //             ctx_img.drawImage(img,0, 0);
+                    //             }
+                    //         img.src = this.drawingFileUrl;
+                    //     }
                 }
             })
-            this.queryAnnotation();
+            setTimeout(()=>{
+                this.queryAnnotation();
+            },1000)
             // console.log(this.drawingFileUrl);
         },
         //获取图纸旋转信息
@@ -875,11 +884,24 @@ export default {
             // }
         },
         annotationClick(){
+            var vm=this;
              this.screenLeft.item = 3
             //  this.isSelect='';
             //  this.biaozhushow=true;
             // this.loadeds()
-            this.queryAnnotation()
+            //  this.isSelect=this.drawingVersionId;
+             this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
+            vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+            this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
+            console.log(this.version,'this.version12')
+             vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+
+            console.log(this.drawingVersionId);
+            console.log(this.drawingVersionList);
+             setTimeout(()=>{
+                this.queryAnnotation();
+            },200)
+            // this.queryAnnotation();
         },
         //更新图纸旋转信息
         updateDrawingRotateInfo(){
@@ -2000,17 +2022,17 @@ export default {
                                 left:30px;
                                 top:9px;
                                 background: url('./images/zuox.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/zuox1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzl.png')no-repeat 0 0;
+                                }
                             }
                             .youRotate{
                                 left:70px;
                                 top:9px;
                                 background: url('./images/youx.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/youx1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzr.png')no-repeat 0 0;
+                                }
                             }
                             .bigRotate{
                                 left:-50px;
@@ -2498,18 +2520,22 @@ export default {
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
                         padding-left:7px; 
+                        position: relative;
                         .label1{
-                            width: 140px;
+                            width: 80%;
                             overflow: hidden;
                             text-overflow: ellipsis;
                             white-space: nowrap;
                             display: inline-block;
                         }
                         .export{
-                            float: right;
-                            margin-right:10px;
+                            // float: right;
+                            // margin-right:10px;
+                            right:10px;
+                            top:2px;
                             cursor: pointer;
                             color:#fc3439;
+                            position: absolute;
                         }
                      }
                      .clickbody{
@@ -2918,15 +2944,16 @@ export default {
             .editBody{
                 .editUpDrawing{
                     margin-top:10px;
+                    margin-left:-60px;
                     .editUpDrawingText{
                         display:inline-block;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
-                        text-align: right;
+                        text-align: left;
                     }
                     .editUpDrawingValue{
-                        margin-left:40px;
+                        margin-left:0px;
                         display:inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -2938,18 +2965,23 @@ export default {
                     width: 400px;
                     margin-left:109px;
                     margin-top:10px;
-
+                    position: relative;
+                    height: 30px;
                     .editUpDrawingProjectText{
                         display:inline-block;
-                        
-                        margin-left: -122px;
+                        // margin-left: -122px;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
                         text-align: left;
+                        position: absolute;
+                         top:0px;
+                         left:-6px;
                     }
                     .editUpDrawingProjectText1{
-                        margin-left: 39px;
+                        // margin-left: 39px;
+                        top:0px;
+                         left:171px;
                         display: inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -2958,24 +2990,31 @@ export default {
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        position: absolute;
 
                     }
                     .editUpDrawingProjectBtn{
-                            margin-top:10px;
-                            margin-left: 100px;
+                        position: absolute;
+                            // margin-top:10px;
+                            // margin-left: 100px;
+                            top:0px;
+                            left:82px;
                             display: block;
                             width: 80px;
-                            height: 30px;
+                            height: 28px;
                             border: none;
-                            line-height: 30px;
+                            line-height: 28px;
                             padding: 0;
                             cursor: pointer;
                             border-radius: 2px;
-                            background: #e2e2e2;
-                            margin-right: 20px;
-                            color: #8f8f8f;
+                            background: #f9f9f9;
+                            border: 1px solid #ccc;
+                            background: #f9f9f9;
                             font-size: 14px;
                             font-weight: normal;
+                            margin-right: 20px;
+                            color: #000;
+
                     }
                 }
             }
