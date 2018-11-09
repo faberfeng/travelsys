@@ -10,7 +10,8 @@
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "fix-memory-limit": "cross-env LIMIT=8096 increase-memory-limit"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -19,7 +20,7 @@
     "element-ui": "^2.2.0",
     "fullcalendar": "^3.9.0",
     "gantt": "^2.3.0",
-    "highcharts": "^6.1.1",  
+    "highcharts": "^6.1.1",
     "jquery": "^3.3.1",
     "js-md5": "^0.7.3",
     "sockjs-client": "^1.1.5",
@@ -60,6 +61,7 @@
     "file-loader": "^1.1.4",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
+    "increase-memory-limit": "^1.0.6",
     "jest": "^22.0.4",
     "jest-serializer-vue": "^0.3.0",
     "less": "^3.0.1",

@@ -1,7 +1,7 @@
 <template>
    <el-form-item class="detail-temp">
         <div class="detail-content-temp">
-            <el-form-item label="开启条件" label-width="100px">
+            <el-form-item label="开始条件" label-width="100px">
                 <div class="select-temp">
                     <el-select v-model="selectValue" placeholder="请选择" @change="startDayOnChange">
                         <el-option

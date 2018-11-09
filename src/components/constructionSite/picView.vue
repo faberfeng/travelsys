@@ -1973,7 +1973,7 @@ export default {
             for(let i = 0;i < list.length;i++){
                 
                 let plotInfo = JSON.parse(list[i].plotInfo);
-                console.log(plotInfo,'plotInfo')
+                // console.log(plotInfo,'plotInfo')
 
                 let item = {
                             data:list[i].data,                                  //  data

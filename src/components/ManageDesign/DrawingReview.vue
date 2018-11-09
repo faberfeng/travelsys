@@ -47,7 +47,7 @@
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
-            <div v-show="screenLeft.item == 3&&!isSelect" id="drawingToolsBody">
+            <div v-show="screenLeft.item == 3||screenLeft.item == 2&&!isSelect" id="drawingToolsBody">
                     <ul class="drawingTools">
                         <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
                         <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
@@ -125,7 +125,7 @@
             </div>
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
-                    <div class="drawingApendedHead" >{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}<div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
+                    <div class="drawingApendedHead" ><label class="label1">{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}</label><div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
                     
                     <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click.stop="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
@@ -1968,6 +1968,7 @@ export default {
                      left:60px;
                      .el-input__inner{
                         height: 30px !important;
+                        padding-left:5px;
                     }
 
                 }
@@ -2374,17 +2375,22 @@ export default {
                 }
             }
             #box-right{
-                 padding: 10px 13px 0 40px;
+                 padding: 10px 0px 0px 26px;
                  .versionBody{
                      .versionHead{
                         font-size:14px;
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        width:100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:4px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        
                      }
                      .versionUlSel{
                          background-color: #f6f6f6;
@@ -2400,7 +2406,7 @@ export default {
                         padding: 4px;
                         width: 100%;
                         height: 122px;
-                        margin:3px;
+                        // margin:3px;
                         text-align: left;
                         border-bottom: 1px solid #e6e6e6;
                     //     &:hover{
@@ -2449,7 +2455,7 @@ export default {
 
             }
             #box-right1{
-                 padding: 10px 15px 0 30px;
+                 padding: 10px 0px 0px 26px;
                  ::-webkit-scrollbar{width:0px}
                 .drawingApendedInfo{
                     width: 100%;
@@ -2460,10 +2466,18 @@ export default {
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        // width: 100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:7px; 
+                        .label1{
+                            width: 140px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            display: inline-block;
+                        }
                         .export{
                             float: right;
                             margin-right:10px;
@@ -2475,9 +2489,10 @@ export default {
                          background: #f6f6f6;
                      }
                     .drawingApendedInfobody{
-                        margin:20px 3px;
+                        margin:0px 0px;
                         position: relative;
                         border-bottom: 1px solid #ccc;
+                        padding: 4px;
                          .apendedInfoOne{
                              width: 100%;
                              height: 30px;
@@ -2485,7 +2500,9 @@ export default {
                              img{
                                  float: left;
                                  margin-top:7px;
-                                 margin-right: 2px
+                                 margin-right: 4px;
+                                 margin-left:4px;
+
                              }
                              .userName{
                                  float: left;
@@ -2521,15 +2538,16 @@ export default {
                                  background: url('./images/zhank.png')no-repeat 0 0;
                                  top:9px;
                                  right:6px;
+                                 cursor: pointer;
 
                              }
                         }
                         .appendedInfotext{
                             text-align: left;
-                            height: 24px;
+                            height: 20px;
                             font-size:12px;
                             color:#666666;
-                            line-height: 24px;
+                            line-height: 20px;
                             white-space: nowrap;
                             overflow: hidden;
                             width: 100%;
@@ -2538,7 +2556,7 @@ export default {
                         }
                         .apendedInfoTwo{
                             height: 20px;
-                            margin-left:8px;
+                            margin-left:5px;
                             .updateTime{
                                 float: left;
                                 font-size: 12px;
@@ -2566,7 +2584,7 @@ export default {
                             .apendedInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 18px;
+                                height: 22px;
                                 padding-left:4px;
                                 // border-radius: 2px;
                                 // background: #fafafa;
@@ -2582,9 +2600,11 @@ export default {
                             .commentInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 30px;
-                                padding-left:4px;
-                                padding-top:4px;
+                                height: 38px;
+                                padding-left:5px;
+                                padding-top:5px;
+                                // font-size: 12px;
+                                // color:#cccccc;
                             }
                             .replayBtn{
                                 background: #fc3439;
@@ -2610,6 +2630,7 @@ export default {
                                     .replyOne{
                                         margin-bottom: 4px;
                                         text-align: left;
+                                        position: relative;
                                         .replyName{
                                             font-size:14px;
                                             color:#333333;
@@ -2628,9 +2649,11 @@ export default {
                                         .deleteMark1{
                                             // margin-left: 78px;
                                             // margin-top:2px;
+                                            position: absolute;
                                             display:inline-block;
                                             background: url('../ManageCost/images/delete.png')no-repeat 0 0;
-                                            margin-left: 30px;
+                                            top:2px;
+                                            right: 13px;
                                             &:hover{
                                                 background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
                                             }

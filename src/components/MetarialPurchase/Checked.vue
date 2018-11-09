@@ -101,7 +101,7 @@
                                         <td v-text="item.checkUserName"></td>
                                         <td v-text="item.checkDate_"></td>
                                         <td>
-                                            <span class="detailsIcon" @click="showDetialList(item,index)" title="详情"></span>
+                                            <span class="detailsIcon" @click="showDetialList(item,index,noShowCheck)" title="详情"></span>
                                             <span v-if="!isReceipt" class="editIcon" :class=" item.checkStatus == 2 ? 'content-hidden' : ''" @click="showOver(index,item.id)" title="完成"></span>
                                             <span v-if="!isReceipt" class="backIcon" :class=" [item.checkStatus == 0 ? 'content-hidden' : '',orderInfo.checkStatus == 2 ? 'content-hidden' : '']" @click="showBackOver( index,item.id )" title="撤销"></span>
                                         </td>
@@ -149,7 +149,7 @@
                                         <td v-text="item.receiptUserName"></td>
                                         <td v-text="item.receiptDate_"></td>
                                         <td>
-                                            <span class="detailsIcon" @click="showDetialList(item,index)" title="详情"></span>
+                                            <span class="detailsIcon" @click="showDetialList(item,index,!noShowCheck)" title="详情"></span>
                                             <span v-if="!isReceipt" class="editIcon" :class=" item.receiptStatus == 1 ? 'content-hidden' : ''" @click="showReceipt( index,item.id )" title="完成"></span>
                                             <span v-if="!isReceipt" class="backIcon" :class=" [item.receiptStatus == 0 ? 'content-hidden' : '',orderInfo.receiptStatus == 1 ? 'content-hidden' : '']" @click="showBackReceipt( index,item.id )" title="撤销"></span>
                                         </td>
@@ -225,25 +225,25 @@
                     </div>
                 </div>
             </div>
-            <common-list :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'检查验收'"  v-if="showCommonList"></common-list>
+            <common-list v-on:back="backToH" @refreshData='getOrderDetail' :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'检查验收'"  :checkReceiptObj="CheckReceiptObj" :isShowcheck="isShowCheck" :isShowreceipt="isShowReceipt" :showEditallcheck='showEditAllCheck' :showEditallreceipt='showEditAllReceipt' v-if="showCommonList"></common-list>
         </div>
 
         <el-dialog title="图片上传" :visible.sync="upImg" @close="upImgCancle">
-                <div class="editBody">
-                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传图片 :</label>
-                        <span class="updataImageSpan">
-                            <button @click="selectImg" class="upImgBtn">选择图片</button>
-                            <input class="upInput"  type="file" accept="image/*" @change="fileChanged" ref="file" multiple="multiple">
-                        </span>
-                        <span class="upImgText">{{imageName}}</span> 
-                    </div>
+            <div class="editBody">
+                <div class="editBodytwo imageBody"><label class=" imageBodyText">上传图片 :</label>
+                    <span class="updataImageSpan">
+                        <button @click="selectImg" class="upImgBtn">选择图片</button>
+                        <input class="upInput"  type="file" accept="image/*" @change="fileChanged" ref="file" multiple="multiple">
+                    </span>
+                    <span class="upImgText">{{imageName}}</span> 
                 </div>
-                <p class="err" v-show="showErr">请输入完整信息</p>
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="upImgSure">上传</button>
-                    <button class="editBtnC" @click="upImgCancle">取消</button>
-                </div>
-            </el-dialog>
+            </div>
+            <p class="err" v-show="showErr">请输入完整信息</p>
+            <div slot="footer" class="dialog-footer">
+                <button class="editBtnS" @click="upImgSure">上传</button>
+                <button class="editBtnC" @click="upImgCancle">取消</button>
+            </div>
+        </el-dialog>
 
     </div>
 </template>
@@ -295,7 +295,7 @@ export default {
             showStore: true,
             selectStatus:0,
             selectStatus1:0,
-            warehouseId:149,
+            warehouseId:'',
             huoJiaId:"",
             huoWeiId:"",
             updeName:'',
@@ -315,7 +315,15 @@ export default {
             newhuoJiaName:'',
             newhuoWeiName:'',
             isAdd: false,
-            
+            showWuZi:true,
+            isShowCheck:true,
+            isShowReceipt:true,
+            CheckObj:{},
+            ReceiptObj:{},
+            CheckReceiptObj:{},
+            noShowCheck:true,
+            showEditAllCheck:true,
+            showEditAllReceipt:true,
         }
     },
     created(){
@@ -328,6 +336,9 @@ export default {
         this.userId = localStorage.getItem('userid');
     },
     methods:{
+        backToH(){
+            this.showCommonList = false;
+        },
         //编辑图片
         upImgCancle(){
             this.upImg = false;
@@ -621,10 +632,27 @@ export default {
                 })
             
         },
-        showDetialList(val,i){
+        showDetialList(val,i,is){
+            if(is){
+                this.isShowCheck = true;
+                this.isShowReceipt = false;
+            }else{
+                this.isShowReceipt = true;
+                this.isShowCheck = false;
+            }
             console.log(val);
             this.showCommonList = true;
+            this.checkItem = {};
             this.checkItem = val;
+            this.CheckReceiptObj = {};
+            Object.assign(this.CheckReceiptObj,{
+                                orderCode:this.orderInfo.orderCode,
+                                orderTitle:this.orderInfo.orderTitle,
+                                checkItem:this.checkItem,
+                                orderId:this.orderInfo.id,
+                                warehouseId:this.warehouseId,
+                                stockName:this.stockName,
+                            })
         },
         //堆场切换
         clickStock( items,i ){
@@ -633,7 +661,7 @@ export default {
             this.warehouseId = items.id;    
             this.showAdd = true;
             this.showAddHuowei = true;
-            this.isclickHuoWei = 1;  
+            this.isclickHuoWei = 0;  
             this.storageSelect= -1,       
             this.store.map( (item,index)=>{
                 if( i == index ){
@@ -651,7 +679,8 @@ export default {
             this.selectStatus1 = 1;
             this.showAdd = true;
             this.showAddHuowei = true;
-            this.huoweiSelect = -1,
+            this.huoweiSelect = -1;
+            this.isclickHuoWei = 1;
             this.storage.map( (item,index)=>{
                 if( i == index ){
                     this.storageName = " - "+item.name;
@@ -694,6 +723,7 @@ export default {
             this.huoweiName = "";
             this.showAdd = true;
             this.showAddHuowei = true;
+            this.isclickHuoWei = 0;
         },
         //检查记录 确认
         showOver( i,id ){
@@ -1031,6 +1061,7 @@ export default {
         handleClick(){
             this.selectIndexone = '-1';
             this.selectIndextwo = '-1';
+            this.showDetail = true;
         },
         //获取群组
         getUserGroup(){
@@ -1083,6 +1114,7 @@ export default {
                             // this.stockName = this.store[0].name;
                         }else {
                             this.stockName = this.store[0].name;
+                            this.warehouseId = this.store[0].id;
                         }
                         
                         this.store.map( (item,index) =>{
@@ -1189,17 +1221,19 @@ export default {
             if(flag){
                 this.selectIndextwo = index;
                 this.isReceipt = false;
+                this.showEditAllCheck = true;
+                this.showEditAllReceipt = true;
             }else{
                 this.selectIndexone = index;
                 this.isReceipt = true;
+                this.showEditAllCheck = false;
+                this.showEditAllReceipt = false;
             }
-
             this.showDetail = false;
             this.itemTitle = item.orderTitle;
             this.getOrderDetail(item.id);
             this.getOrderPaymentItem(item.id);
             this.getOrderInfo(item.id)
-
         },
         //获取订单信息
         getOrderInfo(id){
@@ -1768,22 +1802,22 @@ export default {
             }
             tbody {
                 tr {
-                td {
-                    padding-left: 10px;
-                    height: 36px;
-                    text-align: left;
-                    box-sizing: border-box;
-                    border-right: 1px solid #e6e6e6;
-                    font-size: 12px;
-                    color: #333333;
-                }
-                &:hover {
-                    background: #fafafa;
-                }
+                    td {
+                        padding-left: 10px;
+                        height: 36px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        border-right: 1px solid #e6e6e6;
+                        font-size: 12px;
+                        color: #333333;
+                    }
+                    &:hover {
+                        background: #fafafa;
+                    }
                 }
             }
         }
-    }
+    } 
     .editBody{
         margin: 0 auto;
     }
@@ -1835,21 +1869,6 @@ export default {
     .dialog-footer{
         text-align: center;
     }
-    // .deleteBtn{
-    //     width: 111px;
-    //     height: 36px;
-    //     border: 1px solid #ccc;
-    //     cursor: pointer;
-    //     border-radius: 2px;
-    // }
-    // .deleteBtn{
-    //     color: #fff;
-    //     background: #fc3439;
-    //     border: none;
-    // }
-    // .deleteBtn:hover{
-    //     background: #ff5257;
-    // }
     .editBtnS,.editBtnC{
         width: 111px;
         height: 36px;
