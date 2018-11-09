@@ -121,7 +121,7 @@
                             
                         </div>
                         <div class="rightBottomCheck">
-                            <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                            <el-checkbox v-model="picMark" @change="picShowMark()"  style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
                             <el-checkbox v-model="displaySpotNum" @change="displaySpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                         </div>
                     </div>
@@ -1074,7 +1074,14 @@ export default {
            
         },
         add(val){
+            var vm=this;
            console.log(val,'val');
+           vm.spotPicInfoList.forEach((item)=>{
+                if(item.id+'img'==val.ID_out){
+                    window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
+                }
+            })
+            // console.log(this.pointIds,'this.pointIds');
         },
         //
         sendAlertMessage(){
@@ -1203,7 +1210,7 @@ export default {
             list.forEach((item)=>{
                  this.pointIds.push(item.ID_out);
             })
-            console.log(this.pointIds,'this.pointIds');
+            
             // pointIds
             // console.log(status);
         },
@@ -1297,6 +1304,7 @@ export default {
               
             }
         },
+
         //获取图片列表
          getTagList(){
              var vm=this;
@@ -1312,26 +1320,34 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.spotPicInfoList=response.data.rt;
+                    console.log(this.spotPicInfoList,'this.spotPicInfoList');
                      var alist=[];
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
                     this.spotPicInfoList.forEach((item)=>{
-                        // alist.push(
-                        //     {
-                        //         'data':null,
-                        //         'id':item.id,
-                        //         'isAlert':null,
-                        //         'isBroken':null,
-                        //         'itemId':null,
-                        //         'itemName':null,
-                        //         'plotInfo':item.coordinateInfo,
-                        //         'pointName':null,
-                        //         'type':null,
-                        //     }
-                        // )
-                        alist.push(JSON.parse(item.coordinateInfo));
+                        //  this.$set(JSON.parse(item.coordinateInfo),'filePath',item.filePath);
+                        //  item.coordinateInfo.push(item.filePath);
+                        // console.log(JSON.parse(item.coordinateInfo).plotInfo,'item.coordinateInfo.plotInfo');
+                        alist.push(
+                            {
+                                'data':null,
+                                'id':item.id+'img',
+                                'isAlert':null,
+                                'isBroken':null,
+                                'itemId':null,
+                                'itemName':null,
+                                'plotInfo':JSON.parse(item.coordinateInfo).plotInfo,
+                                'pointName':null,
+                                'type':null,
+                                'filePath':item.filePath,
+                                'baseMapId':item.baseMapId,
+                                'photoId':item.id,
+                            }
+                        )
+                        // alist.push(JSON.parse(item.coordinateInfo));
                     })
-                    // console.log(alist,'dfg');
+                    console.log(alist,'dfg');
                     alist.forEach((item)=>{
+                        //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
@@ -1701,6 +1717,15 @@ export default {
         displaySpot(){
             // console.log(this.displaySpotNum);
             this.$refs.pic.enableLabel(this.displaySpotNum);
+        },
+        //显示图片标记
+        picShowMark(){
+            // this.monitorPointInfo='';
+            if(this.picMark==true){
+                this.getTagList();
+            }else if(this.picMark==false){
+                this.getAllMonitorPoint();
+            }
         },
         //添加底图
         addBaseMap(file){
@@ -3231,6 +3256,8 @@ export default {
         //上传图片编辑
         setSpotPic(){
             this.setSpotPicShow=true;
+            this.picMark=true;
+            this.getTagList();
             this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
         },
         //编辑照片标记
@@ -3317,6 +3344,7 @@ export default {
                     vm.imageName ='未选择任何文件'
                     vm.filesList = null;
                     vm.uploadshow=false;
+                    this.addPhotoTag();
                     // this.monitorPointInfo=response.data.rt;
                     // this.$refs.pic.loadPoints(this.monitorPointInfo);
                 }

@@ -33,6 +33,8 @@
                     </div>
                     <!-- <div class="rotate" v-show="versionPath&&!annotationlist"> -->
                     <div v-show="versionPath" class="rotate">
+                        <i class="drawingIcon bigRotate" @click="bigRotate()"></i>
+                        <i class="drawingIcon smallRotate" @click="smallRotate()"></i>
                         <i class="drawingIcon zuoRotate" @click="zuoRotate(drawingFileUrl1)"></i>
                         <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
@@ -761,6 +763,14 @@ export default {
         //获取图纸旋转信息
         getdrawInfo(){
 
+        },
+        //放大
+        bigRotate(){
+            this.$refs.pic.size_big()
+
+        },
+        smallRotate(){
+             this.$refs.pic.size_small()
         },
         //图纸工具栏操作
         zuoRotate(val){
@@ -2002,6 +2012,23 @@ export default {
                                 //     background: url('./images/youx1.png')no-repeat 0 0;
                                 // }
                             }
+                            .bigRotate{
+                                left:-50px;
+                                top:9px;
+                                background: url('./images/big.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/big1.png')no-repeat 0 0;
+                                }
+                            }
+                            .smallRotate{
+                                 left:-10px;
+                                top:9px;
+                                background: url('./images/small.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/small1.png')no-repeat 0 0;
+                                }
+                            }
+
                 }
             }
             .noImg{
