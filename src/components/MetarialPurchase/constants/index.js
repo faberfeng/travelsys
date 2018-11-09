@@ -216,3 +216,42 @@ export const checkLists_flow = [
         },                    
     },
 ];
+
+export const  serviceStateList = [
+    {
+      value: 0,
+      label: "全部"
+    },
+    {
+      value: 1,
+      label: "构件量核对完成"
+    },
+    {
+      value: 3,
+      label: "工程量核对完成"
+    },
+    // {
+    //   value: 5,
+    //   label: "物料量核对完成"
+    // },
+    {
+      value: 4,
+      label: "已选型"
+    },
+    {
+      value: 2,
+      label: "已计划"
+    },
+    // {
+    //   value: 6,
+    //   label: "已订货"
+    // },
+    // {
+    //   value: 7,
+    //   label: "已发货"
+    // },
+    // {
+    //   value: 8,
+    //   label: "已签收"
+    // }
+  ];//业务状态
