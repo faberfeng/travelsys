@@ -143,8 +143,10 @@ export default {
     },
     methods:{
         Select_item(){
-            if(this.SelectedList[0].type == "Select_img_Mark"){
-                this.$emit('Image_Mark',this.SelectedList[0]);
+            if(this.SelectedList.length > 0){
+                if(this.SelectedList[0].type == "Select_img_Mark"){
+                    this.$emit('Image_Mark',this.SelectedList[0]);
+                }
             }
         },
         init(div,source,type,page_No,angle){
@@ -434,6 +436,10 @@ export default {
                         var SID = red + green * 256 + blue * 256 *256;
 
                         // console.log(SID);
+
+                        if(selectColorID[3] != 255){
+                            SID = 0;
+                        }
 
                         if(SID < 1){
                             this.SelectedList = [];
