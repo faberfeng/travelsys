@@ -162,7 +162,7 @@
                             <tr>
                                 <th>点号</th>
                                 <th>取值</th>
-                                <th>报警</th>
+                                <th >报警</th>
                                 <th>点号</th>
                                 <th>取值</th>
                                 <th>报警</th>
@@ -178,10 +178,10 @@
                                     <td >{{item.latestTime|timeChange()}}</td>
                                     <td >{{item.recentPointName|addSprit()}}</td>
                                     <td>{{item.recentVariation|addSprit1()}}</td>
-                                    <td>{{item.recentAlert|shifouChange()}}</td>
+                                    <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
                                     <td>{{item.totalPointName|addSprit()}}</td>
                                     <td>{{item.totalVariation|addSprit2()}}</td>
-                                    <td>{{item.totalAlert|shifouChange()}}</td>
+                                    <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
                                         <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
@@ -4625,6 +4625,9 @@ export default {
                             }
                             tbody{
                                 tr{
+                                    .red{
+                                        color: red;
+                                    }
                                     td{
                                         padding-left: 6px;
                                         padding-right: 15px;
