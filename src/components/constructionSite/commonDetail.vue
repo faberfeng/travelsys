@@ -42,9 +42,7 @@
                     </div>
                 </div>
                 <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
-                            <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
-                            <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl}"></picView>
+                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
                 </div>
                 <div class="rightBottomCheck">
                         <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
@@ -271,7 +269,7 @@ import pdf from 'vue-pdf'
 import data from '../Settings/js/date';
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','curBaseMapUrl','itemSubmitbaseMapId','itemSubmitCount'],
+    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','paramsListsSub','itemSubmitbaseMapId','itemSubmitCount'],
     components:{
             pdf,picView,VueHighcharts
     },
@@ -332,6 +330,9 @@ export default Vue.component('commonDetail',{
             saveDrawShow:false,
             pageSize:10,
             monitorPointInfo:'',
+            getBaseMapInfoByBaseMapIdInfo:'',
+            paramsInfo:'',
+            angle:0,
             isAlert:'',
             isBroken:'',
             pageNum:1,
@@ -405,9 +406,11 @@ export default Vue.component('commonDetail',{
         this.getPointDatas();
         this.getUserByUserGroup();
         this.getItemDutyUser();
-        this.getAllMonitorPoint();
         this.getMonitorItem();
         this.getAlertArguments();
+        this.getBaseMapInfoByBaseMapId();
+        
+        // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
     },
     filters:{
@@ -448,8 +451,9 @@ export default Vue.component('commonDetail',{
     },
     watch:{
         userGroupId:function(val){
+            this.getBaseMapInfoByBaseMapId();
+            this.getAllMonitorPoint();
             // this.getBaseMapList()
-            
         },
         // calculatorId:function(val){
 
@@ -465,9 +469,11 @@ export default Vue.component('commonDetail',{
 
     },
     mounted(){
-        setTimeout(() => {
-            this.displayInspectSpot()
-        }, 200);
+        var vm=this;
+        vm.getAllMonitorPoint();
+        // setTimeout(() => {
+        //     this.displayInspectSpot();
+        // }, 1000);
         // console.log(12);
     },
     methods:{
@@ -598,6 +604,71 @@ export default Vue.component('commonDetail',{
             // console.log(this.getPointDatasList1,'this.getPointDatasList1');
             // console.log(`当前页: ${val}`);
         },
+        //  getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.selectUgId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             // if(!this.curBaseMapUrl){
+        //                 this.baseMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getBaseMapInfoByBaseMapId();
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //         }else if(response.data.cd=='-1'){
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
+         //根据底图ID获取底图信息
+        getBaseMapInfoByBaseMapId(){
+            var vm=this;
+            this.angle=0;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   baseMapId:vm.itemSubmitbaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBaseMapInfoByBaseMapIdInfo=response.data.rt;
+                    this.angle=this.getBaseMapInfoByBaseMapIdInfo.rotate;
+                    if(this.angle==null){
+                        this.angle=0;
+                    }
+                    var type=(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.substr(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.length-3)).toString();
+                    console.log(type);
+                    this.paramsInfo={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdInfo.relativeUri,angle:this.angle}
+                    // console.log(this.paramsLists,'this.paramsLists');
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:"error",
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
          //获取底图中所有的监测点
         getAllMonitorPoint(){
             var vm=this;
@@ -616,6 +687,7 @@ export default Vue.component('commonDetail',{
                     this.isAlert=this.monitorPointInfo[0].isAlert;
                     this.isBroken=this.monitorPointInfo[0].isBroken;
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    this.displayInspectSpot();
                 }
             })
         },
@@ -793,7 +865,7 @@ export default Vue.component('commonDetail',{
                     itemId:this.itemMonitorId
                 }
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.getAlertArgumentsList=response.data.rt;
                     this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
                     this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;

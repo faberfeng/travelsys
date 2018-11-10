@@ -72,9 +72,15 @@
                             <label class="planeFigureHeadLeftBtn"></label>
                             <label class="planeFigureHeadLeftTxt">平面图</label>
                         </div>
+                        <div  class="rotate">
+                            <i class="drawingIcon bigRotate" @click="bigRotate()"></i>
+                            <i class="drawingIcon smallRotate" @click="smallRotate()"></i>
+                            <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
+                            <i class="drawingIcon youRotate" @click="youRotate()"></i>
+                        </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span>
-                            <span class="uploadPicBtn" @click="setSpotPic()">上传图片</span>
+                            <span class="uploadPicBtn" @click="setSpotPic()">图片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
@@ -84,8 +90,9 @@
                             <span id="inspectContentSel">
                                 <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
                                     <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
+                                    <i class="icon-sanjiao"></i>
                                 </select>
-                                <i class="icon-sanjiao"></i>
+                                
                             </span>
                             <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
@@ -107,7 +114,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="{type:curBaseMapUrl.substr(curBaseMapUrl.length-3),source:QJFileManageSystemURL+curBaseMapUrl,angle:0}"  @Image_Mark="add"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists"  @Image_Mark="add"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -217,7 +224,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :curBaseMapUrl="curBaseMapUrl" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :paramsListsSub="paramsLists" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -578,6 +585,7 @@ export default {
             weatherTime:'',
             editSpotShow:false,
             toolShow:false,
+            listLength:'',//判断选择了几条点位
             picMarkName:'',
             baseMapShow:false,
             baseMapMonitor:false,
@@ -739,7 +747,10 @@ export default {
             monitorLogogram1:'',
             monitorKeyword1:'',
             monitorBaseMapId:'',//选择底图ID
+
+            getBaseMapInfoByBaseMapIdList:'',//根据底图id获取底图信息 
             rotate:0,//旋转角度
+            angle:0,//角度
             monitorTypeList:[
                 {
                     value:1,
@@ -766,6 +777,7 @@ export default {
             monitorMainTableList1:[],//
             pageSize:10,
             pageNum:1,
+            pageNum1:1,
             monitorMainTableListLength:0,//监测内容总表长度
             monitorMainItemList:'',//绘制底图内容
             hoverId:'',//移动底图上的ID
@@ -816,9 +828,10 @@ export default {
             plotInfo:'123',//增加测点绘图信息（需要绘图传递，传什么回什么）
             pointId:'',//监测点ID
             pointIds:[],//选中监测点集合
+            pointIdName:[],//选中监测点名称
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
-            monitorPointInfo:'',//所有图纸监测点信息
+            monitorPointInfo:[],//所有图纸监测点信息
             monitorWord:'',//监测文字 
             currentPage1:1,//改变页面数 
             positionList:'',//岗位列表    
@@ -891,6 +904,8 @@ export default {
             },
             acquisitionTimeXlist:[],
             elevationYlist:[],
+            moreSpotLineList:'',
+            moreSpotLineListLength:'',
 
         }
     },
@@ -1022,6 +1037,7 @@ export default {
              this.nowDate = year + "-" + month + "-" + day;
         },
         handleSizeChange(val){
+            // console.log(val);
             this.monitorMainTableList1=[];
             this.pageSize=val;
             if(this.monitorMainTableListLength<11){
@@ -1078,18 +1094,20 @@ export default {
         add(val){
             var vm=this;
            console.log(val,'val');
-           vm.spotPicInfoList.forEach((item)=>{
-                if(item.id+'img'==val.ID_out){
-                    if(item.filePath==null){
-                        this.$message({
-                            type:'info',
-                            message:'该点位不存在图片,请删除重新上传'
-                        })
-                    }else{
-                         window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
-                    }
-                }
-            })
+            if(this.picMarkName=="Select_img_Mark"){
+                vm.spotPicInfoList.forEach((item)=>{
+                        if(item.id+'img'==val.ID_out){
+                            if(item.filePath==null){
+                                this.$message({
+                                    type:'info',
+                                    message:'该点位不存在图片,请删除重新上传'
+                                })
+                            }else{
+                                window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
+                            }
+                        }
+                    })
+            }
             // console.log(this.pointIds,'this.pointIds');
         },
         //
@@ -1213,21 +1231,27 @@ export default {
           
         },
         picView_status_changed(status,list){
-            this.toolShow=status;
-            console.log(list);
-            this.pointIds=[];
-            this.picMarkName=list[0].type;
-            this.photoIdList=list[0].ID_out.replace("img","");
-            console.log(this.photoIdList,'this.photoIdList');
-            if(this.picMarkName!="Select_img_Mark"){
-            list.forEach((item)=>{
-                 this.pointIds.push(item.ID_out);
-            })
+            this.listLength=list.length;
+            console.log(this.listLength)
+            if(status==true){
+                this.toolShow=status;
+                console.log(list);
+                this.pointIds=[];
+                this.pointIdName=[];
+                this.picMarkName=list[0].type;
+               
+                if(this.picMarkName!="Select_img_Mark"){
+                list.forEach((item)=>{
+                    this.pointIds.push(item.ID_out);
+                    this.pointIdName.push(item.pointName);
+                })
+                }
+                if(this.picMarkName=="Select_img_Mark"){
+                    this.editSpotShow=status;
+                    this.photoIdList=list[0].ID_out.replace("img","");
+                    console.log(this.photoIdList,'this.photoIdList');
+                }
             }
-            if(this.picMarkName=="Select_img_Mark"){
-                this.editSpotShow=status;
-            }
-            
             // this.editSpotShow=status;
             // pointIds
             // console.log(status);
@@ -1235,46 +1259,189 @@ export default {
         //多点对比
         moreSpotLine(){
              var vm=this;
-             this.acquisitionTimeXlist=[];
-             this.elevationYlist=[];
-            axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/getMonitorPointChartData',
-                headers:{
-                    'token':vm.token
-                },
-                data:vm.pointIds
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.moreSpotLineList=response.data.rt.verticalShiftData;
-                     this.moreSpotLineList.forEach((item)=>{
-                         item.list.forEach((item1)=>{
-                              this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                this.elevationYlist.push(item1.elevation)
-                         })
+             if(this.listLength<2){
+                 this.$message({
+                     type:'info',
+                     message:'请选择多于一个点位'
+                 })
+             }else{
+                    this.acquisitionTimeXlist=[];
+                    this.elevationYlist=[];
+                    axios({
+                        method:'post',
+                        url:vm.BDMSUrl+'detectionInfo/getMonitorPointChartData',
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:vm.pointIds
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.moreSpotLineList=response.data.rt.verticalShiftData;
+                            this.moreSpotLineListLength=response.data.rt.verticalShiftData.length;
+                            this.moreSpotLineList.forEach((item)=>{
+                                item.list.forEach((item1)=>{
+                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                        this.elevationYlist.push(item1.elevation)
+                                })
+                            })
+                            var xLength=this.acquisitionTimeXlist.length;
+                            var x=xLength/this.moreSpotLineListLength;
+                            console.log(x,'xx');
+                            console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                            var xShow=[];
+                            
+                            for(var i=0;i<x;i++){
+                                xShow.push(this.acquisitionTimeXlist[i])
+                            }
+                            console.log(xShow,'xShow');
+                            console.log(this.elevationYlist,'this.elevationYlist');
+                            var min=this.getMinValue(this.elevationYlist);
+                            var max=this.getMaxValue(this.elevationYlist)
+                            var middle=(min+max)/2;
+                            console.log(middle);
+                            this.optionMoreSpotChangeLine.yAxis.min=(3*min-2*max);
+                            this.optionMoreSpotChangeLine.yAxis.max=(3*max-2*min);
+                            this.moreSpotShow=true;
+                            this.spotChangeLineShow=true;
+
+                            //改地方就做了两个点位对比，存在唯一性，还没找到规律性方法
+                            var yShow1=[];
+                            var yShow2=[];
+                            var yShow3=[];
+                            var yShow4=[];
+                            var yShow5=[];
+                            var yShow6=[];
+                            var yShow7=[];
+                            var yShow8=[];
+                            for(let a1=0;a1<x;a1++){
+                                yShow1.push(this.elevationYlist[a1])
+                            }
+                            for(let a2=x;a2<x*2;a2++){
+                                yShow2.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*2;a2<x*3;a2++){
+                                yShow3.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*3;a2<x*4;a2++){
+                                yShow4.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*4;a2<x*5;a2++){
+                                yShow5.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*5;a2<x*6;a2++){
+                                yShow6.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*6;a2<x*7;a2++){
+                                yShow7.push(this.elevationYlist[a2])
+                            }
+                            for(let a2=x*7;a2<x*8;a2++){
+                                yShow8.push(this.elevationYlist[a2])
+                            }
+                            console.log(yShow1,'yShow1')
+                            console.log(yShow2,'yShow2')
+                                setTimeout(()=>{
+                                    if(this.moreSpotLineListLength==2){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==3){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==4){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==5){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==6){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                         spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==7){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }else if(this.moreSpotLineListLength==8){
+                                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                        spotChangeLineChart.removeSeries();
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
+                                        spotChangeLineChart.addSeries({name:this.pointIdName[7],data:yShow8});
+                                        spotChangeLineChart.hideLoading();
+                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                    }
+                                },200)
+                        }
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                    console.log(this.elevationYlist,'this.elevationYlist');
-                    // var min=this.getMinValue(this.elevationYlist);
-                    //  var max=this.getMaxValue(this.elevationYlist)
-                    // var middle=(min+max)/2;
-                    // this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                    //  this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                    // //  this.spotChangeLineShow=true;
-                    // setTimeout(()=>{
-                    //     let spotChangeLineChart=this.$refs.spotChangeLine;
-                    //     spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                    //     spotChangeLineChart.removeSeries();
-                    //     spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
-                    //     spotChangeLineChart.hideLoading();
-                    //     spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    // },200)
+            }
 
-                    
+
+        },
+        getMaxValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m<val[i]){
+                    m=val[i]
                 }
-            })
-
-
+            }
+            return m
+        },
+        getMinValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m>val[i]){
+                    m=val[i]
+                }
+            }
+            return m
         },
          timeChangeMethod(val) {
             if (val == null) {
@@ -1295,6 +1462,7 @@ export default {
             this.isClick=false;
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
+                this.spotPicInfo=[];
                 var list1 = this.$refs.pic.saveList();
                   console.log(list1,'list1');  
                 this.spotPicInfo.push({
@@ -1325,6 +1493,9 @@ export default {
         //获取图片列表
          getTagList(){
              var vm=this;
+              var alist=[];
+            //   this.monitorPointInfo=[];
+            //   this.getAllMonitorPoint();
              axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getTagList',
@@ -1337,8 +1508,8 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
-                    // console.log(this.spotPicInfoList,'this.spotPicInfoList');
-                     var alist=[];
+                    console.log(this.spotPicInfoList,'this.spotPicInfoList');
+                    
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
                     this.spotPicInfoList.forEach((item)=>{
                         //  this.$set(JSON.parse(item.coordinateInfo),'filePath',item.filePath);
@@ -1388,11 +1559,21 @@ export default {
             vm.pitchDetailShow=false;
             vm.walkThroughShow=false;
             vm.commonDetailShow=false;
+            // vm.pageSize=10;
+            // vm.pageNum1=2;
+            vm.currentPage1=1;
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getMonitorItem();
-            vm.getAllMonitorPoint();
+            vm.getBaseMapList();
+            // vm.getAllMonitorPoint();
+
+            //  vm.getDetectionSummary();
+            // vm.getMonitorMainTable();
+            // vm.ugCompany();
+           
+            // vm.getMonitorItem();
         },
         //获取可用的群组
         getAccessUserGroup(){
@@ -1689,10 +1870,18 @@ export default {
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
-
+            var alist=[];
             var list = this.$refs.pic.saveList();
             // var list1=this.
-            // console.log(list);
+            console.log(list);
+            list.forEach((item)=>{
+                // console.log(item.id.substr(item.id.length-3),'124')
+                console.log(item.id.length);
+                if(item.id.length==undefined){
+                    alist.push(item);
+                }
+            })
+            console.log(alist,'alist');
             axios({
                     method:'POST',
                     url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
@@ -1702,7 +1891,7 @@ export default {
                     params:{
                         baseMapId:vm.monitorBaseMapId
                     },
-                    data:list
+                    data:alist
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.$message({
@@ -1710,6 +1899,9 @@ export default {
                             message:'保存监测点成功'
                         })
                         this.getAllMonitorPoint();
+                        setTimeout(()=>{
+                                 this.getTagList();
+                            },200)
                     }else if(response.data.cd=='-1'){
                        
                         this.$message({
@@ -1838,26 +2030,27 @@ export default {
                     this.baseMapList=response.data.rt;
                     // console.log(this.baseMapList);
                     //判断是否使用当前图纸
-                    if(!this.curBaseMapUrl){
+                    // if(!this.curBaseMapUrl){
                         this.baseMapList.forEach((item)=>{
                             if(item.isUsed==1){
                                 this.curBaseMapUrl=item.relativeUri;
                                 this.monitorBaseMapId=item.id;
+                                this.getBaseMapInfoByBaseMapId();
                                 this.getAllMonitorPoint();
                             }
                         })
-                    }
-                    if(this.monitorBaseMapId){
-                        this.baseMapList.forEach((item)=>{
-                            if(item.id==this.monitorBaseMapId){
-                                this.curBaseMapUrl=item.relativeUri;
-                            }
-                        })
-                    }
-                    var a=vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3);
-                this.paramsLists={type:vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3),source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
-                console.log(this.paramsLists,'this.paramsLists');
-                console.log(a,'1323')
+                    // }
+                    // if(this.monitorBaseMapId){
+                    //     this.baseMapList.forEach((item)=>{
+                    //         if(item.id==this.monitorBaseMapId){
+                    //             this.curBaseMapUrl=item.relativeUri;
+                    //         }
+                    //     })
+                    // }
+                    // var a=vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3);
+                // this.paramsLists={type:vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3),source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
+                // console.log(this.paramsLists,'this.paramsLists');
+                // console.log(a,'1323')
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -1866,12 +2059,31 @@ export default {
                 }
             })
         },
+        //放大
+        bigRotate(){
+            this.$refs.pic.size_big()
+
+        },
+        smallRotate(){
+             this.$refs.pic.size_small()
+        },
+        //图纸工具栏操作
+        zuoRotate(){
+                this.$refs.pic.rotation(this.$refs.pic.angle - 90);
+                this.rotate = this.$refs.pic.angle;
+                this.updateBaseMapRotate();
+        },
+        youRotate(){
+                this.$refs.pic.rotation(this.$refs.pic.angle + 90);
+                this.rotate = this.$refs.pic.angle;
+                this.updateBaseMapRotate();
+        },
         //更新底图旋转信息
         updateBaseMapRotate(){
             var vm=this;
             axios({
                 method:'post',
-                url:vm.BDMSUrl+'detectionInfo/setBaseMapUsed',
+                url:vm.BDMSUrl+'detectionInfo/updateBaseMapRotate',
                 headers:{
                     'token':vm.token
                 },
@@ -1881,15 +2093,47 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getBaseMapInfoByBaseMapId();
                     // this.getBaseMapList()
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
-                        msg:response.data.msg
+                        message:response.data.msg
                     })
                 }
             })
-
+        },
+        //根据底图ID获取底图信息
+        getBaseMapInfoByBaseMapId(){
+            var vm=this;
+            this.angle=0;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   baseMapId:vm.monitorBaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBaseMapInfoByBaseMapIdList=response.data.rt;
+                    this.angle=this.getBaseMapInfoByBaseMapIdList.rotate;
+                    if(this.angle==null){
+                        this.angle=0;
+                    }
+                    var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
+                    console.log(type);
+                    this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle}
+                    console.log(this.paramsLists,'this.paramsLists');
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:"error",
+                        message:response.data.msg
+                    })
+                }
+            })
         },
         //取消底图列表
         baseMapCancle(){
@@ -3171,8 +3415,8 @@ export default {
                     this.curBaseMapUrl=item.relativeUri;
                     this.monitorBaseMapId=item.id;
                     this.setBaseMapUsed(item.id);
+                    this.getBaseMapInfoByBaseMapId();
                     this.getAllMonitorPoint();
-
                 }
                 // else if(item.id==val&&this.baseMapMonitor){
                 //     this.monitorBaseMapUrl=item.relativeUri;
@@ -3358,6 +3602,7 @@ export default {
                     vm.imageName ='未选择任何文件'
                     vm.filesList = null;
                     vm.uploadshow=false;
+                    vm.setSpotPicShow=false;
                     this.getTagList();
                     // this.getAllMonitorPoint();
                     this.$message({
@@ -3416,7 +3661,15 @@ export default {
         },
         //开启移动
         enableMove(){
-            this.$refs.pic.setMoveStatus();
+            if(this.picMarkName!="Select_img_Mark"){
+                this.$refs.pic.setMoveStatus();
+            }
+            if(this.picMarkName=="Select_img_Mark"){
+                this.$message({
+                    type:'info',
+                    message:'图片标记不支持该操作'
+                })
+            }
         },
         //删除点
         deleteDraw(){
@@ -3452,11 +3705,12 @@ export default {
                                 type:'success',
                                 message:'删除点位图片成功'
                             })
+                             this.getAllMonitorPoint();
+                            
                             setTimeout(()=>{
-                                this.getTagList();
+                                 this.getTagList();
                             },200)
-                            this.getAllMonitorPoint();
-                           this.picShowMark();
+                        //    this.picShowMark();
                         }else if(response.data.cd=='-1'){
                             this.$message({
                                 type:'error',
@@ -3469,13 +3723,21 @@ export default {
         },
         //修复故障
         changeBroken(){
-            this.$refs.pic.changeBroken();
+            if(this.picMarkName!="Select_img_Mark"){
+                this.$refs.pic.changeBroken();
+            }
+            if(this.picMarkName=="Select_img_Mark"){
+                this.$message({
+                    type:'info',
+                    message:'图片标记不支持该操作'
+                })
+            }
         },
         //获取底图中所有的监测点
         getAllMonitorPoint(){
             var vm=this;
             this.$refs.pic.Max_Select = 8;
-            this.$refs.pic.Max_type = 2;
+            this.$refs.pic.Max_type = 1;
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
@@ -3918,6 +4180,7 @@ export default {
                     margin-top:26px;
                     .planeFigureHead{
                         height: 32px;
+                        position: relative;
                         border-bottom: 1px solid #e6e6e6;
                         .planeFigureHeadLeft{
                             // float: left;
@@ -3938,6 +4201,54 @@ export default {
                                 font-weight: bold;
                                 line-height: 32px;
                             }
+                        }
+                         .rotate{
+                            // float: right;
+                            // position: relative;
+                            position: absolute;
+                            left:160px;
+                            top: -2px;
+                            width: 100px;
+                            height: 30px;
+                            .drawingIcon{
+                                        width: 80px;
+                                        height: 26px;
+                                        cursor: pointer;
+                                        position: absolute;
+                                    }
+                                    .zuoRotate{
+                                        left:30px;
+                                        top:9px;
+                                        background: url('./images/zuox.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('./images/xuanzl.png')no-repeat 0 0;
+                                        }
+                                    }
+                                    .youRotate{
+                                        left:70px;
+                                        top:9px;
+                                        background: url('./images/youx.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('./images/xuanzr.png')no-repeat 0 0;
+                                        }
+                                    }
+                                    .bigRotate{
+                                        left:-50px;
+                                        top:9px;
+                                        background: url('./images/big.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('./images/big1.png')no-repeat 0 0;
+                                        }
+                                    }
+                                    .smallRotate{
+                                        left:-10px;
+                                        top:9px;
+                                        background: url('./images/small.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('./images/small1.png')no-repeat 0 0;
+                                        }
+                                    }
+
                         }
                         .planeFigureHeadRight{
                             float: right;
@@ -3998,6 +4309,7 @@ export default {
                         }
                         .planeFigureHeadRightHide{
                             float:right;
+                            // position: relative;
                             #inspectContentSel{
                                 // display: inline-block;
                                 // float: right;
@@ -4005,6 +4317,7 @@ export default {
                                 // margin-right:10px;
                                 // width: 168px;
                                 // height: 30px;
+                                
                                 .inspectSel{
                                     width: 175px;
                                     height: 26px;
@@ -4019,18 +4332,19 @@ export default {
                                     color: #333333;
                                     font-size: 14px;
                                     outline: none;
+                                    .icon-sanjiao{
+                                        display: block;
+                                        position: absolute;
+                                        width: 12px;
+                                        height: 7px;
+                                        background-image: url('../Settings/images/sanjiao.png');
+                                        background-size: 100% 100%;
+                                        content: '';
+                                        top: 0px;
+                                        right: 30px;
                                 }
-                                .icon-sanjiao{
-                                    display: block;
-                                    position: absolute;
-                                    width: 12px;
-                                    height: 7px;
-                                    background-image: url('../Settings/images/sanjiao.png');
-                                    background-size: 100% 100%;
-                                    content: '';
-                                    top: 352px;
-                                    right: 370px;
                                 }
+                                
 
                             }
                             .bottomMap{

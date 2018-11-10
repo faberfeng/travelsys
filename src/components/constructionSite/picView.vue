@@ -69,12 +69,12 @@ export default {
         this.drawID = 1;
 
         this.Refresh_timer = setInterval(()=>{
-
-            if(this.para.type == "")return;
+            // console.log(this.para.type);
+            if(this.para.type=="")return;
             // console.log(this.para,'this.para.type')
 
-            if(this.para.type == "pdf"){
-                this.para.type = "PDF";
+            if(this.para.type=="pdf"){
+                this.para.type="PDF";
                 if(this.para.source != this.old_para){
 
                     this.drawList = [];
@@ -107,9 +107,8 @@ export default {
                     this.old_para = this.para.source;
                     
                 }
-            }else{
-
-                this.para.type = "PNG";
+            }else if(this.para.type=="png"||this.para.type=="jpg"){
+                this.para.type="PNG";
                 if(this.para.source != this.old_para){
                     this.drawList = [];
                     this.$refs.pdfDocument.$el.style.display = "none";
@@ -126,7 +125,7 @@ export default {
                     
                 }
             }
-            // console.log(this.para);
+            
            
             this.Refresh();
 
