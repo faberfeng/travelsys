@@ -9,15 +9,15 @@ export default new Vuex.Store({
         path:'',
         UPID:'BB1408IN16014',
         // 以下是内网配置文件
-        // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
-        // QJFileManageSystemURL1:'http://10.252.26.240:8080/qjbim-file',
-        // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
-        // GMDUrl:"http://10.252.26.240:8080",
-        // WebGlUrl:"http://10.252.26.240", 
-        // BIMServerPort:'8080',
-        // shareUrl:'http://10.252.26.240:8080/bdms/#',
-        // iframeWebGlUrl:'http://10.252.26.240:8080/genDist/',
-        // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
+        QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
+        QJFileManageSystemURL1:'http://10.252.26.240:8080/qjbim-file',
+        BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
+        GMDUrl:"http://10.252.26.240:8080",
+        WebGlUrl:"http://10.252.26.240", 
+        BIMServerPort:'8080',
+        shareUrl:'http://10.252.26.240:8080/bdms/#',
+        iframeWebGlUrl:'http://10.252.26.240:8080/genDist/',
+        applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
         //以下是外网配置文件
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
@@ -29,15 +29,15 @@ export default new Vuex.Store({
         // iframeWebGlUrl:'https://bdms.arctron.cn/genDist/',
         // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
         //外网测试配置文件
-        BIMServerPort:'443',
-        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
-        BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
-        WebGlUrl:"http://bim.arctron.cn",
-        GMDUrl:"http://bim.arctron.cn",
-        shareUrl:"http://bim.arctron.cn/#",
-        iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
-        applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
+        // WebGlUrl:"http://bim.arctron.cn",
+        // GMDUrl:"http://bim.arctron.cn",
+        // shareUrl:"http://bim.arctron.cn/#",
+        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
         //以下是即时通讯网址
 
         // 以下是内网测试配置文件

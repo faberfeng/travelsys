@@ -8,7 +8,7 @@ import ElementUI from 'element-ui'
 import '../theme/index.css'
 import ZkTable from 'vue-table-with-tree-grid'
 import FullCalendar from 'vue-full-calendar'
-// import htmlToPdf from '@/components/utils/htmlToPdf'  
+// import htmlToPdf from '@/components/utils/htmlToPdf.js'  
 // Vue.use(htmlToPdf) 
 import '../node_modules/fullcalendar/dist/fullcalendar.css';
 
