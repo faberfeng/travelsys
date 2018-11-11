@@ -27,11 +27,7 @@
                             <tr>
                                 <th rowspan="2">分类</th>
                                 <th rowspan="2">巡视监测内容</th>
-<<<<<<< HEAD
                                 <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime|timeChange()}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
-=======
-                                <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime|timeChange}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
->>>>>>> c38b2876da33b712b11289df4474ef5cf51a0400
                                 <th colspan="2">最近巡视(今天)</th>
                                 <th rowspan="2">操作</th>
                             </tr>
@@ -205,7 +201,6 @@ export default Vue.component('walkThrough',{
         vm.getAllPatrolSummary();
     },
     filters:{
-<<<<<<< HEAD
          timeChange(val) {
             if (val == null) {
             return '/';
@@ -213,16 +208,6 @@ export default Vue.component('walkThrough',{
             return moment(val).format("YYYY-MM-DD");
             }
         },
-=======
-        timeChange(val) {
-            if (val == null) {
-                return '/';
-                } else {
-                return moment(val).format("YYYY-MM-DD");
-            }
-        },
-
->>>>>>> c38b2876da33b712b11289df4474ef5cf51a0400
     },
     methods:{
         back(){
