@@ -10,15 +10,15 @@
             <div class="projectBodyHead">
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
-                    <span class="headLeftBtn">底图</span>
-                    <span class="headLeftBtn">单点</span>
-                    <span class="headLeftBtn">连续</span>
-                    <span class="headLeftBtn">文字</span>
+                    <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span>
+                    <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
+                    <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
+                    <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                 </div>
                 <div class="headMiddle">
-                    <label>测试总数：80</label>
-                    <label>报警：22</label>
-                    <label>故障：2</label>
+                    <label>测试总数：{{itemSubmitCount}} </label>
+                    <label>报警：{{isAlert}}</label>
+                    <label>故障：{{isBroken}}</label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -26,17 +26,27 @@
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==2" class="import">导入</span>
+                        <span v-show="importMethod==2" class="import" @click="handExportExcel()">导入</span>
                         <span v-show="importMethod==1" class="import">配置</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
                 <div class="operateTool">
-                    <div class="operateToolLeft">
-                        <span class="move"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
-                        <span class="fault"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                        <span class="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
+                    <div class="operateToolLeft" v-show="toolShow">
+                        <span class="move" @click="enableMoveCommon"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
+                        <span class="fault" @click="changeBrokenCommon"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                        <span class="deleteDraw" @click="deleteDrawCommon"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
+                    <div class="operateToolRight" v-show="saveDrawShow" >
+                        <label class="saveDrawTxt" @click="saveDraw()">保存</label>
+                    </div>
+                </div>
+                <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
+                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
+                </div>
+                <div class="rightBottomCheck">
+                        <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                        <el-checkbox v-model="displaySpotNum" @change="displaySubmitSpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                 </div>
                 
             </div>
@@ -46,39 +56,59 @@
                         <thead>
                             <tr>
                                 <th rowspan="2">测点编号</th>
-                                <th colspan="2">初始采集</th>
-                                <th colspan="2">上次采集</th>
-                                <th colspan="2">本次采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">初始采集</th>
+                                <th v-show="itemMonitorType==3" colspan="3">初始采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">上次采集</th>
+                                 <th v-show="itemMonitorType==3" colspan="3">上次采集</th>
+                                <th v-show="itemMonitorType!=3" colspan="2">本次采集</th>
+                                <th v-show="itemMonitorType==3" colspan="3">本次采集</th>
                                 <th colspan="3">变化量</th>
                                 <th rowspan="2">操作</th>
                             </tr>
                             <tr>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
-                                <th>位移(mm)</th>
+                                <th v-show="itemMonitorType==1">位移(mm)</th>
+                                <th v-show="itemMonitorType==2">高程(m)</th>
+                                <th v-show="itemMonitorType==3">水位(m)</th>
+                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>变化时间</th>
-                                <th>本次(mm)</th>
-                                <th>累计(mm)</th>
+                                <th v-show="itemMonitorType!=4">本次(mm)</th>
+                                <th v-show="itemMonitorType==4">本次(kN)</th>
+                                <th v-show="itemMonitorType!=4">累计(mm)</th>
+                                <th v-show="itemMonitorType==4">累计(kN)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in getPointDatasList" :key="index"> 
+                            <tr v-for="(item,index) in getPointDatasList1" :key="index"> 
                                 <td>{{item.pointName|addSprit()}}</td>
                                 <td>{{item.initAcquisitionTime|timeChange()}}</td>
-                                <td>{{item.initData|addSprit()}}</td>
+                                <td >{{item.initData|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.initPipeHeight|addSprit()}}</td>
                                 <td>{{item.lastAcquisitionTime|timeChange()}}</td>
-                                <td>{{item.lastData|addSprit()}}</td>
+                                <td >{{item.lastData|addSprit()}}</td>
+                                 <td v-show="itemMonitorType==3">{{item.lastPipeHeight|addSprit()}}</td>
                                 <td>{{item.latestAcquisitionTime|timeChange()}}</td>
                                 <td>{{item.latestData|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSprit()}}</td>
                                 <td>{{item.variationTime|timeStamp()}}</td>
                                 <td>{{item.recentVariation|addSprit()}}</td>
                                 <td>{{item.totalVariation|addSprit()}}</td>
                                 <td>
                                     <button title="定位" class="location actionBtn"></button>
-                                    <button title="曲线" @click="getCurve(item.pointId)" class="curve actionBtn"></button>
+                                    <button title="曲线" @click="getCurve(item.pointId,item.pointName)" class="curve actionBtn"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -86,7 +116,11 @@
                 </div>
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
-                        <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label><label style="color:#333;font-size:14px;line-height:62px">单次3mm/d</label></span>
+                        <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
@@ -101,10 +135,10 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page.sync="currentPage2"
-                            :page-sizes="[10, 20, 30, 40,50]"
-                            :page-size="10"
+                            :page-sizes="[10]"
+                            :page-size="1"
                             layout="sizes,prev, pager, next"
-                            :total="50">
+                            :total="getPointDatasListLength">
                         </el-pagination>
                     </div>
                 </div>
@@ -142,17 +176,17 @@
                     <div class="editBodyone">
                         <label class="editInpText" style="width:27% !important">累计报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertTotal" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm   kN</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm/d  kN/d</label>
+                        <label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">kN/d</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
                         <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label>mm/h  kN/h</label>
+                        <label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label>
                     </div>
                     <!-- <div class="editBodytwo">
                         <label class="editInpText">单次报警变化量：</label>
@@ -163,6 +197,66 @@
                     <button class="editBtnC" @click="editAlertValueCancle()" >取消</button>
                 </div>
             </el-dialog>
+            <!-- <el-dialog title="导入采集数据" :visible="importGatherDataShow" @close="importGatherDataCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">本地Excel文档:</label>
+                        <span class="updataImageSpan">
+                            <label for="fileInfo">
+                                <button class="upImgBtn" >选择文件</button>
+                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
+                            </label>
+                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                        </span>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao4"></i></div>
+                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
+                        <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
+                        <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
+                        <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
+                </div>
+            </el-dialog> -->
+            <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
+                <div class="baseMapBody">
+                    <ul class="clearfix" style="margin:0px 20px 0px 20px;">
+                        <li class="baseMapBodyLi" @mouseenter="enter(item.id)" @mouseleave="leave()" @click="selectCurBaseMap(item.id)" style="padding: 0px; overflow: hidden;" v-for="(item,index) in baseCommonMapList" :key="index">
+                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="QJFileManageSystemURL+item.relativeUri">
+                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+item.relativeUri"></pdf>
+                            <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
+                                <label class="baseMapName" v-text="item.name"></label>
+                                <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
+                                <label v-show="item.useCount==0" class="deleteBaseMap" @click.stop="deleteBaseMap(item.id)"></label>
+                            </div>
+                        </li>
+                        <li class="uploadBaseBody">
+                            <div class="uploadBaseIcon">
+                                <label for="drawingsInfo">
+                                    <img style=" cursor: pointer"  src="./images/upload.png">
+                                    <p>上传新底图</p>
+                                </label>
+                                <input class="upInput"  type="file"  @change="addBaseMap($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </el-dialog>
+            <el-dialog title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()">
+                    <div v-if="spotChangeLineShow">
+                        <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                    </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -170,11 +264,20 @@
 import axios from 'axios'
 import moment from 'moment'
 import Vue from 'vue'
+import picView from './picView.vue'
+import pdf from 'vue-pdf'
+import data from '../Settings/js/date';
+import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId'],
+    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','paramsListsSub','itemSubmitbaseMapId','itemSubmitCount'],
+    components:{
+            pdf,picView,VueHighcharts
+    },
     name:'commonDetail',
     data(){
         return{
+            picMark:false,
+            displaySpotNum:false,
             importMethod:1,
             importList:[
                 {
@@ -186,12 +289,22 @@ export default Vue.component('commonDetail',{
                     label:'手动导入'
                 }
             ],
-            currentPage2:5,
+            currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
+            changeAlertDay:'',
+            changeAlertHour:'',
+            changeAlertTotal:'',
             getPointDatasList:'',//数据表格
+            getPointDatasList1:[],
+            getPointDatasListLength:0,//数据表格长度
             pointId:'',//监测id
+            pointName:'',//监测名称
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
+            spotChangeLineShow:false,//取消点位改变曲线
+            acquisitionTimeXlist:[],
+            acquisitionTimeYlist:'',
+            elevationYlist:[],
             userGroupList:'',//监测人员列表
             observerId:"",
             calculatorId:'',
@@ -203,7 +316,82 @@ export default Vue.component('commonDetail',{
             variationAlertTotal:'',//报警变化量（累计）
             variationAlertDay:'',//报警变化量（天）
             variationAlertHour:'',//报警变化量（小时）
-
+            commonMonitorMainItemList:'',//监测内容
+            curCommonBaseMapUrl:'',//监测地址
+            baseCommonMapList:'',
+            monitorBaseMapId:'',
+            baseMapShow:false,//底图显示
+            hoverId:'',
+            isClick:false,
+            isClick1:false,
+            isClick2:false,
+            isClick3:false,
+            toolShow:false,
+            saveDrawShow:false,
+            pageSize:10,
+            monitorPointInfo:'',
+            getBaseMapInfoByBaseMapIdInfo:'',
+            paramsInfo:'',
+            angle:0,
+            isAlert:'',
+            isBroken:'',
+            pageNum:1,
+            optionSpotChangeLine:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                            min:4268.5,
+                            max:43403.3542,
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                                // tickPixelInterval:1000
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            }
         }
     },
     created(){
@@ -218,6 +406,12 @@ export default Vue.component('commonDetail',{
         this.getPointDatas();
         this.getUserByUserGroup();
         this.getItemDutyUser();
+        this.getMonitorItem();
+        this.getAlertArguments();
+        this.getBaseMapInfoByBaseMapId();
+        
+        // console.log(vm.paramsListsSub)
+        // this.getBaseMapList();
     },
     filters:{
         addSprit(val){
@@ -235,9 +429,9 @@ export default Vue.component('commonDetail',{
             }
         },
         timeStamp(StatusMinute){	
-            var day=parseInt(StatusMinute/60/60/24);
-            var hour=parseInt(StatusMinute/60/60%24);
-            var min= parseInt(StatusMinute/60%60);
+            var day=parseInt(StatusMinute/1000/60/60/24);
+            var hour=parseInt(StatusMinute/1000/60/60%24);
+            var min= parseInt(StatusMinute/1000/60%60);
             StatusMinute="";
             if (day > 0)
             {
@@ -256,6 +450,11 @@ export default Vue.component('commonDetail',{
 
     },
     watch:{
+        userGroupId:function(val){
+            this.getBaseMapInfoByBaseMapId();
+            this.getAllMonitorPoint();
+            // this.getBaseMapList()
+        },
         // calculatorId:function(val){
 
         // },
@@ -269,17 +468,323 @@ export default Vue.component('commonDetail',{
 
 
     },
+    mounted(){
+        var vm=this;
+        vm.getAllMonitorPoint();
+        // setTimeout(() => {
+        //     this.displayInspectSpot();
+        // }, 1000);
+        // console.log(12);
+    },
     methods:{
+        displaySubmitSpot(){
+            this.$refs.pic.enableLabel(this.displaySpotNum);
+
+        },
+        //显示当前监测内容监测点
+        displayInspectSpot(){
+            // console.log(this.commonMonitorMainItemList);
+             for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+            }
+            this.$refs.pic.enableType(this.itemMonitorType,this.itemMonitorId,true);
+            // console.log('触发')
+        },
+        baseMapCancle(){
+            this.baseMapShow=false;
+        },
         //返回
         back(){
             var vm = this
             vm.$emit('back')
         },
+        //底图选择
+        baseMapEmit(){
+            // this.baseMapShow=true;
+            this.isClick=true;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            // this.getBaseMapList();
+            var vm=this;
+            vm.$emit('baseMapEmit')
+        },
+        //单点
+        spotClick(){
+            this.isClick=false;
+            this.isClick1=true;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.saveDrawShow=true;
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
+        },
+        //连续
+        spotAllClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=true;
+            this.isClick3=false;
+            this.saveDrawShow=true;
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
+        },
+        //文字
+        drawingTxtClick(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=true;
+            this.$refs.pic.setDrawStatus("text",10000,10000,2);
+        },
+         //开启移动
+        enableMoveCommon(){
+            this.$refs.pic.setMoveStatus();
+        },
+        //删除点
+        deleteDrawCommon(){
+            this.$refs.pic.deleteDraw();
+        },
+        //修复故障
+        changeBrokenCommon(){
+            this.$refs.pic.changeBroken();
+        },
         handleSizeChange(val){
-            console.log(`每页 ${val} 条`);
+            this.pageSize=val;
+            this.getPointDatasList1=[];
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9*(this.pageSize);
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(`每页 ${val} 条`);
         },
         handleCurrentChange(val){
-            console.log(`当前页: ${val}`);
+            this.getPointDatasList1=[];
+            this.pageNum=val;
+            if(this.getPointDatasListLength<11){
+                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                        this.getPointDatasList1.push(this.getPointDatasList[i])
+                    }
+            }else if(this.getPointDatasListLength>10){
+                if(this.pageNum==1){
+                    var num=0;
+                    var num2=9;
+
+                }else if(this.pageNum!=1){
+                    if(this.getPointDatasListLength%(this.pageSize)!=0){
+                        var num=(this.pageNum-1)*(this.pageSize)
+                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                    }else{
+                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                    }
+                }
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
+                for(var i=num;i<num2;i++){
+                    this.getPointDatasList1.push(this.getPointDatasList[i])
+                }
+            }
+            // console.log(this.getPointDatasList1,'this.getPointDatasList1');
+            // console.log(`当前页: ${val}`);
+        },
+        //  getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.selectUgId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             // if(!this.curBaseMapUrl){
+        //                 this.baseMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getBaseMapInfoByBaseMapId();
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //         }else if(response.data.cd=='-1'){
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
+         //根据底图ID获取底图信息
+        getBaseMapInfoByBaseMapId(){
+            var vm=this;
+            this.angle=0;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   baseMapId:vm.itemSubmitbaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBaseMapInfoByBaseMapIdInfo=response.data.rt;
+                    this.angle=this.getBaseMapInfoByBaseMapIdInfo.rotate;
+                    if(this.angle==null){
+                        this.angle=0;
+                    }
+                    var type=(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.substr(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.length-3)).toString();
+                    console.log(type);
+                    this.paramsInfo={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdInfo.relativeUri,angle:this.angle}
+                    // console.log(this.paramsLists,'this.paramsLists');
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:"error",
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+         //获取底图中所有的监测点
+        getAllMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    baseMapId:vm.itemSubmitbaseMapId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorPointInfo=response.data.rt;
+                    this.isAlert=this.monitorPointInfo[0].isAlert;
+                    this.isBroken=this.monitorPointInfo[0].isBroken;
+                    this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    this.displayInspectSpot();
+                }
+            })
+        },
+        drawFinish(){
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick=false;
+            this.saveDrawShow=true;
+        },
+        picView_status_changed(val){
+            // console.log(val);
+            this.toolShow=val;
+            this.saveDrawShow=val;
+        },
+        enter(val){
+            this.hoverId=val;
+        },
+        leave(){
+            this.hoverId='';
+
+        },
+        //删除当前底图
+        deleteBaseMap(){
+
+        },
+        //选择当前底图
+        selectCurBaseMap(){
+
+        },
+        //获取底图列表
+        // getBaseMapList(){
+        //     var vm=this;
+        //     axios({
+        //         method:'post',
+        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:vm.userGroupId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             this.baseCommonMapList=response.data.rt;
+        //             // console.log(this.baseMapList);
+        //             //判断是否使用当前图纸
+        //             if(!this.curCommonBaseMapUrl){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.isUsed==1){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                         this.monitorBaseMapId=item.id;
+        //                         this.getAllMonitorPoint();
+        //                     }
+        //                 })
+        //             }
+        //             if(this.monitorBaseMapId){
+        //                 this.baseCommonMapList.forEach((item)=>{
+        //                     if(item.id==this.monitorBaseMapId){
+        //                         this.curCommonBaseMapUrl=item.relativeUri;
+        //                     }
+        //                 })
+        //             }
+        //         }else{
+        //             vm.$message({
+        //                 type:"error",
+        //                 msg:response.data.msg
+        //             })
+        //         }
+        //     })
+        // },
+         //获取监测内容
+        getMonitorItem(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getMonitorItem',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.userGroupId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.commonMonitorMainItemList=response.data.rt;
+                    this.commonMonitorMainItemList.forEach((item,index)=>{
+                        this.$set(item,'spotNum',false)
+                    })
+                    // for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
+                    //     this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+                    // }
+                    // this.drawItemId=this.commonMonitorMainItemList[0].id;
+                    // this.drawItemType=this.commonMonitorMainItemList[0].type;
+                    // console.log(this.commonMonitorMainItemList,'monitorMainItemList')
+                }
+            })
         },
         //获取群组中的用户
         getUserByUserGroup(){
@@ -308,11 +813,44 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //手动导入数据
+        handExportExcel(){
+            this.$emit('importDataShow',true,this.itemMonitorId,this.projctName,this.itemMonitorType,this.itemMonitorKeyWord)
+        },
         //获取用户名
         getUserName(){
             
-
-
+        },
+        saveDraw(){
+            var vm=this;
+            var list = this.$refs.pic.saveList();
+            // console.log(list);
+            axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.itemSubmitbaseMapId
+                    },
+                    data:list
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.$message({
+                            type:'success',
+                            message:'保存监测点成功'
+                        })
+                        this.saveDrawShow=false;
+                        this.getAllMonitorPoint();
+                    }else if(response.data.cd=='-1'){
+                        
+                         this.$message({
+                            type:'success',
+                            message:response.data.msg
+                        })
+                    }
+                })
         },
         //获取警报参数
         getAlertArguments(){
@@ -327,8 +865,11 @@ export default Vue.component('commonDetail',{
                     itemId:this.itemMonitorId
                 }
             }).then((response)=>{
-                if(response.data.cd=='0'){
+                if(response.data.rt){
                     this.getAlertArgumentsList=response.data.rt;
+                    this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
+                    this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
+                    this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -356,6 +897,10 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.editAlertValueShow=false;
                     this.getAlertArguments();
+                    this.$message({
+                        type:'success',
+                        message:'修改报警值成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -446,6 +991,12 @@ export default Vue.component('commonDetail',{
         editAlertValueCancle(){
             this.editAlertValueShow=false;
         },
+        //取消曲线点位改变
+        spotChangeLineCancle(){
+            this.spotChangeLineShow=false;
+             this.optionSpotChangeLine.yAxis.min='';
+             this.optionSpotChangeLine.yAxis.max='';
+        },
         // 获取监测点采集数据（表格）
         getPointDatas(){
             var vm=this;
@@ -461,7 +1012,17 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
-                    console.log(this.getPointDatasList,'123');
+                    this.getPointDatasListLength=response.data.rt.length;
+                    if(this.getPointDatasListLength<11){
+                        for(var i=0;i<this.getPointDatasListLength;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getPointDatasList1.push(this.getPointDatasList[i])
+                        }
+                    }
+                    console.log(this.getPointDatasList1,'123');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -471,10 +1032,11 @@ export default Vue.component('commonDetail',{
             })
         },
         //点击获得曲线
-        getCurve(pointId){
+        getCurve(pointId,name){
             this.pointId=pointId;
+            this.pointName=name;
             if(this.itemMonitorType==1){
-                this.getPointVerticalShiftChartData()
+                this.getPointHorizontalShiftChartData()
             }else if(this.itemMonitorType==2){
                 this.getPointVerticalShiftChartData()
             }else if(this.itemMonitorType==3){
@@ -482,10 +1044,20 @@ export default Vue.component('commonDetail',{
             }else if(this.itemMonitorType==4){
                 this.getPointForceChartData()
             }
+    
+        },
+        timeChangeMethod(val) {
+                if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("MM-DD");
+                }
         },
         //获取30天曲线图（受力）
         getPointForceChartData(){
             var vm=this;
+            this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointForceChartData',
@@ -493,10 +1065,29 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
+                    setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -509,6 +1100,8 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（水位）
         getPointGaugeChartData(){
             var vm=this;
+            this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointGaugeChartData',
@@ -516,10 +1109,29 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                     var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
+                    setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -532,6 +1144,8 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（水平位移）
         getPointHorizontalShiftChartData(){
              var vm=this;
+             this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointHorizontalShiftChartData',
@@ -539,10 +1153,29 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                     var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
+                    setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },200)
                     
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -555,6 +1188,11 @@ export default Vue.component('commonDetail',{
         //获取30天曲线图（垂直位移）
         getPointVerticalShiftChartData(){
              var vm=this;
+             this.acquisitionTimeXlist=[];
+             this.elevationYlist=[];
+             this.optionSpotChangeLine.yAxis.min='';
+             this.optionSpotChangeLine.yAxis.max='';
+             console.log(this.optionSpotChangeLine.yAxis.min);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointVerticalShiftChartData',
@@ -562,11 +1200,30 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.pointId
+                    pointId:this.pointId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    
+
+                    this.getPointList=response.data.rt;
+                    this.getPointList.forEach((item)=>{
+                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
+                        this.elevationYlist.push(item.elevation)
+                    })
+                    var min=this.getMinValue(this.elevationYlist);
+                     var max=this.getMaxValue(this.elevationYlist)
+                    var middle=(min+max)/2;
+                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                     this.spotChangeLineShow=true;
+                    setTimeout(()=>{
+                        let spotChangeLineChart=this.$refs.spotChangeLine;
+                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                        spotChangeLineChart.removeSeries();
+                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                        spotChangeLineChart.hideLoading();
+                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                    },200)
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -575,6 +1232,24 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        getMaxValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m<val[i]){
+                    m=val[i]
+                }
+            }
+            return m
+        },
+        getMinValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m>val[i]){
+                    m=val[i]
+                }
+            }
+            return m
+        }
 
 
     }
@@ -585,6 +1260,10 @@ export default Vue.component('commonDetail',{
         margin:0;
         padding: 0;
         box-sizing: border-box;
+    }
+    .isClickStyle{
+         color: #ffffff !important;
+        background: #fc3439 !important;
     }
     i{
         font-style:normal
@@ -829,22 +1508,47 @@ export default Vue.component('commonDetail',{
                                 }
 
                             }
-                            // .operateToolRight{
-                            //     float: right;
-                            //     width: 62px;
-                            //     height: 34px;
-                            //     margin-left:10px;
-                            //     border:1px solid #ccc;
-                            //     border-radius:2px;
-                            //     box-shadow: 1px 1px 2px #888888;
-                            //     background: #fff;
-                            //     .saveDrawTxt{
-                            //         font-size:12px;
-                            //         color:#666666;
-                            //         line-height: 32px;
-                            //     }
-                            // }
+                            .operateToolRight{
+                                float: right;
+                                width: 62px;
+                                height: 34px;
+                                margin-left:10px;
+                                border:1px solid #ccc;
+                                border-radius:2px;
+                                box-shadow: 1px 1px 2px #888888;
+                                background: #fff;
+                                .saveDrawTxt{
+                                    font-size:12px;
+                                    color:#666666;
+                                    line-height: 32px;
+                                }
+                            }
 
+                        }
+                        .planeFigureGround{
+                            z-index: 8;
+                            height: 540px;
+                            width: 100%;
+                            position:absolute;
+                            top:0px;
+                            left: 0px;
+
+                            img{
+                                width: 100%;
+                                height: 100%;
+                                padding:5px;
+                            }
+                            #drawingPdf{
+                                 width: 100%;
+                                height: 530px;
+                                padding:5px;
+                            }
+                        }
+                        .rightBottomCheck{
+                            position: absolute;
+                            bottom:30px;
+                            left:30px;
+                            z-index:11;
                         }
 
             }
@@ -963,6 +1667,94 @@ export default Vue.component('commonDetail',{
                 color: #333333;
                 font-size: 14px;
                 outline: none;
+            }
+            .baseMapBody{
+                height: 460px;
+                .clearfix{
+                    clear: both;
+                    overflow: hidden;
+                    content: '';
+                }
+                .baseMapBodyLi{
+                    float: left;
+                    display: inline-block;
+                    position: relative;
+                    width: 164px;
+                    height: 122px;
+                    // background: #f0f1f4;
+                    margin-right: 10px;
+                    margin-top:20px;
+                    border-radius: 4px;
+                    &:hover{
+                        border:1px solid #ccc;
+                    }
+                    .baseMapBodyImg{
+                        width: 100%;
+                        height: 122px;
+                        margin: 0;
+                        padding: 0;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        object-fit: contain;
+                        background: #f0f1f4;
+
+                    }
+                    .baseMapBodyLiBottom{
+                        position: absolute;
+                        width: 100%;
+                        height: 26px;
+                        background-color: #000;
+                        opacity: 0.3;;
+                        bottom: 0px;
+                        left:0px;
+                        .baseMapName{
+                            color:#fff;
+                            font-weight: bold;
+                            float: left;
+                            margin-left:10px;
+                            width: 100px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .baseMapCount{
+                            color:#fff;
+                            font-weight: bold;
+                            float: right;
+                            margin-right: 10px
+
+                        }
+                        .deleteBaseMap{
+                            background: url('./images/delete.png') no-repeat 0 0;
+                            width: 20px;
+                            height: 20px;
+                            display: inline-block;   
+                            float:right;
+                            cursor: pointer;
+                            margin-right:5px;
+                        }
+                    }
+                }
+                .uploadBaseBody{
+                    float: left;
+                    display: inline-block;
+                    width: 164px;
+                    height: 122px;
+                    margin-top:20px;
+                    background: #f0f1f4;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    &:hover{
+                        border:1px dashed #0d6cb2;
+                    }
+                    .uploadBaseIcon{
+                        // cursor: pointer;
+                        margin:25px auto;
+                        .upInput{
+                            display: none;
+                        }
+                    }
+                } 
             }
         }
     }

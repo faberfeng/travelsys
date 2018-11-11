@@ -1,7 +1,7 @@
 <template>
     <div id="drwaingReview" >
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div style="min-width: 950px;height:785px;overflow-y: auto;">
+            <div style="min-width: 950px;height:785px;">
                 <div id="item-box-file">
                     <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
                      图纸评审  
@@ -17,7 +17,7 @@
                     </router-link>
                 </div>
                 <div class="commentInformation" >
-                    <div class="commentTool" v-show="screenLeft.item == 3">
+                    <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                             <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -31,7 +31,10 @@
                             <el-option class="commentOpt" v-for="item in isMarkList" :key="item.value" :value="item.value" :label="item.label" ></el-option>
                         </el-select>
                     </div>
-                    <div class="rotate" v-show="versionPath&&!annotationlist">
+                    <!-- <div class="rotate" v-show="versionPath&&!annotationlist"> -->
+                    <div v-show="versionPath" class="rotate">
+                        <i class="drawingIcon bigRotate" @click="bigRotate()"></i>
+                        <i class="drawingIcon smallRotate" @click="smallRotate()"></i>
                         <i class="drawingIcon zuoRotate" @click="zuoRotate(drawingFileUrl1)"></i>
                         <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
@@ -41,21 +44,12 @@
                         <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
                 </div>
 
-                <div  v-loading="loading"  v-show="versionPath" id="drawingPic">
-                    
-                    <!-- @mouseover="loadeds()" -->
-                    <div id="imgCanvasDiv">
-                        <canvas v-show="imgShow" id="imgCanvas"  width="1200" height="800">
-                            <!-- <img id="drawPic" :src="drawingFileUrl"/> -->
-                        </canvas>
-                    </div>
-                    <!-- <pdf  ref="pdfDocument_upload"    @num-pages="pageCount = $event" @page-loaded="currentPage = $event" :rotate="rotate" :src="pdfUrl" :page="pageAllCount"></pdf> -->
-                    <pdf v-show="pdfShow" ref="pdfDocument" id="drawingPdf" @loaded="loadsNew()"   @num-pages="pageCount = $event" @page-loaded="currentPage = $event"  :src="drawingFileUrl1"></pdf>
-
+                <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
+                    <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
-            <div v-show="screenLeft.item == 3&&!isSelect" id="drawingToolsBody">
+            <div v-show="screenLeft.item == 3" id="drawingToolsBody">
                     <ul class="drawingTools">
                         <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
                         <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
@@ -81,7 +75,7 @@
                     </div>
             </div>
             <div v-show="screenLeft.item == 1"  class="screenRight_1">
-                <div v-if="showAction">
+                <div >
                     <p class="clearfix" v-if="IsFolderAction">
                         <i class="icon-goujian icon-add" title="添加图纸" @click="uploadFile"></i>
                         <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
@@ -105,9 +99,9 @@
                         @node-click="handleNodeClick"
                         :check-strictly="true"
                         id="cloudDirveFileTree"
-                        :class="[showAction?'':'noTop']"
+                        
                     >
-                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
+                    <span :class="['custom-tree-node','elselect','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
                 </div>
             </div>
@@ -133,15 +127,19 @@
             </div>
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
-                    <div class="drawingApendedHead" >{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}<div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
+                    <div class="drawingApendedHead" ><label class="label1">{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}</label><div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
                     
-                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
+                    <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click.stop="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
                         <div class="apendedInfoOne">
                             <!-- <form v-on="shapeImg(item.coordinateInfo.t)"> -->
-                                <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo)[index].t)" >
+                                <img id="img1" width="16px" height="16px" :src="shapeImg(JSON.parse(item.coordinateInfo).typeNum)" >
                             <!-- </form> -->
-                        <label class="userName" v-text="item.updateUserName"></label><div class="deleteMark" @click.stop="deleteAnnotation(item.id)"></div><el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @click.stop="true" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox><div class="downIcon" @click.stop="foldComment(item.id)" ></div></div>
+                            <label class="userName" v-text="item.updateUserName"></label>
+                            <div class="deleteMark" @click.stop="deleteAnnotation(item.id)"></div>
+                            <el-checkbox class="isMarkCheck" v-model="item.isMarkValue" @click.stop="true" @change="isMarkChange(item.isMarked,item.id)"></el-checkbox>
+                            <div class="downIcon" @click.stop="foldComment(item.id)" ></div>
+                        </div>
                         <div class="apendedInfoTwo"><label class="updateTime">{{item.updateTime|updateTimeChange()}}</label><label class="reviewStage">{{item.reviewStage|stageListChange()}}</label></div>
                         <!-- <div class="commentIcon"></div> -->
                         <!-- <div class="appendedInfotext">{{JSON.parse(item.coordinateInfo)[index].annotationInfo}}</div> -->
@@ -175,10 +173,10 @@
                     <table class="fileContainer" border="1">
                         <thead>
                             <tr  class="userList-thead">
-                                <th style="width:20%">图号</th>
-                                <th style="width:25%">图名</th>
+                                <th style="width:15%">图号</th>
+                                <th style="width:15%">图名</th>
                                 <th style="width:12%">比例</th>
-                                <th style="width:14%">相关空间</th>
+                                <th style="width:29%">相关空间</th>
                                 <th style="width:17%;max-width:200px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
@@ -202,7 +200,7 @@
                                 </td>
                                 <td>
                                     <select v-model="holderId" class="inp-search">
-                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-text="val.holderName"></option>
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -235,6 +233,13 @@
                             <option value="1:20">1:20</option> 
                             <option value="1:25">1:25</option> 
                             <option value="1:30">1:30</option>
+                        </select>
+                        <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
+                    </div>
+                    <div class="editBodytwo imageBody" style="position: relative;">
+                        <label class=" imageBodyText">相关空间：</label>
+                        <select class="inp-search" v-model="holderId">
+                            <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option> 
                         </select>
                         <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
                     </div>
@@ -277,15 +282,17 @@ import '../ManageCost/js/date.js'
 import data from '../Settings/js/date.js'
 import moment from 'moment';
 import pdf from 'vue-pdf'
+import picView from '../constructionSite/picView.vue'
 var THREE = require('three');
 var isUserInteracting = false;
 export default {
      components: {
-        pdf
+        pdf,picView
     },
     name:'drwaingReview',
     data(){
         return{
+            drawingShow:false,
             showComment:true,//是否折叠评论
             isClick:'',
             selectShape:'',//选中图纸上的标注
@@ -295,7 +302,6 @@ export default {
             drawingVersionId:'',
             version:'',
             queryAnnotationList:'',
-            coordinateInfoList_all:'',
             annotationlist:'',//信息列表
             commentLen:'',//评论条数
             replyList:'',//回复列表
@@ -339,6 +345,7 @@ export default {
                 item:1,
             },
             loading:false,
+            drawingLoading:false,
             showAction:true,
             IsFolderAction:true,
             defaultSubProjId:'',
@@ -446,6 +453,7 @@ export default {
             getHoldersList:'',//空间楼层列表
             holderId:'',//容器ID
             fileGroupId:'',//文件夹ID
+            paraList:{},
         }
     },
     filters: {
@@ -499,19 +507,19 @@ export default {
     },
     watch:{
         annotationUserId:function(val){
-            this.isSelect='';
+            // this.isSelect='';
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
         },
         stage:function(val){
-             this.isSelect='';
+            //  this.isSelect='';
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
             // this.addAnnotation()
         },
         isMark:function(val){
             this.queryAnnotation()
-            this.exportAnnotation()
+            // this.exportAnnotation()
         },
        
 
@@ -522,6 +530,24 @@ export default {
     //    }
     },
     methods:{
+        drawFinish(e){
+            // console.log(e);
+            this.addAnnotation(e[e.length - 1]);
+        },
+        loadPic(){
+             this.$refs.pic.Max_Select = 1;
+        },
+        picView_status_changed(a,b){
+            console.log(a,b);
+            if(a==true){
+                this.isClick=b[0].ID_out;
+                this.isId=b[0].ID_out;
+                // this.drawingShow=true;
+            }else if(a==false){
+                this.isClick='';
+                this.isId='';
+            }
+        },
         letterChange(val){
             if(val==1){
                 return this.letterList[val-1];
@@ -543,24 +569,24 @@ export default {
                 return this.letterList[val-1];
             }else if(val==10){
                 return this.letterList[val-1];
-            }else if(val=11){
+            }else if(val==11){
                  return this.letterList[val-1];
-            }else if(val==''){
+            }else if(val==null){
                 return '';
             }
         },
         shapeImg(val){
-                if(val==1){
+                if(val==101){
                     return require('./images/zx1.png')
-                }else if(val==2){
+                }else if(val==102){
                     return require('./images/yx1.png')
-                }else if(val==3){
+                }else if(val==103){
                     return require('./images/jx1.png')
-                }else if(val==4){
+                }else if(val==104){
                     return require('./images/yunxian1.png')
-                }else if(val==5){
+                }else if(val==10000){
                     return require('./images/wenb1.png')
-                }else if(val==6){
+                }else if(val==105){
                     return require('./images/fuz1.png')
                 }else if(val=undefined){
                     return;
@@ -581,11 +607,22 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getHoldersList=response.data.rt;
-                    this.getHoldersList.push({ 
+                    this.getHoldersList.unshift({ 
                         "holderId": null,
                         "holderName": "无",
                         "holderType": ""
                     })
+                     this.getHoldersList.forEach((item)=>{
+                         if(item.holderType==7){
+                             item.holderName='&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==8){
+                             item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==9){
+                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                     })
                     // this.holderId=null;
                 }else{
                     this.$message({
@@ -650,26 +687,8 @@ export default {
              this.allList='';
             this.isId=val;
             this.isClick=val;
-            this.queryAnnotation();
-            // this.allList=JSON.parse(this.coordinateInfoList_all)
-            // console.log(this.allList,'this.allList');
-            //  if(document.getElementById('abs')){
-            //      let can=document.getElementById('abs');
-            //     can.drawElements=Object.assign(can.drawElements,this.allList)
-            //     console.log(can.drawElements);
-            //         {    // 已经选择标注
-            //                     for(let i = 0;i < can.drawElements.length;i++){
-            //                         if(can.drawElements[i].ID ==this.selectShape){ // 如果选中则改变标签状态为 selected
-            //                             can.drawElements[i].status = "selected";
-            //                         }else{
-            //                             can.drawElements[i].status = "none";
-            //                         }
-                                   
-            //                     }
-            //                      can.reflash();
-            //                     return;
-            //         }
-            // }
+             this.$refs.pic.Selected2(val);
+            // this.queryAnnotation();
         },
         onmouse(){
             var that=this;
@@ -703,6 +722,7 @@ export default {
         },
         //选择版本
         selectVersion(val){
+            var vm=this;
             // this.isSelect='';
             this.isSelect=val;
             // //清除批注遗留的canvas；
@@ -713,88 +733,66 @@ export default {
             //     absInp.parentNode.removeChild(absInp);
             // }
              //清除批注遗留的canvas；
-            if(document.getElementById('abs')){
-                let absInp=document.getElementById('absInp');
-                document.getElementById('abs').drawElements=[];
-                document.getElementById('abs').reflash();
-            }
+            // if(document.getElementById('abs')){
+            //     let absInp=document.getElementById('absInp');
+            //     document.getElementById('abs').drawElements=[];
+            //     document.getElementById('abs').reflash();
+            // }
             // console.log(this.drawingVersionList,"jkdsjdjj");
             this.drawingVersionList.forEach((item)=>{
                 if(val==item.id){
                     this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
                     this.drawingVersionId=item.id;
                     this.version=item.versionId;
-                    if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
-                        {   this.pdfShow=true;
-                            this.imgShow=false;
-                            this.drawingFileUrl1=this.drawingFileUrl;
-                        }else{
-                            this.imgShow=true;
-                            this.pdfShow=false;
-                            var width=c.width;
-                            var height=c.height;
-                            // console.log(width,'',height)
-                            var ctx_img = c.getContext("2d");
-                            ctx_img.clearRect(0,0,width,height);
-                            var img = new Image();
-                            img.onload =function() {
-                                ctx_img.drawImage(img,0, 0);
-                                }
-                            img.src = this.drawingFileUrl;
-                        }
+                    console.log(this.version,'this.version');
+
+                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                    // if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
+                    //     {   this.pdfShow=true;
+                    //         this.imgShow=false;
+                    //         this.drawingFileUrl1=this.drawingFileUrl;
+                    //     }else{
+                    //         this.imgShow=true;
+                    //         this.pdfShow=false;
+                    //         var width=c.width;
+                    //         var height=c.height;
+                    //         // console.log(width,'',height)
+                    //         var ctx_img = c.getContext("2d");
+                    //         ctx_img.clearRect(0,0,width,height);
+                    //         var img = new Image();
+                    //         img.onload =function() {
+                    //             ctx_img.drawImage(img,0, 0);
+                    //             }
+                    //         img.src = this.drawingFileUrl;
+                    //     }
                 }
             })
-            this.queryAnnotation();
+            setTimeout(()=>{
+                this.queryAnnotation();
+            },1000)
             // console.log(this.drawingFileUrl);
         },
         //获取图纸旋转信息
         getdrawInfo(){
 
         },
+        //放大
+        bigRotate(){
+            this.$refs.pic.size_big()
+
+        },
+        smallRotate(){
+             this.$refs.pic.size_small()
+        },
         //图纸工具栏操作
         zuoRotate(val){
-
-                this.rotate=(this.rotate-90)%360;
-                // var drawing4=document.getElementById('drawingPdf');
-               
-                var drawing=document.getElementById('abs');
-                var drawing1=document.getElementById('abs').previousSibling;
-                var drawing2=document.getElementById('abs').nextSibling;
-                var drawing3=document.getElementById('canvas_select');
-                // let ctx=drawing.getContext("2d");
-                // let ctx_select=drawing3.getContext("2d");
-                // ctx.rotate(this.rotate*Math.PI/180);
-                // ctx_select.rotate(this.rotate*Math.PI/180);
-                drawing.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing1.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing2.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing3.style.transform = 'rotate('+this.rotate +'deg)'
-                // drawing4.style.transform = 'rotate('+this.rotate +'deg)'
-                //  this.loadeds();
+                this.$refs.pic.rotation(this.$refs.pic.angle - 90);
+                this.rotate = this.$refs.pic.angle;
                 this.updateDrawingRotateInfo();
         },
         youRotate(val){
-            console.log(val);
-            console.log(this.$refs.pdfDocument.src,'123');
-                this.rotate=(this.rotate+90)%360;
-                // var drawing4=document.getElementById('drawingPdf');
-                // this.loadsNew();
-                 
-                
-                var drawing=document.getElementById('abs');
-                var drawing1=document.getElementById('abs').previousSibling;
-                var drawing2=document.getElementById('abs').nextSibling;
-                var drawing3=document.getElementById('canvas_select');
-                // let ctx=drawing.getContext("2d");
-                // let ctx_select=drawing3.getContext("2d");
-                // ctx.rotate(this.rotate*Math.PI/180);
-                // ctx_select.rotate(this.rotate*Math.PI/180);
-                drawing.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing1.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing2.style.transform = 'rotate('+this.rotate +'deg)'
-                drawing3.style.transform = 'rotate('+this.rotate +'deg)'
-                // drawing4.style.transform = 'rotate('+this.rotate +'deg)'
-                // this.loadeds();
+                this.$refs.pic.rotation(this.$refs.pic.angle + 90);
+                this.rotate = this.$refs.pic.angle;
                 this.updateDrawingRotateInfo();
         },
         straightLine(){
@@ -803,8 +801,9 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+            this.$refs.pic.setDrawStatus('none',101,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+             this.annotationUserId=parseInt(this.userId);
         },
         circular(){
             this.isDrawing=true;
@@ -812,8 +811,10 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+
+            this.$refs.pic.setDrawStatus('none',102,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+            this.annotationUserId=parseInt(this.userId);
         },
         rectangleTool(){
             this.isDrawing=true;
@@ -821,8 +822,10 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+
+            this.$refs.pic.setDrawStatus('none',103,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+            this.annotationUserId=parseInt(this.userId);
         },
         cloudLine(){
             this.isDrawing=true;
@@ -830,8 +833,10 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+
+            this.$refs.pic.setDrawStatus('none',104,0,10000,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+            this.annotationUserId=parseInt(this.userId);
         },
         drawingText(){
             this.isDrawing=true;
@@ -839,8 +844,10 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+
+            this.$refs.pic.setDrawStatus('text',10000,10000,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+            this.annotationUserId=parseInt(this.userId);
         },
         appended(){
             this.isDrawing=true;
@@ -849,10 +856,12 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
+            this.$refs.pic.setDrawStatus('none',105,0,1,{r:255,g:0,b:0});
             this.isMark='0';//标记
-            this.getAllUser();
+            this.annotationUserId=parseInt(this.userId);
         },
         drawingClick(){
+            this.$refs.pic.clearAll();
             this.screenLeft.item = 1;
             this.isSelect='';
             this.allList='';
@@ -878,886 +887,24 @@ export default {
             // }
         },
         annotationClick(){
+            var vm=this;
              this.screenLeft.item = 3
             //  this.isSelect='';
             //  this.biaozhushow=true;
             // this.loadeds()
-            this.queryAnnotation()
-        },
-        reloaded(){
-            this.allList='';
-            let canvas1 = document.getElementById("abs");
-            // console.log(canvas1);
-            let start = {x:0,y:0};
-            let end = {x:0,y:0};
-            var points = [];
-            this.beginDraw = false;
-            var FinishDraw = false;
-            let ctx=canvas1.getContext("2d");
-            ctx.strokeStyle='rgb(252, 52, 57)';
-            ctx.lineWidth=3;
-            let canvas_select = document.getElementById("canvas_select");
-            let ctx_select=canvas_select.getContext("2d");
-            this.allList=JSON.parse(this.coordinateInfoList_all)
-            this.layerID=this.allList[this.allList.length-1].ID;
-            console.log(this.layerID);
-            // console.log(typeof(this.allList),'0000');
-            this.allList.forEach((item)=>{
-                this.drawingMethodsSave(item,ctx,ctx_select);
-            })
-        },
-        loadsNew(){
-            var that =  this; 
-            setTimeout(()=>{
-                that.loadeds()
-                },25
-            )
-        },
-        //此为可以需要批注，加载canvas等
-        loadeds(){
-             this.allList='';
-            //  this.rotate=0;
-            // alert('dff')
-            //  alert('hdjsf')
-            // console.log($event);
-            // this.$refs.pdfDocument.$refs.canvasParent.children[0].onmouseover= ()=>{
-                // console.log(this.coordinateInfoList_all);
-            
-            if(document.getElementById("abs")){
-                    this.getDrawingRotateInfo();
-                    return;
-                }
-            // let fz_img = new Image();
-            // fz_img.src = "./images/fuz1.png";
-            let canvas1 = document.createElement("canvas");
-            let start = {x:0,y:0};
-            let end = {x:0,y:0};
-            var points = [];
-            this.beginDraw = false;
-            var FinishDraw = false;
-            let ctx=canvas1.getContext("2d");
-            ctx.strokeStyle='rgb(252, 52, 57)';
-            ctx.lineWidth=3;
-        
-            {   //  建立显示图层
-                if(this.pdfShow==true){
-                    this.$refs.pdfDocument.$refs.canvasParent.children[0].style.position="absolute";
-                    canvas1.id = "abs";
-                    canvas1.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-                    // console.log("前缀1",canvas1.style.width)
-                    canvas1.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-                    //  console.log("前缀2",canvas1.style.height)
-                    canvas1.style.position = "absolute";
-                    canvas1.style.left=0;
-                    canvas1.style.top=0;
-                    // console.log("前缀11",canvas1.width)
-                    canvas1.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth
-                    canvas1.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight
-                    this.StartWidth = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth
-                    this.StartHeight = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight
-                    this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
-                    if(this.drawingId){
-                        this.getDrawingRotateInfo();
-                    }
-                }else if(this.imgShow==true){
-                    canvas1.id ="abs";
-                    var img=document.getElementById("imgCanvas")
-                    var imgDiv=document.getElementById("imgCanvasDiv")
-                    canvas1.width = img.width;
-                    canvas1.height = img.height;
-                    canvas1.style.position = "absolute";
-                    canvas1.style.left=0;
-                    canvas1.style.top=0;
-                    imgDiv.appendChild(canvas1);
-                }
-            }   
-            let canvas_select = document.createElement("canvas");
-            let ctx_select=canvas_select.getContext("2d");
-            {   //  建立选择图层
-                if(this.pdfShow==true){
-                    canvas_select.id = "canvas_select";
-                    canvas_select.style.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.width;
-                    canvas_select.style.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].style.height;
-                    console.log("前缀2",canvas_select.style.width);
-                    canvas_select.style.display = "none";
-                    canvas_select.style.position = "absolute";
-                    canvas_select.style.left=0;
-                    canvas_select.style.top=0;
-                    canvas_select.width = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetWidth;
-                    canvas_select.height = this.$refs.pdfDocument.$refs.canvasParent.children[0].offsetHeight;
-                    // this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas1);
-                }else if(this.imgShow==true){
-                    canvas_select.id = "canvas_select";
-                    var img=document.getElementById("imgCanvas")
-                    var imgDiv=document.getElementById("imgCanvasDiv")
-                    canvas_select.width = img.width;
-                    canvas_select.height = img.height;
-                    canvas_select.style.display = "none";
-                    canvas_select.style.position = "absolute";
-                    canvas_select.style.left=0;
-                    canvas_select.style.top=0;
-                    // imgDiv.appendChild(canvas_select);
-                }
-                // ctx_select.strokeStyle='rgb(252, 52, 57)';
-                this.$refs.pdfDocument.$refs.canvasParent.appendChild(canvas_select);
-                canvas_select.onclick = (e)=>{console.log("canvas_select"); canvas_select.style.display = "none";}
-            }
-                // canvas1.drawElements=[];
-                let input = document.createElement("input");
-                input.id="absInp"
-                input.style.width = "196px";
-                input.style.height = "28px";
-                input.style.display = "none";
-                input.style.position = "absolute";
-                input.type="text";
-                canvas1.parentNode.appendChild(input);
-                // console.log(this.coordinateInfoAllListss);
-                // this.coordinateInfoList_all.forEach((item)=>{
-                //     this.drawingMethodsSave(item,ctx,ctx_select);
-                
-                // })
-                // this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
-               
-                canvas1.reflash = (e)=>{
-                    
-                    // console.log(canvas1.drawElements);
-                    
-                    ctx.clearRect(0,0,this.StartWidth,this.StartHeight);
-                    ctx_select.clearRect(0,0,this.StartWidth,this.StartHeight);
-                    //  console.log(canvas1.drawElements,'reflash')
-                    // ctx.clearRect(0,0,canvas1.offsetWidth,canvas1.offsetHeight);
-                    this.coordinateInfoAllList=canvas1.drawElements;
-
-                   
-                    // console.log(this.commentShapeType)
-                    // console.log(this.allList,'图纸批注')
-                    
-                    // console.log(canvas1.drawElements);
-                   canvas1.drawElements.forEach((item)=>{
-                       this.drawingMethodsSave(item,ctx,ctx_select);
-                   })
-                   this.allList='';
-                }
-                // if(screenLeft.item ==3){
-                //     canvas1.onmousedown();
-                //     canvas1.onmousemove();
-                //     canvas1.onmouseup();
-                // }
-
-                    var canvas_start_move = {x:0,y:0};
-                    var canvas_start_position = {top:0,left:0};
-                    var canvas_move_status = "none";
-                    var changeSize_position = {x:0,y:0};
-                 
-                    canvas1.onmousedown = (e)=>{
-                        // let ex=e.layerX.style.transform='rotate('+this.rotate +'deg)'
-                        // let ey=e.layerY.style.transform='rotate('+this.rotate +'deg)'
-                        var layerX_ = e.layerX / this.Koeffizent;
-                        var layerY_ = e.layerY / this.Koeffizent;
-
-
-                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
-                        console.log(center);
-                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
-                        V3.x -= center.x;
-                        V3.y -= center.y;
-                        var Matrix = new THREE.Matrix4();
-                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
-                        V3.applyMatrix4(Matrix);
-                        V3.x += center.x;
-                        V3.y += center.y;
-                        layerX_ = V3.x;
-                        layerY_ = V3.y;
-                        console.log(layerX_,'计算的坐标x');
-                        console.log(layerY_,'计算的坐标y');
-
-                        console.log(e.layerX,'坐标x');
-                        console.log(e.layerY,'坐标y');
-                        canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
-                        if(input.style.display == "block"){
-                            input.style.display = "none";
-                            for(let i = 0;i < canvas1.drawElements.length;i++){
-                                if(canvas1.drawElements[i].ID == this.layerID){
-                                    canvas1.drawElements[i].text = input.value;
-                                    // console.log(canvas1.drawElements," ",canvas1.drawElements[i].text);
-                                }
-                            }
-                            var coordinateLen=this.coordinateInfoAllList.length
-                            this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
-                            console.log(this.commentShapeType);
-                            this.coordinateInfoAllList=canvas1.drawElements;
-                            this.addAnnotation();
-
-                            
-                            // console.log(canvas1.drawElements,'输入值');
-                            
-                            // this.commentShapeType='5'
-                            // this.addAnnotation();
-                        }
-
-                        // this.isDrawing=false;
-                        var selectColorID = ctx_select.getImageData(layerX_ ,  layerY_, 1, 1).data;
-                        var red = selectColorID[0];
-                        var green = selectColorID[1];
-                        var blue = selectColorID[2];
-                        console.log(selectColorID);
-                        if(!this.beginDraw){
-                            console.log('选中');
-                            if(red != 0 || green != 0 || blue != 0){    // 已经选择标注
-                                for(let i = 0;i < canvas1.drawElements.length;i++){
-                                    if(canvas1.drawElements[i].ID == red + green * 256 + blue * 256 *256){ // 如果选中则改变标签状态为 selected
-                                        canvas1.drawElements[i].status = "selected";
-                                    }else{
-                                        canvas1.drawElements[i].status = "none";
-                                    }
-                                   
-                                }
-                                 canvas1.reflash();
-                                return;
-                            }
-                        }
-
-                        if(e.button == 0&&this.isDrawing){
-
-                            this.beginDraw = true;
-                            start.x = layerX_;
-                            start.y = layerY_;
-                            this.layerID++;
-                            if(this.shapeType=="4"){
-                                if(!FinishDraw){
-                                    start.x = layerX_;
-                                    start.y = layerY_;
-                                    if(points.length > 0){
-                                        if( Math.pow((points[0].x - layerX_)*(points[0].x - layerX_) + 
-                                                    (points[0].y - layerY_)*(points[0].y - layerY_),0.5) <= 20){	// 首尾链接算完成
-                                            points.push({x:points[0].x,y:points[0].y});
-                                            FinishDraw = true;
-                                            canvas1.onmousemove(e);
-                                            // this.isDrawing = false;
-                                            this.beginDraw=false;
-                                            this.isDrawing=false;
-                                            
-                                            start.x = 1000000000;
-                                            start.y = 1000000000;
-
-                                            end.x = -1000000000;
-                                            end.y = -1000000000;
-
-                                            let points_2 = [];
-
-                                            for(let i = 0; i < points.length;i++){
-                                                if(points[i].x > end.x){
-                                                    end.x = points[i].x;
-                                                }
-
-                                                if(points[i].x < start.x){
-                                                    start.x = points[i].x;
-                                                }
-
-                                                if(points[i].y > end.y){
-                                                    end.y = points[i].y;
-                                                }
-
-                                                if(points[i].y < start.y){
-                                                    start.y = points[i].y;
-                                                }
-
-                                                points_2.push({x:points[i].x,y:points[i].y});
-
-                                            }
-
-                                            start.x -= 20;
-                                            start.y -= 20;
-                                            end.x += 20;
-                                            end.y += 20;
-                                            canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
-                                            canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
-                                            this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},points:points_2,t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
-                                            this.coordinateInfoAllList=canvas1.drawElements;
-                                            var coordinateLen=this.coordinateInfoAllList.length
-                                            this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
-                                            console.log(this.commentShapeType);
-                                            this.addAnnotation();
-                                            points = [];
-                                            FinishDraw = false;
-
-                                            return;
-                                        }
-                                    }
-                                    points.push({x:layerX_,y:layerY_});
-                                }
-                                canvas1.onmousemove(e);
-                            }
-                            
-                        }
-                        // if(e.button == 2){
-                        //     FinishDraw = false;
-                        // 	points = [];
-                        // }
-                        
-                    }
-                    canvas1.onmouseup = (e)=>{
-
-                        var layerX_ = e.layerX / this.Koeffizent;
-                        var layerY_ = e.layerY / this.Koeffizent;
-                        // var center = {x:canvas1.offsetWidth/2,y:canvas1.offsetHeight/2};
-                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
-                        console.log(center);
-                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
-                        V3.x -= center.x;
-                        V3.y -= center.y;
-                        var Matrix = new THREE.Matrix4();
-                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
-                        V3.applyMatrix4(Matrix);
-                        V3.x += center.x;
-                        V3.y += center.y;
-                        layerX_ = V3.x;
-                        layerY_ = V3.y;
-                        console.log(layerX_,'计算的坐标x up');
-                        console.log(layerY_,'计算的坐标y up');
-                        console.log(e.layerX,'坐标x up');
-                        console.log(e.layerY,'坐标y up');
-                        if(this.beginDraw){
-                            if(this.shapeType!="4"){
-                                this.coordinateInfoList=[];
-                                this.beginDraw = false;
-                                this.isDrawing=false;
-                                canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)
-                                // console.log(canvas1.drawElements);
-                                canvas1.drawElements.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
-
-                                this.coordinateInfoList.push({s:{x:start.x,y:start.y},e:{x:end.x,y:end.y},t:this.shapeType,ID:this.layerID,annotationInfo:'',status:"none"});
-                                 var coordinateLen=this.coordinateInfoAllList.length
-                                this.commentShapeType=this.coordinateInfoAllList[coordinateLen-1].t;
-                                // console.log(this.commentShapeType);
-                                if(this.shapeType!= "5"){
-                                    this.addAnnotation();
-                                    // canvas_select.style.display = "block";
-                                }
-                                // console.log(this.coordinateInfoList);
-                                if(this.shapeType == "5"){
-                                    input.value = "标注";
-                                    input.style.left = (end.x  - 98) * this.Koeffizent + "px";
-                                    input.style.top = (end.y - 14) * this.Koeffizent + "px";
-                                    input.style.display = "block";
-                                    // console.log(input.text);
-                                }
-                                canvas1.reflash();
-                            }else{
-                                
-                            }
-                        }
-                       
-                        // console.log(this.coordinateInfoList);
-                    }
-                    canvas1.onmousemove = (e)=>{
-                        // alert('触发节点down2')
-
-                        var layerX_ = e.layerX / this.Koeffizent;
-                        var layerY_ = e.layerY / this.Koeffizent;
-
-                        // var center = {x:canvas1.offsetWidth/2,y:canvas1.offsetHeight/2};
-                        var center = {x:(canvas1.offsetWidth/2)/this.Koeffizent,y:(canvas1.offsetHeight/2)/this.Koeffizent};
-                        // console.log(center);
-                        var V3 = new THREE.Vector3(layerX_,layerY_,0);
-                        V3.x -= center.x;
-                        V3.y -= center.y;
-                        var Matrix = new THREE.Matrix4();
-                        Matrix.makeRotationZ(this.rotate*Math.PI/180);
-                        V3.applyMatrix4(Matrix);
-                        V3.x += center.x;
-                        V3.y += center.y;
-                        layerX_ = V3.x;
-                        layerY_ = V3.y;
-                            // console.log(e.layerX,'坐标x move');
-                            // console.log(e.layerY,'坐标y move');
-                        let x =  layerX_;
-                        let y =  layerY_;
-                        if(this.beginDraw&&this.isDrawing){
-                            canvas1.drawElements=Object.assign(canvas1.drawElements,this.allList)//此为两个数组连接，需要保存之前的数据
-                            canvas1.reflash();
-                            this.drawingMethods(this.shapeType,ctx,start,end,x,y,FinishDraw,points,e)
-                        }
-                    }
-
-                    document.getElementById('drawingPic').onmousemove = (e)=>{
-                        
-                        changeSize_position.x = (e.target.offsetWidth / 2 - e.layerX) / e.target.offsetWidth;
-                        changeSize_position.y = (e.target.offsetHeight / 2 - e.layerY) / e.target.offsetHeight;
-
-                    }
-
-                    document.getElementById('drawingPic').onmousewheel = (e)=>{
-                        e.preventDefault();
-
-                        if(e.deltaY > 0){
-                            
-                            if(this.Koeffizent < 1){
-                                return
-                            }
-                            this.Koeffizent *= 0.8;
-                            
-                        }else{
-                            
-                            if(this.Koeffizent > 3){
-                                return;
-                            }
-                            this.Koeffizent *= 1.25;
-                        }
-
-                        var pdf_div = document.getElementById('drawingPdf');
-
-                        // var drawingPic = document.getElementById('drawingPic');
-
-                        var h = this.$refs.pdfDocument.$refs.canvasParent.children[0].height / this.$refs.pdfDocument.$refs.canvasParent.children[0].width ;
-
-                        pdf_div.style.width = this.Koeffizent * 100 + "%";
-                        pdf_div.style.height = this.Koeffizent * 100 + "%";
-
-                        var annotationLayer = document.getElementsByClassName("annotationLayer");
-                        annotationLayer[0].style.display = "none";
-
-                        canvas1.style.width = pdf_div.offsetWidth + "px";
-                        canvas1.style.height = pdf_div.offsetWidth * h + "px";
-
-                        canvas_select.style.width = pdf_div.offsetWidth + "px";
-                        canvas_select.style.height = pdf_div.offsetWidth * h + "px";
-
-                        ///////////////////////////// 改变位置 //////////////////////////////////
-
-                        var drawingPic = document.getElementById('drawingPic');
-
-                        if(drawingPic.scrollWidth >= drawingPic.offsetWidth){
-
-                            // console.log(drawingPic.offsetHeight," ",drawingPic.offsetWidth);
-                            // console.log(drawingPic.scrollHeight," ",drawingPic.scrollWidth," ",drawingPic.scrollTop," ",drawingPic.scrollLeft);
-
-                            if(changeSize_position.x < 0){
-                                drawingPic.scrollLeft = (drawingPic.scrollWidth - drawingPic.offsetWidth);
-                            }else{
-                                drawingPic.scrollLeft = 0;
-                            }
-
-                            if(changeSize_position.y < 0){
-                                drawingPic.scrollTop = (drawingPic.scrollHeight - drawingPic.offsetHeight);
-                            }else{
-                                drawingPic.scrollTop = 0;
-                            }
-
-                        }
-
-
-                        /////////////////////////////////////////////////////////////////////////
-                    }
-
-            canvas1.drawElements=[];
-            this.coordinateInfoList=[];
-        },
-        //绘图方法储存函数
-        drawingMethodsSave(item,ctx,ctx_select){
-            switch(item.t){
-                    case "1":
-                        ctx.strokeStyle='rgb(252, 52, 57)';
-                        ctx.lineWidth=3;
-                        ctx.beginPath();
-                        ctx.moveTo(item.s.x,item.s.y)
-                        ctx.lineTo(item.e.x,item.e.y)
-                        ctx.stroke();
-                        //直线选中变样式
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                        }
-                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=12;
-                        ctx_select.beginPath();
-                        ctx_select.moveTo(item.s.x,item.s.y)
-                        ctx_select.lineTo(item.e.x,item.e.y)
-                        ctx_select.stroke();
-                        break;
-                    case "2":
-                        ctx.strokeStyle='rgb(252, 52, 57)';
-                        ctx.lineWidth=3;
-                        ctx.beginPath();
-                        ctx.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
-                        ctx.stroke();
-                        
-                        //圆形选中变样式
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                            ctx.setLineDash([12,6]);
-                            ctx.beginPath();
-                            ctx.moveTo(item.s.x + 5,item.s.y);
-                            ctx.lineTo(item.e.x - 5,item.s.y);
-                            ctx.moveTo(item.e.x ,item.s.y + 5);
-                            ctx.lineTo(item.e.x ,item.e.y - 5);
-                            ctx.moveTo(item.e.x - 5,item.e.y);
-                            ctx.lineTo(item.s.x + 5,item.e.y);
-                            ctx.moveTo(item.s.x,item.e.y - 5);
-                            ctx.lineTo(item.s.x,item.s.y + 5);
-                            ctx.stroke();
-                            ctx.setLineDash([]);
-                        }
-
-                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=12;
-                        ctx_select.beginPath();
-                        ctx_select.ellipse(item.s.x + (item.e.x - item.s.x)/2,item.s.y + (item.e.y - item.s.y)/2,Math.abs(item.e.x - item.s.x)/2,Math.abs(item.e.y - item.s.y)/2,0,0,Math.PI*2,true);
-                        ctx_select.stroke();
-
-                        // ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
-                        // ctx_select.fill();
-                        
-                        break;
-                    case "3":
-                        ctx.strokeStyle='rgb(252, 52, 57)';
-                        ctx.lineWidth=3;
-                        ctx.beginPath();
-                        ctx.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
-                        ctx.stroke(); 
-                        //矩形选中变样式
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                        }
-
-                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=12;
-                        ctx_select.beginPath();
-                        ctx_select.rect(item.s.x,item.s.y,item.e.x - item.s.x,item.e.y - item.s.y);
-                        ctx_select.stroke();
-
-                        // ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
-                        // ctx_select.fill();
-                        break;
-                    case "4":
-                        ctx.strokeStyle='rgb(252, 52, 57)';
-                        ctx.lineWidth=3;
-                        ctx.beginPath();
-                        
-                        this.drawCloudLine(ctx,item.points,20,true,item.points[item.points.length - 1]);
-
-                        ctx.stroke(); 
-
-                        //矩形选中变样式
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-                            ctx.setLineDash([]);
-                            ctx.rect(item.s.x - 5,item.s.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.s.x - 5,item.e.y - 5,10,10);
-                            ctx.rect(item.e.x - 5,item.s.y - 5,10,10);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                            ctx.setLineDash([12,6]);
-                            ctx.beginPath();
-                            ctx.moveTo(item.s.x + 5,item.s.y);
-                            ctx.lineTo(item.e.x - 5,item.s.y);
-                            ctx.moveTo(item.e.x ,item.s.y + 5);
-                            ctx.lineTo(item.e.x ,item.e.y - 5);
-                            ctx.moveTo(item.e.x - 5,item.e.y);
-                            ctx.lineTo(item.s.x + 5,item.e.y);
-                            ctx.moveTo(item.s.x,item.e.y - 5);
-                            ctx.lineTo(item.s.x,item.s.y + 5);
-                            ctx.stroke();
-                            ctx.setLineDash([]);
-                        }
-                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=24;
-                        ctx_select.beginPath();
-                        ctx_select.moveTo(item.points[0].x,item.points[0].y);
-                        for(let j = 0; j < item.points.length - 1;j++){ // 画中间线
-                            ctx_select.lineTo(item.points[j + 1].x,item.points[j + 1].y);
-                        }
-
-                        ctx_select.stroke();
-
-                        // ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
-                        // ctx_select.fill();
-
-                        break;
-
-                    case "5":
-
-                        ctx.strokeStyle='rgb(252, 52, 57)';
-                        ctx.lineWidth=3;
-                        let text_X = item.e.x - 120;
-                        let text_Y = item.e.y;
-
-                        if(item.e.x < item.s.x){
-                            text_X = item.e.x + 120;
-                        }
-
-                        ctx.beginPath();
-                        let dir = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
-                        let length = dir.length();
-                        dir.normalize();
-
-                        // length -= 16;
-
-                        ctx.moveTo(item.s.x + dir.x * 16,item.s.y + dir.y * 16);
-                        ctx.lineTo(item.s.x  + dir.x * length,item.s.y  + dir.y * length);
-                        
-                        //执行画线
-                        ctx.stroke();
-
-                        //////////////////////////////////////////////////////////////////////
-
-                        let V = new THREE.Vector2(text_X - item.s.x,text_Y - item.s.y);
-                        V.normalize();
-                        let angle = V.angle();
-
-                        let M = new THREE.Matrix4();
-                        M.makeRotationZ(angle);
-
-                        let V1 = new THREE.Vector3(16,8,0);
-                        let V2 = new THREE.Vector3(16,-8,0);
-
-                        V1.applyMatrix4(M);
-                        V2.applyMatrix4(M);
-
-                        // ctx.lineWidth=1;
-                        ctx.beginPath();
-                        
-                        ctx.moveTo(item.s.x,item.s.y);
-                        ctx.lineTo(item.s.x + V1.x,item.s.y + V1.y);
-                        ctx.lineTo(item.s.x + V2.x,item.s.y + V2.y);
-                        ctx.lineTo(item.s.x,item.s.y);
-                        ctx.stroke();
-                        ctx.fillStyle='rgb(252, 52, 57)';
-                        ctx.fill();
-
-                        ctx.beginPath();
-                        ctx.moveTo(text_X,text_Y);
-                        ctx.lineTo(item.e.x,text_Y);
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                        ctx.moveTo(item.e.x - 100,text_Y + 16);
-                        ctx.lineTo(item.e.x + 100,text_Y + 16);
-                        ctx.lineTo(item.e.x + 100,text_Y - 16);
-                        ctx.lineTo(item.e.x - 100,text_Y - 16);
-                        ctx.lineTo(item.e.x - 100,text_Y + 16);
-
-                        ctx.stroke();
-
-                        ctx.fillStyle='rgb(255,255,255)';
-                        ctx.fill();
-                        
-                        if(item.text){
-                            ctx.fillStyle='rgb(252, 52, 57)';
-                            ctx.font="18px Georgia";
-                            ctx.fillText(item.text,item.e.x - 96,text_Y + 6,192);
-                        }
-
-                        //矩形选中变样式
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-
-                            ctx.rect(item.e.x - 100 - 5,text_Y + 16 - 5,10,10);
-                            ctx.rect(item.e.x + 100 - 5,text_Y + 16 - 5,10,10);
-                            ctx.rect(item.e.x + 100 - 5,text_Y - 16 - 5,10,10);
-                            ctx.rect(item.e.x - 100 - 5,text_Y - 16 - 5,10,10);
-                            ctx.stroke();
-
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                        }
-
-                            ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                            ctx_select.lineWidth=3;
-                            ctx_select.beginPath();
-                            ctx_select.rect(item.e.x - 100,item.e.y - 16,200,32);
-                            ctx_select.stroke();
-
-                            // ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
-                            // ctx_select.fill();
-                        
-                        break;
-                    case "6":
-
-                        let fz_img = document.getElementById("fz_img_for_draw");
-                        ctx.drawImage(fz_img,item.e.x - 9,item.e.y - 9);
-
-                        if(item.status == "selected"){
-                            ctx.strokeStyle='rgb(0, 0, 0)';
-                            ctx.lineWidth=1;
-                            ctx.beginPath();
-
-                            ctx.rect(item.e.x - 12,item.e.y - 12,4,4);
-                            ctx.rect(item.e.x - 12,item.e.y + 8,4,4);
-                            ctx.rect(item.e.x + 8,item.e.y + 8,4,4);
-                            ctx.rect(item.e.x + 8,item.e.y - 12,4,4);
-                            ctx.stroke();
-
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                            ctx.setLineDash([]);
-                        }
-                        ctx_select.strokeStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';
-                        ctx_select.lineWidth=12;
-                        ctx_select.beginPath();
-                        ctx_select.rect(item.e.x - 10,item.e.y - 10,20,20);
-                        ctx_select.stroke();
-
-                        ctx_select.fillStyle='rgb(' + item.ID % 256 +  ','+ parseInt(item.ID / 256) % 256  + ', 0)';;
-                        ctx_select.fill();
-                        break
-            } 
-        },
-        //绘图方法函数
-        drawingMethods(shapeType,ctx,start,end,x,y,FinishDraw,points,e){
-
-            var layerX_ = e.layerX / this.Koeffizent;
-            var layerY_ = e.layerY / this.Koeffizent;
-
-            switch(shapeType){
-                        case "1":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.moveTo(start.x,start.y);
-                            ctx.lineTo(x,y);
-                            // ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                            ctx.stroke(); 
-                            end.x = x;
-                            end.y = y;
-                            // console.log(start.x,"",start.y);                        
-                        break;
-                        case "2":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.ellipse(start.x + (x - start.x)/2,start.y + (y - start.y)/2,Math.abs(x - start.x)/2,Math.abs(y - start.y)/2,0,0,Math.PI*2,true);
-                            ctx.stroke(); 
-                            end.x = x;
-                            end.y = y;
-                        break;
-                        case "3":
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            ctx.rect(start.x,start.y,x - start.x,y - start.y);
-                            ctx.stroke(); 
-                            end.x = x;
-                            end.y = y;
-                        break;
-                        case "4":
-                        {
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            ctx.beginPath();
-                            if(!FinishDraw){
-                                if(points.length > 1){	//	画结束位置
-                                    ctx.rect(points[0].x - 10,points[0].y - 10,20,20);
-                                }
-                            }
-                            ctx.stroke()
-                            this.drawCloudLine(ctx,points,20,FinishDraw,{x:layerX_,y:layerY_});
-                        }
-                        break;
-                        case "5":
-
-                            ctx.strokeStyle='rgb(252, 52, 57)';
-                            ctx.lineWidth=3;
-                            let text_X = layerX_ - 120;
-                            let text_Y = layerY_;
-
-                            if(layerX_ < start.x){
-                                text_X = layerX_ + 120;
-                            }
-
-                            ctx.beginPath();
-                            let dir = new THREE.Vector2(text_X - start.x,text_Y - start.y);
-                            let length = dir.length();
-                            dir.normalize();
-
-                            // length -= 16;
-
-                            ctx.moveTo(start.x + dir.x * 16,start.y + dir.y * 16);
-                            ctx.lineTo(start.x  + dir.x * length,start.y  + dir.y * length);
-                            
-                            //执行画线
-                            ctx.stroke();
-
-                            //////////////////////////////////////////////////////////////////////
-
-                            let V = new THREE.Vector2(text_X - start.x,text_Y - start.y);
-                            V.normalize();
-                            let angle = V.angle();
-
-                            let M = new THREE.Matrix4();
-                            M.makeRotationZ(angle);
-
-                            let V1 = new THREE.Vector3(16,8,0);
-                            let V2 = new THREE.Vector3(16,-8,0);
-
-                            V1.applyMatrix4(M);
-                            V2.applyMatrix4(M);
-                            // ctx.lineWidth=1;
-                            ctx.beginPath();
-                            ctx.moveTo(start.x,start.y);
-                            ctx.lineTo(start.x + V1.x,start.y + V1.y);
-                            ctx.lineTo(start.x + V2.x,start.y + V2.y);
-                            ctx.lineTo(start.x,start.y);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(252, 52, 57)';
-                            ctx.fill();
-                            ctx.beginPath();
-                            ctx.moveTo(text_X,text_Y);
-                            ctx.lineTo(layerX_,text_Y);
-                            ctx.stroke();
-                            ctx.beginPath();
-                            ctx.moveTo(layerX_ - 100,text_Y + 16);
-                            ctx.lineTo(layerX_ + 100,text_Y + 16);
-                            ctx.lineTo(layerX_ + 100,text_Y - 16);
-                            ctx.lineTo(layerX_ - 100,text_Y - 16);
-                            ctx.lineTo(layerX_ - 100,text_Y + 16);
-                            ctx.stroke();
-                            ctx.fillStyle='rgb(255,255,255)';
-                            ctx.fill();
-                            end.x = x;
-                            end.y = y;
-                            
-                        break;
-                        case "6":
-                            let fz_img = document.getElementById("fz_img_for_draw");
-                            ctx.drawImage(fz_img,x - 9,y - 9);
-
-                            end.x = x;
-                            end.y = y;
-                        break;
-                    }
-
-
+            //  this.isSelect=this.drawingVersionId;
+             this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
+            vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+            this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
+            console.log(this.version,'this.version12')
+             vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+
+            console.log(this.drawingVersionId);
+            console.log(this.drawingVersionList);
+             setTimeout(()=>{
+                this.queryAnnotation();
+            },500)
+            // this.queryAnnotation();
         },
         //更新图纸旋转信息
         updateDrawingRotateInfo(){
@@ -1775,6 +922,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     // alert('更新图纸旋转信息成功');
+                    console.log('更新图纸旋转信息成功',this.rotate);
                 }else{
                     this.$message({
                         type:'error',
@@ -1787,10 +935,7 @@ export default {
         getDrawingRotateInfo(){
              var vm=this
              this.rotate=0;
-            // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
-            // document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
-            // document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
-            // document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
+             console.log(this.drawingFileUrl,'this.drawingFileUrl');
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
@@ -1803,25 +948,40 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     if(response.data.rt){
-                        this.rotate=response.data.rt.rotateInfo;
+                        if(isNaN(response.data.rt.rotateInfo)){
+                            this.rotate = 0;
+                        }else{
+                            this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
+                        }
+                        console.log(this.rotate);
+                        // this.drawingFileUrl1=this.drawingFileUrl;
                     }
-                    document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                    document.getElementById('abs').style.transform = 'rotate('+this.rotate +'deg)';
-                    document.getElementById('abs').nextSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                    document.getElementById('canvas_select').style.transform = 'rotate('+this.rotate +'deg)';
+                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                // this.paraList={angle:this.rotate,type:this.drawingFileUrl1.substr(this.drawingFileUrl1.length-3),source:this.drawingFileUrl1};
                 }else{
                     
                 } 
             })
         },
         //添加批注
-        addAnnotation(){
-
-            var vm=this
-            if(this.shapeType=='5'){
-                this.annotationInfo=this.coordinateInfoAllList[this.coordinateInfoAllList.length-1].text;
-                console.log(this.annotationInfo);
+        addAnnotation(data){
+            var vm=this;
+            var type = 0;
+            switch(data.drawtype){
+                case "line":type=1;break;
+                case "circular":type=2;break;
+                case "rectangle":type=3;break;
+                case "cloud":type=4;break;
+                case "text":type=5;break;
+                case "Mark":type=6;break;
             }
+
+            if(data.drawtype == "text"){
+                this.annotationInfo = data.text;
+            }else{
+                this.annotationInfo = "";
+            }
+            
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/addAnnotation',
                 method:'post',
@@ -1832,17 +992,15 @@ export default {
                     annotationInfo:this.annotationInfo,
                     drawingVersionId:this.drawingVersionId,
                     reviewStage:this.stage,
-                    type:this.commentShapeType,
+                    type:type,
                     // projectId:vm.projId
                 },
                 data:{
-                     coordinateInfo:JSON.stringify(this.coordinateInfoAllList)
+                     coordinateInfo:JSON.stringify(data)
                 }
             }).then((response)=>{
                 if(response.data.cd='0'){
                     this.queryAnnotation();
-                    this.annotationInfo='';
-                    this.commentShapeType='';
                 }else{
                     this.$message({
                         type:'error',
@@ -1977,8 +1135,8 @@ export default {
                     this.queryAnnotation();
                     // alert('添加批注ID')
                     
-                }else{
-                    this.message({
+                }else if(response.data.cd=='-1'){
+                    this.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -2040,14 +1198,10 @@ export default {
             vm.annotationlist='';
             // vm.isSelect='';
             //清除批注遗留的canvas；
-            if(document.getElementById('abs')){
-                let absInp=document.getElementById('absInp');
-                document.getElementById('abs').drawElements=[];
-                document.getElementById('abs').reflash();
-            }
             if(this.drawingVersionId==''){
                 return;
             }else{
+                console.log("queryAnnotation");
             axios({
                 url:vm.BDMSUrl+'dc/drawingReview/queryAnnotation',
                 method:'post',
@@ -2076,179 +1230,34 @@ export default {
                     this.replyList=response.data.rt.replyList;
                     var len=this.annotationlist.length;
                     this.commentLen=len;
-                    this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
-                     this.loadeds();
-                    this.reloaded();
                     this.annotationlist.forEach((item,index)=>{
                         if(item.isMarked==0){
                             this.$set(item,'isMarkValue',false);
                         }else if(item.isMarked==1){
                             this.$set(item,'isMarkValue',true);
                         }
-                        if(this.isClick){
-                            if(item.id==this.isClick){
-                                this.selectShape=JSON.parse(item.coordinateInfo)[index].ID;
-                                // console.log(this.selectShape,'成功');
-                                this.allList=JSON.parse(this.coordinateInfoList_all)
-                                // console.log(this.allList,'this.allList');
-                                if(document.getElementById('abs')){
-                                    let can=document.getElementById('abs');
-                                    can.drawElements=Object.assign(can.drawElements,this.allList)
-                                    console.log(can.drawElements);
-                                        {  // 已经选择标注
-                                                    for(let i = 0;i < can.drawElements.length;i++){
-                                                        if(can.drawElements[i].ID ==this.selectShape){ // 如果选中则改变标签状态为 selected
-                                                            can.drawElements[i].status = "selected";
-                                                        }else{
-                                                            can.drawElements[i].status = "none";
-                                                        }
-                                                    }
-                                                    can.reflash();
-                                                    return;
-                                        }
-                                }
-                            }
-                        }
+                        // if(this.isClick){
+                        //     if(item.id==this.isClick){
+                        //         this.selectShape=JSON.parse(item.coordinateInfo).id;
+                        //         // console.log(this.selectShape,'成功');
+                        //         // console.log(this.allList,'this.allList');
+                        //         this.$refs.pic.Selected2(this.selectShape);
+
+                        //     }
+                        // }
                     })
                     var len=this.annotationlist.length;
                     this.commentLen=len;
-                    this.coordinateInfoList_all=this.annotationlist[len-1].coordinateInfo;
-                    this.loadeds();
-                    this.reloaded();
                     // console.log(this.annotationlist,'获取列表');
-                   
+
+                   this.$refs.pic.loadPoints2(this.annotationlist);
                     
+                }else{
+                    this.$refs.pic.loadPoints2([]);
                 }
             })
             
             }
-        },
-         drawCloudLine(cxt,points,radio,finish,last){
-			var counterclockwise = false;
-			////////////////// 画角 /////////////////////
-
-			if(finish){
-				cxt.beginPath();
-				
-				let a1 = this.angle(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
-				let a2 = this.angle(points[0].x,points[0].y,points[1].x,points[1].y); // 
-
-				let l = this.getLength(points[0].x,points[0].y,points[points.length - 2].x,points[points.length - 2].y);
-				let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
-				l2 /= 2;
-				let a11 = Math.acos(l2 / radio);
-				a11 = Math.abs(a11);
-
-				cxt.arc(points[0].x,points[0].y,radio,a1 + a11,a2 - Math.PI / 4,counterclockwise);
-				cxt.stroke();
-
-			}else{
-				if(points.length > 1){
-					cxt.beginPath();
-					
-					let a1 = this.angle(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
-					let a2 = this.angle(points[points.length-1].x,points[points.length-1].y,last.x,last.y); // 
-
-					let l = this.getLength(points[points.length-1].x,points[points.length-1].y,points[points.length-2].x,points[points.length-2].y);
-					let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
-					l2 /= 2;
-					let a11 = Math.acos(l2 / radio);
-					a11 = Math.abs(a11);
-
-
-					cxt.arc(points[points.length-1].x,points[points.length-1].y,radio,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
-					cxt.stroke();
-				}
-			}
-
-			for(let i = 0; i < points.length - 2;i++){ 
-
-				cxt.beginPath();
-				
-				let a1 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
-				let a2 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 2].x,points[i + 2].y); // 
-
-				let l = this.getLength(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
-				let l2 = l - parseInt(l / (radio * 1.5))*(radio * 1.5);
-				l2 /= 2;
-				let a11 = Math.acos(l2 / radio);
-				a11 = Math.abs(a11);
-
-				cxt.arc(points[i + 1].x,points[i + 1].y,radio,a1 + a11,a2 - Math.PI / 4 ,counterclockwise);
-				cxt.stroke();
-			}
-
-			/////////////////////////////////////////////
-
-			/////////////////// 画线 /////////////////////
-
-			for(let i = 0; i < points.length - 1;i++){
-
-				let l = this.getLength(points[i].x,points[i].y,points[i + 1].x,points[i + 1].y);
-				let a1 = this.angle(points[i + 1].x,points[i + 1].y,points[i + 0].x,points[i + 0].y);
-
-				let dir = {x:points[i + 1].x - points[i].x,y:points[i + 1].y - points[i].y};
-				dir = this.normalize(dir);
-
-				let k = radio * 1.5;
-
-				for(let j = 1;j < Math.ceil(l / k);j++){
-
-					cxt.beginPath();
-
-					let item = {x:points[i].x + j*k * dir.x,y:points[i].y + j*k * dir.y};
-					cxt.arc(item.x,item.y,radio,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
-
-					cxt.stroke();
-				}
-			}
-
-			//////////////////////////////////////////////
-
-			///////////////// 画当前线 ////////////////////
-
-			if(points.length > 0){
-
-				let l = this.getLength(	points[points.length-1].x,
-									points[points.length-1].y,last.x,last.y);
-				let a1 = this.angle(last.x,last.y,points[points.length-1].x,points[points.length-1].y);
-
-				let dir = {x:last.x - points[points.length-1].x,y:last.y - points[points.length-1].y};
-				dir = this.normalize(dir);
-
-				let k = radio * 1.5;
-
-				for(let j = 1;j < Math.ceil(l / k);j++){
-
-					cxt.beginPath();
-
-					let item = {x:points[points.length-1].x + j*k * dir.x,y:points[points.length-1].y + j*k * dir.y};
-					cxt.arc(item.x,item.y,radio,a1 + Math.PI / 5 ,a1 + Math.PI / 5 * 4,counterclockwise);
-
-					cxt.stroke();
-				}
-			}
-			//////////////////////////////////////////////
-			return counterclockwise;
-		},
-		angle(x1,y1,x2,y2){
-			let x = x2 - x1;
-			let y = y2 - y1;
-
-			var angle = Math.atan2( y, x );
-
-			if ( angle < 0 ) angle += 2 * Math.PI;
-
-			return angle;
-		},
-        getLength(x1,y1,x2,y2){
-            return Math.pow((x1 - x2)*(x1 - x2) + 
-                            (y1 - y2)*(y1 - y2),0.5)
-        },
-        normalize(dir){
-            let l = Math.pow(dir.x*dir.x + dir.y*dir.y,0.5);
-
-            return {x:dir.x/l,y:dir.y/l};
         },
         //获取目录
         getDirectory(){
@@ -2271,7 +1280,7 @@ export default {
                     console.log(vm.DirectoryList,'directory')
                     this.getDrawingList();
                     // console.log(vm.DirectoryList);
-                    vm.showAction = true
+                    // vm.showAction = true
                 }else{
                     vm.message({
                         type:'error',
@@ -2343,7 +1352,9 @@ export default {
                     }else{
                         let strId='';
                         let strLen='';
-                        vm.FileTree.forEach((item)=>{
+                        console.log(vm.FileTree,'vm.FileTree');
+                        console.log(vm.directoryId,'vm.directoryId');
+                        vm.FileTree[0].children.forEach((item)=>{
                             if(item.code==vm.directoryId){
                                 strLen=item.children.length;
                                 strId=item.children[strLen-1].id;
@@ -2363,22 +1374,6 @@ export default {
                     }
                     this.expandedKeys.push(this.directoryId);
                     console.log(this.expandedKeys);
-                    
-                    // vm.directoryId='';
-                    // vm.expandedKeys=[];
-                   
-
-                    // console.log(vm.FileTree);
-                    // var drawingDirList=this.DirectoryList
-                    // if(vm.drawingList != null){
-                    //   var children = vm.drawingList.concat(drawingDirList)
-                    // }else{
-                    //     var children = drawingDirList
-                    // }
-                    // console.log(children)
-                    // vm.FileTree_original = children
-                    // vm.FileTree = data.transformTozTreeFormat(setting, children)
-                    // console.log(vm.FileTree)
                 }
             })
         },
@@ -2390,7 +1385,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var drawingIdList=[];
-
+            this.drawingLoading=true;
             drawingIdList.push(this.drawingId);
             console.log(drawingIdList);
             var vm=this;
@@ -2403,39 +1398,44 @@ export default {
                 },
                 data:drawingIdList
             }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.versionPath=(response.data.rt)[0].fileUri;
-                    this.drawingFileUrl=this.QJFileManageSystemURL+this.versionPath;
-                    if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
-                        {   this.pdfShow=true;
-                            this.imgShow=false;
-                            this.drawingFileUrl1=this.drawingFileUrl;
-                            var source=this.drawingFileUrl;
+                if(response.data.rt){
+                    vm.versionPath=(response.data.rt)[0].fileUri;
+                    vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
+                    vm.getDrawingRotateInfo();
+                    // vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                    // console.log(vm.paraList,'this.paraList');
+                    this.drawingLoading=false;
+
+                    // if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
+                    //     {   this.pdfShow=true;
+                    //         this.imgShow=false;
+                    //         this.drawingFileUrl1=this.drawingFileUrl;
+                    //         var source=this.drawingFileUrl;
                            
-                            // console.log(source);
-                            // this.getDrawingRotateInfo();
-                            // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                            // this.init(source);
-                            //删除之前节点abs
-                        }else{
-                            this.imgShow=true;
-                            this.pdfShow=false;
-                            //绘制文件是png和jpg格式的图片
-                            var c = document.getElementById("imgCanvas");//此为之前创建的一个图片框架
+                    //         // console.log(source);
+                    //         // this.getDrawingRotateInfo();
+                    //         // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
+                    //         // this.init(source);
+                    //         //删除之前节点abs
+                    //     }else{
+                    //         this.imgShow=true;
+                    //         this.pdfShow=false;
+                    //         //绘制文件是png和jpg格式的图片
+                    //         var c = document.getElementById("imgCanvas");//此为之前创建的一个图片框架
                            
-                            var width=c.width;
-                            var height=c.height;
-                            var ctx_img = c.getContext("2d");
-                            ctx_img.clearRect(0,0,width,height);
-                            var img = new Image();
-                            img.onload =function() {
-                                ctx_img.drawImage(img,0, 0);
-                                }
-                            img.src = this.drawingFileUrl;
-                            var source=this.drawingFileUrl;
-                            // this.init(source);
-                        }
-                        // this.loadeds();
+                    //         var width=c.width;
+                    //         var height=c.height;
+                    //         var ctx_img = c.getContext("2d");
+                    //         ctx_img.clearRect(0,0,width,height);
+                    //         var img = new Image();
+                    //         img.onload =function() {
+                    //             ctx_img.drawImage(img,0, 0);
+                    //             }
+                    //         img.src = this.drawingFileUrl;
+                    //         var source=this.drawingFileUrl;
+                    //         // this.init(source);
+                    //     }
+                    //     // this.loadeds();
                         
                         
                     // console.log(this.versionPath);
@@ -2444,6 +1444,7 @@ export default {
             })
         },
         handleNodeClick(obj){
+             this.drawingLoading=true;
             // this.annotationlist='';
             this.allList='';
             this.rotate=0;
@@ -2471,12 +1472,14 @@ export default {
             vm.drawingId=obj.id
             vm.drawingName=obj.drawingName
             vm.drawingNumber=obj.drawingNumber
+             
             // console.log(vm.directoryId,'vm.directoryId')
             // console.log( vm.drawingId,' vm.drawingId')
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
+              this.getDrawingRotateInfo();
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }
@@ -2490,7 +1493,7 @@ export default {
             }
             console.log(vm.expandedKeys);
         },
-         nodeClickClose(data,node,self){
+        nodeClickClose(data,node,self){
             var vm = this
             if(vm.expandedKeys.indexOf(data.code) != -1){
                  vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
@@ -2527,7 +1530,7 @@ export default {
                     this.version=this.drawingVersionList[listLen-1].versionId;
                     this.drawingVersionId=this.drawingZxVersionId;
                     this.fileGroupId=this.drawingVersionList[0].fileGroupId;
-                    console.log(this.fileGroupId,'文件id')
+                    console.log(this.fileGroupId,'文件id',this.drawingVersionId)
                     // this.isSelect=this.drawingVersionId;
                     // console.log(this.drawingZxVersionId);
                     // console.log(this.drawingVersionList);
@@ -2557,7 +1560,7 @@ export default {
                             type:'success',
                             message:'图纸删除成功'
                         })
-                        this.loading=false;
+                        // this.loading=false;
                         this.drawingFileUrl1='';
                         this.drawingFileUrl='';
                         this.checkFileDir=[];
@@ -2601,7 +1604,7 @@ export default {
             vm.editDrawing.dcode = vm.checkFileDir.drawingNumber
             vm.editDrawing.dname = vm.checkFileDir.drawingName
             vm.editDrawing.dscale = vm.checkFileDir.ratio
-
+            vm.holderId=vm.checkFileDir.holderId
         },
         updateFile(){
             var vm = this
@@ -2618,7 +1621,7 @@ export default {
                     type:'error',
                     message:'系统文件，不能操作'
                 })
-            }else{
+            }else if(vm.checkFileDir.code){
                 vm.drawingsUploadShow = true
             }
             
@@ -2649,7 +1652,8 @@ export default {
                     drawingId:vm.editDrawing.dId,//这是图纸ID
                     drawingNumber:vm.editDrawing.dcode,//这是图纸图号
                     drawingName:vm.editDrawing.dname,//图纸名称
-                    ratio:vm.editDrawing.dscale//图纸比例
+                    ratio:vm.editDrawing.dscale,//图纸比例
+                    holderId:vm.holderId
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
@@ -2871,7 +1875,8 @@ export default {
                             vm.fileList = []
                             vm.holderId=''
                             vm.getDirectory()
-                            // vm.getDrawingList()
+                            // this.getMaxVersionPath();
+                            vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
@@ -2930,6 +1935,9 @@ export default {
         .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
                 background-color: #dfdfdf;
         }
+        // .el-tree--highlight-current .el-tree-node.is-current .elselect{
+        //         background-color: #000;
+        // }
         .el-tree-node__label{
             font-size: 12px;
             color: #666666;
@@ -2967,6 +1975,9 @@ export default {
             background-image: url('./images/zTreeStandard.png');
             background-position: -110px -32px;
         }
+        // .elselect{
+        //     background: #333333;
+        // }
         .el-tree-node__content{
                 height: 30px;
         }
@@ -2974,6 +1985,9 @@ export default {
             color: #333333;
             font-weight: bold;
         }
+        // .is-current .el-tree-node__content {
+        //     background: #333333;
+        // }
         .clearfix{
             clear: both;
             overflow: hidden;
@@ -2998,6 +2012,7 @@ export default {
                      left:60px;
                      .el-input__inner{
                         height: 30px !important;
+                        padding-left:5px;
                     }
 
                 }
@@ -3019,18 +2034,35 @@ export default {
                                 left:30px;
                                 top:9px;
                                 background: url('./images/zuox.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/zuox1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzl.png')no-repeat 0 0;
+                                }
                             }
                             .youRotate{
                                 left:70px;
                                 top:9px;
                                 background: url('./images/youx.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/youx1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzr.png')no-repeat 0 0;
+                                }
                             }
+                            .bigRotate{
+                                left:-50px;
+                                top:9px;
+                                background: url('./images/big.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/big1.png')no-repeat 0 0;
+                                }
+                            }
+                            .smallRotate{
+                                 left:-10px;
+                                top:9px;
+                                background: url('./images/small.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/small1.png')no-repeat 0 0;
+                                }
+                            }
+
                 }
             }
             .noImg{
@@ -3404,20 +2436,25 @@ export default {
                 }
             }
             #box-right{
-                 padding: 10px 13px 0 40px;
+                 padding: 10px 0px 0px 26px;
                  .versionBody{
                      .versionHead{
                         font-size:14px;
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        width:100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:4px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        
                      }
                      .versionUlSel{
-                         background-color: #e6e6e6;
+                         background-color: #f6f6f6;
                         //  padding:5px;
                      }
                     //  .versionUl &:hover{
@@ -3430,7 +2467,7 @@ export default {
                         padding: 4px;
                         width: 100%;
                         height: 122px;
-                        margin:3px;
+                        // margin:3px;
                         text-align: left;
                         border-bottom: 1px solid #e6e6e6;
                     //     &:hover{
@@ -3479,7 +2516,7 @@ export default {
 
             }
             #box-right1{
-                 padding: 10px 13px 0 40px;
+                 padding: 10px 0px 0px 26px;
                  ::-webkit-scrollbar{width:0px}
                 .drawingApendedInfo{
                     width: 100%;
@@ -3490,31 +2527,47 @@ export default {
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        // width: 100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:7px; 
+                        position: relative;
+                        .label1{
+                            width: 80%;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            display: inline-block;
+                        }
                         .export{
-                            float: right;
-                            margin-right:10px;
+                            // float: right;
+                            // margin-right:10px;
+                            right:10px;
+                            top:2px;
                             cursor: pointer;
                             color:#fc3439;
+                            position: absolute;
                         }
                      }
                      .clickbody{
-                         background: #e2e2e2;
+                         background: #f6f6f6;
                      }
                     .drawingApendedInfobody{
-                        margin:20px 3px;
+                        margin:0px 0px;
                         position: relative;
                         border-bottom: 1px solid #ccc;
+                        padding: 4px;
                          .apendedInfoOne{
                              width: 100%;
                              height: 30px;
+                             position: relative;
                              img{
                                  float: left;
                                  margin-top:7px;
-                                 margin-right: 2px
+                                 margin-right: 4px;
+                                 margin-left:4px;
+
                              }
                              .userName{
                                  float: left;
@@ -3523,8 +2576,11 @@ export default {
                                  line-height: 30px;
                              }
                              .deleteMark{
-                                 margin-left: 103px;
-                                 margin-top:6px;
+                                 position: absolute;
+                                 top:6px;
+                                 right: 40px;
+                                //  margin-left: 103px;
+                                //  margin-top:6px;
                                  display:inline-block;
                                 background: url('../ManageCost/images/delete.png')no-repeat 0 0;
                                 margin-right: 10px;
@@ -3546,7 +2602,8 @@ export default {
                                  height: 12px;
                                  background: url('./images/zhank.png')no-repeat 0 0;
                                  top:9px;
-                                 right:4px;
+                                 right:6px;
+                                 cursor: pointer;
 
                              }
                         }
@@ -3564,7 +2621,7 @@ export default {
                         }
                         .apendedInfoTwo{
                             height: 20px;
-                            margin-left:8px;
+                            margin-left:5px;
                             .updateTime{
                                 float: left;
                                 font-size: 12px;
@@ -3592,7 +2649,7 @@ export default {
                             .apendedInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 18px;
+                                height: 22px;
                                 padding-left:4px;
                                 // border-radius: 2px;
                                 // background: #fafafa;
@@ -3608,8 +2665,11 @@ export default {
                             .commentInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 30px;
-                                 padding-left:4px;
+                                height: 38px;
+                                padding-left:5px;
+                                padding-top:5px;
+                                // font-size: 12px;
+                                // color:#cccccc;
                             }
                             .replayBtn{
                                 background: #fc3439;
@@ -3635,6 +2695,7 @@ export default {
                                     .replyOne{
                                         margin-bottom: 4px;
                                         text-align: left;
+                                        position: relative;
                                         .replyName{
                                             font-size:14px;
                                             color:#333333;
@@ -3653,9 +2714,11 @@ export default {
                                         .deleteMark1{
                                             // margin-left: 78px;
                                             // margin-top:2px;
+                                            position: absolute;
                                             display:inline-block;
                                             background: url('../ManageCost/images/delete.png')no-repeat 0 0;
-                                            margin-left: 30px;
+                                            top:2px;
+                                            right: 13px;
                                             &:hover{
                                                 background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
                                             }
@@ -3893,15 +2956,16 @@ export default {
             .editBody{
                 .editUpDrawing{
                     margin-top:10px;
+                    margin-left:-60px;
                     .editUpDrawingText{
                         display:inline-block;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
-                        text-align: right;
+                        text-align: left;
                     }
                     .editUpDrawingValue{
-                        margin-left:40px;
+                        margin-left:0px;
                         display:inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -3913,18 +2977,23 @@ export default {
                     width: 400px;
                     margin-left:109px;
                     margin-top:10px;
-
+                    position: relative;
+                    height: 30px;
                     .editUpDrawingProjectText{
                         display:inline-block;
-                        
-                        margin-left: -122px;
+                        // margin-left: -122px;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
                         text-align: left;
+                        position: absolute;
+                         top:0px;
+                         left:-6px;
                     }
                     .editUpDrawingProjectText1{
-                        margin-left: 39px;
+                        // margin-left: 39px;
+                        top:0px;
+                         left:171px;
                         display: inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -3933,24 +3002,31 @@ export default {
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        position: absolute;
 
                     }
                     .editUpDrawingProjectBtn{
-                            margin-top:10px;
-                            margin-left: 100px;
+                        position: absolute;
+                            // margin-top:10px;
+                            // margin-left: 100px;
+                            top:0px;
+                            left:82px;
                             display: block;
                             width: 80px;
-                            height: 30px;
+                            height: 28px;
                             border: none;
-                            line-height: 30px;
+                            line-height: 28px;
                             padding: 0;
                             cursor: pointer;
                             border-radius: 2px;
-                            background: #e2e2e2;
-                            margin-right: 20px;
-                            color: #8f8f8f;
+                            background: #f9f9f9;
+                            border: 1px solid #ccc;
+                            background: #f9f9f9;
                             font-size: 14px;
                             font-weight: normal;
+                            margin-right: 20px;
+                            color: #000;
+
                     }
                 }
             }
