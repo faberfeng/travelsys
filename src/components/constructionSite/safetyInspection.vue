@@ -4209,7 +4209,7 @@ export default {
                             var imgHeight = 592.28/contentWidth * contentHeight;
                             var pageData = canvas.toDataURL('image/jpeg', 1.0);
 
-                            var pdf = new jsPDF('', 'pt', 'a4');
+                            var pdf = new jsPDF('p', 'pt', 'a4');
 
                             //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
                             //当内容未超过pdf一页显示的范围，无需分页
