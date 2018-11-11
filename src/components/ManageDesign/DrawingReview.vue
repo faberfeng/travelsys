@@ -177,7 +177,7 @@
                                 <th style="width:15%">图名</th>
                                 <th style="width:12%">比例</th>
                                 <th style="width:29%">相关空间</th>
-                                <th style="width:17%;max-width:200px;">文件名称</th>
+                                <th style="width:17%;max-width:150px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
                         </thead>
@@ -723,54 +723,21 @@ export default {
         //选择版本
         selectVersion(val){
             var vm=this;
-            // this.isSelect='';
             this.isSelect=val;
-            // //清除批注遗留的canvas；
-            // if(document.getElementById('abs')){
-            //     let canvas1=document.getElementById('abs');
-            //     let absInp=document.getElementById('absInp');
-            //     canvas1.parentNode.removeChild(canvas1);
-            //     absInp.parentNode.removeChild(absInp);
-            // }
-             //清除批注遗留的canvas；
-            // if(document.getElementById('abs')){
-            //     let absInp=document.getElementById('absInp');
-            //     document.getElementById('abs').drawElements=[];
-            //     document.getElementById('abs').reflash();
-            // }
-            // console.log(this.drawingVersionList,"jkdsjdjj");
+           
             this.drawingVersionList.forEach((item)=>{
                 if(val==item.id){
                     this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
                     this.drawingVersionId=item.id;
                     this.version=item.versionId;
                     console.log(this.version,'this.version');
-
-                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
-                    // if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
-                    //     {   this.pdfShow=true;
-                    //         this.imgShow=false;
-                    //         this.drawingFileUrl1=this.drawingFileUrl;
-                    //     }else{
-                    //         this.imgShow=true;
-                    //         this.pdfShow=false;
-                    //         var width=c.width;
-                    //         var height=c.height;
-                    //         // console.log(width,'',height)
-                    //         var ctx_img = c.getContext("2d");
-                    //         ctx_img.clearRect(0,0,width,height);
-                    //         var img = new Image();
-                    //         img.onload =function() {
-                    //             ctx_img.drawImage(img,0, 0);
-                    //             }
-                    //         img.src = this.drawingFileUrl;
-                    //     }
+                    this.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
                 }
             })
             setTimeout(()=>{
                 this.queryAnnotation();
             },1000)
-            // console.log(this.drawingFileUrl);
+           
         },
         //获取图纸旋转信息
         getdrawInfo(){
@@ -897,8 +864,7 @@ export default {
             vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
             this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
             console.log(this.version,'this.version12')
-             vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
-
+             this.paraList={angle:parseInt(this.rotate),type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
             console.log(this.drawingVersionId);
             console.log(this.drawingVersionList);
              setTimeout(()=>{
@@ -953,11 +919,12 @@ export default {
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                        console.log(this.rotate);
-                        // this.drawingFileUrl1=this.drawingFileUrl;
+                        console.log(parseInt(this.rotate),'this.rotate');
                     }
-                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
-                // this.paraList={angle:this.rotate,type:this.drawingFileUrl1.substr(this.drawingFileUrl1.length-3),source:this.drawingFileUrl1};
+                     var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+                    console.log(type);
+                    this.paraList={type:type,source:vm.drawingFileUrl,angle:0};
+                    console.log(this.paraList,'this.paraList');
                 }else{
                     
                 } 
@@ -1282,7 +1249,7 @@ export default {
                     // console.log(vm.DirectoryList);
                     // vm.showAction = true
                 }else{
-                    vm.message({
+                    vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -1368,7 +1335,7 @@ export default {
                      if(this.drawingId){
                         this.getDrawingVersionList();
                         // this.queryAnnotation();
-                        this.getDrawingRotateInfo();
+                        // this.getDrawingRotateInfo();
                         this.getMaxVersionPath();
                         
                     }
@@ -1479,7 +1446,7 @@ export default {
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
-              this.getDrawingRotateInfo();
+            //   this.getDrawingRotateInfo();
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }
