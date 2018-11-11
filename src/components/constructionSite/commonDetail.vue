@@ -578,25 +578,28 @@ export default Vue.component('commonDetail',{
         handleCurrentChange(val){
             this.getPointDatasList1=[];
             this.pageNum=val;
+            console.log(this.getPointDatasListLength,'this.getPointDatasListLength');
+            console.log((this.getPointDatasListLength)%(this.pageSize),'123');
             if(this.getPointDatasListLength<11){
-                for(var i=0;i<this.getPointDatasListLength-1;i++){
+                for(var i=0;i<this.getPointDatasListLength;i++){
                         this.getPointDatasList1.push(this.getPointDatasList[i])
                     }
             }else if(this.getPointDatasListLength>10){
                 if(this.pageNum==1){
                     var num=0;
-                    var num2=9;
+                    var num2=10;
 
                 }else if(this.pageNum!=1){
                     if(this.getPointDatasListLength%(this.pageSize)!=0){
                         var num=(this.pageNum-1)*(this.pageSize)
                         var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
+                        
                     }else{
-                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
+                         var num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
                     }
                 }
-                // console.log(num,'num')
-                //  console.log(num2,'num2')
+                console.log(num,'num')
+                 console.log(num2,'num2')
                 for(var i=num;i<num2;i++){
                     this.getPointDatasList1.push(this.getPointDatasList[i])
                 }

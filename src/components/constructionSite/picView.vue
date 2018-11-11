@@ -69,13 +69,15 @@ export default {
         this.drawID = 1;
 
         this.Refresh_timer = setInterval(()=>{
-            // console.log(this.para.type);
+            // console.log(this.para);
             if(this.para.type=="")return;
             // console.log(this.para,'this.para.type')
 
             if(this.para.type=="pdf"){
                 this.para.type="PDF";
                 if(this.para.source != this.old_para){
+
+                    console.log(this.para);
 
                     this.drawList = [];
 
