@@ -27,7 +27,11 @@
                             <tr>
                                 <th rowspan="2">分类</th>
                                 <th rowspan="2">巡视监测内容</th>
+<<<<<<< HEAD
                                 <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime|timeChange()}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
+=======
+                                <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime|timeChange}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
+>>>>>>> c38b2876da33b712b11289df4474ef5cf51a0400
                                 <th colspan="2">最近巡视(今天)</th>
                                 <th rowspan="2">操作</th>
                             </tr>
@@ -49,14 +53,14 @@
                                 <td :rowspan="item.historyRemarkspan" :class="{'hidden': item.historyRemarkdis}" v-text="item.historyRemark"></td>
                                 <td :rowspan="item.recentResultspan" :class="{'hidden': item.recentResultdis}" v-text="item.recentResult"></td>
                                 <td :rowspan="item.recentRemarkspan" :class="{'hidden': item.recentRemarkdis}" v-text="item.recentRemark"></td> -->
-                                <td v-show="hasTodayRecordBoolen" v-text="item.historyResult"></td>
-                                <td v-show="hasTodayRecordBoolen" v-text="item.historyRemark"></td>
+                                <td  v-text="item.historyResult"></td>
+                                <td  v-text="item.historyRemark"></td>
                                 <td v-show="saveShow"  v-text="item.recentResult"></td>
                                 <td v-show="saveShow" v-text="item.recentRemark"></td>
                                 <!-- <td v-show="saveShow"  v-text="item.todayResult"></td>
                                 <td v-show="saveShow" v-text="item.todayRemark"></td> -->
-                                <td width="180px" ><label v-show="!isEditShow">{{item.todayResult}}</label><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
-                                <td width="180px"><label v-show="!isEditShow">{{item.todayRemark}}</label><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
+                                <td width="180px" ><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayResult}}</label><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
+                                <td width="180px"><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayRemark}}</label><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
                                 <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
                                 <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
@@ -155,6 +159,8 @@ export default Vue.component('walkThrough',{
             getPatrolRecordList:'',//获取巡视记录
             getPatrolRecordLists:'',
             userGroupIdList:[],
+            getNextHistoryList:'',//上一次记录
+            getPreviousHistoryList:'',//下一次记录
             historyTime:'',//巡视时间
             hasTodayRecordBoolen:false,
             patrolreName:'',
@@ -199,6 +205,7 @@ export default Vue.component('walkThrough',{
         vm.getAllPatrolSummary();
     },
     filters:{
+<<<<<<< HEAD
          timeChange(val) {
             if (val == null) {
             return '/';
@@ -206,6 +213,16 @@ export default Vue.component('walkThrough',{
             return moment(val).format("YYYY-MM-DD");
             }
         },
+=======
+        timeChange(val) {
+            if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("YYYY-MM-DD");
+            }
+        },
+
+>>>>>>> c38b2876da33b712b11289df4474ef5cf51a0400
     },
     methods:{
         back(){
@@ -270,6 +287,10 @@ export default Vue.component('walkThrough',{
                 }
             })
         },
+        //时间格式初始化
+        time(val){
+            return moment(val).format("YYYY-MM-DD");
+        },
         //获取下一次历史记录
         getNextHistoryRecord(){
             var vm=this;
@@ -281,20 +302,42 @@ export default Vue.component('walkThrough',{
             }else {
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'detectionInfo/getPreviousHistoryRecord',
+                    url:this.BDMSUrl+'detectionInfo/getNextHistoryRecord',
                     headers:{
                         'token':vm.token
                     },
                     params:{
                         userGroupId:this.userSelectId,
-                        currentHistoryDate:this.historyTime,
+                        currentHistoryDate:this.time(this.historyTime),
                     },
-                    data:{
-                        patrolId:this.userGroupIdList
-                        }
+                    data:this.userGroupIdList  
                 }).then((response)=>{
                     if(response.data.cd=='0'){
-
+                        this.getNextHistoryList=response.data.rt.records;
+                         var map = new Map();
+                        for (var i = 0; i < this.getNextHistoryList.length;i++){
+                            var patrolId = this.getNextHistoryList[i].patrolId;
+                            if (!map.has(patrolId)) {
+                                var array = new Array();
+                                array.push(this.getNextHistoryList[i]);
+                                map.set(patrolId, array);
+                            }
+                            else {
+                                var array = map.get(patrolId);
+                                array.push(this.getNextHistoryList[i]);
+                                map.set(patrolId, array);
+                            }
+                        }
+                        var lists=[];
+                        map.forEach(function (value, key, mapObject) {
+                            // console.log(key);
+                            for(var i=0;i<value.length;i++){
+                                lists.push(value[i])
+                            } 
+                            console.log(value);
+                        }); 
+                        console.log(lists,'lists123');
+                        this.getNextHistoryList=lists;
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -321,14 +364,36 @@ export default Vue.component('walkThrough',{
                     },
                     params:{
                         userGroupId:this.userSelectId,
-                        currentHistoryDate:this.historyTime,
+                        currentHistoryDate:this.time(this.historyTime),
                     },
-                    data:{
-                        patrolId:this.userGroupIdList
-                        }
+                    data:this.userGroupIdList
                 }).then((response)=>{
                     if(response.data.cd=='0'){
-
+                        this.getPreviousHistoryList=response.data.rt.records;
+                         var map = new Map();
+                        for (var i = 0; i < this.getPreviousHistoryList.length;i++){
+                            var patrolId = this.getPreviousHistoryList[i].patrolId;
+                            if (!map.has(patrolId)) {
+                                var array = new Array();
+                                array.push(this.getPreviousHistoryList[i]);
+                                map.set(patrolId, array);
+                            }
+                            else {
+                                var array = map.get(patrolId);
+                                array.push(this.getPreviousHistoryList[i]);
+                                map.set(patrolId, array);
+                            }
+                        }
+                        var lists=[];
+                        map.forEach(function (value, key, mapObject) {
+                            // console.log(key);
+                            for(var i=0;i<value.length;i++){
+                                lists.push(value[i])
+                            } 
+                            console.log(value);
+                        }); 
+                        console.log(lists,'this.getPreviousHistoryList');
+                        this.getPreviousHistoryList=lists;
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -405,6 +470,10 @@ export default Vue.component('walkThrough',{
                         type:'info',
                         message:'编辑巡视记录内容成功'
                     })
+                    this.getPatrolRecordLists.forEach((item)=>{
+                        document.getElementById('inputRemark'+item.id).value='';
+                        document.getElementById('inputResult'+item.id).value='';
+                })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',

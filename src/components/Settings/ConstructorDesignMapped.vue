@@ -33,7 +33,7 @@
                             <td>
                                 <span v-if="item.criterion!=0"
                                     class="editIcon" @click="editUser(index)"></span>
-                                <span v-if="item.criterion!=0" 
+                                <span v-if="item.criterion!=0"
                                 class="deleteIcon" @click="deleteUser(index)"></span>
                             </td>
                         </tr>
@@ -127,7 +127,7 @@
                         <option v-for="(item,index) in logicSystenData" :key="index">{{item.title}}</option>
                     </select>
                     <i class="icon-sanjiao"></i>
-                </div> 
+                </div>
                 <div class="editBodytwo edit-item clearfix"><label class="editInpText">构件类别 :</label>
                     <select class="editSelect" v-model="goujianType" @change="goujianTypeChange">
                         <option v-for="(item,index) in categoryData" :key="index">{{item.title}}</option>
@@ -150,7 +150,7 @@
                     <i class="icon-sanjiao"></i>
                 </div>
                 <div class="editBodytwo editBodyone edit-item clearfix"><label class="editInpText">关键字类型 :</label>
-                    <select class="editSelect"  v-model="keyTypeVal"> 
+                    <select class="editSelect"  v-model="keyTypeVal">
                         <option v-for="(item,index) in keyTypeData" :key="index" >{{item.name}}</option>
                     </select>
                     <i class="icon-sanjiao"></i>
@@ -427,7 +427,7 @@ export default {
             }
             this.categoryBase = this.constructorData[num].genieClassCode//类型编码
             this.geniceClassJson.forEach((item,index,arr)=>{
-                
+
                 if(item.number.split('')[0] == this.categoryBase.split('')[0] && item.number.split('')[1] == this.categoryBase.split('')[1]){
                     this.designValue = item.title;//设计专业
                     this.logicSystenData = this.geniceClassJson[index].children;
@@ -497,7 +497,7 @@ export default {
                                     oldFamilyNameKeyWord:this.oldFamilyNameKeyWord,
                                     revitCategory:this.constructorData[this.editUserNum].revitCategory,
                                     revitName:this.revitCategory
-                                }   
+                                }
                             }).then(response=>{
                                 if(response.data.cd=='0'){
                                     this.editListShow = false;
@@ -515,7 +515,7 @@ export default {
                                     alert(response.data.msg);
                                 }
                             })
-                        //}    
+                        //}
                     }
                 }
             }
@@ -549,7 +549,7 @@ export default {
                         if(this.designValue == ''){
                             alert('请至少选择设计专业！');
                         }else{
-                            var value = ''; 
+                            var value = '';
                             if(this.keyTypeVal == '族名称'){
                                 value = 0;
                             }else if(this.keyTypeVal == '类型名称'){
@@ -611,7 +611,7 @@ export default {
                             }else if(this.revitCategory == '火警设备'){
                                 revitCa = "FireAlarmDevices";
                             }else if(this.revitCategory == '机械设备'){
-                                revitCa = "MechanicalEquipment	";
+                                revitCa = "MechanicalEquipment";
                             }else if(this.revitCategory == '家具'){
                                 revitCa = "Furniture";
                             }else if(this.revitCategory == '建筑柱'){
@@ -736,9 +736,9 @@ export default {
                 }
             }
 
-            
-            
-            
+
+
+
         },
         addlistClose(){
             this.keyWord='';
@@ -838,7 +838,7 @@ export default {
                 if(item.title == this.logicSystemValue){
                     this.categoryBase = item.number;
                     this.categoryData = this.logicSystenData[index].children;
-                }   
+                }
             })
         },
         //构件类别改变
@@ -848,7 +848,7 @@ export default {
                     this.categoryBase = item.number;
                 }
             })
-        }        
+        }
     }
 }
 </script>
@@ -857,7 +857,7 @@ export default {
         width: 100%;
     }
     .title{
-        border-bottom:1px solid #ccc; 
+        border-bottom:1px solid #ccc;
         margin: 0 ;
         text-align: left;
     }
@@ -885,7 +885,7 @@ export default {
         margin: 0;
         text-align: left;
         margin: 30px 0 20px;
-    }   
+    }
     .btn{
         width: 96px;
         height: 32px;
@@ -915,7 +915,7 @@ export default {
     }
     #edit .editSelect{
         width: 435px;
-        padding: 0 0 0 10px;     
+        padding: 0 0 0 10px;
         box-sizing: content-box;
     }
     #edit .inp{
@@ -962,7 +962,7 @@ export default {
     overflow-x: hidden;
     *{
         box-sizing: border-box;
-        
+
     }
     .edit-item{
             position: relative;
@@ -1009,7 +1009,7 @@ export default {
             margin-left: 120px;
             margin-top: 5px;
         }
-            
+
     }
     .el-button{
         width: 112px;
@@ -1164,7 +1164,7 @@ export default {
                             font-weight: bold;
                             float: left;
                         }
-                       
+
                         .el-radio{
                             float: left;
                             span{
@@ -1184,7 +1184,7 @@ export default {
                             box-sizing: border-box;
                             border-radius: 2px;
                             border:1px solid #e0e0e0;
-                            background: #fafafa; 
+                            background: #fafafa;
                         }
                         .btn{
                             float: left;
@@ -1211,7 +1211,7 @@ export default {
                             margin-top: 4px;
                             .el-checkbox{
                                 display: block;
-                                margin:8px 10px; 
+                                margin:8px 10px;
                                 .el-checkbox__label{
                                     color: #666666;
                                 }
@@ -1332,7 +1332,7 @@ export default {
                     content: '';
                     width: 10px;
                     height: 10px;
-                    background-size: 100% 100%; 
+                    background-size: 100% 100%;
                     top: 8px;
                     left: 8px;
                 }
@@ -1359,6 +1359,6 @@ export default {
             .pagination-info{
                 margin-top: 5px;
             }
-            
+
 }
 </style>

@@ -182,7 +182,7 @@
                     </div>
                 </div>
             </div>
-            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'订货管理'"  v-if="showCommonList"></common-list>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :orderListDetailId='checkItem.id' :dingHuoObj='DingDanObj' :isGongChengLiang="false" :title="'订货管理'" :isShowWuzi="showWuZi" :isDinghuo="isDingHuo" v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="编辑付款项目" :visible.sync="editfukuan.show" :before-close="editfukuanCancel">
@@ -380,6 +380,7 @@
                                 <option value="3">成本管理-工程量</option>
                                 <option value="4">成本管理-物料量</option>
                             </select>
+                            
                             <i class="downAngle"></i>
                         </div>
                     </div>
@@ -397,17 +398,9 @@
                         </div>
                         <span class="yewulaiyuan">业务状态：</span>
                         <div class="titleDiv">
-                            <select class="projectTitleLeftinp" v-model="newList.sourceState">
-                                <option value="0">全部</option>
-                                <option value="1">待选型</option>
-                                <option value="2">已选型</option>
-                                <option value="3">已订货</option>
-                                <option value="4">生产中</option>
-                                <option value="5">已待发</option>
-                                <option value="6">已发货</option>
-                                <option value="7">已到场</option>
-                                <option value="8">已抽检</option>
-                                <option value="9">已签收</option>
+                            <select class="serviceState projectTitleLeftinp" v-model="serviceStateValue">
+                                <option v-for="(item,index) in serviceStateList" :key="index" :value="item.value"
+                                        v-text="item.label"></option>
                             </select>
                             <i class="downAngle"></i>
                         </div>
@@ -435,14 +428,16 @@
                         <tbody>
                             <tr v-for="(item,index) in customData" :key="index">
                                 <td>
-                                    <input type="checkbox" v-model="item.isChecked" @change="handleChecked(item,index)"/>
+                                    <input type="checkbox" v-model="item.isChecked" @click="handleChecked(item,index)"/>
+                                    <!-- <el-checkbox v-model="item.isChecked"></el-checkbox> -->
                                 </td>
-                                <td>{{item.type_c}}</td>
+                                <td v-text="parseType(item.type)"></td>
                                 <td>{{item.detailId}}</td>
                                 <td>{{item.detailName}}</td>
                                 <td>{{item.componentCount}}</td>
-                                <td>{{item.relaType_c}}</td>
-                                <td>{{item.sourceState_c}}</td>
+                                <td v-text="parseMBSource(item.relaType)"></td>
+                                <td v-text="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"
+                                    :title="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"></td>
                                 <td>{{new Date(item.createTime).toLocaleString()}}</td>
                             </tr>
                         </tbody>
@@ -509,11 +504,57 @@
                 <button class="editBtnC" @click="customCancle">取消</button>
             </div>
         </el-dialog>
+        <!-- 选型方式 -->
+        <el-dialog title="选型方式确认" :visible="selectionMethods"  @close="selectionCancel">
+            <div class="editBody">
+                <div class="select-temp ">
+                    <el-select v-model="selectionModelValue" placeholder="请选择" @change="selectionModelChange">
+                        <el-option
+                        v-for="(item,index) in selectionModelList"
+                        :key="index"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>    
+            </div> 
+            <div slot="footer" class="dialog-footer">
+                <el-button class="editBtnC separation" @click="selectionCancel">取 消</el-button>
+                <el-button class="editBtnS" @click="selectionConfirm">确 定</el-button>
+            </div>
+        </el-dialog>
+        <!-- 校验结果 -->
+        <el-dialog title="校验结果" :visible="checkoutResult"  @close="leadCancel">
+            <div class="editBody">
+                <ul>
+                    <li v-for="(item,index) of checkoutResultList" :key="index"></li>
+                </ul>
+            </div> 
+            <div slot="footer" class="dialog-footer">
+                <el-button class="editBtnC separation" @click="leadCancel">取消导入</el-button>
+                <el-button class="editBtnS" @click="leadConfirm">确认导入</el-button>
+            </div>
+        </el-dialog>
+        <!-- 自动选型提示 -->
+        <el-dialog title="自动选型提示" :visible="selectionHint"  @close="hintCancel">
+            <div class="editBody content-left">
+                <h3><span>自动选型结果统计：</span></h3>
+                <p><span>待导入的清单条目数：</span></p>
+                <p><span>不可以实现自动选型的条目数：</span></p>
+                <p><span>选型完成并可以使用的条目数：</span></p>
+            </div> 
+            <div slot="footer" class="dialog-footer">
+                <el-button class="editBtnC separation" @click="hintCancel">取消导入</el-button>
+                <el-button class="editBtnS" @click="hintConfirm">确认导入</el-button>
+            </div>
+        </el-dialog>
+
     </div>
 </template>
 <script>
 import axios from 'axios';
 import commonList from  './../planCost/qingDan.vue'
+import { serviceStateList } from "./constants"
 
 export default {
     name:'DinghuoManage',
@@ -582,6 +623,35 @@ export default {
             jiapyanResult:'',
             jianyanFlag:false,
             supplyData:[],
+            serviceStateList:serviceStateList,
+            serviceStateValue:'0',
+            showWuZi:true,
+            isDingHuo:true,
+            DingDanObj:{},
+            selectionMethods:false,
+            selectionModelList:[
+                {
+                    label:'通过产品ID自动匹配',
+                    value:1,
+                },
+                {
+                    label:'通过标记自动匹配',
+                    value:4,
+                },
+                {
+                    label:'手动选择产品名称，品牌，规格参数',
+                    value:2 ,
+                },
+                {
+                    label:'不采用产品库，直接录入价格',
+                    value:3,
+                },
+            ],
+            selectionModelValue:'',
+            checkoutResult:false,
+            checkoutResultList:[],
+            selectionMode:'',
+            selectionHint:false,
         }
     },
     watch:{
@@ -638,7 +708,7 @@ export default {
             formData.append('detailName',this.newList.detailName|| '');
             formData.append('startDate',rangeData[0] || '');
             formData.append('endDate',rangeData[1] || '');
-            formData.append('serviceState',this.newList.sourceState);
+            formData.append('serviceState',this.serviceStateValue);
             formData.append('relaType',this.handleSource(this.newList.sourceFrom));
             formData.append('page',this.customPageDetial.currentPage);
             formData.append('rows',this.customPageDetial.pagePerNum);
@@ -663,51 +733,7 @@ export default {
                     let sourceState_c = '';
                     if(this.customData!=null && this.customData.length!=0){
                         this.customData.forEach((item,index)=>{
-                            if(item.type == 1){
-                                type_c = '构件量清单';
-                            }else if(item.type == 2){
-                                type_c = '工程量清单';
-                            }else if(item.type == 3){
-                                type_c = '物料量清单';
-                            }
-                            if(item.relaType == 2){
-                                relaType_c = '进度计划-任务核实';
-                            }else if(item.relaType == 1){
-                                relaType_c = "文档管理-关联构件" ;
-                            }else if(item.relaType == 7){
-                                relaType_c = "成本管理-报表快照" ;
-                            }else if(item.relaType == 4){
-                                relaType_c = "成本管理-物料量" ;
-                            }else if(item.relaType == 3){
-                                relaType_c = "成本管理-工程量" ;
-                            }
-                            let stasus=item.serviceState.slice(2)[0];
-                            console.log("stasus",stasus);
-                            if(stasus == 1){
-                                sourceState_c = "待选型";
-                            }else if(stasus == 2){
-                                sourceState_c = "已选型";
-                            }else if(stasus == 3){
-                                sourceState_c = "已订货";
-                            }else if(stasus == 4){
-                                sourceState_c = "生产中";
-                            }else if(stasus == 5){
-                                sourceState_c = "已待发";
-                            }else if(stasus == 6){
-                                sourceState_c = "已发货";
-                            }else if(stasus == 7){
-                                sourceState_c = "已到场";
-                            }else if(stasus == 8){
-                                sourceState_c = "已抽检";
-                            }else if(stasus == 9){
-                                sourceState_c = "已签收";
-                            }else if(stasus == 0){
-                                sourceState_c = "未定义";
-                            }
                             Object.assign(item,{
-                                type_c:type_c,
-                                relaType_c:relaType_c,
-                                sourceState_c:sourceState_c,
                                 isChecked:false
                             })
                         });
@@ -720,6 +746,19 @@ export default {
         //查询
         searchResult(){
             this.reSearchResult(true);
+        },
+        //选择文件
+        checkItem(val) {
+            console.log("选择文件",this.customData[val]);
+            //  vm = this;
+            let fileCheckList = [];
+            for (let i = 0; i < this.customData.length; i++) {
+            this.$set(this.customData[i], 'isChecked', false)
+            }
+            this.$set(this.customData[val], 'isChecked', true)
+            this.checkedItem = this.customData[val]
+            console.log("选择文件",this.customData[val]);
+            // console.log(JSON.stringify(vm.checkedItem))
         },
         //确认订货
         sureDingHuo(){
@@ -744,9 +783,138 @@ export default {
                 }
             })
         },
+        //判断业务状态码
+        parseMStatus(mStatus) {
+            // 施工现场
+            var constructionSite = mStatus.substring(0, 1);
+            switch (constructionSite) {
+            case '8':
+                return '终审驳回';
+            case '7':
+                return '终审通过';
+            case '6':
+                return '终审补充';
+            case '5':
+                return '等待终审';
+            case '4':
+                return '初审驳回';
+            case '3':
+                return '初审通过';
+            case '2':
+                return '初审补充';
+            case '1':
+                return '等待初审';
+            default:
+                break;
+            }
+            // 进度计划
+            var scheduledPlan = mStatus.substring(1, 2);
+            switch (scheduledPlan) {
+            case '3':
+                return '已完工';
+            case '2':
+                return '已开工';
+            case '1':
+                return '已计划';
+            default:
+                break;
+            }
+            // 物资采购
+            var materialPurchasing = mStatus.substring(2, 3);
+            switch (materialPurchasing) {
+            case '9':
+                return '已签收';
+            case '8':
+                return '已抽检';
+            case '7':
+                return '已到场';
+            case '6':
+                return '已发货';
+            case '5':
+                return '已待发';
+            case '4':
+                return '生产中';
+            case '3':
+                return '已订货';
+            case '2':
+                return '已选型';
+            case '1':
+                return '待选型';
+            default:
+                break;
+            }
+            // 成本管理
+            var costControl = mStatus.substring(3, 4);
+            switch (costControl) {
+            case '6':
+                return '物料量核对完成';
+            case '5':
+                return '物料量核对中';
+            case '4':
+                return '工程量核对完成';
+            case '3':
+                return '工程量核对中';
+            case '2':
+                return '构件量核对完成';
+            case '1':
+                return '构件量核对中';
+            default:
+                break;
+            }
+            // 设计协调
+            var designManage = mStatus.substring(4, 6);
+            switch (designManage) {
+            case 'A0':
+                return '施工图深化设计';
+            case '70':
+                return '施工图设计';
+            case '40':
+                return '初步设计';
+            case '10':
+                return '方案设计';
+            case '00':
+                return '未定义';
+            default:
+                return '未定义';
+            }
+        },
+        //业务来源
+        parseMBSource(mBSource) {
+            switch (mBSource) {
+            case 1:
+                return "文档管理-关联构件";
+            case 2:
+                return "进度计划-任务核实";
+            case 3:
+                return "成本管理-工程量";
+            case 4:
+                return "成本管理-物料量";
+            case 5:
+                return "物资采购-订货管理";
+            case 6:
+                return "讨论主题";
+            case 7:
+                return "成本管理-报表快照";
+            default:
+                return "";
+            }
+        },
+        //清单类型
+        parseType(val) {
+            switch (val) {
+            case 1:
+                return "构件量清单";
+            case 2:
+                return "工程量清单";
+            case 3:
+                return "物料量清单"
+            default:
+                return "";
+            }
+        },
         //选择
-        handleChecked(item,i){
-            console.log("选择",item.isChecked,item);
+        handleChecked(items,i){
+            console.log("选择",items.isChecked,items);
             this.customData.map( (item,index)=>{
                 // item.isChecked = false;
                 if( i == index ){
@@ -762,6 +930,14 @@ export default {
             console.log(val);
             this.showCommonList = true;
             this.checkItem = val;
+            this.DingDanObj = {};
+            Object.assign(this.DingDanObj,{
+                                orderCode:this.orderInfo.orderCode,
+                                orderTitle:this.orderInfo.orderTitle,
+                                checkItem:this.checkItem,
+                                orderId:this.orderInfo.id,
+                            })
+            console.log("订货管理到清单",this.DingDanObj); 
         },
         handleClick(){
             this.selectIndexone = '-1';
@@ -807,42 +983,51 @@ export default {
             console.log("确认新建订单s",num,this.selcetedItem)
             if(num == 1){
                 let formData = new FormData();
+                let relaType = this.mappingRelaType(this.selcetedItem.relaType);
                 formData.append('detailId',this.selcetedItem.detailId);
-                formData.append('relaType',this.mappingRelaType(this.selcetedItem.relaType));
+                formData.append('relaType',relaType);
                 formData.append('projectId',this.projId);
                 formData.append('orderId',this.planId);
                 formData.append('selectionMode',1);
-                axios({
-                    method:'post',
-                    url:this.BDMSUrl+'project2/order/addOrderDetailByDetail',
-                    headers:{
-                        token:this.token
-                    },
-                    data:formData
-                }).then(response=>{
-                    console.log("添加清单",response);
-                    if(response.data.cd == 0){
-
-                        this.editBySelfShow = false;
-                        this.$message({
-                            type:'success',
-                            message:'添加清单成功！'
-                        })
-                        this.getOrderDetail(this.planId);
-                        // this.checkedResults = response.data.rt.dataProfiling;
-                        // if(JSON.stringify(response.data.rt.checkResults)=='{}'){
-                        //     this.jiapyanResult = '所有数据校验通过!';
-                        //     this.jianyanFlag = true;
-                        // }else{
-                        //     this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode || response.data.rt.checkResults.verifyProductId;
-                        //     //verifyProductId
-                        //     this.jianyanFlag = false;
-                        // }
-                        // this.shureToImportshow = true;
-                    }else{
-                        alert(response.data.msg);
-                    }
-                })
+                if( relaType == 6 ){
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'project2/order/addOrderDetailByDetail',
+                        headers:{
+                            token:this.token
+                        },
+                        data:formData
+                    }).then(response=>{
+                        console.log("添加清单",response);
+                        if(response.data.cd == 0){
+                            this.editBySelfShow = false;
+                            this.$message({
+                                type:'success',
+                                message:'添加清单成功！'
+                            })
+                            this.getOrderDetail(this.planId);
+                            // this.checkedResults = response.data.rt.dataProfiling;
+                            // if(JSON.stringify(response.data.rt.checkResults)=='{}'){
+                            //     this.jiapyanResult = '所有数据校验通过!';
+                            //     this.jianyanFlag = true;
+                            // }else{
+                            //     this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode || response.data.rt.checkResults.verifyProductId;
+                            //     //verifyProductId
+                            //     this.jianyanFlag = false;
+                            // }
+                            // this.shureToImportshow = true;
+                        }else{
+                            this.$message({
+                                type:'success',
+                                message:response.data.msg,
+                            })
+                        }
+                    })
+                }else {
+                    this.selectionMethods = true;
+                    this.selectionModelValue = this.selectionModelList[0].label;
+                    this.selectionMode = this.selectionModelList[0].value;
+                }    
             }else if(num == 0){
                 this.$message({
                     type:'warring',
@@ -860,6 +1045,78 @@ export default {
         //取消新建订单
         customCancle(){
             this.editBySelfShow = false;
+        },
+        //确认选型
+        selectionConfirm(){
+            // this.selectionMethods = false;
+            this.checkoutResult = true;
+            let formData = new FormData();
+            formData.append('detailId',this.selcetedItem.detailId);
+            formData.append('selectionMode',this.selectionMode);
+            formData.append('projectId',this.projId);
+            formData.append('relaType',this.mappingRelaType(this.selcetedItem.relaType));
+            formData.append('componentCount',this.selcetedItem.componentCount);
+            formData.append('orderId',this.planId);
+
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/order/verifyAddOrderDetailByDetail',
+                headers:{
+                    token:this.token
+                },
+                data:formData
+            }).then(response=>{
+                console.log("添加清单验证(从清单中选取)",response);
+                if(response.data.cd == 0){
+                    // this.editBySelfShow = false;
+                    this.$message({
+                        type:'success',
+                        message:'添加清单验证成功'
+                    })
+                    // this.getOrderDetail(this.planId);
+                    // this.checkedResults = response.data.rt.dataProfiling;
+                    // if(JSON.stringify(response.data.rt.checkResults)=='{}'){
+                    //     this.jiapyanResult = '所有数据校验通过!';
+                    //     this.jianyanFlag = true;
+                    // }else{
+                    //     this.jiapyanResult = response.data.rt.checkResults.verifyClassifyCode || response.data.rt.checkResults.verifyProductId;
+                    //     //verifyProductId
+                    //     this.jianyanFlag = false;
+                    // }
+                    // this.shureToImportshow = true;
+                }else{
+                    this.$message({
+                        type:'warring',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //取消选型
+        selectionCancel(){
+            this.selectionMethods = false;
+        },
+        //选型切换
+        selectionModelChange(val){
+            // console.log("选型切换",val);
+            this.selectionMode = val;
+        },
+        //确认导入
+        leadConfirm(){
+            // this.checkoutResult = false;
+            this.selectionHint = true;
+        },
+        //取消导入
+        leadCancel(){
+            this.checkoutResult = false;
+        },
+        //提示后确认导入
+        hintConfirm(){
+            // this.selectionHint = false;
+        },
+        //提示后取消导入
+        hintCancel(){
+            this.selectionHint = false;
         },
         //改变页码
         changePage(val,isTop){//分页 0 -1 1 2
@@ -946,7 +1203,7 @@ export default {
                 params:{
                     projId:this.projId,
                     orderTitle:this.newListName,
-                    orderUgId:this.suppyModel,
+                    orderUgId:this.selectUser,
                     supplyUgId:this.suppyModel
 
                 }
@@ -1035,10 +1292,12 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
+                        
                         this.userGroup = response.data.rt.ugList;
                         this.selectUser = response.data.rt.selectUgId;
                         this.getPlanList(this.selectUser);
                         this.getNoPlanList(this.selectUser);
+                        console.log("获取群组",this.userGroup,this.selectUser);
                     } 
                 }else{
                     alert(response.data.msg)
@@ -1103,9 +1362,11 @@ export default {
             if(flag){
                 this.selectIndextwo = index;
                 this.isHidden = true;
+                this.isDingHuo =false;
             }else{
                 this.selectIndexone = index;
                 this.isHidden = false;
+                this.isDingHuo = true;
             }
             this.selectObject = item;
             this.showDetail = false;
@@ -1126,6 +1387,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.orderInfo = response.data.rt;
+                    console.log("获取订单信息",this.orderInfo);
                     if(this.orderInfo.orderDate!=null){
                         Object.assign(this.orderInfo,{
                             orderDate_:new Date(this.orderInfo.orderDate).toLocaleString()
@@ -1181,6 +1443,7 @@ export default {
                         if(Array.isArray(this.supplyData) && this.supplyData.length>0){
                             this.suppyModel = this.supplyData[0].ugId;
                         }
+                        console.log("获取弹框订货方数组",this.supplyData);
                     }
                 }else{
                     alert(response.data.msg)
@@ -1289,26 +1552,26 @@ export default {
         biaoqianCLose(){
             this.isbiaoqianshow = false;
         },
-        parseMBSource(mBSource) {
-            switch (mBSource) {
-                case 1:
-                    return "文档管理-关联构件";
-                case 2:
-                    return "进度计划-任务核实";
-                case 3:
-                    return "成本管理-工程量";
-                case 4:
-                    return "成本管理-物料量";
-                case 5:
-                    return "物资采购-订货管理";
-                case 6:
-                    return "讨论主题";
-                case 7:
-                    return "成本管理-报表快照";
-                default:
-                    return "";
-            }
-        },
+        // parseMBSource(mBSource) {
+        //     switch (mBSource) {
+        //         case 1:
+        //             return "文档管理-关联构件";
+        //         case 2:
+        //             return "进度计划-任务核实";
+        //         case 3:
+        //             return "成本管理-工程量";
+        //         case 4:
+        //             return "成本管理-物料量";
+        //         case 5:
+        //             return "物资采购-订货管理";
+        //         case 6:
+        //             return "讨论主题";
+        //         case 7:
+        //             return "成本管理-报表快照";
+        //         default:
+        //             return "";
+        //     }
+        // },
         parseMGSource(mGSource) {
             switch (mGSource) {
                 case 1:
@@ -1631,7 +1894,7 @@ export default {
             float: left;
             width: 12px;
             height: 12px;
-            background: url('./images/viewdetail.png')no-repeat 0 0;
+            background: url('./images/editdetail.png')no-repeat 0 0;
             cursor: pointer;
             margin-right: 20px;
         }
@@ -1639,7 +1902,7 @@ export default {
             float: left;
             width: 10px;
             height: 12px;
-            background: url('./images/editdetail.png')no-repeat 0 0;
+            background: url('./images/viewdetail.png')no-repeat 0 0;
             cursor: pointer;
             margin-right: 20px;
         }
@@ -1747,35 +2010,38 @@ export default {
         }
     }
     //添加清单
-    .addQingDan {
-        // width:660px;
-        
+    .el-select {
+        width:280px;
+    }
+    .content-left {
+        text-align: left;
+        margin-left: 50px;
     }
     .el-dialog {
-            width:660px;
-            .el-dialog__header {
-                height: 68px;
-                padding: 0;
-                border-bottom: 2px solid #e6e6e6;
-                text-align: left;
-                .el-dialog__title {
-                    color: #fc3439;
-                    font-size: 18px;
-                    line-height: 18px;
-                    font-weight: bold;
-                    font-family: 'MicrosoftYaHei';
-                    display: inline-block;
-                    margin: 34px 0 15px 30px;
-                }
-            }
-            .el-dialog__body {
-                margin-top: 20px;
-                padding: 0;
-                color: #606266;
-                line-height: 24px;
-                font-size: 14px;
+        width:660px;
+        .el-dialog__header {
+            height: 68px;
+            padding: 0;
+            border-bottom: 2px solid #e6e6e6;
+            text-align: left;
+            .el-dialog__title {
+                color: #fc3439;
+                font-size: 18px;
+                line-height: 18px;
+                font-weight: bold;
+                font-family: 'MicrosoftYaHei';
+                display: inline-block;
+                margin: 34px 0 15px 30px;
             }
         }
+        .el-dialog__body {
+            margin-top: 20px;
+            padding: 0;
+            color: #606266;
+            line-height: 24px;
+            font-size: 14px;
+        }
+    }
     .project1{
         margin: 20px 30px 30px 30px;
         .projectTitle{

@@ -247,7 +247,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var vm=this;
-            this.drawList=[];
+            vm.drawList=[];
             axios({
             method:'post',
             headers:{
@@ -257,24 +257,24 @@ export default {
             data:this.drawingWebGlIdList
             }).then(response=>{
                 if(response.data.rt){
-                    this.drawingWebGlList=response.data.rt;
+                    vm.drawingWebGlList=response.data.rt;
                     // console.log(this.drawingWebGlList,'图纸地址');
-                    this.drawingWebGlList.forEach((item)=>{
-                        this.getWebGlDrawingList.forEach((item1)=>{
+                    vm.drawingWebGlList.forEach((item)=>{
+                        vm.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
                                 // console.log(item.drawingId,'234');
-                                this.getDrawingRotateInfo(item.drawingId);
-                                  this.drawList.push({
+                                vm.getDrawingRotateInfo(item.drawingId);
+                                  vm.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
                                         type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
                                         source:this.QJFileManageSystemURL+item.fileUri,
                                         page:1,
-                                        angle:0
+                                        angle:this.rotate
                                 })
                             }
                         })
                     })
-                    // console.log(this.drawList,'最后的东西');
+                    console.log(this.drawList,'最后的东西');
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
@@ -298,6 +298,8 @@ export default {
         //
         getDrawingRotateInfo(val){
             var vm=this;
+            this.rotate=0;
+            // vm.drawList=[];
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
@@ -309,9 +311,32 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    if(response.data.rt){
-                        this.rotate=response.data.rt.rotateInfo;
+                     if(response.data.rt){
+                        if(isNaN(response.data.rt.rotateInfo)){
+                            this.rotate = 0;
+                        }else{
+                            this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
+                        }
+                        console.log(this.rotate,'获取角度');
                     }
+                    // console.log(vm.drawingWebGlList,'vm.drawingWebGlList');
+                    //   vm.drawingWebGlList.forEach((item)=>{
+                    //     vm.getWebGlDrawingList.forEach((item1)=>{
+                    //         if(item.drawingId==item1.id){
+                    //             // console.log(item.drawingId,'234');
+                    //             // vm.getDrawingRotateInfo(item.drawingId);
+                    //               vm.drawList.push({
+                    //                     name:item1.drawingNumber+'('+item1.drawingName+')',
+                    //                     type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                    //                     source:this.QJFileManageSystemURL+item.fileUri,
+                    //                     page:1,
+                    //                     angle:this.rotate
+                    //             })
+                    //         }
+                    //     })
+                    // })
+                    // console.log(vm.drawList,'vm.drawList');
+                    //  app.postMessage({command:"DrawingList", parameter:vm.drawList},"*")
                 }else{
                     
                 } 
