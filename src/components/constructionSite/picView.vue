@@ -510,6 +510,21 @@ export default {
 
                                 this.Refresh();
                                 return;
+                            }else{
+                                let temp_SelectedList = this.SelectedList;
+                                this.SelectedList = [];
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    this.drawList[i].Selected = false;
+                                }
+
+                                for(let i = 0; i < temp_SelectedList.length;i++){
+                                    if(temp_SelectedList[i].type != "Select_img_Mark"){
+                                        temp_SelectedList[i].Selected = true;
+                                        this.SelectedList.push(temp_SelectedList[i]);
+                                    }
+                                }
+
                             }
 
                             
