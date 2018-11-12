@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="inspectTable">
+                <div class="inspectTable" id="pdfDom"> 
                     <div class="inspectTableHead">
                         <div class="inspectTableHeadLeft">
                             <label class="inspectTableHeadLeftTxt">监测单位：{{monitorCompany}}
@@ -614,12 +614,12 @@ import walkThrough from './walkThrough.vue' //巡视报告
 import commonDetail from './commonDetail.vue'//除斜度的详情页
 
 import picView from './picView.vue'
-import html2Canvas from 'html2canvas'
-import JsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 var echarts = require('echarts');
 export default {
     components: {
-        pdf,commonPitchDetail,commonDetail,walkThrough,picView,VueHighcharts,JsPDF,html2Canvas
+        pdf,commonPitchDetail,commonDetail,walkThrough,picView,VueHighcharts,jsPDF,html2canvas
     },
     name:'safetyInspection',
     data(){
@@ -4194,8 +4194,8 @@ export default {
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#inspectionBody')
-                html2Canvas(pdfDom, {
-                        onrendered:function(canvas) {
+                console.log(pdfDom,'pdfDom');
+                html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
                             var contentHeight = canvas.height;
                             //一页pdf显示html页面生成的canvas高度;
@@ -4209,7 +4209,7 @@ export default {
                             var imgHeight = 592.28/contentWidth * contentHeight;
                             var pageData = canvas.toDataURL('image/jpeg', 1.0);
 
-                            var pdf = new jsPDF('p', 'pt', 'a4');
+                            var pdf = new jsPDF('', 'pt', 'a4');
 
                             //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
                             //当内容未超过pdf一页显示的范围，无需分页
@@ -4226,12 +4226,10 @@ export default {
                                     }
                                 }
                             }
-                            pdf.save('content.pdf');
+                            pdf.save('导出检测报告.pdf');
                             console.log(pdf,'pdf1234');
-                        }
-
-                })
-                html2Canvas();
+                        })
+                // html2canvas();
             }
     }
     
