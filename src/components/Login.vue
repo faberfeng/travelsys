@@ -61,11 +61,11 @@ export default {
             localStorage.removeItem('defaultSubProjId')
         }
          this.validateInstance()
-        if(token != 'undefined'){
-            vm.token = token
-            //判断是否登陆
-            this.BeforeLogin()
-        }
+        // if(token != 'undefined'){
+        //     vm.token = token
+        //     //判断是否登陆
+        //     this.BeforeLogin()
+        // }
     },
     methods:{
         func(event){
@@ -94,7 +94,7 @@ export default {
                     'token':vm.token
                 },
             }).then((response)=>{
-                if(typeof(response.data.cd) != 'undefined' && response.data.cd == '10004'){
+                if(typeof(response.data.cd) != 'undefined' && response.data.cd === '10004'){
                     vm.$router.push({
                         path:'/showcompany'
                     })
