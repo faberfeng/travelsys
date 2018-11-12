@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="inspectTable" id="pdfDom"> 
+                <div class="inspectTable" > 
                     <div class="inspectTableHead">
                         <div class="inspectTableHeadLeft">
                             <label class="inspectTableHeadLeftTxt">监测单位：{{monitorCompany}}
@@ -527,7 +527,7 @@
                     <!-- style="height:100px;" -->
                     <div class="editEportBodytwo" >
                         <div class="head">
-                            <el-checkbox class="elCheck" v-model="coverChecked"><label style="font-size:16px;font-weight:blod;">封面</label></el-checkbox>
+                            <el-checkbox class="elCheck" v-model="coverChecked" @change="coverCheckedChange()"><label style="font-size:16px;font-weight:blod;">封面</label></el-checkbox>
                             <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span>
                         </div>
                         <div v-show="isShow" class="imgBody">
@@ -546,7 +546,7 @@
                     </div>
                      <div class="editEportBodytwo" >
                         <div class="head">
-                            <el-checkbox class="elCheck" v-model="summaryChecked"><label style="font-size:16px;font-weight:blod;">概述</label></el-checkbox>
+                            <el-checkbox class="elCheck" v-model="summaryChecked" @change="summaryCheckedChange()"><label style="font-size:16px;font-weight:blod;">概述</label></el-checkbox>
                             <span class="groundSpan" @click="retract1"><img class="groundEdit"   :src="retractImg1"/>{{retractText1}}</span>
                         </div>
                         <div class="textBody" v-show="isShow1">
@@ -558,23 +558,23 @@
                     </div>
                     <div class="editEportBodytwo">
                         <div class="head">
-                            <el-checkbox class="elCheck" v-model="spotChecked"><label style="font-size:16px;font-weight:blod;">测点详情：</label></el-checkbox>
+                            <el-checkbox class="elCheck" v-model="spotChecked" @change="spotCheckedChange()"><label style="font-size:16px;font-weight:blod;">测点详情：</label></el-checkbox>
                             <span class="groundSpan" @click="retract2"><img class="groundEdit"   :src="retractImg2"/>{{retractText2}}</span>
                         </div>
                         <div class="selectMap" v-show="isShow2">
                             <div class="map_txt">
                                 <el-checkbox class="map_check" v-model="showBaseImg" @change="showBaseImgCheck()"><label>每一页都展示底图</label></el-checkbox>
-                               <div class="map_check1"><label style="margin-right:20px;">底图位置:</label> <el-radio v-model="pageSelect" label="1">页面上部</el-radio><el-radio v-model="pageSelect" label="2">页面底部</el-radio></div>
+                               <div class="map_check1" v-show="basePicShow"><label style="margin-right:20px;">底图位置:</label> <el-radio v-model="pageSelect" label="1">页面上部</el-radio><el-radio v-model="pageSelect" label="2">页面底部</el-radio></div>
                             </div>
-                            <div class="map_txt" style="margin-top:15px;">
+                            <div class="map_txt" style="margin-top:10px;">
                                  <el-checkbox class="map_check" v-model="optimalLayout" @change="optimalLayoutCheck()"><label>优化布局测点标记</label></el-checkbox>
-                                <div class="map_check1"><label style="margin-right:20px;">优先方式:</label> <el-radio v-model="priorityLayout" label="1">测点顺序优先</el-radio><el-radio v-model="priorityLayout" label="2">图面清晰优先</el-radio></div>
+                                <div class="map_check1" v-show="firstMethodShow"><label style="margin-right:20px;">优先方式:</label> <el-radio v-model="priorityLayout" label="1">测点顺序优先</el-radio><el-radio v-model="priorityLayout" label="2">图面清晰优先</el-radio></div>
                             </div>
                         </div>
                     </div>
                     <div class="editEportBodytwo" >
                         <div class="head">
-                            <el-checkbox class="elCheck" v-model="qcodeChecked"><label style="font-size:16px;font-weight:blod;">生成二维码：</label></el-checkbox>
+                            <el-checkbox class="elCheck" v-model="qcodeChecked" @change="qcodeCheckedChange()"><label style="font-size:16px;font-weight:blod;">生成二维码：</label></el-checkbox>
                             <span class="groundSpan" @click="retract3"><img class="groundEdit"   :src="retractImg3"/>{{retractText3}}</span>
                         </div>
                         <div v-show="isShow3" class="qrcodeBody">
@@ -585,7 +585,7 @@
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="saveReportSetting()" >保存设置</button>
-                    <button class="editBtnC" @click="exportReport()" >生成</button>
+                    <button class="editBtnC" @click="exportReport(selectUgId)" >生成</button>
                 </div>
             </el-dialog>
              <el-dialog title="测点变化曲线" :visible="moreSpotShow" @close="moreSpotCancle()">
@@ -594,11 +594,6 @@
                     </div>
             </el-dialog>
         </div>
-        <!-- <div  class="pdf-dom" id="pdfDom">
-            <label>
-                科技时代开发对接开发进度和飞机JFK但是JFK的艰苦奋斗数据库
-            </label>
-        </div> -->
         <!-- <button @click="getPdf()">按钮</button> -->
     </div>
 </template>
@@ -869,6 +864,8 @@ export default {
             spotChecked:false,//测点
             qcodeChecked:false,//二维码
             showBaseImg:false,//底图选择
+            basePicShow:false,//
+            firstMethodShow:false,//
             optimalLayout:false,//优先布局
             pointPriority:'1',//测点优先
             pageTop:'',//页面头部
@@ -877,18 +874,18 @@ export default {
             priorityLayout:'',//优先布局
             picPriority:'',//图形清晰优先
             suggestList:'',//综述和建议
-            retractImg:shouqiImg,
-            retractText:'收起',//展开与伸缩
-            isShow:true,
-            retractImg1:shouqiImg,
-            retractText1:'收起',//展开与伸缩
-            isShow1:true,
-            retractImg2:shouqiImg,
-            retractText2:'收起',//展开与伸缩
-            isShow2:true,
-            retractImg3:shouqiImg,
-            retractText3:'收起',//展开与伸缩
-            isShow3:true,
+            retractImg:zhankaiImg,
+            retractText:'展开',//展开与伸缩
+            isShow:false,
+            retractImg1:zhankaiImg,
+            retractText1:'展开',//展开与伸缩
+            isShow1:false,
+            retractImg2:zhankaiImg,
+            retractText2:'展开',//展开与伸缩
+            isShow2:false,
+            retractImg3:zhankaiImg,
+            retractText3:'展开',//展开与伸缩
+            isShow3:false,
             surveyName:'',//传递给子组件的name
             detailMonitorId:'',//传递给子组件的id
             itemType:'',//传递给子组件的监测类型
@@ -4052,10 +4049,19 @@ export default {
             })
         },
         //
-        exportReport(){
+        exportReport(id){
             // this.getReportDatas();
             // this.getReportSetting();
             // this.getMonitorMainTable();//获取监测内容主表
+            // var vm=this;
+            // var routerDataUrl='';
+            // // routerDataUrl=vm.$router.resolve({
+            // //         path:`/cloud/sharePassword/${id}`,
+            // //     })
+            //  routerDataUrl=vm.$router.resolve({
+            //             path:`/pdfPreview/${id}`
+            //         })
+            //  window.open(routerDataUrl.href,'_blank');
             this.getPdf();
 
         },
@@ -4162,35 +4168,83 @@ export default {
                             // this.getBaseMapList();
                             this.coverPathUrl=response.data.obj.filePath;
                             // vm.fileList = '';
-                        }
-                        if(response.data.cd != 0){
-                            vm.$message({
+                        }else{
+                             vm.$message({
                                 type:'error',
                                 message:response.data.msg
                             })
                              vm.fileListCover ='';
+
                         }
                     })
         },
         //
         showBaseImgCheck(){
             if(this.showBaseImg==true){
-                this.pageSelect='1'
+                this.pageSelect='1';
+                this.basePicShow=true;
             }else{
-                this.pageSelect=''
+                this.pageSelect='';
+                this.basePicShow=false;
             }
         },
         //
         optimalLayoutCheck(){
             if(this.optimalLayout==true){
-                this.priorityLayout='1'
+                this.priorityLayout='1';
+                this.firstMethodShow=true;
             }else{
-                 this.priorityLayout=''
+                 this.priorityLayout='';
+                 this.firstMethodShow=false;
             }
 
         },
-
-
+        //封面按钮
+        coverCheckedChange(){
+            if(this.coverChecked==true){
+                this.isShow=true;
+                this.retractImg = shouqiImg;
+                this.retractText = '收起';
+            }else {
+                this.isShow=false;
+                 this.retractImg = zhankaiImg;
+                this.retractText = '展开';
+            }
+        },
+        //概述按钮
+        summaryCheckedChange(){
+             if(this.summaryChecked==true){
+                this.isShow1=true;
+                this.retractImg1 = shouqiImg;
+                this.retractText1 = '收起';
+            }else {
+                this.isShow1=false;
+                 this.retractImg1 = zhankaiImg;
+                this.retractText1 = '展开';
+            }
+        },
+        spotCheckedChange(){
+            if(this.spotChecked==true){
+                this.isShow2=true;
+                this.retractImg2 = shouqiImg;
+                this.retractText2 = '收起';
+            }else {
+                this.isShow2=false;
+                this.retractImg2 = zhankaiImg;
+                this.retractText2 = '展开';
+            }
+        },
+        qcodeCheckedChange(){
+            if(this.qcodeChecked==true){
+                this.isShow3=true;
+                this.retractImg3 = shouqiImg;
+                this.retractText3 = '收起';
+            }else {
+                this.isShow3=false;
+                this.retractImg3 = zhankaiImg;
+                this.retractText3 = '展开';
+            }
+        },
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#inspectionBody')
@@ -5461,7 +5515,7 @@ export default {
             .editEportBody{
                 margin:0 auto;
                 width: 92%;
-                height: 600px;
+                height: 420px;
                 overflow: auto;
                 .editEportBodyone{
                    
@@ -5592,17 +5646,19 @@ export default {
                     .selectMap{
                          width: 90%;
                          margin:15px auto; 
-                         height: 120px;
+                        //  height: 120px;
                         .map_txt{
                             .map_check{
                                 display: block;
                                 text-align: left;
+                                 height: 30px;
                                 // float: left;
                             }
                             .map_check1{
                                  display: block;
                                 text-align: left;
                                 margin-left:20px;
+                                height: 30px;
 
                             }
                         }
@@ -5614,6 +5670,9 @@ export default {
                     }
                 }
             }
+        }
+        .pdfStyle{
+
         }
        
 

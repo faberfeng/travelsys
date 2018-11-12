@@ -180,10 +180,10 @@
   cursor: pointer;
 }
 .item-proj:hover,.item-proj-line:hover{
-    box-shadow: 0px 0px 13px #c06000;
+    box-shadow: 0px 0px 13px #d40000;
 }
 .ongoing_color:hover,.ongoing_color_b:hover{
-  box-shadow: 0px 0px 9px #d40000;
+  box-shadow: 0px 0px 9px #5295ef;
 }
 .end_color:hover,.end_color_b:hover{
   box-shadow: 0px 0px 9px #221815;
@@ -278,20 +278,20 @@ p>.body-left-line:first-of-type{
   position: relative;
 }
 .new{
-  background: #ff9933;
+  background: #fc3439;
 }
 .ongoing{
-  background: #fc3439;
+  background: #5295ef;
 }
 .end{
   background: #b3b3b3;
 }
 .new_s{
-  color: #ff9933;
+  color: #fc3439;
   font-size: 14px; 
 }
 .ongoing_s{
-  color: #fc3439;
+  color: #5295ef;
   font-size: 14px; 
 }
 .end_s{

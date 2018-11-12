@@ -394,7 +394,7 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
-                    // localStorage.setItem('projectName',vm.header.projectName)
+                    localStorage.setItem('projectName',vm.header.projectName)
                     // console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
                 }

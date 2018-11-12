@@ -16,6 +16,10 @@
                         设计版本  
                     </router-link>
                 </div>
+                 <div class="noImg" v-show="!versionPath">
+                        <!-- <img style="width:140px;height:115px" src="../../assets/nodata.png"/> -->
+                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
+                </div>
                 <div class="commentInformation" >
                     <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
@@ -39,12 +43,9 @@
                         <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
                 </div>
-                <div class="noImg" v-show="!versionPath">
-                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
-                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
-                </div>
-
-                <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
+               
+<!-- v-show="versionPath" -->
+                <div  id="drawingPic" style="overflow:hidden;left:20px">
                     <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
@@ -175,9 +176,9 @@
                             <tr  class="userList-thead">
                                 <th style="width:15%">图号</th>
                                 <th style="width:15%">图名</th>
-                                <th style="width:12%">比例</th>
+                                <th style="width:15%">比例</th>
                                 <th style="width:29%">相关空间</th>
-                                <th style="width:17%;max-width:150px;">文件名称</th>
+                                <th style="width:14%;max-width:50px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
                         </thead>
@@ -204,7 +205,7 @@
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
-                                <td v-text="item.fileName"></td>
+                                <td style="max-width:100px;" v-text="item.fileName"></td>
                                 <td>
                                     <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteFileList(index)"></button>
                                 </td>
@@ -374,6 +375,7 @@ export default {
             drawingZxVersionId:'',
             pageNo:'',
             versionPath:'',//最新图纸路径
+            picShow:false,
             annotationUserId:'',//批注用户Id
             stage:'1',//阶段
             isMark:'0',//标记
@@ -501,9 +503,13 @@ export default {
         this.$nextTick(() => {
             this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
         });
+       
         // this.load();
     },
     mounted(){
+        console.log('fjjjk')
+         console.log(this.$refs.pic.$el.style,'fjjj');
+        //  this.$refs.pic.$el.style.display="none";
     },
     watch:{
         annotationUserId:function(val){
@@ -536,6 +542,8 @@ export default {
         },
         loadPic(){
              this.$refs.pic.Max_Select = 1;
+             console.log(this.$refs.pic.$el.style,'fjjj');
+            //  this.$refs.pic.$el.style
         },
         picView_status_changed(a,b){
             console.log(a,b);
@@ -731,7 +739,9 @@ export default {
                     this.drawingVersionId=item.id;
                     this.version=item.versionId;
                     console.log(this.version,'this.version');
-                    this.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+                   var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+                    console.log(type);
+                    this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
                 }
             })
             setTimeout(()=>{
@@ -864,7 +874,9 @@ export default {
             vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
             this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
             console.log(this.version,'this.version12')
-             this.paraList={angle:parseInt(this.rotate),type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
+            var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+            console.log(type);
+            this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
             console.log(this.drawingVersionId);
             console.log(this.drawingVersionList);
              setTimeout(()=>{
@@ -923,11 +935,19 @@ export default {
                     }
                      var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
                     console.log(type);
-                    this.paraList={type:type,source:vm.drawingFileUrl,angle:0};
+                    this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
+                   
                     console.log(this.paraList,'this.paraList');
                 }else{
                     
                 } 
+                 if(vm.versionPath){
+                        this.picShow=true;
+                        // console.log(document.getElementById('#drawingPic'))
+                        // console.log(this.$refs.pic.$el.style.display)
+                        this.$refs.pic.$el.style.display="block"
+                        // document.getElementById('#drawingPic').style.top='115px';
+                }
             })
         },
         //添加批注
@@ -1368,6 +1388,7 @@ export default {
                 if(response.data.rt){
                     vm.versionPath=(response.data.rt)[0].fileUri;
                     vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
+                    
                     vm.getDrawingRotateInfo();
                     // vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
                     // console.log(vm.paraList,'this.paraList');
@@ -1545,6 +1566,9 @@ export default {
                             let absInp=document.getElementById('absInp');
                             document.getElementById('abs').drawElements=[];
                             document.getElementById('abs').reflash();
+                        }
+                       if(!this.versionPath){
+                            this.$refs.pic.$el.style.display='none'
                         }
                         // document.getElementById('abs')
                        vm.getDirectory();
@@ -2033,7 +2057,8 @@ export default {
                 }
             }
             .noImg{
-                    margin:150px auto;
+                    margin:10px auto;
+                    // z-index:1000;
                 }
             #drawingPic{
                     margin:0 auto;
@@ -2541,6 +2566,11 @@ export default {
                                  font-size: 14px;
                                  color:#333333;
                                  line-height: 30px;
+                                 width: 60px;
+                                 overflow: hidden;
+                                text-overflow:ellipsis;
+                                white-space: nowrap;
+                                text-align: left;
                              }
                              .deleteMark{
                                  position: absolute;
