@@ -4,7 +4,10 @@
                 <!-- 封面 -->
                 <div class="pdfCover">
                     <div class="pdfImg">
-                        <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/>
+                        
+                         <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/>
+                        <!-- <img id="img1" style="width:400px;height:100px;" :src="coverPath?coverPath:require('../../assets/defaultlogo.png')"> -->
+                        <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
                     </div>
                     <h5 style="margin-top:20px;color:#000;font-size:18px;">{{projectName}}--监测报表</h5>
                     <div class="time"><label>本次观测日期:</label><label>2018/11/12</label><label>前次观测日期:</label><label>2018/11/11</label></div> 
@@ -26,7 +29,7 @@
                                 <thead>
                                     <tr>
                                         <th style="height:100px;">工况</th>
-                                        <th style="height:100px;" colspan="11"></th>
+                                        <th style="height:100px;padding:10px" colspan="11">{{getSiteConditionList}}</th>
                                     </tr>
                                     <tr>
                                         <th rowspan="2">序号</th>
@@ -67,8 +70,8 @@
                                         <td style="height:100px;" colspan="11"></td>
                                     </tr>
                                     <tr>
-                                        <td style="height:100px;">监测综述及建议</td>
-                                        <td style="height:100px;" colspan="11"></td>
+                                        <td style="height:100px;padding:10px">监测综述及建议</td>
+                                        <td style="height:100px;padding:10px" colspan="11">{{suggestion}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -79,51 +82,112 @@
                 <div class="pdfInspection">
                      <label class="pdfSummaryHead">现场巡检</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                    <!-- <div class="containerTable">
-                    <table class="containerList" border="1" cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <th rowspan="2">分类</th>
-                                <th rowspan="2">巡视监测内容</th>
-                                <th colspan="2"><label class="left" @click="getPreviousHistoryRecord()">上一次</label><label class="middle">历史巡视{{historyTime|timeChange()}}</label><label class="right" @click="getNextHistoryRecord()" >下一次</label></th>
-                                <th colspan="2">最近巡视(今天)</th>
-                                <th rowspan="2">操作</th>
-                            </tr>
-                            <tr>
-                                <th>结果</th>
-                                <th>备注</th>
-                                <th>结果</th>
-                                <th>备注</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                           
-                            <tr v-for="(item,index) in getPatrolRecordLists" :key="index">
-                                <td :rowspan="item.patrolTypeNamespan" :class="{'hidden': item.patrolTypeNamedis}">{{item.patrolTypeName}}</td>
-                                <td :rowspan="item.patrolNamespan" :class="{'hidden': item.patrolNamedis}" v-text="item.patrolName"></td>
-                              
-                                <td  v-text="item.historyResult"></td>
-                                <td  v-text="item.historyRemark"></td>
-                                <td v-show="saveShow"  v-text="item.recentResult"></td>
-                                <td v-show="saveShow" v-text="item.recentRemark"></td>
-                            
-                                <td width="180px" ><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayResult}}</label><input v-show="isEditShow" :id="'inputResult'+item.id" placeholder="请输入结果" class="tdInp"/></td>
-                                <td width="180px"><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayRemark}}</label><input v-show="isEditShow" :id="'inputRemark'+item.id" placeholder="请录入备注" class="tdInp"/></td>
-                               
-                                <td>
-                                    <button title="修改" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> -->
-                    
+                    <div class="containerTable">
+                        <table class="containerList" border="1" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>分类</th>
+                                    <th>巡视监测内容</th>
+                                    <th>巡视检测结果</th>
+                                    <th>备注</th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">自然条件</th>
+                                    <th>天气</th>
+                                    <th>{{weatherIcon}}</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <th>温度</th>
+                                    <th>{{weatherAir}}</th>
+                                    <th></th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in getPatrolRecordLists" :key="index">
+                                    <td :rowspan="item.patrolTypeNamespan" :class="{'hidden': item.patrolTypeNamedis}">{{item.patrolTypeName}}</td>
+                                    <td :rowspan="item.patrolNamespan" :class="{'hidden': item.patrolNamedis}" v-text="item.patrolName"></td>
+                                    <td  v-text="item.historyResult"></td>
+                                    <td  v-text="item.historyRemark"></td>
+                                    <!-- <td v-show="saveShow"  v-text="item.recentResult"></td>
+                                    <td v-show="saveShow" v-text="item.recentRemark"></td>
+                                    <td width="180px" ><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayResult}}</label></td>
+                                    <td width="180px"><label v-show="!isEditShow&&hasTodayRecordBoolen">{{item.todayRemark}}</label></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <!-- 竖向位移 -->
-                <div class="verticalLength">
-
-                </div>
+                <ul class="inspectUl">
+                    <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
+                        <div class="verticalLength" v-show="item.type!=5">
+                            <label class="pdfSummaryHead1">{{company}}</label>
+                            <label class="pdfSummaryHead">监测报表</label>
+                            <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
+                            <div class="txt1"><label>监测内容：{{item.name}}</label></div>
+                            <div class="bottomTabel" >
+                                <table class="bottomTableList" border="1" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">测点编号</th>
+                                            <th v-show="item.type!=3" colspan="2">初始采集</th>
+                                            <th v-show="item.type==3" colspan="3">初始采集</th>
+                                            <th v-show="item.type!=3" colspan="2">上次采集</th>
+                                            <th v-show="item.type==3" colspan="3">上次采集</th>
+                                            <th v-show="item.type!=3" colspan="2">本次采集</th>
+                                            <th v-show="item.type==3" colspan="3">本次采集</th>
+                                            <th colspan="3">变化量</th>
+                                        </tr>
+                                        <tr>
+                                            <th>采集时间</th>
+                                            <th v-show="item.type==1">位移(mm)</th>
+                                            <th v-show="item.type==2">高程(m)</th>
+                                            <th v-show="item.type==3">水位(m)</th>
+                                            <th v-show="item.type==3">管口(m)</th>
+                                            <th v-show="item.type==4">受力(kN)</th>
+                                            <th>采集时间</th>
+                                            <th v-show="item.type==1">位移(mm)</th>
+                                            <th v-show="item.type==2">高程(m)</th>
+                                            <th v-show="item.type==3">水位(m)</th>
+                                            <th v-show="item.type==3">管口(m)</th>
+                                            <th v-show="item.type==4">受力(kN)</th>
+                                            <th>采集时间</th>
+                                            <th v-show="item.type==1">位移(mm)</th>
+                                            <th v-show="item.type==2">高程(m)</th>
+                                            <th v-show="item.type==3">水位(m)</th>
+                                            <th v-show="item.type==3">管口(m)</th>
+                                            <th v-show="item.type==4">受力(kN)</th>
+                                            <th>变化时间</th>
+                                            <th v-show="item.type!=4">本次(mm)</th>
+                                            <th v-show="item.type==4">本次(kN)</th>
+                                            <th v-show="item.type!=4">累计(mm)</th>
+                                            <th v-show="item.type==4">累计(kN)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(val,index) in item.dataList" :key="index"> 
+                                            <td>{{val.pointName|addSprit()}}</td>
+                                            <td>{{val.initAcquisitionTime|timeChange()}}</td>
+                                            <td >{{val.initData|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.initPipeHeight|addSprit()}}</td>
+                                            <td>{{val.lastAcquisitionTime|timeChange()}}</td>
+                                            <td >{{val.lastData|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
+                                            <td>{{val.latestAcquisitionTime|timeChange()}}</td>
+                                            <td>{{val.latestData|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.latestPipeHeight|addSprit()}}</td>
+                                            <td>{{val.variationTime|timeStamp()}}</td>
+                                            <td>{{val.recentVariation|addSprit()}}</td>
+                                            <td>{{val.totalVariation|addSprit()}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
                 <!-- 下载到本地 -->
         </div>
         <div>
@@ -144,14 +208,25 @@ export default {
     name:'htmlToPdf',
     data(){
         return{
-            ugSelectId:window.location.href.substr(window.location.href.length-4),//获取到项目群组ID
+            ugSelectId:this.$route.query.ugselectId,//获取到项目群组ID
+            // window.location.href.substr(window.location.href.length-4)
             getReportSettingList:'',//获取报告保存的选项
             getSiteConditionList:'',//获取最新现场工况
             getPatrolRecordList:'',//获取巡视记录
+            getPatrolRecordLists:'',//获取巡视记录
+            historyTime:'',
+            userGroupIdList:[],
             hasTodayRecordBoolen:'',
             historyTime:'',
             getMonitorMainTableList:'',//获取监测内容主表
+            getAllMonitorItemList:'',//获取所有监测项目
+            getReportDatasList:'',//获取所有监测数据
+            mapList:'',
             coverPath:'',//封面地址
+            suggestion:'',
+            weatherIcon:'',
+            weatherAir:'',
+            company:this.$route.query.monitorCompany
         }
     },
     created(){
@@ -166,7 +241,11 @@ export default {
         // this.getUrl();
         this.getReportSetting();
         this.getMonitorMainTable();
-        console.log(this.ugSelectId,'ugSelectId');
+        this.getPatrolRecord();
+        this.getSiteCondition();
+        this.getDetectionSummary();
+        this.getAllMonitorItem();
+        // this.getReportDatas();
     },
     filters:{
         monitorTypeChange(val){
@@ -217,16 +296,56 @@ export default {
             return moment(val).format("YYYY-MM-DD HH:mm");
             }
         },
+        timeStamp(StatusMinute){	
+            var day=parseInt(StatusMinute/1000/60/60/24);
+            var hour=parseInt(StatusMinute/1000/60/60%24);
+            var min= parseInt(StatusMinute/1000/60%60);
+            StatusMinute="";
+            if (day > 0)
+            {
+                StatusMinute= day + "d";
+            } 
+            if (hour>0)
+            {
+                StatusMinute += hour + "h";
+            } 
+            if (min>0)
+            {
+                StatusMinute += parseFloat(min) + "m";
+            }
+                return StatusMinute;
+        }
 
     },
     watch:{
 
     },
     methods:{
-       
-        getUrl(){
-            console.log();
+     getBase64Image(img) {
+            var canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            var dataURL = canvas.toDataURL("image/jpeg");  // 可选其他值 image/jpeg
+            return dataURL;
         },
+
+    main(src){
+        var image = new Image();
+        image.src = src + '?v=' + Math.random(); // 处理缓存
+        image.crossOrigin = "*";  // 支持跨域图片
+        
+        image.onload=function(){
+            var base64 =this.getBase64Image(image);
+            console.log(base64,'base64');
+            // cb && cb(base64);
+        }
+    },
+
+    getUrl(){
+        console.log();
+    },
         //获取报告保存的选项
         getReportSetting(){
             var vm=this;
@@ -241,9 +360,11 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    // this.getReportDatasList=response.data.rt;
+                  
                     this.getReportSettingList=response.data.rt;
                     this.coverPath=this.QJFileManageSystemURL+this.getReportSettingList.coverPath;
+                    // this.main(this.coverPath);
+                    this.suggestion=this.getReportSettingList.suggestion
                     console.log(this.getReportSettingList,'this.getReportSettingList');
                 }
             })
@@ -262,31 +383,62 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    // this.getReportDatasList=response.data.rt;
+                 
                     this.getSiteConditionList=response.data.rt;
                 }
             })
         },
-
-        //获取巡视记录
-        getPatrolRecord(){
-              var vm=this;
+         //获取监测概况
+        getDetectionSummary(){
             axios({
-                method:'get',
-                url:vm.BDMSUrl+'detectionInfo/getPatrolRecord',
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getDetectionSummary',
                 headers:{
-                    'token':vm.token
+                    'token':this.token
                 },
                 params:{
+                    projectId:this.projId,
                     userGroupId:this.ugSelectId
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    // this.getReportDatasList=response.data.rt;
-                    this.getPatrolRecordList=response.data.rt;
-                }
-            })
+                },
+                }).then(response=>{
+                    if(response.data.cd=='0'){
+                        var weatherJson=JSON.parse(response.data.rt.weatherJson);
+                        this.weatherIcon=weatherJson.data[0].wea;
+                        this.weatherAir=weatherJson.data[0].tem1;
+                       
+                        //环形图（当前报警）
+                       
+                        //环形图（累计报警）
+                       
+                        //条形图（现场概况）
+                        
+
+                    }else if(response.data.cd=='-1'){
+                        alert(response.data.msg);
+                    }
+                })
+
         },
+
+        //获取巡视记录
+        // getPatrolRecord(){
+        //       var vm=this;
+        //     axios({
+        //         method:'get',
+        //         url:vm.BDMSUrl+'detectionInfo/getPatrolRecord',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             userGroupId:this.ugSelectId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //             // this.getReportDatasList=response.data.rt;
+        //             this.getPatrolRecordList=response.data.rt;
+        //         }
+        //     })
+        // },
         //获取监测内容主表
         getMonitorMainTable(){
              var vm=this;
@@ -301,67 +453,154 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    // this.getReportDatasList=response.data.rt;
                     this.getMonitorMainTableList=response.data.rt;
                 }
             })
         },
-        //  getPatrolRecord(){
-        //      var vm=this;
-        //     axios({
-        //         method:'get',
-        //         url:this.BDMSUrl+'detectionInfo/getPatrolRecord',
-        //         headers:{
-        //             'token':vm.token
-        //         },
-        //         params:{
-        //             userGroupId:this.userSelectId
-        //         }
-        //     }).then((response)=>{
-        //         if(response.data.cd=='0'){
-        //             this.getPatrolRecordList=response.data.rt.patrolInfos;
-        //             this.hasTodayRecordBoolen=response.data.rt.hasTodayRecord;
-        //             var map = new Map();
-        //             for (var i = 0; i < this.getPatrolRecordList.length;i++){
-        //                 var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
-        //                 if (!map.has(patrolTypeId)) {
-        //                     var array = new Array();
-        //                     array.push(this.getPatrolRecordList[i]);
-        //                     map.set(patrolTypeId, array);
-        //                 }
-        //                 else {
-        //                     var array = map.get(patrolTypeId);
-        //                     array.push(this.getPatrolRecordList[i]);
-        //                     map.set(patrolTypeId, array);
-        //                 }
-        //             }
-        //             var list=[];
-        //             map.forEach(function (value, key, mapObject) {
-        //                 // console.log(key);
-        //                 for(var i=0;i<value.length;i++){
-        //                     list.push(value[i])
-        //                 } 
-        //                 console.log(value);
-        //             }); 
-        //             console.log(list,'list')               
-        //             this.getPatrolRecordList=this.combineCell(list);
+         getPatrolRecord(){
+             var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/getPatrolRecord',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.ugSelectId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getPatrolRecordList=response.data.rt.patrolInfos;
+                    this.hasTodayRecordBoolen=response.data.rt.hasTodayRecord;
+                    var map = new Map();
+                    for (var i = 0; i < this.getPatrolRecordList.length;i++){
+                        var patrolTypeId = this.getPatrolRecordList[i].patrolTypeId;
+                        if (!map.has(patrolTypeId)) {
+                            var array = new Array();
+                            array.push(this.getPatrolRecordList[i]);
+                            map.set(patrolTypeId, array);
+                        }
+                        else {
+                            var array = map.get(patrolTypeId);
+                            array.push(this.getPatrolRecordList[i]);
+                            map.set(patrolTypeId, array);
+                        }
+                    }
+                    var list=[];
+                    map.forEach(function (value, key, mapObject) {
+                        // console.log(key);
+                        for(var i=0;i<value.length;i++){
+                            list.push(value[i])
+                        } 
+                    });          
+                    this.getPatrolRecordList=this.combineCell(list);
 
-        //             this.getPatrolRecordLists=this.getPatrolRecordList;
-        //             this.getPatrolRecordLists.forEach((item)=>{
-        //                 this.userGroupIdList.push(item.id);
-        //             })
-        //             this.historyTime=this.getPatrolRecordLists[0].historyDate;
-        //             console.log(this.userGroupIdList,'this.userGroupIdList');
-        //             console.log(this.getPatrolRecordLists);
-        //         }else if(response.data.cd=='-1'){
-        //             this.$message({
-        //                 type:'error',
-        //                 message:response.data.msg
-        //             })
-        //         }
-        //     })
-        // },
+                    this.getPatrolRecordLists=this.getPatrolRecordList;
+                    this.getPatrolRecordLists.forEach((item)=>{
+                        this.userGroupIdList.push(item.id);
+                    })
+                    this.historyTime=this.getPatrolRecordLists[0].historyDate;
+                    // console.log(this.userGroupIdList,'this.userGroupIdList');
+                    // console.log(this.getPatrolRecordLists);
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+          //动态数据相同类型表格合并
+         combineCell(list) {
+            for (var field in list[0]) {
+                var k = 0;
+                while (k < list.length) {
+                    list[k][field + 'span'] = 1;
+                    list[k][field + 'dis'] = false;
+                    for (var i = k + 1; i <= list.length - 1; i++) {
+                        if (list[k][field] == list[i][field] && list[k][field] != '') {
+                            list[k][field + 'span']++;
+                            list[k][field + 'dis'] = false;
+                            list[i][field + 'span'] = 1;
+                            list[i][field + 'dis'] = true;
+                        } else {
+                            break;
+                        }
+                    }
+                    k = i;
+                }
+            }
+            return list;
+        },
+        // 获取报告所需的数据
+        getReportDatas(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getReportDatas',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.ugSelectId,
+                    beforeDate:this.$route.query.consultValue,
+                    referenceDate:this.$route.query.userValue
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getReportDatasList=response.data.rt;
+                    var mapList = new Map();
+                    for (var i = 0; i < this.getReportDatasList.length;i++){
+                        var itemId = this.getReportDatasList[i].itemId;
+                        if (!mapList.has(itemId)) {
+                            var array = new Array();
+                            array.push(this.getReportDatasList[i]);
+                            mapList.set(itemId, array);
+                        }
+                        else {
+                            var array = mapList.get(itemId);
+                            array.push(this.getReportDatasList[i]);
+                            mapList.set(itemId, array);
+                        }
+                    }
+                    this.getAllMonitorItemList.forEach((item)=>{
+                        mapList.forEach((value, key, mapObject)=>{
+                            if(key==item.id){
+                                this.$set(item,'dataList',value)
+                                }
+                            });
+                    })
+                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                    
+                }
+            })
+        },
+        //通过改方法可以识别不同监测点位
+        inspectSpotMethod(val){
+            // console.log(this.mapList,'getReportDatasList23')
+                 
+        },
+        //获取所有监测项目
+        getAllMonitorItem(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getAllMonitorItem',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.ugSelectId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getAllMonitorItemList=response.data.rt;
+                    this.getReportDatas();
 
+                    console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
+                }
+            }) 
+        },
          //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfDom')
@@ -442,6 +681,7 @@ export default {
             
         }
         .pdfSummary{
+            
             .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
@@ -473,7 +713,7 @@ export default {
                         .inspectTableList{
                             
                             border-collapse: collapse;
-                            border: 1px solid #e6e6e6;
+                            border: 1px solid #000;
                             thead{
                                 // background: #f2f2f2;
                                 background: #fff;
@@ -483,7 +723,7 @@ export default {
                                     height: 32px;
                                     text-align: center;
                                     box-sizing: border-box;
-                                    border-right: 1px solid #e6e6e6;
+                                    border-right: 1px solid #000;
                                     font-size: 12px;
                                     color: #333333;
                                     font-weight: normal;
@@ -500,7 +740,7 @@ export default {
                                         height: 32px;
                                         text-align: center;
                                         box-sizing: border-box;
-                                        border-right: 1px solid #e6e6e6;
+                                        border-right: 1px solid #000;
                                         font-size: 12px;
                                         color: #333333;
                                         // .actionBtn{
@@ -536,6 +776,7 @@ export default {
                     }
         }
         .pdfInspection{
+            margin-top:50px;
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
@@ -558,6 +799,205 @@ export default {
                      top:5px;
                      font-size:16px;
                  }
+            }
+
+            .containerTable{
+                width: 90%;
+                margin:10px auto;
+                // margin-top:10px;
+                .containerList{
+                    border-collapse: collapse;
+                    border: 1px solid #000;
+                    thead{
+                                background: #fff;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 30px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #000;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                    .left{
+                                        cursor: pointer;
+                                        display: inline-block;
+                                        float: left;
+                                        &:hover{
+                                            color:#336699;
+                                        }
+                                    }
+                                    .right{
+                                        cursor: pointer;
+                                        display: inline-block;
+                                        float:right;
+                                            &:hover{
+                                            color:#336699;
+                                        }
+                                    }
+                                }
+                    }
+                    tbody{
+                            tr{
+                                td{
+                                    // padding-left: 6px;
+                                    // padding-right: 15px;
+                                    height: 30px;
+                                    text-align: left;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #000;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    .tdInp{
+                                        width: 178px;
+                                        height: 28px;
+                                    }
+                                    .actionBtn{
+                                            width: 18px;
+                                            height: 18px;
+                                            border: none;
+                                            cursor: pointer;
+                                            margin-left: 10px;
+
+                                    }
+                                    .editBtn{
+                                        background: url('./images/overviewedit.png') no-repeat 0 0;
+                                    }
+                                    .deleteBtn{
+                                        background: url('./images/delete1.png') no-repeat 0 0;
+                                    }
+                                }
+                                .hidden{
+                                    display: none;
+                                }
+                            }
+                    }
+                }
+            }
+        }
+        .inspectUl{
+           
+            .inspectLi{
+                 margin-top:50px;
+                .verticalLength{
+                    .pdfSummaryHead1{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 18px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 40px;
+                        line-height: 40px;
+                        // border-bottom:2px solid #ccc;
+                    }
+                    .pdfSummaryHead{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 18px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 40px;
+                        line-height: 40px;
+                        border-bottom:2px solid #ccc;
+                    }
+                    .pdfSummarytext{
+                        display:inline-block;
+                        width: 90%;
+                        height: 40px;
+                        position: relative;
+                        //  margin-left:5px;
+                        label{
+                            position: absolute;
+                            left:5px;
+                            top:5px;
+                            font-size:16px;
+                        }
+                    }
+                    .txt{
+                        width: 90%;
+                        margin: 0 auto;
+                        height: 30px;
+                        position: relative;
+                        .label1{
+                            position: absolute;
+                            left:0px;
+                            font-size:14px;
+                            color: #000;
+                            line-height: 30px;
+                        }
+                        .span1{
+                            position: absolute;
+                            left:50%;
+                            font-size:14px;
+                            color: #000;
+                            line-height: 30px;
+                        }
+                    }
+                    .txt1{
+                        width: 90%;
+                        font-size:14px;
+                        margin:0 auto;
+                        color: #000;
+                        line-height: 30px;
+                        height: 30px;
+                        position: relative;
+                        label{
+                            position: absolute;
+                            left: 0px;
+                        }
+                    }
+                    .bottomTabel{
+                        width: 90%;
+                        margin:0 auto;
+                            .bottomTableList{
+                                border-collapse: collapse;
+                                border: 1px solid #e6e6e6;
+                                    thead{
+                                        background: #f2f2f2;
+                                        th{
+                                            padding-left: 6px;
+                                            padding-right: 15px;
+                                            height: 32px;
+                                            text-align: center;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #e6e6e6;
+                                            font-size: 12px;
+                                            color: #333333;
+                                            font-weight: normal;
+                                        }
+                                    }
+                                    tbody{
+                                        tr{
+                                            td{
+                                                padding-left: 6px;
+                                                padding-right: 15px;
+                                                height: 32px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 1px solid #e6e6e6;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                .actionBtn{
+                                                    width: 18px;
+                                                    height: 18px;
+                                                    border: none;
+                                                    cursor: pointer;
+                                                    margin-left: 10px;
+                                                }
+                                                .location{
+                                                    background: url('../planCost/images/location.png') no-repeat 0 0;
+                                                }
+                                                .curve{
+                                                    background: url('./images/graph.png') no-repeat 0 0;
+                                                }
+
+                                            }
+                                        }
+                                    }
+                            }
+                    }
+                }
             }
         }
 

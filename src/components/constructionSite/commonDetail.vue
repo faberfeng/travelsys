@@ -682,7 +682,7 @@ export default Vue.component('commonDetail',{
                     'token':vm.token
                 },
                 params:{
-                    baseMapId:vm.itemSubmitbaseMapId
+                    userGroupId:vm.userGroupId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -835,7 +835,7 @@ export default Vue.component('commonDetail',{
                         'token':vm.token
                     },
                     params:{
-                        baseMapId:vm.itemSubmitbaseMapId
+                        userGroupId:vm.userGroupId
                     },
                     data:list
                 }).then((response)=>{

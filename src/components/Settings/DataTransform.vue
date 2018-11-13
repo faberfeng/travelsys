@@ -116,95 +116,95 @@
                     <button class="editBtnC" @click="addCancle">取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="导入标准" :visible.sync="importDialog" @close="importCancle">
-                <div class="editBody">
-                    <div class="editBodytwo"><P>请选择需要导入的标准项</P></div>
-                    <div class="editBodytwo">
-                        <table cellspacing="0" border cellpadding="0" class="elTable">
-                            <thead>
-                                <tr>
-                                    <td>标准类型</td>
-                                    <td>预置条目配置</td>
-                                    <td>自定义条目</td>
-                                    <td>自定义条目配置</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>专业工种分类编码</td>
-                                    <td></td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[0]">{{jiexiData.t13Count}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>作业工具分类编码</td>
-                                    <td></td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[1]">{{jiexiData.t17Count}}项</el-checkbox>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>设计构件分类编码</td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[2]">{{jiexiData.t31ConfigCount}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[3]">{{jiexiData.t31Count}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[4]">{{jiexiData.t31CustomConfigCount}}项</el-checkbox>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>工程招标分类编码</td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[5]">{{jiexiData.t32ConfigCount}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[6]">{{jiexiData.t32Count}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[7]">{{jiexiData.t32CustomConfigCount}}项</el-checkbox>
-                                    </td>
+            <el-dialog title="导入标准" v-loading="importDialogShow" :visible.sync="importDialog" @close="importCancle">
+                    <div class="editBody" >
+                        <div class="editBodytwo"><P>请选择需要导入的标准项</P></div>
+                        <div class="editBodytwo">
+                            <table cellspacing="0" border cellpadding="0" class="elTable">
+                                <thead>
+                                    <tr>
+                                        <td>标准类型</td>
+                                        <td>预置条目配置</td>
+                                        <td>自定义条目</td>
+                                        <td>自定义条目配置</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>专业工种分类编码</td>
+                                        <td></td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[0]">{{jiexiData.t13Count}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>作业工具分类编码</td>
+                                        <td></td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[1]">{{jiexiData.t17Count}}项</el-checkbox>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>设计构件分类编码</td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[2]">{{jiexiData.t31ConfigCount}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[3]">{{jiexiData.t31Count}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[4]">{{jiexiData.t31CustomConfigCount}}项</el-checkbox>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>工程招标分类编码</td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[5]">{{jiexiData.t32ConfigCount}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[6]">{{jiexiData.t32Count}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[7]">{{jiexiData.t32CustomConfigCount}}项</el-checkbox>
+                                        </td>
 
-                                </tr>
-                                <tr>
-                                    <td>物资采购分类编码</td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[8]">{{jiexiData.t16ConfigCount}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[9]">{{jiexiData.t16Count}}项</el-checkbox>
-                                    </td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[10]">{{jiexiData.t16CustomConfigCount}}项</el-checkbox>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>构件属性语意编码</td>
-                                    <td></td>
-                                    <td>
-                                        <el-checkbox v-model="isModelChecked[11]">{{jiexiData.t4xCount}}项</el-checkbox>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </tr>
+                                    <tr>
+                                        <td>物资采购分类编码</td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[8]">{{jiexiData.t16ConfigCount}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[9]">{{jiexiData.t16Count}}项</el-checkbox>
+                                        </td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[10]">{{jiexiData.t16CustomConfigCount}}项</el-checkbox>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>构件属性语意编码</td>
+                                        <td></td>
+                                        <td>
+                                            <el-checkbox v-model="isModelChecked[11]">{{jiexiData.t4xCount}}项</el-checkbox>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="editBodytwo">
+                            <p>来源信息</p>
+                            <p>工程名称：{{jiexiData.projectName}}</p>
+                            <p>生成时间：{{jiexiData.createTime}}</p>
+                        </div>
                     </div>
-                    <div class="editBodytwo">
-                        <p>来源信息</p>
-                        <p>工程名称：{{jiexiData.projectName}}</p>
-                        <p>生成时间：{{jiexiData.createTime}}</p>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="importMakeSure">导入</button>
+                        <button class="editBtnC" @click="importCancle">取消</button>
                     </div>
-                </div>
-                <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="importMakeSure">导入</button>
-                    <button class="editBtnC" @click="importCancle">取消</button>
-                </div>
             </el-dialog>
             <el-dialog title="导入报告" :visible.sync="importResult">
                 <div class="editBody">
@@ -303,6 +303,7 @@ export default {
             exportDialog:false,
             importStandarShow:false,
             importDialog:false,
+            importDialogShow:false,
             importResult:false,
             importResultData:{},
             dataTransformData:[{
@@ -501,7 +502,7 @@ export default {
                         token:this.token,
                     },
                     params:{
-                        projectId:this.projId,
+                        projId:this.projId,
                         items:''
                     },
                     data:formData
@@ -520,21 +521,18 @@ export default {
         importMakeSure(){
             var formData = new FormData();
             formData.append('fileData',this.filesList[0]);
-            var arr = [];
+            var arr = '';
             this.isModelChecked.forEach((item,index)=>{
                 if(item){
-                    arr.push(index);
+                    arr += "&items="+index;
                 }
             })
+            this.importDialogShow=true;
             axios({
                 method:'post',
-                url:this.BDMSUrl+'project2/Config/importStandardInfo',
+                url:this.BDMSUrl+'project2/Config/importStandardInfo?projectId='+this.projId+arr,
                 headers:{
                     token:this.token
-                },
-                params:{
-                    projectId:this.projId,
-                    items:arr
                 },
                 data:formData
             }).then(response=>{
@@ -545,6 +543,7 @@ export default {
                 }else{
                     alert(response.data.msg)
                 }
+                this.importDialogShow=false;
             })
         },
         //取消导入

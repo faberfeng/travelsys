@@ -9,7 +9,7 @@ const router = new Router({
   routes: [
     //pdf
     {
-      path:'/pdfPreview/:id',
+      path:'/pdfPreview',
       name:'pdfPreview',
       component:resolve=>require(['@/components/constructionSite/htmlToPdf'],resolve),
     },
