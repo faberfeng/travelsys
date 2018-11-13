@@ -2694,17 +2694,28 @@ export default {
                                         text-align: left;
                                         position: relative;
                                         .replyName{
-                                            font-size:14px;
+                                            // font-size:14px;
+                                            // color:#333333;
+                                            // width: 45px;
+                                            // display: inline-block;
+                                            // text-align: left;
+
+                                            float: left;
+                                            font-size: 14px;
                                             color:#333333;
-                                            width: 45px;
-                                            display: inline-block;
+                                            line-height: 20px;
+                                            width: 60px;
+                                            overflow: hidden;
+                                            text-overflow:ellipsis;
+                                            white-space: nowrap;
                                             text-align: left;
                                         }
                                         .replyTime{
-                                            margin-left:4px;
+                                            margin-left:2px;
                                             font-size:12px;
                                             color:#666666;
                                             width: 90px;
+                                            line-height: 20px;
                                             display: inline-block;
                                             text-align: left;
                                         }
