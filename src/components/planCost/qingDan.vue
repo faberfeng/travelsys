@@ -180,6 +180,124 @@
                                     <div style="clear:both;"></div>
                                 </div>
                             </div>
+                            <!-- 物资采购 物料跟踪 -->
+                            <div v-if="isShowWuLiao">
+                                <p class="header clearfix"  style="margin-top:30px;">
+                                    <span class="left_header">
+                                        <i class="detial icon"></i>跟踪计划清单【{{wuLiaoObj.orderTitle}}】({{wuLiaoObj.orderCode}})明细
+                                    </span>
+                                    <a :class="['right_header','right-expend',OrderListExpend.isExpend?'':'right-pack-up']" href="javascript:void(0)" @click="changeOrderListExpend()" v-text="OrderListExpend.title"></a>
+                                </p>
+                                <div v-show="OrderListExpend.isExpend">
+                                    <div style="overflow: auto;">
+                                        <p  class="clearfix" style="margin: 7px 0 10px;text-align:left;">
+                                            <!-- <span class="title-list" @click="allEditCount">
+                                                <label class="item-btn-icon title-border">批量编辑</label>
+                                            </span> -->
+                                            <span  class="title-list" v-text="'总价：'+dingHuoAmount">   
+                                            </span>
+                                            <span class="item-btn clearfix"> 
+                                                <label class="item-btn-icon icon-2" @click="showDingHuoLabel()">全部标签</label>
+                                                <label class="item-btn-icon icon-3" @click="showOrderLabelHeader()">显示列</label>
+                                            </span>
+                                        </p>
+                                        <el-table  :data="ComponentList"  border style="width: 100%" class="detialInfoTable" @selection-change="handleSelectionChange">
+                                            <el-table-column :prop="indexList.prop" :label="indexList.name"
+                                                v-if="indexList.show"
+                                                align="center"
+                                                fixed="left"
+                                                width="50"
+                                                :formatter="testIfIsNull">  
+                                            </el-table-column>
+                                            <el-table-column
+                                                type="selection"
+                                                width="50"
+                                                >
+                                            </el-table-column>
+                                            <el-table-column
+                                                v-for="(item,index) in planHead" :key="index"
+                                                :prop="item.prop"
+                                                :label="item.name"
+                                                v-if="item.show"
+                                                align="center"
+                                                :formatter="testIfIsNull"
+                                                >
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="operate"
+                                                label="操作"
+                                                v-if="showOperate"
+                                                fixed="right"
+                                                align="center"
+                                                :formatter="testIfIsNull"
+                                                >
+                                                <template slot-scope="scope">
+                                                
+                                                <button class="editBtn actionBtn" title="编辑"  @click.stop="editCount(scope)" v-if="showType == 'separate' && isDingHuo == false"></button>
+                                                <button class="labelBtn actionBtn" title="标签"  @click.stop="openDingHuoLabel(scope)" ></button>
+                                                <button class="locationBtn actionBtn" title="定位"  @click.stop="openLocation(scope)" ></button>
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+                                    </div>
+                                    <!--以下是page-navigitation-->
+                                    <div class="datagrid-pager pagination" v-if="ComponentList.length>0">
+                                        <table cellspacing="0" cellpadding="0" border="0" >
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="pagination-page-list" v-model="pageOrder.pagePerNum">
+                                                            <option value="10">10</option>
+                                                            <option value="20">20</option>
+                                                            <option value="30">30</option>
+                                                            <option value="40">40</option>
+                                                            <option value="50">50</option>
+                                                    </select>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-left0 btn-TAB" @click="changePageOrder(0)"></a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-left1 btn-TAB" @click="changePageOrder(-1)"></a>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <span  class="pagination-title" style="padding-left:5px;">第</span>
+                                                    </td>
+                                                    <td>
+                                                        <input class="pagination-num" type="text" v-model="pageOrder.currentPage">
+                                                    </td>
+                                                    <td>
+                                                        <span  class="pagination-title" style="padding-right:5px;">共{{Math.ceil(pageOrder.total/pageOrder.pagePerNum)}}页</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-right1 btn-TAB" @click="changePageOrder(1)"></a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" class="btn-right0 btn-TAB"  @click="changePageOrder(2)"></a>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pagination-btn-separator"></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0)" @click="findComponentList()" class="btn-refresh btn-TAB"></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="pagination-info pagination-title" v-text="'显示1到'+pageOrder.pagePerNum+',共'+pageOrder.total+'记录'"></div>
+                                        <div style="clear:both;"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- 物资采购 订货管理 -->
                             <div v-if="isShowWuZi">
                                 <p class="header clearfix"  style="margin-top:30px;">
@@ -2232,11 +2350,11 @@ import '../ManageCost/js/date.js'
 var app
 var CurrentSelectPara
 export default Vue.component('common-list',{
-    props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne','orderListDetailId','isShowWuzi','isDinghuo','dingHuoObj','isShowFahuo','isFahuo','faHuoObj','isShowcheck','isShowreceipt','checkReceiptObj','showEditallcheck','showEditallreceipt'],
+    props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne','orderListDetailId','isShowWuzi','isDinghuo','dingHuoObj','isShowFahuo','isFahuo','faHuoObj','isShowcheck','isShowreceipt','checkReceiptObj','showEditallcheck','showEditallreceipt','isShowWuliao','wuliaoObj'],
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
-            TraceID:'',//追溯Id
+            TraceID:'',//追溯Id 
             HolderPath:'',//容器路径
             GCCode:'',//分类编码
             screenLeft:{
@@ -2284,6 +2402,78 @@ export default Vue.component('common-list',{
             checkedItem:{},
             fullscreenloading:false,
             ManifestInfo:{},//清单基本信息
+            planHead:[
+                {
+                    name:'序号',
+                    show:true,
+                    prop:'fieldDataJson[0].f0',
+                },
+                {
+                    name:'所在单体',
+                    show:true,
+                    prop:'fieldDataJson[1].f1',
+                },
+                {
+                    name:'所在分区',
+                    show:true,
+                    prop:'fieldDataJson[2].f2',
+                },
+                {
+                    name:'所在楼层',
+                    show:true,
+                    prop:'fieldDataJson[3].f3',
+                },
+                {
+                    name:'产品名称',
+                    show:true,
+                    prop:'fieldDataJson[4].f4',
+                },
+                {
+                    name:'类型',
+                    show:true,
+                    prop:'fieldDataJson[5].f5',
+                },
+                {
+                    name:'品牌',
+                    show:true,
+                    prop:'fieldDataJson[6].f6',
+                },
+                {
+                    name:'规格',
+                    show:true,
+                    prop:'fieldDataJson[7].f7',
+                },
+                {
+                    name:'数量',
+                    show:true,
+                    prop:'count',
+                },
+                {
+                    name:'发货时间',
+                    show:true,
+                    prop:'sendDate_show',
+                },
+                {
+                    name:'检查时间',
+                    show:true,
+                    prop:'checkDate_show',
+                },
+                {
+                    name:'签收时间',
+                    show:true,
+                    prop:'receiptDate_show',
+                },
+                {
+                    name:'构件状态',
+                    show:true,
+                    prop:'state',
+                },
+                {
+                    name:'最后操作人',
+                    show:true,
+                    prop:'updateUserName',
+                },
+            ],
             detailsHead:[
                 {
                     name:'',
@@ -2622,12 +2812,14 @@ export default Vue.component('common-list',{
             label_ComponentList:[],
             copy_label_ComponentList:[],
             isShowWuZi:false,
+            isShowWuLiao:false,
             isShowFaHuo:false,
             isDingHuo:true,
             isFaHuo:true,
             isShowCheck:false,
             isShowReceipt:false,
             dinghuoObj:{},
+            wuLiaoObj:{},
             fahuoObj:{},
             CheckReceiptObj:{},
             editCountObj:{},
@@ -2675,8 +2867,10 @@ export default Vue.component('common-list',{
             vm.manifestId = vm.mId
             vm.oId = vm.mId
             vm.isShowWuZi = vm.isShowWuzi;
+            vm.isShowWuLiao = vm.isShowWuliao;
             vm.isDingHuo = vm.isDinghuo;
             vm.dinghuoObj = vm.dingHuoObj;
+            vm.wuLiaoObj = vm.wuliaoObj;
             vm.isShowFaHuo = vm.isShowFahuo;
             vm.isFaHuo = vm.isFahuo;
             vm.fahuoObj = vm.faHuoObj;

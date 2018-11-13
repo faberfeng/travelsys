@@ -1,10 +1,11 @@
 <template>
-   <el-form-item class="detail-temp">
+    <el-form-item class="detail-temp">
         <div class="detail-content-temp">
             <el-form-item label="开始条件" label-width="100px">
                 <div class="select-temp">
                     <el-select v-model="selectValue" placeholder="请选择" @change="startDayOnChange">
                         <el-option
+                        v-if="item.ischeck === 1"
                         v-for="(item,index) in start_options"
                         :key="index"
                         :label="item.label"
@@ -45,7 +46,11 @@
 </template>
 <script>
 import axios from 'axios';
-import {start_options,end_options} from "./../constants"
+import {start_option,end_options} from "./../constants"
+import { throws } from 'assert';
+let start_optionTemp = start_option.map( (item)=> Object.assign({},item))
+        const end_optionTemp = end_options.map( (item)=> item.map(data=>Object.assign({},data)));
+
 export default {
     name:'Wuliao',
     props :{
@@ -54,20 +59,42 @@ export default {
         index:Number,
         startPlan:Number,
         endPlan:Number,
+        checkLists_flow:Array
     },
     data() {
-        const array = start_options.slice(0,this.index);
-        const array1 = end_options[this.index-1];
-        
+        console.log(this.checkLists_flow);
+        this.checkLists_flow && this.checkLists_flow.map((item,index)=>{
+            if(index>0){
+                start_optionTemp[index-1].ischeck = item.ischeck;
+            }
+        });
+        //this.checkLists_flow.map((item,index)=>{
+          //  if(item.ischeck == 0){
+            //    start_optionTemp = start_optionTemp.slice(index-1,1);
+            //}
+        //});
+        console.log("start_optionTemp",start_optionTemp)
+        const array = start_optionTemp.slice(0,this.index);
+        const array1 = end_optionTemp[this.index-1];
         return {
             start_options:array,
             end_options:array1,            
             startPlanDay:'',
             endPlanDay:'',
-            startValue:'',
-            selectValue:array && array.length ? array[ this.selectValueIndex-2 ].label : "",
+            // startValue:'',
+            // selectValue:array && array.length ? array[ this.selectValueIndex-2 ].label : "",
+            selectValue:'',
             endSelectValue:"",
         }
+    },
+    computed:{
+        list:function(){
+            console.log("----")
+            return this.checkLists_flow.map(item=>item.ischeck == 1 );
+        }
+    },
+    updated(){
+        console.log(1)
     },
     watch:{
         startPlan: function(val,oldVal){
@@ -75,12 +102,14 @@ export default {
         },
         endPlan: function( val,oldVal ) {
             this.getEnd();
-        },
+        }
     },
-    created(){
+    mounted(){
         this.getStart();
         this.getEnd();
         this.initEndSelectValue();
+        this.initStartSelectValue();
+        
     },
     methods:{
         initEndSelectValue(){
