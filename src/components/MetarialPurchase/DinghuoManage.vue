@@ -525,9 +525,10 @@
         </el-dialog>
         <!-- 校验结果 -->
         <el-dialog title="校验结果" :visible="checkoutResult"  @close="leadCancel">
-            <div class="editBody">
-                <ul>
-                    <li v-for="(item,index) of checkoutResultList" :key="index"></li>
+            <div class="editBody checkoutResult">
+                <span v-if="isVerify">所有数据校验通过！</span>
+                <ul v-if="!isVerify">
+                    <li v-for="(item,index) of checkoutResultList" :key="index">{{item}}</li>
                 </ul>
             </div> 
             <div slot="footer" class="dialog-footer">
@@ -539,9 +540,9 @@
         <el-dialog title="自动选型提示" :visible="selectionHint"  @close="hintCancel">
             <div class="editBody content-left">
                 <h3><span>自动选型结果统计：</span></h3>
-                <p><span>待导入的清单条目数：</span></p>
-                <p><span>不可以实现自动选型的条目数：</span></p>
-                <p><span>选型完成并可以使用的条目数：</span></p>
+                <p><span>待导入的清单条目数：{{dataProfiling.totalCount}}</span></p>
+                <p><span>不可以实现自动选型的条目数：{{dataProfiling.notPassCount}}</span></p>
+                <p><span>选型完成并可以使用的条目数：{{dataProfiling.passCount}}</span></p>
             </div> 
             <div slot="footer" class="dialog-footer">
                 <el-button class="editBtnC separation" @click="hintCancel">取消导入</el-button>
@@ -652,6 +653,8 @@ export default {
             checkoutResultList:[],
             selectionMode:'',
             selectionHint:false,
+            isVerify:true,
+            dataProfiling:{},
         }
     },
     watch:{
@@ -988,24 +991,57 @@ export default {
                 formData.append('relaType',relaType);
                 formData.append('projectId',this.projId);
                 formData.append('orderId',this.planId);
-                formData.append('selectionMode',1);
-                if( relaType == 6 ){
+                formData.append('componentCount',this.selcetedItem.componentCount);
+                
+                if( relaType == 6 ){  
+                    formData.append('selectionMode',1);
                     axios({
                         method:'post',
-                        url:this.BDMSUrl+'project2/order/addOrderDetailByDetail',
+                        url:this.BDMSUrl+'project2/order/verifyAddOrderDetailByDetail',
                         headers:{
                             token:this.token
                         },
                         data:formData
                     }).then(response=>{
-                        console.log("添加清单",response);
+                        console.log("添加清单验证(从清单中选取)",response);
                         if(response.data.cd == 0){
-                            this.editBySelfShow = false;
-                            this.$message({
-                                type:'success',
-                                message:'添加清单成功！'
-                            })
-                            this.getOrderDetail(this.planId);
+                            this.selectionHint = true;
+                            let obj = response.data.rt;
+                            this.dataProfiling = {};
+                            this.dataProfiling = obj.dataProfiling;
+                            if(obj.checkResults.verifyProductId || obj.checkResults.productIdFormat || obj.checkResults.priceFormat
+                            || obj.checkResults.productTag || obj.checkResults.productTagCount || obj.checkResults.verifyClassifyCode){
+                                if( obj.checkResults.verifyProductId && obj.checkResults.verifyProductId.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.verifyProductId; 
+                                }else if( obj.checkResults.productIdFormat && obj.checkResults.productIdFormat.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.productIdFormat; 
+                                }else if( obj.checkResults.priceFormat && obj.checkResults.priceFormat.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.priceFormat; 
+                                }else if( obj.checkResults.productTag && obj.checkResults.productTag.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.productTag; 
+                                }else if( obj.checkResults.productTagCount && obj.checkResults.productTagCount.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.productTagCount; 
+                                }else if( obj.checkResults.verifyClassifyCode && obj.checkResults.verifyClassifyCode.length > 0 ){
+                                    this.checkoutResultList = [];
+                                    this.checkoutResultList = obj.checkResults.verifyClassifyCode; 
+                                }
+                                // this.isVerify = false;
+                            }else{
+                                // this.isVerify = true;
+                            }
+                            // this.checkoutResult = true;
+                            
+                            // this.editBySelfShow = false;
+                            // this.$message({
+                            //     type:'success',
+                            //     message:'添加清单验证成功'
+                            // })
+                            // this.getOrderDetail(this.planId);
                             // this.checkedResults = response.data.rt.dataProfiling;
                             // if(JSON.stringify(response.data.rt.checkResults)=='{}'){
                             //     this.jiapyanResult = '所有数据校验通过!';
@@ -1018,8 +1054,8 @@ export default {
                             // this.shureToImportshow = true;
                         }else{
                             this.$message({
-                                type:'success',
-                                message:response.data.msg,
+                                type:'warring',
+                                message:response.data.msg
                             })
                         }
                     })
@@ -1027,6 +1063,7 @@ export default {
                     this.selectionMethods = true;
                     this.selectionModelValue = this.selectionModelList[0].label;
                     this.selectionMode = this.selectionModelList[0].value;
+                    formData.append('selectionMode',this.selectionMode);
                 }    
             }else if(num == 0){
                 this.$message({
@@ -1049,7 +1086,6 @@ export default {
         //确认选型
         selectionConfirm(){
             // this.selectionMethods = false;
-            this.checkoutResult = true;
             let formData = new FormData();
             formData.append('detailId',this.selcetedItem.detailId);
             formData.append('selectionMode',this.selectionMode);
@@ -1057,7 +1093,6 @@ export default {
             formData.append('relaType',this.mappingRelaType(this.selcetedItem.relaType));
             formData.append('componentCount',this.selcetedItem.componentCount);
             formData.append('orderId',this.planId);
-
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/order/verifyAddOrderDetailByDetail',
@@ -1068,11 +1103,41 @@ export default {
             }).then(response=>{
                 console.log("添加清单验证(从清单中选取)",response);
                 if(response.data.cd == 0){
+                    let obj = response.data.rt;
+                    this.dataProfiling = {};
+                    this.dataProfiling = obj.dataProfiling;
+                    if(obj.checkResults.verifyProductId || obj.checkResults.productIdFormat || obj.checkResults.priceFormat
+                    || obj.checkResults.productTag || obj.checkResults.productTagCount || obj.checkResults.verifyClassifyCode){
+                        if( obj.checkResults.verifyProductId && obj.checkResults.verifyProductId.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.verifyProductId; 
+                        }else if( obj.checkResults.productIdFormat && obj.checkResults.productIdFormat.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.productIdFormat; 
+                        }else if( obj.checkResults.priceFormat && obj.checkResults.priceFormat.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.priceFormat; 
+                        }else if( obj.checkResults.productTag && obj.checkResults.productTag.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.productTag; 
+                        }else if( obj.checkResults.productTagCount && obj.checkResults.productTagCount.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.productTagCount; 
+                        }else if( obj.checkResults.verifyClassifyCode && obj.checkResults.verifyClassifyCode.length > 0 ){
+                            this.checkoutResultList = [];
+                            this.checkoutResultList = obj.checkResults.verifyClassifyCode; 
+                        }
+                        this.isVerify = false;
+                    }else{
+                        this.isVerify = true;
+                    }
+                    this.checkoutResult = true;
+                    
                     // this.editBySelfShow = false;
-                    this.$message({
-                        type:'success',
-                        message:'添加清单验证成功'
-                    })
+                    // this.$message({
+                    //     type:'success',
+                    //     message:'添加清单验证成功'
+                    // })
                     // this.getOrderDetail(this.planId);
                     // this.checkedResults = response.data.rt.dataProfiling;
                     // if(JSON.stringify(response.data.rt.checkResults)=='{}'){
@@ -1089,6 +1154,7 @@ export default {
                         type:'warring',
                         message:response.data.msg
                     })
+                    this.checkoutResult = false;
                 }
             })
         },
@@ -1098,12 +1164,11 @@ export default {
         },
         //选型切换
         selectionModelChange(val){
-            // console.log("选型切换",val);
             this.selectionMode = val;
         },
         //确认导入
         leadConfirm(){
-            // this.checkoutResult = false;
+            this.checkoutResult = false;
             this.selectionHint = true;
         },
         //取消导入
@@ -1112,10 +1177,48 @@ export default {
         },
         //提示后确认导入
         hintConfirm(){
-            // this.selectionHint = false;
+            let formData = new FormData();
+            let relaType = this.mappingRelaType(this.selcetedItem.relaType);
+            formData.append('detailId',this.selcetedItem.detailId);
+            formData.append('relaType',relaType);
+            formData.append('projectId',this.projId);
+            formData.append('orderId',this.planId);
+            if( relaType == 6 ){  
+                formData.append('selectionMode',1);
+            }else {
+                formData.append('selectionMode',this.selectionMode);
+            }
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/order/addOrderDetailByDetail',
+                headers:{
+                    token:this.token
+                },
+                data:formData
+            }).then(response=>{
+                console.log("添加清单",response);
+                if(response.data.cd == 0){
+                    // this.editBySelfShow = true;
+                    this.$message({
+                        type:'success',
+                        message:'添加清单成功！'
+                    })       
+                }else{
+                    this.$message({
+                        type:'dangerous',
+                        message:'已添加至物料量清单！',
+                    })
+                }
+                this.selectionHint = false;
+                this.checkoutResult = false;
+                this.selectionMethods = false;
+                this.reSearchResult(true)
+                this.getOrderDetail(this.planId);
+            })
         },
         //提示后取消导入
         hintCancel(){
+            this.checkoutResult = false;
             this.selectionHint = false;
         },
         //改变页码
@@ -1294,10 +1397,15 @@ export default {
                     if(response.data.rt != null){
                         
                         this.userGroup = response.data.rt.ugList;
-                        this.selectUser = response.data.rt.selectUgId;
+                        if(response.data.rt.selectUgId == null){
+                            this.selectUser = response.data.rt.ugList[0].ugId;
+                        }else {
+                            this.selectUser = response.data.rt.selectUgId;
+                        }
+                        
                         this.getPlanList(this.selectUser);
                         this.getNoPlanList(this.selectUser);
-                        console.log("获取群组",this.userGroup,this.selectUser);
+                        console.log("获取群组",response,this.userGroup,this.selectUser);
                     } 
                 }else{
                     alert(response.data.msg)
@@ -2016,6 +2124,13 @@ export default {
     .content-left {
         text-align: left;
         margin-left: 50px;
+    }
+    .checkoutResult {
+        max-height: 600px;
+        overflow-y:scroll;
+        li {
+            list-style: none;
+        }
     }
     .el-dialog {
         width:660px;

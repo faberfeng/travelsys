@@ -1079,7 +1079,11 @@ export default {
                     if(response.data.rt != null){
                         console.log("获取群组",response.data.rt)
                         this.userGroup = response.data.rt.ugList;
-                        this.selectUser = response.data.rt.selectUgId;
+                        if(response.data.rt.selectUgId == null){
+                            this.selectUser = response.data.rt.ugList[0].ugId;
+                        }else {
+                            this.selectUser = response.data.rt.selectUgId;
+                        }
                         this.getPlanList(this.selectUser);
                         this.getNoPlanList(this.selectUser);
                     } 

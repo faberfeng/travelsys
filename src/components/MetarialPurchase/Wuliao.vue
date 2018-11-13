@@ -288,7 +288,7 @@
                                             <td v-text="item.status"></td>
                                             <td v-text="item.userName"></td>
                                             <td>
-                                                <span class="editIcon" @click="showDetialList(item,index)"></span>
+                                                <span class="editIcon" @click="showDetialList(item,index)" title="明细"></span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -329,7 +329,7 @@
                                         <div  v-for="(item,index) in checkLists_flow" :key="index">
                                             <div v-if="index == 0"></div>
                                             <div v-else>
-                                                <StartCom v-if="selectValueList.length && startPlanList.length && endPlanList.length" :startPlan="startPlanList[index-1]" :endPlan="endPlanList[index-1]" :selectValueIndex="selectValueList[index-1]" :endSelectValueIndex="endSelectValueIndexList[index-1]" :index="index" :style=" item.isClick == 0?'display:none':'' " @getStartPlan="getStartPlan" @getEndPlan="getEndPlan"/>
+                                                <StartCom :checkLists_flow="checkLists_flow" v-if="selectValueList.length && startPlanList.length && endPlanList.length" :startPlan="startPlanList[index-1]" :endPlan="endPlanList[index-1]" :selectValueIndex="selectValueList[index-1]" :endSelectValueIndex="endSelectValueIndexList[index-1]" :index="index" :style=" item.isClick == 0?'display:none':'' " @getStartPlan="getStartPlan" @getEndPlan="getEndPlan"/>
                                             </div>
                                         </div>
                                     </el-form>
@@ -339,7 +339,7 @@
                     </div>
                 </div>
             </div>
-            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'物料跟踪'"  v-if="showCommonList"></common-list>
+            <common-list v-on:back="backToH" :mId="checkItem.id" rType="5" :bId='checkItem.id' :isGongChengLiang="false" :title="'物料跟踪'"  :isShowWuliao="isShowWuLiao" :wuliaoObj='wuLiaoObj' v-if="showCommonList"></common-list>
         </div>
         <div id="edit">
             <el-dialog title="套用模板" :visible.sync="addplantShow" :before-close="addPlanClose">
@@ -369,7 +369,7 @@
 </template>
 <script>
 import axios from 'axios';
-import { start_options,end_options,checkLists_flow,end_options1 } from "./constants"
+import { start_option,end_options,checkLists_flow,end_options1 } from "./constants"
 import StartCom from './components/start.vue'
 import commonList from  './../planCost/qingDan.vue'
 
@@ -417,7 +417,7 @@ export default {
             planTemplateName:'',
             checkvalue:[],
             checkLists_flow:this.copyflowlist(),
-            start_options: start_options,
+            start_options: this.copystart_option(),
             selectValueList:[],
             endSelectValueIndexList:[],
             startPlanList:[],
@@ -433,6 +433,10 @@ export default {
             showCommonList:false,
             checkItem:{},
             planId:'',
+            wuLiaoObj:{},
+            isShowWuLiao:false,
+            addFlag:false,
+            newTempFlag:false,
         }
     },
     created(){
@@ -486,11 +490,28 @@ export default {
         showDetialList(val,i){
             console.log(val);
             this.showCommonList = true;
+            this.isShowWuLiao = true;
             this.checkItem = val;
+            this.wuLiaoObj = {};
+            // console.log(this.wuLiaoObj.);
+            Object.assign(this.wuLiaoObj,{
+                                orderCode:this.planInfo.orderCode,
+                                orderTitle:this.planInfo.orderTitle,
+                                checkItem:this.checkItem,
+                                orderId:this.planInfo.id,
+                            })
         },
         copyflowlist(){
             let arr = [];
             checkLists_flow.map( (item)=>{
+                const data = Object.assign({},item);
+                arr.push(data);
+            })
+            return arr;
+        },
+        copystart_option(){
+            let arr = [];
+            start_option.map( (item)=>{
                 const data = Object.assign({},item);
                 arr.push(data);
             })
@@ -526,7 +547,11 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.userGroup = response.data.rt.ugList;
-                        this.selectUser = response.data.rt.selectUgId;
+                        if(response.data.rt.selectUgId == null){
+                            this.selectUser = response.data.rt.ugList[0].ugId;
+                        }else {
+                            this.selectUser = response.data.rt.selectUgId;
+                        }
                         this.getPlanList(this.selectUser);
                         this.getNoPlanList(this.selectUser);
                     } 
@@ -552,7 +577,11 @@ export default {
                     if(response.data.rt != null){
                         if(response.data.rt.rows != null){
                             this.planData = response.data.rt.rows;
-                            console.log("有计划列表",this.planData)
+                            console.log("有计划列表",this.planData,this.planData.length);
+                            if(this.addFlag){
+                                this.selectItem(this.planData[this.planData.length-1],this.planData.length-1,1);
+                                this.addFlag = !this.addFlag;
+                            } 
                         }else{
                             this.planData = [];
                         }
@@ -605,6 +634,11 @@ export default {
                         this.templateData = response.data.rt;
                         this.planModel = this.templateData[0].id;
                         console.log("模板管理",this.templateData);
+                        if(this.newTempFlag){
+                            this.selectItem(this.templateData[this.templateData.length-1],this.templateData.length-1,3);
+                            this.newTempFlag = !this.newTempFlag;
+                        }
+                        
                     }else{
                         this.templateData =[];
                     }
@@ -620,8 +654,7 @@ export default {
                 this.showjindujihua = true;
                 this.getOrderDetail(item.id,item.orderId,item.plantemplateId);
                 this.getPlanInfo(item.id);
-                this.itemTitle = item.planName;
-                
+                this.itemTitle = item.planName;       
                 this.isTemplate= true;
                 this.showButton= false;
                 this.planId = item.id;
@@ -676,7 +709,6 @@ export default {
             });
             this.selectValueList = [].concat(this.selectValueList);
             this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
-            
         },
         //保存 计划模板
         savePlanTemplate( type ){
@@ -775,7 +807,7 @@ export default {
                             type: 'success'
                         });
                         this.planTemplateIndex();
-                        
+                        this.newTempFlag = true;   
                     }else{
                         this.$message({
                             message: res.data.msg,
@@ -790,7 +822,8 @@ export default {
                             message: '新建模板成功!'
                         });
                         this.planTemplateIndex();
-                        
+                        this.newTempFlag = true;
+                        // this.selectItem();
                     }else{
                         this.$message({
                             message: res.data.msg,
@@ -817,8 +850,7 @@ export default {
         getStartPlan(obj){
             const index = obj.index;
             const startPlanDay = obj.startPlanDay;
-            this.checkLists_flow[index].flowList.startPlan = startPlanDay;
-            
+            this.checkLists_flow[index].flowList.startPlan = startPlanDay;   
         },
         getEndPlan(obj){
             const index = obj.index;
@@ -881,6 +913,7 @@ export default {
             this.startPlanList = [];
             this.endPlanList = [];
             this.endSelectValueIndexList = [];
+            this.start_options = this.copystart_option()
             axios({
                 method:'get',
                 url:this.BDMSUrl+'project2/planTemplate/getPlanTemplate/'+id,
@@ -921,21 +954,21 @@ export default {
                     if(index == 1){
                         this.checkLists_flow[index].isClick = 1;
                     }                    
-                    if(index > 0){                    
-                                      
+                    if(index > 0){  
                         this.selectValueList.push(item.flowList.startCondition);
                         this.endSelectValueIndexList.push(item.flowList.endCondition);
                         this.startPlanList.push(item.flowList.startPlan);
                         this.endPlanList.push(item.flowList.endPlan);
                         this.start_options[index-1].ischeck=item.ischeck;
                         this.start_options[index-1].startCondition=item.flowList.startCondition;
+                        
                     }
                     if(item.ischeck == 1){
                         this.checkvalue.push(item.flow);
                         this.isClickList.push(item);
-                    }
-                    
+                    }      
                 })
+                console.log("获取模版详细信息",res.data);
                 this.selectValueList = [].concat(this.selectValueList);
                 this.endSelectValueIndexList = [].concat(this.endSelectValueIndexList);
                 this.startPlanList = [].concat(this.startPlanList);
@@ -966,7 +999,7 @@ export default {
                             message: '删除成功!'
                         });
                         this.planTemplateIndex();
-                        this.toggleNewTemp();
+                        this.selectItem(this.templateData[this.templateData.length-1],this.templateData.length-1,3);
                     }else{
                         alert(res.data.msg);
                     }           
@@ -1088,6 +1121,7 @@ export default {
         },
         //获取清单详情
         getOrderDetail(id,orderId,templateId){
+            this.orderDeatilData = [];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/plan/getOrderDetail/'+id+'/'+orderId+'/'+templateId,
@@ -1259,13 +1293,13 @@ export default {
             this.dinghuo = item.orderCode +' '+ item.orderTitle;
         },
         addPlanSure(){
+            this.addFlag =true;
             let isStart;
             if(this.start){
                 isStart = 1;
             }else{
                isStart = 0; 
             }
-            
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/plan/addPlan',
@@ -1285,9 +1319,21 @@ export default {
                     this.getPlanList(this.selectUser);
                     this.getNoPlanList(this.selectUser);
                     this.addplantShow = false;
+                    this.handleClick();
+                    this.activeName = 'first';
+                    this.getUserGroup();
+
+                    
+                    
+                    
+                    
+                    console.log("获取计划信息",this.planInfo);
                 }else{
                     alert(responsed.data.msg)
                 }
+            }).then(()=>{
+                console.log("获取计划最后",this.planData[this.planData.length],this.planInfo,this.planData.length);
+                // this.selectItem(this.planData[this.planData.length-1],this.planData.length-1,1);
             })
         },
         addPlanClose(){
@@ -1467,9 +1513,11 @@ export default {
                     height: 16px;
                     width: 16px;
                     background: url('./images/1-2.png');
+                    // background: url('./../../assets/updataImg-hover.png');
                     float: right;
                     margin-right: 10px;
                     margin-top: 10px;
+                    
                 }
                 .lefttitlespanone{
                     margin-left: 40px;

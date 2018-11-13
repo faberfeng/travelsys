@@ -1,7 +1,8 @@
-export const start_options = [
+export const start_option = [
     {
         value:0,
         label:'计划启动后',
+        label1:"",
         flow:2,
         ischeck:1,
         startCondition:2,
@@ -9,6 +10,7 @@ export const start_options = [
     {
         value:1,
         label:'订货完成后',
+        label1:"订货开始后",
         flow:3,
         ischeck:1,
         startCondition:3,
@@ -16,6 +18,7 @@ export const start_options = [
     {
         value:2,
         label:'发货完成后',
+        label1:"发货开始后",
         flow:4,
         ischeck:1,
         startCondition:4,
@@ -23,40 +26,13 @@ export const start_options = [
     {
         value:3,
         label:'检查完成后',
+        label1:"检查开始后",
         flow:5,
         ischeck:1,
         startCondition:5,
     },
 ];
 
-// start_options_value: this.start_options[0].value,
-
-// export const end_options = [
-//     {
-//         value:2,
-//         label:'计划启动后',
-//         ischeck:1,
-//         endCondition:1,
-//     },
-//     {
-//         value:3,
-//         label:'订货完成后',
-//         ischeck:1,
-//         endCondition:1,
-//     },
-//     {
-//         value:4,
-//         label:'发货完成后',
-//         ischeck:1,
-//         endCondition:1,
-//     },
-//     {
-//         value:5,
-//         label:'检查完成后',
-//         ischeck:1,
-//         endCondition:1,
-//     },
-// ];
 
 export const end_options1 = [
     {

@@ -435,7 +435,11 @@ export default {
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         this.userGroup = response.data.rt.ugList;
-                        this.selectUser = response.data.rt.selectUgId;
+                        if(response.data.rt.selectUgId == null){
+                            this.selectUser = response.data.rt.ugList[0].ugId;
+                        }else {
+                            this.selectUser = response.data.rt.selectUgId;
+                        }
                         this.getPlanList(this.selectUser);
                         this.getNoPlanList(this.selectUser);
                     } 
