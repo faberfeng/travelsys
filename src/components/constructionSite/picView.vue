@@ -69,13 +69,15 @@ export default {
         this.drawID = 1;
 
         this.Refresh_timer = setInterval(()=>{
-
-            if(this.para.type == "")return;
+            // console.log(this.para);
+            if(this.para.type=="")return;
             // console.log(this.para,'this.para.type')
 
-            if(this.para.type == "pdf"){
-                this.para.type = "PDF";
+            if(this.para.type=="pdf"){
+                this.para.type="PDF";
                 if(this.para.source != this.old_para){
+
+                    console.log(this.para);
 
                     this.drawList = [];
 
@@ -107,9 +109,8 @@ export default {
                     this.old_para = this.para.source;
                     
                 }
-            }else{
-
-                this.para.type = "PNG";
+            }else if(this.para.type=="png"||this.para.type=="jpg"){
+                this.para.type="PNG";
                 if(this.para.source != this.old_para){
                     this.drawList = [];
                     this.$refs.pdfDocument.$el.style.display = "none";
@@ -126,7 +127,7 @@ export default {
                     
                 }
             }
-            // console.log(this.para);
+            
            
             this.Refresh();
 
@@ -492,11 +493,43 @@ export default {
                                 
                                 this.SelectedList = [];
                                 this.Selected_typeNum_List = [];
-                                this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+                                // this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    if(this.drawList[i].SID == SID){
+                                        this.SelectedList.push(this.drawList[i]);
+                                    }
+                                }
                     
 
                                 this.SelectedList[0].Selected = true;
+
+                                if(SID > 0){
+                                    this.$emit('status_changed',true,this.SelectedList);
+                                }else{
+                                    this.$emit('status_changed',false,this.SelectedList);
+                                }
+
+                                this.Refresh();
+                                return;
+                            }else{
+                                let temp_SelectedList = this.SelectedList;
+                                this.SelectedList = [];
+
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    this.drawList[i].Selected = false;
+                                }
+
+                                for(let i = 0; i < temp_SelectedList.length;i++){
+                                    if(temp_SelectedList[i].type != "Select_img_Mark"){
+                                        temp_SelectedList[i].Selected = true;
+                                        this.SelectedList.push(temp_SelectedList[i]);
+                                    }
+                                }
+
                             }
+
+                            
                         }
 
                         ///////////////////////////////////////////////////////
@@ -1973,7 +2006,7 @@ export default {
             for(let i = 0;i < list.length;i++){
                 
                 let plotInfo = JSON.parse(list[i].plotInfo);
-                console.log(plotInfo,'plotInfo')
+                // console.log(plotInfo,'plotInfo')
 
                 let item = {
                             data:list[i].data,                                  //  data
@@ -1992,7 +2025,8 @@ export default {
                             TempPostion:plotInfo.TempPostion,
                             text:plotInfo.text,
                             display:true,
-                            typeNum:list[i].type                               //  type
+                            typeNum:list[i].type,                               //  type
+                            userData:plotInfo.userData
                         };
                 this.drawList.push(item);
 

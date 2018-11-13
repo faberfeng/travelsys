@@ -9,9 +9,9 @@ const router = new Router({
   routes: [
     //pdf
     {
-      path:'/pdf',
-      name:'pdf',
-      component:resolve=>require(['@/components/ManageDesign/pdf'],resolve),
+      path:'/pdfPreview/:id',
+      name:'pdfPreview',
+      component:resolve=>require(['@/components/constructionSite/htmlToPdf'],resolve),
     },
 
     //gantt

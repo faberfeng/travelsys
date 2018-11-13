@@ -16,8 +16,12 @@
                         设计版本  
                     </router-link>
                 </div>
+                 <div class="noImg" v-show="!versionPath">
+                        <!-- <img style="width:140px;height:115px" src="../../assets/nodata.png"/> -->
+                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
+                </div>
                 <div class="commentInformation" >
-                    <div class="commentTool" v-show="screenLeft.item == 3">
+                    <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
                             <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
@@ -33,21 +37,20 @@
                     </div>
                     <!-- <div class="rotate" v-show="versionPath&&!annotationlist"> -->
                     <div v-show="versionPath" class="rotate">
+                        <i class="drawingIcon bigRotate" @click="bigRotate()"></i>
+                        <i class="drawingIcon smallRotate" @click="smallRotate()"></i>
                         <i class="drawingIcon zuoRotate" @click="zuoRotate(drawingFileUrl1)"></i>
                         <i class="drawingIcon youRotate" @click="youRotate(drawingFileUrl1)"></i>
                     </div>
                 </div>
-                <div class="noImg" v-show="!versionPath">
-                        <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
-                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
-                </div>
-
-                <div v-show="versionPath" id="drawingPic" style="overflow:hidden;left:20px">
+               
+<!-- v-show="versionPath" -->
+                <div  id="drawingPic" style="overflow:hidden;left:20px">
                     <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
-            <div v-show="screenLeft.item == 3&&!isSelect" id="drawingToolsBody">
+            <div v-show="screenLeft.item == 3" id="drawingToolsBody">
                     <ul class="drawingTools">
                         <!-- <li><i class="drawingIcon zuoRotate" @click="zuoRotate()"></i></li>
                         <li><i class="drawingIcon youRotate" @click="youRotate()"></i></li> -->
@@ -73,7 +76,7 @@
                     </div>
             </div>
             <div v-show="screenLeft.item == 1"  class="screenRight_1">
-                <div v-if="showAction">
+                <div >
                     <p class="clearfix" v-if="IsFolderAction">
                         <i class="icon-goujian icon-add" title="添加图纸" @click="uploadFile"></i>
                         <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
@@ -97,9 +100,9 @@
                         @node-click="handleNodeClick"
                         :check-strictly="true"
                         id="cloudDirveFileTree"
-                        :class="[showAction?'':'noTop']"
+                        
                     >
-                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
+                    <span :class="['custom-tree-node','elselect','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
                 </div>
             </div>
@@ -125,7 +128,7 @@
             </div>
             <div v-show="screenLeft.item == 3" id="box-right1">
                 <ul class="drawingApendedInfo">
-                    <div class="drawingApendedHead" >{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}<div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
+                    <div class="drawingApendedHead" ><label class="label1">{{drawingName+'('+drawingNumber+letterChange(this.version)+')'}}</label><div  v-show="annotationlist" class="export" @click="exportAnnotation()">导出</div></div>
                     
                     <li :class="[{'clickbody':isClick==item.id},'drawingApendedInfobody']" @click.stop="downIconComment(item.id)" v-show="annotationlist" v-for="(item,index) in annotationlist" :key="index">
                         <!-- :src="shapeImg(item.coordinateInfo.t) -->
@@ -173,9 +176,9 @@
                             <tr  class="userList-thead">
                                 <th style="width:15%">图号</th>
                                 <th style="width:15%">图名</th>
-                                <th style="width:12%">比例</th>
+                                <th style="width:15%">比例</th>
                                 <th style="width:29%">相关空间</th>
-                                <th style="width:17%;max-width:200px;">文件名称</th>
+                                <th style="width:14%;max-width:50px;">文件名称</th>
                                 <th style="width:12%">操作</th>
                             </tr>
                         </thead>
@@ -202,7 +205,7 @@
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
-                                <td v-text="item.fileName"></td>
+                                <td style="max-width:100px;" v-text="item.fileName"></td>
                                 <td>
                                     <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteFileList(index)"></button>
                                 </td>
@@ -290,6 +293,7 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            drawingShow:false,
             showComment:true,//是否折叠评论
             isClick:'',
             selectShape:'',//选中图纸上的标注
@@ -371,6 +375,7 @@ export default {
             drawingZxVersionId:'',
             pageNo:'',
             versionPath:'',//最新图纸路径
+            picShow:false,
             annotationUserId:'',//批注用户Id
             stage:'1',//阶段
             isMark:'0',//标记
@@ -498,18 +503,22 @@ export default {
         this.$nextTick(() => {
             this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
         });
+       
         // this.load();
     },
     mounted(){
+        console.log('fjjjk')
+         console.log(this.$refs.pic.$el.style,'fjjj');
+        //  this.$refs.pic.$el.style.display="none";
     },
     watch:{
         annotationUserId:function(val){
-            this.isSelect='';
+            // this.isSelect='';
             this.queryAnnotation()
             // this.exportAnnotation()
         },
         stage:function(val){
-             this.isSelect='';
+            //  this.isSelect='';
             this.queryAnnotation()
             // this.exportAnnotation()
             // this.addAnnotation()
@@ -533,11 +542,18 @@ export default {
         },
         loadPic(){
              this.$refs.pic.Max_Select = 1;
+             console.log(this.$refs.pic.$el.style,'fjjj');
+            //  this.$refs.pic.$el.style
         },
         picView_status_changed(a,b){
             console.log(a,b);
             if(a==true){
                 this.isClick=b[0].ID_out;
+                this.isId=b[0].ID_out;
+                // this.drawingShow=true;
+            }else if(a==false){
+                this.isClick='';
+                this.isId='';
             }
         },
         letterChange(val){
@@ -561,9 +577,9 @@ export default {
                 return this.letterList[val-1];
             }else if(val==10){
                 return this.letterList[val-1];
-            }else if(val=11){
+            }else if(val==11){
                  return this.letterList[val-1];
-            }else if(val==''){
+            }else if(val==null){
                 return '';
             }
         },
@@ -714,53 +730,36 @@ export default {
         },
         //选择版本
         selectVersion(val){
-            // this.isSelect='';
+            var vm=this;
             this.isSelect=val;
-            // //清除批注遗留的canvas；
-            // if(document.getElementById('abs')){
-            //     let canvas1=document.getElementById('abs');
-            //     let absInp=document.getElementById('absInp');
-            //     canvas1.parentNode.removeChild(canvas1);
-            //     absInp.parentNode.removeChild(absInp);
-            // }
-             //清除批注遗留的canvas；
-            if(document.getElementById('abs')){
-                let absInp=document.getElementById('absInp');
-                document.getElementById('abs').drawElements=[];
-                document.getElementById('abs').reflash();
-            }
-            // console.log(this.drawingVersionList,"jkdsjdjj");
+           
             this.drawingVersionList.forEach((item)=>{
                 if(val==item.id){
                     this.drawingFileUrl=this.QJFileManageSystemURL+item.fileUri;
                     this.drawingVersionId=item.id;
                     this.version=item.versionId;
-                    if(item.fileUri.substr(item.fileUri.length-3)=='pdf'||item.fileUri.substr(item.fileUri.length-3)=='PDF')
-                        {   this.pdfShow=true;
-                            this.imgShow=false;
-                            this.drawingFileUrl1=this.drawingFileUrl;
-                        }else{
-                            this.imgShow=true;
-                            this.pdfShow=false;
-                            var width=c.width;
-                            var height=c.height;
-                            // console.log(width,'',height)
-                            var ctx_img = c.getContext("2d");
-                            ctx_img.clearRect(0,0,width,height);
-                            var img = new Image();
-                            img.onload =function() {
-                                ctx_img.drawImage(img,0, 0);
-                                }
-                            img.src = this.drawingFileUrl;
-                        }
+                    console.log(this.version,'this.version');
+                   var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+                    console.log(type);
+                    this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
                 }
             })
-            this.queryAnnotation();
-            // console.log(this.drawingFileUrl);
+            setTimeout(()=>{
+                this.queryAnnotation();
+            },1000)
+           
         },
         //获取图纸旋转信息
         getdrawInfo(){
 
+        },
+        //放大
+        bigRotate(){
+            this.$refs.pic.size_big()
+
+        },
+        smallRotate(){
+             this.$refs.pic.size_small()
         },
         //图纸工具栏操作
         zuoRotate(val){
@@ -865,11 +864,25 @@ export default {
             // }
         },
         annotationClick(){
+            var vm=this;
              this.screenLeft.item = 3
             //  this.isSelect='';
             //  this.biaozhushow=true;
             // this.loadeds()
-            this.queryAnnotation()
+            //  this.isSelect=this.drawingVersionId;
+             this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
+            vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+            this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
+            console.log(this.version,'this.version12')
+            var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+            console.log(type);
+            this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
+            console.log(this.drawingVersionId);
+            console.log(this.drawingVersionList);
+             setTimeout(()=>{
+                this.queryAnnotation();
+            },500)
+            // this.queryAnnotation();
         },
         //更新图纸旋转信息
         updateDrawingRotateInfo(){
@@ -918,14 +931,23 @@ export default {
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                        console.log(this.rotate);
-                        // this.drawingFileUrl1=this.drawingFileUrl;
+                        console.log(parseInt(this.rotate),'this.rotate');
                     }
-                    vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
-                // this.paraList={angle:this.rotate,type:this.drawingFileUrl1.substr(this.drawingFileUrl1.length-3),source:this.drawingFileUrl1};
+                     var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+                    console.log(type);
+                    this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
+                   
+                    console.log(this.paraList,'this.paraList');
                 }else{
                     
                 } 
+                 if(vm.versionPath){
+                        this.picShow=true;
+                        // console.log(document.getElementById('#drawingPic'))
+                        // console.log(this.$refs.pic.$el.style.display)
+                        this.$refs.pic.$el.style.display="block"
+                        // document.getElementById('#drawingPic').style.top='115px';
+                }
             })
         },
         //添加批注
@@ -1245,9 +1267,9 @@ export default {
                     console.log(vm.DirectoryList,'directory')
                     this.getDrawingList();
                     // console.log(vm.DirectoryList);
-                    vm.showAction = true
+                    // vm.showAction = true
                 }else{
-                    vm.message({
+                    vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
@@ -1333,7 +1355,7 @@ export default {
                      if(this.drawingId){
                         this.getDrawingVersionList();
                         // this.queryAnnotation();
-                        this.getDrawingRotateInfo();
+                        // this.getDrawingRotateInfo();
                         this.getMaxVersionPath();
                         
                     }
@@ -1366,6 +1388,7 @@ export default {
                 if(response.data.rt){
                     vm.versionPath=(response.data.rt)[0].fileUri;
                     vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
+                    
                     vm.getDrawingRotateInfo();
                     // vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
                     // console.log(vm.paraList,'this.paraList');
@@ -1444,7 +1467,7 @@ export default {
                 //清除原来的canvas和inuput
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
-              this.getDrawingRotateInfo();
+            //   this.getDrawingRotateInfo();
                 this.getMaxVersionPath();
                 this.getDrawingVersionList();
             }
@@ -1543,6 +1566,9 @@ export default {
                             let absInp=document.getElementById('absInp');
                             document.getElementById('abs').drawElements=[];
                             document.getElementById('abs').reflash();
+                        }
+                       if(!this.versionPath){
+                            this.$refs.pic.$el.style.display='none'
                         }
                         // document.getElementById('abs')
                        vm.getDirectory();
@@ -1900,6 +1926,9 @@ export default {
         .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
                 background-color: #dfdfdf;
         }
+        // .el-tree--highlight-current .el-tree-node.is-current .elselect{
+        //         background-color: #000;
+        // }
         .el-tree-node__label{
             font-size: 12px;
             color: #666666;
@@ -1937,6 +1966,9 @@ export default {
             background-image: url('./images/zTreeStandard.png');
             background-position: -110px -32px;
         }
+        // .elselect{
+        //     background: #333333;
+        // }
         .el-tree-node__content{
                 height: 30px;
         }
@@ -1944,6 +1976,9 @@ export default {
             color: #333333;
             font-weight: bold;
         }
+        // .is-current .el-tree-node__content {
+        //     background: #333333;
+        // }
         .clearfix{
             clear: both;
             overflow: hidden;
@@ -1968,6 +2003,7 @@ export default {
                      left:60px;
                      .el-input__inner{
                         height: 30px !important;
+                        padding-left:5px;
                     }
 
                 }
@@ -1989,22 +2025,40 @@ export default {
                                 left:30px;
                                 top:9px;
                                 background: url('./images/zuox.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/zuox1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzl.png')no-repeat 0 0;
+                                }
                             }
                             .youRotate{
                                 left:70px;
                                 top:9px;
                                 background: url('./images/youx.png')no-repeat 0 0;
-                                // &:hover{
-                                //     background: url('./images/youx1.png')no-repeat 0 0;
-                                // }
+                                &:hover{
+                                    background: url('./images/xuanzr.png')no-repeat 0 0;
+                                }
                             }
+                            .bigRotate{
+                                left:-50px;
+                                top:9px;
+                                background: url('./images/big.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/big1.png')no-repeat 0 0;
+                                }
+                            }
+                            .smallRotate{
+                                 left:-10px;
+                                top:9px;
+                                background: url('./images/small.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/small1.png')no-repeat 0 0;
+                                }
+                            }
+
                 }
             }
             .noImg{
-                    margin:150px auto;
+                    margin:10px auto;
+                    // z-index:1000;
                 }
             #drawingPic{
                     margin:0 auto;
@@ -2374,17 +2428,22 @@ export default {
                 }
             }
             #box-right{
-                 padding: 10px 13px 0 40px;
+                 padding: 10px 0px 0px 26px;
                  .versionBody{
                      .versionHead{
                         font-size:14px;
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        width:100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:4px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        
                      }
                      .versionUlSel{
                          background-color: #f6f6f6;
@@ -2400,7 +2459,7 @@ export default {
                         padding: 4px;
                         width: 100%;
                         height: 122px;
-                        margin:3px;
+                        // margin:3px;
                         text-align: left;
                         border-bottom: 1px solid #e6e6e6;
                     //     &:hover{
@@ -2449,7 +2508,7 @@ export default {
 
             }
             #box-right1{
-                 padding: 10px 15px 0 30px;
+                 padding: 10px 0px 0px 26px;
                  ::-webkit-scrollbar{width:0px}
                 .drawingApendedInfo{
                     width: 100%;
@@ -2460,24 +2519,37 @@ export default {
                         color:#333333;
                         font-weight: bold;
                         height: 28px;
-                        width: 100%;
+                        // width: 100%;
                         text-align: left;
                         margin-left: 1px;
                         border-bottom: 1px solid #e6e6e6;
+                        padding-left:7px; 
+                        position: relative;
+                        .label1{
+                            width: 80%;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            display: inline-block;
+                        }
                         .export{
-                            float: right;
-                            margin-right:10px;
+                            // float: right;
+                            // margin-right:10px;
+                            right:10px;
+                            top:2px;
                             cursor: pointer;
                             color:#fc3439;
+                            position: absolute;
                         }
                      }
                      .clickbody{
                          background: #f6f6f6;
                      }
                     .drawingApendedInfobody{
-                        margin:20px 3px;
+                        margin:0px 0px;
                         position: relative;
                         border-bottom: 1px solid #ccc;
+                        padding: 4px;
                          .apendedInfoOne{
                              width: 100%;
                              height: 30px;
@@ -2485,13 +2557,20 @@ export default {
                              img{
                                  float: left;
                                  margin-top:7px;
-                                 margin-right: 2px
+                                 margin-right: 4px;
+                                 margin-left:4px;
+
                              }
                              .userName{
                                  float: left;
                                  font-size: 14px;
                                  color:#333333;
                                  line-height: 30px;
+                                 width: 60px;
+                                 overflow: hidden;
+                                text-overflow:ellipsis;
+                                white-space: nowrap;
+                                text-align: left;
                              }
                              .deleteMark{
                                  position: absolute;
@@ -2521,15 +2600,16 @@ export default {
                                  background: url('./images/zhank.png')no-repeat 0 0;
                                  top:9px;
                                  right:6px;
+                                 cursor: pointer;
 
                              }
                         }
                         .appendedInfotext{
                             text-align: left;
-                            height: 24px;
+                            height: 20px;
                             font-size:12px;
                             color:#666666;
-                            line-height: 24px;
+                            line-height: 20px;
                             white-space: nowrap;
                             overflow: hidden;
                             width: 100%;
@@ -2538,7 +2618,7 @@ export default {
                         }
                         .apendedInfoTwo{
                             height: 20px;
-                            margin-left:8px;
+                            margin-left:5px;
                             .updateTime{
                                 float: left;
                                 font-size: 12px;
@@ -2566,7 +2646,7 @@ export default {
                             .apendedInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 18px;
+                                height: 22px;
                                 padding-left:4px;
                                 // border-radius: 2px;
                                 // background: #fafafa;
@@ -2582,9 +2662,11 @@ export default {
                             .commentInfoinput{
                                 margin-top:5px;
                                 width: 96%;
-                                height: 30px;
-                                padding-left:4px;
-                                padding-top:4px;
+                                height: 38px;
+                                padding-left:5px;
+                                padding-top:5px;
+                                // font-size: 12px;
+                                // color:#cccccc;
                             }
                             .replayBtn{
                                 background: #fc3439;
@@ -2610,6 +2692,7 @@ export default {
                                     .replyOne{
                                         margin-bottom: 4px;
                                         text-align: left;
+                                        position: relative;
                                         .replyName{
                                             font-size:14px;
                                             color:#333333;
@@ -2628,9 +2711,11 @@ export default {
                                         .deleteMark1{
                                             // margin-left: 78px;
                                             // margin-top:2px;
+                                            position: absolute;
                                             display:inline-block;
                                             background: url('../ManageCost/images/delete.png')no-repeat 0 0;
-                                            margin-left: 30px;
+                                            top:2px;
+                                            right: 13px;
                                             &:hover{
                                                 background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
                                             }
@@ -2868,15 +2953,16 @@ export default {
             .editBody{
                 .editUpDrawing{
                     margin-top:10px;
+                    margin-left:-60px;
                     .editUpDrawingText{
                         display:inline-block;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
-                        text-align: right;
+                        text-align: left;
                     }
                     .editUpDrawingValue{
-                        margin-left:40px;
+                        margin-left:0px;
                         display:inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -2888,18 +2974,23 @@ export default {
                     width: 400px;
                     margin-left:109px;
                     margin-top:10px;
-
+                    position: relative;
+                    height: 30px;
                     .editUpDrawingProjectText{
                         display:inline-block;
-                        
-                        margin-left: -122px;
+                        // margin-left: -122px;
                         width: 60px;
                         font-size: 14px;
                         color:#666666;
                         text-align: left;
+                        position: absolute;
+                         top:0px;
+                         left:-6px;
                     }
                     .editUpDrawingProjectText1{
-                        margin-left: 39px;
+                        // margin-left: 39px;
+                        top:0px;
+                         left:171px;
                         display: inline-block;
                         width: 120px;
                         font-size: 14px;
@@ -2908,24 +2999,31 @@ export default {
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        position: absolute;
 
                     }
                     .editUpDrawingProjectBtn{
-                            margin-top:10px;
-                            margin-left: 100px;
+                        position: absolute;
+                            // margin-top:10px;
+                            // margin-left: 100px;
+                            top:0px;
+                            left:82px;
                             display: block;
                             width: 80px;
-                            height: 30px;
+                            height: 28px;
                             border: none;
-                            line-height: 30px;
+                            line-height: 28px;
                             padding: 0;
                             cursor: pointer;
                             border-radius: 2px;
-                            background: #e2e2e2;
-                            margin-right: 20px;
-                            color: #8f8f8f;
+                            background: #f9f9f9;
+                            border: 1px solid #ccc;
+                            background: #f9f9f9;
                             font-size: 14px;
                             font-weight: normal;
+                            margin-right: 20px;
+                            color: #000;
+
                     }
                 }
             }

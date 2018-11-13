@@ -247,7 +247,7 @@ export default {
         //获取图纸最新版本路径
         getMaxVersionPath(){
             var vm=this;
-            this.drawList=[];
+            vm.drawList=[];
             axios({
             method:'post',
             headers:{
@@ -264,13 +264,13 @@ export default {
                             if(item.drawingId==item1.id){
                                 // console.log(item.drawingId,'234');
                                 vm.getDrawingRotateInfo(item.drawingId);
-                                //   vm.drawList.push({
-                                //         name:item1.drawingNumber+'('+item1.drawingName+')',
-                                //         type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
-                                //         source:this.QJFileManageSystemURL+item.fileUri,
-                                //         page:1,
-                                //         angle:0
-                                // })
+                                  vm.drawList.push({
+                                        name:item1.drawingNumber+'('+item1.drawingName+')',
+                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        source:this.QJFileManageSystemURL+item.fileUri,
+                                        page:1,
+                                        angle:this.rotate
+                                })
                             }
                         })
                     })
@@ -299,6 +299,7 @@ export default {
         getDrawingRotateInfo(val){
             var vm=this;
             this.rotate=0;
+            // vm.drawList=[];
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
                 method:'post',
@@ -316,26 +317,26 @@ export default {
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                        console.log(this.rotate);
+                        console.log(this.rotate,'获取角度');
                     }
-                    console.log(vm.drawingWebGlList,'vm.drawingWebGlList');
-                      vm.drawingWebGlList.forEach((item)=>{
-                        vm.getWebGlDrawingList.forEach((item1)=>{
-                            if(item.drawingId==item1.id){
-                                // console.log(item.drawingId,'234');
-                                // vm.getDrawingRotateInfo(item.drawingId);
-                                  vm.drawList.push({
-                                        name:item1.drawingNumber+'('+item1.drawingName+')',
-                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
-                                        source:this.QJFileManageSystemURL+item.fileUri,
-                                        page:1,
-                                        angle:0
-                                })
-                            }
-                        })
-                    })
-                    console.log(vm.drawList,'vm.drawList');
-                     app.postMessage({command:"DrawingList", parameter:vm.drawList},"*")
+                    // console.log(vm.drawingWebGlList,'vm.drawingWebGlList');
+                    //   vm.drawingWebGlList.forEach((item)=>{
+                    //     vm.getWebGlDrawingList.forEach((item1)=>{
+                    //         if(item.drawingId==item1.id){
+                    //             // console.log(item.drawingId,'234');
+                    //             // vm.getDrawingRotateInfo(item.drawingId);
+                    //               vm.drawList.push({
+                    //                     name:item1.drawingNumber+'('+item1.drawingName+')',
+                    //                     type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                    //                     source:this.QJFileManageSystemURL+item.fileUri,
+                    //                     page:1,
+                    //                     angle:this.rotate
+                    //             })
+                    //         }
+                    //     })
+                    // })
+                    // console.log(vm.drawList,'vm.drawList');
+                    //  app.postMessage({command:"DrawingList", parameter:vm.drawList},"*")
                 }else{
                     
                 } 
@@ -393,7 +394,7 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:''
                     vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
-                    // localStorage.setItem('projectName',vm.header.projectName)
+                    localStorage.setItem('projectName',vm.header.projectName)
                     // console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
                 }

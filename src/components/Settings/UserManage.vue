@@ -14,7 +14,7 @@
                   </span>
                   <span v-show="!applyShow"  class="btn" @click="addUser()">添加</span>
                   <span v-show="applyShow" class="btn2" @click="checkApplyCancle()">返回</span>
-                  <span  class="btn1" @click="checkApply()">查看申请</span>
+                  <span v-show="!applyShow"  class="btn1" @click="checkApply()">查看申请</span>
              </span>
           </h5>
 
@@ -191,7 +191,8 @@
                 <div style="clear:both;"></div>
             </div>
       </div>
-        <el-dialog :title="title" :visible.sync="adduser" :before-close="userClose">
+        <el-dialog  :title="title" :visible.sync="adduser" :before-close="userClose">
+            <div v-loading="loading">
             <div  v-if="userDetial.show">
                 <div class="log-head clearfix">
                     <span class="log-head-title">查找用户:</span>
@@ -240,6 +241,7 @@
                 <el-button type="primary" @click="PostaddUser">保存</el-button>
                 <el-button @click="userClose">取 消</el-button>
             </span>
+            </div>
         </el-dialog>
         <el-dialog title="核实用户" :visible.sync="applyuser" :before-close="applyClose">
             <!-- <div  v-if="userDetial.show">
@@ -712,6 +714,7 @@ export default {
   name:'',
   data(){
       return {
+          loading:false,
           projAuth:{
               deleteUser:false
           },
@@ -1305,6 +1308,7 @@ export default {
             //     })
             //     return false
             // }
+            this.loading=true;
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/Config/saveProjectUser',
@@ -1328,6 +1332,7 @@ export default {
                         type:'success',
                         message:'添加用户成功！'
                     })
+                    
                     vm.getInfo()
                  }else{
                      vm.$message({
@@ -1335,6 +1340,7 @@ export default {
                          message:response.data.msg
                      })
                  }
+                  this.loading=false;
             }).catch((err)=>{
                 console.log(err)
             })
