@@ -9,7 +9,7 @@
         <div class="projectBody">
             <div class="projectBodyHead">
                 <div class="headLeft">
-                    <span class="headLeftBtn">导出</span>
+                    <!-- <span class="headLeftBtn">导出</span> -->
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
@@ -1169,7 +1169,7 @@ export default Vue.component('commonDetail',{
                     this.getPointList=response.data.rt;
                     this.getPointList.forEach((item)=>{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
-                        this.elevationYlist.push(item.elevation)
+                        this.elevationYlist.push(item.force)
                     })
                     var min=this.getMinValue(this.elevationYlist);
                      var max=this.getMaxValue(this.elevationYlist)
@@ -1213,7 +1213,7 @@ export default Vue.component('commonDetail',{
                     this.getPointList=response.data.rt;
                     this.getPointList.forEach((item)=>{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
-                        this.elevationYlist.push(item.elevation)
+                        this.elevationYlist.push(item.gaugeHeight)
                     })
                      var min=this.getMinValue(this.elevationYlist);
                      var max=this.getMaxValue(this.elevationYlist)
@@ -1257,10 +1257,14 @@ export default Vue.component('commonDetail',{
                     this.getPointList=response.data.rt;
                     this.getPointList.forEach((item)=>{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
-                        this.elevationYlist.push(item.elevation)
+                        this.elevationYlist.push(item.shiftDistance)
                     })
+                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                    console.log(this.elevationYlist,'this.elevationYlist');
                      var min=this.getMinValue(this.elevationYlist);
-                     var max=this.getMaxValue(this.elevationYlist)
+                     var max=this.getMaxValue(this.elevationYlist);
+                     console.log(min,'min');
+                     console.log(max,'max');
                     var middle=(min+max)/2;
                     this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
                      this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
