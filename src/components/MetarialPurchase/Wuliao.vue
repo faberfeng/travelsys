@@ -329,7 +329,7 @@
                                         <div  v-for="(item,index) in checkLists_flow" :key="index">
                                             <div v-if="index == 0"></div>
                                             <div v-else>
-                                                <StartCom :checkLists_flow="checkLists_flow" v-if="selectValueList.length && startPlanList.length && endPlanList.length" :startPlan="startPlanList[index-1]" :endPlan="endPlanList[index-1]" :selectValueIndex="selectValueList[index-1]" :endSelectValueIndex="endSelectValueIndexList[index-1]" :index="index" :style=" item.isClick == 0?'display:none':'' " @getStartPlan="getStartPlan" @getEndPlan="getEndPlan"/>
+                                                <StartCom :checkLists_flows="checkLists_flow" :checkLists_flowlists="checkLists_flowlist" v-if="selectValueList.length && startPlanList.length && endPlanList.length" :startPlan="startPlanList[index-1]" :endPlan="endPlanList[index-1]" :selectValueIndex="selectValueList[index-1]" :endSelectValueIndex="endSelectValueIndexList[index-1]" :index="index" :style=" item.isClick == 0?'display:none':'' " @getStartPlan="getStartPlan" @getEndPlan="getEndPlan"/>
                                             </div>
                                         </div>
                                     </el-form>
@@ -437,6 +437,7 @@ export default {
             isShowWuLiao:false,
             addFlag:false,
             newTempFlag:false,
+            checkLists_flowlist:[],
         }
     },
     created(){
@@ -690,9 +691,11 @@ export default {
             this.selectValueList = [];
             this.endSelectValueIndexList = [];
             this.checkvalue = [];
+            this.checkLists_flowlist = [];
             this.checkLists_flow = this.copyflowlist();
             this.checkLists_flow.map( ( item,index ) => {
                 item.ischeck = 1;
+                this.checkLists_flowlist.push(item.ischeck);
                 item.isClick = 0;
                 if ( index > 0 ) {
                     item.flowList.startPlan = 0 ;
@@ -736,7 +739,9 @@ export default {
             }else {
                 form.template.id = null;
             }
+            this.checkLists_flowlist = [];
             this.checkLists_flow.map( (item,index)=>{
+                this.checkLists_flowlist.push(item.ischeck);
                 if( index >0 ) {
                     if( index === 1 ){
                         form.template.isOrder = item.ischeck;
@@ -891,7 +896,9 @@ export default {
             }
             this.startPlanList = [];
             this.endPlanList = [];
+            this.checkLists_flowlist = [];
             this.checkLists_flow.map( (item,index) => {
+                this.checkLists_flowlist.push(item.ischeck);
                 item.isClick = 0;
                 this.isClickList = [];
                 if( item.ischeck === 1 ){
@@ -949,7 +956,9 @@ export default {
 
                 this.checkvalue = [];
                 this.isClickList = [];
+                this.checkLists_flowlist = [];
                 this.checkLists_flow.map((item,index)=>{
+                    this.checkLists_flowlist.push(item.ischeck);
                     item.isClick= 0;                    
                     if(index == 1){
                         this.checkLists_flow[index].isClick = 1;

@@ -6,10 +6,10 @@
                     <el-select v-model="selectValue" placeholder="请选择" @change="startDayOnChange">
                         <el-option
                         v-if="item.ischeck === 1"
-                        v-for="(item,index) in start_options"
+                        v-for="(item,index) in checkStart_options"
                         :key="index"
                         :label="item.label"
-                        :value="item.value" :style="item.ischeck === 1 ? '' : 'display:none'">
+                        :value="index" :style="item.ischeck === 1 ? '' : 'display:none'">
                         </el-option>
                     </el-select>
                 </div>                     
@@ -46,9 +46,9 @@
 </template>
 <script>
 import axios from 'axios';
-import {start_option,end_options} from "./../constants"
+import {start_option,start_option1,end_options} from "./../constants"
 import { throws } from 'assert';
-let start_optionTemp = start_option.map( (item)=> Object.assign({},item))
+        const start_optionTemp = start_option1.map( (item)=> item.map(data=>Object.assign({},data)));
         const end_optionTemp = end_options.map( (item)=> item.map(data=>Object.assign({},data)));
 
 export default {
@@ -59,42 +59,28 @@ export default {
         index:Number,
         startPlan:Number,
         endPlan:Number,
-        checkLists_flow:Array
+        checkLists_flows:Array,
+        checkLists_flowlists:Array,
     },
     data() {
-        console.log(this.checkLists_flow);
-        this.checkLists_flow && this.checkLists_flow.map((item,index)=>{
-            if(index>0){
-                start_optionTemp[index-1].ischeck = item.ischeck;
-            }
-        });
-        //this.checkLists_flow.map((item,index)=>{
-          //  if(item.ischeck == 0){
-            //    start_optionTemp = start_optionTemp.slice(index-1,1);
-            //}
-        //});
-        console.log("start_optionTemp",start_optionTemp)
-        const array = start_optionTemp.slice(0,this.index);
+        const array2 = start_optionTemp[this.index-1];
         const array1 = end_optionTemp[this.index-1];
         return {
-            start_options:array,
+            start_options:array2,
             end_options:array1,            
             startPlanDay:'',
             endPlanDay:'',
-            // startValue:'',
-            // selectValue:array && array.length ? array[ this.selectValueIndex-2 ].label : "",
             selectValue:'',
             endSelectValue:"",
+            checkStart_options: [],
+            checkLists_flow:[],
         }
     },
     computed:{
-        list:function(){
-            console.log("----")
-            return this.checkLists_flow.map(item=>item.ischeck == 1 );
-        }
+
     },
     updated(){
-        console.log(1)
+
     },
     watch:{
         startPlan: function(val,oldVal){
@@ -102,14 +88,20 @@ export default {
         },
         endPlan: function( val,oldVal ) {
             this.getEnd();
-        }
+        },
+        'checkLists_flowlists':{
+                handler:function(newValue,oldValue){
+                    this.getflow(newValue)
+                },
+                deep:true,
+            },
     },
     mounted(){
+        this.checkLists_flow = this.checkLists_flowlists;
         this.getStart();
         this.getEnd();
         this.initEndSelectValue();
         this.initStartSelectValue();
-        
     },
     methods:{
         initEndSelectValue(){
@@ -120,11 +112,20 @@ export default {
             });
         },
         initStartSelectValue(){
-            this.start_options.map( item =>{
-                if( item.startCondition === this.selectValueIndex ){
-                    this.selectValue = item.label;
-                }
+            let isCheckList = [];
+            this.checkLists_flow.map( (item,i)=>{
+                isCheckList.push(item);
+            });
+             for(let i = 0; i<this.index; i++){
+                 this.start_options[i].ischeck = isCheckList[i];
+             }
+            this.checkStart_options = [];
+            this.start_options.map( item =>{  
+                if(item.ischeck == 1){
+                    this.checkStart_options.push(item);
+                }      
             })
+            this.selectValue = this.checkStart_options[this.checkStart_options.length-1].label;
         },
         endDayOnChange(val){
             if(val < this.end_options.length - 1){
@@ -134,7 +135,7 @@ export default {
             }
         },
         startDayOnChange(val){
-            if(val < this.start_options.length - 1){
+            if(val < this.checkStart_options.length - 1){
                 this.mustLast();
                 this.initStartSelectValue();
                 return;
@@ -145,6 +146,11 @@ export default {
         },
         getEnd(){
             this.endPlanDay = this.endPlan;
+        },
+        getflow(val){
+            this.checkLists_flow = [];
+            this.checkLists_flow = val;
+            this.initStartSelectValue();
         },
         handleStart(){
             let regEx = /^[0-9]*$/;

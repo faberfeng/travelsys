@@ -1078,7 +1078,7 @@
             </div>
             <div class="el-dialog__footer">
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="headerOrderListCancle">确定</button>
+                    <button class="editBtnS" @click="headerOrderListConfirm">确定</button>
                     <button class="editBtnC" @click="headerOrderListCancle">取消</button>
                 </div>
             </div>
