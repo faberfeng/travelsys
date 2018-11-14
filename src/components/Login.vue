@@ -61,11 +61,11 @@ export default {
             localStorage.removeItem('defaultSubProjId')
         }
          this.validateInstance()
-        // if(token != 'undefined'){
-        //     vm.token = token
-        //     //判断是否登陆
-        //     this.BeforeLogin()
-        // }
+        if(token != 'undefined'){
+            vm.token = token
+            //判断是否登陆
+            this.BeforeLogin()
+        }
     },
     methods:{
         func(event){

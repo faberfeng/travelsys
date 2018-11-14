@@ -10,7 +10,7 @@
             <div class="projectBodyHead">
                 <div class="headLeft">
                     <span class="headLeftBtn">导出</span>
-                    <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span>
+                    <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
@@ -22,12 +22,12 @@
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
-                        <select v-model="importMethod" class="autoImport">
+                        <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==2" class="import" @click="handExportExcel()">导入</span>
-                        <span v-show="importMethod==1" class="import">配置</span>
+                        <span v-show="importMethod==1" class="import" @click="handExportExcel()">导入</span>
+                        <span v-show="importMethod==2" @click="autoAcquisitionBtn()" class="import">配置</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
@@ -197,37 +197,6 @@
                     <button class="editBtnC" @click="editAlertValueCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <!-- <el-dialog title="导入采集数据" :visible="importGatherDataShow" @close="importGatherDataCancle()">
-                <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">本地Excel文档:</label>
-                        <span class="updataImageSpan">
-                            <label for="fileInfo">
-                                <button class="upImgBtn" >选择文件</button>
-                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
-                            </label>
-                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
-                        </span>
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao1"></i></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao2"></i></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
-                    <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao3"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao4"></i></div>
-                    <div class="editBodytwo" v-show="monitorImportType==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao5"></i></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
-                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
-                </div>
-                <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" v-show="monitorImportType==4" @click="formulaSetting()" >公式设定</button>
-                        <button class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
-                        <button class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
-                        <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
-                </div>
-            </el-dialog> -->
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
                 <div class="baseMapBody">
                     <ul class="clearfix" style="margin:0px 20px 0px 20px;">
@@ -257,6 +226,31 @@
                         <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
             </el-dialog>
+            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
+                <div class="editBody" >
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
+                        <el-radio v-model="radio" label="1">1小时</el-radio>
+                        <el-radio v-model="radio" label="2">1天</el-radio>
+                    </div>
+                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
+                        <select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    </div>
+                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">仪器ID设置：</label>
+                        
+                    </div>
+                     
+
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnC" style="margin-right:88px;" >测试</button>
+                        <button class="editBtnS"  >确定</button>
+                        <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -282,13 +276,15 @@ export default Vue.component('commonDetail',{
             importList:[
                 {
                     value:1,
-                    label:'自动采集'
+                    label:'手动导入'
                 },
                 {
                     value:2,
-                    label:'手动导入'
+                    label:'自动采集'
                 }
             ],
+            radio:'1',
+            manufacturerValue:'',
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             changeAlertDay:'',
@@ -302,6 +298,7 @@ export default Vue.component('commonDetail',{
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
             spotChangeLineShow:false,//取消点位改变曲线
+            autoAcquisitionShow:false,//自动采集配置
             acquisitionTimeXlist:[],
             acquisitionTimeYlist:'',
             elevationYlist:[],
@@ -391,7 +388,116 @@ export default Vue.component('commonDetail',{
                             },
                         },
                         series:[],
-            }
+            },
+            manufacturerList:[
+                {
+                    value:'huahuan',
+                    label:'华环'
+                },
+                {
+                    value:'jikang',
+                    label:'基康'
+                }
+            ],
+            timeList:[
+                {
+                    value:0,
+                    label:'0时'
+                },
+                {
+                    value:1,
+                    label:'01时'
+                },
+                {
+                    value:2,
+                    label:'02时'
+                },
+                {
+                    value:3,
+                    label:'03时'
+                },
+                {
+                    value:4,
+                    label:'04时'
+                },
+                {
+                    value:5,
+                    label:'05时'
+                },
+                {
+                    value:6,
+                    label:'06时'
+                },
+                {
+                    value:7,
+                    label:'07时'
+                },
+                {
+                    value:8,
+                    label:'08时'
+                },
+                {
+                    value:9,
+                    label:'09时'
+                },
+                {
+                    value:10,
+                    label:'10时'
+                },
+                {
+                    value:11,
+                    label:'11时'
+                },
+                {
+                    value:12,
+                    label:'12时'
+                },
+                {
+                    value:13,
+                    label:'13时'
+                },
+                {
+                    value:14,
+                    label:'14时'
+                },
+                {
+                    value:15,
+                    label:'15时'
+                },
+                {
+                    value:16,
+                    label:'16时'
+                },
+                {
+                    value:17,
+                    label:'17时'
+                },
+                {
+                    value:18,
+                    label:'18时'
+                },
+                {
+                    value:19,
+                    label:'19时'
+                },
+                {
+                    value:20,
+                    label:'20时'
+                },
+                {
+                    value:21,
+                    label:'21时'
+                },
+                {
+                    value:22,
+                    label:'22时'
+                },
+                {
+                    value:23,
+                    label:'23时'
+                }
+            ]
+
         }
     },
     created(){
@@ -846,6 +952,7 @@ export default Vue.component('commonDetail',{
                         })
                         this.saveDrawShow=false;
                         this.getAllMonitorPoint();
+                        this.getPointDatas();
                     }else if(response.data.cd=='-1'){
                         
                          this.$message({
@@ -954,7 +1061,6 @@ export default Vue.component('commonDetail',{
         //获取监测项目相关人员
         getItemDutyUser(){
             var vm=this;
-            // this.getUserByUserGroup();
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
@@ -970,18 +1076,6 @@ export default Vue.component('commonDetail',{
                      this.inspectorName=this.getItemDutyUserList.inspectorName;
                      this.calculatorName=this.getItemDutyUserList.calculatorName;
                      this.observerName=this.getItemDutyUserList.observerName;
-                    // console.log(this.userGroupList)
-                    //  this.userGroupList.forEach((item)=>{
-                    //      if(this.getItemDutyUserList.inspector==item.userId){
-                    //          this.inspectorName=item.userName;
-                    //      }
-                    //      if(this.getItemDutyUserList.calculator==item.userId){
-                    //          this.calculatorName=item.userName;
-                    //      }
-                    //      if(this.getItemDutyUserList.observer==item.userId){
-                    //          this.observerName=item.userName;
-                    //      }
-                    //  })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1252,6 +1346,42 @@ export default Vue.component('commonDetail',{
                 }
             }
             return m
+        },
+        //自动采集按钮
+        autoAcquisitionBtn(){
+            this.autoAcquisitionShow=true;
+        },
+        //取消自动采集配置
+        autoAcquisitionCancle(){
+            this.autoAcquisitionShow=false;
+        },
+        //监测项目采集改变
+        importMethodChange(){
+            this.setDetectionItemCollectWay();
+        },
+        //设置监测项目采集方式
+        setDetectionItemCollectWay(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/setDetectionItemCollectWay',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    collectWay:this.importMethod
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
         }
 
 
@@ -1758,6 +1888,36 @@ export default Vue.component('commonDetail',{
                         }
                     }
                 } 
+            }
+            .gatherTimeName{
+                width: 375px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .gatherTimeNameInp{
+                width: 375px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
             }
         }
     }

@@ -352,60 +352,76 @@
                 <div class="editBody" style="height:500px;overflow:auto;">
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">本地Excel文档:</label>
                         <span class="updataImageSpan">
-                            <label for="fileInfo">
+                            <label for="morefileInfo">
                                 <button class="upImgBtn" >选择文件</button>
-                                <input type="file" ref="importExcel" id="fileInfo" @change="addExcel($event)" class="upinput"/>
+                                <input type="file" ref="importMoreExcel" id="morefileInfo" @change="addMoreExcel($event)" class="upinput"/>
                             </label>
-                            <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                            <span class="upImgText">{{excelMoreFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
-                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;">匹配结果</label><label>文档内表总数：{{getPitchBaseInfoListLength}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：</label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao1"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao2"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao3"></i> -->
-                    </div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;">匹配结果:</label><label>文档内表总数：{{allAmount}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：{{matchedAmount}}</label></div>
                     <div class="editBodytwo" ><label class="editInpText" style="width:17% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao3"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">高程取值列名:</label><select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao3"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label><select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao4"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label><select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">斜度位移取值列名:</label><select class="gatherTimeName" v-model="shiftIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">斜度深度取值列名:</label><select class="gatherTimeName" v-model="depthIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="frequencyShow">按频率取值受力</el-checkbox></label></div>
-                    <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">受力取值列名:</label><select class="gatherTimeName" v-model="forceIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">率定系数列名:</label><select class="gatherTimeName" v-model="kIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">初始频率列名:</label><select class="gatherTimeName" v-model="f0IndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">本次频率列名:</label><select class="gatherTimeName" v-model="fnIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">受力计算公式:</label><select class="gatherTimeName" v-model="useFormulaNum"><option v-for="(item,index) in useFormulaList" :value="item.value" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao5"></i> -->
-                    </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div>
+                    <ul>
+                        <li v-for="(val,index) in sheetList" :key="index" >
+                            <div class="editBodytwo">
+                                <label class="editInpText" style="width:18% !important;">使用Excel表名:</label>
+                                <select v-model="sheetIndex" class="sheetName" :id="'sheetName'+val.itemId" @change="sheetIndexChange(val.sheetIndex)"><option v-for="(item,index) in sheetList"  :value="item.sheetIndex" :key="index" v-text="item.sheetName"></option></select>
+                            </div>
+                            <div class="editBodytwo">
+                                <label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{val.itemName}}</label>
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">点位编号列名:</label>
+                                <select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label>
+                                <select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">位移取值列名:</label>
+                                <select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">高程取值列名:</label>
+                                <select class="gatherTimeName" v-model="altitudeCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label>
+                                <select class="gatherTimeName" v-model="pipeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label>
+                                <select class="gatherTimeName" v-model="gaugeHeightCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                          
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">斜度位移取值列名:</label>
+                                <select class="gatherTimeName" v-model="shiftIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">斜度深度取值列名:</label>
+                                <select class="gatherTimeName" v-model="depthIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                           
+                            </div>
+                            <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">
+                                <el-checkbox v-model="frequencyShow">按频率取值受力</el-checkbox></label>
+                            </div>
+                            <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
+                                <select class="gatherTimeName" v-model="forceIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">率定系数列名:</label>
+                                <select class="gatherTimeName" v-model="kIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            
+                            </div>
+                            <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">初始频率列名:</label>
+                                <select class="gatherTimeName" v-model="f0IndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                          
+                            </div>
+                            <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">本次频率列名:</label>
+                                <select class="gatherTimeName" v-model="fnIndexCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
+                            </div>
+                            <div class="editBodytwo" v-show="frequencyShow"><label class="editInpText" style="width:18% !important;">受力计算公式:</label>
+                                <select class="gatherTimeName" v-model="useFormulaNum"><option v-for="(item,index) in useFormulaList" :value="item.value" :key="index" v-text="item.name"></option></select>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div> -->
                     <!-- <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div> -->
 
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
@@ -650,6 +666,7 @@ export default {
     name:'safetyInspection',
     data(){
         return{
+            sheetList:'',
             imgUrl:'',//上传封面图logo
             selectUgId:'',
             monitorCompany:'',//监测单位
@@ -816,6 +833,12 @@ export default {
             excelSheetInfo:'',//获取导入EXCEL文件的sheet信息
             excelFileList:'',
             excelFileListName:'',
+            excelMoreFileList:'',
+            excelMoreFileListName:'',
+            getBatchImportMatchingResultList:'',
+            excelMoreSheetInfo:'',
+            allAmount:'',//总数
+            matchedAmount:'',//匹配数量
             sheetIndex:'',//当前表头
             sheetIndexList:'',//列表
             pageNo:1,
@@ -2040,6 +2063,7 @@ export default {
                             type:'success',
                             message:'保存监测点成功'
                         })
+                        this.getMonitorMainTable();
                         this.getAllMonitorPoint();
                         setTimeout(()=>{
                                  this.getTagList();
@@ -2980,24 +3004,13 @@ export default {
                             message:'测试导入数据成功'
                         })
 
+                    }else if(response.data.rt){
+                            this.$message({
+                                type:'info',
+                                message:response.data.rt
+                            })
+                        }
                     }else if(response.data.cd=='-1'){
-                        this.$message({
-                            type:'error',
-                            message:response.data.rt
-                        })
-                    }
-                    
-                    
-                    // this.importGatherDataShow=false;
-                //     vm.sheetIndex='';
-                //     vm.timeCol=''; //采集时间下标
-                //     vm.distanceCol='';//位移下标
-                //     vm.monitorImportId='';//监测ID
-                //     vm.spotNumCol='';//监测点位下标
-                //    vm.unifiedTime='';//标准时间，不选择可不传
-                //     vm.overwrite=false; //是否覆盖
-                //    vm.inputWorkingCondition='';//现场工况
-                }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
@@ -3404,8 +3417,6 @@ export default {
                                     })
                                    
                                 })
-
-
                             }else{
                             this.excelSheetInfo.forEach((item)=>{
                                 if(item.name==this.matchKeyWord){
@@ -3415,9 +3426,8 @@ export default {
                                     console.log(this.sheetIndex);
                                 }
                             })
-                            }
-                            
-                            
+                            } 
+                            document.getElementById('fileInfoExport').value="";
                             vm.excelFileList='';
                         }
                         if(response.data.cd != 0){
@@ -3428,6 +3438,47 @@ export default {
                             vm.excelFileList='';
                         }
                     })
+        },
+        //批量导入
+        addMoreExcel(){
+            var vm=this;
+            const moreList=this.$refs.importMoreExcel.files;
+            vm.excelMoreFileList=moreList[0];
+            vm.excelMoreFileListName=moreList[0].name;
+            var formData = new FormData();
+            formData.append('data',vm.excelMoreFileList);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getBatchImportMatchingResult',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:this.selectUgId
+                },
+                data:formData
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBatchImportMatchingResultList=response.data.rt;
+                    this.allAmount=this.getBatchImportMatchingResultList.allAmount;
+                    this.matchedAmount=this.getBatchImportMatchingResultList.matchedAmount;
+                    this.sheetList=this.getBatchImportMatchingResultList.sheets;
+                    this.sheetList.forEach((item)=>{
+                        // this.getExcelColumnBySheet(item.sheetIndex)
+                    })
+
+                    console.log(this.getBatchImportMatchingResultList,'this.getBatchImportMatchingResultList')
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+                document.getElementById('morefileInfo').value="";
+            })
+        },
+        sheetIndexChange(val){
+            this.getExcelColumnBySheet(val);
         },
         //根据sheet获取表头
         getExcelColumnBySheet(val){
@@ -3586,7 +3637,7 @@ export default {
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
             console.log(baseMapId,'baseMapId');
-            this.itemSubmitbaseMapId=baseMapId;
+            this.itemSubmitbaseMapId=this.monitorBaseMapId;
             this.itemSubmitCount=count;
             if(type==5){
                 this.pitchDetailShow=true;
@@ -4431,6 +4482,10 @@ export default {
                 this.retractImg3 = zhankaiImg;
                 this.retractText3 = '展开';
             }
+        },
+        //获取批量导入匹配结果和表名、类型对应关系
+        getBatchImportMatchingResult(){
+
         },
         //html转PDF
         getPdf(){
