@@ -1040,6 +1040,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     let responseData = response.data.rt;
+                    console.log("获取左侧容器树初始值",responseData);
                     let newData = {};
                     Object.assign(newData,{
                         name:name,
@@ -1048,7 +1049,9 @@ export default {
                         children:[]
                     });
                     responseData.push(newData);
-                    this.workToolData = dataJs.transformTozTreeFormat(setting,responseData);              
+                    this.workToolData = dataJs.transformTozTreeFormat(setting,responseData);         
+                    
+                    console.log("获取左侧容器树",this.workToolData);     
                 }else{
                     alert(response.data.msg);
                 }
@@ -1070,6 +1073,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.rightTreeData = response.data.rt;
+                    console.log("获取右侧工程量分类树",this.rightTreeData);
                 }else{
                     alert(response.data.msg)
                 }

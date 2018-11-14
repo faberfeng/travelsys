@@ -217,11 +217,19 @@
                     <div class="editBodytwo">
                         <label class="editInpText">产品名称 :</label><input class="inp" placeholder="请输入" v-model="productname"/>
                     </div>
-                    <div class="editBodytwo edit-item clearfix"><label class="editInpText">产品类型 :</label>
-                        <select class="editSelect" v-model="producttype">
+                    <div class="editBodytwo clearfix">
+                        <label class="editInpText">产品类型 :</label>
+                        <!-- <input class="inp" placeholder="请选择" v-model="producttype"/> -->
+                        <div style="border:1px solid #e0e0e0;padding:10px;width:400px;float:right;margin-right:40px;margin-left:0">
+                            <el-tree :data="GenieClassData" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+                        </div>
+                        <!-- <div style="border:1px solid #e0e0e0;padding:10px;">
+                                    <el-tree ref="gongchengliangtree" show-checkbox :data="rightTreeData" :props="treeProps"></el-tree>
+                                </div> -->
+                        <!-- <select class="editSelect" v-model="producttype">
                             <option v-for="(item,index) in GenieClassData" :key="index">{{item.classifyName}}</option>
                         </select>
-                        <i class="icon-sanjiao"></i>
+                        <i class="icon-sanjiao"></i> -->
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">产品品牌 :</label><input class="inp" placeholder="请输入" v-model="productbrand"/>
@@ -401,6 +409,7 @@
 </template>
 <script>
 import axios from 'axios';
+import dataJs from '../Settings/js/date.js'
 
 export default {
     name:'ProductionCenter',
@@ -432,6 +441,10 @@ export default {
             refrenceprice:'',
             remarks:'',
             GenieClassData:[],
+            defaultProps: {
+                children: 'children',
+                label: 'classifyName'
+            },
             editProductionShow:false,
             editOneDay:{},
             importTextShow:false,
@@ -472,6 +485,9 @@ export default {
             },
             showProperty:true,
             detailTableInfo:{},
+            isConfirm:false,
+            initGenieClassData: [],
+            productTypeId:'',
         }
     },
     created(){
@@ -533,6 +549,20 @@ export default {
     methods:{
         clickRow(item){
             this.detailTableInfo = item;
+        },
+        //节点切换
+        handleNodeClick(data){
+            // this.isConfirm = false;
+            // this.producttype = '';
+            console.log(data.children == null);
+            if(data.children != null){
+                this.isConfirm = false;
+                this.producttype = '';
+            }else {
+                this.isConfirm = true;
+                this.producttype = data.classifyName;
+            }  
+            console.log(this.producttype);
         },
         //获取品牌
         getProductBrand(){
@@ -660,11 +690,15 @@ export default {
                 alert('供货单位/产品类型/产品名称/产品品牌/单位/参考价格/标记 均为必输项目')
             }else{
                 let producttypecode ='';
-                this.GenieClassData.forEach(item=>{
+                console.log("产品类型初始值",this.initGenieClassData)
+                this.initGenieClassData.forEach(item=>{
                     if(item.classifyName == this.producttype){
                         producttypecode = item.classifyCode;
+                        console.log("是否有匹配值",item.classifyName == this.producttype,producttypecode);
                     }
                 })
+                console.log("匹配值",producttypecode);
+                this.productTypeId = producttypecode;
                 axios({
                     method:'post',
                     url:this.BDMSUrl+'project2/productLibrary/checkPrimaryKeyExist',
@@ -694,7 +728,7 @@ export default {
         },
         saveProduct(ptypeparam){
             let producttypecode ='';
-            this.GenieClassData.forEach(item=>{
+            this.initGenieClassData.forEach(item=>{
                 if(item.classifyName == this.producttype){
                     producttypecode = item.classifyCode;
                 }
@@ -760,7 +794,7 @@ export default {
         makeEditPartitionList(){
             
             let producttypecode ='';
-            this.GenieClassData.forEach(item=>{
+            this.initGenieClassData.forEach(item=>{
                 if(item.classifyName == this.producttype){
                     producttypecode = item.classifyCode;
                 }
@@ -826,6 +860,22 @@ export default {
         },
         //产品类型获取构件分类编码
         listGenieClassTreegrid(){
+            let setting = {
+                data: {
+                    key:{
+                        name: "authName",
+                        children:'children'
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "_parentId",
+                        rootPId: 0
+                    }
+                }
+            };
+            this.GenieClassData = [];
+            this.initGenieClassData = [];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'project2/productLibrary/listGenieClassTreegrid',
@@ -837,9 +887,20 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-
+                    
                     if(response.data.rt != null){
-                        this.GenieClassData = response.data.rt.rows;
+                        let responseData = response.data.rt.rows;
+                        this.initGenieClassData = response.data.rt.rows;
+                        let newData = {};
+                        Object.assign(newData,{
+                            name:'',
+                            parentId:'',
+                            holderId:'',
+                            children:[]
+                        });
+                        responseData.push(newData);
+                        this.GenieClassData = dataJs.transformTozTreeFormat(setting,responseData);
+                        console.log("产品类型获取构件分类编码",this.GenieClassData)
                     }
                 }else if(response.data.cd == 1){
                     this.$router.push({
@@ -1843,6 +1904,57 @@ export default {
     }
     ::-webkit-scrollbar-thumb:window-inactive {
       background: rgba(255, 0, 0, 0.4);
+    }
+    /*
+        修改eleUI树形组件
+    */
+    
+    .el-tree-node:focus .el-tree-node__content{
+        background-color: transparent;
+    }
+    .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+            background-color: #dfdfdf;
+    }
+    .el-tree-node__label{
+        font-size: 12px;
+        color: #666666;
+        padding-left: 22px; 
+        position: relative;
+    }
+    .el-icon-caret-right:before{
+        content: "\E604";
+        color: #999999;
+        font-weight: bold;
+    }
+    
+    .is-leaf:before{
+        content: ""!important;
+        color: #999999;
+        font-weight: bold;
+    }
+    .el-tree-node__label::before{
+        display: block;
+        position: absolute;
+        top: 6px;
+        left: 4px;
+        width: 14px;
+        height: 13px;
+        background: url('../ManageCost/images/file.png')no-repeat 0 0;
+        content: '';
+    }
+    .fileIcon::before{
+        width: 16px;
+        height: 16px;
+            top: 0px;
+        background-image: url('../ManageDesign/images/zTreeStandard.png');
+        background-position: -110px -32px;
+    }
+    .el-tree-node__content{
+            height: 30px;
+    }
+    .is-current .el-tree-node__content{
+        color: #333333;
+        font-weight: bold;
     }
 }
 </style>

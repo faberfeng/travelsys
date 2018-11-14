@@ -33,7 +33,86 @@ export const start_option = [
     },
 ];
 
-
+export const start_option1 = [
+    [
+        {
+            value:2,
+            label:'计划启动后',
+            startCondition:2,
+            ischeck:1,
+            index:0
+        },
+    ],
+    [
+        {
+            value:2,
+            label:'计划启动后',
+            startCondition:2,
+            ischeck:1,
+            index:0
+        },
+        {
+            value:3,
+            label:'订货完成后',
+            startCondition:3,
+            ischeck:1,
+            index:1
+        },
+    ],
+    [
+        {
+            value:2,
+            label:'计划启动后',
+            startCondition:2,
+            ischeck:1,
+            index:0
+        },
+        {
+            value:3,
+            label:'订货完成后',
+            startCondition:3,
+            ischeck:1,
+            index:1
+        },
+        {
+            value:4,
+            label:'发货开始后',
+            startCondition:4,
+            ischeck:1,
+            index:2
+        },
+    ],
+    [
+        {
+            value:2,
+            label:'计划启动后',
+            startCondition:2,
+            ischeck:1,
+            index:0
+        },
+        {
+            value:3,
+            label:'订货完成后',
+            startCondition:3,
+            ischeck:1,
+            index:1
+        },
+        {
+            value:4,
+            label:'发货完成后',
+            startCondition:4,
+            ischeck:1,
+            index:2
+        },
+        {
+            value:5,
+            label:'检查完成后',
+            startCondition:5,
+            ischeck:1,
+            index:3
+        },
+    ]
+];
 export const end_options1 = [
     {
         value:2,
