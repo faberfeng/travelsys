@@ -638,7 +638,7 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="saveReportSetting()" >保存设置</button>
                     <!-- v-show="reportShow" -->
-                    <button class="editBtnC"  @click="exportReport(selectUgId,consultValue,userValue,monitorCompany)" >生成</button>
+                    <button class="editBtnC"  @click="exportReport(selectUgId,consultValue,userValue,monitorCompany,monitorBaseMapId)" >生成</button>
                 </div>
             </el-dialog>
              <el-dialog title="测点变化曲线" :visible="moreSpotShow" @close="moreSpotCancle()">
@@ -4361,7 +4361,7 @@ export default {
              }
         },
         //
-        exportReport(id,value1,value2,companyValue){
+        exportReport(id,value1,value2,companyValue,BaseMapId){
             this.getReportDatas();
             this.getReportSetting();
             this.getMonitorMainTable();//获取监测内容主表
@@ -4376,7 +4376,7 @@ export default {
 
             }else{
                 routerDataUrl=vm.$router.resolve({
-                            path:'/pdfPreview',query:{ugselectId:id,consultValue:this.timeMethod(value1),userValue:value2,monitorCompany:companyValue}
+                            path:'/pdfPreview',query:{ugselectId:id,consultValue:this.timeMethod(value1),userValue:value2,monitorCompany:companyValue,monitorBaseMapId:BaseMapId}
                         })
                 window.open(routerDataUrl.href,'_blank',);
                 this.exportrEportsShow=false;

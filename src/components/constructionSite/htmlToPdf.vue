@@ -4,7 +4,6 @@
                 <!-- 封面 -->
                 <div class="pdfCover">
                     <div class="pdfImg">
-                        
                          <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/>
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="coverPath?coverPath:require('../../assets/defaultlogo.png')"> -->
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
@@ -127,6 +126,7 @@
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
+                            <div v-show="baseMapPosition==1" class="showBasePic"></div>
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
@@ -185,7 +185,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="showBasePic"></div>
+                            <div v-show="baseMapPosition==2" class="showBasePic"></div>
                         </div>
                     </li>
                 </ul>
@@ -227,7 +227,14 @@ export default {
             suggestion:'',
             weatherIcon:'',
             weatherAir:'',
-            company:this.$route.query.monitorCompany
+            company:this.$route.query.monitorCompany,
+            getBaseMapInfoByBaseMapIdList:'',
+            angle:'',
+            paramsLists:'',
+            monitorPointInfo:'',
+            monitorBaseMapId:this.$route.query.monitorBaseMapId,
+            optimalizationSchema:'', ////优化方案：1-测点顺序优先；2-图面清晰优先
+            baseMapPosition:'', //底图位置：1-上部；2-下部
         }
     },
     created(){
@@ -246,6 +253,9 @@ export default {
         this.getSiteCondition();
         this.getDetectionSummary();
         this.getAllMonitorItem();
+        this.getBaseMapInfoByBaseMapId();
+        this.getAllMonitorPoint();
+
         // this.getReportDatas();
     },
     filters:{
@@ -343,10 +353,61 @@ export default {
             // cb && cb(base64);
         }
     },
-
-    getUrl(){
-        console.log();
+    getBaseMapInfoByBaseMapId(){
+            var vm=this;
+            this.angle=0;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                   baseMapId:vm.monitorBaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getBaseMapInfoByBaseMapIdList=response.data.rt;
+                    this.angle=this.getBaseMapInfoByBaseMapIdList.rotate;
+                    if(this.angle==null){
+                        this.angle=0;
+                    }
+                    var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
+                    this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle} //所需要的pdf的所有信息
+                    console.log(this.paramsLists,'this.paramsLists');
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:"error",
+                        message:response.data.msg
+                    })
+                }
+            })
     },
+    //获得所有监测点位
+    getAllMonitorPoint(){
+            var vm=this;
+            // this.$refs.pic.Max_Select = 8;
+            // this.$refs.pic.Max_type = 1;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.ugSelectId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.monitorPointInfo=response.data.rt; //所有监测点位
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    // this.getTagList();
+                }
+            })
+        },
+        getUrl(){
+            console.log();
+        },
         //获取报告保存的选项
         getReportSetting(){
             var vm=this;
@@ -364,9 +425,10 @@ export default {
                   
                     this.getReportSettingList=response.data.rt;
                     this.coverPath=this.QJFileManageSystemURL+this.getReportSettingList.coverPath;
-                    // this.main(this.coverPath);
                     this.suggestion=this.getReportSettingList.suggestion
                     console.log(this.getReportSettingList,'this.getReportSettingList');
+                    this.optimalizationSchema=this.getReportSettingList.optimalizationSchema //优化方案：1-测点顺序优先；2-图面清晰优先
+                    this.baseMapPosition=this.getReportSettingList.baseMapPosition //底图位置：1-上部；2-下部
                 }
             })
         },
