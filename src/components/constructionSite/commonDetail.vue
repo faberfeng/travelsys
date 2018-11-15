@@ -228,9 +228,9 @@
             </el-dialog>
             <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
-                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
+                    <div class="editBodytwo" v-show="manufacturerValue=='huahuan'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
                         <el-radio v-model="radio" label="1">1小时</el-radio>
@@ -239,14 +239,35 @@
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
                         <select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
                     </div>
-                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">仪器ID设置：</label>
+                     <div class="editBodytwo" v-show="manufacturerValue=='jikang'">
+                         <label class="editInpText" style="width:13% !important;">仪器ID设置</label>
+                         <div class="tool">
+                             <span class="export"><label class="export1"></label><label class="exportTxt">导入</label></span>
+                             <span class="export"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <span class="export"><label class="export3"></label><label class="exportTxt">测试</label></span>
+                        </div>
+                        <div class="toolTbale">
+                            <table class="toolTbaleList" border="1" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="30%">点位名称</th>
+                                        <th width="70%">仪器ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td width="30%"></td>
+                                        <td width="70%"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         
                     </div>
                      
 
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnC" style="margin-right:88px;" >测试</button>
                         <button class="editBtnS"  >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
@@ -270,6 +291,8 @@ export default Vue.component('commonDetail',{
     name:'commonDetail',
     data(){
         return{
+            nodeId:'',//华环的项目id
+            getHuahuanNodeList:"",//获取华环的数据
             picMark:false,
             displaySpotNum:false,
             importMethod:1,
@@ -1386,7 +1409,104 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
+        },
+
+        //添加/华环项目节点
+        editHuahuanNode(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/editHuahuanNode',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    nodeId:this.nodeId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+
+                    
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        // 获取华环项目节点
+        getHuahuanNode(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getHuahuanNode',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.getHuahuanNodeList=response.data.rt;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //
+        editDeviceMonitorPointRelation(){
+
+        },
+        //导入点位对应关系
+        importDeviceMonitorPoint(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                data:vm.multipartFile
+            }).then((response)=>{
+                if(response.data.rt){
+                  
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
+        },
+        // 获取表头
+        addFile(){
+              var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getSingleSheetTitleInfo',
+                headers:{
+                    'token':this.token
+                },
+                data:vm.multipartFile
+            }).then((response)=>{
+                if(response.data.rt){
+                  
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
         }
+
 
 
     }
@@ -1923,6 +2043,104 @@ export default Vue.component('commonDetail',{
                 font-size: 14px;
                 outline: none;
             }
+            .tool{
+                float: right;
+                margin-right:52px;
+                .export{
+                    position: relative;
+                    width:60px;
+                    display: inline-block;
+                    .export1{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/export.png') no-repeat 0 0;
+                    }
+                    .export2{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/clear.png') no-repeat 0 0;
+                    }
+                    .export3{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/save1.png') no-repeat 0 0;
+                    }
+                    .exportTxt{
+                        position: absolute;
+                        width: 50px;
+                        top:-3px;
+                        // left:2px;
+                        
+                        // display: inline-block;
+                    }
+                   
+
+                }
+                .clear{
+
+                }
+                .text{
+
+                }
+                
+
+
+            }
+            .toolTbale{
+                width: 85%;
+                margin:10px auto;
+                .toolTbaleList{
+                     border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                    }
+                                }
+                            }
+                }
+            }
+
         }
     }
 

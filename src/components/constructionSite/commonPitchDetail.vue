@@ -9,7 +9,7 @@
                 <div class="containerHead">
                     <div class="containerHeadLeft">
                         <span class="addOrder" @click="addIndexNum()">添加序列</span>
-                        <span class="exportOrder">导出</span>
+                        <!-- <span class="exportOrder">导出</span> -->
                     </div>
                     <div class="containerHeadMiddle"></div>
                     <div class="containerHeadRight">
@@ -566,6 +566,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.pitchDetailDataList=response.data.rt;
+                        
                         console.log(this.pitchDetailDataList);
                     }else if(respose.data.cd=='-1'){
                         vm.$message({
@@ -608,8 +609,7 @@ export default Vue.component('commonPitch-detail',{
                 })
             },
             numChange(){
-                this.allnum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)
-
+                this.allnum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)+1
             },
             //点击修改斜度序列
             editPitchSeqBtn(val,valItemId){
@@ -700,6 +700,7 @@ export default Vue.component('commonPitch-detail',{
                 this.totalShow=true;
                 this.leftShow=true;
                 if(this.pitchDetailDataList){
+                    
                     this.leftDisplayList=this.pitchDetailDataList;
                     this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
@@ -743,6 +744,7 @@ export default Vue.component('commonPitch-detail',{
             },
             //右侧显示
             rightDisplay(id,name){
+
                 this.rightDisplayListValue1=[];
                 this.rightDisplayListValue2=[];
                 this.rightDisplayListValueXdata=[],

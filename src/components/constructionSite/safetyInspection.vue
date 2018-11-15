@@ -1113,7 +1113,7 @@ export default {
         },
         positionValue:function(val){
             var vm=this;
-            vm.getPositionList();
+            // vm.getPositionList();
             vm.getPositionUserCount();
         }
     },
@@ -2108,9 +2108,11 @@ export default {
                             })
                             this.getMonitorMainTable();
                             this.getAllMonitorPoint();
-                            setTimeout(()=>{
-                                    this.getTagList();
-                                },200)
+                            if(this.picMark==true){
+                                setTimeout(()=>{
+                                        this.getTagList();
+                                    },200)
+                                }
                         }else if(response.data.cd=='-1'){
                         
                             // this.$message({

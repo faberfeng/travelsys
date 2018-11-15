@@ -1216,7 +1216,7 @@ export default {
         this.parentItemId=this.itemId;
         this.parentItemName=this.itemName;
         this.getManageDept();
-        
+        this.addCheckItemNodeShow=true;
         if(this.parentItemName){
             this.validateAddNode();
         }
