@@ -182,12 +182,13 @@
         <div id="edit">
             <el-dialog  width="590px" :visible="addIndexNumShow" title="添加测斜序列" @close="addIndexNumCancle()">
                 <div class="editBody">
-                    <div class="editBodyone">
+                    <!-- <div class="editBodyone">
                         <label class="editTxt">序列编号:</label>
                         
-                    </div>
-                    <div class="editBodytwo">
+                    </div> -->
+                    <div class="editBodyone">
                         <label class="editTxt">测点数量:</label>
+                        <label>{{allnum}}</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">起始高度:</label>
@@ -201,7 +202,7 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">测点间距:</label>
-                        <input placeholder="请输入数值" v-model="pointDistance" class="inp" style="width:140px !important;height:30px !important"/>
+                        <input @change="numChange()" placeholder="请输入数值" v-model="pointDistance" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
@@ -216,11 +217,11 @@
             </el-dialog>
             <el-dialog  width="590px" :visible="editIndexNumShow" title="修改测斜序列" @close="editIndexNumCancle()">
                 <div class="editBody">
-                    <div class="editBodyone">
+                    <!-- <div class="editBodyone">
                         <label class="editTxt">序列编号:</label>
                         <label>{{indexName}}</label>
-                    </div>
-                    <div class="editBodytwo">
+                    </div> -->
+                    <div class="editBodyone">
                         <label class="editTxt">测点数量:</label>
                         <label>{{spotNum}}</label>
                     </div>
@@ -236,7 +237,7 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">测点间距:</label>
-                        <input placeholder="请输入数值" v-model="pointDistance" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
+                        <input placeholder="请输入数值"  v-model="pointDistance" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
@@ -291,6 +292,7 @@ export default Vue.component('commonPitch-detail',{
                 editIndexNumShow:false,//修改序列
                 initDepth:'',//起始标高
                 terminalDepth:'',//结束标高
+                allnum:'',
                 pointDistance:'',//点位间隔
                 keyword:'',//关键字
                 indexName:'',//序列编号
@@ -604,6 +606,10 @@ export default Vue.component('commonPitch-detail',{
                         })
                     }
                 })
+            },
+            numChange(){
+                this.allnum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)
+
             },
             //点击修改斜度序列
             editPitchSeqBtn(val,valItemId){

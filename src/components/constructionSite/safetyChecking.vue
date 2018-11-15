@@ -2007,21 +2007,25 @@ export default {
                 .checkProjectList_header{
                     height: 40px;
                     border-bottom:1px solid #999; 
+                    position: relative;
                     // min-width: 200px;
                     .text{
                         font-size: 16px;
                         line-height: 40px;
-                        float: left;
+                        // float: left;
                         display: inline-block;
-                        margin-left:10px;
+                        left:10px;
                         color: #333333;
+                        position: absolute;
                         font-weight: bold;
                     }
                     .clearfix_icon{
-                        float: right;
+                        // float: right;
                         display: inline-block;
                         margin-top:12px;
                         // width: 60%;
+                        position: absolute;
+                        right: 10px;
                         max-width: 200px;
                         .icon-goujian{
                             float: left;

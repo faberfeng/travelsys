@@ -118,7 +118,7 @@
                         </table>
                     </div>
                 </div>
-                <!-- 竖向位移 -->
+                <!-- 公共面积 -->
                 <ul class="inspectUl">
                     <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
                         <div class="verticalLength" v-show="item.type!=5">
@@ -185,6 +185,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="showBasePic"></div>
                         </div>
                     </li>
                 </ul>
@@ -652,14 +653,16 @@ export default {
     }
     li{list-style: none;}
 #htlmToPdf{
-    width: 100%;
+    width:596px;
+    // width:100%;
     margin: 0 auto;
     .pdfStyle{
         .pdfCover{
-            width:90%;
+            width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            margin:10px auto;
+            height: 832px;
+            margin:17px auto;
             .pdfImg{
                 margin-top:50px;
                 #img1{
@@ -681,6 +684,11 @@ export default {
             
         }
         .pdfSummary{
+            width:98%;
+            border:1px solid #ccc;
+            // margin-bottom: 10px;
+            height: 832px;
+            margin:17px auto;
             
             .pdfSummaryHead{
                 display:inline-block;
@@ -777,6 +785,11 @@ export default {
         }
         .pdfInspection{
             margin-top:50px;
+             width:98%;
+            border:1px solid #ccc;
+            // margin-bottom: 10px;
+            height: 832px;
+            margin:17px auto;
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
@@ -879,7 +892,12 @@ export default {
         .inspectUl{
            
             .inspectLi{
-                 margin-top:50px;
+                 width:98%;
+                border:1px solid #ccc;
+                // margin-bottom: 10px;
+                height: 832px;
+                margin:17px auto;
+                //  margin-top:50px;
                 .verticalLength{
                     .pdfSummaryHead1{
                         display:inline-block;
@@ -997,6 +1015,14 @@ export default {
                                     }
                             }
                     }
+                    .showBasePic{
+                        width: 95%;
+                        margin:0 auto;
+                        height: 220px;
+                        margin-top:20px;
+                        border:1px solid #ccc;
+
+                    }
                 }
             }
         }
@@ -1006,6 +1032,7 @@ export default {
     }
     .downbtn{
         margin-top:20px;
+        margin-bottom:20px;
         background: #fc3439;
         // margin-right: 20px;
         color: #fff;

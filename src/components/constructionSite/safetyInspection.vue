@@ -26,7 +26,7 @@
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
-                    <label class="recordTxt" @click="exportrEports()">导出报告</label>
+                    <label class="recordTxt" @click="exportrEportsBtn()">导出报告</label>
                     <label class="exportTxt" @click="walkThroughBtn()">巡视记录</label>
                 </div>
                 <div class="overviewBody">
@@ -587,11 +587,12 @@
                                     <img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  />
                                     <input class="upInput1"  type="file" accept="image/*"  @change="addCover($event)" ref="drawingsInfo1"  id="drawingsInfo1" multiple="multiple">
                                 </label>
-                                <img v-show="imgUrl" class="logo" :src="imgUrl" style="width:240px;height:60px;"/>
+                                <img v-show="coverPathUrl" class="logo" :src="QJFileManageSystemURL+coverPathUrl" style="width:240px;height:60px;"/>
+                                
                                 
                             </div>
                             <div class="imgBodyRight">
-                                <img v-show="imgUrl" class="logo" :src="imgUrl" style="width:240px;height:60px;"/>
+                                <img v-show="coverPathUrl" class="logo" :src="QJFileManageSystemURL+coverPathUrl" style="width:240px;height:60px;"/>
                             </div>
                         </div>
                     </div>
@@ -629,10 +630,10 @@
                             <span class="groundSpan" @click="retract3"><img class="groundEdit"   :src="retractImg3"/>{{retractText3}}</span>
                         </div>
                         <div v-show="isShow3" class="qrcodeBody">
-                            <img /><label></label>
+                            <img :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                            <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
                         </div>
                     </div>
-                    
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="saveReportSetting()" >保存设置</button>
@@ -1034,7 +1035,8 @@ export default {
             elevationYlist:[],
             moreSpotLineList:'',
             moreSpotLineListLength:'',
-            todayTime:new Date()
+            todayTime:new Date(),
+            onlyNum:'',
         }
     },
     created(){
@@ -1438,14 +1440,44 @@ export default {
                         data:vm.pointIds
                     }).then((response)=>{
                         if(response.data.cd=='0'){
-                            this.moreSpotLineList=response.data.rt.verticalShiftData;
-                            this.moreSpotLineListLength=response.data.rt.verticalShiftData.length;
-                            this.moreSpotLineList.forEach((item)=>{
-                                item.list.forEach((item1)=>{
-                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                        this.elevationYlist.push(item1.elevation)
+                            if(response.data.rt.forceData.length!=0){
+                                this.moreSpotLineList=response.data.rt.forceData;
+                                this.moreSpotLineListLength=response.data.rt.forceData.length;
+                                this.moreSpotLineList.forEach((item)=>{
+                                    item.list.forEach((item1)=>{
+                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                            this.elevationYlist.push(item1.force)
+                                    })
                                 })
-                            })
+                            }else if(response.data.rt.verticalShiftData.length!=0){
+                                this.moreSpotLineList=response.data.rt.verticalShiftData;
+                                this.moreSpotLineListLength=response.data.rt.verticalShiftData.length;
+                                 this.moreSpotLineList.forEach((item)=>{
+                                    item.list.forEach((item1)=>{
+                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                            this.elevationYlist.push(item1.elevation)
+                                    })
+                                })
+                            }else if(response.data.rt.gaugeData.length!=0){
+                                 this.moreSpotLineList=response.data.rt.gaugeData;
+                                this.moreSpotLineListLength=response.data.rt.gaugeData.length;
+                                this.moreSpotLineList.forEach((item)=>{
+                                    item.list.forEach((item1)=>{
+                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                            this.elevationYlist.push(item1.gaugeHeight)
+                                    })
+                                })
+                            }else if(response.data.rt.horizontalShiftData.length!=0){
+                                this.moreSpotLineList=response.data.rt.horizontalShiftData;
+                                this.moreSpotLineListLength=response.data.rt.horizontalShiftData.length;
+                                this.moreSpotLineList.forEach((item)=>{
+                                    item.list.forEach((item1)=>{
+                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                            this.elevationYlist.push(item1.shiftDistance)
+                                    })
+                                })
+                            }
+                           
                             var xLength=this.acquisitionTimeXlist.length;
                             var x=xLength/this.moreSpotLineListLength;
                             console.log(x,'xx');
@@ -1710,8 +1742,10 @@ export default {
             var vm=this;
             vm.walkThroughShow=true;
         },
-        exportrEports(){
+        exportrEportsBtn(){
             this.exportrEportsShow=true;
+            this.getReportSetting();
+            this.generateReportNumber();
         },
         exportrEportsCancle(){
             this.pageSelect='';
@@ -2551,7 +2585,7 @@ export default {
                 )
 
             })
-            console.log(listData)
+            console.log(listData,'listData')
 
 
              var vm=this;
@@ -2717,6 +2751,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2764,6 +2799,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2814,6 +2850,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2869,6 +2906,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2921,6 +2959,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2981,6 +3020,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
+                    this.getDetectionSummary()
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -3591,7 +3631,7 @@ export default {
                 if(Math.ceil(response.data.cd) == 0){
                    this.getMonitorMainTable();
                    this.getAllMonitorPoint();
-                    vm.getMonitorItem();
+                    this.getMonitorItem();
                 }else if(response.data.cd == -1){
                     vm.$message({
                         type:'error',
@@ -4148,7 +4188,7 @@ export default {
                     })
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
-                    console.log(this.monitorMainItemList,'monitorMainItemList')
+                    console.log(this.monitorMainItemList,'monitorMainItemList123')
                 }
             })
         },
@@ -4284,17 +4324,16 @@ export default {
                             'token':vm.token
                         },
                         data:{
-                        baseMapPosition:parseInt(this.pageSelect),//底图位置：1-上部；2-下部
-                        coverPath:this.coverPathUrl,
-                        optimalizationSchema:parseInt(this.priorityLayout),//优化方案：1-测点顺序优先；2-图面清晰优先
-                        suggestion:this.suggestList,//建议概述
-                        useBaseMap:this.showBaseImg==false?0:1,//是否展示底图：0-否；1-是
-                        useCover:this.coverChecked==false?0:1,//是否使用封面：0-否；1-是
-                        useOptimalization:this.optimalLayout==false?0:1,//是否优化布局测点：0-否；1-是
-                        usePointDetail:this.spotChecked==false?0:1,//是否使用测点详情：0-否；1-是
-                        useSuggestion:this.summaryChecked==false?0:1,//是否使用概述：0-否；1-是	
-                        userGroupId:this.selectUgId,//群组ID
-
+                            baseMapPosition:parseInt(this.pageSelect),//底图位置：1-上部；2-下部
+                            coverPath:this.coverPathUrl,
+                            optimalizationSchema:parseInt(this.priorityLayout),//优化方案：1-测点顺序优先；2-图面清晰优先
+                            suggestion:this.suggestList,//建议概述
+                            useBaseMap:this.showBaseImg==false?0:1,//是否展示底图：0-否；1-是
+                            useCover:this.coverChecked==false?0:1,//是否使用封面：0-否；1-是
+                            useOptimalization:this.optimalLayout==false?0:1,//是否优化布局测点：0-否；1-是
+                            usePointDetail:this.spotChecked==false?0:1,//是否使用测点详情：0-否；1-是
+                            useSuggestion:this.summaryChecked==false?0:1,//是否使用概述：0-否；1-是	
+                            userGroupId:this.selectUgId,//群组ID
                         }
                     }).then((response)=>{
                         if(response.data.cd=='0'){
@@ -4339,7 +4378,7 @@ export default {
                 routerDataUrl=vm.$router.resolve({
                             path:'/pdfPreview',query:{ugselectId:id,consultValue:this.timeMethod(value1),userValue:value2,monitorCompany:companyValue}
                         })
-                window.open(routerDataUrl.href,'_blank');
+                window.open(routerDataUrl.href,'_blank',);
                 this.exportrEportsShow=false;
              }
             // this.getPdf();
@@ -4384,6 +4423,26 @@ export default {
                     // this.getReportDatasList=response.data.rt;
                     this.getReportSettingList=response.data.rt;
                     console.log(this.getReportSettingList,'this.getReportSettingList');
+                    this.pageSelect=this.getReportSettingList.baseMapPosition==1?"1":"2";//底图位置：1-上部；2-下部
+                    this.coverPathUrl=this.getReportSettingList.coverPath;
+                    console.log(this.coverPathUrl,'this.coverPathUrl');
+                    this.priorityLayout=this.getReportSettingList.optimalizationSchema==1?"1":"2";//优化方案：1-测点顺序优先；2-图面清晰优先
+                    
+                    this.suggestList=this.getReportSettingList.suggestion;//建议概述
+                    this.showBaseImg=this.getReportSettingList.useBaseMap==0?false:true;//是否展示底图：0-否；1-是
+                    this.coverChecked=this.getReportSettingList.useCover==0?false:true;//是否使用封面：0-否；1-是
+                    this.optimalLayout=this.getReportSettingList.useOptimalization==0?false:true;//是否优化布局测点：0-否；1-是
+                    this.spotChecked=this.getReportSettingList.usePointDetail==0?false:true;//是否使用测点详情：0-否；1-是
+                    this.summaryChecked=this.getReportSettingList.useSuggestion==0?false:true;//是否使用概述：0-否；1-是	
+                    this.isShow1=true;
+                    this.isShow2=true;
+                    this.isShow=true;
+                    this.isShow3=true;
+                    this.basePicShow=true;
+                    this.firstMethodShow=true;
+                    // userGroupId=this.selectUgId,//群组ID
+
+                   
                 }
             })
         },
@@ -4446,6 +4505,7 @@ export default {
                     data:formData,
                     }).then((response)=>{
                         if(response.data.result==true){
+                            
                             // this.getBaseMapList();
                             this.coverPathUrl=response.data.obj.filePath;
                             // vm.fileList = '';
@@ -4525,10 +4585,28 @@ export default {
                 this.retractImg3 = zhankaiImg;
                 this.retractText3 = '展开';
             }
+            this.generateReportNumber();
         },
         //获取批量导入匹配结果和表名、类型对应关系
         getBatchImportMatchingResult(){
 
+        },
+        generateReportNumber(){
+            var vm=this;
+            axios({
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                url:vm.BDMSUrl+'detectionInfo/generateReportNumber',
+                params:{
+                    userGroupId:vm.selectUgId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.onlyNum=response.data.rt;
+                }
+            })
         },
         //html转PDF
         getPdf(){
@@ -5951,7 +6029,22 @@ export default {
                     .qrcodeBody{
                         width: 90%;
                         height: 110px;
-                        margin:15px auto; 
+                        margin:10px auto; 
+                        position: relative;
+                        img{
+                            // line-height: 110px;
+                            top:20px;
+                            left:40px;
+                            position: absolute;
+                        }
+                        .onlyNumStyle{
+                            position: absolute;
+                            line-height: 110px;
+                            font-size: 14px;
+                            left:150px;
+                            top:10px;
+                            color:#666666;
+                        }
                     }
                 }
             }

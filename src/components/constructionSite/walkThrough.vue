@@ -203,7 +203,7 @@ export default Vue.component('walkThrough',{
     filters:{
          timeChange(val) {
             if (val == null) {
-            return '/';
+            return '';
             } else {
             return moment(val).format("YYYY-MM-DD");
             }
@@ -839,7 +839,7 @@ select.eidtInput{
     margin: 0 20px 20px!important;
     .project{
         width: 100%;
-        max-height: 800px;
+        max-height: 500px;
         .antsLine{
                 padding: 10px 10px 15px 0px;
                 font-size: 12px;

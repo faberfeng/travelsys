@@ -33,9 +33,9 @@ export default new Vuex.Store({
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
         // BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
-        // WebGlUrl:"http://bim.arctron.cn",
-        // GMDUrl:"http://bim.arctron.cn",
-        // shareUrl:"http://bim.arctron.cn/#",
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"https://bim.arctron.cn/#",
         // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
         // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
         //以下是即时通讯网址
