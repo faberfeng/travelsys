@@ -8,6 +8,9 @@
         </div>
         <div class="topHeader">
             <div id="item-box-file">
+                <router-link :to="'/constructionSite/safetyInspection'" class="label-item label-item-active">  
+                安全监测  
+                </router-link>
                 <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
                 现场连线  
                 </router-link>
@@ -20,9 +23,7 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
-                <router-link :to="'/constructionSite/safetyInspection'" class="label-item label-item-active">  
-                安全监测  
-                </router-link>
+                
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
@@ -80,6 +81,7 @@
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span> -->
+                            <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">图片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
@@ -94,7 +96,7 @@
                                 </select>
                                 
                             </span>
-                            <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
+                            <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
@@ -110,6 +112,10 @@
                             <div class="operateToolRight">
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                             </div>
+                        </div>
+                        <div class="noDataFigure" v-show="!paramsLists" >
+                            <img style="width:140px;height:115px;margin-top:150px;" src="../../assets/nodata.png"/>
+                            <p style="font-size:16px;color:#ccc">暂时没有底图显示，请点击底图管理按钮上传底图</p>
                         </div>
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
@@ -132,6 +138,7 @@
                             <el-checkbox v-model="displaySpotNum" @change="displaySpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="inspectTable" > 
                     <div class="inspectTableHead">
@@ -141,7 +148,7 @@
                             <label class="inspectTableHeadLeftTxt"></label>
                         </div>
                         <div class="inspectTableHeadRight">
-                            <div class="addData" @click="batchExport()">数据导入</div>
+                            <!-- <div class="addData" @click="batchExport()">数据导入</div> -->
                             <div class="addInspectContent" @click="addMonitorItemBtn()">新增监测内容</div>
                         </div>
                     </div>
@@ -850,6 +857,7 @@ export default {
             sheetIndexList:'',//列表
             pageNo:1,
             baseMapList:'',//底图列表数据
+            isClick0:false,
             isClick:false,//是否点击
             isClick1:false,
             isClick2:false,
@@ -1285,7 +1293,7 @@ export default {
                 params:{
                     projectId:this.projId,
                     userGroupId:this.selectUgId,
-                    position:this.positionValue
+                    positionId:this.positionValue
                 }
             }).then((response)=>{
                 if(response.data.rt){
@@ -2219,6 +2227,7 @@ export default {
         //点击获取底图列表
         getBaseMapListBtn(){
             this.baseMapShow=true;
+            this.isClick0=true;
             this.isClick=true;
             this.isClick1=false;
             this.isClick2=false;
@@ -5041,7 +5050,19 @@ export default {
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
-
+                            }
+                            .bottomMap{
+                                display: inline-block;
+                                width: 84px;
+                                height: 25px;
+                                border:1px solid #f2f2f2;
+                                background: #f2f2f2;
+                                font-size: 12px;
+                                line-height: 25px;
+                                vertical-align: middle;
+                                color:#666666;
+                                border-radius: 2px;
+                                cursor: pointer;
                             }
                             .drawLineBtn{
                                 display: inline-block;
@@ -5110,7 +5131,6 @@ export default {
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
-
                             }
                             .singleSpot{
                                 display: inline-block;
@@ -5148,6 +5168,19 @@ export default {
                         height: 600px;
                         width: 100%;
                         position: relative;
+                        .noDataFigure{
+                            height: 595px;
+                            width: 100%;
+                            // margin:0 auto;
+                            // border: 1px solid #ccc;
+                            position: absolute;
+                            top:0px;
+                            left:0px;
+                            z-index:1000;
+                            background:#fff;
+                            padding:3px;
+
+                        }
                         .operateTool{
                             width: 288px;
                             height: 34px;
@@ -5279,7 +5312,7 @@ export default {
                         }
                         .planeFigureGround{
                             z-index: 8;
-                            height: 540px;
+                            height: 590px;
                             width: 100%;
                             position:absolute;
                             top:0px;
@@ -5310,6 +5343,7 @@ export default {
                             z-index:11;
                         }
                     }
+                    
                 }
                 .inspectTable{
                     margin-top:30px;

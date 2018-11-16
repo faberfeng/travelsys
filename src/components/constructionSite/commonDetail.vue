@@ -2,7 +2,7 @@
     <div id="commonDetail">
         <div class="project">
             <p class="antsLine">
-                施工现场<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
+                安全管理<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
                 <span class="strong">{{projctName}}</span>
             </p>
         </div>
@@ -230,7 +230,7 @@
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
-                    <div class="editBodytwo" v-show="manufacturerValue=='huahuan'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华环'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
                         <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
@@ -239,7 +239,7 @@
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
                         <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
                     </div>
-                     <div class="editBodytwo" v-show="manufacturerValue=='jikang'">
+                     <div class="editBodytwo" v-show="manufacturerValue=='基康'">
                          <label class="editInpText" style="width:13% !important;">仪器ID设置</label>
                          <div class="tool">
                              <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
@@ -262,10 +262,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        
                     </div>
-                     
-
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
@@ -300,7 +297,7 @@
                 <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
                 <div slot="footer" class="dialog-footer">
                     <button v-show="testShow" class="editBtnS" @click="uploadIMG">确认</button>
-                     <button v-show="!testShow" class="editBtnT" style="background:#ccc;" @click="testProject">测试</button>
+                     <button v-show="!testShow" class="editBtnC" style="background:#ccc;margin-right:15px" @click="testProject">测试</button>
                     <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
@@ -453,11 +450,11 @@ export default Vue.component('commonDetail',{
             },
             manufacturerList:[
                 {
-                    value:'huahuan',
+                    value:'华环',
                     label:'华环'
                 },
                 {
-                    value:'jikang',
+                    value:'基康',
                     label:'基康'
                 }
             ],
@@ -1427,14 +1424,14 @@ export default Vue.component('commonDetail',{
         },
         //自动采集配置确认
         autoAcquisitionMakeSure(){
-            if(this.manufacturerValue=='huahuan'){
+            if(this.manufacturerValue=='华环'){
                 this.setCollectSetting();
                 this.editHuahuanNode();
                 this.nodeId='';
             
 
 
-            }else if(this.manufacturerValue=='jikang'){
+            }else if(this.manufacturerValue=='基康'){
 
 
             }
@@ -1490,8 +1487,12 @@ export default Vue.component('commonDetail',{
                 },
             }).then((response)=>{
                 if(response.data.rt){
-                    alert('23');
+                    // alert('23');
                     vm.uploadshow=false;
+                    this.$message({
+                        type:'success',
+                        message:'文件导入成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1503,6 +1504,7 @@ export default Vue.component('commonDetail',{
         },
         //测试
         testProject(){
+            var vm=this;
             var formData =new FormData();
             formData.append('multipartFile',vm.filesList);
              var vm=this;
@@ -1523,6 +1525,10 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                     this.testShow=true;
+                    this.$message({
+                        type:'success',
+                        message:'测试成功'
+                    })
                     // alert('23');
                     // vm.uploadshow=false;
                 }else if(response.data.cd=='-1'){
@@ -2324,6 +2330,9 @@ export default Vue.component('commonDetail',{
                 color: #333333;
                 font-size: 14px;
                 outline: none;
+            }
+            .editBtnT{
+
             }
 
         }

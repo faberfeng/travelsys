@@ -8,6 +8,9 @@
         </div>
         <div class="topHeader" v-if="!showCommonList">
             <div id="item-box-file">
+                 <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
+                安全监测  
+                </router-link>
                 <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
                 现场连线  
                 </router-link>
@@ -20,9 +23,7 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
-                <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
-                安全监测  
-                </router-link>
+               
             </div>
             <div class="box-left" v-show="endFileMessage">
                 <div :class="['box_left_text',{'box_left_text_show':!showLeftContent}]">

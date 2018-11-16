@@ -2,6 +2,9 @@
     <div id="qualityChecking">
             <div class="topHeader">
                 <div id="item-box-file">
+                     <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
+                    安全监测  
+                    </router-link>
                     <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
                     现场连线  
                     </router-link>
@@ -13,9 +16,6 @@
                     </router-link>
                     <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                     安全检查  
-                    </router-link>
-                    <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
-                    安全监测  
                     </router-link>
                 </div>
                 <div id="containerMessage"  v-show="isShowQualityCheckAuth">

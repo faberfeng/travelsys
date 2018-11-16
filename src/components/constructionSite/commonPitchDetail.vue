@@ -2,7 +2,7 @@
     <div id="commonPitchDetail">
         <div class="project">
             <p class="antsLine">
-                施工现场<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
+                安全管理<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
                 <span class="strong">{{surveyName}}</span>
             </p>
             <div class="container">
