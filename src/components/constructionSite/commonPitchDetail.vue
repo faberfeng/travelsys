@@ -118,7 +118,7 @@
                         <div class="twoHeader">
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}曲线</label>
-                            <label class="editSpot">编辑标记</label>
+                            <label class="editSpot" @click="editMarkSpot()">编辑标记</label>
                         </div>
                         <div class="twoGraph">
                             <vue-highcharts id="leftHightchart" style="min-height:1900px"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
@@ -250,6 +250,15 @@
                     <button class="editBtnC" @click="editIndexNumCancle()" >取消</button>
                 </div>
             </el-dialog>
+            <el-dialog  width="590px" :visible="editMarkShow" title="修改测斜序列" @close="editMarkCancle()">
+                <div class="editBody">
+                
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" >确定</button>
+                    <button class="editBtnC" @click="editMarkCancle()" >取消</button>
+                </div>
+            </el-dialog>
         </div>
 
     </div>
@@ -290,6 +299,7 @@ export default Vue.component('commonPitch-detail',{
                 pitchDetailDataList:'',//获取数据详情（下面的图）
                 addIndexNumShow:false,//增加序列
                 editIndexNumShow:false,//修改序列
+                editMarkShow:false,//编辑mark
                 initDepth:'',//起始标高
                 terminalDepth:'',//结束标高
                 allnum:'',
@@ -790,6 +800,13 @@ export default Vue.component('commonPitch-detail',{
                 
                 
                 console.log(this.rightDisplayList,'右边数据')
+            },
+            editMarkSpot(){
+                this.editMarkShow=true;
+            },
+            editMarkCancle(){
+                this.editMarkShow=false;
+
             }
         }
     }
