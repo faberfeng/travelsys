@@ -510,7 +510,8 @@ export default {
                     }else if(vm.auth.design){
                         vm.$router.push({
                             // path:'/Design/management'//设计管理
-                            path:'/Design/drawingReview'
+                            path:'/Design/management'
+                            
                         })
                     }else if(vm.auth.costManagement){
                         vm.$router.push({
@@ -568,7 +569,7 @@ export default {
             }else if(tab.label === '设计管理'){
                 this.$router.push({
                     // path:'/Design/management'
-                    path:'/Design/drawingReview'
+                    path:'/Design/management'
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

@@ -228,7 +228,7 @@
             </el-dialog>
             <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
-                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
                     <div class="editBodytwo" v-show="manufacturerValue=='华桓'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input v-model="nodeId" class="gatherTimeNameInp"/>
                     </div>
@@ -1445,10 +1445,16 @@ export default Vue.component('commonDetail',{
         autoAcquisitionBtn(){
             this.autoAcquisitionShow=true;
             this.getCollectSetting();
+           
         },
         //取消自动采集配置
         autoAcquisitionCancle(){
             this.autoAcquisitionShow=false;
+        },
+        manufacturerChange(){
+            if(this.manufacturerValue=='基康'){
+                this.getDeviceMonitorPointRelation();
+            }
         },
         //自动采集配置确认
         autoAcquisitionMakeSure(){
@@ -1569,6 +1575,7 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+
         //获取点位关系
         getDeviceMonitorPointRelation(){
              var vm=this;
@@ -1643,6 +1650,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                     this.manufacturerValue=response.data.rt.manufacturer;
+                    if( this.manufacturerValue=="基康"){
+                        this.getDeviceMonitorPointRelation();
+                    }
                     this.collectRateRadio=response.data.rt.collectRate==1?'1':'2';
                     this.collectHour=response.data.rt.collectHour;
                 }else if(response.data.cd=='-1'){

@@ -499,7 +499,7 @@ export default {
                         })
                     }else if(vm.auth.design){
                         vm.$router.push({
-                            path:'/Design/drawingReview' //设计管理
+                            path:'/Design/management' //设计管理
                             // path:'/Design/management'
                         })
                     }else if(vm.auth.costManagement){
@@ -558,7 +558,7 @@ export default {
                 sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.label === '设计管理'){
                 this.$router.push({
-                    path:'/Design/drawingReview'
+                    path:'/Design/management'
                     // path:'/Design/management'
                    
                 });

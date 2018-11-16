@@ -513,6 +513,7 @@ export default Vue.component('commonPitch-detail',{
             },
             importExcelData(){
                 this.$emit('importExcelData',true,this.itemMonitorId,this.surveyName,this.itemMonitorType,this.itemMonitorKeyWord)
+                // this.$emit('importDataShow',true,this.itemMonitorId,this.projctName,this.itemMonitorType,this.itemMonitorKeyWord)
 
             },
             //添加序列号
