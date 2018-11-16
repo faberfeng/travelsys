@@ -140,11 +140,11 @@
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            <div v-show="baseMapPosition==1" class="showBasePic"></div>
+                            <!-- <div v-show="baseMapPosition==1" class="showBasePic"></div> -->
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
-                                        <tr>
+                                        <!-- <tr>
                                             <th rowspan="2">测点编号</th>
                                             <th v-show="item.type!=3" colspan="2">初始采集</th>
                                             <th v-show="item.type==3" colspan="3">初始采集</th>
@@ -178,28 +178,70 @@
                                             <th v-show="item.type==4">本次(kN)</th>
                                             <th v-show="item.type!=4">累计(mm)</th>
                                             <th v-show="item.type==4">累计(kN)</th>
+                                        </tr> -->
+                                        <tr>
+                                            <td rowspan="2">测点编号</td>
+                                            <td colspan="2" v-show="item.type==1">位移(mm)</td>
+                                            <td colspan="2" v-show="item.type==2">高程(m)</td>
+                                            <td colspan="2" v-show="item.type==3">水位(m)</td>
+                                            <td v-show="item.type==3">管口(m)</td>
+                                            <td colspan="2" v-show="item.type==4">受力(KN)</td>
+                                            <td colspan="2">变化量</td>
+                                            <td rowspan="2">备注</td>
+                                        </tr>
+                                        <tr>
+                                            <td>初始</td>
+                                            <td>本次</td>
+                                            <td v-show="item.type==3">本次</td>
+                                            <td>本次</td>
+                                            <td>累计</td>
+                                            <!-- <td></td> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(val,index) in item.dataList" :key="index"> 
                                             <td>{{val.pointName|addSprit()}}</td>
-                                            <td>{{val.initAcquisitionTime|timeChange()}}</td>
-                                            <td >{{val.initData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.initPipeHeight|addSprit()}}</td>
-                                            <td>{{val.lastAcquisitionTime|timeChange()}}</td>
-                                            <td >{{val.lastData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
-                                            <td>{{val.latestAcquisitionTime|timeChange()}}</td>
-                                            <td>{{val.latestData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.latestPipeHeight|addSprit()}}</td>
-                                            <td>{{val.variationTime|timeStamp()}}</td>
-                                            <td>{{val.recentVariation|addSprit()}}</td>
+                                            <td >{{val.initValue|addSprit()}}</td>
+                                            <td >{{val.currentValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.currentVariation|addSprit()}}</td>
                                             <td>{{val.totalVariation|addSprit()}}</td>
+                                            <td></td>
+
+
+
+                                            <!-- <td>{{val.pointName|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td >{{val.initValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td >{{val.referenceValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td>{{val.currentValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeStamp()}}</td>
+                                            <td>{{val.recentVariation|addSprit()}}</td>
+                                            <td>{{val.totalVariation|addSprit()}}</td> -->
+
+                                              <!-- <td>{{val.pointName|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td >{{val.initValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td >{{val.referenceValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeChange()}}</td>
+                                            <td>{{val.currentValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.acquisitionTime|timeStamp()}}</td>
+                                            <td>{{val.recentVariation|addSprit()}}</td>
+                                            <td>{{val.totalVariation|addSprit()}}</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div v-show="baseMapPosition==2" class="showBasePic"></div>
+                            <!-- <div v-show="baseMapPosition==2" class="showBasePic"></div> -->
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
                         <!-- <div class="verticalLength1" v-show="item.type==5">
@@ -327,6 +369,7 @@ export default {
         this.getAllMonitorPoint();
         this.generateReportNumber();
         this.curTime();
+        // this.getItemDutyUser();
         // this.getReportDatas();
     },
     filters:{
@@ -403,6 +446,31 @@ export default {
 
     },
     methods:{
+        getItemDutyUser(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                     this.getItemDutyUserList=response.data.rt;
+                     this.inspectorName=this.getItemDutyUserList.inspectorName;
+                     this.calculatorName=this.getItemDutyUserList.calculatorName;
+                     this.observerName=this.getItemDutyUserList.observerName;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         curTime(){
             var date = new Date();
             console.log(date,'date');
@@ -1147,11 +1215,12 @@ export default {
                  width:98%;
                 border:1px solid #ccc;
                 // margin-bottom: 10px;
-                height: 832px;
+               
                 margin:17px auto;
                 position: relative;
                 //  margin-top:50px;
                 .verticalLength{
+                     height: 832px;
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;

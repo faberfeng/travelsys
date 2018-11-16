@@ -2717,7 +2717,7 @@ export default {
                     this.importExcel_4();
                 }
             }
-            this.testShow=true;
+           
         },
         //导入水平位移excel
         importExcel_1(){
@@ -2742,6 +2742,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                     this.testShow=true;
                     this.importGatherDataShow=false;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
@@ -2791,6 +2792,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     vm.altitudeCol='';//高程下标
@@ -2841,6 +2843,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     vm.pipeHeightCol='';//管口高度
@@ -2895,6 +2898,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndexCol='';
                     vm.depthIndexCol='';
                     vm.shiftIndex='';
@@ -2949,6 +2953,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     // vm.pipeHeightCol='';//管口高度
@@ -3005,6 +3010,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.testShow=true;
                     this.importGatherDataShow=false;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标

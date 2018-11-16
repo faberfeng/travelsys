@@ -45,7 +45,7 @@
                     <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
                 </div>
                 <div class="rightBottomCheck">
-                        <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                        <!-- <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox> -->
                         <el-checkbox v-model="displaySpotNum" @change="displaySubmitSpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                 </div>
                 
@@ -233,18 +233,18 @@
                     <div class="editBodytwo" v-show="manufacturerValue=='huahuan'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
-                        <el-radio v-model="radio" label="1">1小时</el-radio>
-                        <el-radio v-model="radio" label="2">1天</el-radio>
+                        <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
+                        <el-radio v-model="collectRateRadio" label="2">1天</el-radio>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
-                        <select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                        <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
                     </div>
                      <div class="editBodytwo" v-show="manufacturerValue=='jikang'">
                          <label class="editInpText" style="width:13% !important;">仪器ID设置</label>
                          <div class="tool">
-                             <span class="export"><label class="export1"></label><label class="exportTxt">导入</label></span>
-                             <span class="export"><label class="export2"></label><label class="exportTxt">清空</label></span>
-                             <span class="export"><label class="export3"></label><label class="exportTxt">测试</label></span>
+                             <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
+                             <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <span class="export" @click="verifyImportDeviceMonitorPoint()"><label class="export3"></label><label class="exportTxt">测试</label></span>
                         </div>
                         <div class="toolTbale">
                             <table class="toolTbaleList" border="1" cellspacing="0" width="100%">
@@ -268,8 +268,40 @@
 
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS"  >确定</button>
+                        <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="文件导入" :visible="uploadshow" @close="upImgCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectImg">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput"  type="file"  @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
+                     <div class="editBodytwo">
+                         <label class="editInpText" style="width:18% !important;">设备点位下标:</label>
+                         <select v-model="devicePointIndex" class="sheetName">
+                             <option v-for="(item,index) in getSingleSheetTitleInfoList"  :value="item.index" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                         <label class="editInpText" style="width:18% !important;">虚拟点位名称下标:</label>
+                         <select v-model="virtualPointIndex" class="sheetName">
+                             <option v-for="(item,index) in getSingleSheetTitleInfoList"  :value="item.index" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
+                <div slot="footer" class="dialog-footer">
+                    <button v-show="testShow" class="editBtnS" @click="uploadIMG">确认</button>
+                     <button v-show="!testShow" class="editBtnT" style="background:#ccc;" @click="testProject">测试</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -306,8 +338,10 @@ export default Vue.component('commonDetail',{
                     label:'自动采集'
                 }
             ],
-            radio:'1',
+            collectRateRadio:'1',
             manufacturerValue:'',
+            devicePointIndex:'',
+            virtualPointIndex:'',
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             changeAlertDay:'',
@@ -322,6 +356,11 @@ export default Vue.component('commonDetail',{
             editAlertValueShow:false,//编辑报警值
             spotChangeLineShow:false,//取消点位改变曲线
             autoAcquisitionShow:false,//自动采集配置
+            uploadshow:false,
+            testShow:false,
+            filesList:"",
+            getSingleSheetTitleInfoList:'',
+            imageName:"未选择任何文件",
             acquisitionTimeXlist:[],
             acquisitionTimeYlist:'',
             elevationYlist:[],
@@ -422,6 +461,7 @@ export default Vue.component('commonDetail',{
                     label:'基康'
                 }
             ],
+            collectHour:'',//采集时间
             timeList:[
                 {
                     value:0,
@@ -606,6 +646,9 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+         selectImg(){
+             this.$refs.file.click()
+        },
         displaySubmitSpot(){
             this.$refs.pic.enableLabel(this.displaySpotNum);
 
@@ -1382,6 +1425,171 @@ export default Vue.component('commonDetail',{
         autoAcquisitionCancle(){
             this.autoAcquisitionShow=false;
         },
+        //自动采集配置确认
+        autoAcquisitionMakeSure(){
+            if(this.manufacturerValue=='huahuan'){
+                this.setCollectSetting();
+                this.editHuahuanNode();
+                this.nodeId='';
+            
+
+
+            }else if(this.manufacturerValue=='jikang'){
+
+
+            }
+
+
+        },
+        //导入
+        autoExport(){
+            this.uploadshow=true;
+        },
+        upImgCancle(){
+            this.uploadshow=false;
+        },
+        fileChanged(file){
+            var vm = this
+            vm.filesList = vm.$refs.file.files[0]; //[]
+            vm.imageName = vm.filesList.name;
+            var formData =new FormData();
+            formData.append('multipartFile',vm.filesList);
+                axios({
+                    method:'post',
+                    headers:{
+                        'token':vm.token
+                    },
+                    url:vm.BDMSUrl+'detectionInfo/getSingleSheetTitleInfo',
+                    data:formData
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getSingleSheetTitleInfoList=response.data.rt;
+                        // this.devicePointIndex=this.getSingleSheetTitleInfoList[2].index;
+                        // this.virtualPointIndex=this.getSingleSheetTitleInfoList[2].index;
+                        // vm.filesList='';
+                        // vm.imageName='未选择任何文件';
+                        // vm.uploadshow=false;
+                    }
+            })
+            console.log(vm.filesList,'vm.filesList');
+        },
+        //上传
+        uploadIMG(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    devicePointIndex:this.devicePointIndex,//设备点位下标
+                    virtualPointIndex:this.virtualPointIndex,//虚拟点位下标
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    alert('23');
+                    vm.uploadshow=false;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+            document.getElementById('fileInfo').value="";
+        },
+        //测试
+        testProject(){
+            var formData =new FormData();
+            formData.append('multipartFile',vm.filesList);
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/verifyImportDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    devicePointIndex:this.devicePointIndex,//设备点位下标
+                    virtualPointIndex:this.virtualPointIndex,//虚拟点位下标
+                },
+                data:formData
+                // data:vm.multipartFile
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.testShow=true;
+                    // alert('23');
+                    // vm.uploadshow=false;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //设置采集配置
+        setCollectSetting(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    collectRate:parseInt(this.collectRateRadio),//采集频率
+                    collectHour:this.collectHour,//采集时间
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.manufacturerValue='';
+                    this.collectRateRadio='1';
+                    this.collectHour='';
+                   
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //清空点位关系
+        clearDeviceMonitorPointRelation(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/clearDeviceMonitorPointRelation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.manufacturerValue='';
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //验证导入点位对应关系
+        verifyImportDeviceMonitorPoint(){
+           
+        },
         //监测项目采集改变
         importMethodChange(){
             this.setDetectionItemCollectWay();
@@ -1426,8 +1634,7 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.rt){
-
-                    
+                    this.nodeId='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1465,47 +1672,9 @@ export default Vue.component('commonDetail',{
         },
         //导入点位对应关系
         importDeviceMonitorPoint(){
-            var vm=this;
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
-                headers:{
-                    'token':this.token
-                },
-                data:vm.multipartFile
-            }).then((response)=>{
-                if(response.data.rt){
-                  
-                }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-            })
+           
 
         },
-        // 获取表头
-        addFile(){
-              var vm=this;
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'detectionInfo/getSingleSheetTitleInfo',
-                headers:{
-                    'token':this.token
-                },
-                data:vm.multipartFile
-            }).then((response)=>{
-                if(response.data.rt){
-                  
-                }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-            })
-        }
 
 
 
@@ -2084,6 +2253,7 @@ export default Vue.component('commonDetail',{
                         position: absolute;
                         width: 50px;
                         top:-3px;
+                        cursor: pointer;
                         // left:2px;
                         
                         // display: inline-block;
@@ -2139,6 +2309,21 @@ export default Vue.component('commonDetail',{
                                 }
                             }
                 }
+            }
+            .sheetName{
+                width: 375px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
             }
 
         }
