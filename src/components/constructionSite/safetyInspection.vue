@@ -1753,6 +1753,7 @@ export default {
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
+
         },
         exportrEportsBtn(){
             this.exportrEportsShow=true;
@@ -2176,7 +2177,7 @@ export default {
             };  
             reader.readAsDataURL(list[0]);
             vm.fileList=list[0];
-            vm.fileListName=list[0].name;
+            vm.fileListName=list[0].name.replace(/\s*/g,"");
             // console.log(vm.fileListName);
             var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
             returnUrl = encodeURIComponent(returnUrl);
@@ -3490,7 +3491,7 @@ export default {
             var vm=this;
             const list = vm.$refs.importExcel.files;
             vm.excelFileList=list[0];
-            vm.excelFileListName=list[0].name;
+            vm.excelFileListName=list[0].name.replace(/\s*/g,"");
             var formData = new FormData()
             formData.append('data',vm.excelFileList);
             axios({

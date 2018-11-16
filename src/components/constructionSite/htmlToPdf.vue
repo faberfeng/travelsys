@@ -304,9 +304,9 @@
     </div>
 </template>
 <script>
-import moment from 'moment'
 import axios from 'axios'
 import pdf from 'vue-pdf'
+import moment from 'moment'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 export default {
@@ -447,6 +447,9 @@ export default {
 
     },
     methods:{
+         timeChangeMethod(val) {
+                return moment(val).format("YYYY-MM-DD hh:mm:ss");
+        },
         getItemDutyUser(){
             var vm=this;
             axios({
@@ -799,8 +802,8 @@ export default {
                 },
                 params:{
                     userGroupId:this.ugSelectId,
-                    beforeDate:this.$route.query.consultValue,
-                    referenceDate:this.$route.query.userValue
+                    beforeDate:this.timeChangeMethod(this.$route.query.consultValue),
+                    referenceDate:this.timeChangeMethod(this.$route.query.userValue)
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -923,7 +926,7 @@ export default {
             width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
             #pdfImg{
                 margin-top:50px;
@@ -1018,7 +1021,7 @@ export default {
             width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
             position: relative;
             .pageNum{
@@ -1125,7 +1128,7 @@ export default {
              width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
             position: relative;
             .pageNum{
@@ -1313,9 +1316,11 @@ export default {
                     .bottomTabel{
                         width: 90%;
                         margin:0 auto;
+                        height: 611px;
+                        overflow: hidden;
                             .bottomTableList{
                                 border-collapse: collapse;
-                                border: 1px solid #000;
+                                border: 0.5px solid #000;
                                     thead{
                                         background: #fff;
                                         th{
@@ -1324,7 +1329,7 @@ export default {
                                             height: 32px;
                                             text-align: center;
                                             box-sizing: border-box;
-                                            border-right: 1px solid #000;
+                                            border-right: 0.5px solid #000;
                                             font-size: 12px;
                                             color: #333333;
                                             font-weight: normal;
@@ -1338,7 +1343,7 @@ export default {
                                                 height: 32px;
                                                 text-align: center;
                                                 box-sizing: border-box;
-                                                border-right: 1px solid #000;
+                                                border-right: 0.5px solid #000;
                                                 font-size: 12px;
                                                 color: #333333;
                                                 .actionBtn{

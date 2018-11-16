@@ -3,11 +3,11 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;">
                 <div id="item-box-file">
-                    <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
-                     图纸评审  
-                    </router-link>
                     <router-link :to="'/Design/management'" class="label-item">  
                      设计协调  
+                    </router-link>
+                    <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
+                     图纸评审  
                     </router-link>
                     <router-link :to="'/Design/attributeManager'"  class="label-item">  
                         属性管理  
@@ -1682,7 +1682,8 @@ export default {
         drawingsUploadCancel(){
             var vm = this
             vm.drawingsUploadShow = false
-            vm.fileList=[]
+            vm.fileList=[];
+            document.getElementById('drawingsInfo').value='';
         },
         updateDrawingCancle(){
             var vm=this;
@@ -1879,6 +1880,7 @@ export default {
                             })
                              vm.fileList = []
                         }
+                        document.getElementById('drawingsInfo').value='';
                     })
             })
         }
