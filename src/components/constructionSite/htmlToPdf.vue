@@ -3,9 +3,9 @@
         <div  class="pdfStyle" id="pdfDom">
                 <!-- 封面 -->
                 <div class="pdfCover">
-                    <div class="pdfImg">
+                    <div id="pdfImg">
                          <!-- <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/> -->
-                        <img id="img1" style="width:400px;height:100px;" :src="coverPath?coverPath:require('../../assets/defaultlogo.png')">
+                        <img id="img1" style="width:400px;height:100px;"  >
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
                     </div>
                     <h5 style="margin-top:20px;color:#000;font-size:18px;">{{projectName}}--监测报表</h5>
@@ -347,6 +347,7 @@ export default {
             beforeDate:this.$route.query.consultValue,
             referenceDate:this.$route.query.userValue,
             nowDate:'',
+            imgUrl:'',
         }
     },
     created(){
@@ -491,21 +492,22 @@ export default {
             canvas.height = img.height;
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, img.width, img.height);
-            var dataURL = canvas.toDataURL("image/jpeg");  // 可选其他值 image/jpeg
+            var ext = img.src.substring(img.src.lastIndexOf(".")+1).toLowerCase();
+            var dataURL = canvas.toDataURL("image/"+ext);
             return dataURL;
         },
 
-    main(src){
-        var image = new Image();
-        image.src = src + '?v=' + Math.random(); // 处理缓存
-        image.crossOrigin = "*";  // 支持跨域图片
+    // main(src){
+    //     var image = new Image();
+    //     image.src = src + '?v=' + Math.random(); // 处理缓存
+    //     image.crossOrigin = "*";  // 支持跨域图片
         
-        image.onload=function(){
-            var base64 =this.getBase64Image(image);
-            console.log(base64,'base64');
-            // cb && cb(base64);
-        }
-    },
+    //     image.onload=function(){
+    //         var base64 =this.getBase64Image(image);
+    //         console.log(base64,'base64');
+    //         // cb && cb(base64);
+    //     }
+    // },
     getBaseMapInfoByBaseMapId(){
             var vm=this;
             this.angle=0;
@@ -595,12 +597,33 @@ export default {
                   
                     this.getReportSettingList=response.data.rt;
                     this.coverPath=this.QJFileManageSystemURL+this.getReportSettingList.coverPath;
+                    this.getUrl()
                     this.suggestion=this.getReportSettingList.suggestion
                     console.log(this.getReportSettingList,'this.getReportSettingList');
                     this.optimalizationSchema=this.getReportSettingList.optimalizationSchema //优化方案：1-测点顺序优先；2-图面清晰优先
                     this.baseMapPosition=this.getReportSettingList.baseMapPosition //底图位置：1-上部；2-下部
                 }
             })
+        },
+        getUrl(){
+            axios({
+                method:'get',
+                responseType:'blob',
+                url:this.coverPath
+            }).then((response)=>{
+                var a=response.data;
+                console.log(a,'url1111');
+                let reader = new window.FileReader();
+                reader.onloadend = function() {
+                    const data = reader.result;
+                     
+                    console.log(data);
+                    // this.imgUrl = data;
+                    document.getElementById('img1').src=data
+                };
+                reader.readAsDataURL(a);
+            })
+
         },
         // 获取最新现场工况
         getSiteCondition(){
@@ -902,7 +925,7 @@ export default {
             // margin-bottom: 10px;
             height: 832px;
             margin:17px auto;
-            .pdfImg{
+            #pdfImg{
                 margin-top:50px;
                 #img1{
                     background: #ccc;

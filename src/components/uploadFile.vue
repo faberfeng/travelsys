@@ -1,5 +1,5 @@
 <template>
-      <el-dialog :title="title" :visible="uploadshow" @close="upImgCancle">
+      <el-dialog :title="title" :visible="uploadshow" @close="upImgCancle" v-loading="uploading">
         <div class="editBody">
             <div class="editBodytwo imageBody">
                 <label class=" imageBodyText">文件说明 :</label>
@@ -38,6 +38,7 @@ export default Vue.component('common-upload',{
             projId:'',
             token:'',
             des:'',//文件描述
+            uploading:false,
         }
     },
     props:['uploadshow','dirid','fgid','isqj','title','accept','ugid'],
@@ -97,6 +98,7 @@ export default Vue.component('common-upload',{
         },
         uploadIMG(){
             var vm = this
+            vm.uploading=true;
             /*
             isUploadPoint 0不是全景类型 1是全景类型 
             dirId 目录ID
@@ -139,6 +141,7 @@ export default Vue.component('common-upload',{
                     vm.$refs.file.value = ''
                     vm.$emit('refreshqj')
                 }
+                this.uploading=false;
             }).catch((err)=>{
                 vm.des = ''
                 vm.imageName ='未选择任何文件'

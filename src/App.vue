@@ -369,6 +369,19 @@ padding-right: 14px;
         margin-left: 10px;
         font-weight: normal;
         color: #999;
+        width: 300px;
+        /*
+        溢出隐藏
+        */
+        overflow: hidden;
+        /*
+        显示省略号
+        */
+        text-overflow: ellipsis;
+        /*
+        不换行
+        */
+        white-space: nowrap;
     }
 
     // #webgl{

@@ -230,37 +230,63 @@
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
-                    <div class="editBodytwo" v-show="manufacturerValue=='华环'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华桓'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input v-model="nodeId" class="gatherTimeNameInp"/>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
                         <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
                         <el-radio v-model="collectRateRadio" label="2">1天</el-radio>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
-                        <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    <div class="editBodytwo" v-show="collectRateRadio=='2'"><label class="editInpText" style="width:18% !important;">采集时间：</label>
+                        <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
                      <div class="editBodytwo" v-show="manufacturerValue=='基康'">
                          <label class="editInpText" style="width:13% !important;">仪器ID设置</label>
                          <div class="tool">
                              <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
                              <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
-                             <span class="export" @click="verifyImportDeviceMonitorPoint()"><label class="export3"></label><label class="exportTxt">测试</label></span>
+                             <!-- <span class="export" @click="verifyImportDeviceMonitorPoint()"><label class="export3"></label><label class="exportTxt">测试</label></span> -->
                         </div>
-                        <div class="toolTbale">
-                            <table class="toolTbaleList" border="1" cellspacing="0" width="100%">
+                        <div id="toolTbale">
+                            <!-- <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                  <colgroup>
+                                    <col width="30%">
+                                    <col width="70%">
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th width="30%">点位名称</th>
-                                        <th width="70%">仪器ID</th>
+                                        <th width="100px">点位名称</th>
+                                        <th width="300px">仪器ID</th>
                                     </tr>
                                 </thead>
+                            </table>
+                            <table class="toolTbaleList1"  cellspacing="0" width="100%">
+                                 <colgroup>
+                                    <col width="30%">
+                                    <col width="70%">
+                                </colgroup>
                                 <tbody>
-                                    <tr>
-                                        <td width="30%"></td>
-                                        <td width="70%"></td>
+                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
+                                        <td width="30%">{{item.virtualPointName}}</td>
+                                        <td width="70%">{{item.devicePointName}}</td>
                                     </tr>
                                 </tbody>
+                            </table> -->
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">点位名称</th>
+                                        <th width="300px">仪器ID</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
+                                        <td width="30%">{{item.virtualPointName}}</td>
+                                        <td width="70%">{{item.devicePointName}}</td>
+                                    </tr>
+                                </tbody>
+
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -282,7 +308,7 @@
                         <span class="upImgText">{{imageName}}</span> 
                     </div>
                      <div class="editBodytwo">
-                         <label class="editInpText" style="width:18% !important;">设备点位下标:</label>
+                         <label class="editInpText" style="width:18% !important;">设备ID点位下标:</label>
                          <select v-model="devicePointIndex" class="sheetName">
                              <option v-for="(item,index) in getSingleSheetTitleInfoList"  :value="item.index" :key="index" v-text="item.name"></option>
                         </select>
@@ -336,7 +362,7 @@ export default Vue.component('commonDetail',{
                 }
             ],
             collectRateRadio:'1',
-            manufacturerValue:'',
+            manufacturerValue:'华桓',
             devicePointIndex:'',
             virtualPointIndex:'',
             currentPage2:1,
@@ -356,6 +382,7 @@ export default Vue.component('commonDetail',{
             uploadshow:false,
             testShow:false,
             filesList:"",
+            getDeviceMonitorPointRelationList:'',//获取点位关系数据
             getSingleSheetTitleInfoList:'',
             imageName:"未选择任何文件",
             acquisitionTimeXlist:[],
@@ -450,15 +477,15 @@ export default Vue.component('commonDetail',{
             },
             manufacturerList:[
                 {
-                    value:'华环',
-                    label:'华环'
+                    value:'华桓',
+                    label:'华桓'
                 },
                 {
                     value:'基康',
                     label:'基康'
                 }
             ],
-            collectHour:'',//采集时间
+            collectHour:0,//采集时间
             timeList:[
                 {
                     value:0,
@@ -1417,6 +1444,7 @@ export default Vue.component('commonDetail',{
         //自动采集按钮
         autoAcquisitionBtn(){
             this.autoAcquisitionShow=true;
+            this.getCollectSetting();
         },
         //取消自动采集配置
         autoAcquisitionCancle(){
@@ -1424,16 +1452,17 @@ export default Vue.component('commonDetail',{
         },
         //自动采集配置确认
         autoAcquisitionMakeSure(){
-            if(this.manufacturerValue=='华环'){
-                this.setCollectSetting();
+            if(this.manufacturerValue=='华桓'){
                 this.editHuahuanNode();
+                this.setCollectSetting();
                 this.nodeId='';
-            
-
-
             }else if(this.manufacturerValue=='基康'){
-
-
+                this.setCollectSetting();
+                 this.$message({
+                        type:'success',
+                        message:'自动采集成功'
+                    })
+                this.autoAcquisitionShow=false;
             }
 
 
@@ -1486,13 +1515,14 @@ export default Vue.component('commonDetail',{
                     virtualPointIndex:this.virtualPointIndex,//虚拟点位下标
                 },
             }).then((response)=>{
-                if(response.data.rt){
+                if(response.data.cd=='0'){
                     // alert('23');
                     vm.uploadshow=false;
                     this.$message({
                         type:'success',
                         message:'文件导入成功'
                     })
+                    this.getDeviceMonitorPointRelation();
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1539,12 +1569,39 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //获取点位关系
+        getDeviceMonitorPointRelation(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getDeviceMonitorPointRelation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                },
+            }).then((response)=>{
+                if(response.data.rt.length!=0){
+                    this.getDeviceMonitorPointRelationList=response.data.rt;
+                    document.getElementById('toolTbale').style.height='300px';
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }else{
+                    // document.getElementById('toolTbale').style.height='0px';
+                }
+            })
+        },
         //设置采集配置
         setCollectSetting(){
              var vm=this;
             axios({
                 method:'post',
-                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
+                url:this.BDMSUrl+'detectionInfo/setCollectSetting',
                 headers:{
                     'token':this.token
                 },
@@ -1568,6 +1625,34 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //getCollectSetting
+        getCollectSetting(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getCollectSetting',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    collectRate:parseInt(this.collectRateRadio),//采集频率
+                    collectHour:this.collectHour,//采集时间
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.manufacturerValue=response.data.rt.manufacturer;
+                    this.collectRateRadio=response.data.rt.collectRate==1?'1':'2';
+                    this.collectHour=response.data.rt.collectHour;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
         //清空点位关系
         clearDeviceMonitorPointRelation(){
              var vm=this;
@@ -1582,8 +1667,10 @@ export default Vue.component('commonDetail',{
                     manufacturer:vm.manufacturerValue,
                 },
             }).then((response)=>{
-                if(response.data.rt){
-                    this.manufacturerValue='';
+                if(response.data.cd=='0'){
+                        document.getElementById('toolTbale').style.height='0px';
+                        this.getDeviceMonitorPointRelation()
+                    // this.manufacturerValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1639,8 +1726,13 @@ export default Vue.component('commonDetail',{
                     nodeId:this.nodeId
                 }
             }).then((response)=>{
-                if(response.data.rt){
+                if(response.data.cd=='0'){
+                    this.autoAcquisitionShow=false;
                     this.nodeId='';
+                    this.$message({
+                        type:'success',
+                        message:'自动采集成功'
+                    })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1959,7 +2051,7 @@ export default Vue.component('commonDetail',{
                         }
                         .planeFigureGround{
                             z-index: 8;
-                            height: 540px;
+                            height: 530px;
                             width: 100%;
                             position:absolute;
                             top:0px;
@@ -2277,12 +2369,18 @@ export default Vue.component('commonDetail',{
 
 
             }
-            .toolTbale{
+            #toolTbale{
                 width: 85%;
                 margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
                 .toolTbaleList{
+                    // position: fixed;
+                    // table-layout: fixed
                      border-collapse: collapse;
                             border: 1px solid #e6e6e6;
+                            overflow: auto;
                             thead{
                                 background: #f2f2f2;
                                 th{
@@ -2311,6 +2409,52 @@ export default Vue.component('commonDetail',{
                                         border-right: 1px solid #e6e6e6;
                                         font-size: 12px;
                                         color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+                .toolTbaleList1{
+                    border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                    overflow: auto;
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
                                     }
                                 }
                             }

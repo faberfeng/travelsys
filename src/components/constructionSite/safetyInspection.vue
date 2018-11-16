@@ -521,7 +521,7 @@
                     <button class="editBtnC" @click="formulaSettingCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()">
+            <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()" v-loading="sendAlertMessageLoad">
                 <div class="editBody">
                     <p>以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
                     <p>{{alertMessage}}</p>
@@ -836,6 +836,7 @@ export default {
             concreteLevelValue:null,//混凝土等级
             barGradeValue:null,//钢筋牌号
             sendAlertMessageShow:false,//是否发送报警信息弹窗
+            sendAlertMessageLoad:false,//loading
             uploadshow:false,//是否上传图片
             filesList:[],
             imageName:'未选择任何文件',
@@ -1284,6 +1285,7 @@ export default {
         },
         //
         sendAlertMessage(){
+            this.sendAlertMessageLoad=true;
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/sendAlertMessage',
@@ -1296,12 +1298,13 @@ export default {
                     positionId:this.positionValue
                 }
             }).then((response)=>{
-                if(response.data.rt){
+                if(response.data.cd=='0'){
+                    // sendAlertMessageShow
                     // this.alertMessage=response.data.rt;
                     this.sendAlertMessageShow=false;
                     this.$message({
                         type:"success",
-                        message:response.data.msg
+                        message:'发送报警短信成功'
                     })
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -1309,6 +1312,7 @@ export default {
                         message:response.data.msg
                     })
                 }
+                this.sendAlertMessageLoad=false;
             })
         },
         positionChange(){
@@ -2228,7 +2232,7 @@ export default {
         getBaseMapListBtn(){
             this.baseMapShow=true;
             this.isClick0=true;
-            this.isClick=true;
+            // this.isClick=true;
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
@@ -3837,6 +3841,7 @@ export default {
         },
         //选择当前底图
         selectCurBaseMap(val){
+            this.isClick0=false;
             this.baseMapList.forEach((item)=>{
                 if(item.id==val){
                     this.curBaseMapUrl=item.relativeUri;
