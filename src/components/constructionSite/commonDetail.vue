@@ -17,8 +17,8 @@
                 </div>
                 <div class="headMiddle">
                     <label>测试总数：{{itemSubmitCount}} </label>
-                    <label>报警：{{isAlert}}</label>
-                    <label>故障：{{isBroken}}</label>
+                    <label>报警：{{isAlertNum}}</label>
+                    <label>故障：{{isBrokenNum}}</label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -413,6 +413,9 @@ export default Vue.component('commonDetail',{
             saveDrawShow:false,
             pageSize:10,
             monitorPointInfo:'',
+            getDetailPointInfoList:'',
+            isAlertNum:0,
+            isBrokenNum:0,
             getBaseMapInfoByBaseMapIdInfo:'',
             paramsInfo:'',
             angle:0,
@@ -602,6 +605,7 @@ export default Vue.component('commonDetail',{
         this.getMonitorItem();
         this.getAlertArguments();
         this.getBaseMapInfoByBaseMapId();
+        this.getDetailPointInfo();
         
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
@@ -867,6 +871,41 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
+        },
+        //获取监测点基本信息
+        getDetailPointInfo(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getDetailPointInfo',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getDetailPointInfoList=response.data.rt;
+                    this.getDetailPointInfoList.forEach((item)=>{
+                        if(item.isAlert==1){
+                            this.isAlertNum++;
+                        }
+
+                        if(item.isBroken==1){
+                            this.isBrokenNum++;
+                        }
+                    })
+                    // this.isAlertNum='';
+                    // this.isBrokenNum='';
+                    console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.isAlert=this.monitorPointInfo[0].isAlert;
+                    // this.isBroken=this.monitorPointInfo[0].isBroken;
+                    
+                }
+            })
+
         },
          //获取底图中所有的监测点
         getAllMonitorPoint(){
