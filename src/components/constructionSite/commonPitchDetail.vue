@@ -250,8 +250,37 @@
                     <button class="editBtnC" @click="editIndexNumCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog  width="590px" :visible="editMarkShow" title="修改测斜序列" @close="editMarkCancle()">
+            <el-dialog  width="590px" :visible="editMarkShow" title="位置标记管理" @close="editMarkCancle()">
                 <div class="editBody">
+                    <div class="editBodyone">
+                        <div class="markhead">
+                            <label class="txt">位置标记</label>
+                            <label class="btn">插入</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <div class="tablemark">
+                                <table class="marktableList" border="1" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>位置</th>
+                                            <th>标记名称</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <button title="修改" class="editBtn actionBtn"></button>
+                                                <button title="删除" class="actionBtn deleteBtn"></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 
                 </div>
                  <div slot="footer" class="dialog-footer">
@@ -1277,6 +1306,90 @@ select.autoImport{
             }
         .editInput{
 
+        }
+        .markhead{
+            width: 90%;
+            height: 32px;
+            margin:0 auto;
+            position: relative;
+            .txt{
+                position: absolute;
+                left:0px;
+                top:0px;
+                font-size: 14px;
+                line-height: 32px;
+            }
+            .btn{
+                position: absolute;
+                right: 0px;
+                top:0px;
+                margin: 0px;
+                display: inline-block;
+                background: #fc3439;
+                // margin-right: 20px;
+                color: #fff;
+                font-size: 14px;
+                padding-left: 50px;
+                font-weight: normal;
+                line-height: 28px;
+                width: 58px;
+                height: 28px;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                border-radius: 2px;
+            }
+        }
+        .tablemark{
+            margin:0 auto;
+            width: 90%;
+                .marktableList{
+                    border-collapse: collapse;
+                    border: 1px solid #e6e6e6;
+                    thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 30px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                    }
+                    tbody{
+                            tr{
+                                td{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 30px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    .actionBtn{
+                                            width: 18px;
+                                            height: 18px;
+                                            border: none;
+                                            cursor: pointer;
+                                            margin-left: 10px;
+
+                                    }
+                                    .editBtn{
+                                        background: url('./images/overviewedit.png') no-repeat 0 0;
+                                    }
+                                    .deleteBtn{
+                                        background: url('./images/delete1.png') no-repeat 0 0;
+                                    }
+                                }
+                            }
+                    }
+
+                }
         }
     }
 }
