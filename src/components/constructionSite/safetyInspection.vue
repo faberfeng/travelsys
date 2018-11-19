@@ -363,7 +363,7 @@
                                 <button class="upImgBtn" >选择文件</button>
                                 <input type="file" ref="importMoreExcel" id="morefileInfo" @change="addMoreExcel($event)" class="upinput"/>
                             </label>
-                            <span class="upImgText">{{excelMoreFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                            <span class="upImgText">{{excelMoreFileListName}}<label v-show="!excelMoreFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
                     <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;">匹配结果:</label><label>文档内表总数：{{allAmount}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：{{matchedAmount}}</label></div>
@@ -421,7 +421,7 @@
                                     <select class="gatherTimeName" v-model="depthIndexCol" :id="'depthIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                             
                                 </div>
-                                 <div class="editBodytwo" v-show="val.type==4"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
+                                 <div class="editBodytwo" v-show="!frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
                                     <select class="gatherTimeName" v-model="forceIndexCol" :id="'forceIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==4"><label class="editInpText" style="width:18% !important;">
@@ -443,17 +443,18 @@
                                 <div class="editBodytwo" v-show="frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">受力计算公式:</label>
                                     <select class="gatherTimeName" v-model="useFormulaNum" :id="'useFormulaNum'+val.itemId"><option v-for="(item,index) in useFormulaList" :value="item.value+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
+                                <button class="editBtnS editBtnSstyle" v-show="frequencyShow&&val.type==4" @click="formulaSetting(val.itemId)" >公式设定</button>
                             </div>
                         </li>
                     </ul>
                     <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div> -->
-                    <!-- <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div> -->
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="workingConditionList"></textarea></div>
 
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" v-show="frequencyShow" @click="formulaSetting()" >公式设定</button>
-                        <button v-show="testShow" class="editBtnC" style="margin-right:88px;" @click="batchImportVerify()">测试</button>
+                       
+                        <button v-show="testShow" class="editBtnC" style="margin-right:40px;" @click="batchImportVerify()">测试</button>
                         <button v-show="!testShow" class="editBtnS" @click="batchImportVerifyMake()" >确定</button>
                         <button class="editBtnC" @click="batchImportCancle()" >取消</button>
                 </div>
@@ -497,14 +498,14 @@
                         </div> -->
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋的牌号：</label>
-                            <select class="eidtSelect" @change="esChange()" v-model="barGradeValue">
+                            <select class="eidtSelect" @change="esChange(barGradeValue)" v-model="barGradeValue">
                                 <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
                             </select>
                             <i class="sanjiaoicon"></i>
                             <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Es：</label><label>{{barGradeValue}}</label>
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土支撑宽度：</label>
@@ -519,14 +520,14 @@
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土的等级：</label>
-                            <select placeholder="请选择" class="eidtSelect" v-model="concreteLevelValue">
-                                <option v-for="(item,index) in ecList" :value="item.name" @change="ecChange(item.name)" :key="index" v-text="item.name"></option>
+                            <select placeholder="请选择" class="eidtSelect" @change="ecChange(concreteLevelValue)" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name"  :key="index" v-text="item.name"></option>
                             </select>
                              <i class="sanjiaoicon1"></i>
                             <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Ec:</label><label>{{concreteLevelValue}}</label>
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{ecValue}}</label>
                         </div>
                     </div>
                 </div>
@@ -746,9 +747,11 @@ export default {
             saveImportColumnValue:false,//保存导入列数据
             frequencyShow:false,//是否按频率取值受力
             overwrite:false,//是否覆盖
+            workingConditionList:'',
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
             useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
+            getFormulaList:'',//获取受力公式
             useFormulaNum:"1",
             useFormulaList:[
                 {
@@ -1157,14 +1160,21 @@ export default {
             this.acValueArea=(this.concreteWidthValue)*(this.concreteHeightValue)-(this.asValueArea)*(this.barCountValue);
         },
         ecChange(name){
-            console.log(name,'name');
-            this.ecValue=name;
+            this.ecList.forEach((item)=>{
+                if(item.name==name){
+                     this.ecValue=item.value;
+                }
+            })
+            // console.log(name,'name');
+           
         },
-         esChange(){
-            //  this.ecList.forEach((item)=>{
-            //      if()
-            //  })
-            this.esValue=name;
+         esChange(val){
+             this.esList.forEach((item)=>{
+                 if(item.name==val){
+                     this.esValue=item.value;
+                 }
+             })
+           
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
@@ -2575,6 +2585,9 @@ export default {
                 return document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value
             }
         },
+        deleteDocumentMethod(){
+
+        },
         spilitMethod(val){
             if(val==''){
                 return ''
@@ -2586,9 +2599,6 @@ export default {
         batchImportVerify(){
             var listData=[];
             this.sheetList.forEach((item)=>{
-                // console.log(this.documentMethod('sheetName',item),'999');
-                // console.log(document.getElementById('sheetName'+item.itemId).options[document.getElementById('sheetName'+item.itemId).selectedIndex].value,'000');
-                // console.log(document.getElementById('timeCol'+item.itemId).selectedIndex,'122')
                 listData.push(
                     {
                         sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
@@ -2606,9 +2616,7 @@ export default {
                         useFormula:this.spilitMethod(this.documentMethod('useFormulaNum',item)),//计算公式*
                         pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
                     }
-
                 )
-
             })
             console.log(listData,'listData')
 
@@ -2623,6 +2631,7 @@ export default {
                 params:{
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//统一时间
                     overwrite:vm.overwrite,//是否覆盖
+                    userGroupId:vm.selectUgId
                 },
                 data:listData
             }).then((response)=>{
@@ -2630,7 +2639,7 @@ export default {
                   if(response.data.rt==''){
                         this.testShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'测试批量导入数据成功'
                         })
 
@@ -2651,6 +2660,27 @@ export default {
         //批量导入数据
         batchImportVerifyMake(){
              var vm=this;
+             var listData=[];
+            this.sheetList.forEach((item)=>{
+                listData.push(
+                    {
+                        sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
+                        acquisitionTimeIndex:this.spilitMethod(this.documentMethod('timeCol',item)), //采集时间下标*
+                        shiftDistanceIndex:this.spilitMethod(this.documentMethod('distanceCol',item)),//位移下标*
+                        depthIndex:this.spilitMethod(this.documentMethod('depthIndexCol',item)),//深度下标*
+                        elevationIndex:this.spilitMethod(this.documentMethod('altitudeCol',item)),//高程下标*
+                        f0Index:this.spilitMethod(this.documentMethod('f0IndexCol',item)),//初始频率下标*
+                        fnIndex:this.spilitMethod(this.documentMethod('fnIndexCol',item)),//本次频率下标*
+                        kIndex:this.spilitMethod(this.documentMethod('kIndexCol',item)),//率定系数下标*
+                        pipeHeightIndex:this.spilitMethod(this.documentMethod('pipeHeightCol',item)),//管口高度*
+                        gaugeHeightIndex:this.spilitMethod(this.documentMethod('gaugeHeightCol',item)),//水位高度下标（水位）*
+                        forceIndex:this.spilitMethod(this.documentMethod('forceIndexCol',item)),//受力下标*
+                        shiftIndex:this.spilitMethod(this.documentMethod('shiftIndexCol',item)),//位移下标*
+                        useFormula:this.spilitMethod(this.documentMethod('useFormulaNum',item)),//计算公式*
+                        pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
+                    }
+                )
+            })
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/batchImport',
@@ -2660,38 +2690,23 @@ export default {
                 params:{
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//统一时间
                     overwrite:vm.overwrite,//是否覆盖
+                    userGroupId:vm.selectUgId,
+                    workingCondition:vm.workingConditionList
                 },
-                data:{
-                    sheetIndex:vm.sheetIndex,//sheet下标*
-                    acquisitionTimeIndex:vm.timeCol, //采集时间下标*
-                    depthIndex:vm.depthIndexCol,//深度下标*
-                    shiftDistanceIndex:vm.distanceCol,//位移下标*
-                    elevationIndex:vm.altitudeCol,//高程下标*
-                    f0Index:vm.f0IndexCol,//初始频率下标*
-                    fnIndex:vm.fnIndexCol,//本次频率下标*
-                    kIndex:vm.kIndexCol,//率定系数下标*
-                    pipeHeightIndex:vm.pipeHeightCol,//管口高度*
-                    gaugeHeightIndex:vm.gaugeHeightCol,//水位高度下标（水位）*
-                    forceIndex:vm.forceIndexCol,//受力下标*
-                    shiftIndex:vm.shiftIndexCol,//位移下标*
-                    useFormula:vm.useFormulaNum,//计算公式*
-                    pointIndex:vm.spotNumCol,//监测点位下标(除斜度外)*
-                    // itemId:vm.monitorImportId,//监测ID
-                    // commonTime:vm.unifiedTime,//标准时间，不选择可不传
-                    // overwrite:vm.overwrite, //是否覆盖
-                    // workingCondition:vm.inputWorkingCondition,//现场工况
-                    // userGroupId:vm.selectUgId,
-                    // baseMapId:vm.monitorBaseMapId
-                }
+                data:listData
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                  if(response.data.rt==''){
+                  if(response.data.rt==null){
                         this.testShow=false;
+                        this.batchImportDataShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'批量导入数据成功'
                         })
-                        vm.sheetIndex='';//sheet下标*
+                this.getMonitorMainTable();
+                 document.getElementById('editBodyStyle').style.height="280px"
+                this.sheetList='';
+                vm.sheetIndex='';//sheet下标*
                    vm.timeCol='';//采集时间下标*
                    vm.depthIndexCol='';//深度下标*
                     vm.distanceCol='';//位移下标*
@@ -2705,8 +2720,11 @@ export default {
                    vm.shiftIndexCol='';//位移下标*
                     vm.useFormulaNum='';//计算公式*
                     vm.spotNumCol='';//监测点位下标(除斜度外)*
-
-
+                    vm.workingConditionList="";
+                    vm.excelMoreFileListName='';
+                    vm.matchedAmount='';
+                    vm.allAmount='';
+                    vm.workingCondition='';
                     }else{
                         this.$message({
                             type:'info',
@@ -2776,6 +2794,7 @@ export default {
                     vm.overwrite=false;//是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
+                  
                     this.getMonitorItem();
                     this.getDetectionSummary()
                     this.$message({
@@ -3402,9 +3421,45 @@ export default {
             })
         },
         //点击公式设定
-        formulaSetting(){
+        formulaSetting(val){
             this.formulaSettingShow=true;
-            this.useFormulaValue=this.useFormulaNum;
+            console.log(this.useFormulaNum.split('-')[0],'useFormulaNum');
+            this.useFormulaValue=this.useFormulaNum.split('-')[0];
+            if(val){
+                this.monitorImportId=val;
+            }
+            this.getFormula();
+        },
+        //获取受力公式
+        getFormula(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/getFormula',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.monitorImportId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getFormulaList=(response.data.rt)[0];
+                    this.AsValue=this.getFormulaList.as;
+                    this.barCountValue=this.getFormulaList.barCount;
+                    this.barDiameterValue=this.getFormulaList.barDiameter
+                    this.barGradeValue=this.getFormulaList.barGrade
+                    this.concreteHeightValue=this.getFormulaList.concreteHeight
+                    this.concreteLevelValue=this.getFormulaList.concreteLevel
+                    this.concreteWidthValue=this.getFormulaList.concreteWidth
+                    this.EsValue=this.getFormulaList.es
+                    this.useFormulaValue=this.getFormulaList.formula==1?'1':'2'
+                    // console.
+                }else if(response.data.cd=='-1'){
+
+                }
+            })
+
         },
         //取消公式设定
         formulaSettingCancle(){
@@ -3493,8 +3548,30 @@ export default {
         },
         //取消批量数据导入
         batchImportCancle(){
+            var vm=this;
+            this.workingConditionList='';
+             vm.excelMoreFileListName='';
+            vm.matchedAmount='';
+            vm.allAmount='';
+            this.sheetList='';
+             this.excelFileListName='';
+            this.monitorImportName='';
+            this.excelFileList='';
+            vm.sheetIndex='';
+            vm.timeCol=''; //采集时间下标
+            vm.distanceCol='';//位移下标
+            vm.monitorImportId='';//监测ID
+            vm.spotNumCol='';//监测点位下标
+            vm.unifiedTime='';//标准时间，不选择可不传
+            vm.overwrite=false; //是否覆盖
+            vm.inputWorkingCondition='';//现场工况
+            vm.pipeHeightCol='';//管口高度
+            vm.gaugeHeightCol='';//水位下标
             this.batchImportDataShow=false;
+             document.getElementById('morefileInfo').value="";
+             document.getElementById('editBodyStyle').style.height="280px"
         },
+        
         //导入excel表格-获取导入EXCEL文件的sheet信息
         addExcel(){
             var vm=this;
@@ -5555,7 +5632,12 @@ export default {
             }
         }
         #edit{
+            .editBtnSstyle{
+                position:absolute;
+                bottom:40px;
+                left:44px;
 
+            }
             .upInput{
                     display: none;
                 }
