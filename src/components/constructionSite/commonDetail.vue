@@ -9,7 +9,7 @@
         <div class="projectBody">
             <div class="projectBodyHead">
                 <div class="headLeft">
-                    <!-- <span class="headLeftBtn">导出</span> -->
+                    <span class="headLeftBtn" @click="getImportHistory">导出</span>
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
@@ -117,9 +117,9 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
@@ -179,14 +179,14 @@
                         <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(天)：</label>
                         <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">kN/d</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">kN/d</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(时)：</label>
                         <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN/h</label>
                     </div>
                     <!-- <div class="editBodytwo">
                         <label class="editInpText">单次报警变化量：</label>
@@ -244,33 +244,8 @@
                          <div class="tool">
                              <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
                              <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
-                             <!-- <span class="export" @click="verifyImportDeviceMonitorPoint()"><label class="export3"></label><label class="exportTxt">测试</label></span> -->
                         </div>
                         <div id="toolTbale">
-                            <!-- <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
-                                  <colgroup>
-                                    <col width="30%">
-                                    <col width="70%">
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th width="100px">点位名称</th>
-                                        <th width="300px">仪器ID</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            <table class="toolTbaleList1"  cellspacing="0" width="100%">
-                                 <colgroup>
-                                    <col width="30%">
-                                    <col width="70%">
-                                </colgroup>
-                                <tbody>
-                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
-                                        <td width="30%">{{item.virtualPointName}}</td>
-                                        <td width="70%">{{item.devicePointName}}</td>
-                                    </tr>
-                                </tbody>
-                            </table> -->
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
                                     <tr>
@@ -327,6 +302,41 @@
                     <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
+             <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
+                <div class="editBody" >
+                     <div class="editBodytwo">
+                        <div id="toolTbale1">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th><el-checkbox v-model="allCheck"></el-checkbox></th>
+                                        <th>序号</th>
+                                        <th>导入时间</th>
+                                        <th>导入方式</th>
+                                        <th>导入用户</th>
+                                        <th>测点数</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getImportHistoryList" :key="index">
+                                        <td><el-checkbox v-model="item.check"></el-checkbox></td>
+                                        <td>{{item.importNo}}</td>
+                                        <td width="150px !important">{{item.importTime|timeChange1}}</td>
+                                        <td>{{item.type}}</td>
+                                        <td>{{item.importUserName}}</td>
+                                        <td>{{item.pointAmount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button>
+                        <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
+                </div>
+            </el-dialog>
+            
         </div>
     </div>
 </template>
@@ -380,6 +390,9 @@ export default Vue.component('commonDetail',{
             spotChangeLineShow:false,//取消点位改变曲线
             autoAcquisitionShow:false,//自动采集配置
             uploadshow:false,
+            exportHistoryRecoedShow:false,
+            idsList:'',
+            allCheck:false,
             testShow:false,
             filesList:"",
             getDeviceMonitorPointRelationList:'',//获取点位关系数据
@@ -414,6 +427,7 @@ export default Vue.component('commonDetail',{
             pageSize:10,
             monitorPointInfo:'',
             getDetailPointInfoList:'',
+            getImportHistoryList:'',//获取导入历史
             isAlertNum:0,
             isBrokenNum:0,
             getBaseMapInfoByBaseMapIdInfo:'',
@@ -606,7 +620,7 @@ export default Vue.component('commonDetail',{
         this.getAlertArguments();
         this.getBaseMapInfoByBaseMapId();
         this.getDetailPointInfo();
-        
+        this.getDetectionItemCollectWay();
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
     },
@@ -623,6 +637,13 @@ export default Vue.component('commonDetail',{
             return '/';
             } else {
             return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
+        timeChange1(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD HH:mm");
             }
         },
         timeStamp(StatusMinute){	
@@ -652,18 +673,6 @@ export default Vue.component('commonDetail',{
             this.getAllMonitorPoint();
             // this.getBaseMapList()
         },
-        // calculatorId:function(val){
-
-        // },
-        // observerId:function(val){
-
-        // },
-        // inspectorId:function(val){
-
-        // }
-
-
-
     },
     mounted(){
         var vm=this;
@@ -742,6 +751,61 @@ export default Vue.component('commonDetail',{
         //删除点
         deleteDrawCommon(){
             this.$refs.pic.deleteDraw();
+        },
+        //获取导入历史
+        getImportHistory(){
+            var vm=this;
+            this.exportHistoryRecoedShow=true;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getImportHistory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getImportHistoryList=response.data.rt;
+                    this.getImportHistoryList.forEach((item)=>{
+                        this.$set(item,'check',false)
+                    })
+                    console.log(this.getImportHistoryList,'this.getImportHistoryList');
+                }
+            })
+        },
+        //导出所有记录
+        exportAllRecode(){
+
+        },
+        //导出选中记录
+        exportSelectRecode(){
+            
+        },
+        //
+        exportHistoryRecoedCancle(){
+            this.exportHistoryRecoedShow=false;
+        },
+        // 导出选中的历史记录
+        exportHistory(){
+             var vm=this;
+            // this.exportHistoryRecoedShow=true;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getImportHistory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    ids:this.idsList
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.getImportHistoryList=response.data.rt;
+            
+                }
+            })
         },
         //修复故障
         changeBrokenCommon(){
@@ -1480,6 +1544,9 @@ export default Vue.component('commonDetail',{
             }
             return m
         },
+
+
+
         //自动采集按钮
         autoAcquisitionBtn(){
             this.autoAcquisitionShow=true;
@@ -1614,7 +1681,6 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
-
         //获取点位关系
         getDeviceMonitorPointRelation(){
              var vm=this;
@@ -1671,7 +1737,7 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
-        //getCollectSetting
+        //获取采集配置
         getCollectSetting(){
              var vm=this;
             axios({
@@ -1728,39 +1794,6 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
-        //验证导入点位对应关系
-        verifyImportDeviceMonitorPoint(){
-           
-        },
-        //监测项目采集改变
-        importMethodChange(){
-            this.setDetectionItemCollectWay();
-        },
-        //设置监测项目采集方式
-        setDetectionItemCollectWay(){
-             var vm=this;
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'detectionInfo/setDetectionItemCollectWay',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    itemId:this.itemMonitorId,
-                    collectWay:this.importMethod
-                }
-            }).then((response)=>{
-                if(response.data.rt){
-                    
-                }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-            })
-        },
-
         //添加/华环项目节点
         editHuahuanNode(){
              var vm=this;
@@ -1813,15 +1846,60 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
-        //
-        editDeviceMonitorPointRelation(){
+
+        //监测项目采集改变
+        importMethodChange(){
+            this.setDetectionItemCollectWay();
+        },
+        //设置监测项目采集方式
+        setDetectionItemCollectWay(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/setDetectionItemCollectWay',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    collectWay:this.importMethod
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取监测项目采集方式
+        getDetectionItemCollectWay(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getDetectionItemCollectWay',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.importMethod=response.data.rt;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
 
         },
-        //导入点位对应关系
-        importDeviceMonitorPoint(){
-           
-
-        },
+        
 
 
 
@@ -2419,6 +2497,97 @@ export default Vue.component('commonDetail',{
 
             }
             #toolTbale{
+                width: 85%;
+                margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
+                .toolTbaleList{
+                    // position: fixed;
+                    // table-layout: fixed
+                     border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            overflow: auto;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+                .toolTbaleList1{
+                    border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                    overflow: auto;
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+            }
+            #toolTbale1{
                 width: 85%;
                 margin:10px auto;
                 // height: 300px;

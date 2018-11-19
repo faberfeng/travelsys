@@ -43,32 +43,20 @@
                                         <th style="height:100px;padding:10px" colspan="11">{{getSiteConditionList}}</th>
                                     </tr>
                                     <tr>
-                                        <th rowspan="2">序号</th>
-                                        <th rowspan="2">监测类型</th>
-                                        <th rowspan="2">监测内容</th>
-                                        <th rowspan="2">简写</th>
-                                        <th rowspan="2">测点数</th>
-                                        <th rowspan="2">最新数据</th>
-                                        <th colspan="3">本次最大变化量</th>
-                                        <th colspan="3">累计最大变化量</th>
-                                    </tr>
-                                    <tr>
+                                        <th>序号</th>
+                                        <th>监测内容</th>
                                         <th>点号</th>
-                                        <th>取值</th>
-                                        <th >报警</th>
+                                        <th>本次最大变化量</th>
+                                        <th>是否报警</th>
                                         <th>点号</th>
-                                        <th>取值</th>
-                                        <th>报警</th>
+                                        <th>累计变化最大量</th>
+                                        <th>是否报警</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item,index) in getMonitorMainTableList" :key="index">
                                         <td v-text="index+1"></td>
-                                        <td>{{item.type|monitorTypeChange()}}</td>
                                         <td v-text="item.name"></td>
-                                        <td v-text="item.logogram"></td>
-                                        <td v-text="item.count"></td>
-                                        <td >{{item.latestTime|timeChange()}}</td>
                                         <td >{{item.recentPointName|addSprit()}}</td>
                                         <td>{{item.recentVariation|addSprit1()}}</td>
                                         <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
@@ -140,45 +128,10 @@
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            <!-- <div v-show="baseMapPosition==1" class="showBasePic"></div> -->
+                            
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
-                                        <!-- <tr>
-                                            <th rowspan="2">测点编号</th>
-                                            <th v-show="item.type!=3" colspan="2">初始采集</th>
-                                            <th v-show="item.type==3" colspan="3">初始采集</th>
-                                            <th v-show="item.type!=3" colspan="2">上次采集</th>
-                                            <th v-show="item.type==3" colspan="3">上次采集</th>
-                                            <th v-show="item.type!=3" colspan="2">本次采集</th>
-                                            <th v-show="item.type==3" colspan="3">本次采集</th>
-                                            <th colspan="3">变化量</th>
-                                        </tr>
-                                        <tr>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>变化时间</th>
-                                            <th v-show="item.type!=4">本次(mm)</th>
-                                            <th v-show="item.type==4">本次(kN)</th>
-                                            <th v-show="item.type!=4">累计(mm)</th>
-                                            <th v-show="item.type==4">累计(kN)</th>
-                                        </tr> -->
                                         <tr>
                                             <td rowspan="2">测点编号</td>
                                             <td colspan="2" v-show="item.type==1">位移(mm)</td>
@@ -207,93 +160,13 @@
                                             <td>{{val.currentVariation|addSprit()}}</td>
                                             <td>{{val.totalVariation|addSprit()}}</td>
                                             <td></td>
-
-
-
-                                            <!-- <td>{{val.pointName|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td >{{val.initValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td >{{val.referenceValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td>{{val.currentValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeStamp()}}</td>
-                                            <td>{{val.recentVariation|addSprit()}}</td>
-                                            <td>{{val.totalVariation|addSprit()}}</td> -->
-
-                                              <!-- <td>{{val.pointName|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td >{{val.initValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td >{{val.referenceValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeChange()}}</td>
-                                            <td>{{val.currentValue|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
-                                            <td>{{val.acquisitionTime|timeStamp()}}</td>
-                                            <td>{{val.recentVariation|addSprit()}}</td>
-                                            <td>{{val.totalVariation|addSprit()}}</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- <div v-show="baseMapPosition==2" class="showBasePic"></div> -->
+                            <div  class="showBasePic"></div>
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
-                        <!-- <div class="verticalLength1" v-show="item.type==5">
-                            <label class="pdfSummaryHead1">{{company}}</label>
-                            <label class="pdfSummaryHead">监测报表</label>
-                            <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
-                            <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            <div class="containerTable">
-                                <table class="containerList" border="1" cellspacing="0" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th rowspan="2">序列编号</th>
-                                            <th rowspan="2">关键字</th>
-                                            <th rowspan="2">起始标高</th>
-                                            <th rowspan="2">结束标高</th>
-                                            <th rowspan="2">点位间隔</th>
-                                            <th rowspan="2">点位数量</th>
-                                            <th colspan="3">当前最大值</th>
-                                            <th colspan="4">累计最大变化量</th>
-                                        </tr>
-                                        <tr>
-                                            <th>位置</th>
-                                            <th>位移</th>
-                                            <th>报警</th>
-                                            <th>时间间隔</th>
-                                            <th>位置</th>
-                                            <th>变化</th>
-                                            <th>报警</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(item,index) in item.dataList" :key="index">
-                                            <td v-text="$options.filters.addSprit(item.name)"></td>
-                                            <td v-text="$options.filters.addSprit(item.keyword)"></td>
-                                            <td v-text="$options.filters.addSprit(item.initDepth)"></td>
-                                            <td v-text="$options.filters.addSprit(item.terminalDepth)"></td>
-                                            <td v-text="item.pointDistance"></td>
-                                            <td v-text="item.pointAmount"></td>
-                                            <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
-                                            <td v-text="$options.filters.addSprit(item.maxShift)"></td>
-                                            <td>{{item.maxAlert|shifouChange()}}</td>
-                                            <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
-                                            <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
-                                            <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
-                                            <td>{{item.maxVariationAlert|shifouChange()}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
-                        </div> -->
                     </li>
                 </ul>
                 <!-- 下载到本地 -->
@@ -615,12 +488,12 @@ export default {
                 url:this.coverPath
             }).then((response)=>{
                 var a=response.data;
-                console.log(a,'url1111');
+                // console.log(a,'url1111');
                 let reader = new window.FileReader();
                 reader.onloadend = function() {
                     const data = reader.result;
                      
-                    console.log(data);
+                    // console.log(data);
                     // this.imgUrl = data;
                     document.getElementById('img1').src=data
                 };
@@ -713,6 +586,18 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getMonitorMainTableList=response.data.rt;
+                    var length=this.getMonitorMainTableList.length;
+                    for(var i=length;i<11;i++){
+                        this.getMonitorMainTableList.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
+                            ,recentPointName:null
+                            ,recentVariation:null
+                            ,totalAlert:null
+                            ,totalPointId:null
+                            ,totalPointName:null
+                            ,totalVariation:null
+                            ,type:null})
+                    }
+                    console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
                 }
             })
         },
@@ -808,6 +693,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
+                    // console.log(this.getReportDatasList,'this.getReportDatasList');
                     var mapList = new Map();
                     for (var i = 0; i < this.getReportDatasList.length;i++){
                         var itemId = this.getReportDatasList[i].itemId;
@@ -825,11 +711,28 @@ export default {
                     this.getAllMonitorItemList.forEach((item)=>{
                         mapList.forEach((value, key, mapObject)=>{
                             if(key==item.id){
-                                this.$set(item,'dataList',value)
+                                    // console.log(value,'value123');
+                                    var aLength=0;
+                                    aLength=value.length;
+                                    if(aLength<=20){
+                                        for(var i=aLength;i<20;i++){
+                                            value.push({acquisitionTime:null,currentValue:null,currentVariation:null,initValue:null
+                                                        ,itemId:null
+                                                        ,itemType:null
+                                                        ,otherParam:null
+                                                        ,pointId:null
+                                                        ,pointName:null
+                                                        ,referenceValue:null
+                                                        ,seqId:null
+                                                        ,totalVariation:null})
+                                        }
+                                    }
+                                    this.$set(item,'dataList',value)
                                 }
                             });
                     })
-                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                    //  console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                    //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
             })
@@ -1316,7 +1219,7 @@ export default {
                     .bottomTabel{
                         width: 90%;
                         margin:0 auto;
-                        height: 611px;
+                        height: 395px;
                         overflow: hidden;
                             .bottomTableList{
                                 border-collapse: collapse;
@@ -1326,7 +1229,7 @@ export default {
                                         th{
                                             // padding-left: 6px;
                                             // padding-right: 15px;
-                                            height: 32px;
+                                            height: 18px;
                                             text-align: center;
                                             box-sizing: border-box;
                                             border-right: 0.5px solid #000;
@@ -1340,7 +1243,7 @@ export default {
                                             td{
                                                 // padding-left: 6px;
                                                 // padding-right: 15px;
-                                                height: 32px;
+                                                height: 18px;
                                                 text-align: center;
                                                 box-sizing: border-box;
                                                 border-right: 0.5px solid #000;
@@ -1369,7 +1272,7 @@ export default {
                     .showBasePic{
                         width: 90%;
                         margin:0 auto;
-                        height: 220px;
+                        height: 210px;
                         margin-top:10px;
                         margin-bottom: 10px;
                         border:1px solid #ccc;

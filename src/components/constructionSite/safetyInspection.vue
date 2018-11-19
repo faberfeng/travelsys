@@ -80,7 +80,7 @@
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
-                            <!-- <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span> -->
+                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
                             <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">图片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
@@ -298,9 +298,8 @@
                         </span>
                     </div>
                     <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">匹配结果</label><label>文档内表总数：{{getPitchBaseInfoListLength}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：</label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao1"></i> -->
-                    </div>
+                    <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
+                    </div> -->
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
                     <div class="editBodytwo" v-show="monitorImportType!=5"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
                     <!-- <i class="icon-sanjiao2"></i> -->
@@ -863,6 +862,7 @@ export default {
             fileListCover:'',
             coverPathUrl:'',
             excelSheetInfo:'',//获取导入EXCEL文件的sheet信息
+            excelSheetInfoLength:'',//获取表格的个数
             excelFileList:'',
             excelFileListName:'',
             excelMoreFileList:'',
@@ -3590,6 +3590,7 @@ export default {
                     }).then((response)=>{
                         if(response.data.cd=='0'){
                             this.excelSheetInfo=response.data.rt;
+                            this.excelSheetInfoLength=response.data.rt.length;
                             console.log(this.excelSheetInfo);
                             if(vm.monitorImportType==5){
                                 this.excelSheetInfo.forEach((item)=>{
@@ -4729,7 +4730,7 @@ export default {
         },
         //html转PDF
         getPdf(){
-                let pdfDom = document.querySelector('#inspectionBody')
+                let pdfDom = document.querySelector('#pdfImport')
                 console.log(pdfDom,'pdfDom');
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
