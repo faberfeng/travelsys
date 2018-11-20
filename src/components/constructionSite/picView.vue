@@ -37,7 +37,10 @@ export default {
             Max_Select:10000,
             Max_type:1000,
             Selected_typeNum_List:[],
-            userData:{}
+            userData:{},
+            old_para:"",
+            drawList:[],
+            Refresh_timer:0
         }
     },
     destroyed(){
@@ -50,14 +53,12 @@ export default {
         this.ResolutionScale = 1.0;
         this.drawCount = 0;
         this.drawMaxCount = 0;
-        this.drawList = [];
         this.startMove = false;
         this.drawtype_move = true;
         this.drawtype_move = true;
         this.drawtype_level = true;
         this.drawtype_force = true;
         this.drawtype_slanting = true;
-        this.Refresh_timer = null;
         this.drawing = false;
         this.lastMovePostion = {x:0,y:0};
         this.PDFsize = {width:0,height:0};
@@ -68,8 +69,21 @@ export default {
 
         this.drawID = 1;
 
-        this.Refresh_timer = setInterval(()=>{
-            // console.log(this.para);
+        this.Refresh_timer = setInterval(this.Refresh_timer_fun,500);
+    },
+    filters:{
+
+    },
+    watch:{
+        para: (newVal,oldVal)=>{
+            // console.log(newVal);
+        }
+    },
+    methods:{
+        Refresh_timer_fun(){
+            
+            // console.log(this.drawList);
+            // console.log(this.old_para);
             if(this.para.type=="")return;
             // console.log(this.para,'this.para.type')
 
@@ -77,7 +91,7 @@ export default {
                 this.para.type="PDF";
                 if(this.para.source != this.old_para){
 
-                    console.log(this.para);
+                    // console.log(this.para);
 
                     this.drawList = [];
 
@@ -119,9 +133,10 @@ export default {
                     this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
                     this.$refs.picView.style.left = "0px";
                     this.$refs.picView.style.top = "0px";
-                    if(this.para.angle){
+                    if(this.para.angle != undefined){
                         this.angle = parseInt(this.para.angle);
                     }
+
                     this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
                     this.old_para = this.para.source;
                     
@@ -132,17 +147,8 @@ export default {
             this.Refresh();
 
             
-        },500);
-    },
-    filters:{
-
-    },
-    watch:{
-        para: (newVal,oldVal)=>{
-            // console.log(newVal);
-        }
-    },
-    methods:{
+        
+        },
         Select_item(){
             if(this.SelectedList.length > 0){
                 if(this.SelectedList[0].type == "Select_img_Mark"){
@@ -151,8 +157,7 @@ export default {
             }
         },
         init(div,source,type,page_No,angle){
-
-            
+         
             this.scale_list = [0.3,0.5,0.75,0.8,1.0,1.5,2.0,3.0];
             this.scale_list_index = 4;
             this.scale = this.scale_list[this.scale_list_index];
@@ -1969,6 +1974,35 @@ export default {
             for(let i = 0; i < this.drawList.length;i++){
                 if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
                     this.drawList[i].display = status;
+                }
+            }
+
+            this.Refresh();
+        },
+        enableTypeOne(drawtype,drawItemId,status){
+            // switch(drawtype){
+            //     case 1: //  位移
+            //         this.drawtype_move = status;
+            //         break;
+            //     case 2: //  位移
+            //         this.drawtype_move = status;
+            //         break;
+            //     case 3: //  水位
+            //         this.drawtype_level = status;
+            //         break;
+            //     case 4: //  力
+            //         this.drawtype_force = status;
+            //         break;
+            //     case 5: //  倾斜
+            //         this.drawtype_slanting = status;
+            //         break;
+            // }
+
+            for(let i = 0; i < this.drawList.length;i++){
+                if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
+                    this.drawList[i].display = status;
+                }else{
+                    this.drawList[i].display = false;
                 }
             }
 
