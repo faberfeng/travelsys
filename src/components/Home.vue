@@ -21,7 +21,7 @@
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase"></el-tab-pane>
-                                <el-tab-pane label="施工现场" v-if="auth.constructionSite" name="construction"></el-tab-pane>
+                                <el-tab-pane label="安全管理" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings"></el-tab-pane>
                             </el-tabs>
@@ -510,7 +510,8 @@ export default {
                     }else if(vm.auth.design){
                         vm.$router.push({
                             // path:'/Design/management'//设计管理
-                            path:'/Design/drawingReview'
+                            path:'/Design/management'
+                            
                         })
                     }else if(vm.auth.costManagement){
                         vm.$router.push({
@@ -526,7 +527,7 @@ export default {
                         })
                     }else if(vm.auth.constructionSite){
                         vm.$router.push({
-                            path:'/constructionSite/fieldConnection'//施工现场
+                            path:'/constructionSite/safetyInspection'//施工现场
                         })
                     }else if(vm.auth.docManagement){
                         vm.$router.push({
@@ -568,7 +569,7 @@ export default {
             }else if(tab.label === '设计管理'){
                 this.$router.push({
                     // path:'/Design/management'
-                    path:'/Design/drawingReview'
+                    path:'/Design/management'
                 });
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
@@ -584,9 +585,9 @@ export default {
                 this.$router.push({
                     path:'/metarialpurchase/productioncenter'//物资采购
                 })
-            }else if(tab.label === '施工现场'){
+            }else if(tab.label === '安全管理'){
                 this.$router.push({
-                    path:'/constructionSite/fieldConnection'
+                    path:'/constructionSite/safetyInspection'
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

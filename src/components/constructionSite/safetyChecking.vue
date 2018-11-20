@@ -2,6 +2,9 @@
     <div id="safetyChecking">
             <div class="topHeader">
                 <div id="item-box-file">
+                    <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
+                    安全监测  
+                    </router-link>
                     <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
                     现场连线  
                     </router-link>
@@ -13,9 +16,6 @@
                     </router-link>
                     <router-link :to="'/constructionSite/safetyChecking'" class="label-item label-item-active">  
                     安全检查  
-                    </router-link>
-                    <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
-                    安全监测  
                     </router-link>
                 </div>
                 <div id="project" v-show="showSafetyCheck">
@@ -1216,7 +1216,7 @@ export default {
         this.parentItemId=this.itemId;
         this.parentItemName=this.itemName;
         this.getManageDept();
-        
+        this.addCheckItemNodeShow=true;
         if(this.parentItemName){
             this.validateAddNode();
         }

@@ -3469,9 +3469,9 @@
                     this.getEntityRelation();
                     this.checkedItem={};
                     this.loadManifestList=[];
-                    if(response.data.msg!=null){
-                      alert(response.data.msg);
-                    }
+                    // if(response.data.msg!=null){
+                    //   alert(response.data.msg);
+                    // }
                     this.$message({
                       type:'success',
                       message:'添加清单成功'

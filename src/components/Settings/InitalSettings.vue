@@ -74,7 +74,7 @@
                     </div>
                     <div style="font-size:18px;color:#333333;margin-top:10px;">打开手机浏览器扫码申请加入</div>
                     <div style="font-size:16px;color:#999999;margin-top:10px;">{{projectName}}</div>
-                    <div style="font-size:16px;color:#999999;margin-top:5px;">BIM协调管理平台</div>
+                    <div style="font-size:16px;color:#999999;margin-top:5px;">BIM协同管理平台</div>
 
                 </div>
             </el-dialog>

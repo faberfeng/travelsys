@@ -2,14 +2,14 @@
     <div id="commonDetail">
         <div class="project">
             <p class="antsLine">
-                施工现场<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
+                安全管理<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全监测</span><i class="icon-sanjiao-right"></i>
                 <span class="strong">{{projctName}}</span>
             </p>
         </div>
         <div class="projectBody">
             <div class="projectBodyHead">
                 <div class="headLeft">
-                    <!-- <span class="headLeftBtn">导出</span> -->
+                    <span class="headLeftBtn" @click="getImportHistory">导出</span>
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
@@ -17,8 +17,8 @@
                 </div>
                 <div class="headMiddle">
                     <label>测试总数：{{itemSubmitCount}} </label>
-                    <label>报警：{{isAlert}}</label>
-                    <label>故障：{{isBroken}}</label>
+                    <label>报警：{{isAlertNum}}</label>
+                    <label>故障：{{isBrokenNum}}</label>
                 </div>
                 <div class="headRight">
                     <span class="autoImportTxt">采集方式:</span>
@@ -45,7 +45,7 @@
                     <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
                 </div>
                 <div class="rightBottomCheck">
-                        <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox>
+                        <!-- <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox> -->
                         <el-checkbox v-model="displaySpotNum" @change="displaySubmitSpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                 </div>
                 
@@ -117,9 +117,9 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">KN/d</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
@@ -179,14 +179,14 @@
                         <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(天)：</label>
                         <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label v-show="itemMonitorType!=4">mm/d</label><label v-show="itemMonitorType==4">kN/d</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">kN/d</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editInpText" style="width:27% !important">单次报警变化量：</label>
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(时)：</label>
                         <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
-                        <label v-show="itemMonitorType!=4">mm/h</label><label v-show="itemMonitorType==4">KN/h</label>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN/h</label>
                     </div>
                     <!-- <div class="editBodytwo">
                         <label class="editInpText">单次报警变化量：</label>
@@ -228,29 +228,115 @@
             </el-dialog>
             <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
-                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">项目ID：</label><input class="gatherTimeNameInp"/>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华桓'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input v-model="nodeId" class="gatherTimeNameInp"/>
                     </div>
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
-                        <el-radio v-model="radio" label="1">1小时</el-radio>
-                        <el-radio v-model="radio" label="2">1天</el-radio>
+                        <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
+                        <el-radio v-model="collectRateRadio" label="2">1天</el-radio>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间：</label>
-                        <select class="gatherTimeName" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.index" :key="index" v-text="item.label"></option></select>
+                    <div class="editBodytwo" v-show="collectRateRadio=='2'"><label class="editInpText" style="width:18% !important;">采集时间：</label>
+                        <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
-                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">仪器ID设置：</label>
-                        
-                    </div>
-                     
+                     <div class="editBodytwo" v-show="manufacturerValue=='基康'">
+                         <label class="editInpText" style="width:13% !important;">仪器ID设置</label>
+                         <div class="tool">
+                             <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
+                             <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                        </div>
+                        <div id="toolTbale">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">点位名称</th>
+                                        <th width="300px">仪器ID</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
+                                        <td width="30%">{{item.virtualPointName}}</td>
+                                        <td width="70%">{{item.devicePointName}}</td>
+                                    </tr>
+                                </tbody>
 
+                            </table>
+
+                        </div>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnC" style="margin-right:88px;" >测试</button>
-                        <button class="editBtnS"  >确定</button>
+                        <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
             </el-dialog>
+            <el-dialog title="文件导入" :visible="uploadshow" @close="upImgCancle">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody">
+                        <label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <span @click="selectImg">
+                                <button class="upImgBtn">选择文件</button>
+                            </span>
+                            <input class="upInput"  type="file"  @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{imageName}}</span> 
+                    </div>
+                     <div class="editBodytwo">
+                         <label class="editInpText" style="width:18% !important;">设备ID点位下标:</label>
+                         <select v-model="devicePointIndex" class="sheetName">
+                             <option v-for="(item,index) in getSingleSheetTitleInfoList"  :value="item.index" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                         <label class="editInpText" style="width:18% !important;">虚拟点位名称下标:</label>
+                         <select v-model="virtualPointIndex" class="sheetName">
+                             <option v-for="(item,index) in getSingleSheetTitleInfoList"  :value="item.index" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
+                <div slot="footer" class="dialog-footer">
+                    <button v-show="testShow" class="editBtnS" @click="uploadIMG">确认</button>
+                     <button v-show="!testShow" class="editBtnC" style="background:#ccc;margin-right:15px" @click="testProject">测试</button>
+                    <button class="editBtnC" @click="upImgCancle">取消</button>
+                </div>
+            </el-dialog>
+             <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
+                <div class="editBody" >
+                     <div class="editBodytwo">
+                        <div id="toolTbale1">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th><el-checkbox v-model="allCheck"></el-checkbox></th>
+                                        <th>序号</th>
+                                        <th>导入时间</th>
+                                        <th>导入方式</th>
+                                        <th>导入用户</th>
+                                        <th>测点数</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getImportHistoryList" :key="index">
+                                        <td><el-checkbox v-model="item.check"></el-checkbox></td>
+                                        <td>{{item.importNo}}</td>
+                                        <td width="150px !important">{{item.importTime|timeChange1}}</td>
+                                        <td>{{item.type}}</td>
+                                        <td>{{item.importUserName}}</td>
+                                        <td>{{item.pointAmount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button>
+                        <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
+                </div>
+            </el-dialog>
+            
         </div>
     </div>
 </template>
@@ -270,6 +356,8 @@ export default Vue.component('commonDetail',{
     name:'commonDetail',
     data(){
         return{
+            nodeId:'',//华环的项目id
+            getHuahuanNodeList:"",//获取华环的数据
             picMark:false,
             displaySpotNum:false,
             importMethod:1,
@@ -283,8 +371,10 @@ export default Vue.component('commonDetail',{
                     label:'自动采集'
                 }
             ],
-            radio:'1',
-            manufacturerValue:'',
+            collectRateRadio:'1',
+            manufacturerValue:'华桓',
+            devicePointIndex:'',
+            virtualPointIndex:'',
             currentPage2:1,
             getAlertArgumentsList:'',//获取报警参数
             changeAlertDay:'',
@@ -299,6 +389,15 @@ export default Vue.component('commonDetail',{
             editAlertValueShow:false,//编辑报警值
             spotChangeLineShow:false,//取消点位改变曲线
             autoAcquisitionShow:false,//自动采集配置
+            uploadshow:false,
+            exportHistoryRecoedShow:false,
+            idsList:'',
+            allCheck:false,
+            testShow:false,
+            filesList:"",
+            getDeviceMonitorPointRelationList:'',//获取点位关系数据
+            getSingleSheetTitleInfoList:'',
+            imageName:"未选择任何文件",
             acquisitionTimeXlist:[],
             acquisitionTimeYlist:'',
             elevationYlist:[],
@@ -327,6 +426,10 @@ export default Vue.component('commonDetail',{
             saveDrawShow:false,
             pageSize:10,
             monitorPointInfo:'',
+            getDetailPointInfoList:'',
+            getImportHistoryList:'',//获取导入历史
+            isAlertNum:0,
+            isBrokenNum:0,
             getBaseMapInfoByBaseMapIdInfo:'',
             paramsInfo:'',
             angle:0,
@@ -391,14 +494,15 @@ export default Vue.component('commonDetail',{
             },
             manufacturerList:[
                 {
-                    value:'huahuan',
-                    label:'华环'
+                    value:'华桓',
+                    label:'华桓'
                 },
                 {
-                    value:'jikang',
+                    value:'基康',
                     label:'基康'
                 }
             ],
+            collectHour:0,//采集时间
             timeList:[
                 {
                     value:0,
@@ -515,7 +619,8 @@ export default Vue.component('commonDetail',{
         this.getMonitorItem();
         this.getAlertArguments();
         this.getBaseMapInfoByBaseMapId();
-        
+        this.getDetailPointInfo();
+        this.getDetectionItemCollectWay();
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
     },
@@ -532,6 +637,13 @@ export default Vue.component('commonDetail',{
             return '/';
             } else {
             return moment(val).format("YYYY-MM-DD HH:mm");
+            }
+        },
+        timeChange1(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD HH:mm");
             }
         },
         timeStamp(StatusMinute){	
@@ -561,18 +673,6 @@ export default Vue.component('commonDetail',{
             this.getAllMonitorPoint();
             // this.getBaseMapList()
         },
-        // calculatorId:function(val){
-
-        // },
-        // observerId:function(val){
-
-        // },
-        // inspectorId:function(val){
-
-        // }
-
-
-
     },
     mounted(){
         var vm=this;
@@ -583,6 +683,9 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+         selectImg(){
+             this.$refs.file.click()
+        },
         displaySubmitSpot(){
             this.$refs.pic.enableLabel(this.displaySpotNum);
 
@@ -648,6 +751,61 @@ export default Vue.component('commonDetail',{
         //删除点
         deleteDrawCommon(){
             this.$refs.pic.deleteDraw();
+        },
+        //获取导入历史
+        getImportHistory(){
+            var vm=this;
+            this.exportHistoryRecoedShow=true;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getImportHistory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getImportHistoryList=response.data.rt;
+                    this.getImportHistoryList.forEach((item)=>{
+                        this.$set(item,'check',false)
+                    })
+                    console.log(this.getImportHistoryList,'this.getImportHistoryList');
+                }
+            })
+        },
+        //导出所有记录
+        exportAllRecode(){
+
+        },
+        //导出选中记录
+        exportSelectRecode(){
+            
+        },
+        //
+        exportHistoryRecoedCancle(){
+            this.exportHistoryRecoedShow=false;
+        },
+        // 导出选中的历史记录
+        exportHistory(){
+             var vm=this;
+            // this.exportHistoryRecoedShow=true;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getImportHistory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    ids:this.idsList
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.getImportHistoryList=response.data.rt;
+            
+                }
+            })
         },
         //修复故障
         changeBrokenCommon(){
@@ -777,6 +935,41 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
+        },
+        //获取监测点基本信息
+        getDetailPointInfo(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'detectionInfo/getDetailPointInfo',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getDetailPointInfoList=response.data.rt;
+                    this.getDetailPointInfoList.forEach((item)=>{
+                        if(item.isAlert==1){
+                            this.isAlertNum++;
+                        }
+
+                        if(item.isBroken==1){
+                            this.isBrokenNum++;
+                        }
+                    })
+                    // this.isAlertNum='';
+                    // this.isBrokenNum='';
+                    console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
+                    // this.monitorPointInfo=response.data.rt;
+                    // this.isAlert=this.monitorPointInfo[0].isAlert;
+                    // this.isBroken=this.monitorPointInfo[0].isBroken;
+                    
+                }
+            })
+
         },
          //获取底图中所有的监测点
         getAllMonitorPoint(){
@@ -1351,14 +1544,309 @@ export default Vue.component('commonDetail',{
             }
             return m
         },
+
+
+
         //自动采集按钮
         autoAcquisitionBtn(){
             this.autoAcquisitionShow=true;
+            this.getCollectSetting();
+           
         },
         //取消自动采集配置
         autoAcquisitionCancle(){
             this.autoAcquisitionShow=false;
         },
+        manufacturerChange(){
+            if(this.manufacturerValue=='基康'){
+                this.getDeviceMonitorPointRelation();
+            }
+        },
+        //自动采集配置确认
+        autoAcquisitionMakeSure(){
+            if(this.manufacturerValue=='华桓'){
+                this.editHuahuanNode();
+                this.setCollectSetting();
+                this.nodeId='';
+            }else if(this.manufacturerValue=='基康'){
+                this.setCollectSetting();
+                 this.$message({
+                        type:'success',
+                        message:'自动采集成功'
+                    })
+                this.autoAcquisitionShow=false;
+            }
+
+
+        },
+        //导入
+        autoExport(){
+            this.uploadshow=true;
+        },
+        upImgCancle(){
+            this.uploadshow=false;
+        },
+        fileChanged(file){
+            var vm = this
+            vm.filesList = vm.$refs.file.files[0]; //[]
+            vm.imageName = vm.filesList.name;
+            var formData =new FormData();
+            formData.append('multipartFile',vm.filesList);
+                axios({
+                    method:'post',
+                    headers:{
+                        'token':vm.token
+                    },
+                    url:vm.BDMSUrl+'detectionInfo/getSingleSheetTitleInfo',
+                    data:formData
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getSingleSheetTitleInfoList=response.data.rt;
+                        // this.devicePointIndex=this.getSingleSheetTitleInfoList[2].index;
+                        // this.virtualPointIndex=this.getSingleSheetTitleInfoList[2].index;
+                        // vm.filesList='';
+                        // vm.imageName='未选择任何文件';
+                        // vm.uploadshow=false;
+                    }
+            })
+            console.log(vm.filesList,'vm.filesList');
+        },
+        //上传
+        uploadIMG(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/importDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    devicePointIndex:this.devicePointIndex,//设备点位下标
+                    virtualPointIndex:this.virtualPointIndex,//虚拟点位下标
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // alert('23');
+                    vm.uploadshow=false;
+                    this.$message({
+                        type:'success',
+                        message:'文件导入成功'
+                    })
+                    this.getDeviceMonitorPointRelation();
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+            document.getElementById('fileInfo').value="";
+        },
+        //测试
+        testProject(){
+            var vm=this;
+            var formData =new FormData();
+            formData.append('multipartFile',vm.filesList);
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/verifyImportDeviceMonitorPoint',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    devicePointIndex:this.devicePointIndex,//设备点位下标
+                    virtualPointIndex:this.virtualPointIndex,//虚拟点位下标
+                },
+                data:formData
+                // data:vm.multipartFile
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.testShow=true;
+                    this.$message({
+                        type:'success',
+                        message:'测试成功'
+                    })
+                    // alert('23');
+                    // vm.uploadshow=false;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取点位关系
+        getDeviceMonitorPointRelation(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getDeviceMonitorPointRelation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                },
+            }).then((response)=>{
+                if(response.data.rt.length!=0){
+                    this.getDeviceMonitorPointRelationList=response.data.rt;
+                    document.getElementById('toolTbale').style.height='300px';
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }else{
+                    // document.getElementById('toolTbale').style.height='0px';
+                }
+            })
+        },
+        //设置采集配置
+        setCollectSetting(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/setCollectSetting',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    collectRate:parseInt(this.collectRateRadio),//采集频率
+                    collectHour:this.collectHour,//采集时间
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.manufacturerValue='';
+                    this.collectRateRadio='1';
+                    this.collectHour='';
+                   
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //获取采集配置
+        getCollectSetting(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getCollectSetting',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                    collectRate:parseInt(this.collectRateRadio),//采集频率
+                    collectHour:this.collectHour,//采集时间
+                },
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.manufacturerValue=response.data.rt.manufacturer;
+                    if( this.manufacturerValue=="基康"){
+                        this.getDeviceMonitorPointRelation();
+                    }
+                    this.collectRateRadio=response.data.rt.collectRate==1?'1':'2';
+                    this.collectHour=response.data.rt.collectHour;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //清空点位关系
+        clearDeviceMonitorPointRelation(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/clearDeviceMonitorPointRelation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    manufacturer:vm.manufacturerValue,
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                        document.getElementById('toolTbale').style.height='0px';
+                        this.getDeviceMonitorPointRelation()
+                    // this.manufacturerValue='';
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        //添加/华环项目节点
+        editHuahuanNode(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/editHuahuanNode',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    nodeId:this.nodeId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.autoAcquisitionShow=false;
+                    this.nodeId='';
+                    this.$message({
+                        type:'success',
+                        message:'自动采集成功'
+                    })
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        // 获取华环项目节点
+        getHuahuanNode(){
+             var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getHuahuanNode',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.getHuahuanNodeList=response.data.rt;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+
         //监测项目采集改变
         importMethodChange(){
             this.setDetectionItemCollectWay();
@@ -1386,7 +1874,33 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
-        }
+        },
+        //获取监测项目采集方式
+        getDetectionItemCollectWay(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getDetectionItemCollectWay',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                    this.importMethod=response.data.rt;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
+        },
+        
+
 
 
     }
@@ -1664,7 +2178,7 @@ export default Vue.component('commonDetail',{
                         }
                         .planeFigureGround{
                             z-index: 8;
-                            height: 540px;
+                            height: 530px;
                             width: 100%;
                             position:absolute;
                             top:0px;
@@ -1923,6 +2437,266 @@ export default Vue.component('commonDetail',{
                 font-size: 14px;
                 outline: none;
             }
+            .tool{
+                float: right;
+                margin-right:52px;
+                .export{
+                    position: relative;
+                    width:60px;
+                    display: inline-block;
+                    .export1{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/export.png') no-repeat 0 0;
+                    }
+                    .export2{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/clear.png') no-repeat 0 0;
+                    }
+                    .export3{
+                         display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        cursor: pointer;
+                        margin-right:10px;
+                        // margin-top:10px;
+                        background: url('./images/save1.png') no-repeat 0 0;
+                    }
+                    .exportTxt{
+                        position: absolute;
+                        width: 50px;
+                        top:-3px;
+                        cursor: pointer;
+                        // left:2px;
+                        
+                        // display: inline-block;
+                    }
+                   
+
+                }
+                .clear{
+
+                }
+                .text{
+
+                }
+                
+
+
+            }
+            #toolTbale{
+                width: 85%;
+                margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
+                .toolTbaleList{
+                    // position: fixed;
+                    // table-layout: fixed
+                     border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            overflow: auto;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+                .toolTbaleList1{
+                    border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                    overflow: auto;
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+            }
+            #toolTbale1{
+                width: 85%;
+                margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
+                .toolTbaleList{
+                    // position: fixed;
+                    // table-layout: fixed
+                     border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            overflow: auto;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+                .toolTbaleList1{
+                    border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                    overflow: auto;
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                }
+            }
+            .sheetName{
+                width: 375px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .editBtnT{
+
+            }
+
         }
     }
 

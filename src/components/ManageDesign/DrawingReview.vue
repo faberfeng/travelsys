@@ -3,11 +3,11 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;">
                 <div id="item-box-file">
-                    <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
-                     图纸评审  
-                    </router-link>
                     <router-link :to="'/Design/management'" class="label-item">  
                      设计协调  
+                    </router-link>
+                    <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
+                     图纸评审  
                     </router-link>
                     <router-link :to="'/Design/attributeManager'"  class="label-item">  
                         属性管理  
@@ -16,10 +16,7 @@
                         设计版本  
                     </router-link>
                 </div>
-                 <div class="noImg" v-show="!versionPath">
-                        <!-- <img style="width:140px;height:115px" src="../../assets/nodata.png"/> -->
-                        <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
-                </div>
+                
                 <div class="commentInformation" >
                     <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
@@ -45,8 +42,14 @@
                 </div>
                
 <!-- v-show="versionPath" -->
-                <div  id="drawingPic" style="overflow:hidden;left:20px">
-                    <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
+                <div class="drawingBody">
+                    <div class="noImg" v-show="!versionPath">
+                            <img style="width:140px;height:115px;margin-top:150px;" src="../../assets/nodata.png"/>
+                            <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的图纸</p>
+                    </div>
+                    <div id="drawingPic" style="overflow:hidden;left:20px">
+                        <picView ref="pic" @load_points="loadPic"  @finish="drawFinish" @status_changed="picView_status_changed" :para="paraList" ></picView>
+                    </div>
                 </div>
                 <!-- {{currentPage}} / {{pageCount}} -->
             </div>
@@ -1679,7 +1682,8 @@ export default {
         drawingsUploadCancel(){
             var vm = this
             vm.drawingsUploadShow = false
-            vm.fileList=[]
+            vm.fileList=[];
+            document.getElementById('drawingsInfo').value='';
         },
         updateDrawingCancle(){
             var vm=this;
@@ -1876,6 +1880,7 @@ export default {
                             })
                              vm.fileList = []
                         }
+                        document.getElementById('drawingsInfo').value='';
                     })
             })
         }
@@ -2056,26 +2061,42 @@ export default {
 
                 }
             }
-            .noImg{
-                    margin:10px auto;
-                    // z-index:1000;
-                }
-            #drawingPic{
-                    margin:0 auto;
-                    overflow: auto;
+            // .noImg{
+            //         margin:10px auto;
+            //         // z-index:1000;
+            //     }
+            .drawingBody{
+                    height: 600px;
+                    width: 100%;
+                    position: relative;
+                .noImg{
+                    height: 600px;
+                    width: 100%;
                     position: absolute;
-                    top: 115px;
-                    left: 0;
-                    bottom: 0;
-                    right: 25px;
-                    min-width: 1000px;
-                    max-width: 1600px;
-                    // height: 800px;
-                    // width:800px;
-                
-                #drawPic{
-                    min-width: 700px;
-                    min-height: 500px;
+                    top:0px;
+                    left:0px;
+                    z-index:1000;
+                    background:#fff;
+                    padding:3px;
+                    
+                }
+                #drawingPic{
+                        margin:0 auto;
+                        overflow: auto;
+                        position: absolute;
+                        top: 0px;
+                        left: 0;
+                        bottom: 0;
+                        right: 25px;
+                        min-width: 1000px;
+                        max-width: 1600px;
+                        // height: 800px;
+                        // width:800px;
+                    
+                    #drawPic{
+                        min-width: 700px;
+                        min-height: 500px;
+                    }
                 }
             }
             #drawingToolsBody{

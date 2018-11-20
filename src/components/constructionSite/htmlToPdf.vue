@@ -3,20 +3,32 @@
         <div  class="pdfStyle" id="pdfDom">
                 <!-- 封面 -->
                 <div class="pdfCover">
-                    <div class="pdfImg">
-                         <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/>
-                        <!-- <img id="img1" style="width:400px;height:100px;" :src="coverPath?coverPath:require('../../assets/defaultlogo.png')"> -->
+                    <div id="pdfImg">
+                         <!-- <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/> -->
+                        <img id="img1" style="width:400px;height:100px;"  >
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
                     </div>
                     <h5 style="margin-top:20px;color:#000;font-size:18px;">{{projectName}}--监测报表</h5>
-                    <div class="time"><label>本次观测日期:</label><label>2018/11/12</label><label>前次观测日期:</label><label>2018/11/11</label></div> 
+                    <div class="time"><label class="timelabel1">报告编码：{{onlyNum}}</label></div>
+                    <div class="time"><label class="timelabel1" >本次观测日期：{{beforeDate}}</label><label class="timelabel2">前次观测日期：{{referenceDate}}</label></div> 
                     <div class="tableList">
                         <div class="tableListDiv">
-                            <ul>
-                                <li ></li>
+                            <ul class="tableListUl">
+                                <li class="tableListLi"><label class="tableListLabel1">报告内容</label></li>
+                                <li class="tableListLi"><label class="tableListLabel1">概述</label><label class="tableListLabel2">第1页</label></li>
+                                <li class="tableListLi"><label class="tableListLabel1">巡视</label><label class="tableListLabel2">第2页</label></li>
+                                <li class="tableListLi" v-for="(item,index) in getPageNumList" :key="index"><label class="tableListLabel1">{{item.name}}</label><label class="tableListLabel2">第{{item.order+2}}页</label></li>
                             </ul>
                         </div>
-                    </div>       
+                        <div class="bottom">
+                            <label class="bottom1">声明：1.本报表不得涂改、换页，否则无效。</label>
+                            <label class="bottom2">2.如对本报表有异议，可在发出日后10日内提出复议。</label>
+                            <label class="bottom3">监测方盖章:</label>
+                            <label class="bottom4">{{company}}</label>
+                            <label class="bottom5">{{nowDate}}</label>
+                        </div>
+                    </div>     
+
                 </div>
                 <!-- 概述 -->
                 <div class="pdfSummary">
@@ -31,32 +43,20 @@
                                         <th style="height:100px;padding:10px" colspan="11">{{getSiteConditionList}}</th>
                                     </tr>
                                     <tr>
-                                        <th rowspan="2">序号</th>
-                                        <th rowspan="2">监测类型</th>
-                                        <th rowspan="2">监测内容</th>
-                                        <th rowspan="2">简写</th>
-                                        <th rowspan="2">测点数</th>
-                                        <th rowspan="2">最新数据</th>
-                                        <th colspan="3">本次最大变化量</th>
-                                        <th colspan="3">累计最大变化量</th>
-                                    </tr>
-                                    <tr>
+                                        <th>序号</th>
+                                        <th>监测内容</th>
                                         <th>点号</th>
-                                        <th>取值</th>
-                                        <th >报警</th>
+                                        <th>本次最大变化量</th>
+                                        <th>是否报警</th>
                                         <th>点号</th>
-                                        <th>取值</th>
-                                        <th>报警</th>
+                                        <th>累计变化最大量</th>
+                                        <th>是否报警</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item,index) in getMonitorMainTableList" :key="index">
                                         <td v-text="index+1"></td>
-                                        <td>{{item.type|monitorTypeChange()}}</td>
                                         <td v-text="item.name"></td>
-                                        <td v-text="item.logogram"></td>
-                                        <td v-text="item.count"></td>
-                                        <td >{{item.latestTime|timeChange()}}</td>
                                         <td >{{item.recentPointName|addSprit()}}</td>
                                         <td>{{item.recentVariation|addSprit1()}}</td>
                                         <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
@@ -75,6 +75,7 @@
                                 </tbody>
                             </table>
                     </div>
+                     <div class="pageNum"><label class="pageNum1">第{{1}}页</label></div>
 
                 </div>
                 <!-- 现场巡检 -->
@@ -116,6 +117,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="pageNum"><label class="pageNum1">第{{2}}页</label></div>
                 </div>
                 <!-- 公共面积 -->
                 <ul class="inspectUl">
@@ -126,66 +128,44 @@
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            <div v-show="baseMapPosition==1" class="showBasePic"></div>
+                            
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2">测点编号</th>
-                                            <th v-show="item.type!=3" colspan="2">初始采集</th>
-                                            <th v-show="item.type==3" colspan="3">初始采集</th>
-                                            <th v-show="item.type!=3" colspan="2">上次采集</th>
-                                            <th v-show="item.type==3" colspan="3">上次采集</th>
-                                            <th v-show="item.type!=3" colspan="2">本次采集</th>
-                                            <th v-show="item.type==3" colspan="3">本次采集</th>
-                                            <th colspan="3">变化量</th>
+                                            <td rowspan="2">测点编号</td>
+                                            <td colspan="2" v-show="item.type==1">位移(mm)</td>
+                                            <td colspan="2" v-show="item.type==2">高程(m)</td>
+                                            <td colspan="2" v-show="item.type==3">水位(m)</td>
+                                            <td v-show="item.type==3">管口(m)</td>
+                                            <td colspan="2" v-show="item.type==4">受力(KN)</td>
+                                            <td colspan="2">变化量</td>
+                                            <td rowspan="2">备注</td>
                                         </tr>
                                         <tr>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>采集时间</th>
-                                            <th v-show="item.type==1">位移(mm)</th>
-                                            <th v-show="item.type==2">高程(m)</th>
-                                            <th v-show="item.type==3">水位(m)</th>
-                                            <th v-show="item.type==3">管口(m)</th>
-                                            <th v-show="item.type==4">受力(kN)</th>
-                                            <th>变化时间</th>
-                                            <th v-show="item.type!=4">本次(mm)</th>
-                                            <th v-show="item.type==4">本次(kN)</th>
-                                            <th v-show="item.type!=4">累计(mm)</th>
-                                            <th v-show="item.type==4">累计(kN)</th>
+                                            <td>初始</td>
+                                            <td>本次</td>
+                                            <td v-show="item.type==3">本次</td>
+                                            <td>本次</td>
+                                            <td>累计</td>
+                                            <!-- <td></td> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(val,index) in item.dataList" :key="index"> 
                                             <td>{{val.pointName|addSprit()}}</td>
-                                            <td>{{val.initAcquisitionTime|timeChange()}}</td>
-                                            <td >{{val.initData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.initPipeHeight|addSprit()}}</td>
-                                            <td>{{val.lastAcquisitionTime|timeChange()}}</td>
-                                            <td >{{val.lastData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.lastPipeHeight|addSprit()}}</td>
-                                            <td>{{val.latestAcquisitionTime|timeChange()}}</td>
-                                            <td>{{val.latestData|addSprit()}}</td>
-                                            <td v-show="item.type==3">{{val.latestPipeHeight|addSprit()}}</td>
-                                            <td>{{val.variationTime|timeStamp()}}</td>
-                                            <td>{{val.recentVariation|addSprit()}}</td>
+                                            <td >{{val.initValue|addSprit()}}</td>
+                                            <td >{{val.currentValue|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
+                                            <td>{{val.currentVariation|addSprit()}}</td>
                                             <td>{{val.totalVariation|addSprit()}}</td>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div v-show="baseMapPosition==2" class="showBasePic"></div>
+                            <div  class="showBasePic"></div>
+                            <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
                     </li>
                 </ul>
@@ -197,9 +177,9 @@
     </div>
 </template>
 <script>
-import moment from 'moment'
 import axios from 'axios'
 import pdf from 'vue-pdf'
+import moment from 'moment'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 export default {
@@ -221,6 +201,7 @@ export default {
             historyTime:'',
             getMonitorMainTableList:'',//获取监测内容主表
             getAllMonitorItemList:'',//获取所有监测项目
+            getPageNumList:'',//所有页面
             getReportDatasList:'',//获取所有监测数据
             mapList:'',
             coverPath:'',//封面地址
@@ -235,6 +216,11 @@ export default {
             monitorBaseMapId:this.$route.query.monitorBaseMapId,
             optimalizationSchema:'', ////优化方案：1-测点顺序优先；2-图面清晰优先
             baseMapPosition:'', //底图位置：1-上部；2-下部
+            onlyNum:'',//报告编码
+            beforeDate:this.$route.query.consultValue,
+            referenceDate:this.$route.query.userValue,
+            nowDate:'',
+            imgUrl:'',
         }
     },
     created(){
@@ -255,7 +241,9 @@ export default {
         this.getAllMonitorItem();
         this.getBaseMapInfoByBaseMapId();
         this.getAllMonitorPoint();
-
+        this.generateReportNumber();
+        this.curTime();
+        // this.getItemDutyUser();
         // this.getReportDatas();
     },
     filters:{
@@ -332,27 +320,70 @@ export default {
 
     },
     methods:{
+         timeChangeMethod(val) {
+                return moment(val).format("YYYY-MM-DD hh:mm:ss");
+        },
+        getItemDutyUser(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.rt){
+                     this.getItemDutyUserList=response.data.rt;
+                     this.inspectorName=this.getItemDutyUserList.inspectorName;
+                     this.calculatorName=this.getItemDutyUserList.calculatorName;
+                     this.observerName=this.getItemDutyUserList.observerName;
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+        curTime(){
+            var date = new Date();
+            console.log(date,'date');
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+             this.nowDate = year + "年" + month + "月" + day+"日";
+        },
      getBase64Image(img) {
             var canvas = document.createElement("canvas");
             canvas.width = img.width;
             canvas.height = img.height;
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, img.width, img.height);
-            var dataURL = canvas.toDataURL("image/jpeg");  // 可选其他值 image/jpeg
+            var ext = img.src.substring(img.src.lastIndexOf(".")+1).toLowerCase();
+            var dataURL = canvas.toDataURL("image/"+ext);
             return dataURL;
         },
 
-    main(src){
-        var image = new Image();
-        image.src = src + '?v=' + Math.random(); // 处理缓存
-        image.crossOrigin = "*";  // 支持跨域图片
+    // main(src){
+    //     var image = new Image();
+    //     image.src = src + '?v=' + Math.random(); // 处理缓存
+    //     image.crossOrigin = "*";  // 支持跨域图片
         
-        image.onload=function(){
-            var base64 =this.getBase64Image(image);
-            console.log(base64,'base64');
-            // cb && cb(base64);
-        }
-    },
+    //     image.onload=function(){
+    //         var base64 =this.getBase64Image(image);
+    //         console.log(base64,'base64');
+    //         // cb && cb(base64);
+    //     }
+    // },
     getBaseMapInfoByBaseMapId(){
             var vm=this;
             this.angle=0;
@@ -405,6 +436,23 @@ export default {
                 }
             })
         },
+    generateReportNumber(){
+        var vm=this;
+        axios({
+            method:'post',
+            headers:{
+                'token':vm.token
+            },
+            url:vm.BDMSUrl+'detectionInfo/generateReportNumber',
+            params:{
+                userGroupId:vm.ugSelectId
+            }
+        }).then((response)=>{
+            if(response.data.cd=='0'){
+                this.onlyNum=response.data.rt;
+            }
+        })
+    },
         getUrl(){
             console.log();
         },
@@ -425,12 +473,33 @@ export default {
                   
                     this.getReportSettingList=response.data.rt;
                     this.coverPath=this.QJFileManageSystemURL+this.getReportSettingList.coverPath;
+                    this.getUrl()
                     this.suggestion=this.getReportSettingList.suggestion
                     console.log(this.getReportSettingList,'this.getReportSettingList');
                     this.optimalizationSchema=this.getReportSettingList.optimalizationSchema //优化方案：1-测点顺序优先；2-图面清晰优先
                     this.baseMapPosition=this.getReportSettingList.baseMapPosition //底图位置：1-上部；2-下部
                 }
             })
+        },
+        getUrl(){
+            axios({
+                method:'get',
+                responseType:'blob',
+                url:this.coverPath
+            }).then((response)=>{
+                var a=response.data;
+                // console.log(a,'url1111');
+                let reader = new window.FileReader();
+                reader.onloadend = function() {
+                    const data = reader.result;
+                     
+                    // console.log(data);
+                    // this.imgUrl = data;
+                    document.getElementById('img1').src=data
+                };
+                reader.readAsDataURL(a);
+            })
+
         },
         // 获取最新现场工况
         getSiteCondition(){
@@ -517,6 +586,18 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getMonitorMainTableList=response.data.rt;
+                    var length=this.getMonitorMainTableList.length;
+                    for(var i=length;i<11;i++){
+                        this.getMonitorMainTableList.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
+                            ,recentPointName:null
+                            ,recentVariation:null
+                            ,totalAlert:null
+                            ,totalPointId:null
+                            ,totalPointName:null
+                            ,totalVariation:null
+                            ,type:null})
+                    }
+                    console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
                 }
             })
         },
@@ -606,12 +687,13 @@ export default {
                 },
                 params:{
                     userGroupId:this.ugSelectId,
-                    beforeDate:this.$route.query.consultValue,
-                    referenceDate:this.$route.query.userValue
+                    beforeDate:this.timeChangeMethod(this.$route.query.consultValue),
+                    referenceDate:this.timeChangeMethod(this.$route.query.userValue)
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
+                    // console.log(this.getReportDatasList,'this.getReportDatasList');
                     var mapList = new Map();
                     for (var i = 0; i < this.getReportDatasList.length;i++){
                         var itemId = this.getReportDatasList[i].itemId;
@@ -629,11 +711,28 @@ export default {
                     this.getAllMonitorItemList.forEach((item)=>{
                         mapList.forEach((value, key, mapObject)=>{
                             if(key==item.id){
-                                this.$set(item,'dataList',value)
+                                    // console.log(value,'value123');
+                                    var aLength=0;
+                                    aLength=value.length;
+                                    if(aLength<=20){
+                                        for(var i=aLength;i<20;i++){
+                                            value.push({acquisitionTime:null,currentValue:null,currentVariation:null,initValue:null
+                                                        ,itemId:null
+                                                        ,itemType:null
+                                                        ,otherParam:null
+                                                        ,pointId:null
+                                                        ,pointName:null
+                                                        ,referenceValue:null
+                                                        ,seqId:null
+                                                        ,totalVariation:null})
+                                        }
+                                    }
+                                    this.$set(item,'dataList',value)
                                 }
                             });
                     })
-                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                    //  console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                    //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
             })
@@ -658,6 +757,13 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getAllMonitorItemList=response.data.rt;
+                    this.getPageNumList=response.data.rt;
+                    // this.getPageNumList.unshift({'name':'概述','order':-1},{'name':'巡视','order':0})
+                    // this.getPageNumList.forEach((item)=>{
+                    //     this.$set(item,'pageNum',item.order+2)
+                    // })
+                    // console.log(this.getPageNumList,'this.getPageNumList112233')
+
                     this.getReportDatas();
 
                     console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
@@ -723,34 +829,109 @@ export default {
             width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
-            .pdfImg{
+            #pdfImg{
                 margin-top:50px;
                 #img1{
                     background: #ccc;
                 }
             }
             .time{
-                margin-top:20px;
-            }
-            .tableList{
-                margin:30px auto;
+                margin:10px auto;
                 width: 80%;
-                .tableListDiv{
-                    height: 500px;
-                    border:1px solid #000;
+                height: 14px;
+                font-size:12px;
+                position:relative;
+                .timelabel1{
+                    position: absolute;
+                    left:0px;
+
+                }
+                .timelabel2{
+                    position: absolute;
+                    right:0px;
+
                 }
             }
-            
-            
+            .tableList{
+                margin:10px auto;
+                width: 80%;
+                .tableListDiv{
+                    height: 400px;
+                    border:1px solid #000;
+                    .tableListUl{
+                        .tableListLi{
+                            margin:8px;
+                            height: 20px;
+                            width: 98%;
+                            position: relative;
+                            .tableListLabel1{
+                                display: inline-block;
+                                position: absolute;
+                                left:5px;
+                                color:#000;
+                                font-size: 14px;
+                            }
+                            .tableListLabel2{
+                                 display: inline-block;
+                                position: absolute;
+                                right:5px;
+                                color:#000;
+                                font-size: 14px;
+                            }
+                        }
+                    }
+                }
+                .bottom{
+                    position: relative;
+                    .bottom1{
+                        position: absolute;
+                        display: inline-block;
+                        left:0px;
+                    }
+                    .bottom2{
+                        position: absolute;
+                        display: inline-block;
+                        left:34px;
+                        top:18px;
+                    }
+                    .bottom3{
+                        position: absolute;
+                        display: inline-block;
+                        left:34px;
+                        top:58px;
+                        font-size:16px;
+                    }
+                    .bottom4{
+                        position: absolute;
+                        display: inline-block;
+                        right:34px;
+                        top:108px;
+                        font-size:16px;
+                    }
+                    .bottom5{
+                        position: absolute;
+                        display: inline-block;
+                        right:34px;
+                        top:128px;
+                        font-size:16px;
+                    }
+                }
+            }
         }
         .pdfSummary{
             width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
+            position: relative;
+            .pageNum{
+                    position: absolute;
+                    bottom:10px;
+                    left:45%;
+            }
             
             .pdfSummaryHead{
                 display:inline-block;
@@ -779,7 +960,7 @@ export default {
             }
             .inspectTableList1{
                 width: 90%;
-                margin:0 auto;
+                margin:10px auto;
                         .inspectTableList{
                             
                             border-collapse: collapse;
@@ -788,8 +969,8 @@ export default {
                                 // background: #f2f2f2;
                                 background: #fff;
                                 th{
-                                    padding-left: 6px;
-                                    padding-right: 15px;
+                                    // padding-left: 6px;
+                                    // padding-right: 15px;
                                     height: 32px;
                                     text-align: center;
                                     box-sizing: border-box;
@@ -805,8 +986,8 @@ export default {
                                         color: red;
                                     }
                                     td{
-                                        padding-left: 6px;
-                                        padding-right: 15px;
+                                        // padding-left: 6px;
+                                        // padding-right: 15px;
                                         height: 32px;
                                         text-align: center;
                                         box-sizing: border-box;
@@ -850,8 +1031,14 @@ export default {
              width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 832px;
+            height: 830px;
             margin:17px auto;
+            position: relative;
+            .pageNum{
+                    position: absolute;
+                    bottom:10px;
+                    left:45%;
+                }
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
@@ -886,8 +1073,8 @@ export default {
                     thead{
                                 background: #fff;
                                 th{
-                                    padding-left: 6px;
-                                    padding-right: 15px;
+                                    // padding-left: 6px;
+                                    // padding-right: 15px;
                                     height: 30px;
                                     text-align: center;
                                     box-sizing: border-box;
@@ -957,10 +1144,12 @@ export default {
                  width:98%;
                 border:1px solid #ccc;
                 // margin-bottom: 10px;
-                height: 832px;
+               
                 margin:17px auto;
+                position: relative;
                 //  margin-top:50px;
                 .verticalLength{
+                     height: 832px;
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;
@@ -1030,18 +1219,20 @@ export default {
                     .bottomTabel{
                         width: 90%;
                         margin:0 auto;
+                        height: 395px;
+                        overflow: hidden;
                             .bottomTableList{
                                 border-collapse: collapse;
-                                border: 1px solid #e6e6e6;
+                                border: 0.5px solid #000;
                                     thead{
-                                        background: #f2f2f2;
+                                        background: #fff;
                                         th{
-                                            padding-left: 6px;
-                                            padding-right: 15px;
-                                            height: 32px;
+                                            // padding-left: 6px;
+                                            // padding-right: 15px;
+                                            height: 18px;
                                             text-align: center;
                                             box-sizing: border-box;
-                                            border-right: 1px solid #e6e6e6;
+                                            border-right: 0.5px solid #000;
                                             font-size: 12px;
                                             color: #333333;
                                             font-weight: normal;
@@ -1050,12 +1241,12 @@ export default {
                                     tbody{
                                         tr{
                                             td{
-                                                padding-left: 6px;
-                                                padding-right: 15px;
-                                                height: 32px;
+                                                // padding-left: 6px;
+                                                // padding-right: 15px;
+                                                height: 18px;
                                                 text-align: center;
                                                 box-sizing: border-box;
-                                                border-right: 1px solid #e6e6e6;
+                                                border-right: 0.5px solid #000;
                                                 font-size: 12px;
                                                 color: #333333;
                                                 .actionBtn{
@@ -1077,13 +1268,150 @@ export default {
                                     }
                             }
                     }
+                   
                     .showBasePic{
-                        width: 95%;
+                        width: 90%;
                         margin:0 auto;
-                        height: 220px;
-                        margin-top:20px;
+                        height: 210px;
+                        margin-top:10px;
+                        margin-bottom: 10px;
                         border:1px solid #ccc;
+                    }
+                    .pageNum{
+                        position: absolute;
+                        bottom:10px;
+                        left:45%;
+                    }
+                }
+                .verticalLength1{
+                    .pdfSummaryHead1{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 18px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 40px;
+                        line-height: 40px;
+                        // border-bottom:2px solid #ccc;
+                    }
+                    .pdfSummaryHead{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 18px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 40px;
+                        line-height: 40px;
+                        border-bottom:2px solid #ccc;
+                    }
+                    .pdfSummarytext{
+                        display:inline-block;
+                        width: 90%;
+                        height: 40px;
+                        position: relative;
+                        //  margin-left:5px;
+                        label{
+                            position: absolute;
+                            left:5px;
+                            top:5px;
+                            font-size:16px;
+                        }
+                    }
+                    .txt{
+                        width: 90%;
+                        margin: 0 auto;
+                        height: 30px;
+                        position: relative;
+                        .label1{
+                            position: absolute;
+                            left:0px;
+                            font-size:14px;
+                            color: #000;
+                            line-height: 30px;
+                        }
+                        .span1{
+                            position: absolute;
+                            left:50%;
+                            font-size:14px;
+                            color: #000;
+                            line-height: 30px;
+                        }
+                    }
+                    .txt1{
+                        width: 90%;
+                        font-size:14px;
+                        margin:0 auto;
+                        color: #000;
+                        line-height: 30px;
+                        height: 30px;
+                        position: relative;
+                        label{
+                            position: absolute;
+                            left: 0px;
+                        }
+                    }
+                     .containerTable{
+                        margin-top:10px;
+                        width: 90%;
+                        margin:0 auto;
+                        .containerList{
+                            border-collapse: collapse;
+                            border: 1px solid #000;
+                            thead{
+                                        background: #fff;
+                                        th{
+                                            // padding-left: 6px;
+                                            // padding-right: 15px;
+                                            height: 30px;
+                                            text-align: center;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #000;
+                                            font-size: 12px;
+                                            color: #333333;
+                                            font-weight: normal;
+                                        }
+                            }
+                            tbody{
+                                    tr{
+                                        td{
+                                            // padding-left: 6px;
+                                            // padding-right: 15px;
+                                            height: 30px;
+                                            text-align: center;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #000;
+                                            font-size: 12px;
+                                            color: #333333;
+                                            // .actionBtn{
+                                            //         width: 18px;
+                                            //         height: 18px;
+                                            //         border: none;
+                                            //         cursor: pointer;
+                                            //         margin-left: 10px;
 
+                                            // }
+                                            // .editBtn{
+                                            //     background: url('./images/overviewedit.png') no-repeat 0 0;
+                                            // }
+                                            // .deleteBtn{
+                                            //     background: url('./images/delete1.png') no-repeat 0 0;
+                                            // }
+                                            // .leftLayBtn{
+                                            //     background: url('./images/leftLay.png') no-repeat 0 0;
+                                            // }
+                                            // .rightLayBtn{
+                                            //     background: url('./images/rightLay.png') no-repeat 0 0;
+                                            // }
+                                        }
+                                    }
+                            }
+
+                        }
+                    }
+                    .pageNum{
+                        position: absolute;
+                        bottom:10px;
+                        left:45%;
                     }
                 }
             }

@@ -547,7 +547,7 @@ export default Vue.component('common-list',{
                 total:0,//所有数据
             },
             checkedItem:{},
-            fullscreenloading:false,
+            fullscreenloading:true,
             ManifestInfo:{},//清单基本信息
             detailsHead:[],
             groupHead:{
@@ -838,6 +838,7 @@ export default Vue.component('common-list',{
                         if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList);
                         if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList);
                         if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList);
+                        this.fullscreenLoading=false;
                     }
                 }else{
                     vm.$message({

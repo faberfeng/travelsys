@@ -64,7 +64,7 @@ export default {
         if(token != 'undefined'){
             vm.token = token
             //判断是否登陆
-            this.BeforeLogin()
+            // this.BeforeLogin()
         }
     },
     methods:{

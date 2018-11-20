@@ -8,6 +8,9 @@
         </div>
         <div class="topHeader">
             <div id="item-box-file">
+                <router-link :to="'/constructionSite/safetyInspection'" class="label-item label-item-active">  
+                安全监测  
+                </router-link>
                 <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
                 现场连线  
                 </router-link>
@@ -20,9 +23,7 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
-                <router-link :to="'/constructionSite/safetyInspection'" class="label-item label-item-active">  
-                安全监测  
-                </router-link>
+                
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
@@ -79,7 +80,8 @@
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
-                            <!-- <span :class="[{'clickStyle':isClick},'exportSaveBtn']">导出保存</span> -->
+                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
+                            <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">图片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
@@ -94,7 +96,7 @@
                                 </select>
                                 
                             </span>
-                            <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
+                            <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
@@ -110,6 +112,10 @@
                             <div class="operateToolRight">
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                             </div>
+                        </div>
+                        <div class="noDataFigure" v-show="!paramsLists" >
+                            <img style="width:140px;height:115px;margin-top:150px;" src="../../assets/nodata.png"/>
+                            <p style="font-size:16px;color:#ccc">暂时没有底图显示，请点击底图管理按钮上传底图</p>
                         </div>
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
@@ -132,6 +138,7 @@
                             <el-checkbox v-model="displaySpotNum" @change="displaySpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="inspectTable" > 
                     <div class="inspectTableHead">
@@ -220,7 +227,7 @@
                 </div>
             </div>
             <!-- 以下是斜度详情页 -->
-            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :itemMonitorId="detailMonitorId"></commonPitch-detail>
+            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemMonitorKeyWord="itemSubmitKeyWord"></commonPitch-detail>
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
@@ -291,9 +298,8 @@
                         </span>
                     </div>
                     <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">匹配结果</label><label>文档内表总数：{{getPitchBaseInfoListLength}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：</label></div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
-                    <!-- <i class="icon-sanjiao1"></i> -->
-                    </div>
+                    <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
+                    </div> -->
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
                     <div class="editBodytwo" v-show="monitorImportType!=5"><label class="editInpText" style="width:18% !important;">点位编号列名:</label><select v-model="spotNumCol" placeholder="请选择"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
                     <!-- <i class="icon-sanjiao2"></i> -->
@@ -356,7 +362,7 @@
                                 <button class="upImgBtn" >选择文件</button>
                                 <input type="file" ref="importMoreExcel" id="morefileInfo" @change="addMoreExcel($event)" class="upinput"/>
                             </label>
-                            <span class="upImgText">{{excelMoreFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
+                            <span class="upImgText">{{excelMoreFileListName}}<label v-show="!excelMoreFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
                     <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;">匹配结果:</label><label>文档内表总数：{{allAmount}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：{{matchedAmount}}</label></div>
@@ -365,43 +371,57 @@
                         <li v-for="(val,index) in sheetList" :key="index" >
                             <div class="editBodytwo">
                                 <label class="editInpText" style="width:18% !important;font-weight:bold;">使用Excel表名:</label>
-                                <select v-model="sheetIndex" class="sheetName" :id="'sheetName'+val.itemId" @change="sheetIndexChange(val.sheetIndex)"><option v-for="(item,index) in sheetList"  :value="item.sheetIndex+'-'+val.itemId" :key="index" v-text="item.sheetName"></option></select>
+                                <!-- v-model="sheetIndex" -->
+                                <select  class="sheetName" :id="'sheetName'+val.itemId" @change="sheetIndexChange(val.sheetIndex)">
+                                    <option value=""></option>
+                                    <option v-for="(item,index) in sheetList"  :value="item.sheetIndex+'-'+val.itemId" :key="index" v-text="item.sheetName"></option>
+                                </select>
                             </div>
+                            <!-- v-show="val.sheetIndex==sheetValue" -->
                             <div v-show="val.sheetIndex==sheetValue">
                                 <div class="editBodytwo">
                                     <label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{val.itemName}}</label>
                                 </div>
+                                <!-- v-model="spotNumCol" -->
                                 <div class="editBodytwo" v-show="val.type!=5" ><label class="editInpText" style="width:18% !important;">点位编号列名:</label>
-                                    <select v-model="spotNumCol" placeholder="请选择" :id="'spotNumCol'+val.itemId"  class="spotNumName"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select  placeholder="请选择" :id="'spotNumCol'+val.itemId"  class="spotNumName">
+                                        <option value=""></option>
+                                        <option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option>
+                                    </select>
                                 </div>
+                                <!-- v-model="timeCol" -->
                                 <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label>
-                                    <select class="gatherTimeName" v-model="timeCol" :id="'timeCol'+val.itemId" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+
+                                    <select class="gatherTimeName"  :id="'timeCol'+val.itemId" placeholder="请选择">
+                                         <option value=""></option>
+                                        <option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option>
+                                    </select>
                                 </div>
                                 
                                 <div class="editBodytwo" v-show="val.type==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label>
-                                    <select class="gatherTimeName" v-model="distanceCol" :id="'distanceCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="distanceCol" :id="'distanceCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label>
-                                    <select class="gatherTimeName" v-model="altitudeCol" :id="'altitudeCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="altitudeCol" :id="'altitudeCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label>
-                                    <select class="gatherTimeName" v-model="pipeHeightCol" :id="'pipeHeightCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="pipeHeightCol" :id="'pipeHeightCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label>
-                                    <select class="gatherTimeName" v-model="gaugeHeightCol" :id="'gaugeHeightCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="gaugeHeightCol" :id="'gaugeHeightCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                             
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==5"><label class="editInpText" style="width:18% !important;">斜度位移取值列名:</label>
-                                    <select class="gatherTimeName" v-model="shiftIndexCol" :id="'shiftIndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="shiftIndexCol" :id="'shiftIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==5"><label class="editInpText" style="width:18% !important;">斜度深度取值列名:</label>
-                                    <select class="gatherTimeName" v-model="depthIndexCol" :id="'depthIndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="depthIndexCol" :id="'depthIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                             
                                 </div>
-                                 <div class="editBodytwo" v-show="val.type==4"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
-                                    <select class="gatherTimeName" v-model="forceIndexCol" :id="'forceIndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                 <div class="editBodytwo" v-show="!frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
+                                    <select class="gatherTimeName" v-model="forceIndexCol" :id="'forceIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
                                 <div class="editBodytwo" v-show="val.type==4"><label class="editInpText" style="width:18% !important;">
                                         <el-checkbox v-model="frequencyShow">按频率取值受力</el-checkbox>
@@ -409,30 +429,31 @@
                                 </div>
                                
                                 <div class="editBodytwo" v-show="frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">率定系数列名:</label>
-                                    <select class="gatherTimeName" v-model="kIndexCol" :id="'kIndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="kIndexCol" :id="'kIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 
                                 </div>
                                 <div class="editBodytwo" v-show="frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">初始频率列名:</label>
-                                    <select class="gatherTimeName" v-model="f0IndexCol" :id="'f0IndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="f0IndexCol" :id="'f0IndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                             
                                 </div>
                                 <div class="editBodytwo" v-show="frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">本次频率列名:</label>
-                                    <select class="gatherTimeName" v-model="fnIndexCol" :id="'fnIndexCol'+val.itemId"><option v-for="(item,index) in sheetIndexList" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
+                                    <select class="gatherTimeName" v-model="fnIndexCol" :id="'fnIndexCol'+val.itemId"><option v-for="(item,index) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
                                 <div class="editBodytwo" v-show="frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">受力计算公式:</label>
                                     <select class="gatherTimeName" v-model="useFormulaNum" :id="'useFormulaNum'+val.itemId"><option v-for="(item,index) in useFormulaList" :value="item.value+'-'+val.itemId" :key="index" v-text="item.name"></option></select>
                                 </div>
+                                <button class="editBtnS editBtnSstyle" v-show="frequencyShow&&val.type==4" @click="formulaSetting(val.itemId)" >公式设定</button>
                             </div>
                         </li>
                     </ul>
                     <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="saveImportColumnValue" @change="saveImportColumnSetting()">保存以上列名匹配为默认</el-checkbox></label></div> -->
-                    <!-- <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="inputWorkingCondition"></textarea></div> -->
+                    <div class="editBodytwo editBodytwo1" ><label class="editInpText editInpText1" style="width:18% !important;">现场监测工况:</label><textarea placeholder="请输入" class="spotTextArea" v-model="workingConditionList"></textarea></div>
 
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;"><el-checkbox v-model="overwrite">覆盖上一次导入的数据</el-checkbox></label></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" v-show="frequencyShow" @click="formulaSetting()" >公式设定</button>
-                        <button v-show="testShow" class="editBtnC" style="margin-right:88px;" @click="batchImportVerify()">测试</button>
+                       
+                        <button v-show="testShow" class="editBtnC" style="margin-right:40px;" @click="batchImportVerify()">测试</button>
                         <button v-show="!testShow" class="editBtnS" @click="batchImportVerifyMake()" >确定</button>
                         <button class="editBtnC" @click="batchImportCancle()" >取消</button>
                 </div>
@@ -476,14 +497,14 @@
                         </div> -->
                         <div class="editBodytwo">
                             <label class="editTxt">钢筋的牌号：</label>
-                            <select class="eidtSelect" @change="esChange()" v-model="barGradeValue">
+                            <select class="eidtSelect" @change="esChange(barGradeValue)" v-model="barGradeValue">
                                 <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
                             </select>
                             <i class="sanjiaoicon"></i>
                             <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Es：</label><label>{{barGradeValue}}</label>
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土支撑宽度：</label>
@@ -498,14 +519,14 @@
                         </div>
                         <div class="editBodytwo">
                             <label class="editTxt">混凝土的等级：</label>
-                            <select placeholder="请选择" class="eidtSelect" v-model="concreteLevelValue">
-                                <option v-for="(item,index) in ecList" :value="item.name" @change="ecChange(item.name)" :key="index" v-text="item.name"></option>
+                            <select placeholder="请选择" class="eidtSelect" @change="ecChange(concreteLevelValue)" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name"  :key="index" v-text="item.name"></option>
                             </select>
                              <i class="sanjiaoicon1"></i>
                             <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">对应弹性模量Ec:</label><label>{{concreteLevelValue}}</label>
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{ecValue}}</label>
                         </div>
                     </div>
                 </div>
@@ -514,7 +535,7 @@
                     <button class="editBtnC" @click="formulaSettingCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()">
+            <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()" v-loading="sendAlertMessageLoad">
                 <div class="editBody">
                     <p>以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
                     <p>{{alertMessage}}</p>
@@ -725,9 +746,11 @@ export default {
             saveImportColumnValue:false,//保存导入列数据
             frequencyShow:false,//是否按频率取值受力
             overwrite:false,//是否覆盖
+            workingConditionList:'',
             batchImportDataShow:false,//批量数据导入
             formulaSettingShow:false,//公式设定
             useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
+            getFormulaList:'',//获取受力公式
             useFormulaNum:"1",
             useFormulaList:[
                 {
@@ -829,6 +852,7 @@ export default {
             concreteLevelValue:null,//混凝土等级
             barGradeValue:null,//钢筋牌号
             sendAlertMessageShow:false,//是否发送报警信息弹窗
+            sendAlertMessageLoad:false,//loading
             uploadshow:false,//是否上传图片
             filesList:[],
             imageName:'未选择任何文件',
@@ -838,6 +862,7 @@ export default {
             fileListCover:'',
             coverPathUrl:'',
             excelSheetInfo:'',//获取导入EXCEL文件的sheet信息
+            excelSheetInfoLength:'',//获取表格的个数
             excelFileList:'',
             excelFileListName:'',
             excelMoreFileList:'',
@@ -850,6 +875,7 @@ export default {
             sheetIndexList:'',//列表
             pageNo:1,
             baseMapList:'',//底图列表数据
+            isClick0:false,
             isClick:false,//是否点击
             isClick1:false,
             isClick2:false,
@@ -1113,7 +1139,7 @@ export default {
         },
         positionValue:function(val){
             var vm=this;
-            vm.getPositionList();
+            // vm.getPositionList();
             vm.getPositionUserCount();
         }
     },
@@ -1134,14 +1160,21 @@ export default {
             this.acValueArea=(this.concreteWidthValue)*(this.concreteHeightValue)-(this.asValueArea)*(this.barCountValue);
         },
         ecChange(name){
-            console.log(name,'name');
-            this.ecValue=name;
+            this.ecList.forEach((item)=>{
+                if(item.name==name){
+                     this.ecValue=item.value;
+                }
+            })
+            // console.log(name,'name');
+           
         },
-         esChange(){
-            //  this.ecList.forEach((item)=>{
-            //      if()
-            //  })
-            this.esValue=name;
+         esChange(val){
+             this.esList.forEach((item)=>{
+                 if(item.name==val){
+                     this.esValue=item.value;
+                 }
+             })
+           
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
@@ -1151,6 +1184,7 @@ export default {
             vm.monitorImportName=valname;
             vm.monitorImportType=valtype;
             vm.monitorImportId=valid;
+            console.log(vm.monitorImportType,'vm.monitorImportType123')
 
         },
         timeMethod(val) {
@@ -1276,6 +1310,7 @@ export default {
         },
         //
         sendAlertMessage(){
+            this.sendAlertMessageLoad=true;
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/sendAlertMessage',
@@ -1285,15 +1320,16 @@ export default {
                 params:{
                     projectId:this.projId,
                     userGroupId:this.selectUgId,
-                    position:this.positionValue
+                    positionId:this.positionValue
                 }
             }).then((response)=>{
-                if(response.data.rt){
+                if(response.data.cd=='0'){
+                    // sendAlertMessageShow
                     // this.alertMessage=response.data.rt;
                     this.sendAlertMessageShow=false;
                     this.$message({
                         type:"success",
-                        message:response.data.msg
+                        message:'发送报警短信成功'
                     })
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -1301,6 +1337,7 @@ export default {
                         message:response.data.msg
                     })
                 }
+                this.sendAlertMessageLoad=false;
             })
         },
         positionChange(){
@@ -1741,6 +1778,7 @@ export default {
         walkThroughBtn(){
             var vm=this;
             vm.walkThroughShow=true;
+
         },
         exportrEportsBtn(){
             this.exportrEportsShow=true;
@@ -2108,9 +2146,11 @@ export default {
                             })
                             this.getMonitorMainTable();
                             this.getAllMonitorPoint();
-                            setTimeout(()=>{
-                                    this.getTagList();
-                                },200)
+                            if(this.picMark==true){
+                                setTimeout(()=>{
+                                        this.getTagList();
+                                    },200)
+                                }
                         }else if(response.data.cd=='-1'){
                         
                             // this.$message({
@@ -2162,7 +2202,7 @@ export default {
             };  
             reader.readAsDataURL(list[0]);
             vm.fileList=list[0];
-            vm.fileListName=list[0].name;
+            vm.fileListName=list[0].name.replace(/\s*/g,"");
             // console.log(vm.fileListName);
             var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
             returnUrl = encodeURIComponent(returnUrl);
@@ -2217,7 +2257,8 @@ export default {
         //点击获取底图列表
         getBaseMapListBtn(){
             this.baseMapShow=true;
-            this.isClick=true;
+            this.isClick0=true;
+            // this.isClick=true;
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
@@ -2538,10 +2579,20 @@ export default {
             })
         },
         documentMethod(name,item){
-            if(name==null){
+            if(document.getElementById(name+item.itemId).selectedIndex==-1){
                 return ''
             }else{
                 return document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value
+            }
+        },
+        deleteDocumentMethod(){
+
+        },
+        spilitMethod(val){
+            if(val==''){
+                return ''
+            }else{
+                return parseInt(val.split('-')[0])
             }
         },
         //批量导入验证
@@ -2549,41 +2600,23 @@ export default {
             var listData=[];
             this.sheetList.forEach((item)=>{
                 listData.push(
-                    // {
-                    //     sheetIndex:document.getElementById('sheetName'+item.itemId).options[document.getElementById('sheetName'+item.itemId).selectedIndex].value,//sheet下标*
-                    //     acquisitionTimeIndex:document.getElementById('timeCol'+item.itemId).options[document.getElementById('timeCol'+item.itemId).selectedIndex].value, //采集时间下标*
-                    //     depthIndex:document.getElementById('depthIndexCol'+item.itemId).options[document.getElementById('depthIndexCol'+item.itemId).selectedIndex].value,//深度下标*
-                    //     shiftDistanceIndex:document.getElementById('distanceCol'+item.itemId).options[document.getElementById('distanceCol'+item.itemId).selectedIndex].value,//位移下标*
-                    //     elevationIndex:vm.altitudeCol,//高程下标*
-                    //     f0Index:vm.f0IndexCol,//初始频率下标*
-                    //     fnIndex:vm.fnIndexCol,//本次频率下标*
-                    //     kIndex:vm.kIndexCol,//率定系数下标*
-                    //     pipeHeightIndex:vm.pipeHeightCol,//管口高度*
-                    //     gaugeHeightIndex:vm.gaugeHeightCol,//水位高度下标（水位）*
-                    //     forceIndex:vm.forceIndexCol,//受力下标*
-                    //     shiftIndex:vm.shiftIndexCol,//位移下标*
-                    //     useFormula:vm.useFormulaNum,//计算公式*
-                    //     pointIndex:vm.spotNumCol,//监测点位下标(除斜度外)*
-                    // }
                     {
-                        sheetIndex:this.documentMethod('sheetName',item),//sheet下标*
-                        acquisitionTimeIndex:this.documentMethod('timeCol',item), //采集时间下标*
-                        depthIndex:this.documentMethod('depthIndexCol',item),//深度下标*
-                        shiftDistanceIndex:this.documentMethod('distanceCol',item),//位移下标*
-                        elevationIndex:this.documentMethod('altitudeCol',item),//高程下标*
-                        f0Index:this.documentMethod('f0IndexCol',item),//初始频率下标*
-                        fnIndex:this.documentMethod('fnIndexCol',item),//本次频率下标*
-                        kIndex:this.documentMethod('kIndexCol',item),//率定系数下标*
-                        pipeHeightIndex:this.documentMethod('pipeHeightCol',item),//管口高度*
-                        gaugeHeightIndex:this.documentMethod('gaugeHeightCol',item),//水位高度下标（水位）*
-                        forceIndex:this.documentMethod('forceIndexCol',item),//受力下标*
-                        shiftIndex:this.documentMethod('shiftIndexCol',item),//位移下标*
-                        useFormula:this.documentMethod('useFormulaNum',item),//计算公式*
-                        pointIndex:this.documentMethod('spotNumCol',item),//监测点位下标(除斜度外)*
+                        sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
+                        acquisitionTimeIndex:this.spilitMethod(this.documentMethod('timeCol',item)), //采集时间下标*
+                        shiftDistanceIndex:this.spilitMethod(this.documentMethod('distanceCol',item)),//位移下标*
+                        depthIndex:this.spilitMethod(this.documentMethod('depthIndexCol',item)),//深度下标*
+                        elevationIndex:this.spilitMethod(this.documentMethod('altitudeCol',item)),//高程下标*
+                        f0Index:this.spilitMethod(this.documentMethod('f0IndexCol',item)),//初始频率下标*
+                        fnIndex:this.spilitMethod(this.documentMethod('fnIndexCol',item)),//本次频率下标*
+                        kIndex:this.spilitMethod(this.documentMethod('kIndexCol',item)),//率定系数下标*
+                        pipeHeightIndex:this.spilitMethod(this.documentMethod('pipeHeightCol',item)),//管口高度*
+                        gaugeHeightIndex:this.spilitMethod(this.documentMethod('gaugeHeightCol',item)),//水位高度下标（水位）*
+                        forceIndex:this.spilitMethod(this.documentMethod('forceIndexCol',item)),//受力下标*
+                        shiftIndex:this.spilitMethod(this.documentMethod('shiftIndexCol',item)),//位移下标*
+                        useFormula:this.spilitMethod(this.documentMethod('useFormulaNum',item)),//计算公式*
+                        pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
                     }
-
                 )
-
             })
             console.log(listData,'listData')
 
@@ -2598,6 +2631,7 @@ export default {
                 params:{
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//统一时间
                     overwrite:vm.overwrite,//是否覆盖
+                    userGroupId:vm.selectUgId
                 },
                 data:listData
             }).then((response)=>{
@@ -2605,7 +2639,7 @@ export default {
                   if(response.data.rt==''){
                         this.testShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'测试批量导入数据成功'
                         })
 
@@ -2626,6 +2660,27 @@ export default {
         //批量导入数据
         batchImportVerifyMake(){
              var vm=this;
+             var listData=[];
+            this.sheetList.forEach((item)=>{
+                listData.push(
+                    {
+                        sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
+                        acquisitionTimeIndex:this.spilitMethod(this.documentMethod('timeCol',item)), //采集时间下标*
+                        shiftDistanceIndex:this.spilitMethod(this.documentMethod('distanceCol',item)),//位移下标*
+                        depthIndex:this.spilitMethod(this.documentMethod('depthIndexCol',item)),//深度下标*
+                        elevationIndex:this.spilitMethod(this.documentMethod('altitudeCol',item)),//高程下标*
+                        f0Index:this.spilitMethod(this.documentMethod('f0IndexCol',item)),//初始频率下标*
+                        fnIndex:this.spilitMethod(this.documentMethod('fnIndexCol',item)),//本次频率下标*
+                        kIndex:this.spilitMethod(this.documentMethod('kIndexCol',item)),//率定系数下标*
+                        pipeHeightIndex:this.spilitMethod(this.documentMethod('pipeHeightCol',item)),//管口高度*
+                        gaugeHeightIndex:this.spilitMethod(this.documentMethod('gaugeHeightCol',item)),//水位高度下标（水位）*
+                        forceIndex:this.spilitMethod(this.documentMethod('forceIndexCol',item)),//受力下标*
+                        shiftIndex:this.spilitMethod(this.documentMethod('shiftIndexCol',item)),//位移下标*
+                        useFormula:this.spilitMethod(this.documentMethod('useFormulaNum',item)),//计算公式*
+                        pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
+                    }
+                )
+            })
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/batchImport',
@@ -2635,38 +2690,23 @@ export default {
                 params:{
                     commonTime:vm.unifiedTime==''?null:vm.unifiedTime,//统一时间
                     overwrite:vm.overwrite,//是否覆盖
+                    userGroupId:vm.selectUgId,
+                    workingCondition:vm.workingConditionList
                 },
-                data:{
-                    sheetIndex:vm.sheetIndex,//sheet下标*
-                    acquisitionTimeIndex:vm.timeCol, //采集时间下标*
-                    depthIndex:vm.depthIndexCol,//深度下标*
-                    shiftDistanceIndex:vm.distanceCol,//位移下标*
-                    elevationIndex:vm.altitudeCol,//高程下标*
-                    f0Index:vm.f0IndexCol,//初始频率下标*
-                    fnIndex:vm.fnIndexCol,//本次频率下标*
-                    kIndex:vm.kIndexCol,//率定系数下标*
-                    pipeHeightIndex:vm.pipeHeightCol,//管口高度*
-                    gaugeHeightIndex:vm.gaugeHeightCol,//水位高度下标（水位）*
-                    forceIndex:vm.forceIndexCol,//受力下标*
-                    shiftIndex:vm.shiftIndexCol,//位移下标*
-                    useFormula:vm.useFormulaNum,//计算公式*
-                    pointIndex:vm.spotNumCol,//监测点位下标(除斜度外)*
-                    // itemId:vm.monitorImportId,//监测ID
-                    // commonTime:vm.unifiedTime,//标准时间，不选择可不传
-                    // overwrite:vm.overwrite, //是否覆盖
-                    // workingCondition:vm.inputWorkingCondition,//现场工况
-                    // userGroupId:vm.selectUgId,
-                    // baseMapId:vm.monitorBaseMapId
-                }
+                data:listData
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                  if(response.data.rt==''){
+                  if(response.data.rt==null){
                         this.testShow=false;
+                        this.batchImportDataShow=false;
                         this.$message({
-                            type:'error',
+                            type:'success',
                             message:'批量导入数据成功'
                         })
-                        vm.sheetIndex='';//sheet下标*
+                this.getMonitorMainTable();
+                 document.getElementById('editBodyStyle').style.height="280px"
+                this.sheetList='';
+                vm.sheetIndex='';//sheet下标*
                    vm.timeCol='';//采集时间下标*
                    vm.depthIndexCol='';//深度下标*
                     vm.distanceCol='';//位移下标*
@@ -2680,8 +2720,11 @@ export default {
                    vm.shiftIndexCol='';//位移下标*
                     vm.useFormulaNum='';//计算公式*
                     vm.spotNumCol='';//监测点位下标(除斜度外)*
-
-
+                    vm.workingConditionList="";
+                    vm.excelMoreFileListName='';
+                    vm.matchedAmount='';
+                    vm.allAmount='';
+                    vm.workingCondition='';
                     }else{
                         this.$message({
                             type:'info',
@@ -2715,7 +2758,7 @@ export default {
                     this.importExcel_4();
                 }
             }
-            this.testShow=true;
+           
         },
         //导入水平位移excel
         importExcel_1(){
@@ -2740,6 +2783,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                     this.testShow=true;
                     this.importGatherDataShow=false;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
@@ -2750,6 +2794,7 @@ export default {
                     vm.overwrite=false;//是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
+                  
                     this.getMonitorItem();
                     this.getDetectionSummary()
                     this.$message({
@@ -2789,6 +2834,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     vm.altitudeCol='';//高程下标
@@ -2839,6 +2885,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     vm.pipeHeightCol='';//管口高度
@@ -2893,6 +2940,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndexCol='';
                     vm.depthIndexCol='';
                     vm.shiftIndex='';
@@ -2947,6 +2995,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.importGatherDataShow=false;
+                     this.testShow=true;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
                     // vm.pipeHeightCol='';//管口高度
@@ -3003,6 +3052,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
+                    this.testShow=true;
                     this.importGatherDataShow=false;
                     vm.sheetIndex='';
                     vm.timeCol=''; //采集时间下标
@@ -3371,9 +3421,45 @@ export default {
             })
         },
         //点击公式设定
-        formulaSetting(){
+        formulaSetting(val){
             this.formulaSettingShow=true;
-            this.useFormulaValue=this.useFormulaNum;
+            console.log(this.useFormulaNum.split('-')[0],'useFormulaNum');
+            this.useFormulaValue=this.useFormulaNum.split('-')[0];
+            if(val){
+                this.monitorImportId=val;
+            }
+            this.getFormula();
+        },
+        //获取受力公式
+        getFormula(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/getFormula',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.monitorImportId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getFormulaList=(response.data.rt)[0];
+                    this.AsValue=this.getFormulaList.as;
+                    this.barCountValue=this.getFormulaList.barCount;
+                    this.barDiameterValue=this.getFormulaList.barDiameter
+                    this.barGradeValue=this.getFormulaList.barGrade
+                    this.concreteHeightValue=this.getFormulaList.concreteHeight
+                    this.concreteLevelValue=this.getFormulaList.concreteLevel
+                    this.concreteWidthValue=this.getFormulaList.concreteWidth
+                    this.EsValue=this.getFormulaList.es
+                    this.useFormulaValue=this.getFormulaList.formula==1?'1':'2'
+                    // console.
+                }else if(response.data.cd=='-1'){
+
+                }
+            })
+
         },
         //取消公式设定
         formulaSettingCancle(){
@@ -3462,14 +3548,36 @@ export default {
         },
         //取消批量数据导入
         batchImportCancle(){
+            var vm=this;
+            this.workingConditionList='';
+             vm.excelMoreFileListName='';
+            vm.matchedAmount='';
+            vm.allAmount='';
+            this.sheetList='';
+             this.excelFileListName='';
+            this.monitorImportName='';
+            this.excelFileList='';
+            vm.sheetIndex='';
+            vm.timeCol=''; //采集时间下标
+            vm.distanceCol='';//位移下标
+            vm.monitorImportId='';//监测ID
+            vm.spotNumCol='';//监测点位下标
+            vm.unifiedTime='';//标准时间，不选择可不传
+            vm.overwrite=false; //是否覆盖
+            vm.inputWorkingCondition='';//现场工况
+            vm.pipeHeightCol='';//管口高度
+            vm.gaugeHeightCol='';//水位下标
             this.batchImportDataShow=false;
+             document.getElementById('morefileInfo').value="";
+             document.getElementById('editBodyStyle').style.height="280px"
         },
+        
         //导入excel表格-获取导入EXCEL文件的sheet信息
         addExcel(){
             var vm=this;
             const list = vm.$refs.importExcel.files;
             vm.excelFileList=list[0];
-            vm.excelFileListName=list[0].name;
+            vm.excelFileListName=list[0].name.replace(/\s*/g,"");
             var formData = new FormData()
             formData.append('data',vm.excelFileList);
             axios({
@@ -3482,6 +3590,7 @@ export default {
                     }).then((response)=>{
                         if(response.data.cd=='0'){
                             this.excelSheetInfo=response.data.rt;
+                            this.excelSheetInfoLength=response.data.rt.length;
                             console.log(this.excelSheetInfo);
                             if(vm.monitorImportType==5){
                                 this.excelSheetInfo.forEach((item)=>{
@@ -3543,10 +3652,12 @@ export default {
                     this.allAmount=this.getBatchImportMatchingResultList.allAmount;
                     this.matchedAmount=this.getBatchImportMatchingResultList.matchedAmount;
                     this.sheetList=this.getBatchImportMatchingResultList.sheets;
+                    // var sheetLists=[];
                     this.sheetList.forEach((item)=>{
-                        // this.getExcelColumnBySheet(item.sheetIndex)
+                        this.getExcelColumnBySheet(item.sheetIndex)
+                        // this.$set(item,'sheetlist',)
                     })
-
+                    console.log(this.sheetList,'this.sheetList1234')
                     console.log(this.getBatchImportMatchingResultList,'this.getBatchImportMatchingResultList')
                     document.getElementById('editBodyStyle').style.height="500px"
                 }else if(response.data.cd=='-1'){
@@ -3559,7 +3670,7 @@ export default {
             })
         },
         sheetIndexChange(val){
-            this.getExcelColumnBySheet(val);
+            // this.getExcelColumnBySheet(val);
             this.sheetValue=val;
         },
         //根据sheet获取表头
@@ -3577,7 +3688,15 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.sheetIndexList=response.data.rt;
-                    console.log(this.sheetIndexList);
+                    console.log(this.sheetIndex,'sheetIndex0000');
+                    this.sheetList.forEach((item)=>{
+                        if(item.sheetIndex==val){
+                            this.$set(item,'sheetlist',this.sheetIndexList)
+                            // var list
+                        }
+                    })
+                    
+                    // console.log(this.sheetIndexList);
                 }else{
                     vm.$message({
                         type:'error',
@@ -3820,6 +3939,7 @@ export default {
         },
         //选择当前底图
         selectCurBaseMap(val){
+            this.isClick0=false;
             this.baseMapList.forEach((item)=>{
                 if(item.id==val){
                     this.curBaseMapUrl=item.relativeUri;
@@ -4610,7 +4730,7 @@ export default {
         },
         //html转PDF
         getPdf(){
-                let pdfDom = document.querySelector('#inspectionBody')
+                let pdfDom = document.querySelector('#pdfImport')
                 console.log(pdfDom,'pdfDom');
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
@@ -5033,7 +5153,19 @@ export default {
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
-
+                            }
+                            .bottomMap{
+                                display: inline-block;
+                                width: 84px;
+                                height: 25px;
+                                border:1px solid #f2f2f2;
+                                background: #f2f2f2;
+                                font-size: 12px;
+                                line-height: 25px;
+                                vertical-align: middle;
+                                color:#666666;
+                                border-radius: 2px;
+                                cursor: pointer;
                             }
                             .drawLineBtn{
                                 display: inline-block;
@@ -5102,7 +5234,6 @@ export default {
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
-
                             }
                             .singleSpot{
                                 display: inline-block;
@@ -5140,6 +5271,19 @@ export default {
                         height: 600px;
                         width: 100%;
                         position: relative;
+                        .noDataFigure{
+                            height: 595px;
+                            width: 100%;
+                            // margin:0 auto;
+                            // border: 1px solid #ccc;
+                            position: absolute;
+                            top:0px;
+                            left:0px;
+                            z-index:1000;
+                            background:#fff;
+                            padding:3px;
+
+                        }
                         .operateTool{
                             width: 288px;
                             height: 34px;
@@ -5271,7 +5415,7 @@ export default {
                         }
                         .planeFigureGround{
                             z-index: 8;
-                            height: 540px;
+                            height: 590px;
                             width: 100%;
                             position:absolute;
                             top:0px;
@@ -5302,6 +5446,7 @@ export default {
                             z-index:11;
                         }
                     }
+                    
                 }
                 .inspectTable{
                     margin-top:30px;
@@ -5488,7 +5633,12 @@ export default {
             }
         }
         #edit{
+            .editBtnSstyle{
+                position:absolute;
+                bottom:40px;
+                left:44px;
 
+            }
             .upInput{
                     display: none;
                 }

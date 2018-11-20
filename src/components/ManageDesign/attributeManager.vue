@@ -3,11 +3,11 @@
         <div :class="[{'box-left-avtive':!screenLeft.show,'box-left-avtive_pre':!SHOWMain},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="item-box-file">
+                     <router-link :to="'/Design/management'" class=" label-item">  
+                     设计协调  
+                    </router-link>
                      <router-link :to="'/Design/drawingReview'" class="label-item">  
                      图纸评审  
-                    </router-link>
-                    <router-link :to="'/Design/management'" class=" label-item">  
-                     设计协调  
                     </router-link>
                     <router-link :to="'/Design/attributeManager'"  class="label-item label-item-active">  
                         属性管理  
