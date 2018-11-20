@@ -172,7 +172,6 @@
                         </table>
                     </div>
                     </div>
-                
             </div>
         </div>
         <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">

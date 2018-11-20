@@ -2070,7 +2070,7 @@ export default {
                     width: 100%;
                     position: relative;
                 .noImg{
-                    height: 600px;
+                    height: 580px;
                     width: 100%;
                     position: absolute;
                     top:0px;

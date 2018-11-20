@@ -34,6 +34,7 @@
                 <div class="pdfSummary">
                     <label class="pdfSummaryHead">概述</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                    <div class="txt"><label class="label1">观测时间：</label></div>
                     <div class="inspectTableList1">
                         <table class="inspectTableList" border="1" cellspacing="0" width="100%">
                                 <!-- <tr class="contentTr"></tr> -->
@@ -80,8 +81,9 @@
                 </div>
                 <!-- 现场巡检 -->
                 <div class="pdfInspection">
-                     <label class="pdfSummaryHead">现场巡检</label>
+                     <label class="pdfSummaryHead">现场巡检报表</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                    <div class="txt"><label class="label1">观测者：</label><span class="span1"><label>观测时间：</label></span></div>
                     <div class="containerTable">
                         <table class="containerList" border="1" cellspacing="0" width="100%">
                             <thead>
@@ -164,7 +166,31 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div  class="showBasePic"></div>
+                            <div class="bottomTabel1">
+                                <div class="bottomTabelDiv">
+
+
+                                </div>
+                                 <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
+                                    <tbody>
+                                        <!-- <tr>
+                                            <td></td>
+                                            <td colspan="6" style="height:200px"></td>
+                                        </tr> -->
+                                        <tr>
+                                            <td rowspan="3">说明</td>
+                                            <td colspan="6" style="text-align:left;margin-left:2px;">1、报警值：变化速率》3mm/d,累计值达到30mm</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                            </div>
+                            <!-- <div  class="showBasePic"></div> -->
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
                     </li>
@@ -825,6 +851,9 @@ export default {
     // width:100%;
     margin: 0 auto;
     .pdfStyle{
+         width:596px;
+        // width:100%;
+        margin: 0 auto;
         .pdfCover{
             width:98%;
             border:1px solid #ccc;
@@ -833,6 +862,7 @@ export default {
             margin:17px auto;
             #pdfImg{
                 margin-top:50px;
+                height: 110px;
                 #img1{
                     background: #ccc;
                 }
@@ -929,38 +959,61 @@ export default {
             position: relative;
             .pageNum{
                     position: absolute;
-                    bottom:10px;
-                    left:45%;
+                    top:59px;
+                    right:90px;
             }
             
             .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
-                font-size: 18px;
+                font-size: 16px;
                 color:#000;
                 font-weight: bold;
-                height: 40px;
-                line-height: 40px;
-                border-bottom:2px solid #ccc;
+                height: 28px;
+                line-height: 28px;
+                margin-top:22px;
+                border-bottom:1px solid black;
             }
             .pdfSummarytext{
                 display:inline-block;
                 width: 90%;
-                 height: 40px;
+                 height: 24px;
                  position: relative;
+                 border-top:1px solid black;
+                        margin-top:2px;
                 //  margin-left:5px;
                  label{
                      position: absolute;
-                     left:5px;
+                     left:0px;
                      top:5px;
-                     font-size:16px;
+                     font-size:12px;
                  }
 
 
             }
+            .txt{
+                    width: 90%;
+                    margin: 0 auto;
+                    height: 24px;
+                    position: relative;
+                    .label1{
+                        position: absolute;
+                        left:0px;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+                    .span1{
+                        position: absolute;
+                        left:42%;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+            }
             .inspectTableList1{
                 width: 90%;
-                margin:10px auto;
+                margin:0px auto;
                         .inspectTableList{
                             
                             border-collapse: collapse;
@@ -1036,36 +1089,59 @@ export default {
             position: relative;
             .pageNum{
                     position: absolute;
-                    bottom:10px;
-                    left:45%;
+                    top:59px;
+                    right:90px;
                 }
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
-                font-size: 18px;
+                font-size: 16px;
                 color:#000;
                 font-weight: bold;
-                height: 40px;
-                line-height: 40px;
-                border-bottom:2px solid #ccc;
+                height: 28px;
+                line-height: 28px;
+               border-bottom:1px solid black;
+               margin-top:22px;
             }
             .pdfSummarytext{
                 display:inline-block;
                 width: 90%;
-                 height: 40px;
+                 height: 24px;
                  position: relative;
+                 border-top:1px solid black;
+                        margin-top:2px;
                 //  margin-left:5px;
                  label{
                      position: absolute;
-                     left:5px;
+                     left:0px;
                      top:5px;
-                     font-size:16px;
+                     font-size:12px;
                  }
+            }
+             .txt{
+                    width: 90%;
+                    margin: 0 auto;
+                    height: 24px;
+                    position: relative;
+                    .label1{
+                        position: absolute;
+                        left:0px;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+                    .span1{
+                        position: absolute;
+                        left:42%;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
             }
 
             .containerTable{
                 width: 90%;
-                margin:10px auto;
+                margin:0px auto;
                 // margin-top:10px;
                 .containerList{
                     border-collapse: collapse;
@@ -1153,63 +1229,66 @@ export default {
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
+                        height: 26px;
+                        line-height: 26px;
+                        margin-top:22px;
                         // border-bottom:2px solid #ccc;
                     }
                     .pdfSummaryHead{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 14px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
-                        border-bottom:2px solid #ccc;
+                        height: 26px;
+                        line-height: 26px;
+                        border-bottom:1px solid black;
                     }
                     .pdfSummarytext{
                         display:inline-block;
                         width: 90%;
-                        height: 40px;
+                        height: 24px;
                         position: relative;
                         //  margin-left:5px;
+                        border-top:1px solid black;
+                        margin-top:2px;
                         label{
                             position: absolute;
-                            left:5px;
+                            left:0px;
                             top:5px;
-                            font-size:16px;
+                            font-size:12px;
                         }
                     }
                     .txt{
                         width: 90%;
                         margin: 0 auto;
-                        height: 30px;
+                        height: 24px;
                         position: relative;
                         .label1{
                             position: absolute;
                             left:0px;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                         .span1{
                             position: absolute;
-                            left:50%;
-                            font-size:14px;
+                            left:42%;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                     }
                     .txt1{
                         width: 90%;
-                        font-size:14px;
+                        font-size:12px;
                         margin:0 auto;
                         color: #000;
-                        line-height: 30px;
-                        height: 30px;
+                        line-height: 24px;
+                        height: 24px;
                         position: relative;
                         label{
                             position: absolute;
@@ -1268,6 +1347,38 @@ export default {
                                     }
                             }
                     }
+                    .bottomTabel1{
+                        width: 90%;
+                        margin:0px auto;
+                        .bottomTabelDiv{
+                            // margin:0 auto;
+                            height: 200px;
+                            // margin-top:10px;
+                            // margin-bottom: 10px;
+                            border-left:1px solid #000;
+                            // border-bottom:1px solid #000;
+                            border-right:1px solid #000;
+
+                        }
+                        .bottomTableList1{
+                             border-collapse: collapse;
+                            border-left: 0.5px solid #000;
+                            border-right: 0.5px solid #000;
+                            border-bottom: 0.5px solid #000;
+                                tbody{
+                                        tr{
+                                            td{
+                                                height: 18px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 0.5px solid #000;
+                                                font-size: 12px;
+                                                color: #333333;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                    
                     .showBasePic{
                         width: 90%;
@@ -1279,71 +1390,74 @@ export default {
                     }
                     .pageNum{
                         position: absolute;
-                        bottom:10px;
-                        left:45%;
+                        top:82px;
+                        right:90px;
                     }
                 }
                 .verticalLength1{
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
+                        height: 26px;
+                        line-height: 28px;
+                        margin-top:22px;
                         // border-bottom:2px solid #ccc;
                     }
                     .pdfSummaryHead{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
-                        border-bottom:2px solid #ccc;
+                        height: 28px;
+                        line-height: 28px;
+                        border-bottom:1px solid black;
                     }
                     .pdfSummarytext{
                         display:inline-block;
                         width: 90%;
-                        height: 40px;
+                        height: 24px;
                         position: relative;
+                        border-top:1px solid black;
+                        margin-top:2px;
                         //  margin-left:5px;
                         label{
                             position: absolute;
-                            left:5px;
+                            left:0px;
                             top:5px;
-                            font-size:16px;
+                            font-size:12px;
                         }
                     }
                     .txt{
                         width: 90%;
                         margin: 0 auto;
-                        height: 30px;
+                        height: 24px;
                         position: relative;
                         .label1{
                             position: absolute;
                             left:0px;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                         .span1{
                             position: absolute;
                             left:50%;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                     }
                     .txt1{
                         width: 90%;
-                        font-size:14px;
+                        font-size:12px;
                         margin:0 auto;
                         color: #000;
-                        line-height: 30px;
-                        height: 30px;
+                        line-height: 24px;
+                        height: 24px;
                         position: relative;
                         label{
                             position: absolute;
@@ -1410,8 +1524,8 @@ export default {
                     }
                     .pageNum{
                         position: absolute;
-                        bottom:10px;
-                        left:45%;
+                        top:71px;
+                        right:90px;
                     }
                 }
             }

@@ -40,16 +40,20 @@
 <script>
 import headerCommon from './header.vue'
 import axios from 'axios'
-var app;            
+var app='';            
 export default {
     name:'Home',
     components: {
       headerCommon
     },
     data(){
-          window.addEventListener("message", (evt)=>{this.callback(evt)});
+        //   window.addEventListener("message", (evt)=>{this.callback(evt)});
+        window.addEventListener("message", (evt)=>{setTimeout(()=>{
+            this.callback(evt)
+        },0)});
         return{
             url:'http://10.252.26.240:8080/genDist/',
+            // url:'http://10.252.29.17/index.html',
             settingsCenter:true,//是否是两边铺满
             header:{
                  userName:'',
@@ -137,7 +141,7 @@ export default {
         vm.token  = localStorage.getItem('token')
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial(vm.projId);
-        this.getInitdata();
+       
         // this.getDrawingList();
         // window.location.reload()
         
@@ -165,7 +169,7 @@ export default {
             setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
                     app.postMessage({command:"Init",parameter:null},"*");
-            },100)
+            },10)
         },
         callback(e){
            // console.log(e)
@@ -174,7 +178,8 @@ export default {
 				{
                     let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
                     // console.log(Horder,'G')
-					let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+                    let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+                    
 					app.postMessage({command:"EnterProject",parameter:para},"*");
 				}
 				break;
@@ -397,6 +402,7 @@ export default {
                     localStorage.setItem('projectName',vm.header.projectName)
                     // console.log(response.data.rt.defaultSubProjId+'1111')
                     vm.getUserInfo()
+                    this.getInitdata();
                 }
             }).catch((err)=>{
                 console.log(err)

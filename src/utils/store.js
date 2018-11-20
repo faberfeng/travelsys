@@ -17,6 +17,7 @@ export default new Vuex.Store({
         BIMServerPort:'8080',
         shareUrl:'http://10.252.26.240:8080/bdms/#',
         iframeWebGlUrl:'http://10.252.26.240:8080/genDist/',
+        // iframeWebGlUrl:'http://10.252.29.17/index.html',
         applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
         //以下是外网配置文件
         // BIMServerPort:'443',

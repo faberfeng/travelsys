@@ -16,7 +16,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div class="header_shareFile" >
-                    {{fileListName[0]}}
+                    {{fileListName}}
                 </div>
                 <ul id="file-container" class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
@@ -35,6 +35,18 @@
                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
                                     <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
                                 </p>
+                            </span>
+                        </div>
+                    </li>
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item.nodeId)">
+                        <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
+                        <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                        <div class="item-file-box clearfix">
+                            <span  class="item-file-image item-folder-image">
+                            <img :src="require('./images/folderBig.png')" />
+                            </span>
+                            <span  class="item-file-detial">
+                                <h3 v-text="item.nodeName"></h3>
                             </span>
                         </div>
                     </li>
@@ -132,9 +144,11 @@ export default {
             },
             shareNo:"",
             fileList:[],
+            folderList:[],
             qjShareGroup:'',
             user:'',
             fileGroupBeanList:'',
+            nodeList:'',
             checkedItem:[],
             fileCheckedNum:'',
             posType:'',
@@ -174,13 +188,22 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.fileGroupBeanList=response.data.rt.fileGroupBeanList;
-                    console.log(this.fileGroupBeanList);
-                    this.fileGroupBeanList.forEach((item)=>{
-                        this.$set(item,'checked',false)
-                        this.fileList.push(item)
-                    })
-                    this.fileListName=this.fileList[0].fgName.split('.');
-                    console.log(this.fileListName[0])
+                    this.nodeList=response.data.rt.nodeList;
+                    console.log(this.fileGroupBeanList,'7777');
+                    if(this.fileGroupBeanList){
+                        this.fileGroupBeanList.forEach((item)=>{
+                            this.$set(item,'checked',false)
+                            this.fileList.push(item)
+                        })
+                        this.fileListName=(this.fileList[0].fgName.split('.'))[0];
+                        console.log(this.fileListName[0])
+                    }else if(this.nodeList){
+                            this.nodeList.forEach((item)=>{
+                                this.$set(item,'checked',false)
+                                this.folderList.push(item)
+                            })
+                            this.fileListName=this.folderList[0].nodeName;
+                    }
                 }
             })
         },
@@ -253,6 +276,10 @@ export default {
             }
             window.open(vm.QJFileManageSystemURL + filePath+'');
         },
+        IntoDir(val){
+            var vm = this
+            // vm.getInfo()
+        },
         checkItem(val,file,isMultiSelect){
             var vm = this
             vm.show.basicAttributes =true
@@ -273,6 +300,12 @@ export default {
                         if(!vm.fileList[i].fgId){
                             vm.auth.canCancelShare = false
                         }
+                    }
+                }
+                 for(var j=0;j<vm.folderList.length;j++){
+                    if(vm.folderList[j].checked){
+                        vm.checkedFile_Folder.folder = true
+                        vm.checkedFile_Folder.folderCheckedNum++
                     }
                 }
                 if(file){
@@ -512,7 +545,7 @@ li{
                             line-height: 12px;
                             color: #b3b3b3;
                             text-align: left;
-                            margin-bottom:6px; 
+                            margin-bottom:4px; 
                         }
                         .text-name{
                             color: #336699;
@@ -523,7 +556,7 @@ li{
                             bottom: 0;
                             left: 88px;
                             right: 0;
-                            margin-bottom:14px; 
+                            margin-bottom:6px; 
                             span{
                                 color: #fc3439;
                             }

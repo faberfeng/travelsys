@@ -23,7 +23,6 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
-                
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
@@ -2095,7 +2094,7 @@ export default {
                 return  require('./images/sunny.png')
             }else if(val=="小雨"||val=="小雨转阴"||val=="小雨转晴"){
                 return  require('./images/lightrain.png')
-            }else if(val=="大雨"||val=="小雨转中雨"){
+            }else if(val=="大雨"||val=="小雨转中雨"||val=="中雨"){
                 return  require('./images/heavyrain.png')
             }else if(val=="多云转小雨"||val=="小雨转多云"){
                 return  require('./images/sunnyandcloudy.png')
