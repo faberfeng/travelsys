@@ -9,7 +9,7 @@
                 <div class="containerHead">
                     <div class="containerHeadLeft">
                         <span class="addOrder" @click="addIndexNum()">添加序列</span>
-                        <!-- <span class="exportOrder">导出</span> -->
+                        <span class="exportOrder" @click="getImportHistory">导出</span>
                     </div>
                     <div class="containerHeadMiddle"></div>
                     <div class="containerHeadRight">
@@ -118,7 +118,7 @@
                         <div class="twoHeader">
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}曲线</label>
-                            <label class="editSpot" @click="editMarkSpot()">编辑标记</label>
+                            <label class="editSpot" @click="editLeftMarkSpot()">编辑标记</label>
                         </div>
                         <div class="twoGraph">
                             <vue-highcharts id="leftHightchart" style="min-height:1900px"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
@@ -170,7 +170,7 @@
                         <div class="fourHeader">
                              <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{rightDisplayName}}曲线</label>
-                             <label class="editSpot">编辑标记</label>
+                             <label class="editSpot" @click="editRightMarkSpot()">编辑标记</label>
                         </div>
                         <div class="fourGraph">
                             <vue-highcharts style="min-height:1900px" :options="optionOnesRight" ref="lineRightChartOne"></vue-highcharts>
@@ -254,26 +254,29 @@
                 <div class="editBody">
                     <div class="editBodyone">
                         <div class="markhead">
-                            <label class="txt">位置标记</label>
-                            <label class="btn">插入</label>
+                            <label class="txt">测点序列{{markSqName}}曲线图位置标记</label>
+                            <label class="btn" @click="addSq()">插入</label>
                         </div>
                         <div class="editBodytwo">
                             <div class="tablemark">
                                 <table class="marktableList" border="1" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>位置</th>
-                                            <th>标记名称</th>
-                                            <th>操作</th>
+                                            <th width="20%">位置</th>
+                                            <th width="50%">标记名称</th>
+                                            <th width="30%">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td>
-                                                <button title="修改" class="editBtn actionBtn"></button>
-                                                <button title="删除" class="actionBtn deleteBtn"></button>
+                                        <tr v-for="(item,index) in getPitchSeqMarkList" :key="index">
+                                            <td width="20%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.depth}}</span><input placeholder="请输入" style="width:100%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markDepth"/></td>
+                                            <td width="50%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.name}}</span><input placeholder="请输入" style="width:55%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markName"/>
+                                                <button v-show="item.id==editPitchShow" @click="editPitchSeqMarkSure(item.id,item.depth,item.name)" class="actionMakeBtn">确定</button>
+                                                <button v-show="item.id==editPitchShow" @click="canclePitchSeqMark()" class="actionCancleBtn">取消</button>
+                                                </td>
+                                            <td width="30%">
+                                                <button title="修改"  @click="editPitchSeqMark(item.id,item.depth,item.name)" class="editBtn actionBtn"></button>
+                                                <button title="删除" @click="deletePitchSeqMark(item.id)" class="actionBtn deleteBtn"></button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -284,7 +287,7 @@
                 
                 </div>
                  <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" >确定</button>
+                    <button class="editBtnS" @click="addPitchSeqMark()" >确定</button>
                     <button class="editBtnC" @click="editMarkCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -364,6 +367,40 @@
                     <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
+             <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
+                <div class="editBody" >
+                     <div class="editBodytwo">
+                        <div id="toolTbale1">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="5%"><el-checkbox @change="allCheckChange" v-model="allCheck"></el-checkbox></th>
+                                        <th width="10%">序号</th>
+                                        <th width="25%">导入时间</th>
+                                        <th width="20%">导入方式</th>
+                                        <th width="20%">导入用户</th>
+                                        <th width="20%">测点数</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getImportHistoryList" :key="index">
+                                        <td><el-checkbox v-model="item.check"></el-checkbox></td>
+                                        <td>{{item.importNo}}</td>
+                                        <td>{{item.importTime|timeChange1}}</td>
+                                        <td>{{item.type|typeChange}}</td>
+                                        <td>{{item.importUserName}}</td>
+                                        <td>{{item.pointAmount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button>
+                        <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
+                </div>
+            </el-dialog>
         </div>
 
     </div>
@@ -435,6 +472,12 @@ export default Vue.component('commonPitch-detail',{
                 time3:'',
                 rightDisplayList:'',
                 rightDisplayListValue:[],
+                rightSqId:'',//右边编辑ID，
+                leftSqId:'',//左边标记ID,
+                rightSqName:'',//右边的名字
+                leftSqName:'',//左边的名字
+                markSqId:'',//标记sqid
+                markSqName:'',//名字
                 itemseqId:'',
                 seqId:'',
                 show:false,
@@ -553,6 +596,10 @@ export default Vue.component('commonPitch-detail',{
                 autoAcquisitionShow:false,
                 manufacturerValue:'华桓',
                 uploadshow:false,
+                //获取导出的历史记录
+                exportHistoryRecoedShow:false,
+                getImportHistoryList:'',
+                allCheck:false,
                 filesList:'',
                 imageName:"未选择任何文件",
                 getSingleSheetTitleInfoList:'',
@@ -670,7 +717,13 @@ export default Vue.component('commonPitch-detail',{
                         label:'基康'
                     }
                 ],
-                testShow:false
+                testShow:false,
+                getPitchSeqMarkList:'',
+                markDepth:'',
+                markName:'',
+                editPitchShow:'',
+
+
             }
         },
         created(){
@@ -705,6 +758,16 @@ export default Vue.component('commonPitch-detail',{
             } else {
             return moment(val).format("MM-DD HH:mm");
             }
+        },
+        timeChange1(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD HH:mm");
+            }
+        },
+        typeChange(val){
+            return val==1?'手动':'自动'
         },
         timeStamp(StatusMinute){	
             if(StatusMinute==null){
@@ -982,6 +1045,8 @@ export default Vue.component('commonPitch-detail',{
             },
             //左侧显示
             leftDisplay(id,name){
+                this.leftSqId=id;
+                this.leftSqName=name;
                 this.leftDisplayListValue1=[];
                 this.leftDisplayListValue2=[];
                 this.leftDisplayListValueXdata=[];
@@ -991,7 +1056,6 @@ export default Vue.component('commonPitch-detail',{
                 this.totalShow=true;
                 this.leftShow=true;
                 if(this.pitchDetailDataList){
-                    
                     this.leftDisplayList=this.pitchDetailDataList;
                     this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
@@ -1035,7 +1099,8 @@ export default Vue.component('commonPitch-detail',{
             },
             //右侧显示
             rightDisplay(id,name){
-
+                this.rightSqId=id;
+                this.rightSqName=name;
                 this.rightDisplayListValue1=[];
                 this.rightDisplayListValue2=[];
                 this.rightDisplayListValueXdata=[],
@@ -1081,15 +1146,263 @@ export default Vue.component('commonPitch-detail',{
                 
                 console.log(this.rightDisplayList,'右边数据')
             },
-            editMarkSpot(){
+            editLeftMarkSpot(){
+                this.markSqId=this.leftSqId;
+                this.markSqName=this.leftSqName;
                 this.editMarkShow=true;
+                this.getPitchSeqMark();
+            },
+            editRightMarkSpot(){
+                this.markSqId=this.rightSqId;
+                this.markSqName=this.leftSqName;
+                this.editMarkShow=true;
+                this.getPitchSeqMark();
+            },
+            //插入
+            addSq(){
+                this.getPitchSeqMarkList.push({"depth":'',"id":null,"name":'',"seqId":''})
+            },
+            //获取斜度序列标记
+            getPitchSeqMark(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getPitchSeqMark',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        seqId:this.markSqId,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getPitchSeqMarkList=response.data.rt;
+                        console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
+                    }else{
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //
+
+            //添加斜度序列标记
+            addPitchSeqMark(){
+                var vm=this;
+                if(this.editPitchShow){
+                     this.$message({
+                        type:"info",
+                        message:'当前不可操作，请保存编辑修改'
+                    })
+                }else if(this.markDepth==''){
+                    this.$message({
+                        type:"info",
+                        message:'请输入位置标记'
+                    })
+                }else if(this.markName==''){
+                     this.$message({
+                        type:"info",
+                        message:'请输入位置标记名称'
+                    })
+                }else if(this.markName.length>8){
+                    this.$message({
+                        type:"info",
+                        message:'位置标记名称不能多余8个字符'
+                    })
+                }else{
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'detectionInfo/addPitchSeqMark',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            seqId:this.markSqId,
+                            depth:this.markDepth,
+                            name:this.markName,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.markDepth='';
+                            this.markName='';
+                            this.getPitchSeqMark();
+                        }else{
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
+            },
+            canclePitchSeqMark(){
+                // this.getPitchSeqMarkList.pop();
+                // this.markDepth='';
+                // this.markName='';
+                this.editPitchShow='';
+            },
+            //编辑斜度序列标记
+            editPitchSeqMark(id,depth,name){
+                var vm=this;
+                if(id==null){
+                    this.$message({
+                            type:'success',
+                            message:'当前不可操作，请先保存'
+                        })
+                }else{
+                    this.markDepth=depth;
+                    this.markName=name;
+                    this.editPitchShow=id;
+                }
+                
+            },
+            //
+            editPitchSeqMarkSure(id,depth,name){
+                var vm=this;
+                  axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/editPitchSeqMark',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        id:id,
+                        depth:this.markDepth,
+                        name:this.markName,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.editPitchShow='';
+                        this.markDepth='';
+                        this.markName='';
+                        this.getPitchSeqMark();
+                    }else{
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            //删除斜度序列标记
+            deletePitchSeqMark(val){
+                var vm=this;
+                if(val==null){
+                    this.$message({
+                            type:'success',
+                            message:'当前不可操作，请先保存'
+                        })
+                    
+                }else{
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'detectionInfo/deletePitchSeqMark',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                        id:val,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.getPitchSeqMark();
+                            this.$message({
+                                type:'success',
+                                message:'位置标记删除成功'
+                            })
+                        }else{
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
             },
             editMarkCancle(){
                 this.editMarkShow=false;
             },
 
+            ////导出历史记录
+             //获取导入历史
+            getImportHistory(){
+                var vm=this;
+                this.exportHistoryRecoedShow=true;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/getImportHistory',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getImportHistoryList=response.data.rt;
+                        this.getImportHistoryList.forEach((item)=>{
+                            this.$set(item,'check',false)
+                        })
+                        console.log(this.getImportHistoryList,'this.getImportHistoryList');
+                    }
+                })
+            },
+            //点击导出所有记录按钮
+            allCheckChange(){
+                if(this.allCheck==true){
+                    this.getImportHistoryList.forEach((item)=>{
+                        item.check=true;
+                    })
+                }else if(this.allCheck==false){
+                    this.getImportHistoryList.forEach((item)=>{
+                        item.check=false;
+                    })
+                }
+            },
+            //导出所有记录
+            exportAllRecode(){
+                this.allCheck=true;
+                this.allCheckChange();
+                this.exportHistory();
+            },
+            //导出选中记录
+            exportSelectRecode(){
 
-
+                this.exportHistory()
+            },
+            //
+            exportHistoryRecoedCancle(){
+                this.exportHistoryRecoedShow=false;
+            
+                this.getImportHistoryList.forEach((item,index)=>{
+                    item.check=true;
+                })
+            },
+            // 导出选中的历史记录
+            exportHistory(){
+                var vm=this;
+                var str='';
+                this.getImportHistoryList.forEach((item,index)=>{
+                    if(item.check==true){
+                    str+="&ids="+item.id
+                    }
+                })
+                if(str){
+                    window.open(vm.BDMSUrl+'detectionInfo/exportHistory?token='+vm.token+str,'_blank')
+                    this.exportHistoryRecoedShow=false;
+                    this.allCheck=false;
+                    this.getImportHistoryList.forEach((item,index)=>{
+                        item.check=false;
+                    })
+                }else{
+                    this.$message({
+                        type:'info',
+                        message:'请选择导出的条目'
+                    })
+                }
+            },
 
 
             //////
@@ -1945,6 +2258,33 @@ select.autoImport{
                                     .deleteBtn{
                                         background: url('./images/delete1.png') no-repeat 0 0;
                                     }
+                                    .actionMakeBtn{
+                                            background: #fc3439;
+                                            margin-right: 2px;
+                                            color: #fff;
+                                            font-size: 14px;
+                                            font-weight: normal;
+                                            width:50px;
+                                            height:24px;
+                                            border: none;
+                                            padding: 0;
+                                            cursor: pointer;
+                                            border-radius: 2px;
+                                            display: inline-block;
+                                    }
+                                    .actionCancleBtn{
+                                            color: #666;
+                                            background: #fff;
+                                            border: 1px solid #ccc;
+                                            display: inline-block;
+                                            width: 50px;
+                                            height: 24px;
+                                            // border: none;
+                                            padding: 0;
+                                            cursor: pointer;
+                                            border-radius: 2px;
+
+                                    }
                                 }
                             }
                     }
@@ -2130,6 +2470,97 @@ select.autoImport{
                             }
                         }
             }
+        }
+         #toolTbale1{
+                    width: 85%;
+                    margin:10px auto;
+                    // height: 300px;
+                    overflow: auto;
+                    position: relative;
+                    .toolTbaleList{
+                        // position: fixed;
+                        // table-layout: fixed
+                        border-collapse: collapse;
+                                border: 1px solid #e6e6e6;
+                                overflow: auto;
+                                thead{
+                                    background: #f2f2f2;
+                                    th{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        font-weight: normal;
+                                    }
+                                }
+                                tbody{
+                                    tr{
+                                        .red{
+                                            color: red;
+                                        }
+                                        td{
+                                            padding-left: 6px;
+                                            padding-right: 15px;
+                                            height: 32px;
+                                            text-align: center;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #e6e6e6;
+                                            font-size: 12px;
+                                            color: #333333;
+                                            /*
+                                            溢出隐藏
+                                            */
+                                            overflow: hidden;
+                                            /*
+                                            显示省略号
+                                            */
+                                            text-overflow: ellipsis;
+                                            /*
+                                            不换行
+                                            */
+                                            white-space: nowrap;
+                                        }
+                                    }
+                                }
+                    }
+                    .toolTbaleList1{
+                        border-collapse: collapse;
+                                border: 1px solid #e6e6e6;
+                        overflow: auto;
+                                tbody{
+                                    tr{
+                                        .red{
+                                            color: red;
+                                        }
+                                        td{
+                                            padding-left: 6px;
+                                            padding-right: 15px;
+                                            height: 32px;
+                                            text-align: center;
+                                            box-sizing: border-box;
+                                            border-right: 1px solid #e6e6e6;
+                                            font-size: 12px;
+                                            color: #333333;
+                                            /*
+                                            溢出隐藏
+                                            */
+                                            overflow: hidden;
+                                            /*
+                                            显示省略号
+                                            */
+                                            text-overflow: ellipsis;
+                                            /*
+                                            不换行
+                                            */
+                                            white-space: nowrap;
+                                        }
+                                    }
+                                }
+                    }
         }
         .sheetName{
             width: 375px;

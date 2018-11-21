@@ -818,12 +818,20 @@ export default Vue.component('commonDetail',{
                    str+="&ids="+item.id
                 }
             })
-            window.open(vm.BDMSUrl+'detectionInfo/exportHistory?token='+vm.token+str,'_blank')
-            this.exportHistoryRecoedShow=false;
-            this.allCheckChange=false;
-            this.getImportHistoryList.forEach((item,index)=>{
-                item.check=true;
-            })
+            if(str){
+                this.exportHistoryRecoedShow=false;
+                this.allCheck=false;
+                this.getImportHistoryList.forEach((item,index)=>{
+                    item.check=false;
+                })
+                window.open(vm.BDMSUrl+'detectionInfo/exportHistory?token='+vm.token+str,'_blank')
+            }else{
+                this.$message({
+                    type:'info',
+                    message:'请选择导出的条目'
+                })
+            }
+           
 
         },
         //修复故障

@@ -332,7 +332,7 @@
       <div class="el-dialog__body">
         <div class="editBody">
           <ul>
-            <li v-for="(item,index) in relaList" :key="index" class="item-label clearfix">
+            <li v-for="(item,index) in relaList1" :key="index" class="item-label clearfix">
               <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.main.pkId, 7)" alt="">
               <div class="right">
                 <p class="item-list clearfix">
@@ -1155,6 +1155,7 @@
         ugList1: [],//群组列表1
         entityRelationList: [],//获取绑定实体关系分组
         relaList: [],
+        relaList1:[],
         mId: '',
         bId: '',
         bType: '',
@@ -1666,11 +1667,6 @@
        callback(e){
             switch(e.data.command){
               case "EngineReady":
-                // {
-                //   let Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                //   let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-                //   app.postMessage({command:"EnterProject",parameter:para},"*");
-                // }
                 break;
               case "CurrentSelectedEnt":
                   CurrentSelectPara=e.data.parameter[0];
@@ -1683,18 +1679,6 @@
               case "GetDrawingList":
               break;
               case "UsingColorStatus":{
-                //  var list=[
-                //     {
-                //       name:'',info:'',
-                //       Items:[{name:'',ColorID:''}],
-                //       ElementSummaryList:[
-                //           {
-                //             TraceID:'',
-                //             HolderPath:[{ID:"",Type:''}]
-                //           }
-                //         ]
-                //     }
-                //   ]
               }
             }
         },
@@ -3623,6 +3607,7 @@
                 }).then(response => {
                   if (response.data.cd == "0") {
                       this.getEntityRelation();
+                      this.addAssociationListDialog=false;
                     } else if (response.data.cd == "-1") {
                       alert(response.data.msg)
                     }
@@ -3642,8 +3627,8 @@
         this.labelListShow = true;
         this.relaList.forEach((item) => {
           if (item.main.pkId == val) {
-            this.relaList = [];
-            this.relaList.push(item);
+            this.relaList1 = [];
+            this.relaList1.push(item);
           }
         })
       },
