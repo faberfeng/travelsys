@@ -87,7 +87,7 @@ export default {
             if(this.para.type=="")return;
             // console.log(this.para,'this.para.type')
 
-            if(this.para.type=="pdf"){
+            if(this.para.type.toLowerCase()=="pdf"){
                 this.para.type="PDF";
                 if(this.para.source != this.old_para){
 
@@ -2219,27 +2219,106 @@ export default {
         print_priority_points(width,height){
 
         },
-        print_priority_pic(width,height){
-            var min_side_outside = Math.min(width,height);
-            var max_side_inside = Math.max(this.oldImageSize.width,this.oldImageSize.height);
-            var big_side_is_width_inside = true;
-            var big_side_is_width_outside = true;
+        print_priority_pic(width,height){   //  外部宽高
 
-            if(this.oldImageSize.width > this.oldImageSize.height){
-                big_side_is_width_inside = true;
-            }else{
-                big_side_is_width_inside = false;
-            }
+            var width_inside = 0;
+            var height_inside = 0;
 
-            if(width > height){
-                var big_side_is_width_outside = true;
-            }else{
-                var big_side_is_width_outside = false;
-            }
-            
             if(this.angle == 90 || this.angle == 270)
             {
-                big_side_is_width_inside = !big_side_is_width_inside;
+                width_inside = this.oldImageSize.height;
+                height_inside = this.oldImageSize.width;
+            }else{
+                width_inside = this.oldImageSize.width;
+                height_inside = this.oldImageSize.height;
+            }
+
+            var scale = 1;
+
+            if(width_inside > width){
+                scale *= width / width_inside;
+            }
+
+            width_inside *= scale;
+            height_inside *= scale;
+
+            if(height_inside > height){
+                scale *= height / height_inside;
+            }
+
+            this.scale = scale;
+
+            switch(this.type){
+
+                case "PDF":
+                    this.start_canvas.x = this.sub_div.offsetLeft;
+                    this.start_canvas.y = this.sub_div.offsetTop;
+                    this.start_canvas.w = this.sub_div.offsetWidth;
+                    this.start_canvas.h = this.sub_div.offsetHeight;
+
+                   {
+
+                        this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                        if(this.angle == 0 || this.angle == 180){
+                            this.sub_div.style.height = this.imageSize.height + "px";
+                            this.sub_div.style.width = this.imageSize.width + "px";
+                            this.drawCanvas.height = this.imageSize.height;
+                            this.drawCanvas.width = this.imageSize.width;
+                            this.drawCanvasSelect.height = this.imageSize.height;
+                            this.drawCanvasSelect.width = this.imageSize.width;
+                        }else{
+                            this.sub_div.style.height = this.imageSize.width + "px";
+                            this.sub_div.style.width = this.imageSize.height + "px";
+                            this.drawCanvas.height = this.imageSize.width;
+                            this.drawCanvas.width = this.imageSize.height;
+                            this.drawCanvasSelect.height = this.imageSize.width;
+                            this.drawCanvasSelect.width = this.imageSize.height;
+                        }
+
+                        
+                    }
+                    break;
+                case "PNG":
+                    this.start_canvas.x = this.sub_div.offsetLeft;
+                    this.start_canvas.y = this.sub_div.offsetTop;
+                    this.start_canvas.w = this.sub_div.offsetWidth;
+                    this.start_canvas.h = this.sub_div.offsetHeight;
+
+                    this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                    if(this.angle == 0 || this.angle == 180){
+                        this.sub_div.style.height = this.imageSize.height + "px";
+                        this.sub_div.style.width  = this.imageSize.width + "px";
+                        this.canvas.height = this.imageSize.height;
+                        this.canvas.width = this.imageSize.width;
+                        this.drawCanvas.height = this.imageSize.height;
+                        this.drawCanvas.width = this.imageSize.width;
+                        this.drawCanvasSelect.height = this.imageSize.height;
+                        this.drawCanvasSelect.width = this.imageSize.width;
+                    }else{
+                        this.sub_div.style.height = this.imageSize.width + "px";
+                        this.sub_div.style.width  = this.imageSize.height + "px";
+                        this.canvas.height = this.imageSize.width;
+                        this.canvas.width = this.imageSize.height;
+                        this.drawCanvas.height = this.imageSize.width;
+                        this.drawCanvas.width = this.imageSize.height;
+                        this.drawCanvasSelect.height = this.imageSize.width;
+                        this.drawCanvasSelect.width = this.imageSize.height;
+                    }
+
+                    this.context = this.canvas.getContext('2d');
+                    this.context.rotate(this.angle*Math.PI/180);
+
+                    switch(this.angle){
+                        case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                        case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                        case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                        case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
+                    }
+
+                    break;
+
             }
 
 
