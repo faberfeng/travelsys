@@ -94,7 +94,9 @@ export default {
       headerCommon
     },
     data(){
-        window.addEventListener("message", (evt)=>{this.callback(evt)});
+        window.addEventListener("message", (evt)=>{setTimeout(()=>{
+            this.callback(evt)
+        },0)});
         return{
             url:'http://10.252.26.240:8080/genDist/',
             BDMSUrl:'',
@@ -205,8 +207,9 @@ export default {
              setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
                     app.postMessage({command:"Init",parameter:null},"*");
-            },0)
+            },10)
         },
+
         callback(e){
             switch(e.data.command){
 			case "EngineReady":

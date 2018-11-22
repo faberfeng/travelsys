@@ -23,7 +23,6 @@
                 <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
                 安全检查  
                 </router-link>
-                
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
@@ -106,9 +105,13 @@
                         <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
-                                <span class="fault" @click="changeBroken" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                                <span  class="fault" @click="changeBroken(1)" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                                 <span  class="fault1" style="margin-left:20px;" @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">正常</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
+                            <!-- <div style="display:inline-block" class="operateToolRight">
+                                <label class="saveDrawTxt" @click="changeBroken(0)">正常</label>
+                            </div> -->
                             <div class="operateToolRight">
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                             </div>
@@ -1063,6 +1066,7 @@ export default {
             moreSpotLineListLength:'',
             todayTime:new Date(),
             onlyNum:'',
+            monitorStatus:1,
         }
     },
     created(){
@@ -1077,6 +1081,7 @@ export default {
         this.getPositionList();
         this.curTime();
         this.curTime1();
+        console.log(window.screen.deviceXDPI,'0000');
     },
     filters:{
         monitorTypeChange(val){
@@ -1433,8 +1438,12 @@ export default {
         },
         picView_status_changed(status,list){
             this.listLength=list.length;
+           
+            // console.log(this.pointId,'this.pointId');
+            console.log(list,'list12345');
             console.log(this.listLength)
             if(status==true){
+                this.pointId=list[0].ID_out;
                 this.toolShow=status;
                 console.log(list);
                 this.pointIds=[];
@@ -2095,7 +2104,7 @@ export default {
                 return  require('./images/sunny.png')
             }else if(val=="小雨"||val=="小雨转阴"||val=="小雨转晴"){
                 return  require('./images/lightrain.png')
-            }else if(val=="大雨"||val=="小雨转中雨"){
+            }else if(val=="大雨"||val=="小雨转中雨"||val=="中雨"||val=="中雨转多云"){
                 return  require('./images/heavyrain.png')
             }else if(val=="多云转小雨"||val=="小雨转多云"){
                 return  require('./images/sunnyandcloudy.png')
@@ -4255,9 +4264,25 @@ export default {
 
         },
         //修复故障
-        changeBroken(){
+        changeBroken(val){
             if(this.picMarkName!="Select_img_Mark"){
-                this.$refs.pic.changeBroken();
+                // this.$refs.pic.changeBroken();
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        pointId:vm.pointId,
+                        status:val //监测点状态(故障为1和正常为0)
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getAllMonitorPoint();
+                    }
+                })
             }
             if(this.picMarkName=="Select_img_Mark"){
                 this.$message({
@@ -5285,7 +5310,7 @@ export default {
 
                         }
                         .operateTool{
-                            width: 288px;
+                            width: 357px;
                             height: 34px;
                             // border:1px solid #ccc;
                             float: right;
@@ -5294,7 +5319,7 @@ export default {
                             position: relative;
                             z-index: 10;
                             .operateToolLeft{
-                                width:216px;
+                                width:280px;
                                 height: 34px;
                                 float: left;
                                 position: relative;
@@ -5304,7 +5329,7 @@ export default {
                                 background: #fff;
                                 .move{
                                     display: inline-block;
-                                    width: 33%;
+                                    width: 25%;
                                     height: 28px;
                                    margin-top:3px;
                                     position: absolute;
@@ -5336,12 +5361,12 @@ export default {
                                 }
                                 .fault{
                                     display: inline-block;
-                                    width: 33%;
+                                    width: 25%;
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
                                     border-right:1px dashed #ccc;
-                                    left:33%;
+                                    left:25%;
                                     cursor: pointer;
                                     .faultIcon{
                                         background: url('./images/falut.png') no-repeat 0 0;
@@ -5370,7 +5395,7 @@ export default {
                                      height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    left:72%;
+                                    left:75%;
                                     cursor: pointer;
                                     .deleteDrawIcon{
                                         background: url('./images/delete.png') no-repeat 0 0;
@@ -5392,6 +5417,37 @@ export default {
                                         margin-left: 12px;
                                         margin-top: 1px;
                                     }
+                                }
+                                 .fault1{
+                                    display: inline-block;
+                                    width: 25%;
+                                    height: 28px;
+                                    margin-top:3px;
+                                    position: absolute;
+                                    border-right:1px dashed #ccc;
+                                    left:41%;
+                                    cursor: pointer;
+                                    .faultIcon{
+                                        background: url('./images/falut.png') no-repeat 0 0;
+                                        width: 54px;
+                                        height: 20px;
+                                        display: inline-block;
+                                        margin-right: -8px;
+                                        margin-top: 2px;
+                                        cursor: pointer;
+                                        &:hover{
+                                            background:url('./images/fault1.png') no-repeat 0 0;
+                                        }
+                                         .faultTxt{
+                                            line-height: 20px;
+                                            color:#666666;
+                                            font-size: 12px;
+                                            display: block;
+                                            margin-left: 12px;
+                                            margin-top: 1px;
+                                        }
+                                    }
+                                   
                                 }
 
                             }

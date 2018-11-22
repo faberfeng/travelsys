@@ -332,7 +332,7 @@
       <div class="el-dialog__body">
         <div class="editBody">
           <ul>
-            <li v-for="(item,index) in relaList" :key="index" class="item-label clearfix">
+            <li v-for="(item,index) in relaList1" :key="index" class="item-label clearfix">
               <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.main.pkId, 7)" alt="">
               <div class="right">
                 <p class="item-list clearfix">
@@ -701,7 +701,7 @@
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
-          <button class="editBtnS" style="display:none" @click="addLinkMakeSure">着色状态</button>
+          <button class="editBtnS" @click="siteColorSearch()" >着色状态</button>
           <button class="editBtnC" @click="progressSearchCancle">取消</button>
         </div>
       </el-dialog>
@@ -882,7 +882,7 @@
           </div>
           <div class="bindListTab">
             <label class="searchResultText">查询结果</label>
-            <div class="siteSearch" style="display:none" @click="siteSearch()">场景选择</div>
+            <div class="siteSearch" @click="siteSearch()">场景选择</div>
             <div class="searchTab">
               <table border="1" width='100%'>
                 <thead>
@@ -1131,9 +1131,13 @@
   import commonList from './qingdan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
+  var app
+  var CurrentSelectPara='';
+  var CurrentSelectedEntList='';
   export default {
     name: 'taskIndex',
     data() {
+      window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
         loading:false,
         showCommonList: false,//显示清单
@@ -1151,6 +1155,7 @@
         ugList1: [],//群组列表1
         entityRelationList: [],//获取绑定实体关系分组
         relaList: [],
+        relaList1:[],
         mId: '',
         bId: '',
         bType: '',
@@ -1566,6 +1571,7 @@
         ge:"",
         rowJson:'',
         screenLeftShow:false,
+        showBimDataList:'',//着色数量
         loadGanttList:{
             tasks: [
               
@@ -1607,6 +1613,7 @@
     created() {
       var vm = this
       this.projId = localStorage.getItem('projId');
+      vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
       this.token = localStorage.getItem('token');
       vm.userId = localStorage.getItem('userid');
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
@@ -1657,9 +1664,71 @@
 
     },
     methods: {
-      //场景选择
-      siteSearch() {
-        alert("虚拟场景面板未打开，请打开左侧虚拟场景面板。")
+       callback(e){
+            switch(e.data.command){
+              case "EngineReady":
+                break;
+              case "CurrentSelectedEnt":
+                  CurrentSelectPara=e.data.parameter[0];
+                  CurrentSelectedEntList=e.data.parameter;
+                  console.log(CurrentSelectPara,'CurrentSelectPara');
+                  console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
+                break;
+              case "ViewpointSubmited":
+                        break;
+              case "GetDrawingList":
+              break;
+              case "UsingColorStatus":{
+              }
+            }
+        },
+      //着色状态
+      siteColorSearch() {
+        var vm=this;
+         if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else{
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                 const app = document.getElementById('webIframe').contentWindow;
+                 axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/schedule/'+this.projId+'/task/showBimData',
+                    headers:{
+                      'token':vm.token
+                    },
+                    params:{
+                      taskStart:this.taskProgressStart,
+                      taskEnd:this.taskProgressEnd,
+                      ugId: this.selectUgId,
+                      type: this.selectType
+                    }
+                  }).then((response)=>{
+                    if(response.data.cd=='0'){
+                      this.showBimDataList=response.data.rt;
+                      var DataList=[];
+                      this.showBimDataList.Items.forEach((item)=>{
+                         var ElementSummaryDataList=[];
+                        item.ElementSummaryList.forEach((val)=>{
+                            ElementSummaryDataList.push(JSON.parse(val))
+                        })
+                        //  console.log(ElementSummaryDataList,'ElementSummaryDataList222');
+                         item.ElementSummaryList = ElementSummaryDataList;
+                      })
+                      console.log(this.showBimDataList,'this.showBimDataList');
+                      this.progressSearchDialog=false;
+                      app.postMessage({command:"UsingColorStatus",parameter:this.showBimDataList},"*");
+                      this.taskProgressStart="";
+                      this.taskProgressEnd="";
+
+
+                    }
+                  })
+
+                
+            }
       },
       // 补零
       addZero(num, size) {
@@ -1811,9 +1880,28 @@
             return '未定义';
         }
       },
+      //获取着色状态
+      showBimData(){
+
+         var list=[
+          {
+            name:'',info:'',
+            Items:[{name:'',ColorID:''}],
+            ElementSummaryList:[
+                {
+                  TraceID:'',
+                  HolderPath:[{ID:"",Type:''}]
+                }
+              ]
+          }
+        ]
+
+      },
+      
 
       //获取工程任务页面
       getTaskIndex() {
+       
         axios({
           method: 'get',
           url: this.BDMSUrl + '/project2/schedule/taskIndex',
@@ -2580,6 +2668,10 @@
             alert(response.data.msg)
           }
         })
+      },
+      //增加绑定实体关系分组、绑定bim关系
+      addEntityRelation(){
+       
       },
       //获取工程任务详细信息
       getTask() {
@@ -3484,6 +3576,44 @@
             })
 
       },
+
+      //场景选择
+      siteSearch(){
+         if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else if(CurrentSelectedEntList==''){
+              this.$message({
+                  type:'info',
+                  message:'先在图形上面选择构件'
+              })
+            }else{
+                // var JsonData=[];
+                // JsonData.push({relaId:this.taskId,relaType: 2,subProjId:this.defaultSubProjId,entityList:CurrentSelectedEntList})
+                // console.log(JsonData,'JsonData');
+                axios({
+                  method: 'post',
+                  url: this.BDMSUrl +'/model2/'+this.projId+'/entityRelation/add',
+                  headers: {
+                    'token': this.token
+                  },
+                  data:{
+                    "entityList":CurrentSelectedEntList,
+                    "relaId":this.taskId,
+                    "relaType":2,
+                    "subProjId":this.defaultSubProjId,
+                  },
+                }).then(response => {
+                  if (response.data.cd == "0") {
+                      this.getEntityRelation();
+                      this.addAssociationListDialog=false;
+                    } else if (response.data.cd == "-1") {
+                      alert(response.data.msg)
+                    }
+                  })
+            }
+      },
       showDetialList(item) {
         this.showCommonList = true;
         this.checkList = item;
@@ -3497,8 +3627,8 @@
         this.labelListShow = true;
         this.relaList.forEach((item) => {
           if (item.main.pkId == val) {
-            this.relaList = [];
-            this.relaList.push(item);
+            this.relaList1 = [];
+            this.relaList1.push(item);
           }
         })
       },
@@ -5406,7 +5536,7 @@
                   font-size: 14px;
                   line-height: 14px;
                   color: #666666;
-                  margin-left: -530px;
+                  margin-left: -441px;
                 }
                 .siteSearch {
                   width: 70px;

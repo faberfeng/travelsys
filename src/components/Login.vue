@@ -61,11 +61,11 @@ export default {
             localStorage.removeItem('defaultSubProjId')
         }
          this.validateInstance()
-        if(token != 'undefined'){
-            vm.token = token
-            //判断是否登陆
-            // this.BeforeLogin()
-        }
+        // if(token != 'undefined'){
+        //     vm.token = token
+        //     // 判断是否登陆
+        //     // this.BeforeLogin()
+        // }
     },
     methods:{
         func(event){
@@ -119,6 +119,7 @@ export default {
                 this.projectData = response.data;
                 if (this.projectData.cd === '10004') {
                     localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
+                    // sessionStorage.setItem('token')
                     localStorage.setItem('username', this.projectData.rt.session.onlineInfo.realName);
                     localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
                     this.$store.commit('changeImagePath',{

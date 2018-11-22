@@ -309,20 +309,20 @@
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
                                     <tr>
-                                        <th><el-checkbox v-model="allCheck"></el-checkbox></th>
-                                        <th>序号</th>
-                                        <th>导入时间</th>
-                                        <th>导入方式</th>
-                                        <th>导入用户</th>
-                                        <th>测点数</th>
+                                        <th width="5%"><el-checkbox @change="allCheckChange" v-model="allCheck"></el-checkbox></th>
+                                        <th width="10%">序号</th>
+                                        <th width="25%">导入时间</th>
+                                        <th width="20%">导入方式</th>
+                                        <th width="20%">导入用户</th>
+                                        <th width="20%">测点数</th>
                                     </tr>
                                 </thead>
                                  <tbody>
                                     <tr v-for="(item,index) in getImportHistoryList" :key="index">
                                         <td><el-checkbox v-model="item.check"></el-checkbox></td>
                                         <td>{{item.importNo}}</td>
-                                        <td width="150px !important">{{item.importTime|timeChange1}}</td>
-                                        <td>{{item.type}}</td>
+                                        <td>{{item.importTime|timeChange1}}</td>
+                                        <td>{{item.type|typeChange}}</td>
                                         <td>{{item.importUserName}}</td>
                                         <td>{{item.pointAmount}}</td>
                                     </tr>
@@ -391,7 +391,7 @@ export default Vue.component('commonDetail',{
             autoAcquisitionShow:false,//自动采集配置
             uploadshow:false,
             exportHistoryRecoedShow:false,
-            idsList:'',
+            idsList:[],
             allCheck:false,
             testShow:false,
             filesList:"",
@@ -646,6 +646,9 @@ export default Vue.component('commonDetail',{
             return moment(val).format("MM-DD HH:mm");
             }
         },
+        typeChange(val){
+            return val==1?'手动':'自动'
+        },
         timeStamp(StatusMinute){	
             var day=parseInt(StatusMinute/1000/60/60/24);
             var hour=parseInt(StatusMinute/1000/60/60%24);
@@ -775,37 +778,61 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //点击导出所有记录按钮
+        allCheckChange(){
+            if(this.allCheck==true){
+                this.getImportHistoryList.forEach((item)=>{
+                    item.check=true;
+                })
+            }else if(this.allCheck==false){
+                 this.getImportHistoryList.forEach((item)=>{
+                    item.check=false;
+                })
+            }
+        },
         //导出所有记录
         exportAllRecode(){
-
+            this.allCheck=true;
+            this.allCheckChange();
+            this.exportHistory();
         },
         //导出选中记录
         exportSelectRecode(){
-            
+
+            this.exportHistory()
         },
         //
         exportHistoryRecoedCancle(){
             this.exportHistoryRecoedShow=false;
+           
+            this.getImportHistoryList.forEach((item,index)=>{
+                item.check=true;
+            })
         },
         // 导出选中的历史记录
         exportHistory(){
              var vm=this;
-            // this.exportHistoryRecoedShow=true;
-            axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/getImportHistory',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    ids:this.idsList
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    // this.getImportHistoryList=response.data.rt;
-            
+            var str='';
+            this.getImportHistoryList.forEach((item,index)=>{
+                if(item.check==true){
+                   str+="&ids="+item.id
                 }
             })
+            if(str){
+                this.exportHistoryRecoedShow=false;
+                this.allCheck=false;
+                this.getImportHistoryList.forEach((item,index)=>{
+                    item.check=false;
+                })
+                window.open(vm.BDMSUrl+'detectionInfo/exportHistory?token='+vm.token+str,'_blank')
+            }else{
+                this.$message({
+                    type:'info',
+                    message:'请选择导出的条目'
+                })
+            }
+           
+
         },
         //修复故障
         changeBrokenCommon(){

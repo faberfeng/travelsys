@@ -172,7 +172,6 @@
                         </table>
                     </div>
                     </div>
-                
             </div>
         </div>
         <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
@@ -302,7 +301,8 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
+                                <!-- @click="showDetialList(item)" -->
+                                <i class="icon-goujian icon-detial" ></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location" @click="goToLocation"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
@@ -510,7 +510,7 @@
                 </div>
                 <div style="overflow:hidden;">
                 <span class="searchresult">查询结果</span>
-                <!-- <button class="selectsence">场景选择</button> -->
+                <button class="selectsence" @click="siteSearch()">场景选择</button>
                 <table border="1" class="UserList" width="100%">
                     <thead>
                     <tr class="userList-thead">
@@ -2624,12 +2624,16 @@ import './js/date.js'
 import data from '../Settings/js/date.js'
 import upload from '../uploadFile.vue'
 import commonList from  '../planCost/qingDan.vue'
+var app
+var CurrentSelectPara='';
+var CurrentSelectedEntList='';
 export default {
     name:'Costover',
     components:{
         upload,commonList
     },
     data() {
+         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             showCommonList:false,
             activeIndex: '1',
@@ -2778,6 +2782,7 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
+        vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.shareUrl=vm.$store.state.shareUrl;
@@ -2861,6 +2866,24 @@ export default {
         },
     },
     methods:{
+         callback(e){
+            switch(e.data.command){
+              case "EngineReady":
+                break;
+              case "CurrentSelectedEnt":
+                  CurrentSelectPara=e.data.parameter[0];
+                  CurrentSelectedEntList=e.data.parameter;
+                  console.log(CurrentSelectPara,'CurrentSelectPara');
+                  console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
+                break;
+              case "ViewpointSubmited":
+                        break;
+              case "GetDrawingList":
+              break;
+              case "UsingColorStatus":{
+              }
+            }
+        },
        initAll(){
           var vm = this
           if(!vm.checkAll){
@@ -4301,7 +4324,7 @@ export default {
                 vm.checkedItem = {}
                 if(vm.checkedFile_Folder.fileCheckedNum == 1){
                     vm.checkedItem = fileCheckList[0]
-                    console.log(vm.checkedItem);
+                    // console.log(vm.checkedItem,'123445');
                     vm.getGouJianInfo()
                     vm.getVersion()
                     vm.getDrawingIdByFgId()
@@ -4768,9 +4791,21 @@ export default {
             this.removelistitem = item.main.pkId;
         },
         deleteMakeSure(){
+            var vm=this;
+            var relaId = ''
+                if(vm.showQuanJing && vm.checkedRound){
+                    relaId = vm.checkedRound.ID
+                }
+                if(!vm.showQuanJing && vm.checkedItem){
+                    if(!vm.checkedItem.fgId){
+                        vm.GouJianItem = []
+                        return false
+                    }
+                    relaId = vm.checkedItem.fgId
+                }
             axios({
                 method:'post',
-                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+relaId+'/'+this.deleteInfo.main.mVersion+'/delete',
                 headers:{
                     token:this.token
                 }
@@ -4864,6 +4899,56 @@ export default {
         biaoqianCLose(){
             this.isbiaoqianshow = false;
         },
+        //场景选择
+      siteSearch(){
+          var vm=this;
+         if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else if(CurrentSelectedEntList==''){
+              this.$message({
+                  type:'info',
+                  message:'先在图形上面选择构件'
+              })
+            }else{
+                // var JsonData=[];
+                // JsonData.push({relaId:this.taskId,relaType: 2,subProjId:this.defaultSubProjId,entityList:CurrentSelectedEntList})
+                // console.log(JsonData,'JsonData');
+                var relaId = ''
+                if(vm.showQuanJing && vm.checkedRound){
+                    relaId = vm.checkedRound.ID
+                }
+                if(!vm.showQuanJing && vm.checkedItem){
+                    if(!vm.checkedItem.fgId){
+                        vm.GouJianItem = []
+                        return false
+                    }
+                    relaId = vm.checkedItem.fgId
+                }
+                axios({
+                  method: 'post',
+                  url: this.BDMSUrl +'/model2/'+this.projId+'/entityRelation/add',
+                  headers: {
+                    'token': this.token
+                  },
+                  data:{
+                    "entityList":CurrentSelectedEntList,
+                    "relaId":relaId,
+                    "relaType":1,
+                    "subProjId":this.defaultSubProjId,
+                  },
+                }).then(response => {
+                  if (response.data.cd == "0") {
+                    //   this.getEntityRelation();
+                    this.editBySelfShow=false;
+                    this.getGouJianInfo();
+                    } else if (response.data.cd == "-1") {
+                      alert(response.data.msg)
+                    }
+                  })
+            }
+      },
         //绑定构件
         showExtension(){
             this.editBySelfShow = true;
@@ -4931,6 +5016,7 @@ export default {
         },
         //确认
         customConfirm(){
+            var vm=this;
             let num =0 ;
             this.selectedItem ={};
             this.customData.forEach((item,index)=>{
@@ -4939,6 +5025,17 @@ export default {
                     this.selectedItem = item;
                 }
             })
+            var relaId = ''
+            if(vm.showQuanJing && vm.checkedRound){
+                relaId = vm.checkedRound.ID
+            }
+            if(!vm.showQuanJing && vm.checkedItem){
+                if(!vm.checkedItem.fgId){
+                    vm.GouJianItem = []
+                    return false
+                }
+                relaId = vm.checkedItem.fgId
+            }
             if(num == 1){
                 axios({
                     method:'post',
@@ -4950,13 +5047,17 @@ export default {
                         projectId:this.projId,
                         manifestId:this.selectedItem.detailId,
                         relaType:this.selectedItem.relaType,
-                        relaId:this.fileList[0].fgId,
+                        relaId:relaId,
                     }
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.editBySelfShow = false;
                         this.getGouJianInfo();
-                        alert('添加成功!');
+                        this.$message({
+                            type:'success',
+                            message:'添加成功!'
+                        })
+                        // alert('添加成功!');
                     }else{
                         alert(response.data.msg);
                     }

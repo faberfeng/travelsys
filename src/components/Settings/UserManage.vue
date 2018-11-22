@@ -237,10 +237,12 @@
                     </div>
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer">   
-                <el-button type="primary" @click="PostaddUser">保存</el-button>
-                <el-button @click="userClose">取 消</el-button>
-            </span>
+                <div style="margin-top:30px;">
+                    <span  slot="footer" class="dialog-footer">   
+                        <el-button type="primary" @click="PostaddUser">保存</el-button>
+                        <el-button @click="userClose">取 消</el-button>
+                    </span>
+                </div>
             </div>
         </el-dialog>
         <el-dialog title="核实用户" :visible.sync="applyuser" :before-close="applyClose">

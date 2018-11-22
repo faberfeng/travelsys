@@ -2349,6 +2349,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 var app
 var CurrentSelectPara
+var CurrentSelectedEntList
 export default Vue.component('common-list',{
     props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne','orderListDetailId','isShowWuzi','isDinghuo','dingHuoObj','isShowFahuo','isFahuo','faHuoObj','isShowcheck','isShowreceipt','checkReceiptObj','showEditallcheck','showEditallreceipt','isShowWuliao','wuliaoObj'],
     data(){
@@ -2929,8 +2930,10 @@ export default Vue.component('common-list',{
                     }
                     break;
                 case "CurrentSelectedEnt":
-                    CurrentSelectPara = e.data.parameter;
+                    CurrentSelectPara = e.data.parameter[0];
+                    CurrentSelectedEntList=e.data.parameter;
                 case "ViewpointSubmited":
+
                     break;
             }
         },

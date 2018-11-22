@@ -1,5 +1,5 @@
 <template>
-    <div id="htlmToPdf">
+    <div id="htlmToPdf" >
         <div  class="pdfStyle" id="pdfDom">
                 <!-- 封面 -->
                 <div class="pdfCover">
@@ -34,6 +34,7 @@
                 <div class="pdfSummary">
                     <label class="pdfSummaryHead">概述</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                    <div class="txt"><label class="label1">观测时间：</label></div>
                     <div class="inspectTableList1">
                         <table class="inspectTableList" border="1" cellspacing="0" width="100%">
                                 <!-- <tr class="contentTr"></tr> -->
@@ -80,8 +81,9 @@
                 </div>
                 <!-- 现场巡检 -->
                 <div class="pdfInspection">
-                     <label class="pdfSummaryHead">现场巡检</label>
+                     <label class="pdfSummaryHead">现场巡检报表</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                    <div class="txt"><label class="label1">观测者：</label><span class="span1"><label>观测时间：</label></span></div>
                     <div class="containerTable">
                         <table class="containerList" border="1" cellspacing="0" width="100%">
                             <thead>
@@ -164,7 +166,30 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div  class="showBasePic"></div>
+                            <div class="bottomTabel1">
+                                <div class="bottomTabelDiv">
+                                     <!-- <picView ref="pic" :para="item.paramsLists"></picView> -->
+                                </div>
+                                 <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
+                                    <tbody>
+                                        <!-- <tr>
+                                            <td></td>
+                                            <td colspan="6" style="height:200px"></td>
+                                        </tr> -->
+                                        <tr>
+                                            <td rowspan="3">说明</td>
+                                            <td colspan="6" style="text-align:left;margin-left:2px;">1、报警值：变化速率》3mm/d,累计值达到30mm</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                            </div>
+                            <!-- <div  class="showBasePic"></div> -->
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
                     </li>
@@ -182,9 +207,12 @@ import pdf from 'vue-pdf'
 import moment from 'moment'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import picView from './picView.vue'
+// var dpiWidth;
+// var dpiHeight;
 export default {
      components: {
-        pdf,jsPDF,html2canvas
+        pdf,jsPDF,html2canvas,picView
     },
     name:'htmlToPdf',
     data(){
@@ -221,6 +249,8 @@ export default {
             referenceDate:this.$route.query.userValue,
             nowDate:'',
             imgUrl:'',
+            dpiWidth:'',
+            dpiHeight:'',
         }
     },
     created(){
@@ -243,6 +273,7 @@ export default {
         this.getAllMonitorPoint();
         this.generateReportNumber();
         this.curTime();
+        this.getdpi();
         // this.getItemDutyUser();
         // this.getReportDatas();
     },
@@ -320,6 +351,18 @@ export default {
 
     },
     methods:{
+        getdpi(){
+            // dpiWidth=window.screen.width;
+            // dpiHeight=window.screen.height;
+            // dpiWidth=window.screen.deviceXDPI
+            // dpiHeight=window.screen.deviceYDPI
+            // window.screen.deviceXDPI
+            // console.log(window.screen.deviceXDPI,'window.screen.deviceXDPI');
+            this.dpiHeight = 'width:'+(210*window.screen.deviceYDPI)/25.4+'px;';
+            this.dpiWidth= 'width:'+(210*window.screen.deviceXDPI)/25.4+'px;';
+            console.log(this.dpiWidth,'this.dpiWidth');
+            console.log(this.dpiHeight,'this.dpiHeight');
+        },
          timeChangeMethod(val) {
                 return moment(val).format("YYYY-MM-DD hh:mm:ss");
         },
@@ -350,7 +393,7 @@ export default {
         },
         curTime(){
             var date = new Date();
-            console.log(date,'date');
+            // console.log(date,'date');
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate();
@@ -405,7 +448,7 @@ export default {
                     }
                     var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
                     this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle} //所需要的pdf的所有信息
-                    console.log(this.paramsLists,'this.paramsLists');
+                    console.log(this.paramsLists,'this.paramsLists0000');
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -475,7 +518,7 @@ export default {
                     this.coverPath=this.QJFileManageSystemURL+this.getReportSettingList.coverPath;
                     this.getUrl()
                     this.suggestion=this.getReportSettingList.suggestion
-                    console.log(this.getReportSettingList,'this.getReportSettingList');
+                    // console.log(this.getReportSettingList,'this.getReportSettingList');
                     this.optimalizationSchema=this.getReportSettingList.optimalizationSchema //优化方案：1-测点顺序优先；2-图面清晰优先
                     this.baseMapPosition=this.getReportSettingList.baseMapPosition //底图位置：1-上部；2-下部
                 }
@@ -597,7 +640,7 @@ export default {
                             ,totalVariation:null
                             ,type:null})
                     }
-                    console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
+                    // console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
                 }
             })
         },
@@ -727,11 +770,12 @@ export default {
                                                         ,totalVariation:null})
                                         }
                                     }
-                                    this.$set(item,'dataList',value)
+                                    this.$set(item,'dataList',value);
+                                    this.$set(item,'paramsLists',this.paramsLists);
                                 }
                             });
                     })
-                    //  console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123')
+                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123');
                     //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
@@ -766,14 +810,14 @@ export default {
 
                     this.getReportDatas();
 
-                    console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
+                    // console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
                 }
             }) 
         },
          //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfDom')
-                console.log(pdfDom,'pdfDom');
+                // console.log(pdfDom,'pdfDom');
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
                             var contentHeight = canvas.height;
@@ -806,7 +850,7 @@ export default {
                                 }
                             }
                             pdf.save('导出检测报告.pdf');
-                            console.log(pdf,'pdf1234');
+                            // console.log(pdf,'pdf1234');
                         })
                 // html2canvas();
             }
@@ -822,17 +866,24 @@ export default {
     li{list-style: none;}
 #htlmToPdf{
     width:596px;
+    // width: 210mm;
     // width:100%;
     margin: 0 auto;
     .pdfStyle{
+         width:596px;
+        // width: 210mm;
+        // width:100%;
+        margin: 0 auto;
         .pdfCover{
             width:98%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
             height: 830px;
+            // height:297mm;
             margin:17px auto;
             #pdfImg{
                 margin-top:50px;
+                height: 110px;
                 #img1{
                     background: #ccc;
                 }
@@ -929,38 +980,61 @@ export default {
             position: relative;
             .pageNum{
                     position: absolute;
-                    bottom:10px;
-                    left:45%;
+                    top:59px;
+                    right:90px;
             }
             
             .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
-                font-size: 18px;
+                font-size: 16px;
                 color:#000;
                 font-weight: bold;
-                height: 40px;
-                line-height: 40px;
-                border-bottom:2px solid #ccc;
+                height: 28px;
+                line-height: 28px;
+                margin-top:22px;
+                border-bottom:1px solid black;
             }
             .pdfSummarytext{
                 display:inline-block;
                 width: 90%;
-                 height: 40px;
+                 height: 24px;
                  position: relative;
+                 border-top:1px solid black;
+                        margin-top:2px;
                 //  margin-left:5px;
                  label{
                      position: absolute;
-                     left:5px;
+                     left:0px;
                      top:5px;
-                     font-size:16px;
+                     font-size:12px;
                  }
 
 
             }
+            .txt{
+                    width: 90%;
+                    margin: 0 auto;
+                    height: 24px;
+                    position: relative;
+                    .label1{
+                        position: absolute;
+                        left:0px;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+                    .span1{
+                        position: absolute;
+                        left:42%;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+            }
             .inspectTableList1{
                 width: 90%;
-                margin:10px auto;
+                margin:0px auto;
                         .inspectTableList{
                             
                             border-collapse: collapse;
@@ -1036,36 +1110,59 @@ export default {
             position: relative;
             .pageNum{
                     position: absolute;
-                    bottom:10px;
-                    left:45%;
+                    top:59px;
+                    right:90px;
                 }
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
-                font-size: 18px;
+                font-size: 16px;
                 color:#000;
                 font-weight: bold;
-                height: 40px;
-                line-height: 40px;
-                border-bottom:2px solid #ccc;
+                height: 28px;
+                line-height: 28px;
+               border-bottom:1px solid black;
+               margin-top:22px;
             }
             .pdfSummarytext{
                 display:inline-block;
                 width: 90%;
-                 height: 40px;
+                 height: 24px;
                  position: relative;
+                 border-top:1px solid black;
+                        margin-top:2px;
                 //  margin-left:5px;
                  label{
                      position: absolute;
-                     left:5px;
+                     left:0px;
                      top:5px;
-                     font-size:16px;
+                     font-size:12px;
                  }
+            }
+             .txt{
+                    width: 90%;
+                    margin: 0 auto;
+                    height: 24px;
+                    position: relative;
+                    .label1{
+                        position: absolute;
+                        left:0px;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
+                    .span1{
+                        position: absolute;
+                        left:42%;
+                        font-size:12px;
+                        color: #000;
+                        line-height: 24px;
+                    }
             }
 
             .containerTable{
                 width: 90%;
-                margin:10px auto;
+                margin:0px auto;
                 // margin-top:10px;
                 .containerList{
                     border-collapse: collapse;
@@ -1153,63 +1250,66 @@ export default {
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
+                        height: 26px;
+                        line-height: 26px;
+                        margin-top:22px;
                         // border-bottom:2px solid #ccc;
                     }
                     .pdfSummaryHead{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 14px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
-                        border-bottom:2px solid #ccc;
+                        height: 26px;
+                        line-height: 26px;
+                        border-bottom:1px solid black;
                     }
                     .pdfSummarytext{
                         display:inline-block;
                         width: 90%;
-                        height: 40px;
+                        height: 24px;
                         position: relative;
                         //  margin-left:5px;
+                        border-top:1px solid black;
+                        margin-top:2px;
                         label{
                             position: absolute;
-                            left:5px;
+                            left:0px;
                             top:5px;
-                            font-size:16px;
+                            font-size:12px;
                         }
                     }
                     .txt{
                         width: 90%;
                         margin: 0 auto;
-                        height: 30px;
+                        height: 24px;
                         position: relative;
                         .label1{
                             position: absolute;
                             left:0px;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                         .span1{
                             position: absolute;
-                            left:50%;
-                            font-size:14px;
+                            left:42%;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                     }
                     .txt1{
                         width: 90%;
-                        font-size:14px;
+                        font-size:12px;
                         margin:0 auto;
                         color: #000;
-                        line-height: 30px;
-                        height: 30px;
+                        line-height: 24px;
+                        height: 24px;
                         position: relative;
                         label{
                             position: absolute;
@@ -1268,6 +1368,38 @@ export default {
                                     }
                             }
                     }
+                    .bottomTabel1{
+                        width: 90%;
+                        margin:0px auto;
+                        .bottomTabelDiv{
+                            // margin:0 auto;
+                            height: 210px;
+                            // margin-top:10px;
+                            // margin-bottom: 10px;
+                            border-left:1px solid #000;
+                            // border-bottom:1px solid #000;
+                            border-right:1px solid #000;
+
+                        }
+                        .bottomTableList1{
+                             border-collapse: collapse;
+                            border-left: 0.5px solid #000;
+                            border-right: 0.5px solid #000;
+                            border-bottom: 0.5px solid #000;
+                                tbody{
+                                        tr{
+                                            td{
+                                                height: 18px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 0.5px solid #000;
+                                                font-size: 12px;
+                                                color: #333333;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                    
                     .showBasePic{
                         width: 90%;
@@ -1279,71 +1411,74 @@ export default {
                     }
                     .pageNum{
                         position: absolute;
-                        bottom:10px;
-                        left:45%;
+                        top:82px;
+                        right:90px;
                     }
                 }
                 .verticalLength1{
                     .pdfSummaryHead1{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
+                        height: 26px;
+                        line-height: 28px;
+                        margin-top:22px;
                         // border-bottom:2px solid #ccc;
                     }
                     .pdfSummaryHead{
                         display:inline-block;
                         width: 90%;
-                        font-size: 18px;
+                        font-size: 16px;
                         color:#000;
                         font-weight: bold;
-                        height: 40px;
-                        line-height: 40px;
-                        border-bottom:2px solid #ccc;
+                        height: 28px;
+                        line-height: 28px;
+                        border-bottom:1px solid black;
                     }
                     .pdfSummarytext{
                         display:inline-block;
                         width: 90%;
-                        height: 40px;
+                        height: 24px;
                         position: relative;
+                        border-top:1px solid black;
+                        margin-top:2px;
                         //  margin-left:5px;
                         label{
                             position: absolute;
-                            left:5px;
+                            left:0px;
                             top:5px;
-                            font-size:16px;
+                            font-size:12px;
                         }
                     }
                     .txt{
                         width: 90%;
                         margin: 0 auto;
-                        height: 30px;
+                        height: 24px;
                         position: relative;
                         .label1{
                             position: absolute;
                             left:0px;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                         .span1{
                             position: absolute;
                             left:50%;
-                            font-size:14px;
+                            font-size:12px;
                             color: #000;
-                            line-height: 30px;
+                            line-height: 24px;
                         }
                     }
                     .txt1{
                         width: 90%;
-                        font-size:14px;
+                        font-size:12px;
                         margin:0 auto;
                         color: #000;
-                        line-height: 30px;
-                        height: 30px;
+                        line-height: 24px;
+                        height: 24px;
                         position: relative;
                         label{
                             position: absolute;
@@ -1410,8 +1545,8 @@ export default {
                     }
                     .pageNum{
                         position: absolute;
-                        bottom:10px;
-                        left:45%;
+                        top:71px;
+                        right:90px;
                     }
                 }
             }
