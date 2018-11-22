@@ -230,7 +230,7 @@
                 </div>
             </div>
             <!-- 以下是斜度详情页 -->
-            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemMonitorKeyWord="itemSubmitKeyWord"></commonPitch-detail>
+            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemMonitorKeyWord="itemSubmitKeyWord"></commonPitch-detail>
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->

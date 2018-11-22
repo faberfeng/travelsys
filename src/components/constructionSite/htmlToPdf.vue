@@ -170,7 +170,7 @@
                             <div class="bottomTabel1">
                                 <div class="bottomTabelDiv" style="padding: 0px; overflow: auto;">
                                     <div class="bottomTabelDiv1">
-                                     <picView  @load_points="allLoad(item.monitorPointInfo,item.id)" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
+                                     <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                      </div>
                                 </div>
                                  <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
@@ -460,10 +460,18 @@ export default {
                 }
             })
     },
-    allLoad(val,id){
+    allLoad(val,id,type){
         var str='pic'+id;
         console.log(str,'str');
-        this.$refs.str.loadPoints(val);
+        // console.log(this.$refs[str][0],'0000');
+        // console.log(document.getElementById(str));
+        // document.getElementById(str).loadPoints(val);
+        // document.getElementById(str)
+        this.$refs[str][0].loadPoints(val);
+        for(let i = 0; i < this.getAllMonitorItemList.length;i++){
+                this.$refs[str][0].enableType(this.getAllMonitorItemList[i].type,this.getAllMonitorItemList[i].id,this.getAllMonitorItemList[i].spotNum);
+            }
+        this.$refs[str][0].enableType(type,id,true);
     },
     //获得所有监测点位
     
@@ -789,7 +797,8 @@ export default {
                                     }
                                     this.$set(item,'dataList',value);
                                     this.$set(item,'paramsLists',this.paramsLists);
-                                    this.$set(item,'monitorPointInfo',this.monitorPointInfo)
+                                    this.$set(item,'monitorPointInfo',this.monitorPointInfo);
+                                    this.$set(item,'spotNum',false)
                                 }
                             });
                     })

@@ -71,6 +71,34 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="bottomTabelPagination">
+                    <div class="paginationLeft">
+                        <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        </span>
+                        <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
+                        <span class="leftTxtTwo">
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">计算：</label><label style="color:#333;font-size:14px;line-height:62px">{{calculatorName}}</label>
+                            <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">检核：</label><label style="color:#333;font-size:14px;line-height:62px">{{inspectorName}}</label>
+                        </span>
+                        <span class="leftBtnOne" @click="editPersonBtn()">修改</span>
+                    </div>
+                    <div class="paginationRight">
+                        <el-pagination class="elPagination"
+                            background
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page.sync="currentPage2"
+                            :page-sizes="[10]"
+                            :page-size="1"
+                            layout="sizes,prev, pager, next"
+                            :total="getPointDatasListLength">
+                        </el-pagination>
+                    </div>
+                </div>
                 <div class="containerBottom" v-show="totalShow">
                     <div class="containerBottomOne" v-show="leftShow">
                         <div class="oneHeader">
@@ -180,6 +208,58 @@
             </div>
         </div>
         <div id="edit">
+            <el-dialog title="修改监测内容相关人员" width="400px" :visible="editPersonShow" @close="editPersonCancle()">
+                <div class="editbody">
+                    <div class="editBodyone">
+                        <label class="editInpText">观测员</label>
+                        <select v-model="observerId" class="editPersonInput">
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText">计算员</label>
+                        <select v-model="calculatorId" class="editPersonInput">
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText">核查员</label>
+                        <select v-model="inspectorId" class="editPersonInput">
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                        </select>
+                    </div>
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editPersonMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="editPersonCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="修改报警值" width="600px" :visible="editAlertValueShow" @close="editAlertValueCancle()">
+                <div class="editbody">
+                    <div class="editBodyone">
+                        <label class="editInpText" style="width:27% !important">累计报警变化量：</label>
+                        <input placeholder="请输入" v-model="variationAlertTotal" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(天)：</label>
+                        <input placeholder="请输入" v-model="variationAlertDay" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">kN/d</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:27% !important">单次报警变化量(时)：</label>
+                        <input placeholder="请输入" v-model="variationAlertHour" class="inp" style="width:200px !important;height:32px !important"/>
+                        <label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN/h</label>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editInpText">单次报警变化量：</label>
+                    </div> -->
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editAlertArgumentsMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="editAlertValueCancle()" >取消</button>
+                </div>
+            </el-dialog>
             <el-dialog  width="590px" :visible="addIndexNumShow" title="添加测斜序列" @close="addIndexNumCancle()">
                 <div class="editBody">
                     <!-- <div class="editBodyone">
@@ -411,12 +491,33 @@ import axios from 'axios'
 import moment from 'moment'
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonPitch-detail',{
-        props:['surveyName','itemMonitorId','itemMonitorType','itemMonitorKeyWord'],
+        props:['surveyName','itemMonitorId','itemMonitorType','itemMonitorKeyWord','userGroupId'],
         components:{
             VueHighcharts
         },
         data(){
             return{
+                editPersonShow:false,
+                editAlertValueShow:false,
+                variationAlertTotal:"",
+                variationAlertDay:'',
+                variationAlertHour:'',
+                userGroupList:'',
+                observerId:'',
+                calculatorId:"",
+                inspectorId:'',
+                currentPage2:1,
+                getPointDatasListLength:0,
+                changeAlertDay:'',
+                changeAlertHour:'',
+                changeAlertTotal:'',
+                observerName:'',
+                calculatorName:'',
+                inspectorName:'',
+                getItemDutyUserList:'',
+                getAlertArgumentsList:'',
+                changeAlertDay:'',
+
                 leftShow:false,
                 rightShow:false,
                 totalShow:false,
@@ -736,6 +837,9 @@ export default Vue.component('commonPitch-detail',{
             vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
             vm.getPitchBaseInfo();
             vm.getDetectionItemCollectWay();
+            this.getItemDutyUser();
+            this.getAlertArguments();
+            this.getUserByUserGroup();
         },
         filters:{
         shifouChange(val){
@@ -798,6 +902,160 @@ export default Vue.component('commonPitch-detail',{
 
         },
         methods:{
+            editAlertValueBtn(){
+                this.editAlertValueShow=true;
+            },
+            editPersonBtn(){
+                this.editPersonShow=true;
+                this.getUserByUserGroup();
+            },
+            //获取群组中的用户
+            getUserByUserGroup(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getUserByUserGroup',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        userGroupId:this.userGroupId
+                        
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.userGroupList=response.data.rt;
+                        this.observerId=this.userGroupList[0].userId;
+                        this.calculatorId=this.userGroupList[0].userId;
+                        this.inspectorId=this.userGroupList[0].userId;
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            editPersonCancle(){
+                this.editPersonShow=false;
+            },
+            editPersonMakeSure(){
+                 var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/editItemDutyUser',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId,
+                        observer:this.observerId,
+                        calculator:this.calculatorId,
+                        inspector:this.inspectorId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.editPersonShow=false;
+                        this.getItemDutyUser();
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+
+            },
+             //获取监测项目相关人员
+            getItemDutyUser(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId
+                    }
+                }).then((response)=>{
+                    if(response.data.rt){
+                        this.getItemDutyUserList=response.data.rt;
+                        this.inspectorName=this.getItemDutyUserList.inspectorName;
+                        this.calculatorName=this.getItemDutyUserList.calculatorName;
+                        this.observerName=this.getItemDutyUserList.observerName;
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            editAlertValueCancle(){
+                this.editAlertValueShow=false;
+            },
+            editAlertArgumentsMakeSure(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/editAlertArguments',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId,
+                        variationAlertTotal:this.variationAlertTotal,
+                        variationAlertDay:this.variationAlertDay,
+                        variationAlertHour:this.variationAlertHour
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.editAlertValueShow=false;
+                        this.getAlertArguments();
+                        this.$message({
+                            type:'success',
+                            message:'修改报警值成功'
+                        })
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            getAlertArguments(){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getAlertArguments',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId
+                    }
+                }).then((response)=>{
+                    if(response.data.rt){
+                        this.getAlertArgumentsList=response.data.rt;
+                        this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
+                        this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
+                        this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            handleSizeChange(){
+
+            },
+            handleCurrentChange(){
+
+            },
             timeChangeMethod(val) {
                 if (val == null) {
                 return '/';
@@ -1913,6 +2171,51 @@ select.autoImport{
 
                 }
             }
+            .bottomTabelPagination{
+                display: block;
+                height: 62px;
+                width: auto;
+                border-left: 1px solid #d4d4d4;
+                border-right: 1px solid #d4d4d4;
+                border-bottom: 1px solid #d4d4d4;
+                box-sizing: border-box;
+                background: #fafafa;
+                position: relative;
+                .paginationLeft{
+                    position: absolute;
+                    left: 50px;
+                    bottom: 0px;
+                    .leftBtnOne{
+                        display: inline-block;
+                        width: 54px;
+                        height: 25px;
+                        border: 1px solid #e6e6e6;
+                        background: #e6e6e6;
+                        font-size: 12px;
+                        line-height: 25px;
+                        vertical-align: middle;
+                        color: #666666;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        margin-left: 30px;
+                        margin-right: 100px;
+                    }
+
+
+                }
+                .paginationRight{
+                    position: absolute;
+                    right: 2px;
+                    bottom: 10px;
+                    .el-pagination .el-select .el-input .el-input__inner{
+                            height: 28px !important;
+                    }
+                    .elPagination{
+                        
+
+                    }
+                }
+            }
             .containerBottom{
                 margin-top:32px;
                 width: 100%;
@@ -2172,6 +2475,22 @@ select.autoImport{
             text-align: right;
             display: inline-block;
             margin-left: 40px;
+        }
+        .editPersonInput{
+                width: 200px;
+                border-radius: 2px;
+                height: 32px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #ffffff;
+                padding-left: 10px;
+                padding-right: 20px;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                margin-right: 15px;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
         }
         .editBodyone,.editBodytwo{
                 text-align: left;

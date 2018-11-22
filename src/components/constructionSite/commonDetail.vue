@@ -1106,6 +1106,7 @@ export default Vue.component('commonDetail',{
                     this.commonMonitorMainItemList.forEach((item,index)=>{
                         this.$set(item,'spotNum',false)
                     })
+                    console.log(this.commonMonitorMainItemList,'2222')
                     // for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
                     //     this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
                     // }
