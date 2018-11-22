@@ -168,8 +168,10 @@
                                 </table>
                             </div>
                             <div class="bottomTabel1">
-                                <div class="bottomTabelDiv">
-                                     <picView ref="pic" :para="item.paramsLists"></picView>
+                                <div class="bottomTabelDiv" style="padding: 0px; overflow: auto;">
+                                    <div class="bottomTabelDiv1">
+                                     <picView  @load_points="allLoad(item.monitorPointInfo,item.id)" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
+                                     </div>
                                 </div>
                                  <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
                                     <tbody>
@@ -264,6 +266,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         // this.getUrl();
+        this.getAllMonitorPoint();
         this.getReportSetting();
         this.getMonitorMainTable();
         this.getPatrolRecord();
@@ -271,7 +274,6 @@ export default {
         this.getDetectionSummary();
         this.getAllMonitorItem();
         this.getBaseMapInfoByBaseMapId();
-        this.getAllMonitorPoint();
         this.generateReportNumber();
         this.curTime();
         this.getdpi();
@@ -458,7 +460,13 @@ export default {
                 }
             })
     },
+    allLoad(val,id){
+        var str='pic'+id;
+        console.log(str,'str');
+        this.$refs.str.loadPoints(val);
+    },
     //获得所有监测点位
+    
     getAllMonitorPoint(){
             var vm=this;
             // this.$refs.pic.Max_Select = 8;
@@ -475,7 +483,15 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt; //所有监测点位
-                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    // console.log(this.monitorPointInfo);
+                    //         var a='';
+                    // this.getAllMonitorItemList.forEach((item)=>{
+                    //         console.log(item.id,'000');
+                    //          a='pic'+item.id;
+                    //         console.log(a,'111');
+                    //         this.$refs.a.loadPoints(this.monitorPointInfo);
+                    // })
+                   
                     // this.getTagList();
                 }
             })
@@ -773,6 +789,7 @@ export default {
                                     }
                                     this.$set(item,'dataList',value);
                                     this.$set(item,'paramsLists',this.paramsLists);
+                                    this.$set(item,'monitorPointInfo',this.monitorPointInfo)
                                 }
                             });
                     })
@@ -1391,14 +1408,19 @@ export default {
                     .bottomTabel1{
                         width: 90%;
                         margin:0px auto;
+                       
                         .bottomTabelDiv{
-                            // margin:0 auto;
                             height: 210px;
-                            // margin-top:10px;
-                            // margin-bottom: 10px;
                             border-left:1px solid #000;
-                            // border-bottom:1px solid #000;
                             border-right:1px solid #000;
+                             position: relative;
+                            .bottomTabelDiv1{
+                                 width: 100%;
+                            position:absolute;
+                            top:0px;
+                            left: 0px;
+
+                            }
 
                         }
                         .bottomTableList1{

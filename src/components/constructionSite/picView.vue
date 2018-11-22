@@ -84,10 +84,10 @@ export default {
             
             // console.log(this.drawList);
             // console.log(this.old_para);
-            if(this.para.type=="")return;
+            
             // console.log(this.para,'this.para.type')
-
-            if(this.para.type.toLowerCase()=="pdf"){
+                // .toLowerCase()
+            if(this.para.type=="pdf"||this.para.type=="PDF"){
                 this.para.type="PDF";
                 if(this.para.source != this.old_para){
 
@@ -142,6 +142,7 @@ export default {
                     
                 }
             }
+            if(this.para.type=="")return;
             
            
             this.Refresh();
