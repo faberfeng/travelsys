@@ -106,7 +106,7 @@
                             <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
                                 <span  class="fault" @click="changeBroken(1)" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                                 <span  class="fault1" style="margin-left:20px;" @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">正常</label></i></span>
+                                 <span  class="fault1" style="margin-left:20px;" @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">修复</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
                             <!-- <div style="display:inline-block" class="operateToolRight">
@@ -1440,21 +1440,23 @@ export default {
             this.listLength=list.length;
            
             // console.log(this.pointId,'this.pointId');
-            console.log(list,'list12345');
-            console.log(this.listLength)
+            // console.log(list,'list12345');
+            // console.log(this.listLength)
             if(status==true){
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
-                console.log(list);
+               
                 this.pointIds=[];
                 this.pointIdName=[];
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                list.forEach((item)=>{
-                    this.pointIds.push(item.ID_out);
-                    this.pointIdName.push(item.pointName);
-                })
+                    // console.log(list,'list123');
+                    list.forEach((item)=>{
+                        this.pointIds.push(item.ID_out);
+                        this.pointIdName.push(item.pointName);
+                        console.log(this.pointIdName,'this.pointIdName');
+                    })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
@@ -4295,7 +4297,7 @@ export default {
         getAllMonitorPoint(){
             var vm=this;
             this.$refs.pic.Max_Select = 8;
-            this.$refs.pic.Max_type = 1;
+            this.$refs.pic.Max_type = 2;
             axios({
                 method:'get',
                 url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',

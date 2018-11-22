@@ -120,6 +120,7 @@
                         </table>
                     </div>
                     <div class="pageNum"><label class="pageNum1">第{{2}}页</label></div>
+                    <div class="baseWord"><div class="baseWord1">工程负责人：</div><div class="baseWord2">监测单位：{{projectName}}</div></div>
                 </div>
                 <!-- 公共面积 -->
                 <ul class="inspectUl">
@@ -168,7 +169,7 @@
                             </div>
                             <div class="bottomTabel1">
                                 <div class="bottomTabelDiv">
-                                     <!-- <picView ref="pic" :para="item.paramsLists"></picView> -->
+                                     <picView ref="pic" :para="item.paramsLists"></picView>
                                 </div>
                                  <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
                                     <tbody>
@@ -1112,7 +1113,7 @@ export default {
                     position: absolute;
                     top:59px;
                     right:90px;
-                }
+            }
              .pdfSummaryHead{
                 display:inline-block;
                 width: 90%;
@@ -1232,6 +1233,25 @@ export default {
                                 }
                             }
                     }
+                }
+            }
+            .baseWord{
+                position: absolute;
+                bottom:20px;
+                right:10px;
+                height: 28px;
+                width:100%;
+                .baseWord1{
+                    position: absolute;
+                    left: 41px;
+                    width: 200px;
+                    text-align: left;
+                }
+                .baseWord2{
+                    position: absolute;
+                    right: 0px;
+                     width: 200px;
+                      text-align: left;
                 }
             }
         }
