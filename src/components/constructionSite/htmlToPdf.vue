@@ -168,7 +168,7 @@
                                 </table>
                             </div>
                             <div class="bottomTabel1">
-                                <div class="bottomTabelDiv" style="padding: 0px; overflow: auto;">
+                                <div class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
                                     <div class="bottomTabelDiv1">
                                      <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                      </div>
