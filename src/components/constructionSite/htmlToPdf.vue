@@ -168,7 +168,7 @@
                                 </table>
                             </div>
                             <div class="bottomTabel1">
-                                <div class="bottomTabelDiv" style="padding: 0px; overflow: auto;">
+                                <div class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
                                     <div class="bottomTabelDiv1">
                                      <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                      </div>
@@ -462,16 +462,26 @@ export default {
     },
     allLoad(val,id,type){
         var str='pic'+id;
-        console.log(str,'str');
-        // console.log(this.$refs[str][0],'0000');
-        // console.log(document.getElementById(str));
-        // document.getElementById(str).loadPoints(val);
-        // document.getElementById(str)
+
+        for(let i = 0; i < val.length;i++){
+            val[i].data = "";
+        }
+
+        
         this.$refs[str][0].loadPoints(val);
+        this.$refs[str][0].enableLabel(true);
+        this.$refs[str][0].setPointScale(0.5);
+       
         for(let i = 0; i < this.getAllMonitorItemList.length;i++){
-                this.$refs[str][0].enableType(this.getAllMonitorItemList[i].type,this.getAllMonitorItemList[i].id,this.getAllMonitorItemList[i].spotNum);
-            }
+            this.$refs[str][0].enableType(this.getAllMonitorItemList[i].type,this.getAllMonitorItemList[i].id,this.getAllMonitorItemList[i].spotNum);
+        }
         this.$refs[str][0].enableType(type,id,true);
+
+        switch(this.optimalizationSchema){
+            case 1:this.$refs[str][0].print_priority_points(523.0,210.0);break;
+            case 2:this.$refs[str][0].print_priority_pic(523.0,210.0);break;
+        }
+        
     },
     //获得所有监测点位
     

@@ -40,6 +40,7 @@ export default {
             userData:{},
             old_para:"",
             drawList:[],
+            pointScale:1.0,
             Refresh_timer:0
         }
     },
@@ -1002,16 +1003,16 @@ export default {
                 let color = this.baseColor;
                 switch(this.drawtype){
                     case "move":
-                        this.drawMove(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                         break;
                     case "level":
-                        this.drawLevel(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                         break;
                     case "force":
-                        this.drawForce(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                         break;
                     case "slanting":
-                        this.drawSlanting(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                        this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                         break;
                     case "Mark":
                         this.drawMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor);
@@ -1029,13 +1030,14 @@ export default {
                 }
 
                 let color = this.baseColor;
-                if(this.drawList[i].isBroken){
-                    color = {r:170,g:0,b:0};
-                }
-
+               
                 if(this.drawList[i].isAlert){
                     color = {r:250,g:250,b:0}
                 }
+                 if(this.drawList[i].isBroken){
+                    color = {r:170,g:0,b:0};
+                }
+
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
 
                 switch(this.drawList[i].type){
@@ -1043,13 +1045,13 @@ export default {
                             if(this.drawing){
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion);
-                                    this.drawMove(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                                    this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                                 }
                             }
 
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
-                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                                 
                             }
                         
@@ -1059,12 +1061,12 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawLevel(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                                    this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
-                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
                         break;
@@ -1073,12 +1075,12 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawForce(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                                    this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],1.0,10,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
-                                this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],1.0,10,colorId);
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
                         
                         break;
@@ -1087,12 +1089,12 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawSlanting(this.drawcontext,this.lastMovePostion,1.0,7.5,color,false,"","");
+                                    this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],1.0,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
-                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],1.0,7.5,colorId);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
                         break;
@@ -2217,111 +2219,326 @@ export default {
             
             return {x:X,y:Y};
         },
+        setPointScale(scale){
+            this.pointScale = scale;
+            this.Refresh();
+        },
         print_priority_points(width,height){
+            
+            var min = {x:1000000000,y:1000000000};
+            var max = {x:-1000000000,y:-1000000000};
+            var width_inside = 0;
+            var height_inside = 0;
+            var count  = 0;
 
+            
+
+
+            var timer = setInterval(()=>{
+
+                if(this.oldImageSize){
+
+                    clearInterval(timer);
+                    if(this.oldImageSize.width != 0 && this.oldImageSize.height != 0){
+
+                        for(let i = 0; i < this.drawList.length;i++){
+                            if(this.drawList[i].display){
+                                count++;
+                                for(let j = 0;j < this.drawList[i].position.length;j++){
+                                    
+                                    var position = this.rotate_XY_display(this.drawList[i].position[j])
+                                    
+                                    position.x *= this.ResolutionScale;
+                                    position.y *= this.ResolutionScale;
+                                    // console.log(position);
+
+                                    if(position.x > max.x){
+                                        max.x = position.x;
+                                    }
+
+                                    if(position.y > max.y){
+                                        max.y = position.y;
+                                    }
+
+                                    if(position.x < min.x){
+                                        min.x = position.x;
+                                    }
+
+                                    if(position.y < min.y){
+                                        min.y = position.y;
+                                    }
+                                }
+                            }
+                        }
+
+                        width_inside = Math.abs(max.x - min.x);
+                        height_inside = Math.abs(max.y - min.y);
+
+                        var scale = 1;
+                        
+                        // if(count == 4){
+                        //     console.log("---------------------------------------");
+                        //     console.log(width_inside,height_inside,max,min);
+                        // }
+
+                        if(height_inside > width_inside){
+                            scale *= height / height_inside;
+                        }else{
+                            scale *= width / width_inside;
+                        }
+
+                        width_inside *= scale;
+                        height_inside *= scale;
+                        max.x *= scale;
+                        max.y *= scale;
+                        min.x *= scale;
+                        min.y *= scale;
+
+                        var scale2 = 1;
+
+                        if(height_inside > width_inside){
+                            if(width_inside > width){
+                                scale2 = width / width_inside;
+                            }
+                        }else{
+                             if(height_inside > height){
+                                scale2 = height / height_inside;
+                            }
+                        }
+
+                        scale2 *= 0.8;
+
+                        width_inside *= scale2;
+                        height_inside *= scale2;
+                        max.x *= scale2;
+                        max.y *= scale2;
+                        min.x *= scale2;
+                        min.y *= scale2;
+
+                        var center = {x:(max.x + min.x) / 2,y:(max.y + min.y) / 2}
+
+                        var center_out = {x:width / 2,y:height / 2};
+                        var center_diff = {x:center_out.x - center.x,y:center_out.y - center.y};
+
+                        this.scale = scale * scale2;
+
+                        // if(count == 4){
+                        //     console.log(width_inside,height_inside,this.scale,center,center_out,center_diff);
+                        //     console.log("---------------------------------------");
+                        // }
+
+                        switch(this.type){
+                            case "PDF":
+                                this.start_canvas.x = this.sub_div.offsetLeft;
+                                this.start_canvas.y = this.sub_div.offsetTop;
+                                this.start_canvas.w = this.sub_div.offsetWidth;
+                                this.start_canvas.h = this.sub_div.offsetHeight;
+
+                                {
+
+                                    this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                                    if(this.angle == 0 || this.angle == 180){
+                                        this.sub_div.style.height = this.imageSize.height + "px";
+                                        this.sub_div.style.width = this.imageSize.width + "px";
+                                        this.drawCanvas.height = this.imageSize.height;
+                                        this.drawCanvas.width = this.imageSize.width;
+                                        this.drawCanvasSelect.height = this.imageSize.height;
+                                        this.drawCanvasSelect.width = this.imageSize.width;
+                                    }else{
+                                        this.sub_div.style.height = this.imageSize.width + "px";
+                                        this.sub_div.style.width = this.imageSize.height + "px";
+                                        this.drawCanvas.height = this.imageSize.width;
+                                        this.drawCanvas.width = this.imageSize.height;
+                                        this.drawCanvasSelect.height = this.imageSize.width;
+                                        this.drawCanvasSelect.width = this.imageSize.height;
+                                    }
+
+                                    this.sub_div.style.left = center_diff.x + "px";
+                                    this.sub_div.style.top = center_diff.y + "px";
+                                }
+                                break;
+                            case "PGN":
+
+                                this.start_canvas.x = this.sub_div.offsetLeft;
+                                this.start_canvas.y = this.sub_div.offsetTop;
+                                this.start_canvas.w = this.sub_div.offsetWidth;
+                                this.start_canvas.h = this.sub_div.offsetHeight;
+
+                                this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                                if(this.angle == 0 || this.angle == 180){
+                                    this.sub_div.style.height = this.imageSize.height + "px";
+                                    this.sub_div.style.width  = this.imageSize.width + "px";
+                                    this.canvas.height = this.imageSize.height;
+                                    this.canvas.width = this.imageSize.width;
+                                    this.drawCanvas.height = this.imageSize.height;
+                                    this.drawCanvas.width = this.imageSize.width;
+                                    this.drawCanvasSelect.height = this.imageSize.height;
+                                    this.drawCanvasSelect.width = this.imageSize.width;
+                                }else{
+                                    this.sub_div.style.height = this.imageSize.width + "px";
+                                    this.sub_div.style.width  = this.imageSize.height + "px";
+                                    this.canvas.height = this.imageSize.width;
+                                    this.canvas.width = this.imageSize.height;
+                                    this.drawCanvas.height = this.imageSize.width;
+                                    this.drawCanvas.width = this.imageSize.height;
+                                    this.drawCanvasSelect.height = this.imageSize.width;
+                                    this.drawCanvasSelect.width = this.imageSize.height;
+                                }
+
+                                this.context = this.canvas.getContext('2d');
+                                this.context.rotate(this.angle*Math.PI/180);
+
+                                switch(this.angle){
+                                    case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                                    case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                                    case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                                    case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
+                                }
+
+                                this.sub_div.style.left = center_diff.x + "px";
+                                this.sub_div.style.top = center_diff.y + "px";
+
+                                break;
+                        }
+
+                        
+
+                        // console.log(max,min);
+                        // console.log(max2,min2);
+                    }
+                }
+            },200);
+           
+            
         },
         print_priority_pic(width,height){   //  外部宽高
 
             var width_inside = 0;
             var height_inside = 0;
 
-            if(this.angle == 90 || this.angle == 270)
-            {
-                width_inside = this.oldImageSize.height;
-                height_inside = this.oldImageSize.width;
-            }else{
-                width_inside = this.oldImageSize.width;
-                height_inside = this.oldImageSize.height;
-            }
+            var timer = setInterval(()=>{
 
-            var scale = 1;
+                if(this.oldImageSize){
 
-            if(width_inside > width){
-                scale *= width / width_inside;
-            }
+                    clearInterval(timer);
+                    if(this.oldImageSize.width != 0 && this.oldImageSize.height != 0){
 
-            width_inside *= scale;
-            height_inside *= scale;
-
-            if(height_inside > height){
-                scale *= height / height_inside;
-            }
-
-            this.scale = scale;
-
-            switch(this.type){
-
-                case "PDF":
-                    this.start_canvas.x = this.sub_div.offsetLeft;
-                    this.start_canvas.y = this.sub_div.offsetTop;
-                    this.start_canvas.w = this.sub_div.offsetWidth;
-                    this.start_canvas.h = this.sub_div.offsetHeight;
-
-                   {
-
-                        this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
-
-                        if(this.angle == 0 || this.angle == 180){
-                            this.sub_div.style.height = this.imageSize.height + "px";
-                            this.sub_div.style.width = this.imageSize.width + "px";
-                            this.drawCanvas.height = this.imageSize.height;
-                            this.drawCanvas.width = this.imageSize.width;
-                            this.drawCanvasSelect.height = this.imageSize.height;
-                            this.drawCanvasSelect.width = this.imageSize.width;
+                        clearInterval(timer);
+                        
+                        if(this.angle == 90 || this.angle == 270)
+                        {
+                            width_inside = this.oldImageSize.height;
+                            height_inside = this.oldImageSize.width;
                         }else{
-                            this.sub_div.style.height = this.imageSize.width + "px";
-                            this.sub_div.style.width = this.imageSize.height + "px";
-                            this.drawCanvas.height = this.imageSize.width;
-                            this.drawCanvas.width = this.imageSize.height;
-                            this.drawCanvasSelect.height = this.imageSize.width;
-                            this.drawCanvasSelect.width = this.imageSize.height;
+                            width_inside = this.oldImageSize.width;
+                            height_inside = this.oldImageSize.height;
                         }
 
+                        var scale = 1;
+
+                        if(width_inside > width){
+                            scale *= width / width_inside;
+                        }
+
+                        width_inside *= scale;
+                        height_inside *= scale;
+
+                        if(height_inside > height){
+                            scale *= height / height_inside;
+                        }
+
+                        this.scale = scale;
+
+                        switch(this.type){
+
+                            case "PDF":
+                                this.start_canvas.x = this.sub_div.offsetLeft;
+                                this.start_canvas.y = this.sub_div.offsetTop;
+                                this.start_canvas.w = this.sub_div.offsetWidth;
+                                this.start_canvas.h = this.sub_div.offsetHeight;
+
+                                {
+
+                                    this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                                    if(this.angle == 0 || this.angle == 180){
+                                        this.sub_div.style.height = this.imageSize.height + "px";
+                                        this.sub_div.style.width = this.imageSize.width + "px";
+                                        this.drawCanvas.height = this.imageSize.height;
+                                        this.drawCanvas.width = this.imageSize.width;
+                                        this.drawCanvasSelect.height = this.imageSize.height;
+                                        this.drawCanvasSelect.width = this.imageSize.width;
+                                        this.sub_div.style.left = (width - this.sub_div.style) / 2 + "px";
+                                        this.sub_div.style.top = (height - this.imageSize.height) / 2 + "px";
+                                    }else{
+                                        this.sub_div.style.height = this.imageSize.width + "px";
+                                        this.sub_div.style.width = this.imageSize.height + "px";
+                                        this.drawCanvas.height = this.imageSize.width;
+                                        this.drawCanvas.width = this.imageSize.height;
+                                        this.drawCanvasSelect.height = this.imageSize.width;
+                                        this.drawCanvasSelect.width = this.imageSize.height;
+                                        this.sub_div.style.left = (width - this.imageSize.height) / 2 + "px";
+                                        this.sub_div.style.top = (height - this.sub_div.style) / 2 + "px";
+                                    }
+
+                                    
+                                }
+                                
+                                break;
+                            case "PNG":
+                                this.start_canvas.x = this.sub_div.offsetLeft;
+                                this.start_canvas.y = this.sub_div.offsetTop;
+                                this.start_canvas.w = this.sub_div.offsetWidth;
+                                this.start_canvas.h = this.sub_div.offsetHeight;
+
+                                this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+
+                                if(this.angle == 0 || this.angle == 180){
+                                    this.sub_div.style.height = this.imageSize.height + "px";
+                                    this.sub_div.style.width  = this.imageSize.width + "px";
+                                    this.canvas.height = this.imageSize.height;
+                                    this.canvas.width = this.imageSize.width;
+                                    this.drawCanvas.height = this.imageSize.height;
+                                    this.drawCanvas.width = this.imageSize.width;
+                                    this.drawCanvasSelect.height = this.imageSize.height;
+                                    this.drawCanvasSelect.width = this.imageSize.width;
+                                    this.sub_div.style.left = (width - this.sub_div.style) / 2 + "px";
+                                    this.sub_div.style.top = (height - this.imageSize.height) / 2 + "px";
+                                }else{
+                                    this.sub_div.style.height = this.imageSize.width + "px";
+                                    this.sub_div.style.width  = this.imageSize.height + "px";
+                                    this.canvas.height = this.imageSize.width;
+                                    this.canvas.width = this.imageSize.height;
+                                    this.drawCanvas.height = this.imageSize.width;
+                                    this.drawCanvas.width = this.imageSize.height;
+                                    this.drawCanvasSelect.height = this.imageSize.width;
+                                    this.drawCanvasSelect.width = this.imageSize.height;
+                                    this.sub_div.style.left = (width - this.imageSize.height) / 2 + "px";
+                                    this.sub_div.style.top = (height - this.sub_div.style) / 2 + "px";
+                                }
+
+                                this.context = this.canvas.getContext('2d');
+                                this.context.rotate(this.angle*Math.PI/180);
+
+                                switch(this.angle){
+                                    case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
+                                    case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
+                                    case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
+                                    case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
+                                }
+
+                                break;
+
+                        }
+                                    
                         
                     }
-                    break;
-                case "PNG":
-                    this.start_canvas.x = this.sub_div.offsetLeft;
-                    this.start_canvas.y = this.sub_div.offsetTop;
-                    this.start_canvas.w = this.sub_div.offsetWidth;
-                    this.start_canvas.h = this.sub_div.offsetHeight;
 
-                    this.imageSize = {width:this.oldImageSize.width * this.scale,height:this.oldImageSize.height * this.scale};
+                }
 
-                    if(this.angle == 0 || this.angle == 180){
-                        this.sub_div.style.height = this.imageSize.height + "px";
-                        this.sub_div.style.width  = this.imageSize.width + "px";
-                        this.canvas.height = this.imageSize.height;
-                        this.canvas.width = this.imageSize.width;
-                        this.drawCanvas.height = this.imageSize.height;
-                        this.drawCanvas.width = this.imageSize.width;
-                        this.drawCanvasSelect.height = this.imageSize.height;
-                        this.drawCanvasSelect.width = this.imageSize.width;
-                    }else{
-                        this.sub_div.style.height = this.imageSize.width + "px";
-                        this.sub_div.style.width  = this.imageSize.height + "px";
-                        this.canvas.height = this.imageSize.width;
-                        this.canvas.width = this.imageSize.height;
-                        this.drawCanvas.height = this.imageSize.width;
-                        this.drawCanvas.width = this.imageSize.height;
-                        this.drawCanvasSelect.height = this.imageSize.width;
-                        this.drawCanvasSelect.width = this.imageSize.height;
-                    }
-
-                    this.context = this.canvas.getContext('2d');
-                    this.context.rotate(this.angle*Math.PI/180);
-
-                    switch(this.angle){
-                        case 0: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0 					,0   				,this.canvas.width ,this.canvas.height);break;
-                        case 90: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,0					,-this.canvas.width ,this.canvas.height,this.canvas.width);break;
-                        case 180: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.width ,-this.canvas.height,this.canvas.width ,this.canvas.height);break;
-                        case 270: 	this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0     				,this.canvas.height,this.canvas.width);break;
-                    }
-
-                    break;
-
-            }
-
+            },200);
 
 
         }
