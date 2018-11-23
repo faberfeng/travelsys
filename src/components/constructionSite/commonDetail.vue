@@ -1691,6 +1691,7 @@ export default Vue.component('commonDetail',{
         autoAcquisitionBtn(){
             this.autoAcquisitionShow=true;
             this.getCollectSetting();
+            this.getHuahuanNode();
            
         },
         //取消自动采集配置
@@ -2016,6 +2017,7 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                     this.getHuahuanNodeList=response.data.rt;
+                    this.nodeId=this.getHuahuanNodeList[0].nodeId;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
