@@ -105,8 +105,8 @@
                         <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
-                                <span  class="fault" @click="changeBroken(1)" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
-                                 <span  class="fault1" style="margin-left:20px;" @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">修复</label></i></span>
+                                <span v-show="broken==0"  class="fault" @click="changeBroken(1)" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                                 <span v-show="broken==1"  class="fault1"  @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">修复</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
                             <!-- <div style="display:inline-block" class="operateToolRight">
@@ -719,6 +719,8 @@ export default {
             weatherTime:'',
             editSpotShow:false,
             toolShow:false,
+            broken:0,
+            alert:'',
             listLength:'',//判断选择了几条点位
             picMarkName:'',
             baseMapShow:false,
@@ -1183,13 +1185,13 @@ export default {
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
-            console.log(valShow);
+            // console.log(valShow);
             this.importGatherDataShow=valShow;
             vm.matchKeyWord=valKeyword;
             vm.monitorImportName=valname;
             vm.monitorImportType=valtype;
             vm.monitorImportId=valid;
-            console.log(vm.monitorImportType,'vm.monitorImportType123')
+            // console.log(vm.monitorImportType,'vm.monitorImportType123')
 
         },
         timeMethod(val) {
@@ -1198,7 +1200,7 @@ export default {
         //当前时间
         curTime(){
             var date = new Date();
-            console.log(date,'date');
+            // console.log(date,'date');
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate();
@@ -1213,7 +1215,7 @@ export default {
         //当前时间
         curTime1(){
             var date = new Date();
-            console.log(date,'date');
+            // console.log(date,'date');
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate()-1;
@@ -1236,7 +1238,7 @@ export default {
                 second = "0" + day;
             }
              this.userValue = year + "-" + month + "-" + day+" "+"23:59:59" ;
-             console.log(this.userValue,'this.userValue')
+            //  console.log(this.userValue,'this.userValue')
         },
 
         handleSizeChange(val){
@@ -1296,7 +1298,7 @@ export default {
         },
         add(val){
             var vm=this;
-           console.log(val,'val');
+        //    console.log(val,'val');
             if(this.picMarkName=="Select_img_Mark"){
                 vm.spotPicInfoList.forEach((item)=>{
                         if(item.id+'img'==val.ID_out){
@@ -1445,23 +1447,24 @@ export default {
             if(status==true){
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
-               
+                this.broken=list[0].isBroken;
+                this.alert=list[0].isAlert;
                 this.pointIds=[];
                 this.pointIdName=[];
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                    // console.log(list,'list123');
+                    console.log(list,'list123');
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
-                        console.log(this.pointIdName,'this.pointIdName');
+                        // console.log(this.pointIdName,'this.pointIdName');
                     })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
-                    console.log(this.photoIdList,'this.photoIdList');
+                    // console.log(this.photoIdList,'this.photoIdList');
                 }
             }
             // this.editSpotShow=status;
@@ -1528,19 +1531,19 @@ export default {
                            
                             var xLength=this.acquisitionTimeXlist.length;
                             var x=xLength/this.moreSpotLineListLength;
-                            console.log(x,'xx');
-                            console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                            // console.log(x,'xx');
+                            // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
                             var xShow=[];
                             
                             for(var i=0;i<x;i++){
                                 xShow.push(this.acquisitionTimeXlist[i])
                             }
-                            console.log(xShow,'xShow');
-                            console.log(this.elevationYlist,'this.elevationYlist');
+                            // console.log(xShow,'xShow');
+                            // console.log(this.elevationYlist,'this.elevationYlist');
                             var min=this.getMinValue(this.elevationYlist);
                             var max=this.getMaxValue(this.elevationYlist)
                             var middle=(min+max)/2;
-                            console.log(middle);
+                            // console.log(middle);
                             this.optionMoreSpotChangeLine.yAxis.min=(3*min-2*max);
                             this.optionMoreSpotChangeLine.yAxis.max=(3*max-2*min);
                             this.moreSpotShow=true;
@@ -1579,8 +1582,8 @@ export default {
                             for(let a2=x*7;a2<x*8;a2++){
                                 yShow8.push(this.elevationYlist[a2])
                             }
-                            console.log(yShow1,'yShow1')
-                            console.log(yShow2,'yShow2')
+                            // console.log(yShow1,'yShow1')
+                            // console.log(yShow2,'yShow2')
                                 setTimeout(()=>{
                                     if(this.moreSpotLineListLength==2){
                                         let spotChangeLineChart=this.$refs.spotChangeLine;
@@ -1706,13 +1709,13 @@ export default {
                 // this.uploadshow=true;
                 this.spotPicInfo=[];
                 var list1 = this.$refs.pic.saveList();
-                  console.log(list1,'list1');  
+                //   console.log(list1,'list1');  
                 this.spotPicInfo.push({
                     "coordinateInfo":JSON.stringify(list1.pop()),
                     "operationType":1,
                     "photoId":this.photoId,
                 });
-                console.log(this.spotPicInfo,'this.spotPicInfo')
+                // console.log(this.spotPicInfo,'this.spotPicInfo')
                     axios({
                         method:'post',
                         url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
@@ -1750,7 +1753,7 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
-                    console.log(this.spotPicInfoList,'this.spotPicInfoList');
+                    // console.log(this.spotPicInfoList,'this.spotPicInfoList');
                     
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
                     this.spotPicInfoList.forEach((item)=>{
@@ -1876,12 +1879,12 @@ export default {
                         this.alertPointAmount=this.detectionSummaryList.alertPointAmount;
                         this.condition=this.detectionSummaryList.condition;
                         this.workingCondition=this.condition.workingCondition;
-                        console.log(this.workingCondition)
+                        // console.log(this.workingCondition)
                         this.weatherJson=JSON.parse(this.detectionSummaryList.weatherJson);
                         this.weatherIcon=this.weatherJson.data[0].wea;
                         this.weatherAir=this.weatherJson.data[0].tem1;
                         this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week
-                        console.log(this.weatherJson)
+                        // console.log(this.weatherJson)
                         var recentData=[];
                         var totalData=[];
                         var legendData='';
@@ -2127,13 +2130,16 @@ export default {
             var alist=[];
             var list = this.$refs.pic.saveList();
             // var list1=this.
-            console.log(list);
+            console.log(list,'list000000');
             list.forEach((item)=>{
                 // console.log(item.id.substr(item.id.length-3),'124')
-                console.log(item.id.length);
-                if(item.id.length==undefined){
-                    alist.push(item);
-                }
+                // console.log(item.id.length,'1111');
+                alist.push(item);
+                // if(item.id.length==undefined){
+                    
+                // }
+                    
+                
             })
             console.log(alist,'alist');
             if(this.alist==[]){
@@ -2175,14 +2181,11 @@ export default {
 
         },
         checkboxChange(){
-            // console.log(this.monitorMainItemList,'checkList');
-
             for(let i = 0; i < this.monitorMainItemList.length;i++){
                 this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].id,this.monitorMainItemList[i].spotNum);
             }
         },
         displaySpot(){
-            // console.log(this.displaySpotNum);
             this.$refs.pic.enableLabel(this.displaySpotNum);
         },
         //显示图片标记
@@ -2214,7 +2217,6 @@ export default {
             reader.readAsDataURL(list[0]);
             vm.fileList=list[0];
             vm.fileListName=list[0].name.replace(/\s*/g,"");
-            // console.log(vm.fileListName);
             var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
@@ -2290,7 +2292,6 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.baseMapList=response.data.rt;
-                    // console.log(this.baseMapList);
                     //判断是否使用当前图纸
                     // if(!this.curBaseMapUrl){
                         this.baseMapList.forEach((item)=>{
@@ -2311,8 +2312,6 @@ export default {
                     // }
                     // var a=vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3);
                 // this.paramsLists={type:vm.curBaseMapUrl.substr(vm.curBaseMapUrl.length-3),source:vm.QJFileManageSystemURL+vm.curBaseMapUrl,angle:0}
-                // console.log(this.paramsLists,'this.paramsLists');
-                // console.log(a,'1323')
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -2385,11 +2384,11 @@ export default {
                     if(this.angle==null){
                         this.angle=0;
                     }
-                    console.log(this.angle,'this.angle');
+                    
                     var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
-                    console.log(type);
+                   
                     this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle}
-                    console.log(this.paramsLists,'this.paramsLists');
+                   
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -2522,7 +2521,7 @@ export default {
             var vm=this;
             var colData=[];
             colData.push({'spotNumCol':vm.spotNumCol,'timeCol':vm.timeCol,'distanceCol':vm.distanceCol,'altitudeCol':vm.altitudeCol,'pipeHeightCol':vm.pipeHeightCol,'gaugeHeightCol':vm.gaugeHeightCol,'saveImportColumnValue':vm.saveImportColumnValue,'depthIndexCol':vm.depthIndexCol,'shiftIndexCol':vm.shiftIndexCol,'forceIndexCol':vm.forceIndexCol,'kIndexCol':vm.kIndexCol,'f0IndexCol':vm.f0IndexCol,'fnIndex':vm.fnIndex,'useFormulaNum':vm.useFormulaNum})
-            console.log(colData);
+           
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/saveImportColumnSetting',
@@ -2561,10 +2560,10 @@ export default {
             }).then((response)=>{
                 if(response.data.rt){
                     vm.getImportColumnList=response.data.rt;
-                    // console.log(vm.getImportColumnList);
+                    
                     var importColumnData=null;
                     importColumnData=JSON.parse(vm.getImportColumnList.data)
-                    // console.log(importColumnData);
+                    
                     importColumnData.forEach((item)=>{
                         vm.spotNumCol=item.spotNumCol;
                         vm.timeCol=item.timeCol;
@@ -2629,7 +2628,7 @@ export default {
                     }
                 )
             })
-            console.log(listData,'listData')
+           
 
 
              var vm=this;
@@ -3434,7 +3433,7 @@ export default {
         //点击公式设定
         formulaSetting(val){
             this.formulaSettingShow=true;
-            console.log(this.useFormulaNum.split('-')[0],'useFormulaNum');
+            // console.log(this.useFormulaNum.split('-')[0],'useFormulaNum');
             this.useFormulaValue=this.useFormulaNum.split('-')[0];
             if(val){
                 this.monitorImportId=val;
@@ -3602,16 +3601,15 @@ export default {
                         if(response.data.cd=='0'){
                             this.excelSheetInfo=response.data.rt;
                             this.excelSheetInfoLength=response.data.rt.length;
-                            console.log(this.excelSheetInfo);
+                            // console.log(this.excelSheetInfo);
                             if(vm.monitorImportType==5){
                                 this.excelSheetInfo.forEach((item)=>{
                                     this.getPitchBaseInfoList.forEach((item1)=>{
                                          if(item.name==item1.keyword){
-                                        // console.log(item.index)
                                             this.getExcelColumnBySheet(item.index);
                                             this.getImportColumnSetting(item.index);
                                             this.sheetIndex=item.index;
-                                            console.log(this.sheetIndex);
+                                            // console.log(this.sheetIndex);
                                         }
 
                                     })
@@ -3623,7 +3621,7 @@ export default {
                                     this.getExcelColumnBySheet(item.index);
                                     this.getImportColumnSetting(item.index);
                                     this.sheetIndex=item.index;
-                                    console.log(this.sheetIndex);
+                                    // console.log(this.sheetIndex);
                                 }
                             })
                             } 
@@ -3668,8 +3666,8 @@ export default {
                         this.getExcelColumnBySheet(item.sheetIndex)
                         // this.$set(item,'sheetlist',)
                     })
-                    console.log(this.sheetList,'this.sheetList1234')
-                    console.log(this.getBatchImportMatchingResultList,'this.getBatchImportMatchingResultList')
+                    // console.log(this.sheetList,'this.sheetList1234')
+                    // console.log(this.getBatchImportMatchingResultList,'this.getBatchImportMatchingResultList')
                     document.getElementById('editBodyStyle').style.height="500px"
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -3699,7 +3697,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.sheetIndexList=response.data.rt;
-                    console.log(this.sheetIndex,'sheetIndex0000');
+                    // console.log(this.sheetIndex,'sheetIndex0000');
                     this.sheetList.forEach((item)=>{
                         if(item.sheetIndex==val){
                             this.$set(item,'sheetlist',this.sheetIndexList)
@@ -3781,16 +3779,16 @@ export default {
         },
         editMonitorNameBtn(val){
             var vm=this;
-            console.log(val);
+            // console.log(val);
             this.editInspectContentShow=true;
-            console.log(this.monitorMainTableList);
+            // console.log(this.monitorMainTableList);
             this.monitorMainTableList.forEach((item)=>{
                 if(item.id==val){
                     this.monitorName1=item.name;
                     this.monitorLogogram1=item.logogram;
                     this.monitorKeyword1=item.keyword;
                     this.monitorId=item.id;
-                    console.log(this.monitorName1);
+                    // console.log(this.monitorName1);
                 }
             })
         },
@@ -3848,7 +3846,7 @@ export default {
             this.detailMonitorId=id;
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
-            console.log(baseMapId,'baseMapId');
+            // console.log(baseMapId,'baseMapId');
             this.itemSubmitbaseMapId=this.monitorBaseMapId;
             this.itemSubmitCount=count;
             if(type==5){
@@ -3886,7 +3884,7 @@ export default {
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
                         vm.getPitchBaseInfoListLength=response.data.rt.length;
-                        console.log(vm.getPitchBaseInfoList);
+                        // console.log(vm.getPitchBaseInfoList);
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
@@ -3912,7 +3910,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
                     this.monitorMainTableListLength=response.data.rt.length;
-                    console.log(this.monitorMainTableListLength);
+                    // console.log(this.monitorMainTableListLength);
                     // this.monitorMainTableList.forEach((item)=>{
                     // })
                      if(this.monitorMainTableListLength<11){
@@ -4335,7 +4333,7 @@ export default {
                     })
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
-                    console.log(this.monitorMainItemList,'monitorMainItemList123')
+                    // console.log(this.monitorMainItemList,'monitorMainItemList123')
                 }
             })
         },
@@ -4549,7 +4547,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
-                    console.log(this.getReportDatasList,'this.getReportDatasList');
+                    // console.log(this.getReportDatasList,'this.getReportDatasList');
                 }
             })
         },
@@ -4569,10 +4567,10 @@ export default {
                 if(response.data.cd=='0'){
                     // this.getReportDatasList=response.data.rt;
                     this.getReportSettingList=response.data.rt;
-                    console.log(this.getReportSettingList,'this.getReportSettingList');
+                    // console.log(this.getReportSettingList,'this.getReportSettingList');
                     this.pageSelect=this.getReportSettingList.baseMapPosition==1?"1":"2";//底图位置：1-上部；2-下部
                     this.coverPathUrl=this.getReportSettingList.coverPath;
-                    console.log(this.coverPathUrl,'this.coverPathUrl');
+                    // console.log(this.coverPathUrl,'this.coverPathUrl');
                     this.priorityLayout=this.getReportSettingList.optimalizationSchema==1?"1":"2";//优化方案：1-测点顺序优先；2-图面清晰优先
                     
                     this.suggestList=this.getReportSettingList.suggestion;//建议概述
@@ -4634,7 +4632,7 @@ export default {
             this.fileListCover=list[0];
             // console.log(list[0],'list');
              this.imgUrl =window.URL.createObjectURL(list[0]);
-            console.log(this.imgUrl,'imgUrl');
+            // console.log(this.imgUrl,'imgUrl');
               var formData = new FormData();
             formData.append('token',vm.token);
             formData.append('projectId',vm.projId);
@@ -4758,7 +4756,7 @@ export default {
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfImport')
-                console.log(pdfDom,'pdfDom');
+                // console.log(pdfDom,'pdfDom');
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
                             var contentHeight = canvas.height;
@@ -4790,8 +4788,8 @@ export default {
                                     }
                                 }
                             }
-                            pdf.save('导出检测报告.pdf');
-                            console.log(pdf,'pdf1234');
+                            pdf.save('安全监测图纸.pdf');
+                            // console.log(pdf,'pdf1234');
                         })
                 // html2canvas();
             }
@@ -5312,7 +5310,7 @@ export default {
 
                         }
                         .operateTool{
-                            width: 357px;
+                            width: 300px;
                             height: 34px;
                             // border:1px solid #ccc;
                             float: right;
@@ -5321,7 +5319,7 @@ export default {
                             position: relative;
                             z-index: 10;
                             .operateToolLeft{
-                                width:280px;
+                                width:200px;
                                 height: 34px;
                                 float: left;
                                 position: relative;
@@ -5331,7 +5329,7 @@ export default {
                                 background: #fff;
                                 .move{
                                     display: inline-block;
-                                    width: 25%;
+                                    width: 33%;
                                     height: 28px;
                                    margin-top:3px;
                                     position: absolute;
@@ -5363,12 +5361,12 @@ export default {
                                 }
                                 .fault{
                                     display: inline-block;
-                                    width: 25%;
+                                    width: 33%;
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
                                     border-right:1px dashed #ccc;
-                                    left:25%;
+                                    left:33%;
                                     cursor: pointer;
                                     .faultIcon{
                                         background: url('./images/falut.png') no-repeat 0 0;
@@ -5397,7 +5395,7 @@ export default {
                                      height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    left:75%;
+                                    left:66%;
                                     cursor: pointer;
                                     .deleteDrawIcon{
                                         background: url('./images/delete.png') no-repeat 0 0;
@@ -5422,23 +5420,23 @@ export default {
                                 }
                                  .fault1{
                                     display: inline-block;
-                                    width: 25%;
+                                    width: 33%;
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
                                     border-right:1px dashed #ccc;
-                                    left:41%;
+                                    left:33%;
                                     cursor: pointer;
                                     .faultIcon{
-                                        background: url('./images/falut.png') no-repeat 0 0;
+                                        background: url('./images/fix.png') no-repeat 0 0;
                                         width: 54px;
                                         height: 20px;
                                         display: inline-block;
                                         margin-right: -8px;
-                                        margin-top: 2px;
+                                        margin-top: 4px;
                                         cursor: pointer;
                                         &:hover{
-                                            background:url('./images/fault1.png') no-repeat 0 0;
+                                            background:url('./images/fix1.png') no-repeat 0 0;
                                         }
                                          .faultTxt{
                                             line-height: 20px;
@@ -5446,7 +5444,7 @@ export default {
                                             font-size: 12px;
                                             display: block;
                                             margin-left: 12px;
-                                            margin-top: 1px;
+                                            margin-top: 0px;
                                         }
                                     }
                                    

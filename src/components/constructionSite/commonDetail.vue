@@ -34,7 +34,8 @@
                 <div class="operateTool">
                     <div class="operateToolLeft" v-show="toolShow">
                         <span class="move" @click="enableMoveCommon"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
-                        <span class="fault" @click="changeBrokenCommon"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                        <span v-show="broken==0" class="fault" @click="changeBroken(1)"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
+                        <span v-show="broken==1"  class="fault1"  @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">修复</label></i></span>
                         <span class="deleteDraw" @click="deleteDrawCommon"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                     </div>
                     <div class="operateToolRight" v-show="saveDrawShow" >
@@ -356,6 +357,8 @@ export default Vue.component('commonDetail',{
     name:'commonDetail',
     data(){
         return{
+            broken:0,
+            alert:'',
             nodeId:'',//华环的项目id
             getHuahuanNodeList:"",//获取华环的数据
             picMark:false,
@@ -837,6 +840,10 @@ export default Vue.component('commonDetail',{
         //修复故障
         changeBrokenCommon(){
             this.$refs.pic.changeBroken();
+        },
+        changeBroken(){
+            
+
         },
         handleSizeChange(val){
             this.pageSize=val;
@@ -2184,6 +2191,37 @@ export default Vue.component('commonDetail',{
                                         margin-left: 12px;
                                         margin-top: 1px;
                                     }
+                                }
+                                .fault1{
+                                    display: inline-block;
+                                    width: 33%;
+                                    height: 28px;
+                                    margin-top:3px;
+                                    position: absolute;
+                                    border-right:1px dashed #ccc;
+                                    left:33%;
+                                    cursor: pointer;
+                                    .faultIcon{
+                                        background: url('./images/fix.png') no-repeat 0 0;
+                                        width: 54px;
+                                        height: 20px;
+                                        display: inline-block;
+                                        margin-right: -8px;
+                                        margin-top: 4px;
+                                        cursor: pointer;
+                                        &:hover{
+                                            background:url('./images/fix1.png') no-repeat 0 0;
+                                        }
+                                            .faultTxt{
+                                            line-height: 20px;
+                                            color:#666666;
+                                            font-size: 12px;
+                                            display: block;
+                                            margin-left: 12px;
+                                            margin-top: 0px;
+                                        }
+                                    }
+                                    
                                 }
 
                             }
