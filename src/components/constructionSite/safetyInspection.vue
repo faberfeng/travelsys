@@ -37,10 +37,11 @@
                     <div class="overviewFrame">
                         <ul class="overviewFrameUl">
                             <li class="overviewFrameLi">
-                                <label class="weatherTxt">天气、温度<br/>{{weatherTime}}</label>
+                                <label class="weatherTxt">天气、温度</label>
                                 <div class="weathBody">
                                     <img id="weathPic" width="100px" height="100px" :src="weathIcon(weatherIcon)">
                                     <p  style="margin-top:10px">{{weatherIcon}}{{weatherAir}}</p>
+                                    <p  style="margin-top:10px">{{weatherTime}}</p>
                                 </div>
                             </li>
                             <li class="overviewFrameLi1">
@@ -80,8 +81,8 @@
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
-                            <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图</span>
-                            <span class="uploadPicBtn" @click="setSpotPic()">图片标记</span>
+                            <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
+                            <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
@@ -2133,13 +2134,10 @@ export default {
             console.log(list,'list000000');
             list.forEach((item)=>{
                 // console.log(item.id.substr(item.id.length-3),'124')
-                // console.log(item.id.length,'1111');
-                alist.push(item);
-                // if(item.id.length==undefined){
-                    
-                // }
-                    
-                
+                console.log(item.id.length,'1111');
+                 if(item.id.length==undefined){
+                    alist.push(item);
+                }
             })
             console.log(alist,'alist');
             if(this.alist==[]){
@@ -4281,6 +4279,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getAllMonitorPoint();
+                        this.picMark=false;
                     }
                 })
             }
@@ -4956,7 +4955,7 @@ export default {
                                 }
                                 .weathBody{
                                     display: block;
-                                    margin-top:70px;
+                                    margin-top:46px;
                                 
                                 }
                             }
@@ -5365,7 +5364,7 @@ export default {
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    border-right:1px dashed #ccc;
+                                    // border-right:1px dashed #ccc;
                                     left:33%;
                                     cursor: pointer;
                                     .faultIcon{
@@ -5395,7 +5394,9 @@ export default {
                                      height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    left:66%;
+                                    left:68%;
+                                    width: 30%;
+                                    border-left:1px dashed #ccc;
                                     cursor: pointer;
                                     .deleteDrawIcon{
                                         background: url('./images/delete.png') no-repeat 0 0;

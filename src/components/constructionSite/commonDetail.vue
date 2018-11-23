@@ -245,6 +245,7 @@
                          <div class="tool">
                              <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
                              <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <!-- <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export3"></label><label class="exportTxt">测试</label></span> -->
                         </div>
                         <div id="toolTbale">
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
@@ -262,7 +263,30 @@
                                 </tbody>
 
                             </table>
-
+                        </div>
+                    </div>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华桓'">
+                        <label class="editInpText" style="width:10% !important;">点位映射</label>
+                         <div class="tool">
+                             <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
+                             <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <span class="export" @click="textDeviceMonitorPointRelation()"><label class="export3"></label><label class="exportTxt">测试</label></span>
+                        </div>
+                        <div id="toolTbale" style="height:300px">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">点位名称</th>
+                                        <th width="300px">华桓点位名称</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
+                                        <td width="30%">{{item.virtualPointName}}</td>
+                                        <td width="70%">{{item.devicePointName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -270,6 +294,49 @@
                         <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
+            </el-dialog>
+            <el-dialog title="采集测试" :visible="textShow" @close="textShowCancle()" >
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editInpText" style="width:35% !important;" >成果获取到{{collectGroupAmount}}组数据,匹配到{{matchGroupAmount}}组数据</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <div id="textBody">
+                           <table class="textBodyTable" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                               <thead>
+                                   <tr>
+                                       <th></th>
+                                       <th colspan="2">系统内最新记录</th>
+                                       <th colspan="2">获取到的匹配记录</th>
+                                   </tr>
+                                   <tr>
+                                       <th>点位编号</th>
+                                       <th>采集时间</th>
+                                       <th>取值</th>
+                                        <th>采集时间</th>
+                                       <th>取值</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                   <tr v-for="(item,index) in testHuahuanList" :key="index">
+                                       <td v-text="item.pointName"></td>
+                                       <td >{{item.systemCollectTime|timeChange}}</td>
+                                       <td>{{item.systemValue}}</td>
+                                       <td>{{item.matchCollectTime|timeChange}}</td>
+                                       <td>{{item.matchValue}}</td>
+                                   </tr>
+
+                               </tbody>
+                           </table>
+
+                        </div>
+                    </div>
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                        <!-- <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button> -->
+                        <button style="margin-right:-440px" class="editBtnC" @click="textShowCancle()" >取消</button>
+                </div>
+
             </el-dialog>
             <el-dialog title="文件导入" :visible="uploadshow" @close="upImgCancle">
                 <div class="editBody">
@@ -360,6 +427,9 @@ export default Vue.component('commonDetail',{
             broken:0,
             alert:'',
             nodeId:'',//华环的项目id
+            testHuahuanList:'',//测试华桓数据
+            collectGroupAmount:0,
+            matchGroupAmount:0,
             getHuahuanNodeList:"",//获取华环的数据
             picMark:false,
             displaySpotNum:false,
@@ -392,6 +462,7 @@ export default Vue.component('commonDetail',{
             editAlertValueShow:false,//编辑报警值
             spotChangeLineShow:false,//取消点位改变曲线
             autoAcquisitionShow:false,//自动采集配置
+            textShow:false,
             uploadshow:false,
             exportHistoryRecoedShow:false,
             idsList:[],
@@ -679,6 +750,9 @@ export default Vue.component('commonDetail',{
             this.getAllMonitorPoint();
             // this.getBaseMapList()
         },
+        manufacturerValue:function(val){
+            this.getDeviceMonitorPointRelation()
+        }
     },
     mounted(){
         var vm=this;
@@ -841,9 +915,33 @@ export default Vue.component('commonDetail',{
         changeBrokenCommon(){
             this.$refs.pic.changeBroken();
         },
-        changeBroken(){
-            
-
+        changeBroken(val){
+             if(this.picMarkName!="Select_img_Mark"){
+                // this.$refs.pic.changeBroken();
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        pointId:vm.pointId,
+                        status:val //监测点状态(故障为1和正常为0)
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getAllMonitorPoint();
+                        // this.picMark=false;
+                    }
+                })
+            }
+            if(this.picMarkName=="Select_img_Mark"){
+                this.$message({
+                    type:'info',
+                    message:'图片标记不支持该操作'
+                })
+            }
         },
         handleSizeChange(val){
             this.pageSize=val;
@@ -1034,10 +1132,16 @@ export default Vue.component('commonDetail',{
             this.isClick=false;
             this.saveDrawShow=true;
         },
-        picView_status_changed(val){
+        picView_status_changed(val,list){
             // console.log(val);
             this.toolShow=val;
             this.saveDrawShow=val;
+            if(val==true){
+                this.pointId=list[0].ID_out;
+                // this.toolShow=status;
+                this.broken=list[0].isBroken;
+                this.alert=list[0].isAlert;
+            }
         },
         enter(val){
             this.hoverId=val;
@@ -1179,6 +1283,7 @@ export default Vue.component('commonDetail',{
                             message:'保存监测点成功'
                         })
                         this.saveDrawShow=false;
+                        this.toolShow=false;
                         this.getAllMonitorPoint();
                         this.getPointDatas();
                     }else if(response.data.cd=='-1'){
@@ -1719,6 +1824,7 @@ export default Vue.component('commonDetail',{
         //获取点位关系
         getDeviceMonitorPointRelation(){
              var vm=this;
+             this.getDeviceMonitorPointRelationList=[];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getDeviceMonitorPointRelation',
@@ -1790,9 +1896,9 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.rt){
                     this.manufacturerValue=response.data.rt.manufacturer;
-                    if( this.manufacturerValue=="基康"){
+                    if( this.manufacturerValue=="基康"){}
                         this.getDeviceMonitorPointRelation();
-                    }
+                    
                     this.collectRateRadio=response.data.rt.collectRate==1?'1':'2';
                     this.collectHour=response.data.rt.collectHour;
                 }else if(response.data.cd=='-1'){
@@ -1828,6 +1934,43 @@ export default Vue.component('commonDetail',{
                     })
                 }
             })
+        },
+        textDeviceMonitorPointRelation(){
+            var vm=this;
+            if(this.nodeId==''){
+                this.$message({
+                    type:'info',
+                    message:'请输入项目ID'
+                })
+            }else{
+                this.textShow=true;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/testHuahuan',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        itemId:vm.itemMonitorId,
+                        nodeId:vm.nodeId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.testHuahuanList=response.data.rt.matchResult;
+                        this.collectGroupAmount=response.data.rt.collectGroupAmount;
+                        this.matchGroupAmount=response.data.rt.matchGroupAmount;
+                    }else if(response.data.cd=='-1'){
+                        this.$message({
+                            type:"error",
+                            message:response.data.msg
+                        })
+                    }
+                })
+            }
+            
+        },
+        textShowCancle(){
+            this.textShow=false;
         },
         //添加/华环项目节点
         editHuahuanNode(){
@@ -2105,7 +2248,7 @@ export default Vue.component('commonDetail',{
                                 background: #fff;
                                 .move{
                                     display: inline-block;
-                                    width: 33%;
+                                    width: 36%;
                                     height: 28px;
                                    margin-top:3px;
                                     position: absolute;
@@ -2141,7 +2284,7 @@ export default Vue.component('commonDetail',{
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    border-right:1px dashed #ccc;
+                                    // border-right:1px dashed #ccc;
                                     left:33%;
                                     .faultIcon{
                                         background: url('./images/falut.png') no-repeat 0 0;
@@ -2167,10 +2310,13 @@ export default Vue.component('commonDetail',{
                                 }
                                 .deleteDraw{
                                     display: inline-block;
-                                     height: 28px;
+                                    height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    left:72%;
+                                    // left:72%;
+                                    left:68%;
+                                    width: 30%;
+                                    border-left:1px dashed #ccc;
                                     .deleteDrawIcon{
                                         background: url('./images/delete.png') no-repeat 0 0;
                                         width: 54px;
@@ -2198,7 +2344,7 @@ export default Vue.component('commonDetail',{
                                     height: 28px;
                                     margin-top:3px;
                                     position: absolute;
-                                    border-right:1px dashed #ccc;
+                                    // border-right:1px dashed #ccc;
                                     left:33%;
                                     cursor: pointer;
                                     .faultIcon{
@@ -2760,6 +2906,63 @@ export default Vue.component('commonDetail',{
                 outline: none;
             }
             .editBtnT{
+
+            }
+            #textBody{
+                width: 85%;
+                margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
+                .textBodyTable{
+                            border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            overflow: auto;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                        }
+
 
             }
 

@@ -2792,6 +2792,7 @@ export default {
         // vm.getDirectory()
         vm.createDrawingDirectory()
         vm.getHolders()
+        // this.intoDir()
     },
     mounted(){
         var vm = this 

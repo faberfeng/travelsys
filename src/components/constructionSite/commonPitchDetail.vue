@@ -11,7 +11,10 @@
                         <span class="addOrder" @click="addIndexNum()">添加序列</span>
                         <span class="exportOrder" @click="getImportHistory">导出</span>
                     </div>
-                    <div class="containerHeadMiddle"></div>
+                    <div class="containerHeadMiddle">
+                        <label>测试总数：{{itemSubmitCount}}</label>
+                        <label>报警：{{isAlertNum}}</label>
+                    </div>
                     <div class="containerHeadRight">
                         <span class="autoImportTxt">采集方式:</span>
                         <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
@@ -56,11 +59,11 @@
                                 <td v-text="item.pointAmount"></td>
                                 <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxShift)"></td>
-                                <td>{{item.maxAlert|shifouChange()}}</td>
+                                <td :class="[{'red':item.maxAlert==true}]">{{item.maxAlert|shifouChange()}}</td>
                                 <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
-                                <td>{{item.maxVariationAlert|shifouChange()}}</td>
+                                <td :class="[{'red':item.maxVariationAlert==true}]">{{item.maxVariationAlert|shifouChange()}}</td>
                                 <td>
                                     <button title="修改" class="editBtn actionBtn" @click="editPitchSeqBtn(item.id,item.itemId)"></button>
                                     <button title="删除" class="deleteBtn actionBtn" @click="deletePitchSeq(item.id,item.itemId)"></button>
@@ -150,7 +153,8 @@
                             <label class="editSpot" @click="editLeftMarkSpot()">编辑标记</label>
                         </div>
                         <div class="twoGraph">
-                            <vue-highcharts id="leftHightchart" style="min-height:1900px"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                            <!-- style="min-height:1900px" -->
+                            <vue-highcharts id="leftHightchart" style="min-height:1900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                         </div>
                     </div>
                     <div class="containerBottomThree" v-show="rightShow">
@@ -830,6 +834,9 @@ export default Vue.component('commonPitch-detail',{
                 markDepth:'',
                 markName:'',
                 editPitchShow:'',
+                itemSubmitCount:0,//测试总数
+                isAlertNum:0,//报警总数
+
 
 
             }
@@ -918,6 +925,7 @@ export default Vue.component('commonPitch-detail',{
         methods:{
             editAlertValueBtn(){
                 this.editAlertValueShow=true;
+                this.getAlertArguments();
             },
             editPersonBtn(){
                 this.editPersonShow=true;
@@ -1027,6 +1035,7 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd=='0'){
                         this.editAlertValueShow=false;
                         this.getAlertArguments();
+                        this.getPitchBaseInfo();
                         this.$message({
                             type:'success',
                             message:'修改报警值成功'
@@ -1056,6 +1065,10 @@ export default Vue.component('commonPitch-detail',{
                         this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
                         this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
                         this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
+
+                        this.variationAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
+                        this.variationAlertDay=this.getAlertArgumentsList.changeAlertDay;
+                        this.variationAlertHour=this.getAlertArgumentsList.changeAlertHour;
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -1219,6 +1232,9 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
                         this.getPitchBaseInfoListLength=response.data.rt.length;
+                        vm.getPitchBaseInfoList.forEach((item)=>{
+                            this.itemSubmitCount+=item.pointAmount
+                        })
                          console.log(vm.getPitchBaseInfoList,'vm.getPitchBaseInfoList');
                         if(this.getPitchBaseInfoListLength<11){
                             for(var i=0;i<this.getPitchBaseInfoListLength;i++){
@@ -1256,7 +1272,15 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.pitchDetailDataListLeft=response.data.rt;
-                        if(this.leftDisplayShow==true){
+                        if(this.pitchDetailDataListLeft.recent2PitchData.length==0){
+                            this.$message({
+                                type:'info',
+                                message:"当前无数据，请导入数据"
+                            })
+                            return ;
+                        }else if(this.leftDisplayShow==true){
+                            this.totalShow=true;
+                            this.leftShow=true;
                              this.leftDisplayListValue1=[];
                             this.leftDisplayListValue2=[];
                             this.leftDisplayListValueXdata=[];
@@ -1266,6 +1290,14 @@ export default Vue.component('commonPitch-detail',{
                                 this.leftDisplayList=this.pitchDetailDataListLeft;
                                 var recentVariationLength=this.leftDisplayList.recentVariation.length;
                                 this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
+                                // var str='';
+                                // console.log(document.getElementById('tableListid'),'style');
+                                //  str=document.getElementById('tableListid').clientHeight-50;
+                                //  setTimeout(()=>{
+                                //         console.log(document.getElementById('tableListid').clientHeight);
+                                       
+
+                                // },20)
                                 if(this.leftDisplayListValue.length==recentVariationLength){
                                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
                                     this.time1=null;
@@ -1284,6 +1316,7 @@ export default Vue.component('commonPitch-detail',{
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
                                     },20)
                                 }else if(this.leftDisplayListValue.length!=recentVariationLength){
+                                    // document.getElementById('leftHightchart').style.minHeight=str+'px';
                                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
                                     this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
@@ -1296,9 +1329,7 @@ export default Vue.component('commonPitch-detail',{
                                             this.leftDisplayListValueYdata2.push(array[index].shift)
                                         }
                                     })
-                                    setTimeout(()=>{
-                                        console.log(document.getElementById('tableListid').clientHeight);
-                                    },20)
+                                    
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                     setTimeout(()=>{
@@ -1310,78 +1341,9 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
-
-                            
-                                // console.log(this.leftDisplayListValue1,'数据1')
-                                // console.log(this.leftDisplayListValue2,'数据2')
-                                // console.log(this.leftDisplayList,'左边数据')
-                                // console.log(this.leftDisplayListValueXdata,'苏醒')
-                                // console.log(this.leftDisplayListValueYdata1,'DATA1')
-                                // console.log(this.leftDisplayListValueYdata2,'data2');
                             }
                             
                         }
-                        // if(this.rightDisplayShow==true){
-                        //     this.rightDisplayListValue1=[];
-                        //     this.rightDisplayListValue2=[];
-                        //     this.rightDisplayListValueXdata=[];
-                        //     this.rightDisplayListValueYdata1=[];
-                        //     this.rightDisplayListValueYdata2=[];
-                            
-                        //     if(this.pitchDetailDataList){
-                        //         this.rightDisplayList=this.pitchDetailDataList;
-                        //         this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
-                        //         var recentVariationLength=this.rightDisplayList.recentVariation.length;
-                        //         if(this.rightDisplayListValue.length==recentVariationLength){
-                        //             this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
-                        //             this.time3=null;
-                        //             this.rightDisplayListValue.forEach((item,index,array)=>{
-                        //                 this.rightDisplayListValue1.push(item)
-                        //                 this.rightDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
-                        //                 this.rightDisplayListValueXdata.push(item.depth)
-                        //                 this.rightDisplayListValueYdata1.push(item.shift)
-                        //             })
-                        //             // let lineLeftChart=this.$refs.lineLeftChartOne;
-                        //             let lineRightChart=this.$refs.lineRightChartOne;
-                        //             lineRightChart.delegateMethod('showLoading', 'Loading...');
-                        //             setTimeout(()=>{
-                        //                 lineRightChart.removeSeries();
-                        //                 lineRightChart.addSeries({name:this.timeChangeMethod(this.time2),data:this.rightDisplayListValueYdata1});
-                        //                 lineRightChart.hideLoading();
-                        //                 lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
-                        //             },20)
-                        //         }else if(this.rightDisplayListValue.length!=recentVariationLength){
-                        //                 this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
-                        //                 this.time3=(this.rightDisplayList.recent2PitchData)[1].acquisitionTime;
-                        //                 this.rightDisplayListValue.forEach((item,index,array)=>{
-                        //                     if(array[index].acquisitionTime==this.time2){
-                        //                         this.rightDisplayListValue1.push(array[index])
-                        //                         this.rightDisplayListValueXdata.push(array[index].depth)
-                        //                         this.rightDisplayListValueYdata1.push(array[index].shift)
-                        //                     }else if(array[index].acquisitionTime==this.time3){
-                        //                         this.rightDisplayListValue2.push(array[index])
-                        //                         this.rightDisplayListValueXdata.push(array[index].depth)
-                        //                         this.rightDisplayListValueYdata2.push(array[index].shift)
-                        //                     }
-                        //                 })
-                                        
-                        //                 let lineRightChart=this.$refs.lineRightChartOne;
-                        //                 // document.getElementById('leftHightchart').style.minHeight='1950px'
-                        //                 lineRightChart.delegateMethod('showLoading', 'Loading...');
-                        //                 setTimeout(()=>{
-                        //                     lineRightChart.removeSeries();
-                        //                     lineRightChart.addSeries({name:this.timeChangeMethod(this.time2),data:this.rightDisplayListValueYdata1});
-                        //                     lineRightChart.addSeries({name:this.timeChangeMethod(this.time3),data:this.rightDisplayListValueYdata2});
-                        //                     lineRightChart.hideLoading();
-                        //                     lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
-                        //                 },20)
-
-                        //         }
-                        //         this.rightDisplayShow==false;
-                        //     }
-                            
-                        // }
-                        // console.log(this.pitchDetailDataList);
                     }else if(respose.data.cd=='-1'){
                         vm.$message({
                             type:'error',
@@ -1404,80 +1366,23 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.pitchDetailDataListRight=response.data.rt;
-                        // if(this.leftDisplayShow==true){
-                        //      this.leftDisplayListValue1=[];
-                        //     this.leftDisplayListValue2=[];
-                        //     this.leftDisplayListValueXdata=[];
-                        //     this.leftDisplayListValueYdata1=[];
-                        //     this.leftDisplayListValueYdata2=[];
-                        //     if(this.pitchDetailDataList){
-                        //         this.leftDisplayList=this.pitchDetailDataList;
-                        //         var recentVariationLength=this.leftDisplayList.recentVariation.length;
-                        //         this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
-                        //         if(this.leftDisplayListValue.length==recentVariationLength){
-                        //             this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
-                        //             this.time1=null;
-                        //             this.leftDisplayListValue.forEach((item,index,array)=>{
-                        //                 this.leftDisplayListValue1.push(item)
-                        //                 this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
-                        //                 this.leftDisplayListValueXdata.push(item.depth)
-                        //                 this.leftDisplayListValueYdata1.push(item.shift)
-                        //             })
-                        //             let lineLeftChart=this.$refs.lineLeftChartOne;
-                        //             lineLeftChart.delegateMethod('showLoading', 'Loading...');
-                        //             setTimeout(()=>{
-                        //                 lineLeftChart.removeSeries();
-                        //                 lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
-                        //                 lineLeftChart.hideLoading();
-                        //                 lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
-                        //             },20)
-                        //         }else if(this.leftDisplayListValue.length!=recentVariationLength){
-                        //             this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
-                        //             this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
-                        //             this.leftDisplayListValue.forEach((item,index,array)=>{
-                        //                 if(array[index].acquisitionTime==this.time){
-                        //                     this.leftDisplayListValue1.push(array[index])
-                        //                     this.leftDisplayListValueXdata.push(array[index].depth)
-                        //                     this.leftDisplayListValueYdata1.push(array[index].shift)
-                        //                 }else if(array[index].acquisitionTime==this.time1){
-                        //                     this.leftDisplayListValue2.push(array[index])
-                        //                     this.leftDisplayListValueYdata2.push(array[index].shift)
-                        //                 }
-                        //             })
-                        //             setTimeout(()=>{
-                        //                 console.log(document.getElementById('tableListid').clientHeight);
-                        //             },20)
-                        //             let lineLeftChart=this.$refs.lineLeftChartOne;
-                        //             lineLeftChart.delegateMethod('showLoading', 'Loading...');
-                        //             setTimeout(()=>{
-                        //                 lineLeftChart.removeSeries();
-                        //                 lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
-                        //                 lineLeftChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.leftDisplayListValueYdata2});
-                        //                 lineLeftChart.hideLoading();
-                        //                 lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
-                        //             },20)
-                        //         }
-                        //         this.leftDisplayShow==false;
-
-                            
-                        //         // console.log(this.leftDisplayListValue1,'数据1')
-                        //         // console.log(this.leftDisplayListValue2,'数据2')
-                        //         // console.log(this.leftDisplayList,'左边数据')
-                        //         // console.log(this.leftDisplayListValueXdata,'苏醒')
-                        //         // console.log(this.leftDisplayListValueYdata1,'DATA1')
-                        //         // console.log(this.leftDisplayListValueYdata2,'data2');
-                        //     }
-                            
-                        // }
-                        if(this.rightDisplayShow==true){
+                        if(this.pitchDetailDataListRight.recent2PitchData.length==0){
+                            this.$message({
+                                type:'info',
+                                message:"当前无数据，请导入数据"
+                            })
+                            return ;
+                        }else if(this.rightDisplayShow==true){
+                            this.totalShow=true;
+                            this.rightShow=true;
                             this.rightDisplayListValue1=[];
                             this.rightDisplayListValue2=[];
                             this.rightDisplayListValueXdata=[];
                             this.rightDisplayListValueYdata1=[];
                             this.rightDisplayListValueYdata2=[];
                             
-                            if(this.pitchDetailDataListLeft){
-                                this.rightDisplayList=this.pitchDetailDataListLeft;
+                            if(this.pitchDetailDataListRight){
+                                this.rightDisplayList=this.pitchDetailDataListRight;
                                 this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
                                 var recentVariationLength=this.rightDisplayList.recentVariation.length;
                                 if(this.rightDisplayListValue.length==recentVariationLength){
@@ -1657,8 +1562,6 @@ export default Vue.component('commonPitch-detail',{
                 this.leftSqName=name;
                 this.leftDisplayName=name;
                 this.leftDisplayShow=true;
-                this.totalShow=true;
-                this.leftShow=true;
                 this.getPitchDetailDataBySeqIdLeft(id)
                
             },
@@ -1668,8 +1571,7 @@ export default Vue.component('commonPitch-detail',{
                 this.rightSqName=name;
                 this.rightDisplayName=name;
                 this.rightDisplayShow=true;
-                this.totalShow=true;
-                this.rightShow=true;
+              
                  this.getPitchDetailDataBySeqIdRight(id)                
                 // console.log(this.rightDisplayList,'右边数据')
             },
@@ -2330,7 +2232,13 @@ select.autoImport{
                     }
                 }
                 .containerHeadMiddle{
-
+                    width: 400px;
+                    display: inline-block;
+                    label{
+                        line-height: 32px;
+                        font-size: 14px;
+                        color: #333333;
+                    }
                 }
                 .containerHeadRight{
                     float: right;
@@ -2405,6 +2313,9 @@ select.autoImport{
                     }
                     tbody{
                             tr{
+                                .red{
+                                    color: red;
+                                }
                                 td{
                                     padding-left: 6px;
                                     padding-right: 15px;

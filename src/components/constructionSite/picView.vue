@@ -88,7 +88,7 @@ export default {
             
             // console.log(this.para,'this.para.type')
                 // .toLowerCase()
-            if(this.para.type.toLowerCase()=="pdf"){
+            if(this.para.type=="pdf"||this.para.type=="PDF"){
                 this.para.type="PDF";
                 if(this.para.source != this.old_para){
 

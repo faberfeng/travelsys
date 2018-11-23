@@ -16,8 +16,12 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div class="header_shareFile" >
+                    <div v-show="backshow==true" @click="showShareFilesOrFolder()" class="header_btn">返回上层</div>
                     {{fileListName}}
                 </div>
+                <!-- <div class="header_btn">
+
+                </div> -->
                 <ul id="file-container" class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)" ></label>
@@ -28,8 +32,8 @@
                             </span>
                             <span  class="item-file-detial">
                                 <h3 v-text="item.fgName"></h3>
-                                <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
-                                <p v-text="initData(item.updateTime)"></p>
+                                <p>由<span class="text-name" v-text="item.uploadUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                <p v-text="initData(item.uploadTime)"></p>
                                 <p class="operation">
                                     <span v-text="'版本'+item.version"></span>
                                     <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
@@ -38,7 +42,9 @@
                             </span>
                         </div>
                     </li>
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item.nodeId)">
+                    <!-- @click="checkItem(index)" -->
+                    <!-- @click="IntoDir(item.nodeId)" -->
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="intoDir(item.nodeId)">
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
                         <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
@@ -154,14 +160,16 @@ export default {
             posType:'',
             versionItem:'',
             docType:'',
-            fileListName:''
+            fileListName:'',
+            backshow:false,
         }
     },
     created(){
         var vm=this;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        this.showShareFilesOrFolder()
+        // this.intoDir();
+        this.showShareFilesOrFolder();
     },
     watch:{
         posType:function(){
@@ -171,6 +179,9 @@ export default {
     },
     methods:{
         showShareFilesOrFolder(){
+            this.backshow=false;
+            this.fileList=[];
+            this.folderList=[];
             this.shareNo=this.$route.path
             var str="/cloud/share/"
             this.shareNo=this.shareNo.replace(new RegExp(str), "")
@@ -197,7 +208,8 @@ export default {
                         })
                         this.fileListName=(this.fileList[0].fgName.split('.'))[0];
                         console.log(this.fileListName[0])
-                    }else if(this.nodeList){
+                    }
+                     if(this.nodeList){
                             this.nodeList.forEach((item)=>{
                                 this.$set(item,'checked',false)
                                 this.folderList.push(item)
@@ -276,8 +288,30 @@ export default {
             }
             window.open(vm.QJFileManageSystemURL + filePath+'');
         },
-        IntoDir(val){
+        intoDir(val){
             var vm = this
+            // this.shareNo=this.$route.path
+            // var str="/cloud/share/"
+            // this.shareNo=this.shareNo.replace(new RegExp(str), "")
+            this.backshow=true;
+            axios({
+                method:'POST',
+                url:this.BDMSUrl+'project2/doc/showShareFilesAndFolder',
+                params:{
+                    dirId:val
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // console.log(response.data.rt,'0000');
+                    this.fileList=response.data.rt.fileGroupBeanList;
+                    this.folderList=[];
+                }else if(response.data.cd=='-1'){
+                    this.$message({
+                        type:"error",
+                        message:message.data.msg
+                    })
+                }
+            })
             // vm.getInfo()
         },
         checkItem(val,file,isMultiSelect){
@@ -449,6 +483,23 @@ li{
             // position: absolute;    
             color:#fc3439;
             border-bottom: 1px solid #ccc;
+            position: relative;
+            .header_btn{
+                    background: #ff5257;
+                position: absolute;
+                margin-right: 20px;
+                color: #fff;
+                font-size: 14px;
+                font-weight: normal;
+                width: 86px;
+                height: 30px;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                border-radius: 2px;
+                line-height: 30px;
+                left:20px;
+            }
         }
         #file-container{
              .icon-goujian{
@@ -556,7 +607,7 @@ li{
                             bottom: 0;
                             left: 88px;
                             right: 0;
-                            margin-bottom:6px; 
+                            margin-bottom:15px; 
                             span{
                                 color: #fc3439;
                             }

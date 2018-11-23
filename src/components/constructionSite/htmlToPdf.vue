@@ -195,6 +195,44 @@
                             <!-- <div  class="showBasePic"></div> -->
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
+                        <!-- <div class="commonSlope" v-show="item.type==5">
+                            <label class="pdfSummaryHead1">{{company}}</label>
+                            <label class="pdfSummaryHead">监测报表</label>
+                            <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
+                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
+                            <div class="txt1"><label>监测内容：{{item.name}}</label></div>
+                            <div class="slopeTable">
+                                <div class="slopeTableBody">
+                                    <div class="left">
+                                        <div class="leftTable">
+                                            <table  border="1" cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th rowspan="2">深度(m)</th>
+                                                        <th colspan="2">位移量(mm)</th>
+                                                        <th rowspan="2">本次变化</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(val,index) in item.dataList" :key="index">
+                                                        <td>{{val.otherParam}}</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                   
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="leftLine"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
                     </li>
                 </ul>
                 <!-- 下载到本地 -->
@@ -788,6 +826,8 @@ export default {
                     }
                     this.getAllMonitorItemList.forEach((item)=>{
                         mapList.forEach((value, key, mapObject)=>{
+                            console.log(value,'value1');
+                            console.log(key,'key1');
                             if(key==item.id){
                                     // console.log(value,'value123');
                                     var aLength=0;
@@ -1608,6 +1648,179 @@ export default {
                         position: absolute;
                         top:71px;
                         right:90px;
+                    }
+                }
+                .commonSlope{
+                      height: 832px;
+                    .pdfSummaryHead1{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 16px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 26px;
+                        line-height: 26px;
+                        margin-top:22px;
+                        // border-bottom:2px solid #ccc;
+                    }
+                    .pdfSummaryHead{
+                        display:inline-block;
+                        width: 90%;
+                        font-size: 14px;
+                        color:#000;
+                        font-weight: bold;
+                        height: 26px;
+                        line-height: 26px;
+                        border-bottom:1px solid black;
+                    }
+                    .pdfSummarytext{
+                        display:inline-block;
+                        width: 90%;
+                        height: 24px;
+                        position: relative;
+                        //  margin-left:5px;
+                        border-top:1px solid black;
+                        margin-top:2px;
+                        label{
+                            position: absolute;
+                            left:0px;
+                            top:5px;
+                            font-size:12px;
+                        }
+                    }
+                    .txt{
+                        width: 90%;
+                        margin: 0 auto;
+                        height: 24px;
+                        position: relative;
+                        .label1{
+                            position: absolute;
+                            left:0px;
+                            font-size:12px;
+                            color: #000;
+                            line-height: 24px;
+                        }
+                        .span1{
+                            position: absolute;
+                            left:42%;
+                            font-size:12px;
+                            color: #000;
+                            line-height: 24px;
+                        }
+                    }
+                    .txt1{
+                        width: 90%;
+                        font-size:12px;
+                        margin:0 auto;
+                        color: #000;
+                        line-height: 24px;
+                        height: 24px;
+                        position: relative;
+                        label{
+                            position: absolute;
+                            left: 0px;
+                        }
+                    }
+                    .slopeTable{
+
+                        .slopeTableBody{
+                            width: 90%;
+                            margin:0 auto;
+                            border: 1px solid #ccc;
+                            position: relative;
+                            height: 650px;
+                            .left{
+                                position: absolute;
+                                height: inherit;
+                                width: 100%;
+                                border:1px solid #ccc;
+                                left:0px;
+                                .leftTable{
+                                    position: absolute;
+                                    height: inherit;
+                                    width: 50%;
+                                    border:1px solid #ccc;
+                                    left:0px;
+                                    table{
+                                        border-collapse: collapse;
+                                        border: 0.5px solid #000;
+                                         thead{
+                                            background: #fff;
+                                            th{
+                                                // padding-left: 6px;
+                                                // padding-right: 15px;
+                                                height: 18px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 0.5px solid #000;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                font-weight: normal;
+                                            }
+                                        }
+                                        tbody{
+                                            tr{
+                                                td{
+                                                    height: 18px;
+                                                    text-align: center;
+                                                    box-sizing: border-box;
+                                                    border-right: 0.5px solid #000;
+                                                    font-size: 12px;
+                                                    color: #333333;
+                                                    // .actionBtn{
+                                                    //     width: 18px;
+                                                    //     height: 18px;
+                                                    //     border: none;
+                                                    //     cursor: pointer;
+                                                    //     margin-left: 10px;
+                                                    // }
+                                                    // .location{
+                                                    //     background: url('../planCost/images/location.png') no-repeat 0 0;
+                                                    // }
+                                                    // .curve{
+                                                    //     background: url('./images/graph.png') no-repeat 0 0;
+                                                    // }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                                .leftLine{
+                                    position: absolute;
+                                    height: inherit;
+                                    width: 50%;
+                                    border:1px solid #ccc;
+                                    right:0px;
+                                }
+                            }
+                            .right{
+                                position: absolute;
+                                 width: 50%;
+                                right: 0px;
+                                 height: inherit;
+                                border:1px solid #ccc;
+                                .rightTable{
+                                     position: absolute;
+                                    height: inherit;
+                                    width: 50%;
+                                    border:1px solid #ccc;
+                                    left:0px;
+
+                                }
+                                .rightLine{
+                                    position: absolute;
+                                    height: inherit;
+                                    width: 50%;
+                                    border:1px solid #ccc;
+                                    right:0px;
+
+                                }
+
+                            }
+
+                        }
+
                     }
                 }
             }
