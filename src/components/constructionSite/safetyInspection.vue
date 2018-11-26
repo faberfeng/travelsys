@@ -231,11 +231,11 @@
                 </div>
             </div>
             <!-- 以下是斜度详情页 -->
-            <commonPitch-detail v-if="pitchDetailShow" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemMonitorKeyWord="itemSubmitKeyWord"></commonPitch-detail>
+            <commonPitch-detail v-if="pitchDetailShow" ref="commonPitchDetailRef" v-on:back="backToH" :surveyName="surveyName" v-on:importExcelData="importDataShow" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemMonitorKeyWord="itemSubmitKeyWord"></commonPitch-detail>
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :paramsListsSub="paramsLists" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" ref="commonDetailRef" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :paramsListsSub="paramsLists" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -256,7 +256,7 @@
                                     <img style=" cursor: pointer"  src="./images/upload.png">
                                     <p>上传新底图</p>
                                 </label>
-                                <input class="upInput"  type="file"  @change="addBaseMap($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                                <input class="upInput"  type="file" accept="image/*,.pdf"  @change="addBaseMap($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
                             </div>
                         </li>
                     </ul>
@@ -283,7 +283,7 @@
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName1" placeholder="请输入" /></div>
                     <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram1" placeholder="两个字母" /></div>
-                    <div class="editBodytwo"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword1" placeholder="与导入Excel表名匹配" /></div>
+                    <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword1" placeholder="与导入Excel表名匹配" /></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="renameMonitor()">确定</button>
@@ -301,7 +301,7 @@
                             <span class="upImgText">{{excelFileListName}}<label v-show="!excelFileListName">未选择任何文件</label></span>
                         </span>
                     </div>
-                    <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">匹配结果</label><label>文档内表总数：{{getPitchBaseInfoListLength}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：</label></div>
+                    <div class="editBodytwo" v-show="monitorImportType==5"><label class="editInpText" style="width:18% !important;">匹配结果</label><label>文档内表总数：{{excelSheetInfoLength}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：</label></div>
                     <!-- <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">使用Excel表名:</label><select v-model="sheetIndex" class="sheetName"><option v-for="(item,index) in excelSheetInfo"  :value="item.index" :key="index" v-text="item.name"></option></select>
                     </div> -->
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">对应监测内容:</label><label >{{monitorImportName}}</label></div>
@@ -868,7 +868,7 @@ export default {
             fileListCover:'',
             coverPathUrl:'',
             excelSheetInfo:'',//获取导入EXCEL文件的sheet信息
-            excelSheetInfoLength:'',//获取表格的个数
+            excelSheetInfoLength:0,//获取表格的个数
             excelFileList:'',
             excelFileListName:'',
             excelMoreFileList:'',
@@ -1084,7 +1084,7 @@ export default {
         this.getPositionList();
         this.curTime();
         this.curTime1();
-        console.log(window.screen.deviceXDPI,'0000');
+        // console.log(window.screen.deviceXDPI,'0000');
     },
     filters:{
         monitorTypeChange(val){
@@ -1118,14 +1118,14 @@ export default {
             if(val==null){
                 return '/'
             }else {
-                return val.recentVariation
+                return val.recentVariation.toFixed(2)
             }
         },
         addSprit2(val){
              if(val==null){
                 return '/'
             }else {
-                return val.totalVariation
+                return val.totalVariation.toFixed(2)
             }
         },
         timeChange(val) {
@@ -1139,11 +1139,20 @@ export default {
     watch:{
         selectUgId:function(val){
             var vm=this;
+             this.paramsLists='';
+             this.picMark==false;
+             this.drawItemId='';
             vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getBaseMapList();
             vm.getMonitorItem();
+            vm.getTagList();
+            vm.getAllMonitorPoint();
+            // vm.getBaseMapList();
+           
+            // vm.getBaseMapInfoByBaseMapId();
+            // vm.getMonitorItem();
         },
         positionValue:function(val){
             var vm=this;
@@ -1192,6 +1201,9 @@ export default {
             vm.monitorImportName=valname;
             vm.monitorImportType=valtype;
             vm.monitorImportId=valid;
+            if(vm.monitorImportType==5){
+                this.getPitchBaseInfo();
+            }
             // console.log(vm.monitorImportType,'vm.monitorImportType123')
 
         },
@@ -1455,7 +1467,7 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                    console.log(list,'list123');
+                    
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
@@ -1914,7 +1926,7 @@ export default {
                             }
                         );
                         conditionData.push(
-                            this.condition.acAmount,this.condition.days
+                            this.condition.days,this.condition.acAmount
                         )
                       
                         var myChart = echarts.init(document.getElementById('overviewPie'))
@@ -2131,15 +2143,15 @@ export default {
             var alist=[];
             var list = this.$refs.pic.saveList();
             // var list1=this.
-            console.log(list,'list000000');
+           
             list.forEach((item)=>{
                 // console.log(item.id.substr(item.id.length-3),'124')
-                console.log(item.id.length,'1111');
+               
                  if(item.id.length==undefined){
                     alist.push(item);
                 }
             })
-            console.log(alist,'alist');
+            
             if(this.alist==[]){
                 this.editSpotShow=false;
             }else if(this.alist!=[]){
@@ -2366,6 +2378,7 @@ export default {
         getBaseMapInfoByBaseMapId(){
             var vm=this;
             this.angle=0;
+            this.paramsLists={};
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',
@@ -2399,6 +2412,8 @@ export default {
         baseMapCancle(){
             this.baseMapShow=false;
             this.isClick=false;
+            this.isClick0=false;
+
         },
         //设置底图使用
         setBaseMapUsed(val){
@@ -2445,29 +2460,23 @@ export default {
         //新增监测内容
         addMonitorItem(){
             var vm=this;
-            // if(this.monitorName==''){
-            //     vm.$message({
-            //         type:'info',
-            //         message:'请输入监测名称'
-            //     })
-            // }else if(this.monitorLogogram==''){
-            //     vm.$message({
-            //         type:'info',
-            //         message:'请输入不重名的简写'
-            //     })
-            // }else if(this.monitorType!=5){
-            //     if(this.monitorKeyword==''){
-            //      vm.$message({
-            //         type:'info',
-            //         message:'请输入不重名的关键字'
-            //     })
-            //     }else if(vm.monitorBaseMapId==''){
-            //         vm.$message({
-            //             type:'info',
-            //             message:'请选择底图'
-            //         })
-            //     }
-            // } else{
+            if(this.monitorName==''){
+                vm.$message({
+                    type:'info',
+                    message:'请输入监测名称'
+                })
+            }else if(this.monitorLogogram==''){
+                vm.$message({
+                    type:'info',
+                    message:'请输入与其他内容不重名的简写'
+                })
+            }else if(this.monitorType!=5&&this.monitorKeyword==''){
+                    vm.$message({
+                        type:'info',
+                        message:'请输入与其他内容不重名的关键字'
+                    })
+            }else
+            {
                 axios({
                     method:'get',
                     url:vm.BDMSUrl+'detectionInfo/addMonitorItem',
@@ -2503,7 +2512,7 @@ export default {
                         })
                     }
                 })
-            // }
+            }
         },
         //取消编辑监测内容
         editInspectContentCancle(){
@@ -2802,9 +2811,13 @@ export default {
                     vm.overwrite=false;//是否覆盖
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
-                  
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    if(this.$refs.commonDetailRef){
+                        this.$refs.commonDetailRef.getAllMonitorPoint();
+                        this.$refs.commonDetailRef.getPointDatas();
+                        this.$refs.commonDetailRef.getDetailPointInfo();
+                    }
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2853,7 +2866,12 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    if(this.$refs.commonDetailRef){
+                        this.$refs.commonDetailRef.getAllMonitorPoint();
+                        this.$refs.commonDetailRef.getPointDatas();
+                        this.$refs.commonDetailRef.getDetailPointInfo();
+                    }
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2905,7 +2923,12 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    if(this.$refs.commonDetailRef){
+                        this.$refs.commonDetailRef.getAllMonitorPoint();
+                        this.$refs.commonDetailRef.getPointDatas();
+                        this.$refs.commonDetailRef.getDetailPointInfo();
+                    }
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -2960,9 +2983,12 @@ export default {
                    vm.unifiedTime='';//标准时间，不选择可不传
                     vm.overwrite=false; //是否覆盖
                    vm.inputWorkingCondition='';//现场工况
+                   vm.shiftIndexCol='';//斜度位移取值
+                   vm.excelSheetInfoLength=0;
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    this.$refs.commonPitchDetailRef.getPitchBaseInfo();
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -3016,7 +3042,12 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    if(this.$refs.commonDetailRef){
+                        this.$refs.commonDetailRef.getAllMonitorPoint();
+                        this.$refs.commonDetailRef.getPointDatas();
+                        this.$refs.commonDetailRef.getDetailPointInfo();
+                    }
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -3078,7 +3109,12 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary()
+                    this.getDetectionSummary();
+                    if(this.$refs.commonDetailRef){
+                        this.$refs.commonDetailRef.getAllMonitorPoint();
+                        this.$refs.commonDetailRef.getPointDatas();
+                        this.$refs.commonDetailRef.getDetailPointInfo();
+                    }
                     this.$message({
                         type:'success',
                         message:'采集数据导入成功'
@@ -3144,7 +3180,7 @@ export default {
                     }else if(response.data.rt){
                             this.$message({
                                 type:'info',
-                                message:response.data.rt
+                                message:response.data.rt.replace(/\r?\n/g,"<br/>")
                             })
                         }
                     }else if(response.data.cd=='-1'){
@@ -3609,6 +3645,12 @@ export default {
                                             this.sheetIndex=item.index;
                                             // console.log(this.sheetIndex);
                                         }
+                                        // else{
+                                        //     this.$message({
+                                        //         type:'info',
+                                        //         message:'无匹配数据'
+                                        //     })
+                                        // }
 
                                     })
                                    
@@ -3621,6 +3663,12 @@ export default {
                                     this.sheetIndex=item.index;
                                     // console.log(this.sheetIndex);
                                 }
+                                // else{
+                                //         this.$message({
+                                //             type:'info',
+                                //             message:'无匹配数据'
+                                //         })
+                                //     }
                             })
                             } 
                             document.getElementById('fileInfoExport').value="";
@@ -3715,26 +3763,43 @@ export default {
         //重命名监测内容
         renameMonitor(){
             var vm=this;
-            axios({
-                method:'get',
-                url:vm.BDMSUrl+'detectionInfo/rename',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    id:this.monitorId,
-                    name:this.monitorName1,
-                    logogram:this.monitorLogogram1,
-                    keyword:this.monitorKeyword1
+             if(this.monitorName1==''){
+                vm.$message({
+                    type:'info',
+                    message:'请输入监测名称'
+                })
+            }else if(this.monitorLogogram1==''){
+                vm.$message({
+                    type:'info',
+                    message:'请输入与其他内容不重名的简写'
+                })
+            }else if(this.monitorType!=5&&this.monitorKeyword1==''){
+                    vm.$message({
+                        type:'info',
+                        message:'请输入与其他内容不重名的关键字'
+                    })
+            }else{
+                    axios({
+                        method:'get',
+                        url:vm.BDMSUrl+'detectionInfo/rename',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            id:this.monitorId,
+                            name:this.monitorName1,
+                            logogram:this.monitorLogogram1,
+                            keyword:this.monitorKeyword1
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.editInspectContentShow=false;
+                            this.getMonitorMainTable();
+                            this.getAllMonitorPoint();
+                            vm.getMonitorItem();
+                        }
+                    })
                 }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.editInspectContentShow=false;
-                    this.getMonitorMainTable();
-                    this.getAllMonitorPoint();
-                     vm.getMonitorItem();
-                }
-            })
         },
         //删除
         deleteMonitorNameBtn(val){
@@ -3786,6 +3851,7 @@ export default {
                     this.monitorLogogram1=item.logogram;
                     this.monitorKeyword1=item.keyword;
                     this.monitorId=item.id;
+                    this.monitorType=item.type;
                     // console.log(this.monitorName1);
                 }
             })
@@ -3920,7 +3986,7 @@ export default {
                             this.monitorMainTableList1.push(this.monitorMainTableList[i])
                         }
                     }
-                    console.log(this.monitorMainTableList1,'monitorMainTableList1')
+                  
                     // this.drawItemId=this.monitorMainTableList[0].id;
                 }
             })
@@ -4026,36 +4092,66 @@ export default {
         },
         //单点触发绘图
         drawingOneSpot(){
-            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
-            this.monitorMainItemList.forEach((item)=>{
-                if(item.id==this.drawItemId){
-                    item.spotNum=true;
-                }
-            })
-            this.isClick1=true;
-            this.isClick2=false;
-            this.isClick3=false;
+            // console.log('0000')
+            // console.log(this.drawItemId,'111')
+            if(this.drawItemId==''){
+               this.$message({
+                    type:'info',
+                    message:'请先添加监测内容'
+                })
+            }else{
+                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+                this.monitorMainItemList.forEach((item)=>{
+                    if(item.id==this.drawItemId){
+                        item.spotNum=true;
+                    }
+                })
+                this.isClick1=true;
+                this.isClick2=false;
+                this.isClick3=false;
+            }
         },
         //多点触发绘图
         drawingSpots(){
-            this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
-            this.isClick2=true;
-            this.isClick1=false;
-            this.isClick3=false;
+             if(this.drawItemId==''){
+               this.$message({
+                    type:'info',
+                    message:'请先添加监测内容'
+                })
+            }else{
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
+                this.isClick2=true;
+                this.isClick1=false;
+                this.isClick3=false;
+            }
         },
         //添加文本
         drawingText(){
-            this.$refs.pic.setDrawStatus("text",10000,10000,2);
-            this.isClick2=false;
-            this.isClick1=false;
-            this.isClick3=true;
+             if(this.drawItemId==''){
+               this.$message({
+                    type:'info',
+                    message:'请先添加监测内容'
+                })
+            }else{
+                this.$refs.pic.setDrawStatus("text",10000,10000,2);
+                this.isClick2=false;
+                this.isClick1=false;
+                this.isClick3=true;
+            }
         },
         //上传图片编辑
         setSpotPic(){
-            this.setSpotPicShow=true;
-            this.picMark=true;
-            this.getTagList();
-            this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+            if(this.drawItemId==''){
+               this.$message({
+                    type:'info',
+                    message:'请先添加监测内容'
+                })
+            }else{
+                this.setSpotPicShow=true;
+                this.picMark=true;
+                this.getTagList();
+                this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+            }
         },
         //编辑照片标记
         editPhotoTag(){
@@ -4315,6 +4411,7 @@ export default {
         //获取监测内容
         getMonitorItem(){
             var vm=this;
+            this.monitorMainItemList=[];
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getMonitorItem',
@@ -5761,7 +5858,7 @@ export default {
                         width: 100%;
                         height: 26px;
                         background-color: #000;
-                        opacity: 0.3;;
+                        opacity: 0.8;
                         bottom: 0px;
                         left:0px;
                         .baseMapName{

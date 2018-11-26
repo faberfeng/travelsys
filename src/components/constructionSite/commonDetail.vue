@@ -851,7 +851,7 @@ export default Vue.component('commonDetail',{
                     this.getImportHistoryList.forEach((item)=>{
                         this.$set(item,'check',false)
                     })
-                    console.log(this.getImportHistoryList,'this.getImportHistoryList');
+                    // console.log(this.getImportHistoryList,'this.getImportHistoryList');
                 }
             })
         },
@@ -932,6 +932,7 @@ export default Vue.component('commonDetail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getAllMonitorPoint();
+                        this.getDetailPointInfo();
                         // this.picMark=false;
                     }
                 })
@@ -974,8 +975,8 @@ export default Vue.component('commonDetail',{
         handleCurrentChange(val){
             this.getPointDatasList1=[];
             this.pageNum=val;
-            console.log(this.getPointDatasListLength,'this.getPointDatasListLength');
-            console.log((this.getPointDatasListLength)%(this.pageSize),'123');
+            // console.log(this.getPointDatasListLength,'this.getPointDatasListLength');
+            // console.log((this.getPointDatasListLength)%(this.pageSize),'123');
             if(this.getPointDatasListLength<11){
                 for(var i=0;i<this.getPointDatasListLength;i++){
                         this.getPointDatasList1.push(this.getPointDatasList[i])
@@ -994,8 +995,8 @@ export default Vue.component('commonDetail',{
                          var num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
                     }
                 }
-                console.log(num,'num')
-                 console.log(num2,'num2')
+                // console.log(num,'num')
+                //  console.log(num2,'num2')
                 for(var i=num;i<num2;i++){
                     this.getPointDatasList1.push(this.getPointDatasList[i])
                 }
@@ -1057,7 +1058,7 @@ export default Vue.component('commonDetail',{
                         this.angle=0;
                     }
                     var type=(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.substr(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.length-3)).toString();
-                    console.log(type);
+                    // console.log(type);
                     this.paramsInfo={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdInfo.relativeUri,angle:this.angle}
                     // console.log(this.paramsLists,'this.paramsLists');
                 }else if(response.data.cd=='-1'){
@@ -1071,6 +1072,8 @@ export default Vue.component('commonDetail',{
         //获取监测点基本信息
         getDetailPointInfo(){
             var vm=this;
+            this.isAlertNum=0;
+            this.isBrokenNum=0;
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getDetailPointInfo',
@@ -1094,7 +1097,7 @@ export default Vue.component('commonDetail',{
                     })
                     // this.isAlertNum='';
                     // this.isBrokenNum='';
-                    console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
+                    // console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
                     // this.monitorPointInfo=response.data.rt;
                     // this.isAlert=this.monitorPointInfo[0].isAlert;
                     // this.isBroken=this.monitorPointInfo[0].isBroken;
@@ -1217,7 +1220,7 @@ export default Vue.component('commonDetail',{
                     this.commonMonitorMainItemList.forEach((item,index)=>{
                         this.$set(item,'spotNum',false)
                     })
-                    console.log(this.commonMonitorMainItemList,'2222')
+                    // console.log(this.commonMonitorMainItemList,'2222')
                     // for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
                     //     this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
                     // }
@@ -1286,6 +1289,7 @@ export default Vue.component('commonDetail',{
                         this.toolShow=false;
                         this.getAllMonitorPoint();
                         this.getPointDatas();
+                        this.getDetailPointInfo();
                     }else if(response.data.cd=='-1'){
                         
                          this.$message({
@@ -1313,6 +1317,9 @@ export default Vue.component('commonDetail',{
                     this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
                     this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
                     this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
+                    this.variationAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
+                    this.variationAlertDay=this.getAlertArgumentsList.changeAlertDay;
+                    this.variationAlertHour=this.getAlertArgumentsList.changeAlertHour;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1340,6 +1347,8 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.editAlertValueShow=false;
                     this.getAlertArguments();
+                    this.getAllMonitorPoint();
+                    this.getDetailPointInfo();
                     this.$message({
                         type:'success',
                         message:'修改报警值成功'
@@ -1354,11 +1363,14 @@ export default Vue.component('commonDetail',{
         },
         editAlertValueBtn(){
             this.editAlertValueShow=true;
+            this.getAlertArguments();
         },
+
         //编辑相关人员
         editPersonBtn(){
             this.editPersonShow=true;
             this.getUserByUserGroup();
+            this.getItemDutyUser();
         },
         //取消监测项目人员
         editPersonCancle(){
@@ -1405,10 +1417,13 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.rt){
-                     this.getItemDutyUserList=response.data.rt;
-                     this.inspectorName=this.getItemDutyUserList.inspectorName;
-                     this.calculatorName=this.getItemDutyUserList.calculatorName;
-                     this.observerName=this.getItemDutyUserList.observerName;
+                    this.getItemDutyUserList=response.data.rt;
+                    this.inspectorName=this.getItemDutyUserList.inspectorName;
+                    this.calculatorName=this.getItemDutyUserList.calculatorName;
+                    this.observerName=this.getItemDutyUserList.observerName;
+                    this.observerId=this.getItemDutyUserList.observer;
+                    this.calculatorId=this.getItemDutyUserList.calculator;
+                    this.inspectorId=this.getItemDutyUserList.inspector;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1430,6 +1445,9 @@ export default Vue.component('commonDetail',{
         // 获取监测点采集数据（表格）
         getPointDatas(){
             var vm=this;
+            this.getPointDatasList1=[];
+            this.getPointDatasList=[];
+            this.getPointDatasListLength=0;
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointDatas',
@@ -1452,7 +1470,7 @@ export default Vue.component('commonDetail',{
                             this.getPointDatasList1.push(this.getPointDatasList[i])
                         }
                     }
-                    console.log(this.getPointDatasList1,'123');
+                    // console.log(this.getPointDatasList1,'123');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1592,12 +1610,12 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.shiftDistance)
                     })
-                    console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                    console.log(this.elevationYlist,'this.elevationYlist');
+                    // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                    // console.log(this.elevationYlist,'this.elevationYlist');
                      var min=this.getMinValue(this.elevationYlist);
                      var max=this.getMaxValue(this.elevationYlist);
-                     console.log(min,'min');
-                     console.log(max,'max');
+                    //  console.log(min,'min');
+                    //  console.log(max,'max');
                     var middle=(min+max)/2;
                     this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
                      this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
@@ -1626,7 +1644,7 @@ export default Vue.component('commonDetail',{
              this.elevationYlist=[];
              this.optionSpotChangeLine.yAxis.min='';
              this.optionSpotChangeLine.yAxis.max='';
-             console.log(this.optionSpotChangeLine.yAxis.min);
+            //  console.log(this.optionSpotChangeLine.yAxis.min);
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointVerticalShiftChartData',
@@ -1755,7 +1773,7 @@ export default Vue.component('commonDetail',{
                         // vm.uploadshow=false;
                     }
             })
-            console.log(vm.filesList,'vm.filesList');
+            // console.log(vm.filesList,'vm.filesList');
         },
         //上传
         uploadIMG(){

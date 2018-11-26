@@ -58,11 +58,11 @@
                                 <td v-text="item.pointDistance"></td>
                                 <td v-text="item.pointAmount"></td>
                                 <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxShift)"></td>
+                                <td v-text="$options.filters.addSprit(item.maxShift.toFixed(1))"></td>
                                 <td :class="[{'red':item.maxAlert==true}]">{{item.maxAlert|shifouChange()}}</td>
                                 <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
+                                <td v-text="$options.filters.addSprit(item.maxVariationShift.toFixed(1))"></td>
                                 <td :class="[{'red':item.maxVariationAlert==true}]">{{item.maxVariationAlert|shifouChange()}}</td>
                                 <td>
                                     <button title="修改" class="editBtn actionBtn" @click="editPitchSeqBtn(item.id,item.itemId)"></button>
@@ -152,9 +152,10 @@
                             <label class="tableTxt">序列{{leftDisplayName}}曲线</label>
                             <label class="editSpot" @click="editLeftMarkSpot()">编辑标记</label>
                         </div>
-                        <div class="twoGraph">
+                        <div class="twoGraph" ref="twoGraphRef">
                             <!-- style="min-height:1900px" -->
                             <vue-highcharts id="leftHightchart" style="min-height:1900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                            <canvas style="position:absolute;top:0px;left:0px"  ref="canvasLeftRef" id="canvasLeft"></canvas>
                         </div>
                     </div>
                     <div class="containerBottomThree" v-show="rightShow">
@@ -414,11 +415,78 @@
 
                         </div>
                     </div>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华桓'">
+                        <label class="editInpText" style="width:10% !important;">点位映射</label>
+                         <div class="tool">
+                             <span class="export" @click="autoExport()"><label class="export1"></label><label class="exportTxt" >导入</label></span>
+                             <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <span class="export" @click="textDeviceMonitorPointRelation()"><label class="export3"></label><label class="exportTxt">测试</label></span>
+                        </div>
+                        <!-- style="height:300px" -->
+                        <div id="toolTbale" >
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">点位名称</th>
+                                        <th width="300px">华桓点位名称</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getDeviceMonitorPointRelationList" :key="index">
+                                        <td width="30%">{{item.virtualPointName}}</td>
+                                        <td width="70%">{{item.devicePointName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
+            </el-dialog>
+            <el-dialog title="采集测试" :visible="textShow" @close="textShowCancle()" >
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editInpText" style="width:35% !important;" >成果获取到{{collectGroupAmount}}组数据,匹配到{{matchGroupAmount}}组数据</label>
+                    </div>
+                    <div class="editBodytwo">
+                        <div id="textBody">
+                           <table class="textBodyTable" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                               <thead>
+                                   <tr>
+                                       <th></th>
+                                       <th colspan="2">系统内最新记录</th>
+                                       <th colspan="2">获取到的匹配记录</th>
+                                   </tr>
+                                   <tr>
+                                       <th>点位编号</th>
+                                       <th>采集时间</th>
+                                       <th>取值</th>
+                                        <th>采集时间</th>
+                                       <th>取值</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                   <tr v-for="(item,index) in testHuahuanList" :key="index">
+                                       <td v-text="item.pointName"></td>
+                                       <td >{{item.systemCollectTime|timeChange}}</td>
+                                       <td>{{item.systemValue}}</td>
+                                       <td>{{item.matchCollectTime|timeChange}}</td>
+                                       <td>{{item.matchValue}}</td>
+                                   </tr>
+                               </tbody>
+                           </table>
+
+                        </div>
+                    </div>
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                        <!-- <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button> -->
+                        <button style="margin-right:-440px" class="editBtnC" @click="textShowCancle()" >取消</button>
+                </div>
+
             </el-dialog>
             <el-dialog title="文件导入" :visible="uploadshow" @close="upImgCancle">
                 <div class="editBody">
@@ -708,6 +776,12 @@ export default Vue.component('commonPitch-detail',{
                 autoAcquisitionShow:false,
                 manufacturerValue:'华桓',
                 uploadshow:false,
+                //测试华桓数据
+                textShow:false,
+                collectGroupAmount:0,
+                testHuahuanList:'',
+                matchGroupAmount:0,
+
                 //获取导出的历史记录
                 exportHistoryRecoedShow:false,
                 getImportHistoryList:'',
@@ -920,6 +994,9 @@ export default Vue.component('commonPitch-detail',{
 
         },
         watch:{
+            manufacturerValue:function(val){
+                this.getDeviceMonitorPointRelation()
+            }
 
         },
         methods:{
@@ -930,6 +1007,7 @@ export default Vue.component('commonPitch-detail',{
             editPersonBtn(){
                 this.editPersonShow=true;
                 this.getUserByUserGroup();
+                this.getItemDutyUser();
             },
             //获取群组中的用户
             getUserByUserGroup(){
@@ -1006,6 +1084,9 @@ export default Vue.component('commonPitch-detail',{
                         this.inspectorName=this.getItemDutyUserList.inspectorName;
                         this.calculatorName=this.getItemDutyUserList.calculatorName;
                         this.observerName=this.getItemDutyUserList.observerName;
+                        this.observerId=this.getItemDutyUserList.observer;
+                        this.calculatorId=this.getItemDutyUserList.calculator;
+                        this.inspectorId=this.getItemDutyUserList.inspector;
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -1107,8 +1188,8 @@ export default Vue.component('commonPitch-detail',{
             handleCurrentChange(val){
                 this.getPitchBaseInfoList1=[];
                 this.pageNum=val;
-                console.log(this.getPitchBaseInfoListLength,'this.getPointDatasListLength');
-                console.log((this.getPitchBaseInfoListLength)%(this.pageSize),'123');
+                // console.log(this.getPitchBaseInfoListLength,'this.getPointDatasListLength');
+                // console.log((this.getPitchBaseInfoListLength)%(this.pageSize),'123');
                 if(this.getPitchBaseInfoListLength<11){
                     for(var i=0;i<this.getPitchBaseInfoListLength;i++){
                             this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
@@ -1127,8 +1208,8 @@ export default Vue.component('commonPitch-detail',{
                             var num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
                         }
                     }
-                    console.log(num,'num')
-                    console.log(num2,'num2')
+                    // console.log(num,'num')
+                    // console.log(num2,'num2')
                     for(var i=num;i<num2;i++){
                         this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                     }
@@ -1219,6 +1300,10 @@ export default Vue.component('commonPitch-detail',{
             //获取斜度基本信息（上面的表）
             getPitchBaseInfo(){
                 var vm=this;
+                this.getPitchBaseInfoList1=[];
+                this.getPitchBaseInfoList=[];
+                this.getPitchBaseInfoListLength=0;
+                this.itemSubmitCount=0;
                 axios({
                     method:'post',
                     url:vm.BDMSUrl+'detectionInfo/getPitchBaseInfo',
@@ -1235,7 +1320,7 @@ export default Vue.component('commonPitch-detail',{
                         vm.getPitchBaseInfoList.forEach((item)=>{
                             this.itemSubmitCount+=item.pointAmount
                         })
-                         console.log(vm.getPitchBaseInfoList,'vm.getPitchBaseInfoList');
+                        //  console.log(vm.getPitchBaseInfoList,'vm.getPitchBaseInfoList');
                         if(this.getPitchBaseInfoListLength<11){
                             for(var i=0;i<this.getPitchBaseInfoListLength;i++){
                                 this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
@@ -1245,10 +1330,10 @@ export default Vue.component('commonPitch-detail',{
                                 this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                             }
                         }
-                        console.log(this.getPitchBaseInfoList1,'123');
+                        // console.log(this.getPitchBaseInfoList1,'123');
 
                         // this.getPitchDetailDataBySeqId(vm.getPitchBaseInfoList1[0].id)
-                        console.log(vm.getPitchBaseInfoList1[0].id);
+                        // console.log(vm.getPitchBaseInfoList1[0].id);
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
@@ -1341,7 +1426,9 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
+                                //  this.drawSpotMark();
                             }
+                           
                             
                         }
                     }else if(respose.data.cd=='-1'){
@@ -1446,34 +1533,76 @@ export default Vue.component('commonPitch-detail',{
             // 添加斜度序列
             addPitchSeq(){
                 var vm=this;
-                axios({
-                    method:'post',
-                    url:vm.BDMSUrl+'detectionInfo/addPitchSeq',
-                    headers:{
-                        'token':vm.token,
-                    },
-                    params:{
-                        itemId:vm.itemMonitorId,
-                        initDepth:vm.initDepth,
-                        terminalDepth:vm.terminalDepth,
-                        pointDistance:vm.pointDistance,
-                        keyword:vm.keyword
-                    }
-                }).then((response)=>{
-                    if(response.data.cd=='0'){
-                        this.addIndexNumShow=false;
-                        this.getPitchBaseInfo();
-                        vm.initDepth='';
-                        vm.terminalDepth='';
-                        vm.pointDistance='';
-                        vm.keyword='';
-                    }else if(response.data.cd=='-1'){
-                        vm.$message({
-                            type:"error",
-                            message:response.data.msg
+                if(this.initDepth==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写起始高度'
+                    })
+                }else if(!(/^[0-9]+.?[0-9]*$/.test(this.initDepth))){
+                    this.$message({
+                            type:'info',
+                            message:'起始高度需为数字'
                         })
-                    }
-                })
+                }else if(this.terminalDepth==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写结束高度'
+                    })
+                }else if(!(/^[0-9]+.?[0-9]*$/.test(this.terminalDepth))){
+                    this.$message({
+                            type:'info',
+                            message:'结束高度需为数字'
+                        })
+                }else if(this.pointDistance==''){
+                     this.$message({
+                        type:'info',
+                        message:'请填写测点间距'
+                    })
+                }else if(!(/^[0-9]+.?[0-9]*$/.test(this.pointDistance))){
+                    this.$message({
+                            type:'info',
+                            message:'测点间距需为数字'
+                        })
+                }else if(this.keyword==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写关键字'
+                    })
+                }else{
+                    axios({
+                        method:'post',
+                        url:vm.BDMSUrl+'detectionInfo/addPitchSeq',
+                        headers:{
+                            'token':vm.token,
+                        },
+                        params:{
+                            itemId:vm.itemMonitorId,
+                            initDepth:vm.initDepth,
+                            terminalDepth:vm.terminalDepth,
+                            pointDistance:vm.pointDistance,
+                            keyword:vm.keyword
+                        }
+                        }).then((response)=>{
+                            if(response.data.cd=='0'){
+                                this.addIndexNumShow=false;
+                                this.getPitchBaseInfo();
+                                vm.initDepth='';
+                                vm.terminalDepth='';
+                                vm.pointDistance='';
+                                vm.keyword='';
+                                 this.$message({
+                                    type:'success',
+                                    message:'添加斜度序列成功'
+                                })
+                            }else if(response.data.cd=='-1'){
+                                vm.$message({
+                                    type:"error",
+                                    message:response.data.msg
+                                })
+                            }
+                        })
+                }
+               
             },
             numChange(){
                 this.allnum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)+1
@@ -1563,6 +1692,10 @@ export default Vue.component('commonPitch-detail',{
                 this.leftDisplayName=name;
                 this.leftDisplayShow=true;
                 this.getPitchDetailDataBySeqIdLeft(id)
+                // setTimeout(()=>{
+                //     this.drawSpotMark();
+                // },500)
+                
                
             },
             //右侧显示
@@ -1606,7 +1739,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getPitchSeqMarkList=response.data.rt;
-                        console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
+                        // console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
                     }else{
                         this.$message({
                             type:'error',
@@ -1620,6 +1753,7 @@ export default Vue.component('commonPitch-detail',{
             //添加斜度序列标记
             addPitchSeqMark(){
                 var vm=this;
+               
                 if(this.editPitchShow){
                      this.$message({
                         type:"info",
@@ -1657,6 +1791,7 @@ export default Vue.component('commonPitch-detail',{
                             this.markDepth='';
                             this.markName='';
                             this.getPitchSeqMark();
+                            // this.drawSpotMark();
                         }else{
                             this.$message({
                                 type:'error',
@@ -1665,6 +1800,18 @@ export default Vue.component('commonPitch-detail',{
                         }
                     })
                 }
+            },
+            drawSpotMark(){
+                // console.log(this.$refs.lineLeftChartOne.clientWidth,'000');
+                // console.log(document.getElementsByClassName('highcharts-background'))
+                this.$refs.canvasLeftRef.style.width='300px';
+                this.$refs.canvasLeftRef.style.height='1000px';
+                var canvas=document.getElementById('canvasLeft');
+                var ctx=canvas.getContext('2d');
+                ctx.beginPath();
+                // ctx.moveTo(100,100);
+                ctx.arc(30,50,10,0,2*Math.PI);
+                ctx.stroke();
             },
             canclePitchSeqMark(){
                 // this.getPitchSeqMarkList.pop();
@@ -1774,7 +1921,7 @@ export default Vue.component('commonPitch-detail',{
                         this.getImportHistoryList.forEach((item)=>{
                             this.$set(item,'check',false)
                         })
-                        console.log(this.getImportHistoryList,'this.getImportHistoryList');
+                        // console.log(this.getImportHistoryList,'this.getImportHistoryList');
                     }
                 })
             },
@@ -1839,8 +1986,13 @@ export default Vue.component('commonPitch-detail',{
             autoAcquisitionBtn(){
                 this.autoAcquisitionShow=true;
                 this.getCollectSetting();
+                this.getHuahuanNode();
             
             },
+            // //获得华桓的数据
+            // getHuahuanNode(){
+
+            // },
             //取消自动采集配置
             autoAcquisitionCancle(){
                 this.autoAcquisitionShow=false;
@@ -1897,7 +2049,7 @@ export default Vue.component('commonPitch-detail',{
                             // vm.uploadshow=false;
                         }
                 })
-                console.log(vm.filesList,'vm.filesList');
+                // console.log(vm.filesList,'vm.filesList');
             },
             //上传
             uploadIMG(){
@@ -1917,6 +2069,9 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         // alert('23');
+                        this.devicePointIndex='';
+                        this.virtualPointIndex='';
+                        this.imageName='未选择任何文件';
                         vm.uploadshow=false;
                         this.$message({
                             type:'success',
@@ -1972,6 +2127,7 @@ export default Vue.component('commonPitch-detail',{
             //获取点位关系
             getDeviceMonitorPointRelation(){
                 var vm=this;
+                this.getDeviceMonitorPointRelationList=[];
                 axios({
                     method:'post',
                     url:this.BDMSUrl+'detectionInfo/getDeviceMonitorPointRelation',
@@ -2043,9 +2199,9 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.manufacturerValue=response.data.rt.manufacturer;
-                        if( this.manufacturerValue=="基康"){
+                        // if( this.manufacturerValue=="基康"){}
                             this.getDeviceMonitorPointRelation();
-                        }
+                        
                         this.collectRateRadio=response.data.rt.collectRate==1?'1':'2';
                         this.collectHour=response.data.rt.collectHour;
                     }else if(response.data.cd=='-1'){
@@ -2081,6 +2237,44 @@ export default Vue.component('commonPitch-detail',{
                         })
                     }
                 })
+            },
+            //测试
+            textDeviceMonitorPointRelation(){
+                var vm=this;
+                if(this.nodeId==''){
+                    this.$message({
+                        type:'info',
+                        message:'请输入项目ID'
+                    })
+                }else{
+                    this.textShow=true;
+                    axios({
+                        method:'post',
+                        url:vm.BDMSUrl+'detectionInfo/testHuahuan',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            itemId:vm.itemMonitorId,
+                            nodeId:vm.nodeId
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.testHuahuanList=response.data.rt.matchResult;
+                            this.collectGroupAmount=response.data.rt.collectGroupAmount;
+                            this.matchGroupAmount=response.data.rt.matchGroupAmount;
+                        }else if(response.data.cd=='-1'){
+                            this.$message({
+                                type:"error",
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
+                
+            },
+            textShowCancle(){
+                this.textShow=false;
             },
             //添加/华环项目节点
             editHuahuanNode(){
@@ -2514,6 +2708,7 @@ select.autoImport{
                         width: 96%;
                         margin:0 auto;
                         margin-top:20px;
+                        position: relative;
                         // transform: rotate(90deg);
                         border:1px solid #ccc;
                         padding: 48px 15px 25px 15px;
@@ -3075,6 +3270,61 @@ select.autoImport{
             color: #333333;
             font-size: 14px;
             outline: none;
+        }
+         #textBody{
+                width: 85%;
+                margin:10px auto;
+                // height: 300px;
+                overflow: auto;
+                position: relative;
+                .textBodyTable{
+                            border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            overflow: auto;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 32px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 12px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 32px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 12px;
+                                        color: #333333;
+                                        /*
+                                        溢出隐藏
+                                        */
+                                        overflow: hidden;
+                                        /*
+                                        显示省略号
+                                        */
+                                        text-overflow: ellipsis;
+                                        /*
+                                        不换行
+                                        */
+                                        white-space: nowrap;
+                                    }
+                                }
+                            }
+                        }
         }
     }
 }

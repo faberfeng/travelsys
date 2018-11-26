@@ -197,7 +197,7 @@ export default Vue.component('walkThrough',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.curTime();
         vm.initPatrolPresupposition();
-        vm.getPatrolRecord();
+        
         vm.getAllPatrolSummary();
     },
     filters:{
@@ -263,7 +263,7 @@ export default Vue.component('walkThrough',{
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-
+                    vm.getPatrolRecord();
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -475,34 +475,41 @@ export default Vue.component('walkThrough',{
         //添加巡视内容
         addPatrol(){
              var vm=this;
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'detectionInfo/addPatrol',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    typeId:this.typeId,
-                    userGroupId:this.userSelectId,
-                    patrolName:this.patrolName,
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.addCheckContentShow=false;
-                    this.typeId='';
-                    this.patrolName='';
-                    this.getPatrolRecord();
-                    this.$message({
-                        type:'info',
-                        message:'添加巡视内容成功'
+             if(this.patrolName==''){
+                 this.$message({
+                     type:'info',
+                     message:'请填入巡视内容'
+                 })
+             }else{
+                    axios({
+                        method:'get',
+                        url:this.BDMSUrl+'detectionInfo/addPatrol',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            typeId:this.typeId,
+                            userGroupId:this.userSelectId,
+                            patrolName:this.patrolName,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.addCheckContentShow=false;
+                            this.typeId='';
+                            this.patrolName='';
+                            this.getPatrolRecord();
+                            this.$message({
+                                type:'info',
+                                message:'添加巡视内容成功'
+                            })
+                        }else if(response.data.cd=='-1'){
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
                     })
-                }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
                 }
-            })
         },
         // 删除巡视内容
         deletePatrol(val){
