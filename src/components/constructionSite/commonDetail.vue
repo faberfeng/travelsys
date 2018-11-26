@@ -1697,6 +1697,11 @@ export default Vue.component('commonDetail',{
         //取消自动采集配置
         autoAcquisitionCancle(){
             this.autoAcquisitionShow=false;
+            this.nodeId='';
+            this.manufacturerValue='华桓';
+            this.getDeviceMonitorPointRelationList='';
+            this.collectRateRadio='1';
+
         },
         manufacturerChange(){
             if(this.manufacturerValue=='基康'){
@@ -2015,7 +2020,7 @@ export default Vue.component('commonDetail',{
                     itemId:this.itemMonitorId
                 }
             }).then((response)=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.getHuahuanNodeList=response.data.rt;
                     this.nodeId=this.getHuahuanNodeList[0].nodeId;
                 }else if(response.data.cd=='-1'){

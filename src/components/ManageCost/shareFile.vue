@@ -44,7 +44,7 @@
                     </li>
                     <!-- @click="checkItem(index)" -->
                     <!-- @click="IntoDir(item.nodeId)" -->
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="intoDir(item.nodeId)">
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'"    @click="intoDir(item.nodeId)">
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
                         <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
