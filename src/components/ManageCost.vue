@@ -8,7 +8,7 @@
             <div v-show="webGlShow" class="webglBackground">
                 <div id="webgl" v-show="webGlShow">
                      <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.29.17/index.html"></iframe> -->
-                    <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeUrl"  ></iframe>
+                    <iframe allowfullscreen=true v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeUrl"  ></iframe>
                 </div>
             </div>
             <div  class="main">

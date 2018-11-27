@@ -764,6 +764,7 @@ export default {
           token:'',
           BDMSUrl:'',
           QJFileManageSystemURL:'',
+          commomHeadPictureFile:'',
           applyShow:false,//是否申请
           remarkIfo:'',//备注信息
           applyMessage:'',//申请留言
@@ -802,6 +803,7 @@ export default {
       var projAuth = localStorage.getItem('projAuth')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL
+      vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')

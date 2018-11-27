@@ -11,7 +11,7 @@
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
                 <div class="loginDialogSide"></div>
-                <div class="loginDialog">
+                <div class="loginDialog" v-loading="loadingShow">
                     <p class="loginBodyText">系统账号登陆</p>
                     <form onsubmit="return false;" method="post">
                         <div class="loginInput">
@@ -21,7 +21,7 @@
                         <div class="autoLogin"> <el-checkbox v-model="isAuto" class="autoLoginText">下次自动登陆</el-checkbox></div>
                         <input type="submit" style="display:none;"/>
                     </form>
-                    <button class="login" @click="Login">登录</button>
+                    <button class="login"  @click="Login">登录</button>
                     <div class="loginInfo">
                         <a class="loginInfoLeft" href="http://bdms.arctron.cn/arctron-usercenter/register/registerIndex" target="blank">立即注册</a>
                         <a class="loginInfoRight" href="http://bdms.arctron.cn/arctron-usercenter/register/forgetPwd" target="blank">忘记密码</a>
@@ -48,7 +48,8 @@ export default {
             BDMSUrl:'',
             projectData:{},
             token:'',
-            isAuto:false
+            isAuto:false,
+            loadingShow:false,
         }
     },
     created(){
@@ -108,6 +109,7 @@ export default {
             formData.append('account',this.login.Id.trim());
             formData.append('isRemember',this.isAuto);
             formData.append('password',this.login.Password);
+            this.loadingShow=true;
             axios({
                 method: 'Post',
                 url: this.BDMSUrl + 'project2/login',
@@ -128,7 +130,14 @@ export default {
                     this.$router.push({
                         path: '/showcompany'
                     })
+                    this.loadingShow=false;
                     sessionStorage.setItem('navigationPath','projectPage');
+                    // const loading = this.$loading({
+                    //     lock: true,
+                    //     text: 'Loading',
+                    //     spinner: 'el-icon-loading',
+                    //     background: 'rgba(0, 0, 0, 0.7)'
+                    // });
                 } else if (this.projectData.cd === '10003') {
                     alert(this.projectData.msg) //密码不正确
                 } else if (this.projectData.cd === '10000') {

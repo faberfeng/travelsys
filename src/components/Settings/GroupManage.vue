@@ -61,9 +61,9 @@
             <span class="icon icon-Bottom" @click="changeQR_(1)"></span>
             <span class="icon icon-addqun" @click="addQR"></span>
         </h1>
-        <ul style="max-height:300px;overflow-y:auto;">
+        <ul style="max-height:600px;overflow-y:auto;">
             <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item,false)">
-                <span class='title-qun' v-text="item.ugName"></span>
+                <span :class="[{'title-red':item.ugStatus==0},'title-qun']" >{{item.ugName}}<label v-show="item.ugStatus==0">(已禁用)</label></span>
                 <span class="icon icon-delect-qun" @click="deleteQR(item.ugId,item.ugName)"></span>
             </li>
         </ul>
@@ -161,7 +161,9 @@ export default {
     watch:{
         'ugEdit.status':function(newval,old){
             var vm = this
+            
             if(old != '' && newval != ''){
+                 
                  if(vm.isCompany){
                     vm.$message({
                         type:'warning',
@@ -182,6 +184,7 @@ export default {
                 }else{
                     this.EditStatus()
                 }
+               
             }
         }
     },
@@ -469,6 +472,7 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd == 0){
+                        this.getQunListOnce();
                         vm.$message({
                             type: 'success',
                             message: '修改群组状态成功'
@@ -523,7 +527,7 @@ export default {
                             ype: 'success',
                             message: '创建成功'
                         });
-                        vm.getQunList()
+                         vm.getQunList()
                     }else{
                         vm.$message({
                             type: 'warning',
@@ -559,10 +563,12 @@ export default {
                         }
                     }).then((response)=>{
                         if(response.data.cd == 0){
+                            // this.getQunListOnce();
                             vm.$message({
                                 type:'success',
                                 message: name+'删除成功'
                             })
+                            vm.getQunList()
                              vm.userListDEL = []
                         }else if(response.data.cd == -1){
                             vm.$message({
@@ -661,6 +667,50 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd == '0'){
                         vm.subCompanyName = response.data.rt.projCompany
+                        var str=response.data.rt.ugList;
+                        // for(var i=0;i<str.length;i++){
+                        //     if(str[i].ugStatus==0){
+                        //         console.log(i,'i111');
+                        //         console.log(i+"="+str[i]);
+                        //         str.splice(i--,1);
+                        //         // str.push(str[i--]);
+                        //     }
+                        // }
+                        str.forEach((item,index)=>{
+                            if(item.ugName=="质量验收"){
+                                str.splice(index,1);
+                            }
+                            if(item.ugName=="安全验收"){
+                                str.splice(index,1);
+                            }
+                            if(item.ugStatus==0){
+                                vm.ugList.splice(index,1);
+                                vm.ugList.push(item);
+                            }
+                        })
+                        // var map = new Map();
+                        // for (var i = 0; i < str.length;i++){
+                        //     var patrolId = str[i].ugStatus;
+                        //     if (!map.has(patrolId)) {
+                        //         var array = new Array();
+                        //         array.push(str[i]);
+                        //         map.set(patrolId, array);
+                        //     }
+                        //     else {
+                        //         var array = map.get(patrolId);
+                        //         array.push(str[i]);
+                        //         map.set(patrolId, array);
+                        //     }
+                        // }
+                        // var str=[];
+                        // map.forEach(function (value, key, mapObject) {
+                        //     for(var i=0;i<value.length;i++){
+                        //         str.push(value[i])
+                        //     } 
+                        //     console.log(value,'ppppp');
+                        //     console.log(str,'strppp');
+                        // });
+                        // vm.ugList=str;
                         if(response.data.rt.ugList){
                             vm.ugList = []
                             vm.subCompanyList = []
@@ -675,7 +725,8 @@ export default {
                                 }
                                 if(response.data.rt.ugList[i].ugType == 2){
                                     vm.ugList.push(response.data.rt.ugList[i])
-                                }else if(response.data.rt.ugList[i].ugName == '质量验收' || response.data.rt.ugList[i].ugName == '质量检查' || response.data.rt.ugList[i].ugName == '安全验收' || response.data.rt.ugList[i].ugName == '安全检查'){
+                                    // || response.data.rt.ugList[i].ugName == '安全验收'
+                                }else if( response.data.rt.ugList[i].ugName == '质量检查' || response.data.rt.ugList[i].ugName == '安全验收'  || response.data.rt.ugList[i].ugName == '安全检查'){
                                     vm.ugList.push(response.data.rt.ugList[i])
                                 }else if(response.data.rt.ugList[i].ugType == 4){
                                     entDept.push(response.data.rt.ugList[i])
@@ -685,6 +736,7 @@ export default {
                                     vm.ugList.push(response.data.rt.ugList[i])
                                 }
                             }
+                            console.log(vm.ugList,'0000')
                             vm.subCompanyList = entDept.concat(entCoop)
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg);
@@ -789,6 +841,19 @@ export default {
                 if(response.data.cd == '0'){
                      if(response.data.rt.ugList){
                         vm.ugList = response.data.rt.ugList;//工程群组
+                        console.log(this.ugList,'vm.ugList');
+                        vm.ugList.forEach((item,index)=>{
+                            if(item.ugName=="质量验收"){
+                                vm.ugList.splice(index,1)
+                            }
+                            if(item.ugName=="安全验收"){
+                                vm.ugList.splice(index,1)
+                            }
+                            if(item.ugStatus==0){
+                                vm.ugList.splice(index,1);
+                                vm.ugList.push(item);
+                            }
+                        })
                         for(var i=0;i<vm.ugList.length;i++){
                             if(vm.ugList[i].ugName == vm.checkedUgList.ugName){
                                 vm.activeugID = vm.ugList[i].ugId;
@@ -1078,6 +1143,9 @@ export default {
         .icon-delect-qun{
            display: block;
         }
+    }
+    .title-red{
+        color:#fc3439;
     }
     .icon-delect-qun{
         display: none;

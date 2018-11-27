@@ -22,6 +22,7 @@ export default new Vuex.Store({
         //无锡市政院
         // QJFileManageSystemURL:'http://58.214.36.222:8080/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'http://58.214.36.222:8080/qjbim-file',
+        // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
         // BDMSUrl:'http://58.214.36.222:8080/h2-bim-project/',//仅供文件上传使用
         // GMDUrl:"http://58.214.36.222:8080",
         // WebGlUrl:"http://58.214.36.222", 
@@ -33,6 +34,7 @@ export default new Vuex.Store({
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
         // BDMSUrl:'https://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
         // WebGlUrl:"https://bdms.arctron.cn",
         // GMDUrl:"https://bdms.arctron.cn",
@@ -43,6 +45,7 @@ export default new Vuex.Store({
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
         // BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
         // WebGlUrl:"https://bim.arctron.cn",
         // GMDUrl:"https://bim.arctron.cn",

@@ -298,7 +298,7 @@
             <el-dialog title="采集测试" :visible="textShow" @close="textShowCancle()" >
                 <div class="editBody">
                     <div class="editBodyone">
-                        <label class="editInpText" style="width:35% !important;" >成果获取到{{collectGroupAmount}}组数据,匹配到{{matchGroupAmount}}组数据</label>
+                        <label class="editInpText" style="width:37% !important;" >成果获取到{{collectGroupAmount}}组数据,匹配到{{matchGroupAmount}}组数据</label>
                     </div>
                     <div class="editBodytwo">
                         <div id="textBody">
@@ -1369,7 +1369,7 @@ export default Vue.component('commonDetail',{
         //编辑相关人员
         editPersonBtn(){
             this.editPersonShow=true;
-            this.getUserByUserGroup();
+            // this.getUserByUserGroup();
             this.getItemDutyUser();
         },
         //取消监测项目人员
@@ -1461,6 +1461,7 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
                     this.getPointDatasListLength=response.data.rt.length;
+                    this.itemSubmitCount=this.getPointDatasListLength;
                     if(this.getPointDatasListLength<11){
                         for(var i=0;i<this.getPointDatasListLength;i++){
                             this.getPointDatasList1.push(this.getPointDatasList[i])

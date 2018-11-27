@@ -6,7 +6,7 @@
                 <span class="strong">现场巡视记录</span>
                 <span class="leftTime">最新数据：{{nowDate}}</span>
             </p>
-            <div class="container">
+            <div class="container" v-show="getPatrolRecordLists">
                 <div class="containerHead">
                     <div class="containerHeadLeft">最近巡视者：{{userName}}</div>
                     <div class="containerHeadRight">
@@ -21,7 +21,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="containerTable">
+                <div class="containerTable" >
                     <table class="containerList" border="1" cellspacing="0" width="100%">
                         <thead>
                             <tr>
@@ -197,7 +197,6 @@ export default Vue.component('walkThrough',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.curTime();
         vm.initPatrolPresupposition();
-        
         vm.getAllPatrolSummary();
     },
     filters:{

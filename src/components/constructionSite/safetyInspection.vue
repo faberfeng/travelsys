@@ -542,7 +542,8 @@
             <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()" v-loading="sendAlertMessageLoad">
                 <div class="editBody">
                     <p>以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
-                    <p>{{alertMessage}}</p>
+                    <p v-show="alertMessage">{{alertMessage}}</p>
+                    <p v-show="!alertMessage" style="color:red;">当前群组管理的安全监测点位中无报警测点</p>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="sendAlertMessage()">发送</button>
@@ -1382,7 +1383,7 @@ export default {
                     userGroupId:this.selectUgId
                 }
             }).then((response)=>{
-                if(response.data.rt!=[]){
+                if(response.data.rt.length!=0){
                     this.alertMessage=response.data.rt;
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -2258,6 +2259,7 @@ export default {
                              vm.fileList ='';
                         }
                     })
+                    document.getElementById('drawingsInfo').value='';
         },
         //删除底图
         deleteBaseMap(val){
@@ -2274,6 +2276,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     vm.getBaseMapList()
+                    this.monitorBaseMapId='';
+                    this.paramsLists='';
+
                 }
             })
         },
@@ -2310,6 +2315,7 @@ export default {
                                 this.monitorBaseMapId=item.id;
                                 this.getBaseMapInfoByBaseMapId();
                                 this.getAllMonitorPoint();
+
                             }
                         })
                     // }
@@ -2378,7 +2384,8 @@ export default {
         getBaseMapInfoByBaseMapId(){
             var vm=this;
             this.angle=0;
-            this.paramsLists={};
+            this.paramsLists='';
+            // 
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getBaseMapInfoByBaseMapId',

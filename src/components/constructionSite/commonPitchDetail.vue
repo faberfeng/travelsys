@@ -58,11 +58,11 @@
                                 <td v-text="item.pointDistance"></td>
                                 <td v-text="item.pointAmount"></td>
                                 <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxShift.toFixed(1))"></td>
+                                <td v-text="$options.filters.addSprit(item.maxShift)"></td>
                                 <td :class="[{'red':item.maxAlert==true}]">{{item.maxAlert|shifouChange()}}</td>
                                 <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
                                 <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxVariationShift.toFixed(1))"></td>
+                                <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
                                 <td :class="[{'red':item.maxVariationAlert==true}]">{{item.maxVariationAlert|shifouChange()}}</td>
                                 <td>
                                     <button title="修改" class="editBtn actionBtn" @click="editPitchSeqBtn(item.id,item.itemId)"></button>
@@ -674,7 +674,7 @@ export default Vue.component('commonPitch-detail',{
                         },
                         yAxis: {
                                 title: {
-                                    text: '数量'
+                                    text: '位移'
                                 },
                                 labels:{
                                     enabled: true
@@ -1006,7 +1006,7 @@ export default Vue.component('commonPitch-detail',{
             },
             editPersonBtn(){
                 this.editPersonShow=true;
-                this.getUserByUserGroup();
+                // this.getUserByUserGroup();
                 this.getItemDutyUser();
             },
             //获取群组中的用户
@@ -1289,6 +1289,7 @@ export default Vue.component('commonPitch-detail',{
             //添加序列号
             addIndexNum(){
                 this.addIndexNumShow=true;
+                this.allnum="";
             },
             addIndexNumCancle(){
                 this.addIndexNumShow=false;
@@ -2025,6 +2026,8 @@ export default Vue.component('commonPitch-detail',{
             },
             upImgCancle(){
                 this.uploadshow=false;
+                 document.getElementById('fileInfo').value="";
+                 this.imageName='未选择任何文件';
             },
             fileChanged(file){
                 var vm = this
