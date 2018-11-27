@@ -118,8 +118,8 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/天</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/时</label><label v-show="itemMonitorType==4">KN</label></label>
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>

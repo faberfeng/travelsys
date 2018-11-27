@@ -1231,9 +1231,6 @@ export default Vue.component('commonPitch-detail',{
                 this.$emit('importExcelData',true,this.itemMonitorId,this.surveyName,this.itemMonitorType,this.itemMonitorKeyWord)
                 // this.$emit('importDataShow',true,this.itemMonitorId,this.projctName,this.itemMonitorType,this.itemMonitorKeyWord)
             },
-
-
-
             //改变方法
             importMethodChange(){
                 this.setDetectionItemCollectWay();
@@ -1674,6 +1671,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getPitchBaseInfo();
+                        this.totalShow=false;
                         vm.$message({
                             type:'info',
                             message:'序列删除成功'

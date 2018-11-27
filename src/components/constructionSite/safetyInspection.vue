@@ -311,7 +311,7 @@
                     <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集时间列名:</label><select class="gatherTimeName" v-model="timeCol" placeholder="请选择"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
                     <!-- <i class="icon-sanjiao3"></i> -->
                     </div>
-                    <div class="editBodytwo" ><label class="editInpText" style="width:17% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
                     <div class="editBodytwo" v-show="monitorImportType==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label><select class="gatherTimeName" v-model="distanceCol"><option v-for="(item,index) in sheetIndexList" :value="item.index" :key="index" v-text="item.name"></option></select>
                     <!-- <i class="icon-sanjiao3"></i> -->
                     </div>
@@ -370,7 +370,7 @@
                         </span>
                     </div>
                     <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;">匹配结果:</label><label>文档内表总数：{{allAmount}}</label><label style="display:inline-block;margin-left:30px;">匹配到的表数量：{{matchedAmount}}</label></div>
-                    <div class="editBodytwo" ><label class="editInpText" style="width:17% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
+                    <div class="editBodytwo" ><label class="editInpText" style="width:18% !important;"><el-checkbox>使用统一时间:</el-checkbox><el-date-picker style="width:374px !important;margin-left:141px;margin-top:-40px;" v-model="unifiedTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间"></el-date-picker></label></div>
                     <ul>
                         <li v-for="(val,index) in sheetList" :key="index" >
                             <div class="editBodytwo">
@@ -541,9 +541,9 @@
             </el-dialog>
             <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()" v-loading="sendAlertMessageLoad">
                 <div class="editBody">
-                    <p>以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
-                    <p v-show="alertMessage">{{alertMessage}}</p>
-                    <p v-show="!alertMessage" style="color:red;">当前群组管理的安全监测点位中无报警测点</p>
+                    <p style="margin-left:50px;text-align:left;width:80%;">以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
+                    <p style="margin-left:50px;text-align:left;color:red;width:80%" v-show="alertMessage">{{alertMessage}}</p>
+                    <p v-show="!alertMessage" style="margin-left:50px;text-align:left;color:red;width:80%">当前群组管理的安全监测点位中无报警测点</p>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="sendAlertMessage()">发送</button>

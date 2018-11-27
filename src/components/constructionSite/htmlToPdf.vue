@@ -539,6 +539,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt; //所有监测点位
+                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     // console.log(this.monitorPointInfo);
                     //         var a='';
                     // this.getAllMonitorItemList.forEach((item)=>{
@@ -826,8 +827,8 @@ export default {
                     }
                     this.getAllMonitorItemList.forEach((item)=>{
                         mapList.forEach((value, key, mapObject)=>{
-                            console.log(value,'value1');
-                            console.log(key,'key1');
+                            // console.log(value,'value1');
+                            // console.log(key,'key1');
                             if(key==item.id){
                                     // console.log(value,'value123');
                                     var aLength=0;
@@ -852,7 +853,7 @@ export default {
                                 }
                             });
                     })
-                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList11123');
+                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList1112311');
                     //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
@@ -884,7 +885,6 @@ export default {
                     //     this.$set(item,'pageNum',item.order+2)
                     // })
                     // console.log(this.getPageNumList,'this.getPageNumList112233')
-
                     this.getReportDatas();
 
                     // console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
