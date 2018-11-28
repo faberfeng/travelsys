@@ -1,14 +1,15 @@
 <template>
-    <div id="htlmToPdf" >
+    <div id="htlmToPdf"  >
+        <!-- v-loading="pdfShow" -->
         <div  class="pdfStyle" id="pdfDom">
                 <!-- 封面 -->
                 <div class="pdfCover">
                     <div id="pdfImg">
                          <!-- <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/> -->
-                        <img id="img1" style="width:400px;height:100px;"  >
+                        <img id="img1" style="width:400px;height:45mm;"  >
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
                     </div>
-                    <h5 style="margin-top:20px;color:#000;font-size:18px;">{{projectName}}--监测报表</h5>
+                    <h5 style="margin-top:20px;color:#000;font-size:4.94mm;">{{projectName}}--监测报表</h5>
                     <div class="time"><label class="timelabel1">报告编码：{{onlyNum}}</label></div>
                     <div class="time"><label class="timelabel1" >本次观测日期：{{beforeDate}}</label><label class="timelabel2">前次观测日期：{{referenceDate}}</label></div> 
                     <div class="tableList">
@@ -40,8 +41,8 @@
                                 <!-- <tr class="contentTr"></tr> -->
                                 <thead>
                                     <tr>
-                                        <th style="height:100px;">工况</th>
-                                        <th style="height:100px;padding:10px" colspan="11">{{getSiteConditionList}}</th>
+                                        <th style="height:25mm;">工况</th>
+                                        <th style="height:25mm;padding:10px" colspan="11">{{getSiteConditionList}}</th>
                                     </tr>
                                     <tr>
                                         <th>序号</th>
@@ -136,21 +137,21 @@
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
-                                            <td rowspan="2">测点编号</td>
-                                            <td colspan="2" v-show="item.type==1">位移(mm)</td>
-                                            <td colspan="2" v-show="item.type==2">高程(m)</td>
-                                            <td colspan="2" v-show="item.type==3">水位(m)</td>
-                                            <td v-show="item.type==3">管口(m)</td>
-                                            <td colspan="2" v-show="item.type==4">受力(KN)</td>
-                                            <td colspan="2">变化量</td>
-                                            <td rowspan="2">备注</td>
+                                            <th rowspan="2">测点编号</th>
+                                            <th colspan="2" v-show="item.type==1">位移(mm)</th>
+                                            <th colspan="2" v-show="item.type==2">高程(m)</th>
+                                            <th colspan="2" v-show="item.type==3">水位(m)</th>
+                                            <th v-show="item.type==3">管口(m)</th>
+                                            <th colspan="2" v-show="item.type==4">受力(KN)</th>
+                                            <th colspan="2">变化量</th>
+                                            <th rowspan="2">备注</th>
                                         </tr>
                                         <tr>
-                                            <td>初始</td>
-                                            <td>本次</td>
-                                            <td v-show="item.type==3">本次</td>
-                                            <td>本次</td>
-                                            <td>累计</td>
+                                            <th>初始</th>
+                                            <th>本次</th>
+                                            <th v-show="item.type==3">本次</th>
+                                            <th>本次</th>
+                                            <th>累计</th>
                                             <!-- <td></td> -->
                                         </tr>
                                     </thead>
@@ -292,6 +293,7 @@ export default {
             imgUrl:'',
             dpiWidth:'',
             dpiHeight:'',
+            pdfShow:false,
         }
     },
     created(){
@@ -893,6 +895,7 @@ export default {
         },
          //html转PDF
         getPdf(){
+            this.pdfShow=true;
                 let pdfDom = document.querySelector('#pdfDom')
                 // console.log(pdfDom,'pdfDom');
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
@@ -900,15 +903,19 @@ export default {
                             var contentHeight = canvas.height;
                             //一页pdf显示html页面生成的canvas高度;
                             var pageHeight = contentWidth / 592.28 * 841.89;
+                            // var pageHeight = contentWidth / 794 * 1123;
                             //未生成pdf的html页面高度
                             var leftHeight = contentHeight;
+                            console.log(contentWidth,'contentWidth');
+                            console.log(contentHeight,'contentHeight');
                             //页面偏移
                             var position = 0;
                             //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
-                            var imgWidth = 595.28;
+                            var imgWidth = 592.28;
                             var imgHeight = 592.28/contentWidth * contentHeight;
                             var pageData = canvas.toDataURL('image/jpeg', 1.0);
-
+                            console.log(imgWidth,'imgWidth');
+                            console.log(imgHeight,'imgHeight');
                             var pdf = new jsPDF('', 'pt', 'a4');
 
                             //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
@@ -926,7 +933,9 @@ export default {
                                     }
                                 }
                             }
+                            
                             pdf.save('导出检测报告.pdf');
+                            this.pdfShow=false;
                             // console.log(pdf,'pdf1234');
                         })
                 // html2canvas();
@@ -942,34 +951,41 @@ export default {
     }
     li{list-style: none;}
 #htlmToPdf{
-    width:596px;
+    // width:596px;
     // width: 210mm;
     // width:100%;
     margin: 0 auto;
     .pdfStyle{
-         width:596px;
-        // width: 210mm;
+        //  width:596px;
+        width: 210mm;
         // width:100%;
         margin: 0 auto;
         .pdfCover{
             width:98%;
+            //  width:100%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 830px;
-            // height:297mm;
-            margin:17px auto;
+            // height: 830px;
+            margin:0 auto;
+            height:298mm;
+            // margin:17px auto;
             #pdfImg{
-                margin-top:50px;
-                height: 110px;
+                margin-top:15mm;
+                height: 45mm;
                 #img1{
                     background: #ccc;
                 }
             }
             .time{
-                margin:10px auto;
+                // margin:10px auto;
+                // width: 80%;
+                // height: 14px;
+                // font-size:12px;
+                // position:relative;
+                 margin:10px auto;
                 width: 80%;
-                height: 14px;
-                font-size:12px;
+                height: 8mm;
+                font-size:3.70mm;
                 position:relative;
                 .timelabel1{
                     position: absolute;
@@ -986,12 +1002,15 @@ export default {
                 margin:10px auto;
                 width: 80%;
                 .tableListDiv{
-                    height: 400px;
+                    // height: 400px;
+                    // border:1px solid #000;
+                    height: 130mm;
                     border:1px solid #000;
                     .tableListUl{
                         .tableListLi{
                             margin:8px;
-                            height: 20px;
+                            // height: 20px;
+                            height: 5mm;
                             width: 98%;
                             position: relative;
                             .tableListLabel1{
@@ -999,14 +1018,16 @@ export default {
                                 position: absolute;
                                 left:5px;
                                 color:#000;
-                                font-size: 14px;
+                                // font-size: 14px;
+                                font-size: 3.70mm;
                             }
                             .tableListLabel2{
                                  display: inline-block;
                                 position: absolute;
                                 right:5px;
                                 color:#000;
-                                font-size: 14px;
+                                // font-size: 14px;
+                                font-size: 3.70mm;
                             }
                         }
                     }
@@ -1029,106 +1050,143 @@ export default {
                         display: inline-block;
                         left:34px;
                         top:58px;
-                        font-size:16px;
+                        // font-size:16px;
+                        font-size:4.23mm;
                     }
                     .bottom4{
                         position: absolute;
                         display: inline-block;
                         right:34px;
                         top:108px;
-                        font-size:16px;
+                        // font-size:16px;
+                        font-size: 5.29mm;
                     }
                     .bottom5{
                         position: absolute;
                         display: inline-block;
                         right:34px;
                         top:128px;
-                        font-size:16px;
+                         font-size: 5.29mm;
+                        // font-size:16px;
                     }
                 }
             }
         }
         .pdfSummary{
             width:98%;
+            //  width:100%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 830px;
-            margin:17px auto;
+            height: 295mm;
+            margin:10px auto;
+            // margin:17px auto;
             position: relative;
             .pageNum{
                     position: absolute;
-                    top:59px;
+                    top:159px;
                     right:90px;
             }
             
             .pdfSummaryHead{
+                // display:inline-block;
+                // width: 90%;
+                // font-size: 16px;
+                // color:#000;
+                // font-weight: bold;
+                // height: 28px;
+                // line-height: 28px;
+                // margin-top:22px;
+                // border-bottom:1px solid black;
+                //*
                 display:inline-block;
                 width: 90%;
-                font-size: 16px;
+                font-size: 4.94mm;
                 color:#000;
                 font-weight: bold;
-                height: 28px;
-                line-height: 28px;
-                margin-top:22px;
+                height: 15mm;
+                line-height: 15mm;
+                margin-top:25mm;
                 border-bottom:1px solid black;
             }
             .pdfSummarytext{
+                // display:inline-block;
+                // width: 90%;
+                //  height: 24px;
+                //  position: relative;
+                //  border-top:1px solid black;
+                // margin-top:2px;
+                //*
                 display:inline-block;
                 width: 90%;
-                 height: 24px;
+                 height: 7mm;
                  position: relative;
                  border-top:1px solid black;
-                        margin-top:2px;
-                //  margin-left:5px;
+                margin-top:1mm;
+                
                  label{
                      position: absolute;
                      left:0px;
                      top:5px;
-                     font-size:12px;
+                     font-size:3.70mm;
                  }
-
-
             }
             .txt{
+                    // width: 90%;
+                    // margin: 0 auto;
+                    // height: 24px;
+                    // position: relative;
                     width: 90%;
                     margin: 0 auto;
-                    height: 24px;
+                    height: 8mm;
                     position: relative;
                     .label1{
+                        // position: absolute;
+                        // left:0px;
+                        // font-size:12px;
+                        // color: #000;
+                        // line-height: 24px;
                         position: absolute;
                         left:0px;
-                        font-size:12px;
+                        font-size:3.70mm;
                         color: #000;
-                        line-height: 24px;
+                        line-height: 8mm;
                     }
                     .span1{
                         position: absolute;
                         left:42%;
-                        font-size:12px;
+                        font-size:3.70mm;
+                        line-height: 8mm;
+                        // font-size:12px;
                         color: #000;
-                        line-height: 24px;
+                        // line-height: 24px;
                     }
             }
             .inspectTableList1{
                 width: 90%;
                 margin:0px auto;
                         .inspectTableList{
-                            
                             border-collapse: collapse;
                             border: 1px solid #000;
                             thead{
                                 // background: #f2f2f2;
                                 background: #fff;
                                 th{
-                                    // padding-left: 6px;
-                                    // padding-right: 15px;
-                                    height: 32px;
+                                    // height: 32px;
+                                    // text-align: center;
+                                    // box-sizing: border-box;
+                                    // border-right: 1px solid #000;
+                                    // font-size: 12px;
+                                    // color: #333333;
+                                    // font-weight: normal;
+
+                                    height: 10mm;
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #000;
-                                    font-size: 12px;
+                                    font-size: 4.23mm;
                                     color: #333333;
                                     font-weight: normal;
+                                    
                                 }
                             }
                             tbody{
@@ -1137,40 +1195,20 @@ export default {
                                         color: red;
                                     }
                                     td{
-                                        // padding-left: 6px;
-                                        // padding-right: 15px;
-                                        height: 32px;
+                                        // height: 32px;
+                                        // text-align: center;
+                                        // box-sizing: border-box;
+                                        // border-right: 1px solid #000;
+                                        // font-size: 12px;
+                                        // color: #333333;
+
+                                        height: 10mm;
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #000;
-                                        font-size: 12px;
+                                        font-size: 4.23mm;
                                         color: #333333;
-                                        // .actionBtn{
-                                        //     width: 18px;
-                                        //     height: 18px;
-                                        //     border: none;
-                                        //     cursor: pointer;
-                                        //     margin-left: 10px;
-
-                                        // }
-                                        // .deleteBtn{
-                                        //     background: url('../../assets/delete.png') no-repeat 0 0;
-                                        // }
-                                        // .editBtn{
-                                        //     background: url('./images/overviewedit.png') no-repeat 0 0;
-                                        // }
-                                        // .upmoveBtn{
-                                        //     background: url('./images/overviewup.png') no-repeat 0 0;
-                                        // }
-                                        // .downmoveBtn{
-                                        //     background: url('./images/downmove.png') no-repeat 0 0;
-                                        // }
-                                        // .detailBtn{
-                                        //     background: url('./images/overfile.png') no-repeat 0 0;
-                                        // }
-                                        // .exportBtn{
-                                        //     background: url('./images/overviewdown.png') no-repeat 0 0;
-                                        // }
+                                        font-weight: normal;
                                     }
                                 }
                             }
@@ -1178,55 +1216,84 @@ export default {
                     }
         }
         .pdfInspection{
-            margin-top:50px;
+            // margin-top:50px;
              width:98%;
+            //  width:100%;
             border:1px solid #ccc;
             // margin-bottom: 10px;
-            height: 830px;
-            margin:17px auto;
+            // height: 830px;
+            height: 295mm;
+            margin:10px auto;
+            // margin:17px auto;
             position: relative;
             .pageNum{
                     position: absolute;
-                    top:59px;
+                    top:159px;
                     right:90px;
             }
              .pdfSummaryHead{
+            //     display:inline-block;
+            //     width: 90%;
+            //     font-size: 16px;
+            //     color:#000;
+            //     font-weight: bold;
+            //     height: 28px;
+            //     line-height: 28px;
+            //    border-bottom:1px solid black;
+            //    margin-top:22px;
                 display:inline-block;
                 width: 90%;
-                font-size: 16px;
+                font-size: 4.94mm;
                 color:#000;
                 font-weight: bold;
-                height: 28px;
-                line-height: 28px;
-               border-bottom:1px solid black;
-               margin-top:22px;
+                height: 15mm;
+                line-height: 15mm;
+                margin-top:25mm;
+                border-bottom:1px solid black;
             }
             .pdfSummarytext{
-                display:inline-block;
+                // display:inline-block;
+                // width: 90%;
+                //  height: 24px;
+                //  position: relative;
+                //  border-top:1px solid black;
+                // margin-top:2px;
+                 display:inline-block;
                 width: 90%;
-                 height: 24px;
+                 height: 7mm;
                  position: relative;
                  border-top:1px solid black;
-                        margin-top:2px;
-                //  margin-left:5px;
+                margin-top:1mm;
+                
                  label{
                      position: absolute;
                      left:0px;
                      top:5px;
-                     font-size:12px;
+                    //  font-size:12px;
+                    font-size:3.70mm;
                  }
             }
              .txt{
+                    // width: 90%;
+                    // margin: 0 auto;
+                    // height: 24px;
+                    // position: relative;
                     width: 90%;
                     margin: 0 auto;
-                    height: 24px;
+                    height: 8mm;
                     position: relative;
                     .label1{
-                        position: absolute;
+                        // position: absolute;
+                        // left:0px;
+                        // font-size:12px;
+                        // color: #000;
+                        // line-height: 24px;
+                         position: absolute;
                         left:0px;
-                        font-size:12px;
+                        font-size:3.70mm;
                         color: #000;
-                        line-height: 24px;
+                        line-height: 8mm;
+                        
                     }
                     .span1{
                         position: absolute;
@@ -1249,11 +1316,13 @@ export default {
                                 th{
                                     // padding-left: 6px;
                                     // padding-right: 15px;
-                                    height: 30px;
+                                    // height: 30px;
+                                    height: 10mm;
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #000;
-                                    font-size: 12px;
+                                    // font-size: 12px;
+                                    font-size: 4.23mm;
                                     color: #333333;
                                     font-weight: normal;
                                     .left{
@@ -1279,11 +1348,13 @@ export default {
                                 td{
                                     // padding-left: 6px;
                                     // padding-right: 15px;
-                                    height: 30px;
+                                    // height: 30px;
+                                    height: 10mm;
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #000;
-                                    font-size: 12px;
+                                    // font-size: 12px;
+                                    font-size: 4.23mm;
                                     color: #333333;
                                     .tdInp{
                                         width: 178px;
@@ -1315,107 +1386,164 @@ export default {
                 position: absolute;
                 bottom:20px;
                 right:10px;
-                height: 28px;
+                height: 10mm;
                 width:100%;
                 .baseWord1{
                     position: absolute;
                     left: 41px;
-                    width: 200px;
+                    width: 60mm;
                     text-align: left;
+                    font-size: 4.23mm;
                 }
                 .baseWord2{
                     position: absolute;
                     right: 0px;
-                     width: 200px;
-                      text-align: left;
+                    width: 60mm;
+                    text-align: left;
+                    font-size: 4.23mm;
                 }
             }
         }
         .inspectUl{
-           
+           margin:0 auto;
             .inspectLi{
-                 width:98%;
-                border:1px solid #ccc;
+                
                 // margin-bottom: 10px;
                
-                margin:17px auto;
+                // margin:17px auto;
+                margin:10px auto;
                 position: relative;
+                width:98%;
                 //  margin-top:50px;
                 .verticalLength{
-                     height: 832px;
+                    //  height: 832px;
+                     
+                    //  width:100%;
+                    border:1px solid #ccc;
+                    height: 295mm;
                     .pdfSummaryHead1{
+                        // display:inline-block;
+                        // width: 90%;
+                        // font-size: 16px;
+                        // color:#000;
+                        // font-weight: bold;
+                        // height: 26px;
+                        // line-height: 26px;
+                        // margin-top:22px;
+
                         display:inline-block;
                         width: 90%;
-                        font-size: 16px;
+                        font-size: 4.94mm;
                         color:#000;
                         font-weight: bold;
-                        height: 26px;
-                        line-height: 26px;
-                        margin-top:22px;
-                        // border-bottom:2px solid #ccc;
+                        height: 7mm;
+                        line-height: 7mm;
+                        margin-top:12mm;
+                    
                     }
                     .pdfSummaryHead{
+                        // display:inline-block;
+                        // width: 90%;
+                        // font-size: 14px;
+                        // color:#000;
+                        // font-weight: bold;
+                        // height: 26px;
+                        // line-height: 26px;
+                        // border-bottom:1px solid black;
+
                         display:inline-block;
                         width: 90%;
-                        font-size: 14px;
+                        font-size: 4.23mm;
                         color:#000;
                         font-weight: bold;
-                        height: 26px;
-                        line-height: 26px;
+                        height: 6mm;
+                        line-height: 6mm;
                         border-bottom:1px solid black;
                     }
                     .pdfSummarytext{
+                        // display:inline-block;
+                        // width: 90%;
+                        // height: 24px;
+                        // position: relative;
+                        // border-top:1px solid black;
+                        // margin-top:2px;
                         display:inline-block;
                         width: 90%;
-                        height: 24px;
+                        height: 6mm;
                         position: relative;
-                        //  margin-left:5px;
                         border-top:1px solid black;
                         margin-top:2px;
                         label{
-                            position: absolute;
+                            // position: absolute;
+                            // left:0px;
+                            // top:5px;
+                            // font-size:12px;
+                             position: absolute;
                             left:0px;
                             top:5px;
-                            font-size:12px;
+                            font-size:3.70mm;
                         }
                     }
                     .txt{
+                        // width: 90%;
+                        // margin: 0 auto;
+                        // height: 24px;
+                        // position: relative;
                         width: 90%;
                         margin: 0 auto;
-                        height: 24px;
+                        height: 8mm;
                         position: relative;
                         .label1{
-                            position: absolute;
+                            // position: absolute;
+                            // left:0px;
+                            // font-size:12px;
+                            // color: #000;
+                            // line-height: 24px;
+                             position: absolute;
                             left:0px;
-                            font-size:12px;
+                            font-size:3.70mm;
                             color: #000;
-                            line-height: 24px;
+                            line-height: 8mm;
                         }
                         .span1{
+                            // position: absolute;
+                            // left:42%;
+                            // font-size:12px;
+                            // color: #000;
+                            // line-height: 24px;
                             position: absolute;
                             left:42%;
-                            font-size:12px;
+                            font-size:3.70mm;
                             color: #000;
-                            line-height: 24px;
+                            line-height: 8mm;
                         }
                     }
                     .txt1{
-                        width: 90%;
-                        font-size:12px;
+                        // width: 90%;
+                        // font-size:12px;
+                        // margin:0 auto;
+                        // color: #000;
+                        // line-height: 24px;
+                        // height: 24px;
+                        // position: relative;
+                         width: 90%;
+                        font-size:3.70mm;
                         margin:0 auto;
                         color: #000;
-                        line-height: 24px;
-                        height: 24px;
+                        line-height: 6mm;
+                        height: 6mm;
                         position: relative;
                         label{
                             position: absolute;
                             left: 0px;
+                            // font-size: 
                         }
                     }
                     .bottomTabel{
                         width: 90%;
                         margin:0 auto;
-                        height: 395px;
+                        // height: 395px;
+                        height: 133.7mm;
                         overflow: hidden;
                             .bottomTableList{
                                 border-collapse: collapse;
@@ -1425,11 +1553,13 @@ export default {
                                         th{
                                             // padding-left: 6px;
                                             // padding-right: 15px;
-                                            height: 18px;
+                                            // height: 18px;
+                                            height: 5mm;
                                             text-align: center;
                                             box-sizing: border-box;
                                             border-right: 0.5px solid #000;
-                                            font-size: 12px;
+                                            // font-size: 12px;
+                                            font-size: 4.23mm;
                                             color: #333333;
                                             font-weight: normal;
                                         }
@@ -1439,11 +1569,13 @@ export default {
                                             td{
                                                 // padding-left: 6px;
                                                 // padding-right: 15px;
-                                                height: 18px;
+                                                // height: 18px;
+                                                height: 6mm;
                                                 text-align: center;
                                                 box-sizing: border-box;
                                                 border-right: 0.5px solid #000;
-                                                font-size: 12px;
+                                                // font-size: 12px;
+                                                font-size: 4.23mm;
                                                 color: #333333;
                                                 .actionBtn{
                                                     width: 18px;
@@ -1469,15 +1601,15 @@ export default {
                         margin:0px auto;
                        
                         .bottomTabelDiv{
-                            height: 210px;
+                            height: 359px;
                             border-left:1px solid #000;
                             border-right:1px solid #000;
                              position: relative;
                             .bottomTabelDiv1{
-                                 width: 100%;
-                            position:absolute;
-                            top:0px;
-                            left: 0px;
+                                width: 100%;
+                                position:absolute;
+                                top:0px;
+                                left: 0px;
 
                             }
 
@@ -1490,11 +1622,11 @@ export default {
                                 tbody{
                                         tr{
                                             td{
-                                                height: 18px;
+                                                height: 5mm;
                                                 text-align: center;
                                                 box-sizing: border-box;
                                                 border-right: 0.5px solid #000;
-                                                font-size: 12px;
+                                                font-size: 4.23mm;
                                                 color: #333333;
                                             }
                                         }
@@ -1512,7 +1644,7 @@ export default {
                     }
                     .pageNum{
                         position: absolute;
-                        top:82px;
+                        top:101px;
                         right:90px;
                     }
                 }

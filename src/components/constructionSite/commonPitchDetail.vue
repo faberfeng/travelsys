@@ -13,7 +13,7 @@
                     </div>
                     <div class="containerHeadMiddle">
                         <label>测试总数：{{itemSubmitCount}}</label>
-                        <label>报警：{{isAlertNum}}</label>
+                        <label>报警：{{itemAlertAmount}}</label>
                     </div>
                     <div class="containerHeadRight">
                         <span class="autoImportTxt">采集方式:</span>
@@ -95,7 +95,7 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page.sync="currentPage2"
-                            :page-sizes="[10]"
+                            :page-sizes="[5,10,15]"
                             :page-size="1"
                             layout="sizes,prev, pager, next"
                             :total="getPitchBaseInfoListLength">
@@ -137,8 +137,8 @@
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
-                                        <td>5mm</td>
-                                        <td>6mm</td>
+                                        <td>{{leftMaxShift1}}mm</td>
+                                        <td>{{leftMaxShift2}}mm</td>
                                         <!-- {{(leftDisplayList.recentVariation)[index].recentVariation|totalVariation}} -->
                                         <td>mm/d</td>
                                     </tr>
@@ -191,8 +191,8 @@
                                         <td>变化量(mm)</td>
                                     </tr>
                                     <tr>
-                                        <td>5mm</td>
-                                        <td>6mm</td>
+                                        <td>{{rightMaxShift1}}mm</td>
+                                        <td>{{rightMaxShift2}}mm</td>
                                         <!-- {{(rightDisplayList.recentVariation)[index].totalVariation|addSprit}} -->
                                         <td>mm/d</td>
                                     </tr>
@@ -614,7 +614,7 @@ export default Vue.component('commonPitch-detail',{
                 getPitchBaseInfoList:'',//获取斜度基本信息
                 getPitchBaseInfoList1:[],
                 getPitchBaseInfoListLength:0,
-                pageSize:10,
+                pageSize:5,
                 pageNum:1,
                 pitchDetailDataList:'',//获取数据详情（下面的图）
                 pitchDetailDataListLeft:'',
@@ -636,6 +636,10 @@ export default Vue.component('commonPitch-detail',{
                 leftDisplayList:'',
                 leftDisplayListValue:'',
                 leftDisplayListValue1:[],
+                leftMaxShift1:'',
+                leftMaxShift2:'',
+                rightMaxShift1:'',
+                rightMaxShift2:'',
                 leftDisplayListValueXdata:[],
                 leftDisplayListValueYdata1:[],
                 leftDisplayListValueYdata2:[],
@@ -733,7 +737,7 @@ export default Vue.component('commonPitch-detail',{
                         },
                         yAxis: {
                                 title: {
-                                    text: '数量'
+                                    text: '位移'
                                 },
                                 labels:{
                                     enabled: true
@@ -909,6 +913,7 @@ export default Vue.component('commonPitch-detail',{
                 markName:'',
                 editPitchShow:'',
                 itemSubmitCount:0,//测试总数
+                itemAlertAmount:0,
                 isAlertNum:0,//报警总数
 
 
@@ -1161,58 +1166,26 @@ export default Vue.component('commonPitch-detail',{
             handleSizeChange(val){
                  this.pageSize=val;
                 this.getPitchBaseInfoList1=[];
-                getPitchBaseInfoList
-                if(this.getPitchBaseInfoListLength<11){
-                    for(var i=0;i<this.getPitchBaseInfoListLength-1;i++){
-                            this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
-                        }
-                }else if(this.getPitchBaseInfoListLength>10){
-                    if(this.pageNum==1){
-                        var num=0;
-                        var num2=9*(this.pageSize);
-
-                    }else if(this.pageNum!=1){
-                        if(this.getPitchBaseInfoListLength%(this.pageSize)!=0){
-                            var num=(this.pageNum-1)*(this.pageSize)
-                            var num2=(this.pageNum-1)*(this.pageSize)+((this.getPitchBaseInfoListLength)%(this.pageSize))
-                        }else{
-                            num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                        }
-                    }
-                    for(var i=num;i<num2;i++){
-                        this.getPointDatasList1.push(this.getPointDatasList[i])
-                    }
+                var NumB=this.pageSize*(this.pageNum-1)
+                var NumE=this.pageSize*this.pageNum-1
+                if(this.getPitchBaseInfoListLength-1>=NumB&&this.getPitchBaseInfoListLength-1<=NumE){
+                    NumE=this.getPitchBaseInfoListLength-1;
+                }
+                for(var i=NumB;i<NumE+1;i++){
+                    this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                 }
 
             },
             handleCurrentChange(val){
                 this.getPitchBaseInfoList1=[];
                 this.pageNum=val;
-                // console.log(this.getPitchBaseInfoListLength,'this.getPointDatasListLength');
-                // console.log((this.getPitchBaseInfoListLength)%(this.pageSize),'123');
-                if(this.getPitchBaseInfoListLength<11){
-                    for(var i=0;i<this.getPitchBaseInfoListLength;i++){
-                            this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
-                        }
-                }else if(this.getPitchBaseInfoListLength>10){
-                    if(this.pageNum==1){
-                        var num=0;
-                        var num2=10;
-
-                    }else if(this.pageNum!=1){
-                        if(this.getPitchBaseInfoListLength%(this.pageSize)!=0){
-                            var num=(this.pageNum-1)*(this.pageSize)
-                            var num2=(this.pageNum-1)*(this.pageSize)+((this.getPitchBaseInfoListLength)%(this.pageSize))
-                            
-                        }else{
-                            var num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                        }
-                    }
-                    // console.log(num,'num')
-                    // console.log(num2,'num2')
-                    for(var i=num;i<num2;i++){
-                        this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
-                    }
+                var NumB=this.pageSize*(this.pageNum-1)
+                var NumE=this.pageSize*this.pageNum-1
+                if(this.getPitchBaseInfoListLength-1>=NumB&&this.getPitchBaseInfoListLength-1<=NumE){
+                    NumE=this.getPitchBaseInfoListLength-1;
+                }
+                for(var i=NumB;i<NumE+1;i++){
+                    this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                 }
             },
             timeChangeMethod(val) {
@@ -1302,6 +1275,7 @@ export default Vue.component('commonPitch-detail',{
                 this.getPitchBaseInfoList=[];
                 this.getPitchBaseInfoListLength=0;
                 this.itemSubmitCount=0;
+                this.itemAlertAmount=0;
                 axios({
                     method:'post',
                     url:vm.BDMSUrl+'detectionInfo/getPitchBaseInfo',
@@ -1317,14 +1291,15 @@ export default Vue.component('commonPitch-detail',{
                         this.getPitchBaseInfoListLength=response.data.rt.length;
                         vm.getPitchBaseInfoList.forEach((item)=>{
                             this.itemSubmitCount+=item.pointAmount
+                            this.itemAlertAmount+=item.alertAmount
                         })
                         //  console.log(vm.getPitchBaseInfoList,'vm.getPitchBaseInfoList');
-                        if(this.getPitchBaseInfoListLength<11){
+                        if(this.getPitchBaseInfoListLength<6){
                             for(var i=0;i<this.getPitchBaseInfoListLength;i++){
                                 this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                             }
                         }else{
-                            for(var i=0;i<10;i++){
+                            for(var i=0;i<5;i++){
                                 this.getPitchBaseInfoList1.push(this.getPitchBaseInfoList[i])
                             }
                         }
@@ -1385,10 +1360,10 @@ export default Vue.component('commonPitch-detail',{
                                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
                                     this.time1=null;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
-                                        this.leftDisplayListValue1.push(item)
-                                        this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
-                                        this.leftDisplayListValueXdata.push(item.depth)
-                                        this.leftDisplayListValueYdata1.push(item.shift)
+                                    this.leftDisplayListValue1.push(item)
+                                    this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                    this.leftDisplayListValueXdata.push(item.depth)
+                                    this.leftDisplayListValueYdata1.push(item.shift)
                                     })
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
@@ -1424,7 +1399,17 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
-                                //  this.drawSpotMark();
+                                console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
+                                var maxShift1=[];
+                                this.leftDisplayListValue1.forEach((item)=>{
+                                    maxShift1.push(item.shift)
+                                })
+                                this.leftMaxShift1=this.getMaxValue(maxShift1);
+                                var maxShift2=[];
+                                this.leftDisplayListValue2.forEach((item)=>{
+                                    maxShift2.push(item.shift)
+                                })
+                                this.leftMaxShift2=this.getMaxValue(maxShift2);
                             }
                            
                             
@@ -1436,6 +1421,24 @@ export default Vue.component('commonPitch-detail',{
                         })
                     }
                 })
+            },
+            getMaxValue(val){
+                var m = val[0];
+                for(var i=1;i<val.length;i++){ //循环数组
+                if(m<val[i]){
+                        m=val[i]
+                    }
+                }
+                return m
+            },
+            getMinValue(val){
+                var m = val[0];
+                for(var i=1;i<val.length;i++){ //循环数组
+                if(m>val[i]){
+                        m=val[i]
+                    }
+                }
+                return m
             },
             getPitchDetailDataBySeqIdRight(num){
                 var vm=this;
@@ -1516,6 +1519,16 @@ export default Vue.component('commonPitch-detail',{
 
                                 }
                                 this.rightDisplayShow==false;
+                                 var maxShift1=[];
+                                this.rightDisplayListValue1.forEach((item)=>{
+                                    maxShift1.push(item.shift)
+                                })
+                                this.rightMaxShift1=this.getMaxValue(maxShift1);
+                                var maxShift2=[];
+                                this.rightDisplayListValue2.forEach((item)=>{
+                                    maxShift2.push(item.shift)
+                                })
+                                this.rightMaxShift2=this.getMaxValue(maxShift2);
                             }
                             
                         }

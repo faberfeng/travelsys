@@ -220,7 +220,7 @@
                                 @size-change="handleSizeChange"
                                 @current-change="handleCurrentChange"
                                 :current-page.sync="currentPage1"
-                                :page-sizes="[10]"
+                                :page-sizes="[10,20,30]"
                                 :page-size="1"
                                 layout="sizes,prev, pager, next"
                                 :total="monitorMainTableListLength">
@@ -1259,54 +1259,27 @@ export default {
             // console.log(val);
             this.monitorMainTableList1=[];
             this.pageSize=val;
-            if(this.monitorMainTableListLength<11){
-                for(var i=0;i<this.monitorMainTableListLength-1;i++){
-                        this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                    }
-            }else if(this.monitorMainTableListLength>10){
-                if(this.pageNum==1){
-                    var num=0;
-                    var num2=9;
-
-                }else if(this.pageNum!=1){
-                    if(this.monitorMainTableListLength%(this.pageSize)!=0){
-                        var num=(this.pageNum-1)*(this.pageSize)
-                        var num2=(this.pageNum-1)*(this.pageSize)+((this.monitorMainTableListLength)%(this.pageSize))
-                    }else{
-                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                    }
-                }
-                
-                for(var i=num;i<num2;i++){
-                    this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                }
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.monitorMainTableListLength-1>=NumB&&this.monitorMainTableListLength-1<=NumE){
+                NumE=this.monitorMainTableListLength-1;
             }
-            
+            console.log(NumB,'NumBp')
+            console.log(NumE,'NumEp')
+            for(var i=NumB;i<NumE+1;i++){
+                this.monitorMainTableList1.push(this.monitorMainTableList[i])
+            }
         },
         handleCurrentChange(val){
             this.monitorMainTableList1=[];
             this.pageNum=val;
-            if(this.monitorMainTableListLength<11){
-                for(var i=0;i<this.monitorMainTableListLength;i++){
-                        this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                    }
-            }else if(this.monitorMainTableListLength>10){
-                if(this.pageNum==1){
-                    var num=0;
-                    var num2=10;
-
-                }else if(this.pageNum!=1){
-                    if(this.monitorMainTableListLength%(this.pageSize)!=0){
-                        var num=(this.pageNum-1)*(this.pageSize)
-                        var num2=(this.pageNum-1)*(this.pageSize)+((this.monitorMainTableListLength)%(this.pageSize))
-                    }else{
-                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                    }
-                }
-               
-                for(var i=num;i<num2;i++){
-                    this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                }
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.monitorMainTableListLength-1>=NumB&&this.monitorMainTableListLength-1<=NumE){
+                NumE=this.monitorMainTableListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.monitorMainTableList1.push(this.monitorMainTableList[i])
             }
            
         },
@@ -1767,13 +1740,9 @@ export default {
             }).then((response)=>{
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
-                    // console.log(this.spotPicInfoList,'this.spotPicInfoList');
-                    
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
+                     console.log(this.photoId,'this.photoId');
                     this.spotPicInfoList.forEach((item)=>{
-                        //  this.$set(JSON.parse(item.coordinateInfo),'filePath',item.filePath);
-                        //  item.coordinateInfo.push(item.filePath);
-                        // console.log(JSON.parse(item.coordinateInfo).plotInfo,'item.coordinateInfo.plotInfo');
                         alist.push(
                             {
                                 'data':null,
@@ -2177,7 +2146,7 @@ export default {
                             if(this.picMark==true){
                                 setTimeout(()=>{
                                         this.getTagList();
-                                    },200)
+                                    },400)
                                 }
                         }else if(response.data.cd=='-1'){
                         
@@ -2507,6 +2476,7 @@ export default {
                         this.monitorType=1;
                         this.monitorLogogram='';
                         this.monitorKeyword='';
+                        this.currentPage1=1;
                         // this.monitorBaseMapId='';
                         this.$message({
                             type:'success',
@@ -4160,25 +4130,6 @@ export default {
                 this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
             }
         },
-        //编辑照片标记
-        editPhotoTag(){
-            axios({
-                method:'post',
-                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    userGroupId:vm.selectUgId
-                },
-                data:vm.spotPicInfo
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    // this.monitorPointInfo=response.data.rt;
-                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
-                }
-            })
-        },
         //获取图片列表
         // getTagList(){
         //      axios({
@@ -4209,8 +4160,40 @@ export default {
         },
         //取消上传图片
         upImgCancle(){
+            var vm=this;
             this.uploadshow=false;
-        },
+             this.spotPicInfo=[];
+            this.spotPicInfo.push({
+                "coordinateInfo":null,
+                "operationType":2,
+                "photoId":this.photoId,
+            });
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userGroupId:vm.selectUgId
+                    },
+                    data:this.spotPicInfo
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.spotPicInfo=[];
+                        this.getAllMonitorPoint();
+                    setTimeout(()=>{
+                            this.getTagList();
+                    },400)
+                //    this.picShowMark();
+                }else if(response.data.cd=='-1'){
+                    // this.$message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
+                }
+            })
+            },
 
         //上传照片
         addPhotoTag(){
@@ -4330,7 +4313,6 @@ export default {
                         "operationType":2,
                         "photoId":this.photoIdList,
                     });
-                    // console.log(this.spotPicInfo,'this.spotPicInfo')
                         axios({
                             method:'post',
                             url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
@@ -4348,11 +4330,12 @@ export default {
                                 type:'success',
                                 message:'删除点位图片成功'
                             })
+                            this.spotPicInfo=[];
                              this.getAllMonitorPoint();
                             
                             setTimeout(()=>{
                                  this.getTagList();
-                            },200)
+                            },400)
                         //    this.picShowMark();
                         }else if(response.data.cd=='-1'){
                             this.$message({
@@ -5598,6 +5581,12 @@ export default {
                             top:30px;
                             left:30px;
                             z-index:11;
+                            ul{
+                                height: 500px;
+                                overflow: auto;
+                                width: 200px;
+                                
+                            }
 
                         }
                         .rightBottomCheck{

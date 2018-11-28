@@ -84,7 +84,7 @@ export default {
         Refresh_timer_fun(){
             
             // console.log(this.drawList);
-            // console.log(this.old_para);
+            // console.log(this.$refs.picView.parentNode.offsetWidth, this.$refs.picView.parentNode.offsetHeight);
             
             // console.log(this.para,'this.para.type')
                 // .toLowerCase()

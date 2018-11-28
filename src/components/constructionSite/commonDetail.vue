@@ -136,7 +136,7 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page.sync="currentPage2"
-                            :page-sizes="[10]"
+                            :page-sizes="[10,20,30]"
                             :page-size="1"
                             layout="sizes,prev, pager, next"
                             :total="getPointDatasListLength">
@@ -947,96 +947,32 @@ export default Vue.component('commonDetail',{
         handleSizeChange(val){
             this.pageSize=val;
             this.getPointDatasList1=[];
-            if(this.getPointDatasListLength<11){
-                for(var i=0;i<this.getPointDatasListLength-1;i++){
-                        this.getPointDatasList1.push(this.getPointDatasList[i])
-                    }
-            }else if(this.getPointDatasListLength>10){
-                if(this.pageNum==1){
-                    var num=0;
-                    var num2=9*(this.pageSize);
-
-                }else if(this.pageNum!=1){
-                    if(this.getPointDatasListLength%(this.pageSize)!=0){
-                        var num=(this.pageNum-1)*(this.pageSize)
-                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
-                    }else{
-                        num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                    }
-                }
-                // console.log(num,'num')
-                //  console.log(num2,'num2')
-                for(var i=num;i<num2;i++){
-                    this.getPointDatasList1.push(this.getPointDatasList[i])
-                }
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getPointDatasListLength-1>=NumB&&this.getPointDatasListLength-1<=NumE){
+                NumE=this.getPointDatasListLength-1;
             }
-            // console.log(`每页 ${val} 条`);
+            console.log(NumB,'NumBp')
+            console.log(NumE,'NumEp')
+            for(var i=NumB;i<NumE+1;i++){
+                this.getPointDatasList1.push(this.getPointDatasList[i])
+            }
+
         },
         handleCurrentChange(val){
             this.getPointDatasList1=[];
             this.pageNum=val;
-            // console.log(this.getPointDatasListLength,'this.getPointDatasListLength');
-            // console.log((this.getPointDatasListLength)%(this.pageSize),'123');
-            if(this.getPointDatasListLength<11){
-                for(var i=0;i<this.getPointDatasListLength;i++){
-                        this.getPointDatasList1.push(this.getPointDatasList[i])
-                    }
-            }else if(this.getPointDatasListLength>10){
-                if(this.pageNum==1){
-                    var num=0;
-                    var num2=10;
-
-                }else if(this.pageNum!=1){
-                    if(this.getPointDatasListLength%(this.pageSize)!=0){
-                        var num=(this.pageNum-1)*(this.pageSize)
-                        var num2=(this.pageNum-1)*(this.pageSize)+((this.getPointDatasListLength)%(this.pageSize))
-                        
-                    }else{
-                         var num2=(this.pageNum-1)*(this.pageSize)+(9+(this.pageNum-1)*(this.pageSize))
-                    }
-                }
-                // console.log(num,'num')
-                //  console.log(num2,'num2')
-                for(var i=num;i<num2;i++){
-                    this.getPointDatasList1.push(this.getPointDatasList[i])
-                }
+             var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getPointDatasListLength-1>=NumB&&this.getPointDatasListLength-1<=NumE){
+                NumE=this.getPointDatasListLength-1;
             }
-            // console.log(this.getPointDatasList1,'this.getPointDatasList1');
-            // console.log(`当前页: ${val}`);
+            console.log(NumB,'NumBp')
+            console.log(NumE,'NumEp')
+            for(var i=NumB;i<NumE+1;i++){
+                this.getPointDatasList1.push(this.getPointDatasList[i])
+            }
         },
-        //  getBaseMapList(){
-        //     var vm=this;
-        //     axios({
-        //         method:'post',
-        //         url:vm.BDMSUrl+'detectionInfo/getBaseMapList',
-        //         headers:{
-        //             'token':vm.token
-        //         },
-        //         params:{
-        //             userGroupId:vm.selectUgId
-        //         }
-        //     }).then((response)=>{
-        //         if(response.data.cd=='0'){
-        //             this.baseMapList=response.data.rt;
-        //             // console.log(this.baseMapList);
-        //             //判断是否使用当前图纸
-        //             // if(!this.curBaseMapUrl){
-        //                 this.baseMapList.forEach((item)=>{
-        //                     if(item.isUsed==1){
-        //                         this.curBaseMapUrl=item.relativeUri;
-        //                         this.monitorBaseMapId=item.id;
-        //                         this.getBaseMapInfoByBaseMapId();
-        //                         this.getAllMonitorPoint();
-        //                     }
-        //                 })
-        //         }else if(response.data.cd=='-1'){
-        //             vm.$message({
-        //                 type:"error",
-        //                 msg:response.data.msg
-        //             })
-        //         }
-        //     })
-        // },
          //根据底图ID获取底图信息
         getBaseMapInfoByBaseMapId(){
             var vm=this;

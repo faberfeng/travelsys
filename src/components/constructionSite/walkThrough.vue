@@ -318,10 +318,11 @@ export default Vue.component('walkThrough',{
                             for(var i=0;i<value.length;i++){
                                 lists.push(value[i])
                             } 
-                            console.log(value);
+                            // console.log(value);
                         }); 
-                        console.log(lists,'lists123');
+                        // console.log(lists,'lists123');
                         this.getNextHistoryList=lists;
+                        console.log(this.getNextHistoryList,'this.getNextHistoryList');
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -374,10 +375,11 @@ export default Vue.component('walkThrough',{
                             for(var i=0;i<value.length;i++){
                                 lists.push(value[i])
                             } 
-                            console.log(value);
+                            // console.log(value);
                         }); 
-                        console.log(lists,'this.getPreviousHistoryList');
+                        // console.log(lists,'this.getPreviousHistoryList');
                         this.getPreviousHistoryList=lists;
+                        console.log(this.getPreviousHistoryList,'this.getPreviousHistoryList')
                     }else if(response.data.cd=='-1'){
                         this.$message({
                             type:'error',
@@ -438,7 +440,7 @@ export default Vue.component('walkThrough',{
                     }
                 )
             })
-            console.log(this.checkList,'this.checkList')
+            // console.log(this.checkList,'this.checkList')
              axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/editPatrolRecord',
@@ -577,9 +579,9 @@ export default Vue.component('walkThrough',{
                         for(var i=0;i<value.length;i++){
                             list.push(value[i])
                         } 
-                        console.log(value);
+                        // console.log(value);
                     }); 
-                    console.log(list,'list')               
+                    // console.log(list,'list')               
                     this.getPatrolRecordList=this.combineCell(list);
 
                     this.getPatrolRecordLists=this.getPatrolRecordList;
@@ -587,8 +589,8 @@ export default Vue.component('walkThrough',{
                         this.userGroupIdList.push(item.id);
                     })
                     this.historyTime=this.getPatrolRecordLists[0].historyDate;
-                    console.log(this.userGroupIdList,'this.userGroupIdList');
-                    console.log(this.getPatrolRecordLists);
+                    // console.log(this.userGroupIdList,'this.userGroupIdList');
+                    console.log(this.getPatrolRecordLists,'000000');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -624,9 +626,9 @@ export default Vue.component('walkThrough',{
         // },
         //编辑巡视内容弹框
         renamePatrolBtn(id,patrolTypeId,name){
-            console.log(id,'巡视内容ID')
-            console.log(patrolTypeId,'巡视类型ID')
-            console.log(name,'内容')
+            // console.log(id,'巡视内容ID')
+            // console.log(patrolTypeId,'巡视类型ID')
+            // console.log(name,'内容')
             var vm=this;
             vm.renameCheckContentShow=true;
             vm.typeId=patrolTypeId;
@@ -748,7 +750,7 @@ export default Vue.component('walkThrough',{
                         this.historySummaryList=this.getAllPatrolSummaryList[index+1].summary;
                         this.historySummaryListId=this.getAllPatrolSummaryList[index+1].id;
                     }
-                    console.log(index);
+                    // console.log(index);
                 }
             })
         },
