@@ -270,6 +270,7 @@ export default {
             hasTodayRecordBoolen:'',
             historyTime:'',
             getMonitorMainTableList:'',//获取监测内容主表
+            getMonitorMainTableListTable:'',
             getAllMonitorItemList:'',//获取所有监测项目
             getPageNumList:'',//所有页面
             getReportDatasList:'',//获取所有监测数据
@@ -706,6 +707,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.getMonitorMainTableList=response.data.rt;
                     var length=this.getMonitorMainTableList.length;
+                    // if(length<11)
                     for(var i=length;i<11;i++){
                         this.getMonitorMainTableList.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
                             ,recentPointName:null
@@ -716,7 +718,12 @@ export default {
                             ,totalVariation:null
                             ,type:null})
                     }
-                    // console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
+                    // this.getMonitorMainTableList=[];
+                    // for(var i=0;i<11;i++){
+
+                    //     this.getMonitorMainTableList.push(this.getMonitorMainTableList[i]);
+                    // }
+                    console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
                 }
             })
         },
@@ -1006,6 +1013,7 @@ export default {
                     // border:1px solid #000;
                     height: 130mm;
                     border:1px solid #000;
+                    overflow: hidden;
                     .tableListUl{
                         .tableListLi{
                             margin:8px;
@@ -1190,6 +1198,8 @@ export default {
                                 }
                             }
                             tbody{
+                                height: 169mm;
+                                overflow: hidden;
                                 tr{
                                     .red{
                                         color: red;
