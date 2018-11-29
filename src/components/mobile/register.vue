@@ -76,39 +76,44 @@
 
         let str = this.checknickname(this.account);
         if (str != "" ) {
-          this.$message({
-            message: str,
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: str,
+          //   type: 'warning'
+          // });
+          alert(str)
           return false;
         }
         if (this.realName === "") { //输入不能为空
-          this.$message({
-            message: '真实姓名不能为空',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '真实姓名不能为空',
+          //   type: 'warning'
+          // });
+          alert('真实姓名不能为空')
           return false;
         }
 
         if (this.pwd.length == 0) { //输入不能为空
-          this.$message({
-            message: '密码不能为空',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '密码不能为空',
+          //   type: 'warning'
+          // });
+          console.log('密码不能为空')
           return false;
         }
         if (!isNaN(this.pwd)) { //输入不能为空
-          this.$message({
-            message: '密码不能全是数字',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '密码不能全是数字',
+          //   type: 'warning'
+          // });
+          alert('密码不能全是数字')
           return false;
         }
         if (this.pwd != this.pwdRepeat) { //输入不能为空
-          this.$message({
-            message: '两次输入的密码不一样',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '两次输入的密码不一样',
+          //   type: 'warning'
+          // });
+          alert('两次输入的密码不一样')
           return false;
         }
         axios({
@@ -141,16 +146,18 @@
                 }
               })
             } else if (response.data.msg === "该账号已被注册") {
-              this.$message({
-                message: "用户名已被使用",
-                type: 'warning'
-              });
+              // this.$message({
+              //   message: "用户名已被使用",
+              //   type: 'warning'
+              // });
+              alert("用户名已被使用")
             }
           } else {
-            this.$message({
-              message: response.data.msg,
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: response.data.msg,
+            //   type: 'warning'
+            // });
+            alert(response.data.msg)
           }
         })
       },

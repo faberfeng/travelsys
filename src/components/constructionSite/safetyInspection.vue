@@ -80,11 +80,11 @@
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
-                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
                             <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
-                            <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
+                            <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
+                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
                             <img id="fz_img_for_site1" src="./images/site1.png" style="display:none"/>
                         </div>
@@ -100,23 +100,25 @@
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
+                            <span :class="[{'clickStyle':isClick4},'inputText']" @click="enableMove" >移动</span>
+                            <span :class="[{'clickStyle':isClick5},'inputText']" @click="changeBroken(1)" >故障</span>
+                            <span :class="[{'clickStyle':isClick6},'inputText']" @click="deleteDraw">删除</span>
+                            <span :class="[{'clickStyle':isClick7},'inputText']" @click="saveDraw()">保存</span>
+                            <span :class="[{'clickStyle':isClick8},'inputText']" >取消</span>
                         </div>
                     </div>
                     <div class="planeFigureBody">
-                        <div class="operateTool" v-show="editSpotShow">
+                        <!-- <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
                                 <span v-show="broken==0"  class="fault" @click="changeBroken(1)" ><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
                                  <span v-show="broken==1"  class="fault1"  @click="changeBroken(0)" ><i class="faultIcon"><label class="faultTxt">修复</label></i></span>
                                 <span class="deleteDraw" @click="deleteDraw"><i class="deleteDrawIcon"><label class="deleteDrawTxt">删除</label></i></span>
                             </div>
-                            <!-- <div style="display:inline-block" class="operateToolRight">
-                                <label class="saveDrawTxt" @click="changeBroken(0)">正常</label>
-                            </div> -->
                             <div class="operateToolRight">
                                 <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="noDataFigure" v-show="!paramsLists" >
                             <img style="width:140px;height:115px;margin-top:150px;" src="../../assets/nodata.png"/>
                             <p style="font-size:16px;color:#ccc">暂时没有底图显示，请点击底图管理按钮上传底图</p>
@@ -669,7 +671,8 @@
             </el-dialog>
              <el-dialog title="测点变化曲线" :visible="moreSpotShow" @close="moreSpotCancle()">
                     <div v-if="moreSpotShow">
-                        <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                        <vue-highcharts v-show="typeSpotShow"  id="spotChangeLine" style="max-height:500px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                        <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:500px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
                     </div>
             </el-dialog>
         </div>
@@ -698,6 +701,7 @@ export default {
     name:'safetyInspection',
     data(){
         return{
+            typeSpotShow:false,
             sheetValue:'aaa',
             sheetList:'',
             imgUrl:'',//上传封面图logo
@@ -887,6 +891,11 @@ export default {
             isClick1:false,
             isClick2:false,
             isClick3:false,
+            isClick4:false,
+            isClick5:false,
+            isClick6:false,
+            isClick7:false,
+            isClick8:false,
             hoverShow:false,
             setSpotPicShow:false,//是否为上传图片标记
             monitorName:'',//监测名称
@@ -1020,8 +1029,8 @@ export default {
                             categories:[],
                         },
                         yAxis: {
-                            min:4268.5,
-                            max:43403.3542,
+                            min:'',
+                            max:'',
                                 title: {
                                     text: '数量'
                                 },
@@ -1032,6 +1041,25 @@ export default {
                                
                             
                                 },
+                        // yAxis: [{
+                        //             // min:4268.5,
+                        //             // max:43403.3542,
+                        //             title: {
+                        //                 text: '位移'
+                        //             },
+                        //         },
+                        //         // labels:{
+                        //         //     enabled: true
+                        //         // },
+                        //         // {
+                        //         //     min:4268.5,
+                        //         //     max:43403.3542,
+                        //         //     title: {
+                        //         //         text:'利润 (millions)'
+                        //         //     },
+                        //         //     opposite: true
+                        //         // }
+                        //     ],
                         credits: {
                             enabled: false
                         },
@@ -1064,10 +1092,78 @@ export default {
                         },
                         series:[],
             },
+            optionMoreSpotChangeLineType:{
+                chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: [{
+                                    // min:4268.5,
+                                    // max:43403.3542,
+                                    title: {
+                                        text: '位移'
+                                    },
+                                },
+                                {
+                                    min:4268.5,
+                                    max:43403.3542,
+                                    title: {
+                                        text:'位移2'
+                                    },
+                                    opposite: true
+                                }
+                            ],
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+
+            },
             acquisitionTimeXlist:[],
             elevationYlist:[],
             moreSpotLineList:'',
             moreSpotLineListLength:'',
+            moreTypeSpotList1:'',
+            moreTypeSpotList2:'',
+            moreTypeSpotList1Length:'',
+            moreTypeSpotList2Length:'',
+            X1List:[],
+            Y1List:[],
+            X2List:[],
+            Y2List:[],
             todayTime:new Date(),
             onlyNum:'',
             monitorStatus:1,
@@ -1441,11 +1537,12 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                    
+                    console.log(list,'list111')
+
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
-                        // console.log(this.pointIdName,'this.pointIdName');
+                        console.log(this.pointIdName,'this.pointIdName');
                     })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
@@ -1478,179 +1575,612 @@ export default {
                         data:vm.pointIds
                     }).then((response)=>{
                         if(response.data.cd=='0'){
-                            if(response.data.rt.forceData.length!=0){
-                                this.moreSpotLineList=response.data.rt.forceData;
-                                this.moreSpotLineListLength=response.data.rt.forceData.length;
-                                this.moreSpotLineList.forEach((item)=>{
-                                    item.list.forEach((item1)=>{
-                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                            this.elevationYlist.push(item1.force)
-                                    })
-                                })
-                            }else if(response.data.rt.verticalShiftData.length!=0){
-                                this.moreSpotLineList=response.data.rt.verticalShiftData;
-                                this.moreSpotLineListLength=response.data.rt.verticalShiftData.length;
-                                 this.moreSpotLineList.forEach((item)=>{
-                                    item.list.forEach((item1)=>{
-                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                            this.elevationYlist.push(item1.elevation)
-                                    })
-                                })
-                            }else if(response.data.rt.gaugeData.length!=0){
-                                 this.moreSpotLineList=response.data.rt.gaugeData;
-                                this.moreSpotLineListLength=response.data.rt.gaugeData.length;
-                                this.moreSpotLineList.forEach((item)=>{
-                                    item.list.forEach((item1)=>{
-                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                            this.elevationYlist.push(item1.gaugeHeight)
-                                    })
-                                })
-                            }else if(response.data.rt.horizontalShiftData.length!=0){
-                                this.moreSpotLineList=response.data.rt.horizontalShiftData;
-                                this.moreSpotLineListLength=response.data.rt.horizontalShiftData.length;
-                                this.moreSpotLineList.forEach((item)=>{
-                                    item.list.forEach((item1)=>{
-                                        this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
-                                            this.elevationYlist.push(item1.shiftDistance)
-                                    })
-                                })
-                            }
-                           
-                            var xLength=this.acquisitionTimeXlist.length;
-                            var x=xLength/this.moreSpotLineListLength;
-                            // console.log(x,'xx');
-                            // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                            var xShow=[];
-                            
-                            for(var i=0;i<x;i++){
-                                xShow.push(this.acquisitionTimeXlist[i])
-                            }
-                            // console.log(xShow,'xShow');
-                            // console.log(this.elevationYlist,'this.elevationYlist');
-                            var min=this.getMinValue(this.elevationYlist);
-                            var max=this.getMaxValue(this.elevationYlist)
-                            var middle=(min+max)/2;
-                            // console.log(middle);
-                            this.optionMoreSpotChangeLine.yAxis.min=(3*min-2*max);
-                            this.optionMoreSpotChangeLine.yAxis.max=(3*max-2*min);
-                            this.moreSpotShow=true;
-                            this.spotChangeLineShow=true;
+                            var chartDataLength=response.data.rt;
+                            var f=chartDataLength.forceData.length;
+                            var g=chartDataLength.gaugeData.length;
+                            var h=chartDataLength.horizontalShiftData.length;
+                            var v=chartDataLength.verticalShiftData.length;
 
-                            //改地方就做了两个点位对比，存在唯一性，还没找到规律性方法
-                            var yShow1=[];
-                            var yShow2=[];
-                            var yShow3=[];
-                            var yShow4=[];
-                            var yShow5=[];
-                            var yShow6=[];
-                            var yShow7=[];
-                            var yShow8=[];
-                            for(let a1=0;a1<x;a1++){
-                                yShow1.push(this.elevationYlist[a1])
-                            }
-                            for(let a2=x;a2<x*2;a2++){
-                                yShow2.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*2;a2<x*3;a2++){
-                                yShow3.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*3;a2<x*4;a2++){
-                                yShow4.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*4;a2<x*5;a2++){
-                                yShow5.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*5;a2<x*6;a2++){
-                                yShow6.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*6;a2<x*7;a2++){
-                                yShow7.push(this.elevationYlist[a2])
-                            }
-                            for(let a2=x*7;a2<x*8;a2++){
-                                yShow8.push(this.elevationYlist[a2])
-                            }
-                            // console.log(yShow1,'yShow1')
-                            // console.log(yShow2,'yShow2')
-                                setTimeout(()=>{
-                                    if(this.moreSpotLineListLength==2){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==3){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==4){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==5){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==6){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
-                                         spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==7){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
-                                    }else if(this.moreSpotLineListLength==8){
-                                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                                        spotChangeLineChart.removeSeries();
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
-                                        spotChangeLineChart.addSeries({name:this.pointIdName[7],data:yShow8});
-                                        spotChangeLineChart.hideLoading();
-                                        spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                            var fList=chartDataLength.forceData;
+                            var gList=chartDataLength.gaugeData;
+                            var hList=chartDataLength.horizontalShiftData;
+                            var vList=chartDataLength.verticalShiftData;
+                            console.log(chartDataLength,'chartDataLength');
+                            //两种监测类型对比，有6种情况
+                            if((f!=0&&g!=0)||(f!=0&&h!=0)||(f!=0&&v!=0)||(g!=0&&v!=0)||(g!=0&&h!=0)||(v!=0&&h!=0)){
+                                this.typeSpotShow=false;
+                                console.log('000');
+                                console.log(f,'f');
+                                console.log(g,'g');
+                                {
+                                    if((f!=0&&g!=0)){
+                                        console.log('111');
+                                        this.moreTypeSpotList1=fList;
+                                        this.moreTypeSpotList2=gList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.force)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.gaugeHeight)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
+                                    }else if(f!=0&&h!=0){
+                                        this.moreTypeSpotList1=fList;
+                                        this.moreTypeSpotList2=hList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.force)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.shiftDistance)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
+                                    }else if(f!=0&&v!=0){
+                                        this.moreTypeSpotList1=fList;
+                                        this.moreTypeSpotList2=vList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.force)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.elevation)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
+                                    }else if(g!=0&&v!=0){
+                                        this.moreTypeSpotList1=gList;
+                                        this.moreTypeSpotList2=vList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.gaugeHeight)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.elevation)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
+                                    }else if(g!=0&&h!=0){
+                                        this.moreTypeSpotList1=gList;
+                                        this.moreTypeSpotList2=hList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.gaugeHeight)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.shiftDistance)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
+                                    }else if(v!=0&&h!=0){
+                                        this.moreTypeSpotList1=vList;
+                                        this.moreTypeSpotList2=hList;
+                                        console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                        this.moreTypeSpotList1.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y1List.push(item1.elevation)
+                                            })
+                                        })
+                                        console.log(this.X1List,'this.X1List')
+                                        console.log(this.Y1List,'this.Y1List')
+                                        this.moreTypeSpotList2.forEach((item)=>{
+                                            item.list.forEach((item1)=>{
+                                                this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                this.Y2List.push(item1.shiftDistance)
+                                            })
+                                            console.log(this.X2List,'this.X2List')
+                                            console.log(this.Y2List,'this.Y2List')
+                                        })
                                     }
-                                },200)
+                                }
+                                {
+                                    var x1Length=this.X1List.length;
+                                    console.log(x1Length,'x1Length');
+                                    console.log(this.moreTypeSpotList1.length,'this.moreTypeSpotList1.length');
+                                    var x1=x1Length/this.moreTypeSpotList1.length;
+                                    var x2Length=this.X2List.length;
+                                    console.log(x2Length,'x2Length');
+                                    var x2=x2Length/this.moreTypeSpotList2.length;
+                                    this.moreTypeSpotList1Length=this.moreTypeSpotList1.length;
+                                    this.moreTypeSpotList2Length=this.moreTypeSpotList2.length;
+                                    console.log(x1,'x1000');
+                                    console.log(x2,'x2000');
+                                    this.moreSpotShow=true;
+                                    var yLeft1=[];
+                                    var yLeft2=[];
+                                    var yLeft3=[];
+                                    var yLeft4=[];
+                                    var yRight1=[];
+                                    var yRight2=[];
+                                    var yRight3=[];
+                                    var yRight4=[];
+                                    //左边的数据
+                                    for(let a1=0;a1<x1;a1++){
+                                        yLeft1.push(this.Y1List[a1])
+                                    }
+                                    for(let a1=x1;a1<x1*2;a1++){
+                                        yLeft2.push(this.Y1List[a1])
+                                    }
+                                    for(let a1=x1*2;a1<x1*3;a1++){
+                                        yLeft3.push(this.Y1List[a1])
+                                    }
+                                    for(let a1=x1*3;a1<x1*4;a1++){
+                                        yLeft4.push(this.Y1List[a1])
+                                    }
+                                    //右边的数据
+                                    for(let a2=0;a2<x2;a2++){
+                                        yRight1.push(this.Y2List[a2])
+                                    }
+                                    for(let a2=x2;a2<x2*2;a2++){
+                                        yRight2.push(this.Y2List[a2])
+                                    }
+                                    for(let a2=x2*2;a2<x2*3;a2++){
+                                        yRight3.push(this.Y2List[a2])
+                                    }
+                                    for(let a2=x2*3;a2<x2*4;a2++){
+                                        yRight4.push(this.Y2List[a2])
+                                    }
+                                    console.log(yLeft1,'yLeft1');
+                                    console.log(yRight1,'yRight1');
+                                    console.log(yLeft2,'yLeft2');
+                                    console.log(yRight2,'yRight2');
+                                }
+                                {
+                                    setTimeout(()=>{
+                                        if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==1){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==2){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==3){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                             spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==4){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==1){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==2){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==3){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==4){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==1){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==2){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==3){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==4){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==1){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft4});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==2){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft4});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==3){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft4});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            // spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==4){
+                                            let spotTypeChangeChart=this.$refs.spotTypeChange;
+                                            spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
+                                            spotTypeChangeChart.removeSeries();
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft2});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft3});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[0],data:yLeft4});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight1,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight2,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight3,yAxis:1});
+                                            spotTypeChangeChart.addSeries({name:this.pointIdName[1],data:yRight4,yAxis:1});
+                                            spotTypeChangeChart.hideLoading();
+                                            // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
+                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                        }
+                                    },200)
+                                }
+                            }
+                            else{
+                                    this.typeSpotShow=true;
+                                    {
+                                        if(response.data.rt.forceData.length!=0){
+                                            this.moreSpotLineList=response.data.rt.forceData;
+                                            this.moreSpotLineListLength=response.data.rt.forceData.length;
+                                            this.moreSpotLineList.forEach((item)=>{
+                                                item.list.forEach((item1)=>{
+                                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                        this.elevationYlist.push(item1.force)
+                                                })
+                                            })
+                                        }else if(response.data.rt.verticalShiftData.length!=0){
+                                            this.moreSpotLineList=response.data.rt.verticalShiftData;
+                                            this.moreSpotLineListLength=response.data.rt.verticalShiftData.length;
+                                            this.moreSpotLineList.forEach((item)=>{
+                                                item.list.forEach((item1)=>{
+                                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                        this.elevationYlist.push(item1.elevation)
+                                                })
+                                            })
+                                        }else if(response.data.rt.gaugeData.length!=0){
+                                            this.moreSpotLineList=response.data.rt.gaugeData;
+                                            this.moreSpotLineListLength=response.data.rt.gaugeData.length;
+                                            this.moreSpotLineList.forEach((item)=>{
+                                                item.list.forEach((item1)=>{
+                                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                        this.elevationYlist.push(item1.gaugeHeight)
+                                                })
+                                            })
+                                        }else if(response.data.rt.horizontalShiftData.length!=0){
+                                            this.moreSpotLineList=response.data.rt.horizontalShiftData;
+                                            this.moreSpotLineListLength=response.data.rt.horizontalShiftData.length;
+                                            this.moreSpotLineList.forEach((item)=>{
+                                                item.list.forEach((item1)=>{
+                                                    this.acquisitionTimeXlist.push(this.timeChangeMethod(item1.acquisitionTime))
+                                                        this.elevationYlist.push(item1.shiftDistance)
+                                                })
+                                            })
+                                        }
+                                    }
+                                    {
+                                        var xLength=this.acquisitionTimeXlist.length;
+                                        var x=xLength/this.moreSpotLineListLength;
+                                        console.log(x,'xx');
+                                        console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                                        console.log(this.moreSpotLineListLength,'this.moreSpotLineListLength');
+                                        var xShow=[];
+                                        for(var i=0;i<x;i++){
+                                            xShow.push(this.acquisitionTimeXlist[i])
+                                        }
+                                        // console.log(xShow,'xShow');
+                                        // console.log(this.elevationYlist,'this.elevationYlist');
+                                        var min=this.getMinValue(this.elevationYlist);
+                                        var max=this.getMaxValue(this.elevationYlist)
+                                        var middle=(min+max)/2;
+                                        // console.log(middle);
+                                        this.optionMoreSpotChangeLine.yAxis.min=(3*min-2*max);
+                                        this.optionMoreSpotChangeLine.yAxis.max=(3*max-2*min);
+                                        this.moreSpotShow=true;
+                                        this.spotChangeLineShow=true;
+
+                                        //改地方就做了两个点位对比，存在唯一性，还没找到规律性方法
+                                        var yShow1=[];
+                                        var yShow2=[];
+                                        var yShow3=[];
+                                        var yShow4=[];
+                                        var yShow5=[];
+                                        var yShow6=[];
+                                        var yShow7=[];
+                                        var yShow8=[];
+                                        for(let a1=0;a1<x;a1++){
+                                            yShow1.push(this.elevationYlist[a1])
+                                        }
+                                        for(let a2=x;a2<x*2;a2++){
+                                            yShow2.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*2;a2<x*3;a2++){
+                                            yShow3.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*3;a2<x*4;a2++){
+                                            yShow4.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*4;a2<x*5;a2++){
+                                            yShow5.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*5;a2<x*6;a2++){
+                                            yShow6.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*6;a2<x*7;a2++){
+                                            yShow7.push(this.elevationYlist[a2])
+                                        }
+                                        for(let a2=x*7;a2<x*8;a2++){
+                                            yShow8.push(this.elevationYlist[a2])
+                                        }
+                                    }
+                                    // console.log(yShow1,'yShow1')
+                                    // console.log(yShow2,'yShow2')
+                                        setTimeout(()=>{
+                                            if(this.moreSpotLineListLength==2){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().yAxis[0].setTitle({text:'位移'})
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==3){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==4){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==5){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==6){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==7){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }else if(this.moreSpotLineListLength==8){
+                                                let spotChangeLineChart=this.$refs.spotChangeLine;
+                                                spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                                                spotChangeLineChart.removeSeries();
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[0],data:yShow1});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[1],data:yShow2});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[2],data:yShow3});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[3],data:yShow4});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[4],data:yShow5});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[5],data:yShow6});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[6],data:yShow7});
+                                                spotChangeLineChart.addSeries({name:this.pointIdName[7],data:yShow8});
+                                                spotChangeLineChart.hideLoading();
+                                                spotChangeLineChart.getChart().xAxis[0].update({categories:xShow});
+                                            }
+                                        },200)
+                            }
                         }
                     })
             }
@@ -1679,7 +2209,7 @@ export default {
             if (val == null) {
             return '/';
             } else {
-            return moment(val).format("MM-DD");
+            return moment(val).format("MM-DD HH:mm");
             }
         },
         moreSpotCancle(){
@@ -1688,10 +2218,10 @@ export default {
         drawFinish(){
             var vm=this;
             // console.log("finish");
-            this.isClick1=false;
-            this.isClick2=false;
-            this.isClick3=false;
-            this.isClick=false;
+            // this.isClick1=false;
+            // this.isClick2=false;
+            // this.isClick3=false;
+            // this.isClick=false;
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
                 this.spotPicInfo=[];
@@ -2107,9 +2637,14 @@ export default {
         saveDraw(){
             var vm=this;
             this.editSpotShow=false;
-            this.isClick1=false;
+           this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
             var alist=[];
             var list = this.$refs.pic.saveList();
             // var list1=this.
@@ -3740,7 +4275,7 @@ export default {
         //重命名监测内容
         renameMonitor(){
             var vm=this;
-             if(this.monitorName1==''){
+            if(this.monitorName1==''){
                 vm.$message({
                     type:'info',
                     message:'请输入监测名称'
@@ -4086,6 +4621,12 @@ export default {
                 this.isClick1=true;
                 this.isClick2=false;
                 this.isClick3=false;
+                this.isClick4=false;
+                this.isClick5=false;
+                this.isClick6=false;
+                this.isClick7=false;
+                this.isClick8=false;
+
             }
         },
         //多点触发绘图
@@ -4097,9 +4638,14 @@ export default {
                 })
             }else{
                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
-                this.isClick2=true;
                 this.isClick1=false;
+                this.isClick2=true;
                 this.isClick3=false;
+                this.isClick4=false;
+                this.isClick5=false;
+                this.isClick6=false;
+                this.isClick7=false;
+                this.isClick8=false;
             }
         },
         //添加文本
@@ -4111,9 +4657,14 @@ export default {
                 })
             }else{
                 this.$refs.pic.setDrawStatus("text",10000,10000,2);
-                this.isClick2=false;
                 this.isClick1=false;
+                this.isClick2=false;
                 this.isClick3=true;
+                this.isClick4=false;
+                this.isClick5=false;
+                this.isClick6=false;
+                this.isClick7=false;
+                this.isClick8=false;
             }
         },
         //上传图片编辑
@@ -4287,6 +4838,14 @@ export default {
         },
         //开启移动
         enableMove(){
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=true;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
             if(this.picMarkName!="Select_img_Mark"){
                 this.$refs.pic.setMoveStatus();
             }
@@ -4300,6 +4859,14 @@ export default {
         //删除点
         deleteDraw(){
             var vm=this;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=true;
+            this.isClick7=false;
+            this.isClick8=false;
             if(this.picMarkName!="Select_img_Mark")
             {
                  this.$refs.pic.deleteDraw();
@@ -4349,6 +4916,14 @@ export default {
         },
         //修复故障
         changeBroken(val){
+                this.isClick1=false;
+                this.isClick2=false;
+                this.isClick3=false;
+                this.isClick4=false;
+                this.isClick5=true;
+                this.isClick6=false;
+                this.isClick7=false;
+                this.isClick8=false;
             if(this.picMarkName!="Select_img_Mark"){
                 // this.$refs.pic.changeBroken();
                 var vm=this;
@@ -4969,7 +5544,7 @@ export default {
             box-sizing: border-box;
             float: left;
             width: 100%;
-            max-height:800px;
+            min-height:800px;
             overflow: auto;
              #inspectionBody{
                 margin:0 auto;
@@ -5232,7 +5807,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5245,7 +5820,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5258,7 +5833,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5271,7 +5846,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5284,7 +5859,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5339,7 +5914,7 @@ export default {
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5348,11 +5923,11 @@ export default {
                             }
                             .singleSpot{
                                 display: inline-block;
-                                width: 84px;
+                                width: 52px;
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5361,11 +5936,11 @@ export default {
                             }
                             .inputText{
                                 display: inline-block;
-                                width: 84px;
+                                width: 52px;
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
-                                font-size: 12px;
+                                font-size: 14px;
                                 line-height: 25px;
                                 vertical-align: middle;
                                 color:#666666;
@@ -5436,7 +6011,7 @@ export default {
                                          .moveTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 1px;
@@ -5468,7 +6043,7 @@ export default {
                                          .faultTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 1px;
@@ -5500,7 +6075,7 @@ export default {
                                     .deleteDrawTxt{
                                         line-height: 20px;
                                         color:#666666;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         display: block;
                                         margin-left: 12px;
                                         margin-top: 1px;
@@ -5529,7 +6104,7 @@ export default {
                                          .faultTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 0px;
@@ -5620,7 +6195,7 @@ export default {
                                     height: 25px;
                                     border:1px solid #f2f2f2;
                                     background: #f2f2f2;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     line-height: 25px;
                                     vertical-align: middle;
                                     color:#666666;
@@ -5633,7 +6208,7 @@ export default {
                                     height: 25px;
                                     border:1px solid #f2f2f2;
                                     background: #f2f2f2;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     line-height: 25px;
                                     vertical-align: middle;
                                     color:#666666;
@@ -5656,7 +6231,7 @@ export default {
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -5673,7 +6248,7 @@ export default {
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         .actionBtn{
                                             width: 18px;

@@ -1435,7 +1435,7 @@ export default Vue.component('commonDetail',{
                 if (val == null) {
                 return '/';
                 } else {
-                return moment(val).format("MM-DD");
+                return moment(val).format("MM-DD HH:mm");
                 }
         },
         //获取30天曲线图（受力）

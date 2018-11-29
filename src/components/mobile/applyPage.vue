@@ -92,11 +92,14 @@
       sendPhoneCode: function () {
         if (this.codeTime == '重新发送验证码' || this.codeTime == '获取验证码') {
           if (this.mobile.length != 11 || isNaN(this.mobile) || this.mobile.substring(0, 1) != 1) {
-            this.$message({
-              message: '手机号码格式不正确',
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: '手机号码格式不正确',
+            //   type: 'warning'
+            // });
+             alert('手机号码格式不正确')
             return;
+           
+            
           }
           axios({
             method: 'GET',
@@ -122,34 +125,39 @@
                 }
               }, 1000)
             } else {
-              this.$message({
-                message: response.data.msg,
-                type: 'warning'
-              });
+              // this.$message({
+              //   message: response.data.msg,
+              //   type: 'warning'
+              // });
+              alert(response.data.msg)
             }
           })
         }
       },
       submitInfo: function () {
         if (this.mobile.length != 11 || isNaN(this.mobile) || this.mobile.substring(0, 1) != 1) {
-          this.$message({
-            message: '手机号码格式不正确',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '手机号码格式不正确',
+          //   type: 'warning'
+          // });
+           alert('手机号码格式不正确');
           return false;
+         
         }
         var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
         if (this.email === "") { //输入不能为空
-          this.$message({
-            message: '邮箱不能为空',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '邮箱不能为空',
+          //   type: 'warning'
+          // });
+          alert('邮箱不能为空')
           return false;
         } else if (!reg.test(this.email)) { //正则验证不通过，格式不对
-          this.$message({
-            message: '邮箱格式不正确',
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: '邮箱格式不正确',
+          //   type: 'warning'
+          // });
+          alert('邮箱格式不正确')
           return false;
         }
         this.setPageData();
@@ -225,16 +233,18 @@
                 }
               })
             } else {
-              this.$message({
-                message: response.data.msg,
-                type: 'warning'
-              });
+              // this.$message({
+              //   message: response.data.msg,
+              //   type: 'warning'
+              // });
+              alert(response.data.msg)
             }
           } else {
-            this.$message({
-              message: response.data.msg,
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: response.data.msg,
+            //   type: 'warning'
+            // });
+            alert(response.data.msg)
           }
         })
       },

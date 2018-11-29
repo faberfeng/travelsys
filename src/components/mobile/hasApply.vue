@@ -58,10 +58,11 @@
       },
       submitInfo: function () {
         if(this.applyMessage.length == 0){
-          this.$message({
-            message: "留言不能为空",
-            type: 'warning'
-          });
+          // this.$message({
+          //   message: "留言不能为空",
+          //   type: 'warning'
+          // });
+          alert("留言不能为空")
           return;
         }
         this.setPageData();
@@ -84,10 +85,11 @@
               }
             })
           } else {
-            this.$message({
-              message: response.data.msg,
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: response.data.msg,
+            //   type: 'warning'
+            // });
+            alert(response.data.msg)
           }
         })
       },

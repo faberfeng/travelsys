@@ -56,7 +56,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item,index) in getMonitorMainTableList" :key="index">
+                                    <tr v-for="(item,index) in getMonitorMainTableListTable" :key="index">
                                         <td v-text="index+1"></td>
                                         <td v-text="item.name"></td>
                                         <td >{{item.recentPointName|addSprit()}}</td>
@@ -270,7 +270,7 @@ export default {
             hasTodayRecordBoolen:'',
             historyTime:'',
             getMonitorMainTableList:'',//获取监测内容主表
-            getMonitorMainTableListTable:'',
+            getMonitorMainTableListTable:[],
             getAllMonitorItemList:'',//获取所有监测项目
             getPageNumList:'',//所有页面
             getReportDatasList:'',//获取所有监测数据
@@ -404,8 +404,8 @@ export default {
             // console.log(window.screen.deviceXDPI,'window.screen.deviceXDPI');
             this.dpiHeight = 'width:'+(210*window.screen.deviceYDPI)/25.4+'px;';
             this.dpiWidth= 'width:'+(210*window.screen.deviceXDPI)/25.4+'px;';
-            console.log(this.dpiWidth,'this.dpiWidth');
-            console.log(this.dpiHeight,'this.dpiHeight');
+            // console.log(this.dpiWidth,'this.dpiWidth');
+            // console.log(this.dpiHeight,'this.dpiHeight');
         },
          timeChangeMethod(val) {
                 return moment(val).format("YYYY-MM-DD hh:mm:ss");
@@ -492,7 +492,7 @@ export default {
                     }
                     var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
                     this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle} //所需要的pdf的所有信息
-                    console.log(this.paramsLists,'this.paramsLists0000');
+                    // console.log(this.paramsLists,'this.paramsLists0000');
                 }else if(response.data.cd=='-1'){
                     vm.$message({
                         type:"error",
@@ -542,7 +542,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt; //所有监测点位
-                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    // console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     // console.log(this.monitorPointInfo);
                     //         var a='';
                     // this.getAllMonitorItemList.forEach((item)=>{
@@ -707,23 +707,39 @@ export default {
                 if(response.data.cd=='0'){
                     this.getMonitorMainTableList=response.data.rt;
                     var length=this.getMonitorMainTableList.length;
-                    // if(length<11)
-                    for(var i=length;i<11;i++){
-                        this.getMonitorMainTableList.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
-                            ,recentPointName:null
-                            ,recentVariation:null
-                            ,totalAlert:null
-                            ,totalPointId:null
-                            ,totalPointName:null
-                            ,totalVariation:null
-                            ,type:null})
-                    }
-                    // this.getMonitorMainTableList=[];
-                    // for(var i=0;i<11;i++){
+                    this.getMonitorMainTableListTable=[];
+                    if(length<14){
+                        for(var i=0;i<length;i++){
+                            this.getMonitorMainTableListTable.push(this.getMonitorMainTableList[i]);
+                        }
+                        for(var i=length;i<14;i++){
+                            this.getMonitorMainTableListTable.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
+                                ,recentPointName:null
+                                ,recentVariation:null
+                                ,totalAlert:null
+                                ,totalPointId:null
+                                ,totalPointName:null
+                                ,totalVariation:null
+                                ,type:null})
+                        }
 
-                    //     this.getMonitorMainTableList.push(this.getMonitorMainTableList[i]);
-                    // }
-                    console.log(this.getMonitorMainTableList,'this.getMonitorMainTableList111');
+                    }else if(length>14){
+                         for(var i=0;i<14;i++){
+                            this.getMonitorMainTableListTable.push(this.getMonitorMainTableList[i]);
+                        }
+                    }else{
+                        for(var i=0;i<14;i++){
+                             this.getMonitorMainTableListTable.push({baseMapId:null,count:null,id:null,keyword:null,latestTime:null,logogram:null,name:null,recentAlert:null,recentPointId:null
+                                ,recentPointName:null
+                                ,recentVariation:null
+                                ,totalAlert:null
+                                ,totalPointId:null
+                                ,totalPointName:null
+                                ,totalVariation:null
+                                ,type:null})
+                        }
+                    }
+                    console.log(this.getMonitorMainTableListTable,'this.getMonitorMainTableListTable11');
                 }
             })
         },
@@ -837,7 +853,7 @@ export default {
                     this.getAllMonitorItemList.forEach((item)=>{
                         mapList.forEach((value, key, mapObject)=>{
                             // console.log(value,'value1');
-                            // console.log(key,'key1');
+                            console.log(key,'key1');
                             if(key==item.id){
                                     // console.log(value,'value123');
                                     var aLength=0;
@@ -862,7 +878,7 @@ export default {
                                 }
                             });
                     })
-                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList1112311');
+                    //  console.log(this.getAllMonitorItemList,'getAllMonitorItemList1112311');
                     //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
@@ -913,16 +929,16 @@ export default {
                             // var pageHeight = contentWidth / 794 * 1123;
                             //未生成pdf的html页面高度
                             var leftHeight = contentHeight;
-                            console.log(contentWidth,'contentWidth');
-                            console.log(contentHeight,'contentHeight');
+                            // console.log(contentWidth,'contentWidth');
+                            // console.log(contentHeight,'contentHeight');
                             //页面偏移
                             var position = 0;
                             //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
                             var imgWidth = 592.28;
                             var imgHeight = 592.28/contentWidth * contentHeight;
                             var pageData = canvas.toDataURL('image/jpeg', 1.0);
-                            console.log(imgWidth,'imgWidth');
-                            console.log(imgHeight,'imgHeight');
+                            // console.log(imgWidth,'imgWidth');
+                            // console.log(imgHeight,'imgHeight');
                             var pdf = new jsPDF('', 'pt', 'a4');
 
                             //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)

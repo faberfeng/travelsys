@@ -2066,7 +2066,7 @@ export default {
             //         // z-index:1000;
             //     }
             .drawingBody{
-                    height: 600px;
+                    height: 650px;
                     width: 100%;
                     position: relative;
                 .noImg{

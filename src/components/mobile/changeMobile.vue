@@ -94,10 +94,11 @@
       sendPhoneCode: function () {
         if (this.codeTime == '重新发送' || this.codeTime == '发送') {
           if (this.oldMobile.length != 11 || isNaN(this.oldMobile) || this.oldMobile.substring(0, 1) != 1) {
-            this.$message({
-              message: '手机号码格式不正确',
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: '手机号码格式不正确',
+            //   type: 'warning'
+            // });
+            alert('手机号码格式不正确')
             return;
           }
           axios({
@@ -124,10 +125,11 @@
                 }
               }, 1000)
             } else {
-              this.$message({
-                message: response.data.msg,
-                type: 'warning'
-              });
+              // this.$message({
+              //   message: response.data.msg,
+              //   type: 'warning'
+              // });
+              alert(response.data.msg)
             }
           })
         }
@@ -172,16 +174,18 @@
                 }
               })
             } else {
-              this.$message({
-                message: response.data.msg,
-                type: 'warning'
-              });
+              // this.$message({
+              //   message: response.data.msg,
+              //   type: 'warning'
+              // });
+              alert(response.data.msg)
             }
           } else {
-            this.$message({
-              message: response.data.msg,
-              type: 'warning'
-            });
+            // this.$message({
+            //   message: response.data.msg,
+            //   type: 'warning'
+            // });
+            alert(response.data.msg)
           }
         })
       },
