@@ -101,7 +101,7 @@
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
                             <span :class="[{'clickStyle':isClick4},'inputText']" @click="enableMove" >移动</span>
-                            <span :class="[{'clickStyle':isClick5},'inputText']" @click="changeBroken(1)" >故障</span>
+                            <span :class="[{'clickStyle':isClick5},'inputText']" @click="changeBroken()" >故障</span>
                             <span :class="[{'clickStyle':isClick6},'inputText']" @click="deleteDraw">删除</span>
                             <span :class="[{'clickStyle':isClick7},'inputText']" style="margin-left:10px;" @click="saveDraw()">保存</span>
                             <span :class="[{'clickStyle':isClick8},'inputText1']"  @click="cancleAll()" >取消</span>
@@ -126,7 +126,7 @@
                         <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                             <!-- <img v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='jpg'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='png'" style="object-fit: contain;" :src="QJFileManageSystemURL+curBaseMapUrl">
                             <pdf v-show="curBaseMapUrl.substr(curBaseMapUrl.length-3)=='pdf'||curBaseMapUrl.substr(curBaseMapUrl.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+curBaseMapUrl"></pdf> -->
-                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists"  @Image_Mark="add"></picView>
+                            <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists" @Broken_changed="brokenChanged"   @Image_Mark="add"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
@@ -1517,9 +1517,12 @@ export default {
                 if(item.id==this.drawItemId){
                     this.drawItemType=item.type;
                 }
-               
             })
-          
+            if(this.isClick1==true){
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+            }else if(this.isClick2==true){
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
+            }
         },
         picView_status_changed(status,list){
             this.listLength=list.length;
@@ -2936,6 +2939,7 @@ export default {
                                 type:'success',
                                 message:'保存监测点成功'
                             })
+                             this.$refs.pic.setDrawCancel();
                             this.getMonitorMainTable();
                             this.getAllMonitorPoint();
                             if(this.picMark==true){
@@ -2958,6 +2962,7 @@ export default {
         cancleAll(){
             this.editSpotShow=false;
             this.$refs.pic.setDrawCancel();
+             this.getAllMonitorPoint();
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){
@@ -4952,15 +4957,13 @@ export default {
         },
         //单点触发绘图
         drawingOneSpot(){
-            // console.log('0000')
-            // console.log(this.drawItemId,'111')
             if(this.drawItemId==''){
                this.$message({
                     type:'info',
                     message:'请先添加监测内容'
                 })
             }else{
-                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
                 this.monitorMainItemList.forEach((item)=>{
                     if(item.id==this.drawItemId){
                         item.spotNum=true;
@@ -5262,8 +5265,35 @@ export default {
                 }
 
         },
+        brokenChanged(val){
+            // console.log(val,'val111')
+            var pointId=val.ID_out;
+            var status="";
+            if(val.isBroken==0){
+                status=1
+            }else if(val.isBroken==1){
+                status=0
+            }
+            var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        pointId:pointId,
+                        status:status //监测点状态(故障为1和正常为0)
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getAllMonitorPoint();
+                        this.picMark=false;
+                    }
+            })
+        },
         //修复故障
-        changeBroken(val){
+        changeBroken(){
                 this.isClick1=false;
                 this.isClick2=false;
                 this.isClick3=false;
@@ -5273,24 +5303,7 @@ export default {
                 this.isClick7=false;
                 this.isClick8=false;
             if(this.picMarkName!="Select_img_Mark"){
-                // this.$refs.pic.changeBroken();
-                var vm=this;
-                axios({
-                    method:'post',
-                    url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        pointId:vm.pointId,
-                        status:val //监测点状态(故障为1和正常为0)
-                    }
-                }).then((response)=>{
-                    if(response.data.cd=='0'){
-                        this.getAllMonitorPoint();
-                        this.picMark=false;
-                    }
-                })
+                this.$refs.pic.changeBroken();
             }
             if(this.picMarkName=="Select_img_Mark"){
                 this.$message({

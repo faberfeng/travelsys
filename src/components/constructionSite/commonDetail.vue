@@ -49,7 +49,7 @@
                     </div>
                 </div> -->
                 <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
-                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
+                    <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" @Broken_changed="brokenChanged" :para="paramsInfo"></picView>
                 </div>
                 <div class="rightBottomCheck">
                         <!-- <el-checkbox v-model="picMark" style="display:block;width:120px;text-align:left">显示照片被标记</el-checkbox> -->
@@ -957,7 +957,33 @@ export default Vue.component('commonDetail',{
         },
         //修复故障
         changeBrokenCommon(){
-            this.$refs.pic.changeBroken();
+            
+        },
+        brokenChanged(val){
+            var pointId=val.ID_out;
+            var status="";
+            if(val.isBroken==0){
+                status=1
+            }else if(val.isBroken==1){
+                status=0
+            }
+            var vm=this;
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'detectionInfo/editMonitorPointStatus',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        pointId:pointId,
+                        status:status //监测点状态(故障为1和正常为0)
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getAllMonitorPoint();
+                        this.picMark=false;
+                    }
+            })
         },
         changeBroken(val){
             this.isClick=false;
@@ -970,7 +996,7 @@ export default Vue.component('commonDetail',{
             this.isClick7=false;
             this.isClick8=false;
              if(this.picMarkName!="Select_img_Mark"){
-                // this.$refs.pic.changeBroken();
+                this.$refs.pic.changeBroken();
                 var vm=this;
                 axios({
                     method:'post',
@@ -1264,7 +1290,7 @@ export default Vue.component('commonDetail',{
             this.isClick4=false;
             this.isClick5=false;
             this.isClick6=false;
-            this.isClick7=true;
+            this.isClick7=false;
             this.isClick8=false;
             // console.log(list);
             axios({
@@ -1283,6 +1309,7 @@ export default Vue.component('commonDetail',{
                             type:'success',
                             message:'保存监测点成功'
                         })
+                        this.$refs.pic.setDrawCancel();
                         this.saveDrawShow=false;
                         this.toolShow=false;
                         this.getAllMonitorPoint();
@@ -1307,6 +1334,9 @@ export default Vue.component('commonDetail',{
             this.isClick6=false;
             this.isClick7=false;
             this.isClick8=false;
+            this.$refs.pic.setDrawCancel();
+            this.getBaseMapInfoByBaseMapId();
+            this.getAllMonitorPoint();
 
             
         },
