@@ -843,7 +843,7 @@ export default {
         },
         //选择
         selectDraw(){
-
+            this.$refs.pic.setDrawCancel();
         },
         drawingClick(){
             this.$refs.pic.clearAll();

@@ -1542,7 +1542,7 @@ export default {
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
-                        console.log(this.pointIdName,'this.pointIdName');
+                        // console.log(this.pointIdName,'this.pointIdName');
                     })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
@@ -2957,6 +2957,7 @@ export default {
         },
         cancleAll(){
             this.editSpotShow=false;
+            this.$refs.pic.setDrawCancel();
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){

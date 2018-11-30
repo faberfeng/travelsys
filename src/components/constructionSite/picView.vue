@@ -63,6 +63,8 @@ export default {
         this.drawing = false;
         this.lastMovePostion = {x:0,y:0};
         this.PDFsize = {width:0,height:0};
+        this.SelectedList_last_length = 0;
+        this.needChangeBroken = false;
 
         this.$refs.picView.style.width = this.$refs.picView.parentNode.offsetWidth + "px";
         this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight + "px";
@@ -331,10 +333,8 @@ export default {
 
             if(e.button == 0){
                 this.lastPostion = {x:X,y:Y};
-                if(this.editStatus == "move"){   //  移动标记
-                    this.startMove = true;
-                }else{  //  绘制标记
-                    if(this.drawCount > 0){
+                
+                    if(this.drawCount > 0 && this.drawing){ //  绘制标记
                         this.drawCount--;
                         
                         let find = false;
@@ -429,88 +429,76 @@ export default {
 
                             }
 
-                            this.drawing = false;
-
+                            // this.drawing = false;
+                            this.drawCount = this.drawMaxCount;
                             this.drawID++;
                         }
 
                         this.Refresh();
-                    }else{ // 选取元素
-                        var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
-                        var red = selectColorID[0];
-                        var green = selectColorID[1];
-                        var blue = selectColorID[2];
+                    }
+                    else
+                    { 
+                       if(this.needChangeBroken){
 
-                        var SID = red + green * 256 + blue * 256 *256;
+                            var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
+                            var red = selectColorID[0];
+                            var green = selectColorID[1];
+                            var blue = selectColorID[2];
 
-                        // console.log(SID);
+                            var SID = red + green * 256 + blue * 256 *256;
 
-                        if(selectColorID[3] != 255){
-                            SID = 0;
-                        }
+                            // console.log(SID);
 
-                        if(SID < 1){
-                            this.SelectedList = [];
-                            this.Selected_typeNum_List = [];
-                        }
-
-                        /////////////////  Max_Select 为1特例 ////////////////
-
-                        if(this.Max_Select == 1){ 
-
-                            this.SelectedList = [];
-                            this.Selected_typeNum_List = [];
-
-                             for(let i = 0; i < this.drawList.length;i++){
-                                this.drawList[i].Selected = false;
-                                if(this.drawList[i].SID == SID){
-                                    this.SelectedList.push(this.drawList[i]);
-                                    this.SelectedList[0].Selected = true;
-                                }
-                             }
-                        
-                            if(SID > 0){
-                                this.$emit('status_changed',true,this.SelectedList);
-                            }else{
-                                this.$emit('status_changed',false,this.SelectedList);
+                            if(selectColorID[3] != 255){
+                                SID = 0;
                             }
 
-                            this.Refresh();
-                            return;
-                        
-                        }
-
-                        //////////////// Select_img_Mark 特例 /////////////////
-
-                        {
-                            var find_Select_img_Mark = false;
-                            for(let i = 0; i < this.drawList.length;i++){
-                                if(this.drawList[i].SID == SID){
-                                    if(this.drawList[i].type == "Select_img_Mark"){
-                                        find_Select_img_Mark = true;
+                            if(SID > 0){
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    if(this.drawList[i].SID == SID){
+                                        // this.drawList[i].isBroken = !this.drawList[i].isBroken;
+                                        // this.Refresh();
+                                        this.$emit('Broken_changed',this.drawList[i]);
+                                        break;
                                     }
                                 }
                             }
+                            
+                        }else{
+                            // 选取元素
+                            var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
+                            var red = selectColorID[0];
+                            var green = selectColorID[1];
+                            var blue = selectColorID[2];
 
-                            if(find_Select_img_Mark){
+                            var SID = red + green * 256 + blue * 256 *256;
+
+                            // console.log(SID);
+
+                            if(selectColorID[3] != 255){
+                                SID = 0;
+                            }
+
+                            if(SID < 1){
+                                this.SelectedList = [];
+                                this.Selected_typeNum_List = [];
+                            }
+
+                            /////////////////  Max_Select 为1特例 ////////////////
+
+                            if(this.Max_Select == 1){ 
+
+                                this.SelectedList = [];
+                                this.Selected_typeNum_List = [];
 
                                 for(let i = 0; i < this.drawList.length;i++){
                                     this.drawList[i].Selected = false;
-                                }
-                                
-                                this.SelectedList = [];
-                                this.Selected_typeNum_List = [];
-                                // this.SelectedList.push(this.drawList[this.drawList.length - 1]);
-
-                                for(let i = 0; i < this.drawList.length;i++){
                                     if(this.drawList[i].SID == SID){
                                         this.SelectedList.push(this.drawList[i]);
+                                        this.SelectedList[0].Selected = true;
                                     }
                                 }
-                    
-
-                                this.SelectedList[0].Selected = true;
-
+                            
                                 if(SID > 0){
                                     this.$emit('status_changed',true,this.SelectedList);
                                 }else{
@@ -519,86 +507,148 @@ export default {
 
                                 this.Refresh();
                                 return;
-                            }else{
-                                let temp_SelectedList = this.SelectedList;
-                                this.SelectedList = [];
+                            
+                            }
+
+                            //////////////// Select_img_Mark 特例 /////////////////
+
+                            {
+                                var find_Select_img_Mark = false;
+                                for(let i = 0; i < this.drawList.length;i++){
+                                    if(this.drawList[i].SID == SID){
+                                        if(this.drawList[i].type == "Select_img_Mark"){
+                                            find_Select_img_Mark = true;
+                                        }
+                                    }
+                                }
+
+                                if(find_Select_img_Mark){
+
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        this.drawList[i].Selected = false;
+                                    }
+                                    
+                                    this.SelectedList = [];
+                                    this.Selected_typeNum_List = [];
+                                    // this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        if(this.drawList[i].SID == SID){
+                                            this.SelectedList.push(this.drawList[i]);
+                                        }
+                                    }
+                        
+
+                                    this.SelectedList[0].Selected = true;
+
+                                    if(SID > 0){
+                                        this.$emit('status_changed',true,this.SelectedList);
+                                    }else{
+                                        this.$emit('status_changed',false,this.SelectedList);
+                                    }
+
+                                    this.Refresh();
+                                    return;
+                                }else{
+                                    let temp_SelectedList = this.SelectedList;
+                                    this.SelectedList = [];
+
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        this.drawList[i].Selected = false;
+                                    }
+
+                                    for(let i = 0; i < temp_SelectedList.length;i++){
+                                        if(temp_SelectedList[i].type != "Select_img_Mark"){
+                                            temp_SelectedList[i].Selected = true;
+                                            this.SelectedList.push(temp_SelectedList[i]);
+                                        }
+                                    }
+
+                                }
+
+                                
+                            }
+
+                            ///////////////////////////////////////////////////////
+
+                            if(this.SelectedList.length < this.Max_Select){
 
                                 for(let i = 0; i < this.drawList.length;i++){
                                     this.drawList[i].Selected = false;
-                                }
+                                    if(this.drawList[i].SID == SID){
+                                        // this.SelectedList.push(this.drawList[i]);
+                                        var find = false;
+                                        for(let j = 0;j < this.SelectedList.length;j++){
+                                            if(this.SelectedList[j].SID == SID){
+                                                find = true;
+                                            }
+                                        }
 
-                                for(let i = 0; i < temp_SelectedList.length;i++){
-                                    if(temp_SelectedList[i].type != "Select_img_Mark"){
-                                        temp_SelectedList[i].Selected = true;
-                                        this.SelectedList.push(temp_SelectedList[i]);
+                                        var typeNum_enable = true;
+
+                                        if(this.Selected_typeNum_List.length >= this.Max_type){
+                                            
+                                            typeNum_enable = false;
+
+                                            for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                                if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                    typeNum_enable = true;
+                                                }
+                                            }
+
+                                            
+                                        }else{
+                                            let find_type = false;
+
+                                            for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                                if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                    find_type = true;
+                                                }
+                                            }
+                                            if(!find_type){this.Selected_typeNum_List.push(this.drawList[i].typeNum);}
+                                        }
+
+                                        if(!find && typeNum_enable){
+                                            this.SelectedList.push(this.drawList[i]);
+                                        }
                                     }
                                 }
 
+                                for(let i = 0; i < this.SelectedList.length;i++){
+                                    this.SelectedList[i].Selected = true;
+                                }
+
+                                if(SID > 0){
+                                    this.$emit('status_changed',true,this.SelectedList);
+                                }else{
+                                    this.$emit('status_changed',false,this.SelectedList);
+                                }
+
+                                this.Refresh();
                             }
 
                             
-                        }
 
-                        ///////////////////////////////////////////////////////
+                            if(this.editStatus == "move" && SID != 0){   //  移动标记
+                                
+                                if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
+                                    
+                                    var center={x:X,y:Y};
 
-                        if(this.SelectedList.length < this.Max_Select){
-
-                            for(let i = 0; i < this.drawList.length;i++){
-                                this.drawList[i].Selected = false;
-                                if(this.drawList[i].SID == SID){
-                                    // this.SelectedList.push(this.drawList[i]);
-                                    var find = false;
-                                    for(let j = 0;j < this.SelectedList.length;j++){
-                                        if(this.SelectedList[j].SID == SID){
-                                            find = true;
-                                        }
+                                    for(let i = 0; i < this.SelectedList.length;i++){
+                                        this.SelectedList[i].TempPostion.x = this.SelectedList[i].position[0].x - center.x;
+                                        this.SelectedList[i].TempPostion.y = this.SelectedList[i].position[0].y - center.y;
                                     }
 
-                                    var typeNum_enable = true;
-
-                                    if(this.Selected_typeNum_List.length >= this.Max_type){
-                                        
-                                        typeNum_enable = false;
-
-                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
-                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
-                                                typeNum_enable = true;
-                                            }
-                                        }
-
-                                        
-                                    }else{
-                                        let find_type = false;
-
-                                        for(let j = 0; j < this.Selected_typeNum_List.length;j++){
-                                            if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
-                                                find_type = true;
-                                            }
-                                        }
-                                        if(!find_type){this.Selected_typeNum_List.push(this.drawList[i].typeNum);}
-                                    }
-
-                                    if(!find && typeNum_enable){
-                                        this.SelectedList.push(this.drawList[i]);
-                                    }
+                                    this.startMove = true;
                                 }
                             }
 
-                            for(let i = 0; i < this.SelectedList.length;i++){
-                                this.SelectedList[i].Selected = true;
-                            }
-
-                            if(SID > 0){
-                                this.$emit('status_changed',true,this.SelectedList);
-                            }else{
-                                this.$emit('status_changed',false,this.SelectedList);
-                            }
-
-                            this.Refresh();
+                            this.SelectedList_last_length = this.SelectedList.length;
                         }
 
                     }
-                }
+                
             }
         },
         Selected2(id){
@@ -634,18 +684,32 @@ export default {
 
             if(this.startMove){
                 for(let i = 0;i < this.SelectedList.length;i++){
-                    if(this.SelectedList[i].type == "text"){
-                        let dist = {x:this.SelectedList[i].position[1].x - this.SelectedList[i].position[0].x,y:this.SelectedList[i].position[1].y - this.SelectedList[i].position[0].y};
+                    // if(this.SelectedList[i].type == "text"){
+                    //     let dist = {x:this.SelectedList[i].position[1].x - this.SelectedList[i].position[0].x,y:this.SelectedList[i].position[1].y - this.SelectedList[i].position[0].y};
 
-                        this.SelectedList[i].position[0].x = X;
-                        this.SelectedList[i].position[0].y = Y;
+                    //     this.SelectedList[i].position[0].x = X;
+                    //     this.SelectedList[i].position[0].y = Y;
 
-                        this.SelectedList[i].position[1].x = X + dist.x;
-                        this.SelectedList[i].position[1].y = Y + dist.y;
+                    //     this.SelectedList[i].position[1].x = X + dist.x;
+                    //     this.SelectedList[i].position[1].y = Y + dist.y;
 
-                    }else{
-                        this.SelectedList[i].position[0].x = X;
-                        this.SelectedList[i].position[0].y = Y;
+                    // }else{
+                    //     this.SelectedList[i].position[0].x = X;
+                    //     this.SelectedList[i].position[0].y = Y;
+                    // }
+
+                    var relative_position = [];
+
+                    for(let j = 0;j < this.SelectedList[i].position.length;j++){
+                        var position = {};
+                        position.x = this.SelectedList[i].position[j].x -  this.SelectedList[i].position[0].x;
+                        position.y = this.SelectedList[i].position[j].y -  this.SelectedList[i].position[0].y;
+                        relative_position.push(position);
+                    }
+
+                    for(let j = 0;j < this.SelectedList[i].position.length;j++){
+                        this.SelectedList[i].position[j].x = X + this.SelectedList[i].TempPostion.x + relative_position[j].x;
+                        this.SelectedList[i].position[j].y = Y + this.SelectedList[i].TempPostion.y + relative_position[j].y;
                     }
                 }
             }
@@ -656,7 +720,7 @@ export default {
         },
         oncanvasmouseup(e){
             this.startMove = false;
-            this.editStatus = "normal";
+            // this.editStatus = "normal";
         },
         onmousemove(e){
             if(this.status == "start_move"){
@@ -1032,10 +1096,10 @@ export default {
                 let color = this.baseColor;
                
                 if(this.drawList[i].isAlert){
-                    color = {r:250,g:250,b:0}
+                    color = {r:170,g:0,b:0};    //  报警颜色
                 }
                  if(this.drawList[i].isBroken){
-                    color = {r:170,g:0,b:0};
+                    color = {r:250,g:250,b:0}   //  故障颜色 
                 }
 
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
@@ -1827,12 +1891,18 @@ export default {
             this.Refresh();
         },
         drawFinish(){
-            this.sub_div.style.cursor = "default";
+            // this.sub_div.style.cursor = "default";
             this.$emit('finish',this.drawList);
         },
         pageSize(w,h){
             // console.log(w,h);
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
+        },
+        setDrawCancel(){
+            this.sub_div.style.cursor = "default";
+            this.editStatus = "normal";
+            this.drawing = false;
+            this.needChangeBroken = false;
         },
         setDrawStatus(status,drawtype,drawItemId,count,color,userData){
             this.status = "none";
@@ -1907,6 +1977,8 @@ export default {
         },
         setMoveStatus(){
             this.editStatus = "move";
+            this.sub_div.style.cursor = "default";
+            this.drawing = false;
         },
         deleteDraw(){
             if(this.SelectedList.length > 0){
@@ -2114,12 +2186,13 @@ export default {
             this.Refresh();
         },
         changeBroken(){
-            if(this.SelectedList.length > 0){
-                for(let j = 0;j < this.SelectedList.length;j++){
-                    this.SelectedList[j].isBroken = 0;
-                }
-                this.Refresh();
-            }
+            // if(this.SelectedList.length > 0){
+            //     for(let j = 0;j < this.SelectedList.length;j++){
+            //         this.SelectedList[j].isBroken = 0;
+            //     }
+            //     this.Refresh();
+            // }
+            this.needChangeBroken = true;
         },
         getAngle(x1,y1,x2,y2){
 			let x = x2 - x1;
@@ -2230,9 +2303,6 @@ export default {
             var width_inside = 0;
             var height_inside = 0;
             var count  = 0;
-
-            
-
 
             var timer = setInterval(()=>{
 
