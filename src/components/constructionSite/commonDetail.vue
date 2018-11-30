@@ -401,6 +401,7 @@
                                         <td>{{item.pointAmount}}</td>
                                     </tr>
                                 </tbody>
+                                <!-- <img style="height:230px" src="../../assets/nodata.png" v-show="!getImportHistoryList"> -->
                             </table>
                         </div>
                     </div>
@@ -2211,8 +2212,12 @@ export default Vue.component('commonDetail',{
             .projectBodyHead{
                 height: 32px;
                 margin-top:26px;
+                position: relative;
                 .headLeft{
-                    float: right;
+                    // float: right;
+                    position: absolute;
+                    right: 0px;
+                    top:0px;
                     .headLeftBtn{
                         display: inline-block;
                         width: 54px;
@@ -2238,8 +2243,11 @@ export default Vue.component('commonDetail',{
                     }
                 }
                 .headRight{
-                    float: left;
-                    position:relative;
+                    // float: left;
+                    position: absolute;
+                    left:0px;
+                    top:0px;
+                    
                     .autoImportTxt{
                         color:#999999;
                         font-size: 12px;
@@ -2883,7 +2891,7 @@ export default Vue.component('commonDetail',{
             #toolTbale1{
                 width: 85%;
                 margin:10px auto;
-                // height: 300px;
+                height: 300px;
                 overflow: auto;
                 position: relative;
                 .toolTbaleList{
