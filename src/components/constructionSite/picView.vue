@@ -429,8 +429,15 @@ export default {
 
                             }
 
+                            if(this.drawList[this.drawList.length - 1].type == "Select_img_Mark"){
+                                this.setDrawCancel();
+                            }else{
+                                this.drawCount = this.drawMaxCount;
+                            }
+
+
                             // this.drawing = false;
-                            this.drawCount = this.drawMaxCount;
+                            // this.drawCount = this.drawMaxCount;
                             this.drawID++;
                         }
 
