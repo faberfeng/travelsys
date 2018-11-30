@@ -63,6 +63,7 @@
                         <li><i class="drawingIcon cloudLine" @click="cloudLine()"><span style="color:#fc3439;font-size:14px;">云线</span></i></li>
                         <li><i class="drawingIcon text" @click="drawingText()"><span style="color:#fc3439;font-size:14px;">文本</span></i></li>
                         <li><i class="drawingIcon appended" @click="appended()"><span style="color:#fc3439;font-size:14px;">附注</span></i></li>
+                         <li><i class="drawingIcon select" @click="selectDraw()"><span style="color:#fc3439;font-size:14px;">选择</span></i></li>
                         <img id="fz_img_for_draw" src="./images/fuz1.png" style="display:none"/>
                     </ul>
             </div>
@@ -839,6 +840,10 @@ export default {
             this.$refs.pic.setDrawStatus('none',105,0,1,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
+        },
+        //选择
+        selectDraw(){
+
         },
         drawingClick(){
             this.$refs.pic.clearAll();
@@ -2106,7 +2111,7 @@ export default {
                 width: 100%;
                 margin-left:-210px;
                     .drawingTools{
-                        width: 475px;
+                        width: 530px;
                         height: 36px;
                         background-color:#3b3b3b;
                         position: relative;
@@ -2180,6 +2185,14 @@ export default {
                             }
                             .appended{
                                 left:380px;
+                                top:9px;
+                                background: url('./images/fuz.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('./images/fuz1.png')no-repeat 0 0;
+                                }
+                            }
+                            .select{
+                                left:450px;
                                 top:9px;
                                 background: url('./images/fuz.png')no-repeat 0 0;
                                 &:hover{

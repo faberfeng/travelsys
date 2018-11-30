@@ -40,8 +40,8 @@
                                 <label class="weatherTxt">天气、温度</label>
                                 <div class="weathBody">
                                     <img id="weathPic" width="100px" height="100px" :src="weathIcon(weatherIcon)">
-                                    <p  style="margin-top:10px">{{weatherIcon}}{{weatherAir}}</p>
-                                    <p  style="margin-top:10px">{{weatherTime}}</p>
+                                    <p  style="font-size:14px;margin-top:10px">{{weatherIcon}}{{weatherAir}}</p>
+                                    <p  style="font-size:14px;margin-top:10px">{{weatherTime}}</p>
                                 </div>
                             </li>
                             <li class="overviewFrameLi1">
@@ -92,8 +92,8 @@
                             <span id="inspectContentSel">
                                 <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
                                     <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
-                                    <i class="icon-sanjiao"></i>
                                 </select>
+                                <i class="icon-sanjiao"></i>
                                 
                             </span>
                             <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
@@ -103,8 +103,8 @@
                             <span :class="[{'clickStyle':isClick4},'inputText']" @click="enableMove" >移动</span>
                             <span :class="[{'clickStyle':isClick5},'inputText']" @click="changeBroken(1)" >故障</span>
                             <span :class="[{'clickStyle':isClick6},'inputText']" @click="deleteDraw">删除</span>
-                            <span :class="[{'clickStyle':isClick7},'inputText']" @click="saveDraw()">保存</span>
-                            <span :class="[{'clickStyle':isClick8},'inputText']" >取消</span>
+                            <span :class="[{'clickStyle':isClick7},'inputText']" style="margin-left:10px;" @click="saveDraw()">保存</span>
+                            <span :class="[{'clickStyle':isClick8},'inputText1']"  @click="cancleAll()" >取消</span>
                         </div>
                     </div>
                     <div class="planeFigureBody">
@@ -2616,7 +2616,7 @@ export default {
                 return  require('./images/sunnyandcloudy.png')
             }else if(val=="多云"){
                 return  require('./images/cloudy.png')
-            }else if(val=="多云转阴"){
+            }else if(val=="多云转阴"||val=="阴转多云"){
                 return  require('./images/sunnyandcloudy.png')
             }else if(val=="晴"||val=="晴转多云"||val=="多云转晴"){
                 return  require('./images/sunny.png')
@@ -2694,6 +2694,9 @@ export default {
                 }
 
 
+        },
+        cancleAll(){
+            this.editSpotShow=false;
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){
@@ -5808,11 +5811,12 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
+                                margin-left:10px;
                             }
                             .uploadPicBtn{
                                 display: inline-block;
@@ -5821,7 +5825,7 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
@@ -5834,11 +5838,12 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
+                                margin-right: 10px;
                             }
                             .bottomMap{
                                 display: inline-block;
@@ -5847,11 +5852,12 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
+                                margin-right: 10px;
                             }
                             .drawLineBtn{
                                 display: inline-block;
@@ -5860,11 +5866,12 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
                                 cursor: pointer;
+                                margin-right: 10px;
                             }
 
                         }
@@ -5878,12 +5885,13 @@ export default {
                                 // margin-right:10px;
                                 // width: 168px;
                                 // height: 30px;
+                                position: relative;
                                 
                                 .inspectSel{
                                     width: 175px;
                                     height: 26px;
                                     border: 1px solid #cccccc;
-                                    position: relative;
+                                    // position: relative;
                                     background: #fafafa;
                                     padding-left: 10px;
                                     padding-right: 20px;
@@ -5893,7 +5901,8 @@ export default {
                                     color: #333333;
                                     font-size: 14px;
                                     outline: none;
-                                    .icon-sanjiao{
+                                }
+                                .icon-sanjiao{
                                         display: block;
                                         position: absolute;
                                         width: 12px;
@@ -5901,9 +5910,8 @@ export default {
                                         background-image: url('../Settings/images/sanjiao.png');
                                         background-size: 100% 100%;
                                         content: '';
-                                        top: 0px;
-                                        right: 30px;
-                                }
+                                        top: 9px;
+                                        right: 245px;
                                 }
                                 
 
@@ -5915,7 +5923,7 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
@@ -5928,7 +5936,7 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
@@ -5941,7 +5949,20 @@ export default {
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
                                 font-size: 14px;
-                                line-height: 25px;
+                                line-height: 24px;
+                                vertical-align: middle;
+                                color:#666666;
+                                border-radius: 2px;
+                                cursor: pointer;
+                            }
+                            .inputText1{
+                                display: inline-block;
+                                width: 52px;
+                                height: 25px;
+                                border:1px solid #fff;
+                                background: #fff;
+                                font-size: 14px;
+                                line-height: 24px;
                                 vertical-align: middle;
                                 color:#666666;
                                 border-radius: 2px;
@@ -6196,7 +6217,7 @@ export default {
                                     border:1px solid #f2f2f2;
                                     background: #f2f2f2;
                                     font-size: 14px;
-                                    line-height: 25px;
+                                    line-height: 24px;
                                     vertical-align: middle;
                                     color:#666666;
                                     border-radius: 2px;
@@ -6209,7 +6230,7 @@ export default {
                                     border:1px solid #f2f2f2;
                                     background: #f2f2f2;
                                     font-size: 14px;
-                                    line-height: 25px;
+                                    line-height: 24px;
                                     vertical-align: middle;
                                     color:#666666;
                                     border-radius: 2px;

@@ -9,11 +9,16 @@
         <div class="projectBody">
             <div class="projectBodyHead">
                 <div class="headLeft">
-                    <span class="headLeftBtn" @click="getImportHistory">导出</span>
+                    
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
+                    <span :class="[{'isClickStyle':isClick4},'headLeftBtn']" @click="enableMoveCommon()">移动</span>
+                    <span :class="[{'isClickStyle':isClick5},'headLeftBtn']" @click="changeBroken(1)">故障</span>
+                    <span :class="[{'isClickStyle':isClick6},'headLeftBtn']" @click="deleteDrawCommon()">删除</span>
+                    <span :class="[{'isClickStyle':isClick7},'headLeftBtn']" style="margin-left:10px;" @click="saveDraw()">保存</span>
+                    <span :class="[{'isClickStyle':isClick8},'headLeftBtn']" style="background:#fff !important;" @click="cancleAll()">取消</span>
                 </div>
                 <div class="headMiddle">
                     <label>测试总数：{{itemSubmitCount}} </label>
@@ -28,10 +33,11 @@
                         <i class="icon-sanjiao"></i>
                         <span v-show="importMethod==1" class="import" @click="handExportExcel()">导入</span>
                         <span v-show="importMethod==2" @click="autoAcquisitionBtn()" class="import">配置</span>
+                        <span class="import1" @click="getImportHistory">导出</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
-                <div class="operateTool">
+                <!-- <div class="operateTool">
                     <div class="operateToolLeft" v-show="toolShow">
                         <span class="move" @click="enableMoveCommon"><i class="moveIcon"><label class="moveTxt">移动</label></i></span>
                         <span v-show="broken==0" class="fault" @click="changeBroken(1)"><i class="faultIcon"><label class="faultTxt">故障</label></i></span>
@@ -41,7 +47,7 @@
                     <div class="operateToolRight" v-show="saveDrawShow" >
                         <label class="saveDrawTxt" @click="saveDraw()">保存</label>
                     </div>
-                </div>
+                </div> -->
                 <div class="planeFigureGround" style="padding: 0px; overflow: auto;">
                     <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsInfo"></picView>
                 </div>
@@ -496,6 +502,11 @@ export default Vue.component('commonDetail',{
             isClick1:false,
             isClick2:false,
             isClick3:false,
+            isClick4:false,
+            isClick5:false,
+            isClick6:false,
+            isClick7:false,
+            isClick8:false,
             toolShow:false,
             saveDrawShow:false,
             pageSize:10,
@@ -804,6 +815,11 @@ export default Vue.component('commonDetail',{
             this.isClick1=true;
             this.isClick2=false;
             this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
             this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
         },
@@ -813,6 +829,11 @@ export default Vue.component('commonDetail',{
             this.isClick1=false;
             this.isClick2=true;
             this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
             this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
         },
@@ -822,15 +843,38 @@ export default Vue.component('commonDetail',{
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=true;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
             this.$refs.pic.setDrawStatus("text",10000,10000,2);
         },
          //开启移动
         enableMoveCommon(){
             this.$refs.pic.setMoveStatus();
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=true;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
         },
         //删除点
         deleteDrawCommon(){
             this.$refs.pic.deleteDraw();
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=true;
+            this.isClick7=false;
+            this.isClick8=false;
         },
         //获取导入历史
         getImportHistory(){
@@ -916,6 +960,15 @@ export default Vue.component('commonDetail',{
             this.$refs.pic.changeBroken();
         },
         changeBroken(val){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=true;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
              if(this.picMarkName!="Select_img_Mark"){
                 // this.$refs.pic.changeBroken();
                 var vm=this;
@@ -1204,6 +1257,15 @@ export default Vue.component('commonDetail',{
         saveDraw(){
             var vm=this;
             var list = this.$refs.pic.saveList();
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=true;
+            this.isClick8=false;
             // console.log(list);
             axios({
                     method:'POST',
@@ -1234,6 +1296,19 @@ export default Vue.component('commonDetail',{
                         })
                     }
                 })
+        },
+        cancleAll(){
+            this.isClick=false;
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
+
+            
         },
         //获取警报参数
         getAlertArguments(){
@@ -2107,7 +2182,7 @@ export default Vue.component('commonDetail',{
                 height: 32px;
                 margin-top:26px;
                 .headLeft{
-                    float: left;
+                    float: right;
                     .headLeftBtn{
                         display: inline-block;
                         width: 54px;
@@ -2120,7 +2195,7 @@ export default Vue.component('commonDetail',{
                         color:#666666;
                         border-radius: 2px;
                         cursor: pointer;
-                        margin-right: 3px;
+                        // margin-right: 3px;
                     }
                 }
                 .headMiddle{
@@ -2133,7 +2208,7 @@ export default Vue.component('commonDetail',{
                     }
                 }
                 .headRight{
-                    float: right;
+                    float: left;
                     position:relative;
                     .autoImportTxt{
                         color:#999999;
@@ -2166,7 +2241,7 @@ export default Vue.component('commonDetail',{
                         background-size: 100% 100%;
                         content: '';
                         top: 11px;
-                        right: 65px;
+                        right: 125px;
                     }
                     .import{
                         display: inline-block;
@@ -2180,6 +2255,20 @@ export default Vue.component('commonDetail',{
                         color:#f2f2f2;
                         border-radius: 3px;
                         cursor: pointer;
+                    }
+                    .import1{
+                        display: inline-block;
+                        width:54px;
+                        height: 26px;
+                        border:1px solid #f2f2f2;
+                        background: #f2f2f2;
+                        font-size: 12px;
+                        line-height: 26px;
+                        // vertical-align: middle;
+                        color:#666;
+                        border-radius: 3px;
+                        cursor: pointer;
+
                     }
                 }
             }
