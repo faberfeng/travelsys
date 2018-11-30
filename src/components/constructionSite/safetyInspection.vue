@@ -99,11 +99,11 @@
                             <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
-                            <span :class="[{'clickStyle':isClick3},'inputText']" @click="drawingText">文字</span>
-                            <span :class="[{'clickStyle':isClick4},'inputText']" @click="enableMove" >移动</span>
-                            <span :class="[{'clickStyle':isClick5},'inputText']" @click="changeBroken()" >故障</span>
-                            <span :class="[{'clickStyle':isClick6},'inputText']" @click="deleteDraw">删除</span>
-                            <span :class="[{'clickStyle':isClick7},'inputText']" style="margin-left:10px;" @click="saveDraw()">保存</span>
+                            <span :class="[{'clickStyle':isClick3},'inputText2']" @click="drawingText">文字</span>
+                            <span :class="[{'clickStyle':isClick4},'inputText2']" @click="enableMove" >移动</span>
+                            <span :class="[{'clickStyle':isClick5},'inputText3']" @click="changeBroken()" >故障/修复</span>
+                            <span :class="[{'clickStyle':isClick6},'inputText2']" @click="deleteDraw">删除</span>
+                            <span :class="[{'clickStyle':isClick7},'inputText2']" style="margin-left:20px;" @click="saveDraw()">保存</span>
                             <span :class="[{'clickStyle':isClick8},'inputText1']"  @click="cancleAll()" >取消</span>
                         </div>
                     </div>
@@ -552,7 +552,7 @@
                     <button class="editBtnC" @click="sendAlertMessageCancle()" >取消</button>
                 </div>
             </el-dialog>
-             <el-dialog title="上传标记图片" :visible="uploadshow" @close="upImgCancle">
+             <el-dialog title="上传标记图片" :visible="uploadshow" >
                 <div class="editBody">
                     <!-- <div class="editBodytwo imageBody">
                         <label class=" imageBodyText">文件说明 :</label>
@@ -572,7 +572,7 @@
                 <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addPhotoTag">上传</button>
-                    <button class="editBtnC" @click="upImgCancle">取消</button>
+                    <button class="editBtnC" @click.stop="upImgCancle">取消</button>
                 </div>
             </el-dialog>
             <el-dialog title="导出监测报告" :visible="exportrEportsShow" @close="exportrEportsCancle()">
@@ -1232,6 +1232,10 @@ export default {
             return moment(val).format("YYYY-MM-DD HH:mm");
             }
         },
+    },
+    mounted(){
+        this.$refs.pic.Max_Select = 8;
+        this.$refs.pic.Max_type = 2;
     },
     watch:{
         selectUgId:function(val){
@@ -2895,6 +2899,8 @@ export default {
         editSpot(){
             var vm=this;
             this.editSpotShow=true;
+            this.$refs.pic.Max_Select = 1000000;
+            this.$refs.pic.Max_type = 1000000;
             // this.isClick=true;
         },
         saveDraw(){
@@ -2962,7 +2968,17 @@ export default {
         cancleAll(){
             this.editSpotShow=false;
             this.$refs.pic.setDrawCancel();
-             this.getAllMonitorPoint();
+            this.getAllMonitorPoint();
+            this.isClick1=false;
+            this.isClick2=false;
+            this.isClick3=false;
+            this.isClick4=false;
+            this.isClick5=false;
+            this.isClick6=false;
+            this.isClick7=false;
+            this.isClick8=false;
+              this.$refs.pic.Max_Select = 8;
+            this.$refs.pic.Max_type = 2;
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){
@@ -4957,6 +4973,7 @@ export default {
         },
         //单点触发绘图
         drawingOneSpot(){
+            this.$refs.pic.setDrawCancel();
             if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -4982,6 +4999,7 @@ export default {
         },
         //多点触发绘图
         drawingSpots(){
+            this.$refs.pic.setDrawCancel();
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -5001,6 +5019,7 @@ export default {
         },
         //添加文本
         drawingText(){
+            this.$refs.pic.setDrawCancel();
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -5065,36 +5084,33 @@ export default {
             var vm=this;
             this.uploadshow=false;
              this.spotPicInfo=[];
-            this.spotPicInfo.push({
-                "coordinateInfo":null,
-                "operationType":2,
-                "photoId":this.photoId,
-            });
-                axios({
-                    method:'post',
-                    url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        userGroupId:vm.selectUgId
-                    },
-                    data:this.spotPicInfo
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.spotPicInfo=[];
-                        this.getAllMonitorPoint();
-                    setTimeout(()=>{
-                            this.getTagList();
-                    },400)
-                //    this.picShowMark();
-                }else if(response.data.cd=='-1'){
-                    // this.$message({
-                    //     type:'error',
-                    //     message:response.data.msg
-                    // })
-                }
-            })
+                this.spotPicInfo.push({
+                    "coordinateInfo":null,
+                    "operationType":2,
+                    "photoId":this.photoId,
+                });
+                    axios({
+                        method:'post',
+                        url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            userGroupId:vm.selectUgId
+                        },
+                        data:this.spotPicInfo
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.spotPicInfo=[];
+                            this.getAllMonitorPoint();
+                        setTimeout(()=>{
+                                this.getTagList();
+                        },400)
+                        // alert('000000000000000');
+                    }else if(response.data.cd=='-1'){
+                       
+                    }
+                })
             },
 
         //上传照片
@@ -5189,6 +5205,7 @@ export default {
         },
         //开启移动
         enableMove(){
+            this.$refs.pic.setDrawCancel();
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
@@ -5210,59 +5227,69 @@ export default {
         //删除点
         deleteDraw(){
             var vm=this;
-            this.isClick1=false;
-            this.isClick2=false;
-            this.isClick3=false;
-            this.isClick4=false;
-            this.isClick5=false;
-            this.isClick6=true;
-            this.isClick7=false;
-            this.isClick8=false;
-            if(this.picMarkName!="Select_img_Mark")
-            {
-                 this.$refs.pic.deleteDraw();
-            }
-            if(this.picMarkName=="Select_img_Mark"){
-                // var list1 = this.$refs.pic.saveList();
-                //     console.log(list1,'list1');  
-                    this.spotPicInfo=[];
-                    this.spotPicInfo.push({
-                        "coordinateInfo":null,
-                        "operationType":2,
-                        "photoId":this.photoIdList,
-                    });
-                        axios({
-                            method:'post',
-                            url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-                            headers:{
-                                'token':vm.token
-                            },
-                            params:{
-                                userGroupId:vm.selectUgId
-                            },
-                            data:this.spotPicInfo
-                    }).then((response)=>{
-                        if(response.data.cd=='0'){
-                            // this.uploadshow=true;
-                            this.$message({
-                                type:'success',
-                                message:'删除点位图片成功'
-                            })
-                            this.spotPicInfo=[];
-                             this.getAllMonitorPoint();
-                            
-                            setTimeout(()=>{
-                                 this.getTagList();
-                            },400)
-                        //    this.picShowMark();
-                        }else if(response.data.cd=='-1'){
-                            this.$message({
-                                type:'error',
-                                message:response.data.msg
-                            })
-                        }
-                    })
+            if(this.toolShow==false){
+                this.$message({
+                    type:'info',
+                    message:'请先选择一个或多个点位再删除'
+                })
+            }else{
+                this.$refs.pic.setDrawCancel();
+                this.isClick1=false;
+                this.isClick2=false;
+                this.isClick3=false;
+                this.isClick4=false;
+                this.isClick5=false;
+                this.isClick6=true;
+                this.isClick7=false;
+                this.isClick8=false;
+                if(this.picMarkName!="Select_img_Mark")
+                {
+                    this.$refs.pic.deleteDraw();
                 }
+                if(this.picMarkName=="Select_img_Mark"){
+                    // var list1 = this.$refs.pic.saveList();
+                    //     console.log(list1,'list1');  
+                        this.spotPicInfo=[];
+                        this.spotPicInfo.push({
+                            "coordinateInfo":null,
+                            "operationType":2,
+                            "photoId":this.photoIdList,
+                        });
+                            axios({
+                                method:'post',
+                                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                                headers:{
+                                    'token':vm.token
+                                },
+                                params:{
+                                    userGroupId:vm.selectUgId
+                                },
+                                data:this.spotPicInfo
+                        }).then((response)=>{
+                            if(response.data.cd=='0'){
+                                // this.uploadshow=true;
+                                this.$message({
+                                    type:'success',
+                                    message:'删除点位图片成功'
+                                })
+                                this.spotPicInfo=[];
+                                this.getAllMonitorPoint();
+                                
+                                setTimeout(()=>{
+                                    this.getTagList();
+                                },400)
+                            //    this.picShowMark();
+                            }else if(response.data.cd=='-1'){
+                                this.$message({
+                                    type:'error',
+                                    message:response.data.msg
+                                })
+                            }
+                        })
+                    }
+                
+            }
+                
 
         },
         brokenChanged(val){
@@ -5302,6 +5329,9 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.$refs.pic.setDrawCancel();
+                 this.getAllMonitorPoint();
+                
             if(this.picMarkName!="Select_img_Mark"){
                 this.$refs.pic.changeBroken();
             }
@@ -5315,8 +5345,6 @@ export default {
         //获取底图中所有的监测点
         getAllMonitorPoint(){
             var vm=this;
-            this.$refs.pic.Max_Select = 8;
-            this.$refs.pic.Max_type = 2;
             axios({
                 method:'get',
                 url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
@@ -6269,7 +6297,7 @@ export default {
                                         background-size: 100% 100%;
                                         content: '';
                                         top: 9px;
-                                        right: 245px;
+                                        right: 280px;
                                 }
                                 
 
@@ -6300,9 +6328,22 @@ export default {
                                 border-radius: 2px;
                                 cursor: pointer;
                             }
-                            .inputText{
+                            .inputText2{
                                 display: inline-block;
                                 width: 52px;
+                                height: 25px;
+                                border:1px solid #f2f2f2;
+                                background: #f2f2f2;
+                                font-size: 14px;
+                                line-height: 24px;
+                                vertical-align: middle;
+                                color:#666666;
+                                border-radius: 2px;
+                                cursor: pointer;
+                            }
+                            .inputText3{
+                                display: inline-block;
+                                width: 100px;
                                 height: 25px;
                                 border:1px solid #f2f2f2;
                                 background: #f2f2f2;
@@ -6317,7 +6358,7 @@ export default {
                                 display: inline-block;
                                 width: 52px;
                                 height: 25px;
-                                border:1px solid #fff;
+                                border:1px solid #f2f2f2;
                                 background: #fff;
                                 font-size: 14px;
                                 line-height: 24px;

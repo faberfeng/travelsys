@@ -1569,7 +1569,7 @@ export default {
                         width: 90%;
                         margin:0 auto;
                         // height: 395px;
-                        height: 133.7mm;
+                        height: 129.7mm;
                         overflow: hidden;
                             .bottomTableList{
                                 border-collapse: collapse;

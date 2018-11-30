@@ -15,9 +15,9 @@
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
                     <span :class="[{'isClickStyle':isClick4},'headLeftBtn']" @click="enableMoveCommon()">移动</span>
-                    <span :class="[{'isClickStyle':isClick5},'headLeftBtn']" @click="changeBroken(1)">故障</span>
+                    <span :class="[{'isClickStyle':isClick5},'headLeftBtn']" style="width:100px !important" @click="changeBroken(1)">故障/修复</span>
                     <span :class="[{'isClickStyle':isClick6},'headLeftBtn']" @click="deleteDrawCommon()">删除</span>
-                    <span :class="[{'isClickStyle':isClick7},'headLeftBtn']" style="margin-left:10px;" @click="saveDraw()">保存</span>
+                    <span :class="[{'isClickStyle':isClick7},'headLeftBtn']" style="margin-left:20px;" @click="saveDraw()">保存</span>
                     <span :class="[{'isClickStyle':isClick8},'headLeftBtn']" style="background:#fff !important;" @click="cancleAll()">取消</span>
                 </div>
                 <div class="headMiddle">
@@ -812,6 +812,7 @@ export default Vue.component('commonDetail',{
         },
         //单点
         spotClick(){
+            this.$refs.pic.setDrawCancel();
             this.isClick=false;
             this.isClick1=true;
             this.isClick2=false;
@@ -823,9 +824,11 @@ export default Vue.component('commonDetail',{
             this.isClick8=false;
             this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
+            
         },
         //连续
         spotAllClick(){
+            this.$refs.pic.setDrawCancel();
             this.isClick=false;
             this.isClick1=false;
             this.isClick2=true;
@@ -837,9 +840,11 @@ export default Vue.component('commonDetail',{
             this.isClick8=false;
             this.saveDrawShow=true;
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
+            
         },
         //文字
         drawingTxtClick(){
+            this.$refs.pic.setDrawCancel();
             this.isClick=false;
             this.isClick1=false;
             this.isClick2=false;
@@ -850,9 +855,11 @@ export default Vue.component('commonDetail',{
             this.isClick7=false;
             this.isClick8=false;
             this.$refs.pic.setDrawStatus("text",10000,10000,2);
+            
         },
          //开启移动
         enableMoveCommon(){
+            this.$refs.pic.setDrawCancel();
             this.$refs.pic.setMoveStatus();
             this.isClick=false;
             this.isClick1=false;
@@ -863,9 +870,11 @@ export default Vue.component('commonDetail',{
             this.isClick6=false;
             this.isClick7=false;
             this.isClick8=false;
+            
         },
         //删除点
         deleteDrawCommon(){
+            this.$refs.pic.setDrawCancel();
             this.$refs.pic.deleteDraw();
             this.isClick=false;
             this.isClick1=false;
@@ -876,6 +885,8 @@ export default Vue.component('commonDetail',{
             this.isClick6=true;
             this.isClick7=false;
             this.isClick8=false;
+
+            
         },
         //获取导入历史
         getImportHistory(){

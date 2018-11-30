@@ -2194,9 +2194,9 @@ export default {
                             .select{
                                 left:450px;
                                 top:9px;
-                                background: url('./images/fuz.png')no-repeat 0 0;
+                                background: url('./images/select.png')no-repeat 0 0;
                                 &:hover{
-                                    background: url('./images/fuz1.png')no-repeat 0 0;
+                                    background: url('./images/select1.png')no-repeat 0 0;
                                 }
                             }
                     }
