@@ -124,6 +124,7 @@
                 highlight-current
                 :props="defaultProps">
                 </el-tree>
+                <!--  -->
             </div>
             <span slot="footer" class="dialog-footer">   
                 <el-button type="primary" @click="PostaddUser">保存</el-button>
@@ -362,7 +363,15 @@ export default {
             var vm = this;
             //var checkCode = [];
             console.log(vm.jobDetial)
-            this.checkCode = vm.$refs.tree_job.getCheckedKeys();
+            this.checkCode=[];
+            this.checkCode=vm.$refs.tree_job.getCheckedKeys();
+            // var all1 = vm.$refs.tree_job.getCheckedKeys();
+            // var all=[];
+            // var all= vm.$refs.tree_job.getHalfCheckedKeys();
+            // console.log(all,'alll');
+            // console.log(all1,'all1');
+            // this.checkCode=all1.concat(all);
+            console.log(this.checkCode,'this.checkCode')
             if(vm.jobID == 0){
                 var flag = this.jobList.some(item=>{
                     if(item.posName == this.jobDetial.posName){
@@ -400,7 +409,7 @@ export default {
                             vm.adduser = false;
                             this.jobDetial.posName = '';
                             vm.jobDetial.posType ='1';
-                            vm.$refs.tree_job.setCheckedKeys([]);
+                            // vm.$refs.tree_job.setCheckedKeys([]);
                             vm.getInfo();
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg);

@@ -5077,7 +5077,6 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
-
             }
         },
         //多点触发绘图

@@ -40,12 +40,12 @@
                                 <th rowspan="2">操作</th>
                             </tr>
                             <tr>
-                                <th>位置</th>
-                                <th>位移</th>
+                                <th>位置(m)</th>
+                                <th>位移(cm)</th>
                                 <th>报警</th>
                                 <th>时间间隔</th>
-                                <th>位置</th>
-                                <th>变化</th>
+                                <th>位置(m)</th>
+                                <th>变化(mm)</th>
                                 <th>报警</th>
                             </tr>
                         </thead>
@@ -113,7 +113,7 @@
                                 <thead>
                                     <tr>
                                         <th rowspan="2">深度(m)</th>
-                                        <th colspan="2">最新位移(m)</th>
+                                        <th colspan="2">最新位移(mm)</th>
                                         <th colspan="2">最近一次</th>
                                     </tr>
                                     <tr>
@@ -168,7 +168,7 @@
                                 <thead>
                                     <tr>
                                         <th rowspan="2">深度(m)</th>
-                                        <th colspan="2">最新位移(m)</th>
+                                        <th colspan="2">最新位移(mm)</th>
                                         <th colspan="2">最近一次</th>
                                     </tr>
                                     <tr>
@@ -638,8 +638,10 @@ export default Vue.component('commonPitch-detail',{
                 leftDisplayListValue1:[],
                 leftMaxShift1:'',
                 leftMaxShift2:'',
+                leftMaxShift3:'',
                 rightMaxShift1:'',
                 rightMaxShift2:'',
+                rightMaxShift3:'',
                 leftDisplayListValueXdata:[],
                 leftDisplayListValueYdata1:[],
                 leftDisplayListValueYdata2:[],
