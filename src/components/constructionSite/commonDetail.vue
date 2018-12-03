@@ -8,7 +8,7 @@
         </div>
         <div class="projectBody">
             <div class="projectBodyHead">
-                <div class="headLeft">
+                <div class="headLeft" v-show="manageEdit">
                     
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
@@ -25,15 +25,15 @@
                     <label>报警：{{isAlertNum}}</label>
                     <label>故障：{{isBrokenNum}}</label>
                 </div>
-                <div class="headRight">
+                <div class="headRight" v-show="editInspectMethodEdit">
                     <span class="autoImportTxt">采集方式:</span>
                         <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==1" class="import" @click="handExportExcel()">导入</span>
-                        <span v-show="importMethod==2" @click="autoAcquisitionBtn()" class="import">配置</span>
-                        <span class="import1" @click="getImportHistory">导出</span>
+                        <span v-show="importMethod==1&&importDataEdit" class="import" @click="handExportExcel()">导入</span>
+                        <span v-show="importMethod==2&&importDataEdit" @click="autoAcquisitionBtn()" class="import">配置</span>
+                        <span class="import1" v-show="exportDataEdit" @click="getImportHistory">导出</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
@@ -128,13 +128,13 @@
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/时</label><label v-show="itemMonitorType==4">KN</label></label>
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
-                        <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
+                        <span class="leftBtnOne" v-show="editAlertEdit" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">计算：</label><label style="color:#333;font-size:14px;line-height:62px">{{calculatorName}}</label>
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">检核：</label><label style="color:#333;font-size:14px;line-height:62px">{{inspectorName}}</label>
                         </span>
-                        <span class="leftBtnOne" @click="editPersonBtn()">修改</span>
+                        <span class="leftBtnOne" v-show="editAlertEdit" @click="editPersonBtn()">修改</span>
                     </div>
                     <div class="paginationRight">
                         <el-pagination class="elPagination"
@@ -686,7 +686,13 @@ export default Vue.component('commonDetail',{
                     value:23,
                     label:'23时'
                 }
-            ]
+            ],
+            projAuth1:[],
+            manageEdit:false,
+            editInspectMethodEdit:false,
+            importDataEdit:false,
+            exportDataEdit:false,
+            editAlertEdit:false,
 
         }
     },
@@ -699,6 +705,7 @@ export default Vue.component('commonDetail',{
         vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        //  vm.projAuth = localStorage.getItem('projAuth')
         this.getPointDatas();
         this.getUserByUserGroup();
         this.getItemDutyUser();
@@ -707,6 +714,8 @@ export default Vue.component('commonDetail',{
         this.getBaseMapInfoByBaseMapId();
         this.getDetailPointInfo();
         this.getDetectionItemCollectWay();
+        // this.checkAuth();
+        this.getUserInfo();
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
     },
@@ -775,6 +784,43 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+        getUserInfo(){
+                var vm = this
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/getOnlineInfo',
+                    params:{
+                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                    },
+                    headers:{
+                        'accept':'application/json;charset=UTF-8',
+                        'token':vm.token,
+                    },
+                }).then((response)=>{
+                    var id = localStorage.getItem('projId');
+                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                    this.checkAuth();
+                })
+            
+            },
+        checkAuth(){
+            var vm=this;
+            if(vm.projAuth1.indexOf("00601202") > 0){
+              vm.manageEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601203") > 0){
+                vm.editInspectMethodEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601204") > 0){
+                vm.importDataEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601205") > 0){
+                vm.exportDataEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601206") > 0){
+                vm.editAlertEdit = true
+            }
+        },
          selectImg(){
              this.$refs.file.click()
         },
@@ -1007,6 +1053,7 @@ export default Vue.component('commonDetail',{
             this.isClick6=false;
             this.isClick7=false;
             this.isClick8=false;
+            this.$refs.pic.setDrawCancel();
              if(this.picMarkName!="Select_img_Mark"){
                 this.$refs.pic.changeBroken();
                 var vm=this;
@@ -2235,7 +2282,7 @@ export default Vue.component('commonDetail',{
                         height: 25px;
                         border:1px solid #f2f2f2;
                         background: #f2f2f2;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 25px;
                         vertical-align: middle;
                         color:#666666;
@@ -2261,7 +2308,7 @@ export default Vue.component('commonDetail',{
                     
                     .autoImportTxt{
                         color:#999999;
-                        font-size: 12px;
+                        font-size: 14px;
                         width: 60px;
                         height: 26px;
                         line-height: 26px;
@@ -2298,7 +2345,7 @@ export default Vue.component('commonDetail',{
                         height: 26px;
                         border:1px solid #f2f2f2;
                         background: #fc3439;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 26px;
                         // vertical-align: middle;
                         color:#f2f2f2;
@@ -2311,7 +2358,7 @@ export default Vue.component('commonDetail',{
                         height: 26px;
                         border:1px solid #f2f2f2;
                         background: #f2f2f2;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 26px;
                         // vertical-align: middle;
                         color:#666;
@@ -2322,7 +2369,7 @@ export default Vue.component('commonDetail',{
                 }
             }
             .projectBodyCenter{
-                        margin-top:15px !important;
+                        margin-top:10px !important;
                         margin:0 auto;
                         border:1px solid #e6e6e6;
                         height: 540px;
@@ -2369,7 +2416,7 @@ export default Vue.component('commonDetail',{
                                          .moveTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 1px;
@@ -2400,7 +2447,7 @@ export default Vue.component('commonDetail',{
                                          .faultTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 1px;
@@ -2432,7 +2479,7 @@ export default Vue.component('commonDetail',{
                                     .deleteDrawTxt{
                                         line-height: 20px;
                                         color:#666666;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         display: block;
                                         margin-left: 12px;
                                         margin-top: 1px;
@@ -2461,7 +2508,7 @@ export default Vue.component('commonDetail',{
                                             .faultTxt{
                                             line-height: 20px;
                                             color:#666666;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             display: block;
                                             margin-left: 12px;
                                             margin-top: 0px;
@@ -2481,7 +2528,7 @@ export default Vue.component('commonDetail',{
                                 box-shadow: 1px 1px 2px #888888;
                                 background: #fff;
                                 .saveDrawTxt{
-                                    font-size:12px;
+                                    font-size:14px;
                                     color:#666666;
                                     line-height: 32px;
                                 }
@@ -2530,7 +2577,7 @@ export default Vue.component('commonDetail',{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2544,7 +2591,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         .actionBtn{
                                             width: 18px;
@@ -2585,7 +2632,7 @@ export default Vue.component('commonDetail',{
                             height: 25px;
                             border: 1px solid #e6e6e6;
                             background: #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             line-height: 25px;
                             vertical-align: middle;
                             color: #666666;
@@ -2829,7 +2876,7 @@ export default Vue.component('commonDetail',{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2846,7 +2893,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏
@@ -2880,7 +2927,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏
@@ -2920,7 +2967,7 @@ export default Vue.component('commonDetail',{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2937,7 +2984,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏
@@ -2971,7 +3018,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏
@@ -3027,7 +3074,7 @@ export default Vue.component('commonDetail',{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -3044,7 +3091,7 @@ export default Vue.component('commonDetail',{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏

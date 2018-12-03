@@ -207,7 +207,7 @@
             <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.commomHeadPictureFile+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
@@ -260,7 +260,7 @@
             <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.commomHeadPictureFile+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>

@@ -3062,6 +3062,7 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         vm.projAuth = localStorage.getItem('projAuth')
+        console.log(vm.projAuth.indexOf("00400205"),'vm.projAuth');
         vm.entType = localStorage.getItem('entType')
         // vm.WebGlUrl=vm.$store.state.WebGlUrl
         // vm.BIMServerPort=vm.$store.state.BIMServerPort;

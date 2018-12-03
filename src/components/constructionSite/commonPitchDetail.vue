@@ -2417,7 +2417,7 @@ select.autoImport{
                         height: 26px;
                         border:1px solid #f2f2f2;
                         background: #fc3439;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 26px;
                         vertical-align: middle;
                         color:#f2f2f2;
@@ -2431,7 +2431,7 @@ select.autoImport{
                         height: 26px;
                         border:1px solid #f2f2f2;
                         background: #f2f2f2;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 26px;
                         vertical-align: middle;
                         color:#666666;
@@ -2453,7 +2453,7 @@ select.autoImport{
                     position:relative;
                     .autoImportTxt{
                         color:#999999;
-                        font-size: 12px;
+                        font-size: 14px;
                         width: 60px;
                         height: 26px;
                         line-height: 26px;
@@ -2490,7 +2490,7 @@ select.autoImport{
                         height: 26px;
                         border:1px solid #f2f2f2;
                         background: #fc3439;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 26px;
                         // vertical-align: middle;
                         color:#f2f2f2;
@@ -2514,7 +2514,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2531,7 +2531,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     .actionBtn{
                                             width: 18px;
@@ -2579,7 +2579,7 @@ select.autoImport{
                         height: 25px;
                         border: 1px solid #e6e6e6;
                         background: #e6e6e6;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 25px;
                         vertical-align: middle;
                         color: #666666;
@@ -2655,7 +2655,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2669,7 +2669,7 @@ select.autoImport{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                     }
                                 }
@@ -2711,7 +2711,7 @@ select.autoImport{
                         .editSpot{
                             display: inline-block;
                             float: right;
-                            font-size:12px;
+                            font-size:14px;
                             color:#336699;
                             line-height: 30px;
                             cursor: pointer;
@@ -2775,7 +2775,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2789,7 +2789,7 @@ select.autoImport{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                     }
                                 }
@@ -2829,7 +2829,7 @@ select.autoImport{
                         .editSpot{
                             display: inline-block;
                             float: right;
-                            font-size:12px;
+                            font-size:14px;
                             color:#336699;
                             line-height: 30px;
                             cursor: pointer;
@@ -2936,7 +2936,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -2950,7 +2950,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     .actionBtn{
                                             width: 18px;
@@ -3109,7 +3109,7 @@ select.autoImport{
                                 text-align: center;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
-                                font-size: 12px;
+                                font-size: 14px;
                                 color: #333333;
                                 font-weight: normal;
                             }
@@ -3126,7 +3126,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     /*
                                     溢出隐藏
@@ -3160,7 +3160,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     /*
                                     溢出隐藏
@@ -3200,7 +3200,7 @@ select.autoImport{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         font-weight: normal;
                                     }
@@ -3217,7 +3217,7 @@ select.autoImport{
                                             text-align: center;
                                             box-sizing: border-box;
                                             border-right: 1px solid #e6e6e6;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             color: #333333;
                                             /*
                                             溢出隐藏
@@ -3251,7 +3251,7 @@ select.autoImport{
                                             text-align: center;
                                             box-sizing: border-box;
                                             border-right: 1px solid #e6e6e6;
-                                            font-size: 12px;
+                                            font-size: 14px;
                                             color: #333333;
                                             /*
                                             溢出隐藏
@@ -3304,7 +3304,7 @@ select.autoImport{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                 }
@@ -3321,7 +3321,7 @@ select.autoImport{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
-                                        font-size: 12px;
+                                        font-size: 14px;
                                         color: #333333;
                                         /*
                                         溢出隐藏

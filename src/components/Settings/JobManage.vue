@@ -119,6 +119,7 @@
                 node-key="authCode"
                 :default-expanded-keys="jobTree_opend"
                 :default-checked-keys="jobTree_checked"
+                :check-strictly="true"
                 ref="tree_job"
                 highlight-current
                 :props="defaultProps">

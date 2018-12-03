@@ -26,8 +26,8 @@
             </div>
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
                 <div class="textBtnLeft">
-                    <label class="recordTxt" @click="exportrEportsBtn()">导出报告</label>
-                    <label class="exportTxt" @click="walkThroughBtn()">巡视记录</label>
+                    <label class="recordTxt" v-show="exportReportEdit" @click="exportrEportsBtn()">导出报告</label>
+                    <label class="exportTxt" v-show="searchCheckEdit" @click="walkThroughBtn()">巡视记录</label>
                 </div>
                 <div class="overviewBody">
                     <div class="overviewHead">
@@ -45,15 +45,24 @@
                                 </div>
                             </li>
                             <li class="overviewFrameLi1">
-                                <label class="alertTxt">本次报警点位分布</label>
-                                <div id="overviewPie"></div>
+                                <label class="alertTxt">本次变化量报警点位分布</label>
+                                <div id="overviewPie">
+                                </div>
+                                <div class="overviewPieLabel">
+                                    <label style="font-size:24px;color:#333333">{{recentAlertAmount}}</label>
+                                    <label style="display:block;font-size:14px;color:#cccccc;">报警</label>
+                                </div>
                             </li>
                             <li class="overviewFrameLi2">
-                                <label class="alertTxt">累计报警点位分布</label>
+                                <label class="alertTxt">累计变化量报警点位分布</label>
                                 <div id="overviewPie2"></div>
+                                <div class="overviewPieLabel1">
+                                    <label style="font-size:24px;color:#333333">{{totalAlertAmount}}</label>
+                                    <label style="display:block;font-size:14px;color:#cccccc;">报警</label>
+                                </div>
                             </li>
                             <li class="overviewFrameLi3">
-                                <label class="alertTxt">监测工况综述</label>
+                                <label class="alertTxt">监测数据统计</label>
                                 <div id="conditionLine"></div>
                                 <div id="conditionLine1"></div>
 
@@ -80,7 +89,7 @@
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
-                            <span :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
+                            <span v-show="basePicEdit" :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
@@ -197,10 +206,10 @@
                                     <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
-                                        <button title="编辑" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
-                                        <button title="上移" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
-                                        <button title="下移" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count)"></button>
+                                        <button title="编辑" v-show="editInspectWordEdit" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
+                                        <button title="上移" v-show="editInspectWordEdit" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
+                                        <button title="下移" v-show="editInspectWordEdit" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
+                                        <button title="详情" v-show="searchInspectDetailEdit" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count)"></button>
                                         <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
@@ -214,7 +223,8 @@
                             <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
                                 <el-select v-model="positionValue" @change="positionChange()"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
                             </span>
-                            <span class="leftTxtOne"><label style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" @click="previewAlert()">发短信报警</label></span>
+                            <span class="leftTxtOne"><label class="leftTxtOneBtn"  @click="previewAlert()">发送报警短信</label></span>
+                            <!-- style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" -->
                         </div>
                         <div class="tableBodyPaginationRight">
                             <el-pagination class="elPagination"
@@ -544,7 +554,7 @@
             <el-dialog title="发送报警短信" :visible="sendAlertMessageShow" @close="sendAlertMessageCancle()" v-loading="sendAlertMessageLoad">
                 <div class="editBody">
                     <p style="margin-left:50px;text-align:left;width:80%;">以下内容将通过手机短信发送给具有【{{positionListName}}】岗位的{{positionListLength}}名用户：</p>
-                    <p style="margin-left:50px;text-align:left;color:red;width:80%" v-show="alertMessage">{{alertMessage}}</p>
+                    <p style="margin-left:50px;text-align:left;width:80%" v-show="alertMessage" v-html="alertMessage"></p>
                     <p v-show="!alertMessage" style="margin-left:50px;text-align:left;color:red;width:80%">当前群组管理的安全监测点位中无报警测点</p>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -723,6 +733,8 @@ export default {
             weatherIcon:'',
             weatherAir:'',
             weatherTime:'',
+            recentAlertAmount:0,
+            totalAlertAmount:0,
             editSpotShow:false,
             toolShow:false,
             broken:0,
@@ -1167,6 +1179,13 @@ export default {
             todayTime:new Date(),
             onlyNum:'',
             monitorStatus:1,
+            projAuth1:[],//当前用户权限
+            basePicEdit:false,
+            searchCheckEdit:false,
+            exportReportEdit:false,
+            editInspectWordEdit:false,
+            searchInspectDetailEdit:false,
+
         }
     },
     created(){
@@ -1177,10 +1196,18 @@ export default {
         vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        // vm.projAuth = localStorage.getItem('projAuth')
+        // console.log(vm.projAuth,'vm.projAuth');
         this.getAccessUserGroup();
         this.getPositionList();
         this.curTime();
         this.curTime1();
+        setTimeout(()=>{
+             this.getUserInfo();
+        },200)
+       
+        // this.checkAuth();
+        // this.methodp();
         // console.log(window.screen.deviceXDPI,'0000');
     },
     filters:{
@@ -1270,6 +1297,60 @@ export default {
         //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
         // },
         //as计算公式
+        // methodp(){
+        //     axios({
+        //         url:'http://10.252.26.240:8080/arctron-usercenter/UserApp/getInstanceList.json?pCode=BS1803',
+        //         method:'get',
+        //         headers:{
+        //             'tokenId':this.token
+        //         }
+        //     }).then((response)=>{
+        //         console.log('0000')
+        //     })
+        // },
+        getUserInfo(){
+                var vm = this;
+                vm.basePicEdit = false;
+                vm.searchCheckEdit = false;
+                vm.exportReportEdit = false;
+                vm.editInspectWordEdit = false;
+                vm.searchInspectDetailEdit = false;
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/getOnlineInfo',
+                    params:{
+                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                    },
+                    headers:{
+                        'accept':'application/json;charset=UTF-8',
+                        'token':vm.token,
+                    },
+                }).then((response)=>{
+                    var id = localStorage.getItem('projId');
+                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                    
+                    if(vm.projAuth1.indexOf("00600801") > 0){
+                        vm.basePicEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00600901") > 0){
+                        // alert('00600901')
+                        vm.searchCheckEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00601001") > 0){
+                        vm.exportReportEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00601101") > 0){
+                        vm.editInspectWordEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00601201") > 0){
+                        vm.searchInspectDetailEdit = true
+                    }
+                    // this.checkAuth();
+                })
+        },
+        // checkAuth(){
+        //     var vm = this
+        // },
         asMethod(){
             this.asValueArea=3.14*(this.barDiameterValue)*(this.barDiameterValue)/4
         },
@@ -1457,7 +1538,7 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.rt.length!=0){
-                    this.alertMessage=response.data.rt;
+                    this.alertMessage=response.data.rt[0];
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -2476,7 +2557,7 @@ export default {
             if (val == null) {
             return '/';
             } else {
-            return moment(val).format("MM-DD HH:mm");
+            return moment(val).format("MM-DD");
             }
         },
         moreSpotCancle(){
@@ -2663,7 +2744,9 @@ export default {
                         this.weatherJson=JSON.parse(this.detectionSummaryList.weatherJson);
                         this.weatherIcon=this.weatherJson.data[0].wea;
                         this.weatherAir=this.weatherJson.data[0].tem1;
-                        this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week
+                        this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week;
+                        this.recentAlertAmount=this.alertPointAmount.recentAlertAmount;
+                        this.totalAlertAmount=this.alertPointAmount.totalAlertAmount;
                         // console.log(this.weatherJson)
                         var recentData=[];
                         var totalData=[];
@@ -2672,10 +2755,10 @@ export default {
                         var conditionData=[];//监测工况综述
                         recentData.push(
                             {
-                            name:'报警',
+                            name:'报警'+this.alertPointAmount.recentAlertAmount,
                             value:this.alertPointAmount.recentAlertAmount
                             },{
-                                name:'总数',
+                                name:'总数'+this.alertPointAmount.allAmount,
                                 value:this.alertPointAmount.allAmount
                             }
                         );
@@ -2683,11 +2766,11 @@ export default {
                         legendAllData='总数'+this.alertPointAmount.allAmount;
                         totalData.push(
                             {
-                            name:'报警',
+                            name:'报警'+this.alertPointAmount.totalAlertAmount,
                             value:this.alertPointAmount.totalAlertAmount
                             },
                             {
-                                name:'总数',
+                                name:'总数'+this.alertPointAmount.allAmount,
                                 value:this.alertPointAmount.allAmount
                                 
                             }
@@ -2695,7 +2778,6 @@ export default {
                         conditionData.push(
                             this.condition.days,this.condition.acAmount
                         )
-                      
                         var myChart = echarts.init(document.getElementById('overviewPie'))
                         var myChart1 = echarts.init(document.getElementById('overviewPie2'))
                         var myChart2=echarts.init(document.getElementById('conditionLine'))
@@ -2714,12 +2796,12 @@ export default {
                                 // top: 'middle',
                                 bottom: 0,
                                 // left: 'center',
-                                data:['报警','总数']
+                                data:['报警'+this.recentAlertAmount,'总数'+this.alertPointAmount.allAmount]
                             },
                             color:['#ff634d','#dcdcdc'],
                             series : [
                                 {
-                                    name: '本次报警点位分布',
+                                    name: '本次变化量报警点位分布',
                                     type: 'pie',
                                     radius: ['50%', '65%'],
                                     center: ['50%', '50%'],
@@ -2768,12 +2850,12 @@ export default {
                                 // top: 'middle',
                                 bottom: 0,
                                 left: 'center',
-                                data:['报警','总数']
+                                data:['报警'+this.alertPointAmount.totalAlertAmount,'总数'+this.alertPointAmount.allAmount]
                             },
                             color:['#ffaa25','#dcdcdc'],
                             series : [
                                 {
-                                    name: '本次报警点位分布',
+                                    name: '本次变化量报警点位分布',
                                     type: 'pie',
                                     radius: ['50%', '65%'],
                                     center: ['50%', '50%'],
@@ -3954,6 +4036,7 @@ export default {
                 })
 
             }else if(vm.inputWorkingCondition.length>150){
+                console.log(vm.inputWorkingCondition.length,'vm.inputWorkingCondition.length');
                 this.$message({
                     type:'info',
                     message:"文本字符超过150个"
@@ -6035,6 +6118,12 @@ export default {
                                     left:0%;
                                     top:2%;
                                 }
+                                .overviewPieLabel{
+                                    position: absolute;
+                                    top:100px;
+                                    left:46%;
+                                }
+
                             }
                             .overviewFrameLi2{
                                 width: 20%;
@@ -6058,7 +6147,11 @@ export default {
                                     height:180px;
                                     left:0%;
                                     top:2%;
-                                   
+                                }
+                                .overviewPieLabel1{
+                                    position: absolute;
+                                    top:100px;
+                                    left:46%;
                                 }
                             }
                             .overviewFrameLi3{
@@ -6728,6 +6821,21 @@ export default {
                                         color:#333333;
                                         height: 38px;
                                     }
+                                }
+                                .leftTxtOneBtn{
+                                    background: #fc3439;
+                                    margin-right: 20px;
+                                    color: #fff;
+                                    font-size: 14px;
+                                    font-weight: normal;
+                                    line-height: 28px;
+                                    display: inline-block;
+                                    width: 100px;
+                                    height: 28px;
+                                    border: none;
+                                    padding: 0;
+                                    cursor: pointer;
+                                    border-radius: 2px;
                                 }
                             }
                         }

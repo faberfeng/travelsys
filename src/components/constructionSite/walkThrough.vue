@@ -10,10 +10,10 @@
                 <div class="containerHead">
                     <div class="containerHeadLeft">最近巡视者：{{userName}}</div>
                     <div class="containerHeadRight">
-                        <span class="addCheckcontent" @click="addCheckContentBtn()">
+                        <span v-show="editWorkThroughtEdit" class="addCheckcontent" @click="addCheckContentBtn()">
                             添加巡视内容
                         </span>
-                        <span v-show="!isEditShow" class="writeNewContent" @click="writeNewRecord()">
+                        <span v-show="!isEditShow&&inputRemarkEdit" class="writeNewContent" @click="writeNewRecord()">
                             录入新记录
                         </span>
                         <span v-show="isEditShow" class="writeNewContent" @click="saveNewRecord()">
@@ -60,8 +60,8 @@
                                 <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
                                 <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
-                                    <button title="修改" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
-                                    <button title="删除" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
+                                    <button title="修改" v-show="editWorkThroughtEdit" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
+                                    <button title="删除" v-show="editWorkThroughtEdit" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -175,7 +175,11 @@ export default Vue.component('walkThrough',{
             excessWordSizeShow:false,//是否超过字数
             txtVal:0,//文本框的字数
             saveShow:false,
-            checkList:[]
+            checkList:[],
+            projAuth:[],//权限列表
+            editWorkThroughtEdit:false,
+            inputRemarkEdit:false,
+
         }
 
     },
@@ -195,9 +199,11 @@ export default Vue.component('walkThrough',{
         vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.projAuth1 = localStorage.getItem('projAuth')
         vm.curTime();
         vm.initPatrolPresupposition();
         vm.getAllPatrolSummary();
+        vm.getUserInfo();
     },
     filters:{
          timeChange(val) {
@@ -209,6 +215,34 @@ export default Vue.component('walkThrough',{
         },
     },
     methods:{
+        getUserInfo(){
+                var vm = this;
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/getOnlineInfo',
+                    params:{
+                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                    },
+                    headers:{
+                        'accept':'application/json;charset=UTF-8',
+                        'token':vm.token,
+                    },
+                }).then((response)=>{
+                    var id = localStorage.getItem('projId');
+                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                    
+                    if(vm.projAuth1.indexOf("00600902") > 0){
+                    vm.editWorkThroughtEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00600903") > 0){
+                        vm.inputRemarkEdit = true
+                    }
+                })
+        },
+        checkAuth(){
+            var vm=this;
+           
+        },
         back(){
             var vm = this
             vm.$emit('back')
@@ -898,7 +932,7 @@ select.eidtInput{
                         height: 28px;
                         border: 1px solid #f2f2f2;
                         background: #f2f2f2;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 28px;
                         vertical-align: middle;
                         color: #666666;
@@ -911,7 +945,7 @@ select.eidtInput{
                         height: 28px;
                         border: 1px solid #f2f2f2;
                         background: #f2f2f2;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 28px;
                         vertical-align: middle;
                         color: #666666;
@@ -934,13 +968,14 @@ select.eidtInput{
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
                                     .left{
                                        cursor: pointer;
                                         display: inline-block;
                                         float: left;
+                                        font-size: 12px;
                                         &:hover{
                                             color:#336699;
                                         }
@@ -949,6 +984,7 @@ select.eidtInput{
                                         cursor: pointer;
                                         display: inline-block;
                                         float:right;
+                                        font-size: 12px;
                                          &:hover{
                                             color:#336699;
                                         }
@@ -964,7 +1000,7 @@ select.eidtInput{
                                     text-align: left;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
-                                    font-size: 12px;
+                                    font-size: 14px;
                                     color: #333333;
                                     .tdInp{
                                         width: 178px;
@@ -1033,7 +1069,7 @@ select.eidtInput{
                             height: 25px;
                             border: 1px solid #f2f2f2;
                             background: #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             line-height: 25px;
                             vertical-align: middle;
                             color: #666666;
@@ -1049,7 +1085,7 @@ select.eidtInput{
                             height: 25px;
                             border: 1px solid #f2f2f2;
                             background: #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             line-height: 25px;
                             vertical-align: middle;
                             color: #666666;
@@ -1109,7 +1145,7 @@ select.eidtInput{
                             height: 25px;
                             border: 1px solid #f2f2f2;
                             background: #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             line-height: 25px;
                             vertical-align: middle;
                             color: #666666;
@@ -1135,7 +1171,7 @@ select.eidtInput{
                             height: 25px;
                             border: 1px solid #f2f2f2;
                             background: #fc3439;
-                            font-size: 12px;
+                            font-size: 14px;
                             line-height: 25px;
                             vertical-align: middle;
                             color: #ffffff;

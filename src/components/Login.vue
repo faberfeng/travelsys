@@ -3,8 +3,11 @@
         <div class="loginHeader">
             <div style="width:1200px;position:relative;margin:0 auto;height:72px;">
                 <div class="firstTitle">
-                    <span class="firstTitleText">BDMS建筑数据管理系统 </span> 
-                    <span class="sendTitle">工程建设全过程项目管理系统</span></div>
+                    <!-- <span class="firstTitleText">BDMS建筑数据管理系统 </span> 
+                    <span class="sendTitle">工程建设全过程项目管理系统</span> -->
+                    <span class="firstTitleText">建筑VR协同设计平台</span> 
+                    <span class="sendTitle">BIM协作支撑系统</span>
+                </div>
                 <!-- <button class="registerBtn">注册</button> -->
             </div>
         </div>
