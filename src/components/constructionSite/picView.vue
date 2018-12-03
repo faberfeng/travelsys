@@ -2106,7 +2106,7 @@ export default {
                 item.type = this.drawList[i].typeNum;
                 item.plotInfo = JSON.stringify(this.drawList[i]);
                 
-                if(item.type == 5){continue;}
+                // if(item.type == 5){continue;}
 
                 output.push(item);
             }
