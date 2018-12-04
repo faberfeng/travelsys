@@ -48,7 +48,7 @@
         code: '',
         codeTime: '获取验证码',
         total: 60,
-        btnStyle: 'border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;',
+        btnStyle: 'border: 0;font-size: 1rem;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;',
         applyMessage: '',
         totalMessage: 20,
         projId: 0
@@ -98,8 +98,8 @@
             // });
              alert('手机号码格式不正确')
             return;
-           
-            
+
+
           }
           axios({
             method: 'GET',
@@ -113,7 +113,7 @@
           }).then((response) => {
             if (response.data.result) {
               this.codeTime = this.total + 's后重新发送';
-              this.btnStyle = "border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #EAEAEA;";
+              this.btnStyle = "border: 0;font-size: 1rem;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #EAEAEA;";
               let clock = window.setInterval(() => {
                 this.total--;
                 this.codeTime = this.total + 's后重新发送';
@@ -121,7 +121,7 @@
                   window.clearInterval(clock)
                   this.codeTime = '重新发送验证码';
                   this.total = 60;
-                  this.btnStyle = "border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;";
+                  this.btnStyle = "border: 0;font-size: 1rem;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;";
                 }
               }, 1000)
             } else {
@@ -142,7 +142,7 @@
           // });
            alert('手机号码格式不正确');
           return false;
-         
+
         }
         var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
         if (this.email === "") { //输入不能为空
@@ -298,7 +298,7 @@
   .pNameDivT {
     text-align: left;
     margin-left: 1rem;
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: #fc3439;
   }
 
@@ -311,6 +311,7 @@
     width: 95%;
     height: 2rem;
     padding-left: 1rem;
+    font-size: 1.2rem;
     border: 0;
   }
 
@@ -328,6 +329,7 @@
     padding: 0.5rem;
     padding-left: 1rem;
     border: 0;
+    font-size: 1.2rem;
   }
 
   .nameLengthDiv {
