@@ -31,8 +31,8 @@
                             <tr>
                                 <th rowspan="2">序列编号</th>
                                 <th rowspan="2">关键字</th>
-                                <th rowspan="2">起始标高</th>
-                                <th rowspan="2">结束标高</th>
+                                <th rowspan="2">起始深度</th>
+                                <th rowspan="2">结束深度</th>
                                 <th rowspan="2">点位间隔</th>
                                 <th rowspan="2">点位数量</th>
                                 <th colspan="3">当前最大值</th>
@@ -41,7 +41,7 @@
                             </tr>
                             <tr>
                                 <th>位置(m)</th>
-                                <th>位移(cm)</th>
+                                <th>位移(mm)</th>
                                 <th>报警</th>
                                 <th>时间间隔</th>
                                 <th>位置(m)</th>
@@ -77,9 +77,9 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2&&itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2&&itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
                         <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
@@ -140,7 +140,7 @@
                                         <td>{{leftMaxShift1}}mm</td>
                                         <td>{{leftMaxShift2}}mm</td>
                                         <!-- {{(leftDisplayList.recentVariation)[index].recentVariation|totalVariation}} -->
-                                        <td>mm/d</td>
+                                        <td>{{leftMaxVariation}}mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -155,7 +155,7 @@
                         <div class="twoGraph" ref="twoGraphRef">
                             <!-- style="min-height:1900px" -->
                             <vue-highcharts id="leftHightchart" style="min-height:1900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
-                            <canvas style="position:absolute;top:0px;left:0px"  ref="canvasLeftRef" id="canvasLeft"></canvas>
+                            <canvas style="position:absolute;top:48px;left:15px"  ref="canvasLeftRef" id="canvasLeft"></canvas>
                         </div>
                     </div>
                     <div class="containerBottomThree" v-show="rightShow">
@@ -194,7 +194,7 @@
                                         <td>{{rightMaxShift1}}mm</td>
                                         <td>{{rightMaxShift2}}mm</td>
                                         <!-- {{(rightDisplayList.recentVariation)[index].totalVariation|addSprit}} -->
-                                        <td>mm/d</td>
+                                        <td>{{rightMaxVariation}}mm/d</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -208,6 +208,7 @@
                         </div>
                         <div class="fourGraph">
                             <vue-highcharts style="min-height:1900px" :options="optionOnesRight" ref="lineRightChartOne"></vue-highcharts>
+                            <canvas style="position:absolute;top:48px;left:15px"  ref="canvasRightRef" id="canvasRight"></canvas>
                         </div>
                     </div>
                 </div>
@@ -277,12 +278,12 @@
                         <label>{{allnum}}</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">起始高度:</label>
+                        <label class="editTxt">起始深度:</label>
                         <input placeholder="请输入数值" v-model="initDepth" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">结束高度:</label>
+                        <label class="editTxt">结束深度:</label>
                         <input placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
@@ -312,12 +313,12 @@
                         <label>{{spotNum}}</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">起始高度:</label>
+                        <label class="editTxt">起始深度:</label>
                         <input placeholder="请输入数值" v-model="initDepth" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">结束高度:</label>
+                        <label class="editTxt">结束深度:</label>
                         <input placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
@@ -336,12 +337,12 @@
                     <button class="editBtnC" @click="editIndexNumCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog  width="590px" :visible="editMarkShow" title="位置标记管理" @close="editMarkCancle()">
+            <el-dialog  width="590px" :visible="editMarkShowLeft" title="位置标记管理" @close="editMarkCancle()">
                 <div class="editBody">
                     <div class="editBodyone">
                         <div class="markhead">
                             <label class="txt">测点序列{{markSqName}}曲线图位置标记</label>
-                            <label class="btn" @click="addSq()">插入</label>
+                            <label class="btn" @click="addSqL()">插入</label>
                         </div>
                         <div class="editBodytwo">
                             <div class="tablemark">
@@ -354,15 +355,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(item,index) in getPitchSeqMarkList" :key="index">
+                                        <tr v-for="(item,index) in getPitchSeqMarkLeftList" :key="index">
                                             <td width="20%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.depth}}</span><input placeholder="请输入" style="width:100%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markDepth"/></td>
-                                            <td width="50%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.name}}</span><input placeholder="请输入" style="width:55%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markName"/>
-                                                <button v-show="item.id==editPitchShow" @click="editPitchSeqMarkSure(item.id,item.depth,item.name)" class="actionMakeBtn">确定</button>
+                                            <td width="50%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.name}}</span><input placeholder="请输入" style="width:54%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markName"/>
+                                                <button v-show="item.id==editPitchShow" @click="editPitchSeqMarkSure(item.id,item.depth,item.name,item.seqId)" class="actionMakeBtn">确定</button>
                                                 <button v-show="item.id==editPitchShow" @click="canclePitchSeqMark()" class="actionCancleBtn">取消</button>
                                                 </td>
                                             <td width="30%">
                                                 <button title="修改"  @click="editPitchSeqMark(item.id,item.depth,item.name)" class="editBtn actionBtn"></button>
-                                                <button title="删除" @click="deletePitchSeqMark(item.id)" class="actionBtn deleteBtn"></button>
+                                                <button title="删除" @click="deletePitchSeqMark(item.id,item.seqId)" class="actionBtn deleteBtn"></button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -374,6 +375,47 @@
                 </div>
                  <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addPitchSeqMark()" >确定</button>
+                    <button class="editBtnC" @click="editMarkCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog  width="590px" :visible="editMarkShowRight" title="位置标记管理" @close="editMarkCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <div class="markhead">
+                            <label class="txt">测点序列{{markSqName}}曲线图位置标记</label>
+                            <label class="btn" @click="addSqR()">插入</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <div class="tablemark">
+                                <table class="marktableList" border="1" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">位置</th>
+                                            <th width="50%">标记名称</th>
+                                            <th width="30%">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item,index) in getPitchSeqMarkRightList" :key="index">
+                                            <td width="20%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.depth}}</span><input placeholder="请输入" style="width:100%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markDepth"/></td>
+                                            <td width="50%"><span v-show="item.id!=null&&item.id!=editPitchShow">{{item.name}}</span><input placeholder="请输入" style="width:54%;height:28px" v-show="item.id==null||item.id==editPitchShow" v-model="markName"/>
+                                                <button v-show="item.id==editPitchShow" @click="editPitchSeqMarkSure1(item.id,item.depth,item.name,item.seqId)" class="actionMakeBtn">确定</button>
+                                                <button v-show="item.id==editPitchShow" @click="canclePitchSeqMark()" class="actionCancleBtn">取消</button>
+                                                </td>
+                                            <td width="30%">
+                                                <button title="修改"  @click="editPitchSeqMark(item.id,item.depth,item.name)" class="editBtn actionBtn"></button>
+                                                <button title="删除" @click="deletePitchSeqMark1(item.id,item.seqId)" class="actionBtn deleteBtn"></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addPitchSeqMark1()" >确定</button>
                     <button class="editBtnC" @click="editMarkCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -622,6 +664,8 @@ export default Vue.component('commonPitch-detail',{
                 addIndexNumShow:false,//增加序列
                 editIndexNumShow:false,//修改序列
                 editMarkShow:false,//编辑mark
+                editMarkShowLeft:false,
+                editMarkShowRight:false,
                 initDepth:'',//起始标高
                 terminalDepth:'',//结束标高
                 allnum:'',
@@ -638,9 +682,13 @@ export default Vue.component('commonPitch-detail',{
                 leftDisplayListValue1:[],
                 leftMaxShift1:'',
                 leftMaxShift2:'',
+                leftMaxVariation:"",
+                leftMaxHeight:'',
                 leftMaxShift3:'',
                 rightMaxShift1:'',
                 rightMaxShift2:'',
+                rightMaxVariation:"",
+                rightMaxHeight:'',
                 rightMaxShift3:'',
                 leftDisplayListValueXdata:[],
                 leftDisplayListValueYdata1:[],
@@ -911,6 +959,8 @@ export default Vue.component('commonPitch-detail',{
                 ],
                 testShow:false,
                 getPitchSeqMarkList:'',
+                getPitchSeqMarkLeftList:'',
+                getPitchSeqMarkRightList:'',
                 markDepth:'',
                 markName:'',
                 editPitchShow:'',
@@ -1412,6 +1462,17 @@ export default Vue.component('commonPitch-detail',{
                                     maxShift2.push(item.shift)
                                 })
                                 this.leftMaxShift2=this.getMaxValue(maxShift2);
+                                var maxVariation=[];
+                                var maxHeight=[];
+                                this.leftDisplayList.recentVariation.forEach((item)=>{
+                                    maxVariation.push(item.recentVariation)
+                                    maxHeight.push(parseInt(item.otherParam))
+                                })
+                                // console.log(maxHeight,'maxHeight')
+                                // console.log(maxVariation,'maxVariation')
+                                this.leftMaxVariation=this.getMaxValue(maxVariation)
+                                this.leftMaxHeight=this.getMaxValue(maxHeight)
+                                console.log(this.leftMaxHeight,'this.leftMaxHeight')
                             }
                            
                             
@@ -1503,11 +1564,10 @@ export default Vue.component('commonPitch-detail',{
                                                 this.rightDisplayListValueYdata1.push(array[index].shift)
                                             }else if(array[index].acquisitionTime==this.time3){
                                                 this.rightDisplayListValue2.push(array[index])
-                                                this.rightDisplayListValueXdata.push(array[index].depth)
+                                                // this.rightDisplayListValueXdata.push(array[index].depth)
                                                 this.rightDisplayListValueYdata2.push(array[index].shift)
                                             }
                                         })
-                                        
                                         let lineRightChart=this.$refs.lineRightChartOne;
                                         // document.getElementById('leftHightchart').style.minHeight='1950px'
                                         lineRightChart.delegateMethod('showLoading', 'Loading...');
@@ -1531,8 +1591,15 @@ export default Vue.component('commonPitch-detail',{
                                     maxShift2.push(item.shift)
                                 })
                                 this.rightMaxShift2=this.getMaxValue(maxShift2);
+                                var maxVariation=[];
+                                var maxHeight=[];
+                                this.rightDisplayList.recentVariation.forEach((item)=>{
+                                    maxVariation.push(item.recentVariation)
+                                    maxHeight.push(parseInt(item.otherParam))
+                                })
+                                this.rightMaxVariation=this.getMaxValue(maxVariation)
+                                this.rightMaxHeight=this.getMaxValue(maxHeight)
                             }
-                            
                         }
                         // console.log(this.pitchDetailDataList);
                     }else if(respose.data.cd=='-1'){
@@ -1554,7 +1621,7 @@ export default Vue.component('commonPitch-detail',{
                 }else if(!(/^[0-9]+.?[0-9]*$/.test(this.initDepth))){
                     this.$message({
                             type:'info',
-                            message:'起始高度需为数字'
+                            message:'起始深度需为数字'
                         })
                 }else if(this.terminalDepth==''){
                     this.$message({
@@ -1564,7 +1631,7 @@ export default Vue.component('commonPitch-detail',{
                 }else if(!(/^[0-9]+.?[0-9]*$/.test(this.terminalDepth))){
                     this.$message({
                             type:'info',
-                            message:'结束高度需为数字'
+                            message:'结束深度需为数字'
                         })
                 }else if(this.pointDistance==''){
                      this.$message({
@@ -1706,9 +1773,12 @@ export default Vue.component('commonPitch-detail',{
                 this.leftDisplayName=name;
                 this.leftDisplayShow=true;
                 this.getPitchDetailDataBySeqIdLeft(id)
+                this.markSqId=id;
+                // this.getPitchSeqMark();
+                this.getPitchSeqMarkL(this.leftSqId);
                 // setTimeout(()=>{
                 //     this.drawSpotMark();
-                // },500)
+                // },1000)
                 
                
             },
@@ -1718,28 +1788,36 @@ export default Vue.component('commonPitch-detail',{
                 this.rightSqName=name;
                 this.rightDisplayName=name;
                 this.rightDisplayShow=true;
-              
-                 this.getPitchDetailDataBySeqIdRight(id)                
+                this.getPitchDetailDataBySeqIdRight(id)
+                this.markSqId=id;
+                // this.getPitchSeqMark();          
+                this.getPitchSeqMarkR(this.rightSqId);      
                 // console.log(this.rightDisplayList,'右边数据')
             },
             editLeftMarkSpot(){
                 this.markSqId=this.leftSqId;
                 this.markSqName=this.leftSqName;
-                this.editMarkShow=true;
-                this.getPitchSeqMark();
+                this.editMarkShowLeft=true;
+                this.getPitchSeqMarkL(this.leftSqId);
+                // this.getPitchSeqMark();
             },
             editRightMarkSpot(){
                 this.markSqId=this.rightSqId;
                 this.markSqName=this.leftSqName;
-                this.editMarkShow=true;
-                this.getPitchSeqMark();
+                // this.editMarkShow=true;
+                this.editMarkShowRight=true;
+                this.getPitchSeqMarkR(this.rightSqId);
             },
             //插入
-            addSq(){
-                this.getPitchSeqMarkList.push({"depth":'',"id":null,"name":'',"seqId":''})
+            addSqL(){
+                this.getPitchSeqMarkLeftList.push({"depth":'',"id":null,"name":'',"seqId":''})
             },
+             addSqR(){
+                this.getPitchSeqMarkRightList.push({"depth":'',"id":null,"name":'',"seqId":''})
+            },
+
             //获取斜度序列标记
-            getPitchSeqMark(){
+            getPitchSeqMarkL(val){
                 var vm=this;
                 axios({
                     method:'post',
@@ -1748,11 +1826,15 @@ export default Vue.component('commonPitch-detail',{
                         'token':vm.token
                     },
                     params:{
-                        seqId:this.markSqId,
+                        seqId:val,
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.getPitchSeqMarkList=response.data.rt;
+                        this.getPitchSeqMarkLeftList=response.data.rt;
+                        setTimeout(() => {
+                            this.drawLeftSpotMark();
+                        }, 1000);
                         // console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
                     }else{
                         this.$message({
@@ -1762,8 +1844,62 @@ export default Vue.component('commonPitch-detail',{
                     }
                 })
             },
-            //
 
+            getPitchSeqMarkR(val){
+                var vm=this;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/getPitchSeqMark',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        seqId:val,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getPitchSeqMarkList=response.data.rt;
+                        this.getPitchSeqMarkRightList=response.data.rt;
+                        setTimeout(() => {
+                            this.drawRightSpotMark();
+                        }, 1000);
+                        // console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
+                    }else{
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            // getPitchSeqMark(){
+            //     var vm=this;
+            //     axios({
+            //         method:'post',
+            //         url:this.BDMSUrl+'detectionInfo/getPitchSeqMark',
+            //         headers:{
+            //             'token':vm.token
+            //         },
+            //         params:{
+            //             seqId:this.markSqId,
+            //         }
+            //     }).then((response)=>{
+            //         if(response.data.cd=='0'){
+            //             this.getPitchSeqMarkList=response.data.rt;
+            //             this.getPitchSeqMarkRightList=response.data.rt;
+            //             setTimeout(() => {
+            //                 this.drawRightSpotMark();
+            //             }, 1000);
+            //             // console.log(this.getPitchSeqMarkList,'this.getPitchSeqMarkList');
+            //         }else{
+            //             this.$message({
+            //                 type:'error',
+            //                 message:response.data.msg
+            //             })
+            //         }
+            //     })
+            // },
+            //
             //添加斜度序列标记
             addPitchSeqMark(){
                 var vm=this;
@@ -1804,7 +1940,9 @@ export default Vue.component('commonPitch-detail',{
                         if(response.data.cd=='0'){
                             this.markDepth='';
                             this.markName='';
-                            this.getPitchSeqMark();
+                            // this.getPitchSeqMarkR(this.markSqId);
+                            this.getPitchSeqMarkL(this.markSqId);
+                            this.editMarkShowLeft=false;
                             // this.drawSpotMark();
                         }else{
                             this.$message({
@@ -1815,17 +1953,119 @@ export default Vue.component('commonPitch-detail',{
                     })
                 }
             },
-            drawSpotMark(){
+            addPitchSeqMark1(){
+                var vm=this;
+               
+                if(this.editPitchShow){
+                     this.$message({
+                        type:"info",
+                        message:'当前不可操作，请保存编辑修改'
+                    })
+                }else if(this.markDepth==''){
+                    this.$message({
+                        type:"info",
+                        message:'请输入位置标记'
+                    })
+                }else if(this.markName==''){
+                     this.$message({
+                        type:"info",
+                        message:'请输入位置标记名称'
+                    })
+                }else if(this.markName.length>8){
+                    this.$message({
+                        type:"info",
+                        message:'位置标记名称不能多余8个字符'
+                    })
+                }else{
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'detectionInfo/addPitchSeqMark',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            seqId:this.markSqId,
+                            depth:this.markDepth,
+                            name:this.markName,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.markDepth='';
+                            this.markName='';
+                            this.getPitchSeqMarkR(this.markSqId);
+                            this.editMarkShowRight=false;
+                            // this.getPitchSeqMarkL(this.markSqId);
+                            // this.drawSpotMark();
+                        }else{
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
+            },
+            drawLeftSpotMark(){
                 // console.log(this.$refs.lineLeftChartOne.clientWidth,'000');
                 // console.log(document.getElementsByClassName('highcharts-background'))
-                this.$refs.canvasLeftRef.style.width='300px';
-                this.$refs.canvasLeftRef.style.height='1000px';
-                var canvas=document.getElementById('canvasLeft');
-                var ctx=canvas.getContext('2d');
-                ctx.beginPath();
-                // ctx.moveTo(100,100);
-                ctx.arc(30,50,10,0,2*Math.PI);
-                ctx.stroke();
+                if(this.$refs.lineLeftChartOne&&this.leftDisplayShow){
+                    console.log(this.$refs.lineLeftChartOne.$el.clientWidth,'offsetWidth');
+                    console.log(this.$refs.lineLeftChartOne.$el.clientHeight,'offsetWidth');
+                    var heightLeft=this.$refs.lineLeftChartOne.$el.clientHeight;
+                    this.$refs.canvasLeftRef.style.width=this.$refs.lineLeftChartOne.$el.clientWidth+'px';
+                    this.$refs.canvasLeftRef.style.height=this.$refs.lineLeftChartOne.$el.clientHeight+'px';
+                    this.$refs.canvasLeftRef.width=this.$refs.lineLeftChartOne.$el.clientWidth;
+                    this.$refs.canvasLeftRef.height=this.$refs.lineLeftChartOne.$el.clientHeight;
+                    var canvasLeft=document.getElementById('canvasLeft');
+                    var ctxLeft=canvasLeft.getContext('2d');
+                    ctxLeft.font='normal 12px Arial';
+                    ctxLeft.fillStyle='red';
+                    var spotHeightLeft=(heightLeft-10)/(this.leftMaxHeight+1);
+                    this.getPitchSeqMarkLeftList.forEach((item)=>{
+                        console.log(spotHeightLeft*Number(item.depth),'0000');
+                        ctxLeft.strokeRect(80,spotHeightLeft*Number(item.depth),15,15);
+                        ctxLeft.strokeText(item.name,100,spotHeightLeft*Number(item.depth)+11,[100])
+                    })
+                }
+                // if(this.$refs.lineRightChartOne&&this.rightDisplayShow){
+                //     var heightRight=this.$refs.lineRightChartOne.$el.clientHeight;
+                //     this.$refs.canvasRightRef.style.width=this.$refs.lineRightChartOne.$el.clientWidth+'px';
+                //     this.$refs.canvasRightRef.style.height=this.$refs.lineRightChartOne.$el.clientHeight+'px';
+                //     this.$refs.canvasRightRef.width=this.$refs.lineRightChartOne.$el.clientWidth;
+                //     this.$refs.canvasRightRef.height=this.$refs.lineRightChartOne.$el.clientHeight;
+                //     var canvasRight=document.getElementById('canvasRight');
+                //     var ctxRight=canvasRight.getContext('2d');
+                //     ctxRight.font='normal 12px Arial';
+                //     ctxRight.fillStyle='red';
+                //     var spotHeightRight=heightRight/this.rightMaxHeight;
+                //     this.getPitchSeqMarkRightList.forEach((item)=>{
+                //         // console.log(spotHeight*parseInt(item.depth),'0000');
+                //         ctxRight.strokeRect(80,spotHeightRight*parseInt(item.depth)-18,15,15);
+                //         ctxRight.strokeText(item.name,100,  spotHeightRight*parseInt(item.depth)-5, [100])
+                //     })
+                // }
+                // ctx.stroke();
+            },
+            drawRightSpotMark(){
+        
+                if(this.$refs.lineRightChartOne&&this.rightDisplayShow){
+                    var heightRight=this.$refs.lineRightChartOne.$el.clientHeight;
+                    this.$refs.canvasRightRef.style.width=this.$refs.lineRightChartOne.$el.clientWidth+'px';
+                    this.$refs.canvasRightRef.style.height=this.$refs.lineRightChartOne.$el.clientHeight+'px';
+                    this.$refs.canvasRightRef.width=this.$refs.lineRightChartOne.$el.clientWidth;
+                    this.$refs.canvasRightRef.height=this.$refs.lineRightChartOne.$el.clientHeight;
+                    var canvasRight=document.getElementById('canvasRight');
+                    var ctxRight=canvasRight.getContext('2d');
+                    ctxRight.font='normal 12px Arial';
+                    ctxRight.fillStyle='red';
+                    var spotHeightRight=heightRight/this.rightMaxHeight;
+                    this.getPitchSeqMarkRightList.forEach((item)=>{
+                        // console.log(spotHeight*parseInt(item.depth),'0000');
+                        ctxRight.strokeRect(80,spotHeightRight*parseInt(item.depth)-18,15,15);
+                        ctxRight.strokeText(item.name,100,  spotHeightRight*parseInt(item.depth)-5, [100])
+                    })
+                }
+                // ctx.stroke();
             },
             canclePitchSeqMark(){
                 // this.getPitchSeqMarkList.pop();
@@ -1849,7 +2089,7 @@ export default Vue.component('commonPitch-detail',{
                 
             },
             //
-            editPitchSeqMarkSure(id,depth,name){
+            editPitchSeqMarkSure(id,depth,name,seqId){
                 var vm=this;
                   axios({
                     method:'post',
@@ -1867,7 +2107,34 @@ export default Vue.component('commonPitch-detail',{
                         this.editPitchShow='';
                         this.markDepth='';
                         this.markName='';
-                        this.getPitchSeqMark();
+                        this.getPitchSeqMarkL(seqId);
+                    }else{
+                        this.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                })
+            },
+            editPitchSeqMarkSure1(id,depth,name,seqId){
+                var vm=this;
+                  axios({
+                    method:'post',
+                    url:this.BDMSUrl+'detectionInfo/editPitchSeqMark',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        id:id,
+                        depth:this.markDepth,
+                        name:this.markName,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.editPitchShow='';
+                        this.markDepth='';
+                        this.markName='';
+                        this.getPitchSeqMarkR(seqId);
                     }else{
                         this.$message({
                             type:'error',
@@ -1877,7 +2144,7 @@ export default Vue.component('commonPitch-detail',{
                 })
             },
             //删除斜度序列标记
-            deletePitchSeqMark(val){
+            deletePitchSeqMark(val,seqId){
                 var vm=this;
                 if(val==null){
                     this.$message({
@@ -1897,7 +2164,41 @@ export default Vue.component('commonPitch-detail',{
                         }
                     }).then((response)=>{
                         if(response.data.cd=='0'){
-                            this.getPitchSeqMark();
+                            this.getPitchSeqMarkL(seqId);
+                            this.$message({
+                                type:'success',
+                                message:'位置标记删除成功'
+                            })
+                        }else{
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                    })
+                }
+            },
+            deletePitchSeqMark1(val,seqId){
+                var vm=this;
+                if(val==null){
+                    this.$message({
+                            type:'success',
+                            message:'当前不可操作，请先保存'
+                        })
+                    
+                }else{
+                    axios({
+                        method:'post',
+                        url:this.BDMSUrl+'detectionInfo/deletePitchSeqMark',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                        id:val,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd=='0'){
+                            this.getPitchSeqMarkR(seqId);
                             this.$message({
                                 type:'success',
                                 message:'位置标记删除成功'
@@ -1913,6 +2214,8 @@ export default Vue.component('commonPitch-detail',{
             },
             editMarkCancle(){
                 this.editMarkShow=false;
+                this.editMarkShowLeft=false;
+                this.editMarkShowRight=false;
             },
 
             ////导出历史记录
@@ -2843,6 +3146,7 @@ select.autoImport{
                             margin-top: 20px;
                             border: 1px solid #ccc;
                             padding: 48px 15px 25px 15px;
+                            position: relative;
                     }
                 }
 

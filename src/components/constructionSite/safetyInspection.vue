@@ -365,8 +365,8 @@
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" v-show="monitorImportType==4&&frequencyShow" @click="formulaSetting()" >公式设定</button>
-                        <button v-show="testShow" class="editBtnC" style="margin-right:88px;" @click="verifyExcelDataBtn()">测试</button>
-                        <button v-show="!testShow" class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
+                        <button  class="editBtnC" style="margin-right:15px;" @click="verifyExcelDataBtn()">测试</button>
+                        <button  class="editBtnS" @click="importExcelDataMakeSure()" >确定</button>
                         <button class="editBtnC" @click="importGatherDataCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -469,8 +469,8 @@
                 </div>
                 <div slot="footer" class="dialog-footer">
                        
-                        <button v-show="testShow" class="editBtnC" style="margin-right:40px;" @click="batchImportVerify()">测试</button>
-                        <button v-show="!testShow" class="editBtnS" @click="batchImportVerifyMake()" >确定</button>
+                        <button  class="editBtnC" style="margin-right:15px;" @click="batchImportVerify()">测试</button>
+                        <button  class="editBtnS" @click="batchImportVerifyMake()" >确定</button>
                         <button class="editBtnC" @click="batchImportCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -625,13 +625,11 @@
                                     <img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  />
                                     <input class="upInput1"  type="file" accept="image/*"  @change="addCover($event)" ref="drawingsInfo1"  id="drawingsInfo1" multiple="multiple">
                                 </label>
-                                <img v-show="coverPathUrl" class="logo" :src="QJFileManageSystemURL+coverPathUrl" style="width:240px;height:60px;"/>
-                                
-                                
+                                <img v-show="coverPathUrl" class="logo" :src="QJFileManageSystemURL+coverPathUrl" style="width:240px;height:60px;"/> 
                             </div>
-                            <div class="imgBodyRight">
+                            <!-- <div class="imgBodyRight">
                                 <img v-show="coverPathUrl" class="logo" :src="QJFileManageSystemURL+coverPathUrl" style="width:240px;height:60px;"/>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                      <div class="editEportBodytwo" >
@@ -4610,7 +4608,7 @@ export default {
                                             this.getImportColumnSetting(item.index);
                                             this.sheetIndex=item.index;
                                             // console.log(this.sheetIndex);
-                                        }else{
+                                        }else if(item.name!=item1.keyword){
                                             this.$message({
                                                 type:'info',
                                                 message:'无匹配数据'
@@ -4620,19 +4618,19 @@ export default {
                                    
                                 })
                             }else{
-                            this.excelSheetInfo.forEach((item)=>{
-                                if(item.name==this.matchKeyWord){
-                                    this.getExcelColumnBySheet(item.index);
-                                    this.getImportColumnSetting(item.index);
-                                    this.sheetIndex=item.index;
-                                    // console.log(this.sheetIndex);
-                                }else{
-                                        this.$message({
-                                            type:'info',
-                                            message:'无匹配数据'
-                                        })
-                                    }
-                            })
+                                this.excelSheetInfo.forEach((item)=>{
+                                    if(item.name==this.matchKeyWord){
+                                        this.getExcelColumnBySheet(item.index);
+                                        this.getImportColumnSetting(item.index);
+                                        this.sheetIndex=item.index;
+                                        // console.log(this.sheetIndex);
+                                    }else if(item.name!=this.matchKeyWord){
+                                            this.$message({
+                                                type:'info',
+                                                message:'无匹配数据'
+                                            })
+                                        }
+                                })
                             } 
                             document.getElementById('fileInfoExport').value="";
                             vm.excelFileList='';
@@ -5439,6 +5437,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
+                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
@@ -7343,11 +7342,12 @@ export default {
                             position: relative;
                             float: left;
                             width: 49%;
-                            width: 260px;
+                            width: 240px;
                             // left:20px;
-                            height: 65px;
+                            height: 60px;
                             border:1px solid #ccc;
                             border-radius: 3px;
+                            margin-left:12px;
                             .upInput1{
                                 display: none;
                             }

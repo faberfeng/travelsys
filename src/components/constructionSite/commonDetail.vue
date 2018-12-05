@@ -76,26 +76,28 @@
                                 <th>采集时间</th>
                                 <th v-show="itemMonitorType==1">位移(mm)</th>
                                 <th v-show="itemMonitorType==2">高程(m)</th>
-                                <th v-show="itemMonitorType==3">水位(m)</th>
-                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==3">测量值(m)</th>
+                                <th v-show="itemMonitorType==3">管口高(m)</th>
                                 <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
                                 <th v-show="itemMonitorType==1">位移(mm)</th>
                                 <th v-show="itemMonitorType==2">高程(m)</th>
-                                <th v-show="itemMonitorType==3">水位(m)</th>
-                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==3">测量值(m)</th>
+                                <th v-show="itemMonitorType==3">管口高(m)</th>
                                 <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>采集时间</th>
                                 <th v-show="itemMonitorType==1">位移(mm)</th>
                                 <th v-show="itemMonitorType==2">高程(m)</th>
-                                <th v-show="itemMonitorType==3">水位(m)</th>
-                                <th v-show="itemMonitorType==3">管口(m)</th>
+                                <th v-show="itemMonitorType==3">测量值(m)</th>
+                                <th v-show="itemMonitorType==3">管口高(m)</th>
                                 <th v-show="itemMonitorType==4">受力(kN)</th>
                                 <th>变化时间</th>
-                                <th v-show="itemMonitorType!=4">本次(mm)</th>
+                                <th v-show="itemMonitorType!=4&&itemMonitorType!=3">本次(mm)</th>
                                 <th v-show="itemMonitorType==4">本次(kN)</th>
-                                <th v-show="itemMonitorType!=4">累计(mm)</th>
+                                <th v-show="itemMonitorType==3">本次(cm)</th>
+                                <th v-show="itemMonitorType!=4&&itemMonitorType!=3">累计(mm)</th>
                                 <th v-show="itemMonitorType==4">累计(kN)</th>
+                                <th v-show="itemMonitorType==3">累计(cm)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,8 +113,14 @@
                                 <td>{{item.latestData|addSprit()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSprit()}}</td>
                                 <td>{{item.variationTime|timeStamp()}}</td>
-                                <td>{{item.recentVariation|addSprit()}}</td>
-                                <td>{{item.totalVariation|addSprit()}}</td>
+                                <td v-show="itemMonitorType==1">{{item.recentVariation|addSprit()}}</td>
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.recentVariation*1000|addSprit()}}</td>
+                                <td v-show="itemMonitorType==4">{{item.recentVariation|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.recentVariation*100|addSprit()}}</td>
+                                 <td v-show="itemMonitorType==1">{{item.recentVariation|addSprit()}}</td>
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.totalVariation*1000|addSprit()}}</td>
+                                <td v-show="itemMonitorType==4">{{item.totalVariation|addSprit()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSprit()}}</td>
                                 <td>
                                     <button title="定位" class="location actionBtn"></button>
                                     <button title="曲线" @click="getCurve(item.pointId,item.pointName)" class="curve actionBtn"></button>
@@ -124,9 +132,9 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4">mm/天</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4">mm/时</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4">mm</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm/天</label><label v-show="itemMonitorType==2||itemMonitorType==3">m/天</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm/时</label><label v-show="itemMonitorType==2||itemMonitorType==3">m/时</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2||itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
                         <span class="leftBtnOne" v-show="editAlertEdit" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">

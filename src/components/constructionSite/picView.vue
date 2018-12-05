@@ -1164,7 +1164,7 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].itemName);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         

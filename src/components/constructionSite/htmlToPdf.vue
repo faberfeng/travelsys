@@ -6,12 +6,12 @@
                 <div class="pdfCover">
                     <div id="pdfImg">
                          <!-- <img id="img1" style="width:400px;height:100px;" src="../../assets/huajianlogo.png"/> -->
-                        <img id="img1" style="width:400px;height:45mm;"  >
+                        <img id="img1" style="width:160mm;height:40mm;"  >
                         <!-- <img id="img1" style="width:400px;height:100px;" :src="main(coverPath)"> -->
                     </div>
                     <h5 style="margin-top:20px;color:#000;font-size:4.94mm;">{{projectName}}--监测报表</h5>
                     <div class="time"><label class="timelabel1">报告编码：{{onlyNum}}</label></div>
-                    <div class="time"><label class="timelabel1" >本次观测日期：{{beforeDate}}</label><label class="timelabel2">前次观测日期：{{referenceDate}}</label></div> 
+                    <div class="time"><label class="timelabel1" >本次观测日期：{{beforeDate|timeChange()}}</label><label class="timelabel2">前次观测日期：{{referenceDate|timeChange()}}</label></div> 
                     <div class="tableList">
                         <div class="tableListDiv">
                             <ul class="tableListUl">
@@ -33,6 +33,10 @@
                 </div>
                 <!-- 概述 -->
                 <div class="pdfSummary">
+                    <div class="qrcodeBody">
+                            <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                            <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
+                    </div>
                     <label class="pdfSummaryHead">概述</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                     <div class="txt"><label class="label1">观测时间：</label></div>
@@ -82,6 +86,10 @@
                 </div>
                 <!-- 现场巡检 -->
                 <div class="pdfInspection">
+                     <div class="qrcodeBody">
+                            <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                            <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
+                    </div>
                      <label class="pdfSummaryHead">现场巡检报表</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                     <div class="txt"><label class="label1">观测者：</label><span class="span1"><label>观测时间：</label></span></div>
@@ -126,13 +134,24 @@
                 <!-- 公共面积 -->
                 <ul class="inspectUl">
                     <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
+                       
                         <div class="verticalLength" v-show="item.type!=5">
+                             <div class="qrcodeBody">
+                                <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                                <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
+                            </div>
                             <label class="pdfSummaryHead1">{{company}}</label>
                             <label class="pdfSummaryHead">监测报表</label>
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            
+                            <div class="bottomTabel2" v-show="baseMapPosition==1">
+                                <div class="bottomTabelDiv"  style="padding: 0px; overflow: hidden;">
+                                        <div class="bottomTabelDiv1">
+                                            <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
+                                        </div>
+                                </div>
+                             </div>
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
@@ -168,10 +187,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="bottomTabel1">
-                                <div class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
+                            <div class="bottomTabel1" v-show="baseMapPosition==2">
+                                <div  class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
                                     <div class="bottomTabelDiv1">
-                                     <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
+                                        <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                      </div>
                                 </div>
                                  <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
@@ -183,6 +202,22 @@
                                         <tr>
                                             <td rowspan="3">说明</td>
                                             <td colspan="6" style="text-align:left;margin-left:2px;">1、报警值：变化速率》3mm/d,累计值达到30mm</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                            </div>
+                            <div class="bottomTabel3" v-show="baseMapPosition==1">
+                                 <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="3">说明</td>
+                                            <td colspan="6" style="text-align:left;margin-left:2px;">1、报警值：变化速率>=3mm/d,累计值达到30mm</td>
                                         </tr>
                                         <tr>
                                             <td colspan="6"></td>
@@ -367,7 +402,7 @@ export default {
             if (val == null) {
             return '/';
             } else {
-            return moment(val).format("YYYY-MM-DD HH:mm");
+            return moment(val).format("YYYY-MM-DD HH:mm:ss");
             }
         },
         timeStamp(StatusMinute){	
@@ -517,10 +552,10 @@ export default {
             this.$refs[str][0].enableType(this.getAllMonitorItemList[i].type,this.getAllMonitorItemList[i].id,this.getAllMonitorItemList[i].spotNum);
         }
         this.$refs[str][0].enableType(type,id,true);
-
+            // 523.0,210.0
         switch(this.optimalizationSchema){
-            case 1:this.$refs[str][0].print_priority_points(523.0,210.0);break;
-            case 2:this.$refs[str][0].print_priority_pic(523.0,210.0);break;
+            case 1:this.$refs[str][0].print_priority_points(698.0,359.0);break;
+            case 2:this.$refs[str][0].print_priority_pic(698.0,359.0);break;
         }
         
     },
@@ -1096,6 +1131,7 @@ export default {
                 }
             }
         }
+       
         .pdfSummary{
             width:98%;
             //  width:100%;
@@ -1105,6 +1141,15 @@ export default {
             margin:10px auto;
             // margin:17px auto;
             position: relative;
+             .qrcodeBody{
+                 position: absolute;
+                 left:10px;
+                 top:42px;
+                 .onlyNumStyle{
+                     display: block;
+                     margin-left:30px;
+                 }
+            }
             .pageNum{
                     position: absolute;
                     top:159px;
@@ -1252,6 +1297,15 @@ export default {
             margin:10px auto;
             // margin:17px auto;
             position: relative;
+            .qrcodeBody{
+                 position: absolute;
+                 left:10px;
+                 top:42px;
+                 .onlyNumStyle{
+                     display: block;
+                     margin-left:30px;
+                 }
+            }
             .pageNum{
                     position: absolute;
                     top:159px;
@@ -1433,14 +1487,18 @@ export default {
         .inspectUl{
            margin:0 auto;
             .inspectLi{
-                
-                // margin-bottom: 10px;
-               
-                // margin:17px auto;
                 margin:10px auto;
                 position: relative;
                 width:98%;
-                //  margin-top:50px;
+                .qrcodeBody{
+                    position: absolute;
+                    left:10px;
+                    top:10px;
+                    .onlyNumStyle{
+                        display: block;
+                        margin-left:30px;
+                    }
+                }
                 .verticalLength{
                     //  height: 832px;
                      
@@ -1657,8 +1715,83 @@ export default {
                                             }
                                         }
                                     }
-                                }
                             }
+                    }
+                    .bottomTabel2{
+                        width: 90%;
+                        margin:0px auto;
+                       
+                        .bottomTabelDiv{
+                            height: 359px;
+                            border-top:1px solid #000;
+                            border-left:1px solid #000;
+                            border-right:1px solid #000;
+                             position: relative;
+                            .bottomTabelDiv1{
+                                width: 100%;
+                                position:absolute;
+                                top:0px;
+                                left: 0px;
+
+                            }
+
+                        }
+                        .bottomTableList1{
+                             border-collapse: collapse;
+                            border-left: 0.5px solid #000;
+                            border-right: 0.5px solid #000;
+                            border-bottom: 0.5px solid #000;
+                                tbody{
+                                        tr{
+                                            td{
+                                                height: 5mm;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 0.5px solid #000;
+                                                font-size: 4.23mm;
+                                                color: #333333;
+                                            }
+                                        }
+                                    }
+                            }
+                    }
+                    .bottomTabel3{
+                        width: 90%;
+                        margin:-2px auto;
+                        
+                        .bottomTabelDiv{
+                            height: 359px;
+                            border-top:1px solid #000;
+                            border-left:1px solid #000;
+                            border-right:1px solid #000;
+                                position: relative;
+                            .bottomTabelDiv1{
+                                width: 100%;
+                                position:absolute;
+                                top:0px;
+                                left: 0px;
+                            }
+                        }
+                        .bottomTableList1{
+                                border-collapse: collapse;
+                            border-left: 0.5px solid #000;
+                            border-right: 0.5px solid #000;
+                            border-bottom: 0.5px solid #000;
+                                tbody{
+                                        tr{
+                                            td{
+                                                height: 5mm;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 0.5px solid #000;
+                                                font-size: 4.23mm;
+                                                color: #333333;
+                                            }
+                                        }
+                                    }
+                            }
+                    }
+
                    
                     .showBasePic{
                         width: 90%;
