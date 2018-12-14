@@ -21,35 +21,39 @@
                 <label class="item-btn-icon icon-3" @click="exportToExcel(true)">导出XML</label>
             </span>
         </p>
-        <table :class="['UserList',rcStyle.tableBorderWidth == '0'?'noBorder':'']" border="1"  :style="{'width':rcStyle.tableWidth.includes('%')?rcStyle.tableWidth:rcStyle.tableWidth+'px'}">
-            <thead :style="{'backgroundColor':rcStyle.tableTitleBgColor,'textAlign':rcStyle.titleAlign,'lineHeight':rcStyle.titleBorderHeight+'px','height':rcStyle.titleBorderHeight+'px'}">
+        <table :class="['UserList',rcStyle.tableBorderWidth == '0'?'noBorder':'']" border="1"  :style="{'width':(rcStyle.tableWidth)?rcStyle.tableWidth:rcStyle.tableWidth+'px'}">
+            <!-- .includes('%') -->
+            <thead :style="{'textAlign':rcStyle.titleAlign,'height':rcStyle.titleBorderHeight+'px'}">
                 <tr v-show="rcStyle.showTitle != 0" :class="['userList-thead',rcStyle.tableBorderWidth == '0'?'noBorder':'']"  :style="{'backgroundColor':rcStyle.titleBgColor,'fontSize':rcStyle.titleFontSize+'px'}">
-                    <th rowspan="1" :colspan="4+detailsHead.length-totalTitleNum" v-text="rcStyle.titleName"></th>
+                    <th rowspan="1" :colspan="4+detailsHead.length-totalTitleNum" v-text="rcStyle.titleName" :style="[{'height':rcStyle.titleBorderHeight+'px'+'!important'}]" :class="[rcStyle.titleUseBorder==1?'userBorder':'']"></th>
                 </tr>
-                <tr  class="userList-thead" style="font-size:14px;">
+                <tr  class="userList-thead" :style="{'backgroundColor':rcStyle.tableTitleBgColor,'fontSize':rcStyle.tableFontSize+'px',}">
                     <!-- <th style="width:100px;" v-if="groupHead.monomer.length>0"></th>
                     <th style="width:100px;" v-if="groupHead.partition.length>0"></th>
                     <th style="width:100px;" v-if="groupHead.floor.length>0"></th> -->
-                    <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item"></th>
-                    <!-- <th v-if="displayTyle == 0">数量</th> -->
-                    <th>操作</th>
+                    <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}"></th>
+                    <th :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="displayTyle == 0">数量</th>
+                    <th :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}">操作</th>
                 </tr>
             </thead>
-            <tbody :style="{'fontSize':rcStyle.tableFontSize+'px','textAlign':rcStyle.tableAlign}">
-                <tr v-for="(val,index) in DatatableList" :key="index">
-                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
-                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
-                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
+            <tbody :style="{'textAlign':rcStyle.tableAlign}">
+                <tr v-for="(val,index) in DatatableList" :key="index" :style="{'fontSize':rcStyle.tableFontSize+'px'}">
+                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
+                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
+                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
                     <td style="border-right:none;border-left: none;font-weight: bold;" v-for="(val_2,index_2) in val.level" :key="'kongge'+index_2" v-text="index_2==0?'小计':''"></td>
-                    <!-- <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1" v-if="!(index_1 == val.list.length-1 && displayTyle == 0)"></td> -->
-                    <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1"></td>
-                    <td >
-                        <button  class="locationBtn actionBtn" title="定位" @click.stop="openLocation(val.list)"></button>
+                    <td v-for="(val_1,index_1) in val.list" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" :key="index_1" v-text="val_1" v-if="!(index_1 == val.list.length-1)"></td>
+                    <td v-if="displayTyle == 0">{{JSON.parse(val.list[val.list.length-1]).length}}</td>
+                    <!-- !(index_1 == val.list.length-1 && displayTyle == 0) -->
+                    <!-- <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1"></td> -->
+                    <td :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" >
+                        <button  class="locationBtn actionBtn" title="定位" @click.stop="openLocation(val.list[val.list.length-1])"></button>
                     </td>
                 </tr>
-                <tr :style="{'backgroundColor':rcStyle.tableTitleBgColor}" v-if="sumary_all">
-                    <td :colspan="Footer.num" rowspan="1" style="font-weight: bold;">总计</td>
-                    <td :colspan="Footer.info.length">{{sumary_all}}</td>
+                <tr :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="sumary_all">
+                    <td :colspan="Footer.num" rowspan="1" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}">总计</td>
+                    <td :colspan="Footer.info.length+(displayTyle == 0?1:0)" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}">{{sumary_all}}</td>
+                    <!-- <td v-if="displayTyle == 0"></td> -->
                 </tr>
             </tbody>
         </table>
@@ -85,6 +89,7 @@
     }
     #CommenDataPage{
         margin: 5px 20px!important;
+        height: 700px;
        *{
            box-sizing: border-box;
        }
@@ -211,24 +216,28 @@
                     border: 1px solid #fc3439;
                 }
                 thead{
-                    background: #f2f2f2;
+                    // background: #f2f2f2;
                     th{
                         padding-left: 6px;
                         padding-right: 15px;
-                        height: 55px;
+                        // height: 55px;
                         // text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
                         color: #333333;
                         font-weight: normal;
+                       
                     }
+                     .userBorder{
+                            border:1px solid #000;
+                        }
                 }
                 tbody{
                     tr{
                         td{
                             padding-left: 6px;
                             padding-right: 15px;
-                            height: 55px;
+                            // height: 55px;
                             // text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
@@ -263,6 +272,9 @@
                     }
                 }
             }
+            // .haveBorder{
+            //     border:1px solid #000;
+            // }
             .noBorder{
                 border: none!important;
                 th,td{
@@ -519,7 +531,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
 
 export default Vue.component('common-list',{
-    props:['rcId','isSnapshot','isbaobiao'],
+    props:['rcId','isSnapshot','isbaobiao','isRealTime'],
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
@@ -570,6 +582,9 @@ export default Vue.component('common-list',{
             sumary_all:'',
             displayTyle:'',
             TraceID:'',
+            GCCodeList:'',
+            paraList:'',
+            holderId:[],
             HolderPath:[]
         }
     },
@@ -680,6 +695,33 @@ export default Vue.component('common-list',{
                 console.log(err)
             })
         },
+        getParentId(){
+            axios({
+                url:this.BDMSUrl+'/model2/getHolderPath',
+                method:'post',
+                headers:{
+                    'token':this.token
+                },
+                data:this.holderId
+            }).then((response)=>{
+                var str=[];
+                if(response.data.cd==0){
+                    this.HolderPath=JSON.parse(response.data.rt)[0].holderInfo;
+                    
+                    this.paraList={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCodeList};
+                    console.log(this.paraList,'this.paraList');
+                    const app = document.getElementById('webIframe').contentWindow;
+                    app.postMessage({command:"LookAtEntities",parameter:this.paraList},"*");
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                    this.HolderPath=[];
+                    this.holderId=[];
+
+                }
+                // console.log(str,'strm0000')
+                
+            })
+        },
         openLocation(val){
             var vm  = this
             if(document.getElementById('webgl').style.display=='none'){
@@ -688,19 +730,13 @@ export default Vue.component('common-list',{
                     message:'请打开顶部的虚拟场景'
                 })
             }else{
-                console.log(val);
-                this.TraceID=String(val[7]);
-                this.HolderPath.push({'ID':val[12],'Type':'',"Name":'',"ParentID":''})
-                // this.HolderPath=JSON.parse(scope.row.dHolderPath);
-                // this.GCCode=scope.row.dGCCode;
-                console.log(this.HolderPath)
+                console.log(JSON.parse(val),'val2222');
+                var val=JSON.parse(val);
+                this.TraceID=String(val[0].b_TraceID);
+                this.GCCodeList=val[0].b_GCCode;
+                this.holderId.push(val[0].b_HolderID);
                 console.log(this.TraceID);
-                const para={"TraceID":'416f551c-878b-4f25-97ec-19056bd13330#4992',"HolderPath":this.HolderPath,"GCCode":''} 
-                const app = document.getElementById('webIframe').contentWindow;
-                app.postMessage({command:"LookAtEntities",parameter:para},"*");
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-                this.HolderPath=[];
+                this.getParentId();
             }
         },
         testIfIsNull(row, column, cellValue, index){
@@ -735,122 +771,253 @@ export default Vue.component('common-list',{
         getIntoList(){
             var vm = this;
             vm.fullscreenLoading =true;
-            axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/count',
-                headers:{
-                    token:vm.token
-                },
-                params:{
-                    projId:this.projId
-                }
-            }).then(response=>{
-                console.log(response.data);
-                if(response.data.cd == 0){
-                    console.log(response.data.rt);
-                    vm.rcStyle = response.data.rt.rcStyle
-                    vm.dataName = response.data.rt.reportName;
-                    this.displayTyle = response.data.rt.rcConfig.displayType;
-                    vm.DatatableList = [];
-                    vm.detailsHead = [];
-                    vm.groupHead.monomer = [];
-                    vm.groupHead.partition = [];
-                    vm.groupHead.floor = [];
-                    let titleLength = 0;
-                    if(response.data.rt.rowList != null){
-                        var rowLenth = response.data.rt.rowList.length;
-                        var monomer_summary = [],
-                        partition_summary = [],
-                        floor_summary = [];
-                        response.data.rt.rowList.forEach((element,index)=>{
-                            if(element.rowType == 'ROW_TITLE'){
-                                vm.detailsHead = element.infoList;
-                                titleLength = element.infoList.length;
-                            }else if(element.rowType == 'ROW_GROUP'){
-                                var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList);
-                                    element.length = ROW_GROUP_length
-                                if(element.groupLevel == 1){//单体
-                                    vm.groupHead.monomer.push(element)
-                                }else if(element.groupLevel == 2){//分区
-                                    vm.groupHead.partition.push(element)
-                                }else if(element.groupLevel == 3){//楼层
-                                    vm.groupHead.floor.push(element)
-                                }
-                            }else if(element.rowType == 'ROW_CONTENT'){ 
-                                let itemIndex;
-                                this.detailsHead.forEach((item,index)=>{
-                                    if(item == '所在空间'){
-                                        itemIndex = index;
+            if(vm.isRealTime==true){
+                    axios({
+                        method:'POST',
+                        url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/count',
+                        headers:{
+                            token:vm.token
+                        },
+                        params:{
+                            projId:this.projId
+                        }
+                    }).then(response=>{
+                        console.log(response.data);
+                        if(response.data.cd == 0){
+                            console.log(response.data.rt);
+                            vm.rcStyle = response.data.rt.rcStyle
+                            console.log(vm.rcStyle,'rcStyle');
+                            vm.dataName = response.data.rt.reportName;
+                            this.displayTyle = response.data.rt.rcConfig.displayType;
+                            vm.DatatableList = [];
+                            vm.detailsHead = [];
+                            vm.groupHead.monomer = [];
+                            vm.groupHead.partition = [];
+                            vm.groupHead.floor = [];
+                            let titleLength = 0;
+                            if(response.data.rt.rowList != null){
+                                var rowLenth = response.data.rt.rowList.length;
+                                var monomer_summary = [],
+                                partition_summary = [],
+                                floor_summary = [];
+                                response.data.rt.rowList.forEach((element,index)=>{
+                                    if(element.rowType == 'ROW_TITLE'){
+                                        vm.detailsHead = element.infoList;
+                                        titleLength = element.infoList.length;
+                                    }else if(element.rowType == 'ROW_GROUP'){
+                                        var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList);
+                                            element.length = ROW_GROUP_length
+                                        if(element.groupLevel == 1){//单体
+                                            vm.groupHead.monomer.push(element)
+                                        }else if(element.groupLevel == 2){//分区
+                                            vm.groupHead.partition.push(element)
+                                        }else if(element.groupLevel == 3){//楼层
+                                            vm.groupHead.floor.push(element)
+                                        }
+                                    }else if(element.rowType == 'ROW_CONTENT'){ 
+                                        let itemIndex;
+                                        this.detailsHead.forEach((item,index)=>{
+                                            if(item == '所在空间'){
+                                                itemIndex = index;
+                                            }
+                                        })
+                                        if(element.infoList[2]!='' && itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[2];
+                                        }else if(element.infoList[1]!=''&& itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[1];
+                                        }else if(element.infoList[0]!='' && itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[0];
+                                        }
+                                        vm.DatatableList.push({
+                                            'list':element.infoList,
+                                            'level':element.groupLevel
+                                        });
+                                        // console.log(vm.DatatableList,'vm.DatatableList');                                
+                                    }else if(element.rowType == 'ROW_SUMMARY'){
+                                        
+                                        if(element.count != null){
+                                            this.sumary_all = element.count;
+                                        }
+                                        //console.log(this.sumary_all)
+                                        if(element.groupLevel == 1){//单体 的 小计
+                                            monomer_summary.push(element);
+                                        }else if(element.groupLevel == 2){//分区 的 小计
+                                            partition_summary.push(element)
+                                        }else if(element.groupLevel == 3){//楼层 的 小计
+                                            floor_summary.push(element);
+                                        }else if(element.groupLevel == 0){ //总计
+                                            var totalFooterNum = 1;
+                                            if(vm.groupHead.floor.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            if(vm.groupHead.partition.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            if(vm.groupHead.monomer.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            vm.Footer.num = totalFooterNum;
+                                            vm.Footer.info = element.infoList;
+                                        }
                                     }
                                 })
-                                if(element.infoList[2]!='' && itemIndex!= undefined){
-                                    element.infoList[itemIndex] = element.infoList[2];
-                                }else if(element.infoList[1]!=''&& itemIndex!= undefined){
-                                    element.infoList[itemIndex] = element.infoList[1];
-                                }else if(element.infoList[0]!='' && itemIndex!= undefined){
-                                    element.infoList[itemIndex] = element.infoList[0];
-                                }
-                                vm.DatatableList.push({
-                                    'list':element.infoList,
-                                    'level':element.groupLevel
-                                });
-                                // console.log(vm.DatatableList);                                
-                            }else if(element.rowType == 'ROW_SUMMARY'){
-                                
-                                if(element.count != null){
-                                    this.sumary_all = element.count;
-                                }
-                                //console.log(this.sumary_all)
-                                if(element.groupLevel == 1){//单体 的 小计
-                                    monomer_summary.push(element);
-                                }else if(element.groupLevel == 2){//分区 的 小计
-                                    partition_summary.push(element)
-                                }else if(element.groupLevel == 3){//楼层 的 小计
-                                    floor_summary.push(element);
-                                }else if(element.groupLevel == 0){ //总计
-                                    var totalFooterNum = 1;
-                                    if(vm.groupHead.floor.length>0){
-                                        totalFooterNum++;
-                                        this.totalTitleNum++;
-                                    }
-                                    if(vm.groupHead.partition.length>0){
-                                        totalFooterNum++;
-                                        this.totalTitleNum++;
-                                    }
-                                    if(vm.groupHead.monomer.length>0){
-                                        totalFooterNum++;
-                                        this.totalTitleNum++;
-                                    }
-                                    vm.Footer.num = totalFooterNum;
-                                    vm.Footer.info = element.infoList;
-                                }
+                                // vm.DatatableList.forEach((item,index)=>{
+                                //     vm.$set(item.list[item.list.length],'operateShow',false)
+                                // })
+                                // vm.DatatableList.forEach((item,index)=>{
+                                //     item.list.splice(titleLength,item.list.length-titleLength);    
+                                // })
+                                console.log(vm.DatatableList,'00000')
+                                /**
+                                 * 查看各个小计数组，
+                                 * 确定插入总列表的方式
+                                 * 并对层级做标记
+                                * ***/
+                                if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList);
+                                if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList);
+                                if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList);
+                                this.fullscreenLoading=false;
                             }
-                        })
-                        vm.DatatableList.forEach((item,index)=>{
-                            item.list.splice(titleLength,item.list.length-titleLength);    
-                        })
-                        // console.log(vm.DatatableList)
-                        /**
-                         * 查看各个小计数组，
-                         * 确定插入总列表的方式
-                         * 并对层级做标记
-                        * ***/
-                        if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList);
-                        if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList);
-                        if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList);
-                        this.fullscreenLoading=false;
-                    }
-                }else{
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
+                        }else{
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                        vm.fullscreenLoading =false
+                    }).catch((err)=>{
+                        console.log(err)
                     })
-                }
-                vm.fullscreenLoading =false
-            }).catch((err)=>{
-                console.log(err)
-            })
+            }else if(vm.isRealTime==false){
+                 axios({
+                        method:'POST',
+                        url:vm.BDMSUrl+'project2/report/'+vm.rcId+'/content',
+                        headers:{
+                            token:vm.token
+                        }
+                    }).then(response=>{
+                        console.log(response.data);
+                        if(response.data.cd == 0){
+                            console.log(response.data.rt);
+                            var rssList='';
+                            rssList=JSON.parse(response.data.rt);
+                            vm.rcStyle = rssList.rcStyle
+                            // console.log(JSON.parse(response.data.rt),'pppp');
+                            // console.log(vm.rcStyle,'rcStyle');
+                            vm.dataName = rssList.reportName;
+                            this.displayTyle = rssList.rcConfig.displayType;
+                            vm.DatatableList = [];
+                            vm.detailsHead = [];
+                            vm.groupHead.monomer = [];
+                            vm.groupHead.partition = [];
+                            vm.groupHead.floor = [];
+                            let titleLength = 0;
+                            if(rssList.rowList != null){
+                                var rowLenth = rssList.rowList.length;
+                                var monomer_summary = [],
+                                partition_summary = [],
+                                floor_summary = [];
+                                rssList.rowList.forEach((element,index)=>{
+                                    if(element.rowType == 'ROW_TITLE'){
+                                        vm.detailsHead = element.infoList;
+                                        titleLength = element.infoList.length;
+                                    }else if(element.rowType == 'ROW_GROUP'){
+                                        var ROW_GROUP_length = vm.findChild(element.id,response.data.rt.rowList);
+                                            element.length = ROW_GROUP_length
+                                        if(element.groupLevel == 1){//单体
+                                            vm.groupHead.monomer.push(element)
+                                        }else if(element.groupLevel == 2){//分区
+                                            vm.groupHead.partition.push(element)
+                                        }else if(element.groupLevel == 3){//楼层
+                                            vm.groupHead.floor.push(element)
+                                        }
+                                    }else if(element.rowType == 'ROW_CONTENT'){ 
+                                        let itemIndex;
+                                        this.detailsHead.forEach((item,index)=>{
+                                            if(item == '所在空间'){
+                                                itemIndex = index;
+                                            }
+                                        })
+                                        if(element.infoList[2]!='' && itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[2];
+                                        }else if(element.infoList[1]!=''&& itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[1];
+                                        }else if(element.infoList[0]!='' && itemIndex!= undefined){
+                                            element.infoList[itemIndex] = element.infoList[0];
+                                        }
+                                        vm.DatatableList.push({
+                                            'list':element.infoList,
+                                            'level':element.groupLevel
+                                        });
+                                        // console.log(vm.DatatableList,'vm.DatatableList');                                
+                                    }else if(element.rowType == 'ROW_SUMMARY'){
+                                        
+                                        if(element.count != null){
+                                            this.sumary_all = element.count;
+                                        }
+                                        //console.log(this.sumary_all)
+                                        if(element.groupLevel == 1){//单体 的 小计
+                                            monomer_summary.push(element);
+                                        }else if(element.groupLevel == 2){//分区 的 小计
+                                            partition_summary.push(element)
+                                        }else if(element.groupLevel == 3){//楼层 的 小计
+                                            floor_summary.push(element);
+                                        }else if(element.groupLevel == 0){ //总计
+                                            var totalFooterNum = 1;
+                                            if(vm.groupHead.floor.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            if(vm.groupHead.partition.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            if(vm.groupHead.monomer.length>0){
+                                                totalFooterNum++;
+                                                this.totalTitleNum++;
+                                            }
+                                            vm.Footer.num = totalFooterNum;
+                                            vm.Footer.info = element.infoList;
+                                        }
+                                    }
+                                })
+                                // vm.DatatableList.forEach((item,index)=>{
+                                //     vm.$set(item.list[item.list.length],'operateShow',false)
+                                // })
+                                // vm.DatatableList.forEach((item,index)=>{
+                                //     item.list.splice(titleLength,item.list.length-titleLength);    
+                                // })
+                                console.log(vm.DatatableList,'00000')
+                                /**
+                                 * 查看各个小计数组，
+                                 * 确定插入总列表的方式
+                                 * 并对层级做标记
+                                * ***/
+                                if(floor_summary.length>0)vm.appendSummary(floor_summary,response.data.rt.rowList);
+                                if(partition_summary.length>0)vm.appendSummary(partition_summary,response.data.rt.rowList);
+                                if(monomer_summary.length>0)vm.appendSummary(monomer_summary,response.data.rt.rowList);
+                                this.fullscreenLoading=false;
+                            }
+                        }else{
+                            vm.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                        vm.fullscreenLoading =false
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+
+                
+            }
         },
+        
+
+
         /**
          * 查看各个小计数组，
          * 确定插入总列表的方式

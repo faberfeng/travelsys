@@ -9,20 +9,22 @@
                 <div class="containerHead">
                     <div class="containerHeadLeft">
                         <span class="addOrder" @click="addIndexNum()">添加序列</span>
-                        <span class="exportOrder" @click="getImportHistory">导出</span>
+                        <span class="exportOrder" v-show="exportDataEdit" @click="getImportHistory">导出</span>
                     </div>
                     <div class="containerHeadMiddle">
                         <label>测试总数：{{itemSubmitCount}}</label>
                         <label>报警：{{itemAlertAmount}}</label>
                     </div>
-                    <div class="containerHeadRight">
+                    <div class="containerHeadRight" v-show="editInspectMethodEdit">
                         <span class="autoImportTxt">采集方式:</span>
-                        <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
-                            <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
-                        </select>                        
-                        <i class="icon-sanjiao"></i>
-                        <span v-show="importMethod==1" @click="importExcelData()" class="import">导入</span>
-                        <span v-show="importMethod==2" class="import" @click="autoAcquisitionBtn()">配置</span>
+                        <div class="import2">
+                            <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
+                                <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
+                            </select>                        
+                            <i class="icon-sanjiao"></i>
+                        </div>
+                        <span v-show="importMethod==1&&importDataEdit" @click="importExcelData()" class="import">导入</span>
+                        <span v-show="importMethod==2&&importDataEdit" class="import" @click="autoAcquisitionBtn()">配置</span>
                     </div>
                 </div>
                 <div class="containerTable">
@@ -53,16 +55,16 @@
                             <tr v-for="(item,index) in getPitchBaseInfoList1" :key="index">
                                 <td v-text="$options.filters.addSprit(item.name)"></td>
                                 <td v-text="$options.filters.addSprit(item.keyword)"></td>
-                                <td v-text="$options.filters.addSprit(item.initDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.terminalDepth)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.initDepth)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.terminalDepth)"></td>
                                 <td v-text="item.pointDistance"></td>
                                 <td v-text="item.pointAmount"></td>
-                                <td v-text="$options.filters.addSprit(item.maxDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxShift)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.maxDepth)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.maxShift)"></td>
                                 <td :class="[{'red':item.maxAlert==true}]">{{item.maxAlert|shifouChange()}}</td>
                                 <td v-text="$options.filters.timeStamp(item.maxVariationInterval)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxVariationDepth)"></td>
-                                <td v-text="$options.filters.addSprit(item.maxVariationShift)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.maxVariationDepth)"></td>
+                                <td v-text="$options.filters.addSpritNum(item.maxVariationShift)"></td>
                                 <td :class="[{'red':item.maxVariationAlert==true}]">{{item.maxVariationAlert|shifouChange()}}</td>
                                 <td>
                                     <button title="修改" class="editBtn actionBtn" @click="editPitchSeqBtn(item.id,item.itemId)"></button>
@@ -81,13 +83,13 @@
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2&&itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2&&itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
                         </span>
-                        <span class="leftBtnOne" @click="editAlertValueBtn()">修改</span>
+                        <span class="leftBtnOne" v-show="editAlertEdit" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">观测：</label><label style="color:#333;font-size:14px;line-height:62px">{{observerName}}</label>
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">计算：</label><label style="color:#333;font-size:14px;line-height:62px">{{calculatorName}}</label>
                             <label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:30px">检核：</label><label style="color:#333;font-size:14px;line-height:62px">{{inspectorName}}</label>
                         </span>
-                        <span class="leftBtnOne" @click="editPersonBtn()">修改</span>
+                        <span class="leftBtnOne" v-show="editAlertEdit" @click="editPersonBtn()">修改</span>
                     </div>
                     <div class="paginationRight">
                         <el-pagination class="elPagination"
@@ -126,9 +128,9 @@
                                     <tr v-for="(item,index) in leftDisplayList.recentVariation" :key="index">
                                         <!-- {{leftDisplayListValue1[index].depth}} -->
                                         <td>{{(leftDisplayList.recentVariation)[index].otherParam|addSprit}}</td>
-                                        <td >{{leftDisplayListValue1[index].shift|addSprit}}</td>
-                                        <td >{{leftDisplayListValue2[index].shift|addSprit}}</td>
-                                        <td>{{(leftDisplayList.recentVariation)[index].recentVariation|addSprit}}</td>
+                                        <td >{{leftDisplayListValue1[index].shift|addSpritNum}}</td>
+                                        <td >{{leftDisplayListValue2[index].shift|addSpritNum}}</td>
+                                        <td>{{(leftDisplayList.recentVariation)[index].recentVariation|addSpritNum}}</td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
@@ -180,9 +182,9 @@
                                <tbody>
                                     <tr v-for="(item,index) in rightDisplayList.recentVariation" :key="index">
                                         <td>{{(rightDisplayList.recentVariation)[index].otherParam|addSprit}}</td>
-                                        <td >{{rightDisplayListValue1[index].shift|addSprit}}</td>
-                                        <td >{{rightDisplayListValue2[index].shift|addSprit}}</td>
-                                        <td>{{(rightDisplayList.recentVariation)[index].recentVariation|addSprit}}</td>
+                                        <td >{{rightDisplayListValue1[index].shift|addSpritNum}}</td>
+                                        <td >{{rightDisplayListValue2[index].shift|addSpritNum}}</td>
+                                        <td>{{(rightDisplayList.recentVariation)[index].recentVariation|addSpritNum}}</td>
                                     </tr>
                                     <tr>
                                         <td rowspan="2">极值</td>
@@ -967,6 +969,12 @@ export default Vue.component('commonPitch-detail',{
                 itemSubmitCount:0,//测试总数
                 itemAlertAmount:0,
                 isAlertNum:0,//报警总数
+                projAuth1:'',
+                importDataEdit:false,
+                editInspectMethodEdit:false,
+                exportDataEdit:false,
+                editAlertEdit:false,
+
 
 
 
@@ -985,6 +993,7 @@ export default Vue.component('commonPitch-detail',{
             this.getItemDutyUser();
             this.getAlertArguments();
             this.getUserByUserGroup();
+            this.getUserInfo();
         },
         filters:{
         shifouChange(val){
@@ -999,6 +1008,13 @@ export default Vue.component('commonPitch-detail',{
                 return '/'
             }else {
                 return val
+            }
+        },
+        addSpritNum(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.toFixed(1)
             }
         },
         hiddenShow(val){
@@ -1057,6 +1073,43 @@ export default Vue.component('commonPitch-detail',{
 
         },
         methods:{
+              getUserInfo(){
+                var vm = this
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/getOnlineInfo',
+                    params:{
+                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                    },
+                    headers:{
+                        'accept':'application/json;charset=UTF-8',
+                        'token':vm.token,
+                    },
+                }).then((response)=>{
+                    var id = localStorage.getItem('projId');
+                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                    this.checkAuth();
+                })
+            
+            },
+        checkAuth(){
+            var vm=this;
+            // if(vm.projAuth1.indexOf("00601202") > 0){
+            //   vm.manageEdit = true
+            // }
+            if(vm.projAuth1.indexOf("00601203") > 0){
+                vm.editInspectMethodEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601204") > 0){
+                vm.importDataEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601205") > 0){
+                vm.exportDataEdit = true
+            }
+            if(vm.projAuth1.indexOf("00601206") > 0){
+                vm.editAlertEdit = true
+            }
+        },
             editAlertValueBtn(){
                 this.editAlertValueShow=true;
                 this.getAlertArguments();
@@ -1724,6 +1777,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.addIndexNumShow=false;
+                        this.editIndexNumShow=false;
                         this.getPitchBaseInfo();
                         vm.initDepth='';
                         vm.terminalDepth='';
@@ -2284,7 +2338,7 @@ export default Vue.component('commonPitch-detail',{
                 })
                 if(str){
                     window.open(vm.BDMSUrl+'detectionInfo/exportHistory?token='+vm.token+str,'_blank')
-                    this.exportHistoryRecoedShow=false;
+                    // this.exportHistoryRecoedShow=false;
                     this.allCheck=false;
                     this.getImportHistoryList.forEach((item,index)=>{
                         item.check=false;
@@ -2763,31 +2817,35 @@ select.autoImport{
                         height: 26px;
                         line-height: 26px;
                     }
-                    .autoImport{
-                        width: 121px;
-                        height: 26px;
-                        border: 1px solid #cccccc;
+                    .import2{
+                        display: inline-block;
                         position: relative;
-                        background: #fff;
-                        padding-left: 10px;
-                        padding-right: 20px;
-                        box-sizing: border-box;
-                        margin-right: 0px;
-                        color: #333333;
-                        font-size: 14px;
-                        border-radius: 2px;
-                        outline: none;
-                    }
-                    .icon-sanjiao{
-                        display: block;
-                        position: absolute;
-                        width: 12px;
-                        height: 7px;
-                        background-image: url('../Settings/images/sanjiao.png');
-                        background-size: 100% 100%;
-                        content: '';
-                        top: 11px;
-                        right: 65px;
+                        .autoImport{
+                            width: 121px;
+                            height: 26px;
+                            border: 1px solid #cccccc;
+                            position: relative;
+                            background: #fff;
+                            padding-left: 10px;
+                            padding-right: 20px;
+                            box-sizing: border-box;
+                            margin-right: 0px;
+                            color: #333333;
+                            font-size: 14px;
+                            border-radius: 2px;
+                            outline: none;
+                        }
+                        .icon-sanjiao{
+                            display: block;
+                            position: absolute;
+                            width: 12px;
+                            height: 7px;
+                            background-image: url('../Settings/images/sanjiao.png');
+                            background-size: 100% 100%;
+                            content: '';
+                            top: 11px;
+                            right: 11px;
+                        }
                     }
                     .import{
                         display: inline-block;

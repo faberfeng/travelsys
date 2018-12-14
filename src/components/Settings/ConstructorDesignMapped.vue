@@ -576,7 +576,7 @@ export default {
                                 revitCa = "LightingFixtures";
                             }else if(this.revitCategory == '地形'){
                                 revitCa = "Topography";
-                            }else if(this.revitCategory == '电器设备'){
+                            }else if(this.revitCategory == '电气设备'){
                                 revitCa = "ElectricalEquipment";
                             }else if(this.revitCategory == '电缆桥架'){
                                 revitCa = "CableTray";
@@ -661,7 +661,7 @@ export default {
                             }else if(this.revitCategory == '体量'){
                                 revitCa = "Mass";
                             }else if(this.revitCategory == '天花板'){
-                                revitCa = "Walls";
+                                revitCa = "Ceilings";
                             }else if(this.revitCategory == '停车场'){
                                 revitCa = "Parking";
                             }else if(this.revitCategory == '卫浴装置'){
@@ -686,6 +686,16 @@ export default {
                                 revitCa = "Planting";
                             }else if(this.revitCategory == '风道末端'){
                                 revitCa = "DuctTerminal";
+                            }else if(this.revitCategory == '楼板边缘'){
+                                revitCa = "EdgeSlab";
+                            }else if(this.revitCategory == '灯具装置'){
+                                revitCa = "LightingFixtures";
+                            }else if(this.revitCategory == '喷头'){
+                                revitCa = "Sprinklers";
+                            }else if(this.revitCategory == '结构加强版'){
+                                revitCa = "StructuralStiffener";
+                            }else if(this.revitCategory == 'MEP预置管道'){
+                                revitCa = "FabricationPipework";
                             }
                             // var keyword = this.totalConstructorData.some(item=>{
                             //     if(item.keyWord == this.keyWord || item.keyWord.includes(this.keyWord) || this.keyWord.includes(item.keyWord)){

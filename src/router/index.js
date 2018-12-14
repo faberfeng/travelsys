@@ -101,7 +101,7 @@ const router = new Router({
     {
       path:'/home',
       name:'Home',
-      component:resolve=>require(['@/components/Home'],resolve),
+      component:resolve=>require(['@/components/ManageCost'],resolve),
       // meta:{
       //   requireAuth:true
       // },
@@ -297,6 +297,14 @@ const router = new Router({
       component:resolve=>require(['@/components/planCost/getManifestDetailInfoForPage'],resolve),
     },
     {
+      path:'/Cost/getMainLabelInformation/:mid',
+      name:'getMainLabelInformation',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost/getMainLabelInformation'],resolve),
+    },
+    {
       path:'/Drive',
       name:'Drive',
       meta:{
@@ -337,7 +345,7 @@ const router = new Router({
     {
       path:'/setting',
       name:'Setting',
-      component:resolve=>require(['@/components/Home'],resolve),
+      component:resolve=>require(['@/components/ManageCost'],resolve),
       children:[
         {
           path:'/setting/initalsettings',

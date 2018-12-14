@@ -330,7 +330,7 @@ export default {
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
+                        font-size: 14px;
                         color: #333333;
                     }
                 }
@@ -342,7 +342,7 @@ export default {
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: #333333;
                         }
                         &:hover{

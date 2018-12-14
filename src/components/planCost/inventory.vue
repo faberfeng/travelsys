@@ -2001,7 +2001,7 @@ export default {
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
+                        font-size: 14px;
                         color: #333333;
                         font-weight: normal;
                     }
@@ -2015,7 +2015,7 @@ export default {
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: #333333;
                             .location{
                                 display: block;
@@ -2222,7 +2222,7 @@ export default {
                     th{
                         height: 36px;
                         text-align: left;
-                        font-size: 12px;
+                        font-size: 14px;
                         color: #999999;
                         font-weight: normal;
                         border-right: 1px solid #e1e1e1;
@@ -2514,7 +2514,7 @@ export default {
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: #333333;
                             font-weight: normal;
                         }
@@ -2528,7 +2528,7 @@ export default {
                                 text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
-                                font-size: 12px;
+                                font-size: 14px;
                                 color: #333333;
                                 .location{
                                     display: block;

@@ -99,6 +99,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.getPJDetial()
+        
         vm.findManifestDetailList()
   }, 
     methods:{

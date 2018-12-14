@@ -16,7 +16,7 @@
                         <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
                         <p style="font-size:16px;color:#ccc">暂无数据</p>
                     </span>
-                    <li v-for="(item,index) in overviewList" :key='index'><label>{{item.viewKey}}</label>{{item.viewVal}}</li>
+                    <li v-for="(item,index) in overviewList" :key='index' ><label>{{item.viewKey}}</label><label v-html="item.viewVal"></label></li>
                 </ul>
             </div>
         </div>
@@ -374,6 +374,9 @@ export default {
         margin-right: 20px;
         margin-left: 20px;
         padding-top: 33px;
+        overflow-x: hidden;
+        height: 800px;
+        
         .font-color1{
             color: #333;
             font-size: 14px;
@@ -432,12 +435,14 @@ export default {
             width: 100%;
             float: left;
             margin-top: 42px;
+            margin-left: 26px;
         }
         /* 工程信息 */
         .projectInfo{
             width: 100%;
             overflow: hidden;
             display: flex;
+            margin-left:26px;
         }
         .projectInfo .lunbo-container,.projectInfo .tal{
             height: 242px;

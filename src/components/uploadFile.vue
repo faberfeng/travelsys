@@ -1,5 +1,7 @@
 <template>
-      <el-dialog :title="title" :visible="uploadshow" @close="upImgCancle" v-loading="uploading">
+      <el-dialog :title="title" :visible="uploadshow" @close="upImgCancle" v-loading="uploading" element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.5)">
         <div class="editBody">
             <div class="editBodytwo imageBody">
                 <label class=" imageBodyText">文件说明 :</label>
@@ -57,8 +59,10 @@ export default Vue.component('common-upload',{
         },
         fileChanged(file){
             var vm = this
+            console.log(vm.$refs.file.files,'多文件上传');
             // var FileLength = vm.$refs.file.files.length
-            vm.filesList = vm.$refs.file.files[0] //[]
+            vm.filesList = vm.$refs.file.files[0]
+            // vm.filesList= vm.$refs.file.files;
             // for(var i= 0;i<FileLength;i++){
             //     vm.filesList.push(vm.$refs.file.files[i])
             // }
@@ -113,7 +117,8 @@ export default Vue.component('common-upload',{
                return false
            }
            console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
-            var returnUrl = vm.BDMSUrl+"project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
+            var returnUrl = vm.BDMSUrl+"project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj+"&from="+1;
+            // var returnUrl = "http://10.252.29.13:8060/uploading/uploadMultiplyFileInfo?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
             formData.append('token',vm.token);
@@ -125,7 +130,9 @@ export default Vue.component('common-upload',{
             formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                //vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                // url:'http://10.252.29.13:8060/uploading/uploadMultiplyFileInfo',
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 },

@@ -90,7 +90,7 @@
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <span v-show="basePicEdit" :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
-                            <span :class="[{'clickStyle':isClick},'editSpotBtn']"  @click="editSpot()">编辑点位</span>
+                            <span :class="[{'clickStyle':isClick},'editSpotBtn']" v-show="manageEdit"  @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
@@ -163,8 +163,8 @@
                             <label class="inspectTableHeadLeftTxt"></label>
                         </div>
                         <div class="inspectTableHeadRight">
-                            <div class="addData" @click="batchExport()">数据导入</div>
-                            <div class="addInspectContent" @click="addMonitorItemBtn()">新增监测内容</div>
+                            <div class="addData" v-show="importDataEdit" @click="batchExport()">数据导入</div>
+                            <div class="addInspectContent" v-show="editInspectWordEdit" @click="addMonitorItemBtn()">新增监测内容</div>
                         </div>
                     </div>
                     <div class="inspectTableBody">
@@ -210,7 +210,7 @@
                                         <button title="上移" v-show="editInspectWordEdit" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" v-show="editInspectWordEdit" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
                                         <button title="详情" v-show="searchInspectDetailEdit" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count)"></button>
-                                        <button title="导入" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
+                                        <button title="导入" v-show="importDataEdit" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -259,10 +259,10 @@
                             <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
                                 <label class="baseMapName" v-text="item.name"></label>
                                 <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
-                                <label v-show="item.useCount==0" class="deleteBaseMap" @click.stop="deleteBaseMap(item.id)"></label>
+                                <label v-show="item.useCount==0&&manageEdit" class="deleteBaseMap"  @click.stop="deleteBaseMap(item.id)"></label>
                             </div>
                         </li>
-                        <li class="uploadBaseBody">
+                        <li class="uploadBaseBody" v-show="manageEdit">
                             <div class="uploadBaseIcon">
                                 <label for="drawingsInfo">
                                     <img style=" cursor: pointer"  src="./images/upload.png">
@@ -977,6 +977,7 @@ export default {
             summaryChecked:false,//概述
             spotChecked:false,//测点
             qcodeChecked:false,//二维码
+            generateQrcode:0,//是否生成二维码
             showBaseImg:false,//底图选择
             basePicShow:false,//
             firstMethodShow:false,//
@@ -1183,6 +1184,8 @@ export default {
             exportReportEdit:false,
             editInspectWordEdit:false,
             searchInspectDetailEdit:false,
+            importDataEdit:false,//导入数据
+            manageEdit:false,//管理底图和点位
 
         }
     },
@@ -1194,8 +1197,7 @@ export default {
         vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        // vm.projAuth = localStorage.getItem('projAuth')
-        // console.log(vm.projAuth,'vm.projAuth');
+        
         this.getAccessUserGroup();
         this.getPositionList();
         this.curTime();
@@ -1204,9 +1206,7 @@ export default {
              this.getUserInfo();
         },200)
        
-        // this.checkAuth();
-        // this.methodp();
-        // console.log(window.screen.deviceXDPI,'0000');
+  
     },
     filters:{
         monitorTypeChange(val){
@@ -1287,25 +1287,7 @@ export default {
         }
     },
     methods:{
-        //判断是否为图片或者pdf
-        // judgeImg(val){
-        //     val.substr(val.length-3)=='jpg'||val.substr(val.length-3)=='png'
-        // },
-        // judgePdf(){
-        //     val.substr(val.length-3)=='pdf'||val.substr(val.length-3)=='PDF'
-        // },
-        //as计算公式
-        // methodp(){
-        //     axios({
-        //         url:'http://10.252.26.240:8080/arctron-usercenter/UserApp/getInstanceList.json?pCode=BS1803',
-        //         method:'get',
-        //         headers:{
-        //             'tokenId':this.token
-        //         }
-        //     }).then((response)=>{
-        //         console.log('0000')
-        //     })
-        // },
+      
         getUserInfo(){
                 var vm = this;
                 vm.basePicEdit = false;
@@ -1343,6 +1325,12 @@ export default {
                     if(vm.projAuth1.indexOf("00601201") > 0){
                         vm.searchInspectDetailEdit = true
                     }
+                    if(vm.projAuth1.indexOf("00601204") > 0){
+                        vm.importDataEdit = true
+                    }
+                    if(vm.projAuth1.indexOf("00601202") > 0){
+                        vm.manageEdit = true
+                    }
                     // this.checkAuth();
                 })
         },
@@ -1362,7 +1350,7 @@ export default {
                      this.ecValue=item.value;
                 }
             })
-            // console.log(name,'name');
+           
            
         },
          esChange(val){
@@ -1375,7 +1363,7 @@ export default {
         },
         importDataShow(valShow,valid,valname,valtype,valKeyword){
             var vm=this;
-            // console.log(valShow);
+          
             this.importGatherDataShow=valShow;
             vm.matchKeyWord=valKeyword;
             vm.monitorImportName=valname;
@@ -1384,7 +1372,7 @@ export default {
             if(vm.monitorImportType==5){
                 this.getPitchBaseInfo();
             }
-            // console.log(vm.monitorImportType,'vm.monitorImportType123')
+          
 
         },
         timeMethod(val) {
@@ -1393,7 +1381,7 @@ export default {
         //当前时间
         curTime(){
             var date = new Date();
-            // console.log(date,'date');
+           
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate();
@@ -1408,7 +1396,7 @@ export default {
         //当前时间
         curTime1(){
             var date = new Date();
-            // console.log(date,'date');
+           
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate()-1;
@@ -1431,11 +1419,11 @@ export default {
                 second = "0" + day;
             }
              this.userValue = year + "-" + month + "-" + day+" "+"23:59:59" ;
-            //  console.log(this.userValue,'this.userValue')
+           
         },
 
         handleSizeChange(val){
-            // console.log(val);
+            
             this.monitorMainTableList1=[];
             this.pageSize=val;
             var NumB=this.pageSize*(this.pageNum-1)
@@ -1443,8 +1431,7 @@ export default {
             if(this.monitorMainTableListLength-1>=NumB&&this.monitorMainTableListLength-1<=NumE){
                 NumE=this.monitorMainTableListLength-1;
             }
-            console.log(NumB,'NumBp')
-            console.log(NumE,'NumEp')
+          
             for(var i=NumB;i<NumE+1;i++){
                 this.monitorMainTableList1.push(this.monitorMainTableList[i])
             }
@@ -1464,7 +1451,7 @@ export default {
         },
         add(val){
             var vm=this;
-        //    console.log(val,'val');
+       
             if(this.picMarkName=="Select_img_Mark"){
                 vm.spotPicInfoList.forEach((item)=>{
                         if(item.id+'img'==val.ID_out){
@@ -1479,7 +1466,6 @@ export default {
                         }
                     })
             }
-            // console.log(this.pointIds,'this.pointIds');
         },
         //
         sendAlertMessage(){
@@ -1609,10 +1595,6 @@ export default {
         },
         picView_status_changed(status,list){
             this.listLength=list.length;
-           
-            // console.log(this.pointId,'this.pointId');
-            // console.log(list,'list12345');
-            // console.log(this.listLength)
             if(status==true){
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
@@ -1623,23 +1605,21 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                    console.log(list,'list111')
+                    
 
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
-                        // console.log(this.pointIdName,'this.pointIdName');
+                      
                     })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
-                    // console.log(this.photoIdList,'this.photoIdList');
+                  
                 }
             }
-            // this.editSpotShow=status;
-            // pointIds
-            // console.log(status);
+           
         },
         timeChangeMethod1(val) {
             return moment(val).format("YYYY/MM/DD");
@@ -1671,40 +1651,89 @@ export default {
                             var h=chartDataLength.horizontalShiftData.length;
                             var v=chartDataLength.verticalShiftData.length;
                             var fList=chartDataLength.forceData;
-                             var gList=chartDataLength.gaugeData;
+                            var gList=chartDataLength.gaugeData;
                             var hList=chartDataLength.horizontalShiftData;
                             var vList=chartDataLength.verticalShiftData;
                             var lastMonth = [];
                             for(var i = 0;i<30;i++){
                                     lastMonth.unshift(new Date(new Date().setDate(new Date().getDate()-i)).toLocaleString().substring(0,10))
+                                    // lastMonth[i]=Number(lastMonth[i])
                             }
-                            var hList1=[];
-                            // for(var i=0;i<30;i++){
-                            //     vList.forEach((item)=>{
-                            //         item.list.forEach((item1)=>{
-                            //             item1.push({acquisitionTime:lastMonth[i],elevation:null})
-                            //         })
-                            //     })
+                            // for(i=0;i<lastMonth.length;i++){
+                            //     lastMonth[i]=Number(lastMonth[i])
                             // }
-                            // for(var i=0;i<30;i++){
-                            //     hList1.push({
-                            //                         acquisitionTime:lastMonth[i],
-                            //                         gaugeHeight:null
-                            //                 })
-                            // }
-                            console.log(vList,'fList1');
+                            // console.log(lastMonth,'lastMonth')
                            
-                            // var curTime= (new Date()).getTime()
-                            // console.log(curTime,'curTime111');
-                            
-                            console.log(lastMonth,'lastMonth000')
-                            console.log(chartDataLength,'chartDataLength');
+                            for(let j=0; j<vList.length;j++){
+                                if(vList[j].list.length < 30){
+                                    let index = 30-vList[j].list.length;
+                                    console.log(index,'inex');
+                                    for(let i = 0 ; i < index; i++){
+                                        console.log(i,'i0')
+                                        vList[j].list.push({acquisitionTime:null,elevation:null})
+                                    }
+                                }else{
+                                    vList[j].list=vList[j].list.slice(0,30)
+                                }
+                                for(let a=0;a<30;a++){
+                                     vList[j].list[a].acquisitionTime=lastMonth[a]
+                                }
+                            }
+                            for(let j=0; j<hList.length;j++){
+                                if(hList[j].list.length < 30){
+                                    let index = 30-hList[j].list.length;
+                                    console.log(index,'inex');
+                                    for(let i = 0 ; i < index; i++){
+                                        console.log(i,'i0')
+                                        hList[j].list.push({acquisitionTime:null,shiftDistance:null})
+                                    }
+                                }else{
+                                    hList[j].list=hList[j].list.slice(0,30)
+                                }
+                                for(let a=0;a<30;a++){
+                                     hList[j].list[a].acquisitionTime=lastMonth[a]
+                                }
+                            }
+                            for(let j=0; j<gList.length;j++){
+                                if(gList[j].list.length < 30){
+                                    let index = 30-gList[j].list.length;
+                                    console.log(index,'inex');
+                                    for(let i = 0 ; i < index; i++){
+                                        console.log(i,'i0')
+                                        gList[j].list.push({acquisitionTime:null,gaugeHeight:null})
+                                    }
+                                }else{
+                                     gList[j].list=gList[j].list.slice(0,30)
+                                }
+                                for(let a=0;a<30;a++){
+                                     gList[j].list[a].acquisitionTime=lastMonth[a]
+                                }
+                            }
+                            for(let j=0; j<fList.length;j++){
+                                if(fList[j].list.length < 30){
+                                    let index = 30-fList[j].list.length;
+                                    console.log(index,'inex');
+                                    for(let i = 0 ; i < index; i++){
+                                        console.log(i,'i0')
+                                        fList[j].list.push({acquisitionTime:null,force:null})
+                                    }
+                                }else{
+                                        fList[j].list=fList[j].list.slice(0,30)
+                                }
+                                // console.log(fList[j].list,'fList[j].list');
+                                for(let a=0;a<30;a++){
+                                     fList[j].list[a].acquisitionTime=lastMonth[a]
+                                }
+                            }
+                            // console.log(vList,'vList');
+                            // console.log(hList,'hList');
+                            // console.log(gList,'gList');
+                            // console.log(fList,'fList');
+                           
                             //两种监测类型对比，有6种情况
                             if((f!=0&&g!=0)||(f!=0&&h!=0)||(f!=0&&v!=0)||(g!=0&&v!=0)||(g!=0&&h!=0)||(v!=0&&h!=0)){
                                 this.typeSpotShow=false;
-                                console.log('000');
-                                console.log(f,'f');
-                                console.log(g,'g');
+                               
                                 {
                                     if((f!=0&&g!=0)){
                                         // console.log('111');
@@ -1831,16 +1860,16 @@ export default {
                                 }
                                 {
                                     var x1Length=this.X1List.length;
-                                    console.log(x1Length,'x1Length');
-                                    console.log(this.moreTypeSpotList1.length,'this.moreTypeSpotList1.length');
+                                    // console.log(x1Length,'x1Length');
+                                    // console.log(this.moreTypeSpotList1.length,'this.moreTypeSpotList1.length');
                                     var x1=x1Length/this.moreTypeSpotList1.length;
                                     var x2Length=this.X2List.length;
-                                    console.log(x2Length,'x2Length');
+                                    // console.log(x2Length,'x2Length');
                                     var x2=x2Length/this.moreTypeSpotList2.length;
                                     this.moreTypeSpotList1Length=this.moreTypeSpotList1.length;
                                     this.moreTypeSpotList2Length=this.moreTypeSpotList2.length;
-                                    console.log(x1,'x1000');
-                                    console.log(x2,'x2000');
+                                    // console.log(x1,'x1000');
+                                    // console.log(x2,'x2000');
                                     this.moreSpotShow=true;
                                     var yLeft1=[];
                                     var yLeft2=[];
@@ -1908,10 +1937,10 @@ export default {
                                      for(let a2=x2*7;a2<x2*8;a2++){
                                         yRight8.push(this.Y2List[a2])
                                     }
-                                    console.log(yLeft1,'yLeft1');
-                                    console.log(yRight1,'yRight1');
-                                    console.log(yLeft2,'yLeft2');
-                                    console.log(yRight2,'yRight2');
+                                    // console.log(yLeft1,'yLeft1');
+                                    // console.log(yRight1,'yRight1');
+                                    // console.log(yLeft2,'yLeft2');
+                                    // console.log(yRight2,'yRight2');
                                 }
                                 {
                                     setTimeout(()=>{
@@ -1924,7 +1953,7 @@ export default {
                                             spotTypeChangeChart.hideLoading();
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
-                                            // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -1936,6 +1965,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==3){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -1948,6 +1978,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==4){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -1961,6 +1992,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==5){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -1976,6 +2008,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==6){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -1992,6 +2025,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==1&&this.moreTypeSpotList2Length==7){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2009,6 +2043,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2023,6 +2058,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2037,6 +2073,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==3){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2051,6 +2088,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==4){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2065,6 +2103,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==5){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2080,6 +2119,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==2&&this.moreTypeSpotList2Length==6){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2096,6 +2136,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2111,6 +2152,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2126,6 +2168,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==3){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2141,6 +2184,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==4){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2156,6 +2200,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==3&&this.moreTypeSpotList2Length==5){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2172,6 +2217,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2188,6 +2234,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2204,6 +2251,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==3){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2220,6 +2268,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==4&&this.moreTypeSpotList2Length==4){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2236,6 +2285,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==5&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2253,6 +2303,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==5&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2270,6 +2321,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==5&&this.moreTypeSpotList2Length==3){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2287,6 +2339,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==6&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2305,6 +2358,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==6&&this.moreTypeSpotList2Length==2){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2323,6 +2377,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }else if(this.moreTypeSpotList1Length==7&&this.moreTypeSpotList2Length==1){
                                             let spotTypeChangeChart=this.$refs.spotTypeChange;
                                             spotTypeChangeChart.delegateMethod('showLoading', 'Loading...');
@@ -2342,6 +2397,7 @@ export default {
                                             // spotTypeChangeChart.getChart().yAxis[0].setTitle({text:'位移'})
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:this.X2List});
                                             // spotTypeChangeChart.getChart().xAxis[0].update({categories:xShow});
+                                            spotTypeChangeChart.getChart().xAxis[0].update({categories:lastMonth});
                                         }
                                     },200)
                                 }
@@ -2390,19 +2446,18 @@ export default {
                                     {
                                         var xLength=this.acquisitionTimeXlist.length;
                                         var x=xLength/this.moreSpotLineListLength;
-                                        console.log(x,'xx');
-                                        console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                                        console.log(this.moreSpotLineListLength,'this.moreSpotLineListLength');
+                                        // console.log(x,'xx');
+                                        // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                                        // console.log(this.moreSpotLineListLength,'this.moreSpotLineListLength');
                                         var xShow=[];
                                         for(var i=0;i<x;i++){
                                             xShow.push(this.acquisitionTimeXlist[i])
                                         }
-                                        // console.log(xShow,'xShow');
-                                        // console.log(this.elevationYlist,'this.elevationYlist');
+                                      
                                         var min=this.getMinValue(this.elevationYlist);
                                         var max=this.getMaxValue(this.elevationYlist)
                                         var middle=(min+max)/2;
-                                        // console.log(middle);
+                                      
                                         this.optionMoreSpotChangeLine.yAxis.min=(3*min-2*max);
                                         this.optionMoreSpotChangeLine.yAxis.max=(3*max-2*min);
                                         this.moreSpotShow=true;
@@ -2442,8 +2497,6 @@ export default {
                                             yShow8.push(this.elevationYlist[a2])
                                         }
                                     }
-                                    // console.log(yShow1,'yShow1')
-                                    // console.log(yShow2,'yShow2')
                                         setTimeout(()=>{
                                             if(this.moreSpotLineListLength==2){
                                                 let spotChangeLineChart=this.$refs.spotChangeLine;
@@ -2563,11 +2616,7 @@ export default {
         },
         drawFinish(){
             var vm=this;
-            // console.log("finish");
-            // this.isClick1=false;
-            // this.isClick2=false;
-            // this.isClick3=false;
-            // this.isClick=false;
+        
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
                 this.spotPicInfo=[];
@@ -2578,7 +2627,7 @@ export default {
                     "operationType":1,
                     "photoId":this.photoId,
                 });
-                // console.log(this.spotPicInfo,'this.spotPicInfo')
+               
                     axios({
                         method:'post',
                         url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
@@ -2617,7 +2666,7 @@ export default {
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
-                     console.log(this.photoId,'this.photoId');
+                     
                     this.spotPicInfoList.forEach((item)=>{
                         alist.push(
                             {
@@ -2635,15 +2684,12 @@ export default {
                                 'photoId':item.id,
                             }
                         )
-                        // alist.push(JSON.parse(item.coordinateInfo));
+                     
                     })
                     alist.forEach((item)=>{
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
-                    // console.log(this.monitorPointInfo,'this.monitorPointInfo');
-
-                    // // console.log(alist,'spotPicInfoList');
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
             })
@@ -2738,14 +2784,14 @@ export default {
                         this.alertPointAmount=this.detectionSummaryList.alertPointAmount;
                         this.condition=this.detectionSummaryList.condition;
                         this.workingCondition=this.condition.workingCondition;
-                        // console.log(this.workingCondition)
+                  
                         this.weatherJson=JSON.parse(this.detectionSummaryList.weatherJson);
                         this.weatherIcon=this.weatherJson.data[0].wea;
                         this.weatherAir=this.weatherJson.data[0].tem1;
                         this.weatherTime=this.weatherJson.data[0].date+this.weatherJson.data[0].week;
                         this.recentAlertAmount=this.alertPointAmount.recentAlertAmount;
                         this.totalAlertAmount=this.alertPointAmount.totalAlertAmount;
-                        // console.log(this.weatherJson)
+                       
                         var recentData=[];
                         var totalData=[];
                         var legendData='';
@@ -2959,17 +3005,19 @@ export default {
         },
         //
         weathIcon(val){
-            if(val=="阴转小雨"||val=="阴"){
+            // var str='';
+
+            if(val=="阴转小雨"||val=="阴"||val.indexOf("阴")==0){
                 return  require('./images/sunnyandcloudy.png')
             }else if(val=="多云"){
                 return  require('./images/cloudy.png')
             }else if(val=="多云转阴"||val=="阴转多云"){
                 return  require('./images/sunnyandcloudy.png')
-            }else if(val=="晴"||val=="晴转多云"||val=="多云转晴"){
+            }else if(val=="晴"||val=="晴转多云"||val=="多云转晴"||val.indexOf("晴")==0){
                 return  require('./images/sunny.png')
-            }else if(val=="小雨"||val=="小雨转阴"||val=="小雨转晴"){
+            }else if(val=="小雨"||val=="小雨转阴"||val=="小雨转晴"||val.indexOf("小雨")==0){
                 return  require('./images/lightrain.png')
-            }else if(val=="大雨"||val=="小雨转中雨"||val=="中雨"||val=="中雨转多云"){
+            }else if(val=="大雨"||val=="小雨转中雨"||val=="中雨"||val=="中雨转多云"||val.indexOf("中雨")==0){
                 return  require('./images/heavyrain.png')
             }else if(val=="多云转小雨"||val=="小雨转多云"){
                 return  require('./images/sunnyandcloudy.png')
@@ -2999,8 +3047,6 @@ export default {
             // var list1=this.
            
             list.forEach((item)=>{
-                // console.log(item.id.substr(item.id.length-3),'124')
-               
                  if(item.id.length==undefined){
                     alist.push(item);
                 }
@@ -4034,7 +4080,6 @@ export default {
                 })
 
             }else if(vm.inputWorkingCondition.length>150){
-                console.log(vm.inputWorkingCondition.length,'vm.inputWorkingCondition.length');
                 this.$message({
                     type:'info',
                     message:"文本字符超过150个"
@@ -4431,7 +4476,7 @@ export default {
         //点击公式设定
         formulaSetting(val){
             this.formulaSettingShow=true;
-            // console.log(this.useFormulaNum.split('-')[0],'useFormulaNum');
+            
             this.useFormulaValue=this.useFormulaNum.split('-')[0];
             if(val){
                 this.monitorImportId=val;
@@ -4599,7 +4644,7 @@ export default {
                         if(response.data.cd=='0'){
                             this.excelSheetInfo=response.data.rt;
                             this.excelSheetInfoLength=response.data.rt.length;
-                            // console.log(this.excelSheetInfo);
+                           
                             if(vm.monitorImportType==5){
                                 this.excelSheetInfo.forEach((item)=>{
                                     this.getPitchBaseInfoList.forEach((item1)=>{
@@ -4607,7 +4652,7 @@ export default {
                                             this.getExcelColumnBySheet(item.index);
                                             this.getImportColumnSetting(item.index);
                                             this.sheetIndex=item.index;
-                                            // console.log(this.sheetIndex);
+                                          
                                         }else if(item.name!=item1.keyword){
                                             this.$message({
                                                 type:'info',
@@ -4623,7 +4668,7 @@ export default {
                                         this.getExcelColumnBySheet(item.index);
                                         this.getImportColumnSetting(item.index);
                                         this.sheetIndex=item.index;
-                                        // console.log(this.sheetIndex);
+                                       
                                     }else if(item.name!=this.matchKeyWord){
                                             this.$message({
                                                 type:'info',
@@ -4668,13 +4713,12 @@ export default {
                     this.allAmount=this.getBatchImportMatchingResultList.allAmount;
                     this.matchedAmount=this.getBatchImportMatchingResultList.matchedAmount;
                     this.sheetList=this.getBatchImportMatchingResultList.sheets;
-                    // var sheetLists=[];
+                    
                     this.sheetList.forEach((item)=>{
                         this.getExcelColumnBySheet(item.sheetIndex)
-                        // this.$set(item,'sheetlist',)
+                        
                     })
-                    // console.log(this.sheetList,'this.sheetList1234')
-                    // console.log(this.getBatchImportMatchingResultList,'this.getBatchImportMatchingResultList')
+                   
                     document.getElementById('editBodyStyle').style.height="500px"
                 }else if(response.data.cd=='-1'){
                     this.$message({
@@ -4704,7 +4748,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.sheetIndexList=response.data.rt;
-                    // console.log(this.sheetIndex,'sheetIndex0000');
+               
                     this.sheetList.forEach((item)=>{
                         if(item.sheetIndex==val){
                             this.$set(item,'sheetlist',this.sheetIndexList)
@@ -4712,7 +4756,7 @@ export default {
                         }
                     })
                     
-                    // console.log(this.sheetIndexList);
+                  
                 }else{
                     vm.$message({
                         type:'error',
@@ -4804,9 +4848,9 @@ export default {
         },
         editMonitorNameBtn(val){
             var vm=this;
-            // console.log(val);
+           
             this.editInspectContentShow=true;
-            // console.log(this.monitorMainTableList);
+           
             this.monitorMainTableList.forEach((item)=>{
                 if(item.id==val){
                     this.monitorName1=item.name;
@@ -4814,7 +4858,7 @@ export default {
                     this.monitorKeyword1=item.keyword;
                     this.monitorId=item.id;
                     this.monitorType=item.type;
-                    // console.log(this.monitorName1);
+
                 }
             })
         },
@@ -4872,7 +4916,6 @@ export default {
             this.detailMonitorId=id;
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
-            // console.log(baseMapId,'baseMapId');
             this.itemSubmitbaseMapId=this.monitorBaseMapId;
             this.itemSubmitCount=count;
             if(type==5){
@@ -4910,7 +4953,6 @@ export default {
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
                         vm.getPitchBaseInfoListLength=response.data.rt.length;
-                        // console.log(vm.getPitchBaseInfoList);
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:"error",
@@ -4936,9 +4978,6 @@ export default {
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
                     this.monitorMainTableListLength=response.data.rt.length;
-                    // console.log(this.monitorMainTableListLength);
-                    // this.monitorMainTableList.forEach((item)=>{
-                    // })
                      if(this.monitorMainTableListLength<11){
                         for(var i=0;i<this.monitorMainTableListLength;i++){
                             this.monitorMainTableList1.push(this.monitorMainTableList[i])
@@ -5182,6 +5221,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.spotPicInfo=[];
+                        this.setSpotPicShow=false;
                             this.getAllMonitorPoint();
                         setTimeout(()=>{
                                 this.getTagList();
@@ -5327,8 +5367,7 @@ export default {
                     this.$refs.pic.deleteDraw();
                 }
                 if(this.picMarkName=="Select_img_Mark"){
-                    // var list1 = this.$refs.pic.saveList();
-                    //     console.log(list1,'list1');  
+                 
                         this.spotPicInfo=[];
                         this.spotPicInfo.push({
                             "coordinateInfo":null,
@@ -5373,7 +5412,7 @@ export default {
 
         },
         brokenChanged(val){
-            // console.log(val,'val111')
+         
             var pointId=val.ID_out;
             var status="";
             if(val.isBroken==0){
@@ -5437,7 +5476,19 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
-                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    this.monitorPointInfo.forEach((item)=>{
+                        if(item.data==null){
+                            return;
+                        }else{
+                             item.data=parseFloat(item.data).toFixed(3);
+                        }
+                        // console.log(item.data,'item.data');
+                        // item.data.toFixed(3)
+                    })
+
+                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+
+                    
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
@@ -5464,7 +5515,7 @@ export default {
                     })
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
-                    // console.log(this.monitorMainItemList,'monitorMainItemList123')
+                   
                 }
             })
         },
@@ -5610,6 +5661,7 @@ export default {
                             usePointDetail:this.spotChecked==false?0:1,//是否使用测点详情：0-否；1-是
                             useSuggestion:this.summaryChecked==false?0:1,//是否使用概述：0-否；1-是	
                             userGroupId:this.selectUgId,//群组ID
+                            generateQrcode:this.qcodeChecked==false?0:1,//是否使用二维码
                         }
                     }).then((response)=>{
                         if(response.data.cd=='0'){
@@ -5678,7 +5730,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
-                    // console.log(this.getReportDatasList,'this.getReportDatasList');
+                  
                 }
             })
         },
@@ -5696,12 +5748,12 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    // this.getReportDatasList=response.data.rt;
+              
                     this.getReportSettingList=response.data.rt;
-                    // console.log(this.getReportSettingList,'this.getReportSettingList');
+                    
                     this.pageSelect=this.getReportSettingList.baseMapPosition==1?"1":"2";//底图位置：1-上部；2-下部
                     this.coverPathUrl=this.getReportSettingList.coverPath;
-                    // console.log(this.coverPathUrl,'this.coverPathUrl');
+                  
                     this.priorityLayout=this.getReportSettingList.optimalizationSchema==1?"1":"2";//优化方案：1-测点顺序优先；2-图面清晰优先
                     
                     this.suggestList=this.getReportSettingList.suggestion;//建议概述
@@ -5710,6 +5762,7 @@ export default {
                     this.optimalLayout=this.getReportSettingList.useOptimalization==0?false:true;//是否优化布局测点：0-否；1-是
                     this.spotChecked=this.getReportSettingList.usePointDetail==0?false:true;//是否使用测点详情：0-否；1-是
                     this.summaryChecked=this.getReportSettingList.useSuggestion==0?false:true;//是否使用概述：0-否；1-是	
+                    this.qcodeChecked=this.getReportSettingList.generateQrcode==0?false:true;
                     this.isShow1=true;
                     this.isShow2=true;
                     this.isShow=true;
@@ -5761,9 +5814,9 @@ export default {
             var vm=this;
             const list = vm.$refs.drawingsInfo1.files;
             this.fileListCover=list[0];
-            // console.log(list[0],'list');
+           
              this.imgUrl =window.URL.createObjectURL(list[0]);
-            // console.log(this.imgUrl,'imgUrl');
+         
               var formData = new FormData();
             formData.append('token',vm.token);
             formData.append('projectId',vm.projId);
@@ -5856,10 +5909,12 @@ export default {
                 this.isShow3=true;
                 this.retractImg3 = shouqiImg;
                 this.retractText3 = '收起';
+                this.generateQrcode=1;
             }else {
                 this.isShow3=false;
                 this.retractImg3 = zhankaiImg;
                 this.retractText3 = '展开';
+                this.generateQrcode=0;
             }
             this.generateReportNumber();
         },
@@ -5887,7 +5942,7 @@ export default {
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfImport')
-                // console.log(pdfDom,'pdfDom');
+               
                 html2canvas(pdfDom, {allowTaint: true}).then(function(canvas){
                             var contentWidth = canvas.width;
                             var contentHeight = canvas.height;
@@ -5920,7 +5975,7 @@ export default {
                                 }
                             }
                             pdf.save('安全监测图纸.pdf');
-                            // console.log(pdf,'pdf1234');
+                          
                         })
                 // html2canvas();
             }

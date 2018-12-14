@@ -1,6 +1,6 @@
 <template>
 <div id="cloudDrive_Share">
-        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
+        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="item-box-file">
                     <router-link :to="'/Drive/costover'" class=" label-item">  
@@ -23,165 +23,167 @@
                         <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
                     </div>
                 </div>
-                <p class="antsLine">
-                    文档管理<i class="icon-sanjiao-right"></i><span class="strong" @click="refreshPage()">已经分享</span><i class="icon-sanjiao-right"></i>
-                    <span class="strong SH" v-for="item in ShareBreadList" :key="item.nodeId+'antLine_1'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
-                    <span class="strong GD" v-for="item in FGBreadList" :key="item.nodeId+'antLine_2'" @click="IntoDir(item,true,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
-                    <span class="strong" v-for="item in breadList" :key="item.nodeId+'antLine_3'" @click="IntoDir(item,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
-                </p>
-                <p class="select-header clearfix">
-                    <label   :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile"  @click="initAll()"></label>
-                    <input  type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                    <!--
-                        文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
+                <div v-show="!showCommonList">
+                    <p class="antsLine">
+                        文档管理<i class="icon-sanjiao-right"></i><span class="strong" @click="refreshPage()">已经分享</span><i class="icon-sanjiao-right"></i>
+                        <span class="strong SH" v-for="item in ShareBreadList" :key="item.nodeId+'antLine_1'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                        <span class="strong GD" v-for="item in FGBreadList" :key="item.nodeId+'antLine_2'" @click="IntoDir(item,true,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                        <span class="strong" v-for="item in breadList" :key="item.nodeId+'antLine_3'" @click="IntoDir(item,true)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                    </p>
+                    <p class="select-header clearfix">
+                        <label   :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile"  @click="initAll()"></label>
+                        <input  type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                        <!--
+                            文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
 
-                        具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
+                            具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
 
-                    -->
-                    <ul class="operation">
-                        <li   @click="copyURL" v-if="fgList.length>0 && showLocation" class="item copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput">复制链接</li>
-                        <li class="item"   @click="showLink"  v-if="fgList.length>0 && showLocation">地址</li>
-                        <li class="item" @click="cancleShare" v-if='auth.canCancelShare && fgList.length>0' v-loading.fullscreen.lock="fullscreenLoading">取消分享</li>
-                    </ul>
-                    <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
-                    <input type="text" id="copyInput" v-if="fgList.length>0"
-                    :value="checkedItem.sharePassword !=null?'链接：'+this.shareUrl+'/cloud/sharePassword/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:this.shareUrl+'/cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
-                </p>
-                <div>
-                <!--文件夹代码-->
-                <div id="file-container" v-if="listStyle == 'card'">
-                    <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                        <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
-                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)" ></label>
-                            <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            <div class="item-file-box clearfix">
-                                <span  class="item-file-image">
-                                <img :src="require('./images/icon/'+item.icon)" />
-                                </span>
-                                <span  class="item-file-detial">
-                                    <h3 v-text="item.fgName"></h3>
-                                    <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
-                                    <p v-text="initData(item.updateTime)"></p>
-                                    <p class="operation">
-                                        <span v-text="'版本'+item.version"></span>
-                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
-                                        <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
-                                    </p>
-                                </span>
-                            </div>
-                        </li>
-                        <li :class="[{'item-file-active':item.checked},'item-file','fgfile']" v-for="(item,index) in fgList" :key="index+'folder_fg'"   @click="checkShareItem(index)" @dblclick="IntoDir(item)">
-                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkShareItem(index,true)" ></label>
-                            <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            <div class="item-file-box clearfix">
-                                <span  class="item-file-image item-folder-image">
-                                <img :src="require('./images/folderBig.png')" />
-                                </span>
-                                <span  class="item-file-detial">
-                                    <h3 v-text="item.shareName"></h3>
-                                    <p style="line-height: 16px;" class="detial">由<span class="text-name"  v-text="item.userName"></span>通过<span  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></span>分享</p>
-                                    <p class="operation">
-                                        <span v-text="item.sharePassword ==null?'公开分享':'私有分享'" :style="{color:item.sharePassword ==null?'#fc3439':'#336699'}"></span>
-                                        <span v-text="initData(item.shareTime)" style="color:#b3b3b3;float:right;padding-right:9px;"></span>
-                                    </p>
-                                </span>
-                            </div>
-                        </li>
-                        <li :class="[{'item-file-active':item.checked},'item-file','folder']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
-                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
-                            <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            <div class="item-file-box clearfix">
-                                <span  class="item-file-image item-folder-image">
-                                <img :src="require('./images/folderBig.png')" />
-                                </span>
-                                <span  class="item-file-detial">
-                                    <h3 v-text="item.nodeName"></h3>
-                                </span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div id="file-container-table" v-else>
-                    <table class="UserList" width='100%'>
-                        <thead>
-                            <tr  class="userList-thead" v-if="ShareStyleHeader">
-                                <th style="width:55px;"></th>
-                                <th style="min-width:428px;">文件名</th>
-                                <th style="width:70px;"></th>
-                                <th style="width:70px;">更新渠道</th>
-                                <th style="width:80px;">类型</th>
-                                <th style="width:40px;">版本</th>
-                                <th style="min-width:60px;">上传人</th>
-                                <th style="min-width:120px;">更新时间</th>
-                            </tr>
-                            <tr  class="userList-thead" v-else>
-                                <th style="width:55px;"></th>
-                                <th>文件名</th>
-                                <th style="width:70px;"></th>
-                                <th style="min-width:150px;">分享时间</th>
-                                <th style="width:150px;">类型</th>
-                                <th style="width:170px;">分享人</th>
-                                <th style="width:100px;">分享渠道</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked},'fileList']" @click="checkItem(index,true)">
-                                <td @click.stop="checkItem(index,true,true)">
-                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                    <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                </td>
-                                <td>
+                        -->
+                        <ul class="operation">
+                            <li   @click="copyURL" v-if="fgList.length>0 && showLocation" class="item copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput">复制链接</li>
+                            <li class="item"   @click="showLink"  v-if="fgList.length>0 && showLocation">地址</li>
+                            <li class="item" @click="cancleShare" v-if='auth.canCancelShare && fgList.length>0' v-loading.fullscreen.lock="fullscreenLoading">取消分享</li>
+                        </ul>
+                        <!-- //http://10.252.26.240:8080/qjbim-project/cloud/share/a1a8eed2-9b9d-489d-94b0-e5185194eaed -->
+                        <input type="text" id="copyInput" v-if="fgList.length>0"
+                        :value="checkedItem.sharePassword !=null?'链接：'+this.shareUrl+'/cloud/sharePassword/'+checkedItem.shareNo+' 密码：'+checkedItem.sharePassword:this.shareUrl+'/cloud/share/'+checkedItem.shareNo" style=" opacity: 0;">
+                    </p>
+                    <div>
+                    <!--文件夹代码-->
+                    <div id="file-container" v-if="listStyle == 'card'">
+                        <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
+                            <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)" ></label>
+                                <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                <div class="item-file-box clearfix">
+                                    <span  class="item-file-image">
                                     <img :src="require('./images/icon/'+item.icon)" />
-                                    <span v-text="item.fgName"></span>
-                                </td>
-                                <td>
-                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
-                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
-                                </td>
-                                <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
-                                <td v-text="splitType(item.icon)"></td>
-                                <td v-text="item.version"></td>
-                                <td v-text="item.uploadUser"></td>
-                                <td v-text="initData(item.updateTime)"></td>
-                            </tr>
-                            <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked},'fgList']" @click="checkShareItem(index)"  @dblclick="IntoDir(item)">
-                                <td @click.stop="checkShareItem(index,true)">
-                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                    <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                </td>
-                                <td>
+                                    </span>
+                                    <span  class="item-file-detial">
+                                        <h3 v-text="item.fgName"></h3>
+                                        <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                        <p v-text="initData(item.updateTime)"></p>
+                                        <p class="operation">
+                                            <span v-text="'版本'+item.version"></span>
+                                            <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
+                                            <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
+                                        </p>
+                                    </span>
+                                </div>
+                            </li>
+                            <li :class="[{'item-file-active':item.checked},'item-file','fgfile']" v-for="(item,index) in fgList" :key="index+'folder_fg'"   @click="checkShareItem(index)" @dblclick="IntoDir(item)">
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkShareItem(index,true)" ></label>
+                                <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                <div class="item-file-box clearfix">
+                                    <span  class="item-file-image item-folder-image">
                                     <img :src="require('./images/folderBig.png')" />
-                                    <span v-text="item.shareName"></span>
-                                </td>
-                                <td></td>
-                                <td v-text="initData(item.shareTime)"></td>
-                                <td v-text="item.sharePassword ==null?'公开分享':'私有分享'"></td>
-                                <td v-text="item.userName"></td>
-                                <td  v-text="item.shareFrom == 0?'QB Cloud':'浏览器'"></td>
-                            </tr>
-                            <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked},'folderList']" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
-                                <td @click.stop="checkItem(index,false,true)">
-                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                    <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                </td>
-                                <td>
+                                    </span>
+                                    <span  class="item-file-detial">
+                                        <h3 v-text="item.shareName"></h3>
+                                        <p style="line-height: 16px;" class="detial">由<span class="text-name"  v-text="item.userName"></span>通过<span  v-text="item.shareFrom == 0?'AT Cloud':'浏览器'"></span>分享</p>
+                                        <p class="operation">
+                                            <span v-text="item.sharePassword ==null?'公开分享':'私有分享'" :style="{color:item.sharePassword ==null?'#fc3439':'#336699'}"></span>
+                                            <span v-text="initData(item.shareTime)" style="color:#b3b3b3;float:right;padding-right:9px;"></span>
+                                        </p>
+                                    </span>
+                                </div>
+                            </li>
+                            <li :class="[{'item-file-active':item.checked},'item-file','folder']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
+                                <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                <div class="item-file-box clearfix">
+                                    <span  class="item-file-image item-folder-image">
                                     <img :src="require('./images/folderBig.png')" />
-                                    <span v-text="item.nodeName"></span>
-                                </td>
-                                <td></td>
-                                <td v-text="'-'"></td>
-                                <td v-text="'文件夹'"></td>
-                                <td v-text="'-'"></td>
-                                <td v-text="'-'"></td>
-                                <td v-text="item.createTime?initData(item.createTime):item.uploadTime?initData(item.uploadTime):'-'"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                    </span>
+                                    <span  class="item-file-detial">
+                                        <h3 v-text="item.nodeName"></h3>
+                                    </span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="file-container-table" v-else>
+                        <table class="UserList" width='100%'>
+                            <thead>
+                                <tr  class="userList-thead" v-if="ShareStyleHeader">
+                                    <th style="width:55px;"></th>
+                                    <th style="min-width:428px;">文件名</th>
+                                    <th style="width:70px;"></th>
+                                    <th style="width:70px;">更新渠道</th>
+                                    <th style="width:80px;">类型</th>
+                                    <th style="width:40px;">版本</th>
+                                    <th style="min-width:60px;">上传人</th>
+                                    <th style="min-width:120px;">更新时间</th>
+                                </tr>
+                                <tr  class="userList-thead" v-else>
+                                    <th style="width:55px;"></th>
+                                    <th>文件名</th>
+                                    <th style="width:70px;"></th>
+                                    <th style="min-width:150px;">分享时间</th>
+                                    <th style="width:150px;">类型</th>
+                                    <th style="width:170px;">分享人</th>
+                                    <th style="width:100px;">分享渠道</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked},'fileList']" @click="checkItem(index,true)">
+                                    <td @click.stop="checkItem(index,true,true)">
+                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                        <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    </td>
+                                    <td>
+                                        <img :src="require('./images/icon/'+item.icon)" />
+                                        <span v-text="item.fgName"></span>
+                                    </td>
+                                    <td>
+                                        <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
+                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
+                                    </td>
+                                    <td  v-text="item.shareFrom == 0?'AT Cloud':'浏览器'"></td>
+                                    <td v-text="splitType(item.icon)"></td>
+                                    <td v-text="item.version"></td>
+                                    <td v-text="item.uploadUser"></td>
+                                    <td v-text="initData(item.updateTime)"></td>
+                                </tr>
+                                <tr v-for="(item,index) in fgList" :key="index+'table_fg'" :class="[{'active':item.checked},'fgList']" @click="checkShareItem(index)"  @dblclick="IntoDir(item)">
+                                    <td @click.stop="checkShareItem(index,true)">
+                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                        <input type="checkbox" :id='item.shareId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    </td>
+                                    <td>
+                                        <img :src="require('./images/folderBig.png')" />
+                                        <span v-text="item.shareName"></span>
+                                    </td>
+                                    <td></td>
+                                    <td v-text="initData(item.shareTime)"></td>
+                                    <td v-text="item.sharePassword ==null?'公开分享':'私有分享'"></td>
+                                    <td v-text="item.userName"></td>
+                                    <td  v-text="item.shareFrom == 0?'AT Cloud':'浏览器'"></td>
+                                </tr>
+                                <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked},'folderList']" @click="checkItem(index)"  @dblclick="IntoDir(item,true)">
+                                    <td @click.stop="checkItem(index,false,true)">
+                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                        <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    </td>
+                                    <td>
+                                        <img :src="require('./images/folderBig.png')" />
+                                        <span v-text="item.nodeName"></span>
+                                    </td>
+                                    <td></td>
+                                    <td v-text="'-'"></td>
+                                    <td v-text="'文件夹'"></td>
+                                    <td v-text="'-'"></td>
+                                    <td v-text="'-'"></td>
+                                    <td v-text="item.createTime?initData(item.createTime):item.uploadTime?initData(item.uploadTime):'-'"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+        <div v-show="!showCommonList" :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -238,10 +240,10 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-detial"></i>
-                                <i class="icon-goujian icon-QRcode"></i>
+                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
+                                <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location"></i>
-                                <i class="icon-goujian icon-delete"></i>
+                                <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
@@ -276,7 +278,7 @@
                     <i class="icon-sanjiao"></i>
                 </p>
                 <ul>
-                    <li class="item-version" v-for="(item,index) in  versionItem" :key="index">
+                    <li  :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
                         <div class="clearfix">
                             <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                             <div class="versin-detial">
@@ -285,11 +287,12 @@
                                 <p class="version-des">上传了新文档</p>
                             </div>
                         </div>
-                        <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFromExplorer == 1?'浏览器':'手机端')+'更新'}}</p>
+                        <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFrom == 1?'浏览器':'手机端')+'更新'}}</p>
                     </li>
                 </ul>
             </div>
         </div>
+        <common-list v-on:back="backToH" :mId="setId"   :title="'构件量清单'" v-if="showCommonList"></common-list>
         <div id="edit">
              <el-dialog title="分享地址" :visible.sync="sharePath.show" @close="closeLink">
                 <div class="editBody">
@@ -303,9 +306,67 @@
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="openUrl(checkedItem.shareNo,sharePath.password)">打开页面</button>
+                    <button class="editBtnS" @click="openUrl(checkedItem.shareNo,sharePath.password,checkedItem.shareName)">打开页面</button>
                     <button class="editBtnS copyhref"  data-clipboard-action="cut" data-clipboard-target="#copyInput" @click="copyURL" v-if="sharePath.path !=''">复制地址</button>
                     <button class="editBtnS" @click="closeLink">关闭</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="标签信息预览" :visible.sync="isbiaoqianshow" @close="biaoqianCLose">
+            <div class="editBody">
+                <ul style="padding:0 20px">
+                    <li class="item-label clearfix">
+                        <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(biaoqianInfo.pkId, 7)" alt="二维码">
+                        <div class="right">
+                            <p class="item-list clearfix">
+                                <span class="text-left">清单ID：</span>
+                                <span class="text-right" v-text="biaoqianInfo.pkId"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">清单名称：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mName"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">生成方式：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mGSource_"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">源自业务：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mBSource_"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">创建用户：</span>
+                                <span class="text-right" v-text="biaoqianInfo.creator"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">创建时间：</span>
+                                <span class="text-right">{{new Date(biaoqianInfo.createTime).toLocaleString()}}</span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">变更版本：</span>
+                                <span class="text-right" v-text="biaoqianInfo.mVersion"></span>
+                            </p>
+                            <p class="item-list clearfix">
+                                <span class="text-left">明细数量：</span>
+                                <span class="text-right" v-text="biaoqianInfo.manifestDetailCount"></span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div slot="footer" class="dialog-footer">
+               <button class="editBtnS" @click="labelListConfirm(biaoqianInfo.pkId)">网页预览</button>
+                    <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
+            </div>
+        </el-dialog>
+        </div>
+         <div id="inital">
+            <el-dialog  :visible.sync="deleteDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">是否移除清单【{{removelistitem}}】?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteDialog=false">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -435,6 +496,71 @@
             background: url('./images/checked.png') no-repeat 1px 2px;
                 border: 1px solid #fc3439;
         }
+    }
+    .img_left {
+      float: left;
+      width: 90px;
+      height: 90px;
+      margin: 40px 30px 0 10px;
+    }
+    .right {
+      float: left;
+      width: 400px;
+      margin-top: 20px;
+
+      .item-list {
+        margin-bottom: 14px;
+
+        .text-left {
+          float: left;
+          font-size: 12px;
+          line-height: 12px;
+          width: 80px;
+          color: #999;
+          text-align: left;
+        }
+
+        .text-right {
+          float: left;
+          width: 300px;
+          font-size: 12px;
+          line-height: 12px;
+          color: #333333;
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        &:last-of-type {
+          margin-bottom: 20px;
+        }
+      }
+    }
+    /*删除弹框*/
+    .deleteDialogImg{
+        height: 50px;
+    }
+    #inital{
+        .el-dialog{
+            margin:15vh auto;
+        }
+    }
+    .deleteDialogWarning{
+        font-size: 18px;
+        line-height: 18px;
+        font-family: 'MicrosoftYahei';
+        color: #fc3439;
+        font-weight: bold;
+        margin:20px 0 0 0;
+    }
+    .deleteDialogText{
+        color: #333333;
+        font-size: 14px;
+        line-height: 14px;
+        font-family: 'MicrosoftYahei';
+        font-weight: normal;
+        margin: 16px 0 0 0;
     }
     #GroupSelect{
         display: block;
@@ -981,6 +1107,9 @@
             transition: all ease .5s;
         }
     }
+    .qindanWidth{
+        width: 100% !important;
+    }
     .el-main{
         padding: 0;
     }
@@ -1474,6 +1603,9 @@
                 text-align: left;
             }
         }
+        .active-item{
+            box-shadow: 0px 1px 8px rgba(252, 52, 57, 0.2);
+        }
     }
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
@@ -1506,11 +1638,18 @@ import './js/jquery-1.8.3.js'
 import './js/jquery-ui-1.9.2.custom.js'
 import './js/date.js'
 import data from '../Settings/js/date.js'
-
+import commonList from  '../planCost/qingDan.vue'
 export default {
   name:'Costover',
+  components:{
+        commonList
+    },
   data(){
       return {
+        showCommonList:false,
+        isbiaoqianshow:false,
+        biaoqianInfo:'',
+        setId:'',//传递的参数
         activeIndex:'1',
          tabShow:1,
          listStyle:'table',//列表展示方式
@@ -1583,6 +1722,9 @@ export default {
         fullscreenLoading:false,
         WebGlUrl:'',
         shareUrl:'',
+        deleteDialog:false,
+        deleteInfo:'',
+        removelistitem:'',
       }
   },
   created(){
@@ -1738,17 +1880,18 @@ export default {
             vm.sharePath.path = ''
             vm.sharePath.password = ''
         },
-        openUrl(id,passwordId){
+        openUrl(id,passwordId,name){
             var vm = this
             var routerDataUrl=''
+            // this.$router.push({query:{showName:name}}) //将文件的名字传参到路由
             // localStorage.setItem('projId',id)
             if(passwordId==''){
              routerDataUrl=vm.$router.resolve({
-              path:`/cloud/share/${id}`,
+              path:`/cloud/share/${id}`,query:{shareName:name}
             })
             }else{
                 routerDataUrl=vm.$router.resolve({
-                    path:`/cloud/sharePassword/${id}`,
+                    path:`/cloud/sharePassword/${id}`,query:{shareName:name}
                 })
             }
             window.open(routerDataUrl.href,'_blank');
@@ -2153,6 +2296,14 @@ export default {
           var tt=new Date(val).Format('yyyy-MM-dd hh:mm') 
           return tt; 
       },
+      selectVersion(val){
+            var vm = this
+            this.versionIndex=val;
+            vm.versionItem.forEach((item)=>{
+                vm.$set(item,'checked',false)
+            })
+            vm.$set(vm.versionItem[val],'checked',true)
+        },
       /**
          * 预览文件集文件
          * @param fileUuid
@@ -2162,7 +2313,13 @@ export default {
         var vm = this
         if(!filePath){
             if(vm.checkedItem){
-                filePath =  vm.checkedItem.filePath
+               vm.versionItem.forEach((item)=>{
+                    if(item.checked){
+                        filePath =  item.filePath
+                        // fileId = item.fileId
+                        fileName = item.fileName
+                    }
+                })
             }
         }
         if(!filePath){
@@ -2172,19 +2329,151 @@ export default {
         })
         return false
         }
-        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
-            window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
+            window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
     },
+    //删除构件
+    deleteList(item){
+            this.deleteDialog = true;
+            this.deleteInfo = item;
+            this.removelistitem = item.main.pkId;
+    },
+    deleteMakeSure(){
+            var vm=this;
+            var relaId = ''
+            if(vm.checkedItem){
+                if(!vm.checkedItem.fgId){
+                    vm.GouJianItem = []
+                    return false
+                }
+                relaId = vm.checkedItem.fgId
+            }
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+relaId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                headers:{
+                    token:this.token
+                }
+            }).then(response=>{
+                if(response.data.cd == 0){
+                    this.getGouJianInfo();
+                    this.deleteDialog = false;
+                }else{  
+                    alert(response.data.msg);
+                }
+            })
+        },
+
+     backToH(){
+            this.showCommonList=false;
+            // vm.checkFilePaste()
+            // vm.getIntoCloudD()
+            // vm.createDrawingDirectory()
+            // vm.getHolders()
+    },
+    //进入详情清单
+   showDetialList(item){
+            console.log(item,'item0000')
+            this.setId=item.main.pkId
+            this.showCommonList=true;
+    },
+
+     //清单二维码
+    viewListQrcode(item){
+        axios({
+            method:'post',
+            url:this.BDMSUrl+'manifest2/getManifestInfoByMId',
+            headers:{
+                token:this.token
+            },
+            params:{
+                mId:item.main.pkId
+            }
+        }).then(response=>{
+            if(response.data.cd == 0){
+                this.isbiaoqianshow = true;
+                this.biaoqianInfo = response.data.rt;
+                Object.assign(this.biaoqianInfo,{
+                    mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
+                    mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
+
+                })
+            }else{
+                alert(response.data.msg);
+            }
+        })
+
+    },
+    parseMBSource(mBSource) {
+        switch (mBSource) {
+            case 1:
+                return "文档管理-关联构件";
+            case 2:
+                return "进度计划-任务核实";
+            case 3:
+                return "成本管理-工程量";
+            case 4:
+                return "成本管理-物料量";
+            case 5:
+                return "物资采购-订货管理";
+            case 6:
+                return "讨论主题";
+            case 7:
+                return "成本管理-报表快照";
+            default:
+                return "";
+        }
+    },
+    parseMGSource(mGSource) {
+        switch (mGSource) {
+            case 1:
+                return "选择集";
+            case 2:
+                return "报表快照";
+            case 3:
+                return "构件量生成";
+            case 4:
+                return "外部导入";
+            case 5:
+                return "构件量生成";
+            default:
+                return "";
+        }
+    },
+    biaoqianCLose(){
+            this.isbiaoqianshow = false;
+    },
+    addZero(num,size){
+        var len = ('' + num).length;
+        return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
+    },
+    //网页预览
+    labelListConfirm(val){
+        // this.$refs.manifestQrCodeSingleForm.submit();
+        var vm = this;
+        window.open('/#/Cost/getMainLabelInformation/'+val)
+    },
+    //打印当前标签页
+    printLabelList(){
+        this.$message({
+            type:"info",
+            message:'已向打印机发送请求！'
+        })
+    },  
     downLoad(filePath){
         //latestFile(fileId,fgId,"下载了文件"+fileName);
         var vm = this
          if(!filePath){
-            if(vm.checkedItem){
-                filePath =  vm.checkedItem.filePath
-            }
+           vm.versionItem.forEach((item)=>{
+                    if(item.checked){
+                        filePath =  item.filePath
+                        // fileId = item.fileId
+                        // fileName = item.fileName
+                    }
+                })
         }
         if(!filePath){
              vm.$message({
@@ -2291,6 +2580,7 @@ export default {
             vm.showLocation = true
             vm.fgList[val].checked =  true
             vm.checkedItem = vm.fgList[val]
+            console.log(vm.checkedItem,'vm.checkedItem00000');
         }
     },
     checkItem(val,file,isMultiSelect){
@@ -2512,6 +2802,7 @@ export default {
         })
     },
     getSFInfo(){
+        this.fileList=[];
         var vm = this
         /**
          *  dirId: vm.checkFileDir.nodeId,//当前文件夹ID
@@ -2548,6 +2839,7 @@ export default {
        * 获取单个文件夹
        * **/
         var vm = this
+        this.folderList=[];
         axios({
             method: 'POST',
             url: vm.BDMSUrl + 'project2/doc/searchFolderInfo', //查询单个文件 ，下面要查询单个文件夹

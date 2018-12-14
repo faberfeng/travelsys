@@ -1,7 +1,7 @@
 <template>
-      <div id="sendme" v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}"  v-loading.fullscreen.lock="fullscreenLoading">
+      <div id="sendme" v-if="showBox" class="sendmessage" :style="{margin: !iscomment?'0px':''}"  v-loading.fullscreen.lock="fullscreenLoading" >
           <div class="left" v-if="iscomment">
-              <img :src="userImg" alt="" >
+              <img :src="userImg!=''?userImg:require('../../assets/people.png')" alt="" >
           </div>
           <div class="center" :style="{paddingLeft: !iscomment?'0px':''}">
               <div class="box">
@@ -11,7 +11,9 @@
                     </div>
                     <div class="func_area">
                         <div class="limits">
-                            <span class="icon-eye" @click="AddViewpoint()">视点</span>
+                            <!-- v-if="iscomment" -->
+                            <span  class="icon-eye" @click="AddViewpoint()">视点</span>
+                            <!-- <span v-if="!iscomment" class="icon-eye" @click="AddViewpoint1()">视点1</span> -->
                             <span class="icon-image" @click="showUploadBox_img()">图片</span>
                             <span class="icon-file"  @click="showUploadBox_file()">文档</span>
                             <span class="icon-message" @click="getShortStateMent()">短语</span>
@@ -25,8 +27,19 @@
                     </div>
                  </div>
                  <div class="fileitem">   
-                     <ul class="clearfix" style="padding: 0px 0px 2px 2px;">
-                         <li class="item-file" v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                     <ul class="clearfix"  style="padding: 0px 0px 2px 2px;">
+                         <!-- <li v-if="noCommentShow" class="item-file"  v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
+                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                <i class="line"></i>
+                                <i class="button-search"  @click="preview(val.filePath)"></i>
+                                 <i class="line"></i>
+                                 <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
+                            </div>
+                        </li> -->
+                        <!-- v-if="CommentShow" -->
+                        <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
                             <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
                                 <i class="button-relocation" title="定位" @click="relocation()"></i>
@@ -39,7 +52,7 @@
                         <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
-                                    <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
+                                    <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                 </span>
                                 <span  class="item-file-detial">
                                     <h3 v-text="val.fileName"></h3>
@@ -67,7 +80,8 @@
                     </ul>
               </div>
           </div>
-          <div :title="title" v-if="uploadshow"  id="edit" class="hahahha">
+          <div v-loading="Loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)" :title="title" v-if="uploadshow"   id="edit" class="hahahha">
                  <div class="el-dialog__header">
                      <span class="el-dialog__title" v-text="type==1?'图片上传':'文件上传'"></span>
                     <button type="button" aria-label="Close" class="el-dialog__headerbtn"  @click="upImgCancle">
@@ -84,7 +98,7 @@
                                 </span>
                                 <input class="upInput"  type="file" :accept="type == 1?'image/*':''" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
                             </span>
-                            <span class="upImgText">{{imageName}}</span> 
+                            <span class="upImgText" style="width:120px !important">{{imageName}}</span> 
                         </div>
                     </div>
                 </div>
@@ -131,7 +145,7 @@
                     </div>
                 </div>
             </div>
-            <div id="mask" v-if="uploadshow || ShortStateMent.show" @click="upImgCancle"></div>
+            <div id="mask" v-if="uploadshow || ShortStateMent.show"  @click="upImgCancle"></div>
       </div>
 </template>
 <script>
@@ -174,12 +188,15 @@ export default Vue.component('common-upload',{
                 obj:[],//短语列表
             },
             fullscreenLoading:false,
+            Loading:false,
             WebGlSaveId:'',
             WebGlSaveType:'',
             WebGlSaveName:'',
             base64Str:'',
             elementFilter:'',
-            uploadViewPointList:[]
+            uploadViewPointList:[],
+            noCommentShow:false,
+            CommentShow:false,
         }
     },
     props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout'],
@@ -189,6 +206,7 @@ export default Vue.component('common-upload',{
         vm.userId  = localStorage.getItem('userid')
         vm.projId = localStorage.getItem('projId');
         vm.userImg = localStorage.getItem('userImg')
+        console.log(vm.userImg,'vm.userImg0000');
         // vm.WebGlSaveId = localStorage.getItem('WebGlSaveId')
         // vm.WebGlSaveType = localStorage.getItem('WebGlSaveType')
         // vm.WebGlSaveName = localStorage.getItem('WebGlSaveName')
@@ -261,6 +279,8 @@ export default Vue.component('common-upload',{
 		    }
         },
         AddViewpoint(){
+            // this.noCommentShow=true;
+            // this.CommentShow=false;
             if(document.getElementById('webgl').style.display=='none'){
             this.$message({
                 type:'info',
@@ -272,6 +292,20 @@ export default Vue.component('common-upload',{
                 app.postMessage({command:"AddViewpoint",parameter:123},"*");
             }
         },
+        // AddViewpoint1(){
+        //     this.noCommentShow=false;
+        //     this.CommentShow=true;
+        //     if(document.getElementById('webgl').style.display=='none'){
+        //     this.$message({
+        //         type:'info',
+        //         message:'请打开顶部的虚拟场景'
+        //     })}else{
+        //         document.body.scrollTop = 0;
+        //         document.documentElement.scrollTop = 0;
+        //          const app = document.getElementById('webIframe').contentWindow;
+        //         app.postMessage({command:"AddViewpoint",parameter:123},"*");
+        //     }
+        // },
         checkItem(index){
             var vm = this
             vm.ShortStateMent.obj.forEach((item,key)=>{
@@ -281,6 +315,16 @@ export default Vue.component('common-upload',{
                         item.checked = false
                  }
             })
+        },
+        checkIcon1(val){
+            var vm = this
+            // console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
         },
         deleteShortStateMent(id,index){
              var vm = this
@@ -411,6 +455,7 @@ export default Vue.component('common-upload',{
             vm.imageName = '未选择任何文件'
             vm.filesList = null
             vm.attachList = null
+            document.getElementById('fileInfo').value='';
         },
         getShortStateMent(){
             var vm = this
@@ -437,11 +482,12 @@ export default Vue.component('common-upload',{
         },
          trim(str){ 
             /**去掉字符串前后所有空格*/
-            return str.replace(/(^\s*)|(\s*$)/g, ""); 
+            // return str.replace(/(^\s*)|(\s*$)/g, ""); 
+            return str.replace(/\n|\r\n/g,"<br/>") //将字符串的空格变成<br/>编译
         },
         sendInfo(){
             var vm = this
-            vm.$refs.message.value = vm.trim(vm.$refs.message.value)
+            // vm.$refs.message.value = vm.trim(vm.$refs.message.value)
             if(vm.$refs.message.value==''){
                 vm.$message({
                     type:'error',
@@ -477,7 +523,7 @@ export default Vue.component('common-upload',{
                     pageType:1,	//设计协调
                     newStmt:vm.newStmt,
                     designCoordinate:{
-                        dcContent: vm.$refs.message.value,
+                        dcContent: vm.trim(vm.$refs.message.value),
                         ugId: vm.selectugid,
                         projId: vm.projId,
                         subProjId: vm.defaultSubProjId,
@@ -499,7 +545,7 @@ export default Vue.component('common-upload',{
                     themeStatus: '',//主题状态
                     dcReview: {
                         dcId: vm.dcid,
-                        rvContent: vm.$refs.message.value
+                        rvContent: vm.trim(vm.$refs.message.value)
                     },
                     dcSearchCondition: {
                         builderId: vm.valuemonomer,//单体
@@ -535,6 +581,11 @@ export default Vue.component('common-upload',{
                 params:params
             }).then((response)=>{
                 if(parseInt(response.data.cd) == 0){
+                     this.$message({
+                            type:'info',
+                            message:'发布成功'
+                        })
+                    
                     if(vm.iscomment){
                          vm.$emit('refresh')
                     }else{
@@ -542,23 +593,26 @@ export default Vue.component('common-upload',{
                         if(vm.checked){
                             var recall = {
                                 isChecked:true,
-                                data:response.data.rt
+                                data:response.data.rt,
+                                count:1
                             }
                             vm.$emit('refreshcomment',recall)
                         }else{
                             var recall = {
                                 isChecked:false,
-                                data:response.data.rt
+                                data:response.data.rt,
+                                count:1
                             }
                             vm.$emit('refreshcomment',recall)
                         }
+                       
                        vm.checked = false
                     }
                     vm.filesList = null
                     vm.fileId = []
                     vm.attachId = []
                     vm.uploadViewPointList=[]                     
-                    vm.$refs.message.value = ''
+                   vm.$refs.message.value = ''
                     vm.newStmt = false
                 }else{
                     // vm.$message({
@@ -591,6 +645,7 @@ export default Vue.component('common-upload',{
                     return false
                 }
             }
+            this.Loading=true;
             var returnUrl = vm.BDMSUrl+'project2/dc/dcUpload?ugId='+vm.selectugid+"&type="+vm.type+'&dirId=-1'
             returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
@@ -621,11 +676,16 @@ export default Vue.component('common-upload',{
                     }
                     vm.$refs.file.value = ''
                     vm.upImgCancle()
+                    this.Loading=false;
+                     
                 }
             }).catch((err)=>{
                 vm.imageName ='未选择任何文件'
                 console.log(err)
             })
+            document.getElementById('fileInfo').value='';
+            
+           
         }
     }
 })

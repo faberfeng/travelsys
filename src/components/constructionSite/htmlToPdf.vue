@@ -33,13 +33,13 @@
                 </div>
                 <!-- 概述 -->
                 <div class="pdfSummary">
-                    <div class="qrcodeBody">
-                            <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                    <div class="qrcodeBody" v-show="generateQrcode==1">
+                            <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                             <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
                     </div>
                     <label class="pdfSummaryHead">概述</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                    <div class="txt"><label class="label1">观测时间：</label></div>
+                    <div class="txt"><label class="label1">观测时间：{{beforeDate|timeChange()}}</label></div>
                     <div class="inspectTableList1">
                         <table class="inspectTableList" border="1" cellspacing="0" width="100%">
                                 <!-- <tr class="contentTr"></tr> -->
@@ -63,10 +63,10 @@
                                     <tr v-for="(item,index) in getMonitorMainTableListTable" :key="index">
                                         <td v-text="index+1"></td>
                                         <td v-text="item.name"></td>
-                                        <td >{{item.recentPointName|addSprit()}}</td>
+                                        <td >{{item.recentPointName|addSpritNum()}}</td>
                                         <td>{{item.recentVariation|addSprit1()}}</td>
                                         <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
-                                        <td>{{item.totalPointName|addSprit()}}</td>
+                                        <td>{{item.totalPointName|addSpritNum()}}</td>
                                         <td>{{item.totalVariation|addSprit2()}}</td>
                                         <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     </tr>
@@ -86,8 +86,8 @@
                 </div>
                 <!-- 现场巡检 -->
                 <div class="pdfInspection">
-                     <div class="qrcodeBody">
-                            <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                     <div class="qrcodeBody" v-show="generateQrcode==1">
+                            <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                             <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
                     </div>
                      <label class="pdfSummaryHead">现场巡检报表</label>
@@ -136,14 +136,14 @@
                     <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
                        
                         <div class="verticalLength" v-show="item.type!=5">
-                             <div class="qrcodeBody">
-                                <img style="margin-left:-104px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
+                             <div class="qrcodeBody" v-show="generateQrcode==1">
+                                <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                                 <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
                             </div>
                             <label class="pdfSummaryHead1">{{company}}</label>
                             <label class="pdfSummaryHead">监测报表</label>
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
+                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">观测：{{item.getItemDutyUserList.observerName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">计算：{{item.getItemDutyUserList.calculatorName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">检核：{{item.getItemDutyUserList.inspectorName}}</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
                             <div class="bottomTabel2" v-show="baseMapPosition==1">
                                 <div class="bottomTabelDiv"  style="padding: 0px; overflow: hidden;">
@@ -162,7 +162,10 @@
                                             <th colspan="2" v-show="item.type==3">水位(m)</th>
                                             <th v-show="item.type==3">管口(m)</th>
                                             <th colspan="2" v-show="item.type==4">受力(KN)</th>
-                                            <th colspan="2">变化量</th>
+                                            <th colspan="2" v-show="item.type==1">变化量(mm)</th>
+                                            <th colspan="2" v-show="item.type==2">变化量(mm)</th>
+                                            <th colspan="2" v-show="item.type==3">变化量(cm)</th>
+                                            <th colspan="2" v-show="item.type==4">变化量(kN)</th>
                                             <th rowspan="2">备注</th>
                                         </tr>
                                         <tr>
@@ -176,12 +179,18 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(val,index) in item.dataList" :key="index"> 
-                                            <td>{{val.pointName|addSprit()}}</td>
+                                            <td>{{val.pointName|addSpritNum()}}</td>
                                             <td >{{val.initValue|addSprit()}}</td>
                                             <td >{{val.currentValue|addSprit()}}</td>
                                             <td v-show="item.type==3">{{val.seqId|addSprit()}}</td>
-                                            <td>{{val.currentVariation|addSprit()}}</td>
-                                            <td>{{val.totalVariation|addSprit()}}</td>
+                                            <td v-show="item.type==1">{{val.currentVariation|addSpritTo()}}</td>
+                                            <td v-show="item.type==1">{{val.totalVariation|addSpritTo()}}</td>
+                                            <td v-show="item.type==2">{{val.currentVariation*1000|addSprit()}}</td>
+                                            <td v-show="item.type==2">{{val.totalVariation*1000|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.currentVariation*100|addSprit()}}</td>
+                                            <td v-show="item.type==3">{{val.totalVariation*100|addSprit()}}</td>
+                                            <td v-show="item.type==4">{{val.currentVariation|addSprit()}}</td>
+                                            <td v-show="item.type==4">{{val.totalVariation|addSprit()}}</td>
                                             <td></td>
                                         </tr>
                                     </tbody>
@@ -322,6 +331,7 @@ export default {
             monitorBaseMapId:this.$route.query.monitorBaseMapId,
             optimalizationSchema:'', ////优化方案：1-测点顺序优先；2-图面清晰优先
             baseMapPosition:'', //底图位置：1-上部；2-下部
+            generateQrcode:'',//是否有二维码
             onlyNum:'',//报告编码
             beforeDate:this.$route.query.consultValue,
             referenceDate:this.$route.query.userValue,
@@ -330,6 +340,18 @@ export default {
             dpiWidth:'',
             dpiHeight:'',
             pdfShow:false,
+            getItemDutyUserList:'',
+            getItemDutyUserList1:{
+                calculator:null,
+                calculatorName:null,
+                id:null,
+                inspector:null,
+                inspectorName:null,
+                itemId:null,
+                observer:null,
+                observerName:null
+            },
+
         }
     },
     created(){
@@ -381,9 +403,24 @@ export default {
             if(val==null){
                 return '/'
             }else {
+                return val.toFixed(3)
+            }
+        },
+         addSpritTo(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.toFixed(1)
+            }
+        },
+        addSpritNum(val){
+            if(val==null){
+                return '/'
+            }else {
                 return val
             }
         },
+
         addSprit1(val){
             if(val==null){
                 return '/'
@@ -445,8 +482,9 @@ export default {
          timeChangeMethod(val) {
                 return moment(val).format("YYYY-MM-DD hh:mm:ss");
         },
-        getItemDutyUser(){
+        getItemDutyUser(val){
             var vm=this;
+            this.getItemDutyUserList='';
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getItemDutyUser',
@@ -454,14 +492,18 @@ export default {
                     'token':this.token
                 },
                 params:{
-                    itemId:this.itemMonitorId
+                    itemId:val
                 }
             }).then((response)=>{
                 if(response.data.rt){
                      this.getItemDutyUserList=response.data.rt;
-                     this.inspectorName=this.getItemDutyUserList.inspectorName;
-                     this.calculatorName=this.getItemDutyUserList.calculatorName;
-                     this.observerName=this.getItemDutyUserList.observerName;
+                     this.getAllMonitorItemList.forEach((item)=>{
+                         if(item.id==this.getItemDutyUserList.itemId){
+                             this.$set(item,'getItemDutyUserList',this.getItemDutyUserList)
+                         }else{
+                             this.$set(item,'getItemDutyUserList',this.getItemDutyUserList1)
+                         }
+                     })
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -633,6 +675,7 @@ export default {
                     // console.log(this.getReportSettingList,'this.getReportSettingList');
                     this.optimalizationSchema=this.getReportSettingList.optimalizationSchema //优化方案：1-测点顺序优先；2-图面清晰优先
                     this.baseMapPosition=this.getReportSettingList.baseMapPosition //底图位置：1-上部；2-下部
+                    this.generateQrcode=this.getReportSettingList.generateQrcode
                 }
             })
         },
@@ -870,6 +913,9 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
+                    // this.getReportDatasList.forEach((item)=>{
+                        
+                    // })
                     // console.log(this.getReportDatasList,'this.getReportDatasList');
                     var mapList = new Map();
                     for (var i = 0; i < this.getReportDatasList.length;i++){
@@ -886,10 +932,13 @@ export default {
                         }
                     }
                     this.getAllMonitorItemList.forEach((item)=>{
+                        
+                        
                         mapList.forEach((value, key, mapObject)=>{
                             // console.log(value,'value1');
                             console.log(key,'key1');
                             if(key==item.id){
+                                
                                     // console.log(value,'value123');
                                     var aLength=0;
                                     aLength=value.length;
@@ -909,16 +958,20 @@ export default {
                                     this.$set(item,'dataList',value);
                                     this.$set(item,'paramsLists',this.paramsLists);
                                     this.$set(item,'monitorPointInfo',this.monitorPointInfo);
-                                    this.$set(item,'spotNum',false)
+                                    this.$set(item,'spotNum',false);
+                                    this.getItemDutyUser(item.id)
+                                    // this.$set(item,'getItemDutyUserList',this.getItemDutyUserList);
+                                   
                                 }
                             });
                     })
-                    //  console.log(this.getAllMonitorItemList,'getAllMonitorItemList1112311');
+                     console.log(this.getAllMonitorItemList,'getAllMonitorItemList1112311');
                     //  ColorThemeJSON={'name':'','info':'','item':{'name':'','ColorID':'',}}
                     
                 }
             })
         },
+        ///detectionInfo/getItemDutyUser
         //通过改方法可以识别不同监测点位
         inspectSpotMethod(val){
             // console.log(this.mapList,'getReportDatasList23')
@@ -1143,7 +1196,7 @@ export default {
             position: relative;
              .qrcodeBody{
                  position: absolute;
-                 left:10px;
+                 right:37px;
                  top:42px;
                  .onlyNumStyle{
                      display: block;
@@ -1299,7 +1352,7 @@ export default {
             position: relative;
             .qrcodeBody{
                  position: absolute;
-                 left:10px;
+                 right:37px;
                  top:42px;
                  .onlyNumStyle{
                      display: block;
@@ -1492,7 +1545,7 @@ export default {
                 width:98%;
                 .qrcodeBody{
                     position: absolute;
-                    left:10px;
+                    right:37px;
                     top:10px;
                     .onlyNumStyle{
                         display: block;

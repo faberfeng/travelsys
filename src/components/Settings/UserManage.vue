@@ -207,7 +207,7 @@
             <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.commomHeadPictureFile+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
@@ -260,7 +260,7 @@
             <div class="log-body clearfix">
                 <span class="log-head-title">用户信息:</span>
                 <div class="clearfix userInfo">
-                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.QJFileManageSystemURL+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
+                    <span class="image-user" :style="userDetial.info.imgUuid?'background-image:url('+this.commomHeadPictureFile+userDetial.info.imgUuid+');':'background-image: url('+require('./images/people.png')+');'"></span>
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
@@ -803,7 +803,8 @@ export default {
       var projAuth = localStorage.getItem('projAuth')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL
-      vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile
+    //   vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile
+      vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')

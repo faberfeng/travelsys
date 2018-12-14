@@ -8,9 +8,9 @@
             <div class="worktable">
                 <zk-table 
                 index-text="序号"
-                :data="constructorData" :columns="columns" :tree-type="props.treeType" 
+                :data="constructorData" :columns="columns" @expand-cell-click="expandClick" :tree-type="props.treeType" 
                 :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border" empty-text="正在加载...">
+                :border="props.border"  empty-text="正在加载...">
                     <template slot="appearence" slot-scope="scope">
                        <div v-html="scope.row.color_0+scope.row.color_1+scope.row.color_2">
                        </div>
@@ -300,7 +300,7 @@
                     index-text="序号"
                     :data="projectMappingData" :columns="columnsProject" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :selection-type="props.selectionType" 
-                    :border="props.border" style="width:525px;margin:0 30px;">
+                    :border="props.border"  style="width:525px;margin:0 30px;">
                         <template slot="action" slot-scope="scope">
                             <button class="editBtn actionBtn" style="margin-right:10px" @click="editProjectProperty(scope)"></button>
                             <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteProjectProperty(scope)"></button>
@@ -814,6 +814,12 @@ export default {
                     }
                 }
             },100)
+        },
+        expandClick(row, rowIndex, $event){
+            console.log(row,'row');
+            console.log(rowIndex,'rowIndex');
+            console.log($event,'$event')
+
         },
         //获取分类编码树列表
         getProjectGenieClassByProject(){

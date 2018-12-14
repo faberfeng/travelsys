@@ -87,7 +87,7 @@ export default{
                 if(response.data.cd=='0'){
                     this.passwordShowNo=response.data.rt;
                     this.$router.push({
-                        path:`/cloud/share/${this.passwordShowNo}`,
+                        path:`/cloud/share/${this.passwordShowNo}`,query:{shareName:this.$route.query.shareName}
                     })
                 }
             })

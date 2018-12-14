@@ -75,7 +75,8 @@
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
-                                                        <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" />
+                                                        <!-- <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" /> -->
+                                                        <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                                     </span>
                                                     <span  class="item-file-detial">
                                                         <h3 v-text="val.fileName"></h3>
@@ -135,7 +136,8 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
-                                                                                <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" />
+                                                                                <!-- <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" /> -->
+                                                                                 <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                                                             </span>
                                                                             <span  class="item-file-detial">
                                                                                 <h3 v-text="left.fileName"></h3>
@@ -310,6 +312,7 @@ export default {
         pageTotal:0,//评论总个数
         canEditMes:true,//当前用户可以修改消息状态
         canDeleteMes:true,//当前用户可以删除消息
+        isComment:true,
         dcStatus:{
             show:false,
             val:'10',
@@ -374,6 +377,16 @@ export default {
               return true
           }else{
               return false
+          }
+      },
+      checkIcon1(val){
+          var vm = this
+          console.log(val,'val1111');
+          var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+          if(iconArr.indexOf(val) > -1){
+              return val
+          }else{
+              return 'FILE'
           }
       },
       showHide(data){
@@ -459,7 +472,9 @@ export default {
         // if(dcStatus==8||9){
         //     return ;
         // }
-        if(reviewCount == 0){
+         vm.isComment=false;
+        console.log(event,'00000')
+        if(reviewCount == 0&&event==null){
              vm.$message({
                 type:'warning',
                 message:'还没有评论!'
@@ -492,8 +507,10 @@ export default {
                 })
                 if(event != null){
                     vm.CommunicationList[index].flowCharts = event.data[index].flowCharts
+                    console.log('qqqqq');
                 }
                 if(event != null && event.isChecked)vm.CommunicationList.unshift(event.data[0])
+
             }else{
                 vm.$message({
                     type:'error',
@@ -626,7 +643,8 @@ export default {
                     type:'success',
                     message:'状态修改成功'
                 })
-                vm.dcStatusCancle()
+                vm.dcStatusCancle();
+                vm.getCommunicationList();
             }else{
                 vm.$message({
                     type:'error',
@@ -668,6 +686,11 @@ export default {
             // console.log(this.str);
             // console.log(this.checkTypeId);
             // console.log(this.checkTypeValue);
+        },
+         SendMes(){
+          var vm = this
+          vm.goingToSend =true
+          vm.isComment=true
         },
         hideSendMes(){
           var vm = this
@@ -715,6 +738,7 @@ export default {
                 })
             }
             this.loading=false;
+            this.goingToSend=false;
         }).catch((err)=>{
             console.log(err)
         })
@@ -822,6 +846,7 @@ export default {
                             type:'success',
                             message:'状态修改成功'
                         })
+                        vm.getCommunicationList();
                     }else{
                         vm.$message({
                             type:'error',

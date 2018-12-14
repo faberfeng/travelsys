@@ -320,7 +320,7 @@ $.fn.showAtUsers = function(setting) {
                 _top = Ttop;
             }
             $at_userslist.css({
-                "left":_left,   
+                // "left":_left,   
                 "top":"32px",
                 "display":"block"
             }).html('<ul>'+html+'</ul>').find("li").eq(1).addClass("on");

@@ -2709,7 +2709,7 @@ export default {
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
+                        font-size: 14px;
                         color: #333333;
                         font-weight: normal;
                     }
@@ -2723,7 +2723,7 @@ export default {
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: #333333;
                             .location{
                                 display: block;

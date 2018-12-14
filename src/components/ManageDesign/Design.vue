@@ -1,5 +1,6 @@
 <template>
-<div id="DesignManagement" v-loading.fullscreen.lock="fullscreenLoading">
+<div id="DesignManagement" v-loading="fullscreenLoading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)">
         <div id="GroupSelect">
             <select v-model="selectUgId" class="inp-search">
                 <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
@@ -25,7 +26,7 @@
                 </div>
                 <div id="containerMessage">
                     <p class="header clearfix">
-                        <span class="title">设计协同</span>
+                        <!-- <span class="title">设计协同</span> -->
                         <span class="item-upload" @click="SendMes">新建主题</span>
                     </p>
                     <div class="ForumSelector">
@@ -75,7 +76,7 @@
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
                                     <div class="projectListImg">
-                                        <img :src="item.createUserImg != ''?(QJFileManageSystemURL+item.createUserImg):require('../../assets/people.png')">
+                                        <img :src="item.createUserImg != ''?(commomHeadPictureFile+item.createUserImg):require('../../assets/people.png')">
                                     </div> 
                                     <div class="projectListText">
                                         <span class="action_rightBox">
@@ -90,7 +91,8 @@
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
-                                                        <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png'):''" />
+                                                        <!-- <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png'):''" /> -->
+                                                        <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                                     </span>
                                                     <span  class="item-file-detial">
                                                         <h3 v-text="val.fileName"></h3>
@@ -121,7 +123,7 @@
                                                 <span v-text="'#'+item.sortId" style="cursor: auto;"></span>
                                                 <span v-text="item.statusText" @click="item.showResponse = false;item.showFlowChart = !item.showFlowChart" :class="item.showFlowChart?'arrow':''"></span>
                                                 <span v-text="item.collect?'取消收藏':'收藏'" @click="collect(item.dcId,item.collect,index)"></span>
-                                                <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="item.showResponse?'arrow':''"></span>
+                                                <span v-text="(item.showResponse?'收起':'展开')+'回复 ('+(item.reviewCount?item.reviewCount:0)+')'"  @click="getComment(item.dcId,index,item.showResponse,item.reviewCount,false,null)" :class="[item.showResponse?'arrow':'',item.showResponse?'spanColor':'']"></span>
                                                 <span v-text="item.reviewName" v-if="item.reviewName != null" style="cursor: auto;"></span>
                                             </span>
                                         </p>
@@ -158,7 +160,8 @@
                                                                     <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
-                                                                                <img :src="checkIcon(left.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+left.fileExtension.toUpperCase()+'.png'):''" />
+                                                                                <!-- checkIcon(left.fileExtension.toUpperCase())? -->
+                                                                                <img :src="require('../ManageCost/images/icon/'+checkIcon1(left.fileExtension.toUpperCase())+'.png')" />
                                                                             </span>
                                                                             <span  class="item-file-detial">
                                                                                 <h3 v-text="left.fileName"></h3>
@@ -220,12 +223,12 @@
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span>
+                        <!-- <span class="item-property " @click="screenLeft.item = 1">图<br>纸</span> -->
                         <span class="item-version " @click="screenLeft.item = 2">联<br>系<br>人</span>
-                        <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span>
+                        <!-- <span class="item-version-3 " @click="screenLeft.item = 3;">属<br>性</span> -->
                     </div>
             </div>
-            <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
+            <!-- <div style="display:none;" v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
                 <div v-if="showAction">
                     <p class="clearfix" v-if="IsFolderAction">
                         <i class="icon-goujian icon-add" title="新建文件夹" @click="addFile"></i>
@@ -251,16 +254,16 @@
                     id="cloudDirveFileTree"
                     :class="[showAction?'':'noTop']"
                 >
-                <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
+                    <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                 </el-tree>
-            </div>
-            <div id="box-right" v-show="screenLeft.show" v-else-if="screenLeft.item == 2">
+            </div> -->
+            <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 2">
                 <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;" v-if="hasAuthDelUser">
                     <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i>
                 </p>
                 <ul class="container-contacts">
                     <li class="member clearfix" v-for="(item,index) in contacts" :key="index">
-                        <img :src="item.imgUuid!=''?(QJFileManageSystemURL+item.imgUuid):''" alt="">
+                        <img :src="item.imgUuid!=''?(commomHeadPictureFile+item.imgUuid):''" alt="">
                         <span class="member-name">
                             <h3 v-text="item.userName"></h3>
                             <p v-text="item.account"></p>
@@ -270,7 +273,7 @@
                     </li>
                 </ul>
             </div>
-            <div id="box-right-2" v-show="screenLeft.show"  v-else>
+            <!-- <div id="box-right-2" v-show="screenLeft.show"  v-else>
                 <h3 class="header-attribute1" style="margin-top:0;">
                     <i class="trrangle"></i>
                     基本属性
@@ -322,7 +325,30 @@
                         <span class="detial-text-value" v-text="CurrentSelectPara.UpdateTime"></span>
                     </li>
                 </ul>
-            </div>
+                <h3 class="header-attribute1" style="margin-top:10px;">
+                    <i class="trrangle"></i>
+                    设计属性
+                    <i :class="[{'active':show.designAttributes},'icon-dropDown1']" @click="show.designAttributes = show.designAttributes?false:true;"></i>
+                </h3>
+                 <ul id="basicAttributes1" :class="[{'show':show.designAttributes}]">
+                    <li class="detial-item clearfix" v-for="(item,index) in mapInfo" :key="index" >
+                        <span class="detial-text-name" v-text="item.classifyName"></span>
+                        <span class="detial-text-value" v-text="item.value" ></span>
+                    </li>
+                </ul>
+                <h3 class="header-attribute1" style="margin-top: 10px;">
+                    <i class="trrangle"></i>
+                    关联文档
+                    <i :class="[{'active':show.relevantDoc},'icon-dropDown2']" @click="show.relevantDoc = show.relevantDoc?false:true;"></i>
+                </h3>
+                <ul id="basicAttributes1" :class="[{'show':show.relevantDoc},'Att']" v-if="fgList!=null && fgList.length>0">
+                    <li class="detial-item clearfix" v-for="(item,index) in fgList" :key="index">
+                        <span class="detial-text-name" v-text="item.fgName" style="max-width: 140px;width: auto;float: left;height:26px"></span>
+                        <span class="icon-search" @click="view(item.filePath,item.fileName)"></span>
+                    </li>
+                </ul>
+               
+            </div> -->
         </div>
       <div id="edit">
         <el-dialog title="文件重命名" :visible="PointFigure.renameshow" @close="renameCancle">
@@ -484,7 +510,7 @@
     </div>
     <el-dialog title="联系人详情" id="contactINFO" :visible="selectContact.infoShow" @close="selectInfoCancle">
         <div class="clearfix">
-            <img :src="selectContact.infoObj.imgUuid !=''?(QJFileManageSystemURL+selectContact.infoObj.imgUuid):require('../../assets/people.png')" alt="" class="img">
+            <img :src="selectContact.infoObj.imgUuid !=''?(commomHeadPictureFile+selectContact.infoObj.imgUuid):require('../../assets/people.png')" alt="" class="img">
             <div class="info">
                 <h1 v-text="selectContact.infoObj.realName"></h1>
                 <div class="detial">
@@ -864,7 +890,7 @@
                 padding-left:30px; 
                 .header{
                     text-align: left;
-                    margin: 15px 0;
+                    margin: 14px 0;
                     .title{
                         font-size: 14px;
                         float: left;
@@ -873,7 +899,8 @@
                     }
                     .item-upload{
                         float: right;
-                        margin-right: 30px;
+                        // margin-right: 30px;
+                        margin-right: 5px;
                         background: #fc3439;
                         color: #ffffff;
                         font-size: 12px;
@@ -902,7 +929,8 @@
                     height: 40px;
                     color: #999999;
                     font-size: 12px;
-                    margin-right: 30px;
+                    // margin-right: 30px;
+                    margin-right: 5px;
                     .name{
                         float: left;
                         width: 96px;
@@ -937,7 +965,7 @@
                     }
                 }
                 .project{
-                    margin: 20px 0px 0 0px;
+                    margin: 30px 0px 0 0px;
                       .pagenation{
                             width: 100%;
                             text-align: right;
@@ -965,7 +993,7 @@
                 .projectList li{
                     display: inline-block;
                     width: 100%;
-                    margin-top: 5px; 
+                    margin-top: 8px; 
                     border-bottom:1px solid #ebebeb;
                 }
                 .projectListInfo{
@@ -1252,7 +1280,8 @@
                     // overflow: hidden;
                     color: #ccc;
                     margin-top: 20px;
-                    margin-bottom: 6px;
+                    // margin-bottom: 6px;
+                    margin-bottom: 20px;
                     .icon-time{
                         display: inline-block;
                         width: 12px;
@@ -1289,6 +1318,9 @@
                                 content: '';
                             }   
                         }
+                        .spanColor{
+                            color: red;
+                        }
                     }
                 }
                 .projectBottom label{
@@ -1313,7 +1345,7 @@
                     background: #fafafa;
                     margin-top: 12px;
                     margin-bottom: 20px;
-                    margin-right: 30px;
+                    margin-right: 5px;
                     .comments-item{
                         border-bottom: none;
                         .left{
@@ -1386,7 +1418,8 @@
                                         background: #ffffff;
                                         .textArea{
                                             textarea{
-                                                min-height: 116px;
+                                                // min-height: 116px;
+                                                min-height: 93px;
                                                 width: 100%;
                                                 // height: auto;
                                                 margin: 0px; 
@@ -1884,6 +1917,7 @@
                     border-left: 1px solid #cccccc;
                     border-bottom: 1px solid #cccccc;
                     position: relative;
+                    background: #f2f2f2;
                     cursor: pointer;
                     .icon-right{
                         display: block;
@@ -2364,6 +2398,26 @@
                         transition:  all ease .2s;
                         transform: rotate(180deg);
                     }
+                    .icon-dropDown1{
+                        display: block;
+                        width: 12px;
+                        height: 12px;
+                        background:url('../ManageCost/images/arror.png')no-repeat 0 0; 
+                        float: right;
+                        cursor: pointer;
+                        transition:  all ease .2s;
+                        transform: rotate(180deg);
+                    }
+                    .icon-dropDown2{
+                        display: block;
+                        width: 12px;
+                        height: 12px;
+                        background:url('../ManageCost/images/arror.png')no-repeat 0 0; 
+                        float: right;
+                        cursor: pointer;
+                        transition:  all ease .2s;
+                        transform: rotate(180deg);
+                    }
                     .active{
                         transform: rotate(0deg);
                     }
@@ -2388,6 +2442,19 @@
                     }
                     &:first-of-type{
                         margin-top: 18px;
+                    }
+                    .icon-search{
+                        background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                        margin-left: 10px;
+                        width:16px;
+                        height: 16px;
+                        display: block;
+                        position: absolute;
+                        right: 20px;
+                        margin-top: 10px;
+                        &:hover{
+                            background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                        }
                     }
             }
 
@@ -2522,7 +2589,7 @@
         // }
         /**********以下是消息输入框样式***********/
          .sendmessage{
-            margin: 30px 30px 20px 0;
+            margin: 30px 5px 20px 0;
             margin-top: 30px;
             .left{
                 width: 80px;
@@ -2896,10 +2963,13 @@ export default {
        window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
           CurrentSelectPara:"",//图形引擎选中数据
+          mapInfo:'',//设计属性
+          fgList:'',//文件属性
+          TraceId:'',
           loadings:true,//加载loadding
          screenLeft:{
              show:true,
-             item:1,
+             item:2,
          },
          token:'',
          entId:'',//公司ID
@@ -2907,11 +2977,15 @@ export default {
          userId:'',
          defaultSubProjId:'',
          QJFileManageSystemURL:'',
+         commomHeadPictureFile:'',
          BDMSUrl:'',
+         GMDUrl:'',
          checkedItem:{},//选中的file
          show:{
              basicAttributes:false,
-             BindingArtifacts:false
+             BindingArtifacts:false,
+             designAttributes:false,
+             relevantDoc:false
          },
          FileTree_original:[],//原始文件树形图
         FileTree:[],//文件夹树形图
@@ -3052,6 +3126,7 @@ export default {
         fullscreenLoading:false,
         entType:'',
         hasAuthDelUser:false,
+        isComment:false,
       }
   },
   created(){
@@ -3073,6 +3148,9 @@ export default {
             vm.hasAuthDelUser = true
         }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile
+        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        vm.GMDUrl=vm.$store.state.GMDUrl
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         var timer = setInterval(function(){
@@ -3113,6 +3191,14 @@ export default {
             $("#basicAttributes").hide(200);
           }
       },
+      'show.designAttributes':function(val){
+          if(val){
+            $("#designAttributes").show(200);
+          }else{
+            $("#designAttributes").hide(200);
+          }
+      },
+      
      'show.BindingArtifacts':function(val){
           if(val){
             $("#BindingArtifacts").show(200);
@@ -3143,8 +3229,10 @@ export default {
 				}
 				break;
             case "CurrentSelectedEnt":
-               this.CurrentSelectPara = e.data.parameter;
-               console.log(this.CurrentSelectPara);
+               this.TraceId =e.data.parameter[0].TraceID;
+               console.log(e.data.parameter,'e.data.parameter');
+               console.log(this.TraceId,'this.TraceId');
+               this.getPropertyInfo();
                break;
 			case "ViewpointSubmited":
                 // ScreenPara = e.data.parameter;
@@ -3152,18 +3240,57 @@ export default {
             
 		    }
         },
+        getPropertyInfo(){
+            var vm=this;
+            axios({
+                method:"post",
+                url:this.BDMSUrl+'project2/dc/getPropertyInfo',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    TraceId:vm.TraceId,
+                    projId:vm.projId,
+                    type:''
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.CurrentSelectPara=response.data.rt;
+                    this.mapInfo=this.CurrentSelectPara.mapInfo;
+                    this.fgList=this.CurrentSelectPara.fgList;
+                    this.show.basicAttributes=true;
+                    this.show.BindingArtifacts=true;
+                    this.show.designAttributes=true;
+                    this.show.relevantDoc=true;
+                    console.log(this.CurrentSelectPara);
+                }
+            })
+
+        },
       checkIcon(val){
           var vm = this
-          var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+          console.log(val,'val000');
+          var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX','PSD']
           if(iconArr.indexOf(val) > -1){
               return true
           }else{
               return false
           }
       },
+      checkIcon1(val){
+          var vm = this
+          console.log(val,'val1111');
+          var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+          if(iconArr.indexOf(val) > -1){
+              return val
+          }else{
+              return 'FILE'
+          }
+      },
       SendMes(){
           var vm = this
           vm.goingToSend =true
+          vm.isComment=true
       },
       hideSendMes(){
           var vm = this
@@ -3196,7 +3323,12 @@ export default {
       },
       getComment(val,index,showResponse,reviewCount,reload,event){
         var vm = this
-        if(reviewCount == 0){
+        vm.isComment=false;
+        console.log(event,'event0000')
+        // if(event=null){
+        //     reviewCount=event.count;
+        // }
+        if(reviewCount == 0&&event==null){
              vm.$message({
                 type:'warning',
                 message:'还没有评论!'
@@ -3343,6 +3475,7 @@ export default {
                     message:'状态修改成功'
                 })
                 vm.dcStatusCancle()
+                vm.getCommunicationList();
             }else{
                 vm.$message({
                     type:'error',
@@ -3391,6 +3524,7 @@ export default {
                             type:'success',
                             message:'状态修改成功'
                         })
+                        vm.getCommunicationList();
                     }else{
                         vm.$message({
                             type:'error',
@@ -3500,6 +3634,7 @@ export default {
                 })
                }
                vm.pageTotal = response.data.rt.pager.totalSize
+               this.goingToSend=false;
             }else{
                   vm.$message({
                     type:'error',
@@ -4221,6 +4356,14 @@ export default {
              window.open(vm.QJFileManageSystemURL+val+"/preview");
         }else{
               window.open(vm.QJFileManageSystemURL+vm.checkFileDir.dpath+"/preview");
+        }
+    },
+    view(filePath,fileName){
+        var vm=this;
+        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
+            window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
+        }else{
+            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
     },
     getIntoDesignPage(){

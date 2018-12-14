@@ -35,7 +35,7 @@
                   <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
                 </p>
                 <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
-                  <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-text="val.viewVal"></span>
+                  <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-html="val.viewVal"></span>
                 </p>
               </div>
               <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'new_s','text-s']"></span>

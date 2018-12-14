@@ -7,7 +7,8 @@
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">
-                <img class="headerInfoImg" :src="userImg?QJFileManageSystemURL+userImg:require('../assets/people.png')" />
+                
+                <img class="headerInfoImg" :src="userImg?commomHeadPictureFile+userImg:require('../assets/people.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
                     <p class="p2 p-hover" @click="logout">退出</p>
@@ -33,7 +34,8 @@ export default Vue.component('common-header', {
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
+        // vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
+        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
     },
     computed:{
         userImg(){

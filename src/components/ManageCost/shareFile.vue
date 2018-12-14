@@ -104,8 +104,8 @@
             </div> 
             <div id="box-right-1" v-show="screenLeft.show" v-else-if="fileCheckedNum == 1">
                 <p class="head" ><!-- v-if="checkedItem.dirId"-->
-                    <i class="icon-goujian icon-search" @click="view()"></i>
-                    <i class="icon-goujian icon-download" @click="downLoad()"></i>
+                    <i class="icon-goujian icon-search" @click="viewVersion()"></i>
+                    <i class="icon-goujian icon-download" @click="downLoadVersion()"></i>
                      <select v-model="posType" class="inp-search">
                         <option value="">所有版本</option>
                         <option value="1">本周更新</option>
@@ -115,7 +115,7 @@
                     <i class="icon-sanjiao"></i>
                 </p>
                 <ul>
-                    <li class="item-version" v-for="(item,index) in  versionItem" :key="index">
+                    <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
                         <div class="clearfix">
                             <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
                             <div class="versin-detial">
@@ -160,7 +160,7 @@ export default {
             posType:'',
             versionItem:'',
             docType:'',
-            fileListName:'',
+            fileListName:this.$route.query.shareName,
             backshow:false,
             WebGlUrl:'',
             GMDUrl:'',
@@ -172,6 +172,7 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         this.GMDUrl = this.$store.state.GMDUrl;
         // this.intoDir();
+        console.log(this.$route.query.shareName,'this.$route.query.shareName')
         this.showShareFilesOrFolder();
     },
     watch:{
@@ -209,15 +210,15 @@ export default {
                             this.$set(item,'checked',false)
                             this.fileList.push(item)
                         })
-                        this.fileListName=(this.fileList[0].fgName.split('.'))[0];
-                        console.log(this.fileListName[0])
+                        // this.fileListName=(this.fileList[0].fgName.split('.'))[0];
+                        // console.log(this.fileListName[0])
                     }
                      if(this.nodeList){
                             this.nodeList.forEach((item)=>{
                                 this.$set(item,'checked',false)
                                 this.folderList.push(item)
                             })
-                            this.fileListName=this.folderList[0].nodeName;
+                            // this.fileListName=this.folderList[0].nodeName;
                     }
                 }
             })
@@ -243,10 +244,20 @@ export default {
             }).then((response)=>{
                 if(Math.ceil(response.data.cd) == 0){
                     vm.versionItem = response.data.rt == null?{}:response.data.rt
+                    vm.versionItem.forEach((item)=>{
+                        vm.$set(item,'checked',false)
+                    })
                 }
             }).catch((err)=>{
                 console.log(err)
             })
+        },
+        selectVersion(val){
+            var vm = this
+            vm.versionItem.forEach((item)=>{
+                vm.$set(item,'checked',false)
+            })
+            vm.$set(vm.versionItem[val],'checked',true)
         },
         initData(val){
             if(!val)return ''
@@ -259,6 +270,7 @@ export default {
             if(!filePath){
                 if(vm.checkedItem){
                     filePath =  vm.checkedItem.filePath
+                    
                 }
             }
             if(!filePath){
@@ -266,10 +278,37 @@ export default {
                 type:'info',
                 message:'请勾选要预览的文件'
             })
-            return false
+              return false
             }
             if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
-                window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+                window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
+            }else{
+                window.open(vm.QJFileManageSystemURL+filePath+"/preview");
+            }
+        },
+        viewVersion(filePath,fileName){
+            //latestFile(fileId,fgId,"预览了文件"+fileName);
+            var vm = this
+            if(!filePath){
+                if(vm.versionItem){
+                    vm.versionItem.forEach((item)=>{
+                        if(item.checked){
+                            filePath =  item.filePath
+                            // fileId = item.fileId
+                            fileName = item.fileName
+                        }
+                    })
+                }
+            }
+            if(!filePath){
+                vm.$message({
+                type:'info',
+                message:'请勾选要下载的文件版本'
+            })
+              return false
+            }
+            if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+                window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
             }else{
                 window.open(vm.QJFileManageSystemURL+filePath+"/preview");
             }
@@ -286,6 +325,29 @@ export default {
                 vm.$message({
                     type:'info',
                     message:'请勾选要下载的文件'
+                })
+                return false
+            }
+            window.open(vm.QJFileManageSystemURL + filePath+'');
+        },
+        downLoadVersion(filePath){
+            //latestFile(fileId,fgId,"下载了文件"+fileName);
+            var vm = this
+            if(!filePath){
+                if(vm.versionItem){
+                    vm.versionItem.forEach((item)=>{
+                        if(item.checked){
+                            filePath =  item.filePath
+                            // fileId = item.fileId
+                            // fileName = item.fileName
+                        }
+                    })
+                }
+            }
+            if(!filePath){
+                vm.$message({
+                    type:'info',
+                    message:'请勾选要下载的文件版本'
                 })
                 return false
             }
@@ -599,7 +661,7 @@ li{
                             line-height: 12px;
                             color: #b3b3b3;
                             text-align: left;
-                            margin-bottom:4px; 
+                            margin-bottom:12px; 
                         }
                         .text-name{
                             color: #336699;
@@ -699,7 +761,7 @@ li{
             }   
             .item-version{//属性
                 display: block;
-                width: 25px;
+                width: 24px;
                 height: 56px;
                 background: #fafafa;
                 padding-top:12px;
@@ -724,8 +786,8 @@ li{
             }
             .item-version-3{//版本
                  display: block;
-                width: 25px;
-                height: 68px;
+                width: 24px;
+                height: 56px;
                 background: #fafafa;
                 padding-top:24px;
                 font-size: 12px;
@@ -844,7 +906,7 @@ li{
         }
         .detial-item{
             font-size: 12px;
-            line-height: 12px;
+            // line-height: 12px;
             margin-top: 16px;
             text-align: left;
             .detial-text-name{
@@ -919,7 +981,7 @@ li{
                 }
         }
         .item-version{
-            margin:10px 15px 0 30px;
+            margin:10px 4px 0 30px;
             border-bottom: 1px solid #e6e6e6;
             .img{
                 float: left;
@@ -969,6 +1031,9 @@ li{
                 margin: 12px 0 11px;
                 text-align: left;
             }
+        }
+        .active-item{
+           box-shadow: 0px 1px 8px rgba(252, 52, 57, 0.2);
         }
     }
     .box-right-avtive{

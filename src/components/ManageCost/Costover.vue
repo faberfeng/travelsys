@@ -1,6 +1,6 @@
 <template>
 <div>
-        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
+        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="item-box-file">
                     <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
@@ -23,76 +23,78 @@
                         <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
                     </div>
                 </div>
-                <p class="select-header clearfix">
-                        <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
-                        <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                        <span class="button-download" @click="downloadFile">下载</span>
-                </p>
-                <div id="file-container" v-if="listStyle == 'card'">
-                    <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                        <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
-                            <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true)"></label>
-                            <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                            <div class="item-file-box clearfix">
-                                <span  class="item-file-image">
-                                <img :src="require('./images/icon/'+item.icon)" />
-                                </span>
-                                <span  class="item-file-detial">
-                                    <h3 v-text="item.fgName"></h3>
-                                    <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
-                                    <p v-text="initData(item.updateTime)"></p>
-                                    <p class="operation">
-                                        <span v-text="'版本'+item.version"></span>
-                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                        <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                    </p>
-                                </span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div id="file-container-table" v-else>
-                    <table class="UserList" width='100%'>
-                        <thead>
-                            <tr  class="userList-thead">
-                                <th style="width:55px;"></th>
-                                <th style="min-width:428px;">文件名</th>
-                                <th style="width:70px;"></th>
-                                <th style="width:70px;">更新渠道</th>
-                                <th style="width:50px;">类型</th>
-                                <th style="width:40px;">版本</th>
-                                <th style="width:70px;">大小</th>
-                                <th style="min-width:60px;">上传人</th>
-                                <th style="min-width:150px;">更新时间</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index)">
-                                <td>
-                                    <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
-                                    <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                </td>
-                                <td>
+                <div v-show="!showCommonList">
+                    <p class="select-header clearfix">
+                            <label :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
+                            <input type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                            <span class="button-download" @click="downloadFile">下载</span>
+                    </p>
+                    <div id="file-container" v-if="listStyle == 'card'">
+                        <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
+                            <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index"  @click="checkItem(index)">
+                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true)"></label>
+                                <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                <div class="item-file-box clearfix">
+                                    <span  class="item-file-image">
                                     <img :src="require('./images/icon/'+item.icon)" />
-                                    <span v-text="item.fgName"></span>
-                                </td>
-                                <td>
-                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
-                                </td>
-                                <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
-                                <td v-text="splitType(item.icon)"></td>
-                                <td v-text="item.version"></td>
-                                <td>{{item.fileSize|fileSizeChange()}}M</td>
-                                <td v-text="item.uploadUser"></td>
-                                <td v-text="initData(item.updateTime)"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                    </span>
+                                    <span  class="item-file-detial">
+                                        <h3 v-text="item.fgName"></h3>
+                                        <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                        <p v-text="initData(item.updateTime)"></p>
+                                        <p class="operation">
+                                            <span v-text="'版本'+item.version"></span>
+                                            <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                            <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                        </p>
+                                    </span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="file-container-table" v-else>
+                        <table class="UserList" width='100%'>
+                            <thead>
+                                <tr  class="userList-thead">
+                                    <th style="width:55px;"></th>
+                                    <th style="min-width:428px;">文件名</th>
+                                    <th style="width:70px;"></th>
+                                    <th style="width:40px;">版本</th>
+                                    <th style="width:70px;">大小</th>
+                                    <th style="width:50px;">类型</th>
+                                    <th style="width:70px;">更新渠道</th>
+                                    <th style="min-width:60px;">上传人</th>
+                                    <th style="min-width:150px;">更新时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index)">
+                                    <td>
+                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" @click.stop="checkItem(index,true)"></label>
+                                        <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    </td>
+                                    <td>
+                                        <img :src="require('./images/icon/'+item.icon)" />
+                                        <span v-text="item.fgName"></span>
+                                    </td>
+                                    <td>
+                                        <i class="icon-goujian icon-download" @click="downLoad(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                        <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName,item.fgId)"></i>
+                                    </td>
+                                    <td v-text="item.version"></td>
+                                    <td>{{item.fileSize|fileSizeChange()}}</td>
+                                    <td v-text="splitType(item.icon)"></td>
+                                    <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
+                                    <td v-text="item.uploadUser"></td>
+                                    <td v-text="initData(item.updateTime)"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+        <div v-show="!showCommonList" :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -135,7 +137,7 @@
                     </li>
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">文件大小</span>
-                        <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}M</span>
+                        <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}</span>
                     </li>
                 </ul>
                  <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-else>
@@ -153,7 +155,7 @@
                     <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
-                                <i class="icon-goujian icon-detial"></i>
+                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
@@ -200,11 +202,13 @@
                                 <p class="version-des">上传了新文档</p>
                             </div>
                         </div>
-                        <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFromExplorer == 1?'浏览器':'手机端')+'更新'}}</p>
+                        <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFrom == 1?'浏览器':'手机端')+'更新'}}</p>
                     </li>
                 </ul>
             </div>
         </div>
+        <!--下面是报表清单的编码-->
+        <common-list v-on:back="backToH" :mId="setId"   :title="'构件量清单'" v-if="showCommonList"></common-list>
         <div id="edit">
             <el-dialog title="标签信息预览" :visible.sync="isbiaoqianshow" @close="biaoqianCLose">
                 <div class="editBody">
@@ -249,7 +253,7 @@
                     </ul>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                <button class="editBtnS" @click="labelListConfirm">网页预览</button>
+                        <button class="editBtnS" @click="labelListConfirm(biaoqianInfo.pkId)">网页预览</button>
                         <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
                 </div>
             </el-dialog>
@@ -654,6 +658,9 @@
             transition: all ease .5s;
         }
     }
+    .qindanWidth{
+        width: 100% !important;
+    }
     .el-main{
         padding: 0;
     }
@@ -818,6 +825,7 @@
         width: 2%;
         transition: all ease .5s;
     }
+    
     #box-right{
         padding: 19px 13px 0 10px;
         margin-left:24px;
@@ -1130,8 +1138,12 @@
 import axios from 'axios'
 import '../Settings/js/jquery-1.4.4.min.js'
 import './js/date.js'
+import commonList from '../planCost/qingDan.vue'
 export default {
   name:'Costover',
+  components:{
+        commonList
+    },
   data(){
       return {
         activeIndex:'1',
@@ -1169,6 +1181,8 @@ export default {
         deleteDialog:false,
         deleteInfo:{},
         removelistitem:'',
+        showCommonList:false,
+        setId:'',
       }
   },
   created(){
@@ -1203,23 +1217,43 @@ export default {
   filters:{
       //保留两位小数点
          fileSizeChange(val){
-             var x=(val/1048576);
-              var f = parseFloat(x); 
-                if (isNaN(f)) { 
-                    return false; 
-                } 
-                var f = Math.floor(x*100)/100; 
-                var s = f.toString(); 
-                var rs = s.indexOf('.'); 
-                if (rs < 0) { 
-                    rs = s.length; 
-                    s += '.'; 
-                } 
-                while (s.length <= rs + 2) { 
-                    s += '0'; 
-                } 
-                return s; 
-      },
+             if(val/1024<100){
+                 var y=(val/1024);
+                 let f = parseFloat(y); 
+                    if (isNaN(f)) { 
+                        return false; 
+                    } 
+                    var f = Math.floor(y*100)/100; 
+                    var s = f.toString(); 
+                    var rs = s.indexOf('.'); 
+                    if (rs < 0) { 
+                        rs = s.length; 
+                        s += '.'; 
+                    } 
+                    while (s.length <= rs + 2) { 
+                        s += '0'; 
+                    }
+
+                 return s+'K'
+             }else{
+                var x=(val/1048576);
+                let f = parseFloat(x); 
+                    if (isNaN(f)) { 
+                        return false; 
+                    } 
+                    var f = Math.floor(x*100)/100; 
+                    var s = f.toString(); 
+                    var rs = s.indexOf('.'); 
+                    if (rs < 0) { 
+                        rs = s.length; 
+                        s += '.'; 
+                    } 
+                    while (s.length <= rs + 2) { 
+                        s += '0'; 
+                    } 
+                    return s+'M'; 
+                }
+        },
   },
   methods:{
        initAll(){
@@ -1356,24 +1390,27 @@ export default {
         var len = ('' + num).length;
         return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
     },
-    labelListConfirm(){
-
-
+    labelListConfirm(val){
+        var vm = this;
+        window.open('/#/Cost/getMainLabelInformation/'+val)
     },
     printLabelList(){
-
-
+        this.$message({
+                type:"info",
+                message:'已向打印机发送请求！'
+        })
     },
     //删除构件清单
     deleteList(item){
         this.deleteDialog = true;
         this.deleteInfo = item;
         this.removelistitem= item.main.pkId;
+        // this.fileList[0].fgId
     },
     deleteMakeSure(){
         axios({
                 method:'post',
-                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.fileList[0].fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+this.checkedItem.fgId+'/'+this.deleteInfo.main.mVersion+'/delete',
                 headers:{
                     token:this.token
                 }
@@ -1388,6 +1425,18 @@ export default {
 
 
 
+    },
+    backToH(){
+            this.showCommonList=false;
+            // vm.checkFilePaste()
+            // vm.getIntoCloudD()
+            // vm.createDrawingDirectory()
+            // vm.getHolders()
+    },
+    showDetialList(item){
+        console.log(item,'item0000')
+        this.setId=item.main.pkId
+        this.showCommonList=true;
     },
     //清单二维码
     viewListQrcode(item){
@@ -1408,6 +1457,8 @@ export default {
                     mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
                     mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
                 })
+                console.log(this.biaoqianInfo,'this.biaoqianInfo');
+
             }else{
                 alert(response.data.msg);
             }
@@ -1465,6 +1516,8 @@ export default {
             vm.versionItem.forEach((item)=>{
                 if(item.checked){
                     filePath =  item.filePath
+                    fileId = item.fileId
+                    fileName = item.fileName
                 }
             })
         }
@@ -1475,7 +1528,7 @@ export default {
             })
             return false
         }
-        if(fileName.split('.')[1] == 'gmd' || fileName.split('.')[1] == 'GMD'){
+        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
             window.open(this.WebGlUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");

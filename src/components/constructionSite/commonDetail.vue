@@ -27,10 +27,12 @@
                 </div>
                 <div class="headRight" v-show="editInspectMethodEdit">
                     <span class="autoImportTxt">采集方式:</span>
+                    <div class="import2">
                         <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
                             <option v-for="(item,index) in importList" :key="index" :value="item.value" v-text="item.label"></option>
                         </select>                        
                         <i class="icon-sanjiao"></i>
+                    </div>
                         <span v-show="importMethod==1&&importDataEdit" class="import" @click="handExportExcel()">导入</span>
                         <span v-show="importMethod==2&&importDataEdit" @click="autoAcquisitionBtn()" class="import">配置</span>
                         <span class="import1" v-show="exportDataEdit" @click="getImportHistory">导出</span>
@@ -104,23 +106,26 @@
                             <tr v-for="(item,index) in getPointDatasList1" :key="index"> 
                                 <td>{{item.pointName|addSprit()}}</td>
                                 <td>{{item.initAcquisitionTime|timeChange()}}</td>
-                                <td >{{item.initData|addSprit()}}</td>
-                                <td v-show="itemMonitorType==3">{{item.initPipeHeight|addSprit()}}</td>
-                                <td>{{item.lastAcquisitionTime|timeChange()}}</td>
-                                <td >{{item.lastData|addSprit()}}</td>
-                                 <td v-show="itemMonitorType==3">{{item.lastPipeHeight|addSprit()}}</td>
+                                <td v-show="itemMonitorType==1" >{{item.initData|addSpritNum2()}}</td>
+                                <td v-show="itemMonitorType!=1" >{{item.initData|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.initPipeHeight|addSpritNum1()}}</td>
+                                <td >{{item.lastAcquisitionTime|timeChange()}}</td>
+                                <td v-show="itemMonitorType==1" >{{item.lastData|addSpritNum2()}}</td>
+                                <td v-show="itemMonitorType!=1" >{{item.lastData|addSpritNum1()}}</td>
+                                 <td v-show="itemMonitorType==3">{{item.lastPipeHeight|addSpritNum1()}}</td>
                                 <td>{{item.latestAcquisitionTime|timeChange()}}</td>
-                                <td>{{item.latestData|addSprit()}}</td>
-                                <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSprit()}}</td>
+                                <td v-show="itemMonitorType==1">{{item.latestData|addSpritNum2()}}</td>
+                                <td v-show="itemMonitorType!=1">{{item.latestData|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSpritNum1()}}</td>
                                 <td>{{item.variationTime|timeStamp()}}</td>
-                                <td v-show="itemMonitorType==1">{{item.recentVariation|addSprit()}}</td>
-                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.recentVariation*1000|addSprit()}}</td>
-                                <td v-show="itemMonitorType==4">{{item.recentVariation|addSprit()}}</td>
-                                <td v-show="itemMonitorType==3">{{item.recentVariation*100|addSprit()}}</td>
-                                 <td v-show="itemMonitorType==1">{{item.recentVariation|addSprit()}}</td>
-                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.totalVariation*1000|addSprit()}}</td>
-                                <td v-show="itemMonitorType==4">{{item.totalVariation|addSprit()}}</td>
-                                <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSprit()}}</td>
+                                <td v-show="itemMonitorType==1">{{item.recentVariation|addSpritNum2()}}</td>
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.recentVariation*1000|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==4">{{item.recentVariation|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.recentVariation*100|addSpritNum1()}}</td>
+                                 <td v-show="itemMonitorType==1">{{item.recentVariation|addSpritNum2()}}</td>
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.totalVariation*1000|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
+                                <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
                                     <button title="定位" class="location actionBtn"></button>
                                     <button title="曲线" @click="getCurve(item.pointId,item.pointName)" class="curve actionBtn"></button>
@@ -735,6 +740,21 @@ export default Vue.component('commonDetail',{
                 return val
             }
         },
+        addSpritNum1(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.toFixed(3)
+            }
+        },
+        addSpritNum2(val){
+            if(val==null){
+                return '/'
+            }else {
+                return val.toFixed(1)
+            }
+        },
+        
         timeChange(val) {
             if (val == null) {
             return '/';
@@ -1006,7 +1026,7 @@ export default Vue.component('commonDetail',{
                 }
             })
             if(str){
-                this.exportHistoryRecoedShow=false;
+                // this.exportHistoryRecoedShow=false;
                 this.allCheck=false;
                 this.getImportHistoryList.forEach((item,index)=>{
                     item.check=false;
@@ -2321,32 +2341,37 @@ export default Vue.component('commonDetail',{
                         height: 26px;
                         line-height: 26px;
                     }
-                    .autoImport{
-                        width: 121px;
-                        height: 26px;
-                        border: 1px solid #cccccc;
+                    .import2{
                         position: relative;
-                        background: #fff;
-                        padding-left: 10px;
-                        padding-right: 20px;
-                        box-sizing: border-box;
-                        margin-right: 0px;
-                        color: #333333;
-                        font-size: 14px;
-                        border-radius: 2px;
-                        outline: none;
+                        display: inline-block;
+                        .autoImport{
+                            width: 121px;
+                            height: 26px;
+                            border: 1px solid #cccccc;
+                            position: relative;
+                            background: #fff;
+                            padding-left: 10px;
+                            padding-right: 20px;
+                            box-sizing: border-box;
+                            margin-right: 0px;
+                            color: #333333;
+                            font-size: 14px;
+                            border-radius: 2px;
+                            outline: none;
+                        }
+                        .icon-sanjiao{
+                            display: block;
+                            position: absolute;
+                            width: 12px;
+                            height: 7px;
+                            background-image: url('../Settings/images/sanjiao.png');
+                            background-size: 100% 100%;
+                            content: '';
+                            top: 9px;
+                            right: 11px;
+                        }
                     }
-                    .icon-sanjiao{
-                        display: block;
-                        position: absolute;
-                        width: 12px;
-                        height: 7px;
-                        background-image: url('../Settings/images/sanjiao.png');
-                        background-size: 100% 100%;
-                        content: '';
-                        top: 11px;
-                        right: 125px;
-                    }
+                    
                     .import{
                         display: inline-block;
                         width:54px;

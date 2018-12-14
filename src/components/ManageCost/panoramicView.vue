@@ -2,7 +2,7 @@
 <div class="box">
       <div id="panoramicView"></div>
       <div id="info_panoramicView">
-         <p class="headTitle">点位名称</p>
+         <p class="headTitle">点位位置</p>
           <div  id="planeDIV">
               <img :src="imgdetial.path" id="planeFigure">
               <span :class="['round']"   :style="{'top':imgdetial.y+'px','left':imgdetial.x+'px'}">

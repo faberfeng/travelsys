@@ -227,9 +227,14 @@
                         </span>
                         <br>
                     </p>
-                    <p style="text-align:left;margin-bottom:20px;padding-left:105px;">
-                        <el-checkbox v-model="titleUseReportName" >使用表名</el-checkbox>
-                        <el-checkbox v-model="styleShowTitle">显示标题</el-checkbox>
+                    <!-- <p style="text-align:left;margin-bottom:20px;margin-top:10px;padding-left:105px;">
+                        <el-checkbox v-model="titleUseReportName" style="margin-right:10px;">使用表名</el-checkbox>
+                        <el-checkbox v-model="styleShowTitle">显示标题</el-checkbox> -->
+                    <p class="clearfix">
+                        <label   :class="[titleUseReportName?'active':'','checkbox-fileItem','userTable']" for="titleUseReportName"></label>
+                        <input   type="checkbox" id='titleUseReportName' class="hideInput"  v-model="titleUseReportName">
+                        <label   :class="[styleShowTitle?'active':'','checkbox-fileItem','userTitle']" for="styleShowTitle"></label>
+                        <input   type="checkbox" id='styleShowTitle' class="hideInput"  v-model="styleShowTitle">
                     </p>
                     <p class="clearfix">
                         <span class="item-title">字体大小</span>
@@ -376,7 +381,7 @@
                     </p>
                 </div>
             </div>
-            <p>
+            <p class="btnBottom">
                 <span class="saveBtn" @click="saveForm()">保存</span>
                 <span class="cancelBtn"  @click="saveForm(true)">数据</span>
             </p>
@@ -408,6 +413,7 @@
 </template>
 <style lang="less">
    #commonEditBox{
+       min-width: 1000px;
        margin: 0 20px 20px!important;
        .isDisable{
            background: #ccc;
@@ -436,6 +442,7 @@
             padding-right: 14px;  
         } 
         .project{
+            position: relative;
             .antsLine{
                 padding: 10px 10px 15px 0px;
                 font-size: 12px;
@@ -684,6 +691,22 @@
                              content: '使用外边框';
                          }
                     }
+                    .userTable{
+                         margin-left: 106px;
+                         margin-top: 12px;
+                         &::after{
+                             right: -60px;
+                             content: '使用表名';
+                         }
+                    }
+                    .userTitle{
+                         margin-left: 70px;
+                         margin-top: 12px;
+                         &::after{
+                             right: -60px;
+                             content: '显示标题';
+                         }
+                    }
                     .active{
                         background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
                             border: 1px solid #fc3439;
@@ -725,37 +748,51 @@
                     text-align: left;
                 }
             }
-            .saveBtn{
-                display: inline-block;
-               line-height: 36px;
-                background: #fc3439;
-                margin-right: 20px;
-                color: #fff;
-                font-size: 14px;
-                font-weight: normal;
-                width: 111px;
-                height: 36px;
-                border: none;
-                padding: 0;
-                cursor: pointer;
-                border-radius: 2px;
-                    &:hover {
-                        background: #ff5257;
-                    }
-            }
-            .cancelBtn{
-                display: inline-block;
-                font-size: 14px;
-               line-height: 36px;
-                color: #666;
+            .btnBottom{
+                position: fixed;
+                margin:0px auto;
+                // left: 500px;
+                width: 100%;
                 background: #fff;
-                border: 1px solid #ccc;
-                width: 111px;
-                height: 36px;
-                padding: 0;
-                cursor: pointer;
-                border-radius: 2px;
+                bottom: 0px;
+                // margin-top:2px;
+                height: 80px;
+                // border-top:1px solid #ccc;
+                .saveBtn{
+                    display: inline-block;
+                    line-height: 36px;
+                    background: #fc3439;
+                    margin-right: 20px;
+                    color: #fff;
+                    font-size: 14px;
+                    font-weight: normal;
+                    width: 111px;
+                    height: 36px;
+                    border: none;
+                    margin-top:15px;
+                    padding: 0;
+                    cursor: pointer;
+                    border-radius: 2px;
+                        &:hover {
+                            background: #ff5257;
+                        }
+                }
+                .cancelBtn{
+                    display: inline-block;
+                    font-size: 14px;
+                    line-height: 36px;
+                    color: #666;
+                    background: #fff;
+                    border: 1px solid #ccc;
+                    width: 111px;
+                    height: 36px;
+                    margin-top:15px;
+                    padding: 0;
+                    cursor: pointer;
+                    border-radius: 2px;
+                }
             }
+            
             .diolog-main{
                 float: left;
                 width: 240px;
@@ -814,7 +851,7 @@
                     }
                     .check-title{
                         display: inline-block;
-                        font-size: 12px;
+                        font-size: 14px;
                         line-height: 14px;
                         color: #999999;
                     }
@@ -1263,15 +1300,15 @@ export default Vue.component('common-edit',{
             styleShowTitle:false,
             tableWidth:'100%',
             tableWidthVal:'',
-            titleFontSize:12,
+            titleFontSize:14,
             titleAlign:'center',
-            titleUseBorder:false,
+            titleUseBorder:true,
             titleLineHeight:32,
-            tableFontsize:12,
+            tableFontsize:14,
             tableLineHeight:32,
             tableAlign:'center',
             database:'ALL',
-            showTableNet:0,
+            showTableNet:1,
             dataBaseList:[
                 {
                     name:'城市数据库',
@@ -1381,13 +1418,20 @@ export default Vue.component('common-edit',{
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        
+        vm.data_right=[];
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
             vm.getIntoDesignPage(true)
         }else{
+            console.log('00000')
+            vm.data_right=[];
+            vm.data_left=dataLeft;
+            vm.data_left.forEach((item)=>{
+                item.checked=false;
+            })
             vm.getIntoDesignPage(false)
-            vm.addField()
+            // vm.initFiled(true);
+            // vm.addField()
         }
         vm.getPV();
     },
@@ -1964,6 +2008,7 @@ export default Vue.component('common-edit',{
                 fieldList.push({
                     fieldCode: ele.fieldCode,
                     fieldAlias: ele.fieldName,
+                    // .split('[')[0]
                     fieldType: ele.fieldType, 
                     tableType: ele.tableType
                 })
@@ -2231,6 +2276,9 @@ export default Vue.component('common-edit',{
             var vm = this
             vm.data_right = []
             vm.data_left = dataLeft
+            vm.data_left.forEach((item)=>{
+                item.checked=false;
+            })
             if(isClear){
                 vm.addField()
             }
@@ -2337,12 +2385,16 @@ export default Vue.component('common-edit',{
         },
         addField(){
             var vm = this
+            console.log(vm.data_right,'vm.data_right');
+            // vm.data_right=[]
             var arr = []
+            // vm.data_left=dataLeft;
             vm.data_left.forEach((element,index) => {
               if(element.checked){
                   vm.data_right.push({
                     fieldCode: element.fieldCode,
                     fieldName:element.fieldName,
+                    // +'['+element.fieldName+']'
                     fieldType:element.fieldType,
                     tableType:element.tableType,
                     checked: false
@@ -2351,7 +2403,9 @@ export default Vue.component('common-edit',{
                   arr.push(element)
               }
             })
+            // vm.data_right=[]
             vm.data_left = arr
+            console.log(vm.data_left,'vm.data_left')
         },
         removeField(index){
             var vm = this

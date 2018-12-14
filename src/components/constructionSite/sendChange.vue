@@ -39,7 +39,7 @@
                         <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
-                                    <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
+                                    <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                 </span>
                                 <span  class="item-file-detial">
                                     <h3 v-text="val.fileName"></h3>
@@ -86,7 +86,7 @@
                                 </span>
                                 <input class="upInput"  type="file" :accept="type == 1?'image/*':''" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
                             </span>
-                            <span class="upImgText">{{imageName}}</span> 
+                            <span class="upImgText" style="width:120px !important">{{imageName}}</span> 
                         </div>
                     </div>
                 </div>
@@ -222,6 +222,16 @@ export default Vue.component('common-upload',{
                         item.checked = false
                  }
             })
+        },
+        checkIcon1(val){
+            var vm = this
+            // console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
         },
         deleteShortStateMent(id,index){
              var vm = this
@@ -400,6 +410,7 @@ export default Vue.component('common-upload',{
             vm.imageName = '未选择任何文件'
             vm.filesList = null
             vm.attachList = null
+            document.getElementById('fileInfo').value='';
         },
         getShortStateMent(){
             var vm = this
@@ -426,11 +437,12 @@ export default Vue.component('common-upload',{
         },
          trim(str){ 
             /**去掉字符串前后所有空格*/
-            return str.replace(/(^\s*)|(\s*$)/g, ""); 
+            // return str.replace(/(^\s*)|(\s*$)/g, ""); 
+            return str.replace(/\n|\r\n/g,"<br/>") //将字符串的空格变成<br/>编译
         },
         sendInfo(){
             var vm = this
-            vm.$refs.message.value = vm.trim(vm.$refs.message.value)
+            // vm.$refs.message.value = vm.trim(vm.$refs.message.value)
             if(vm.$refs.message.value == ''){
                 vm.$message({
                     type:'error',
@@ -470,7 +482,7 @@ export default Vue.component('common-upload',{
                     pageType:3,	//质量检查
                     newStmt:vm.newStmt,
                     designCoordinate:{
-                        dcContent: '[检查类型]'+'-'+vm.checkTypeName+"<br/>"+vm.$refs.message.value,//质量检查传递的值
+                        dcContent: '[检查类型]'+'-'+vm.checkTypeName+"<br/>"+vm.trim(vm.$refs.message.value),//质量检查传递的值
                         ugId:strUgid,
                         projId: vm.projId,
                         subProjId: vm.defaultSubProjId,
@@ -491,7 +503,7 @@ export default Vue.component('common-upload',{
                     themeStatus: '',//主题状态
                     dcReview: {
                         dcId: vm.dcid,
-                        rvContent: vm.$refs.message.value
+                        rvContent: vm.trim(vm.$refs.message.value)
                     },
                     dcSearchCondition: {
                         builderId: vm.valuemonomer,//单体
@@ -526,22 +538,30 @@ export default Vue.component('common-upload',{
                 params:params
             }).then((response)=>{
                 if(parseInt(response.data.cd) == 0){
+                     this.$message({
+                            type:'info',
+                            message:'发布成功'
+                        })
                     if(vm.iscomment){
                          vm.$emit('refresh')
+                         console.log('mmmm')
                     }else{
-                        
+                         console.log('aaaa')
+                         vm.$emit('refreshcomment',1)
                         if(vm.checked){
                             var recall = {
                                 isChecked:true,
-                                data:response.data.rt
+                                data:response.data.rt,
+                                count:1
                             }
-                            vm.$emit('refreshcomment',recall)
+                            vm.$emit('refreshcomment',1)
                         }else{
                             var recall = {
                                 isChecked:false,
-                                data:response.data.rt
+                                data:response.data.rt,
+                                count:1
                             }
-                            vm.$emit('refreshcomment',recall)
+                            vm.$emit('refreshcomment',0)
                         }
                        vm.checked = false
                     }
@@ -619,6 +639,7 @@ export default Vue.component('common-upload',{
                 vm.imageName ='未选择任何文件'
                 console.log(err)
             })
+            document.getElementById('fileInfo').value='';
         }
     }
 })

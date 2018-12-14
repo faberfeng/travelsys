@@ -154,7 +154,7 @@
                                 <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                                     <div class="item-file-box clearfix">
                                         <span  class="item-file-image">
-                                            <img :src="require('../ManageCost/images/icon/'+val.fileExtension.toUpperCase()+'.png')" />
+                                            <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
                                         </span>
                                         <span  class="item-file-detial">
                                             <h3 v-text="val.fileName"></h3>
@@ -255,7 +255,7 @@
                             </span>
                             <input class="upInput"  type="file" :accept="type == 1?'image/*':''" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
                         </span>
-                        <span class="upImgText">{{imageName}}</span> 
+                        <span class="upImgText" style="width:150px">{{imageName}}</span> 
                     </div>
                 </div>
             </div>
@@ -504,7 +504,7 @@ export default {
             projectValue:'',
             uploadshow:false,
             type:'',
-            imageName:'',
+            imageName:'未选择任何文件',
             fileId:[],
             attachId:[],
             relaList:'',
@@ -692,6 +692,16 @@ export default {
                 }
             })
 
+        },
+        checkIcon1(val){
+            var vm = this
+            console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
         },
         //获取左侧列表信息
         getContactList(){
@@ -1177,6 +1187,7 @@ export default {
             vm.imageName = '未选择任何文件'
             vm.filesList = null
             vm.attachList = null
+            document.getElementById('fileInfo').value='';
         },
         uploadIMG(){
             var vm = this
@@ -1251,6 +1262,7 @@ export default {
                 vm.imageName ='未选择任何文件'
                 console.log(err)
             })
+            document.getElementById('fileInfo').value='';
         },
         selectImg(){
              this.$refs.file.click()

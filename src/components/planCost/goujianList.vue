@@ -142,7 +142,7 @@
                             <td v-text="initData(val.createTime)"></td>
                              <td v-text="val.createUser"></td>
                             <td >
-                                <button class="dataBtn actionBtn" title="数据"  @click="showData(val,false)" ></button>
+                                <button class="dataBtn actionBtn" title="数据"  @click="showRssData(val,false)" ></button>
                                  <button class="listBtn actionBtn" title="清单"  @click="showDetialList(val)" ></button>
                                 <button class="deleteBtn actionBtn" title="删除"  @click="deleteItem(val.rssId,false)" ></button>
                             </td>
@@ -215,7 +215,7 @@
         <!--下面是报表清单的编码-->
         <common-list v-on:back="backToH" :mId="checkItem.rssId" rType="7" :bId='checkItem.rssId'  :title="'构件量清单'" v-if="showCommonList"></common-list>
         <!--下面是报表数据的编码-->
-        <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItem.rcId" :isSnapshot="false" :isbaobiao="isBaoBiao"></common-data>
+        <common-data v-if="showCommonData" v-on:back="backToH" v-on:toedit="editReportFromData" :rcId="checkItemId" :isSnapshot="false" :isbaobiao="isBaoBiao" :isRealTime="isRealTime"></common-data>
     </div>
     <div id="edit">
 
@@ -373,7 +373,7 @@
                         text-align: left;
                         box-sizing: border-box;
                         border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
+                        font-size: 14px;
                         color: #333333;
                         font-weight: normal;
                     }
@@ -387,7 +387,7 @@
                             text-align: left;
                             box-sizing: border-box;
                             border-right: 1px solid #e6e6e6;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: #333333;
                             .location{
                                 display: block;
@@ -563,6 +563,8 @@ export default {
             showCommonData:false,
             checkItem:{},
             isBaoBiao:true,
+            isRealTime:true,
+            checkItemId:'',
 
         }
     },
@@ -607,10 +609,13 @@ export default {
         },
         refrehPage(event){
             var vm = this
+            vm.checkItem={}
             if(event != null){
                 if(event.showData){
+                    
+                    console.log(event.rcid,'event.rcid0000')
                     vm.backToH()
-                    if(event.rcid != null)vm.checkItem.rcId = event.rcid
+                    if(event.rcid != null)vm.checkItemId = event.rcid
                     vm.showCommonData = true
                 }else{
                     vm.backToH()
@@ -625,10 +630,13 @@ export default {
         },
         editReport(val){
             var vm = this;
+            vm.checkItem={};
             vm.checkItem = val;
+            console.log(vm.checkItem,'editReport')
             vm.showCommonEdit = true;
         },
         showData(val,istrue){
+            this.isRealTime=true;
             if(istrue){
                 this.isBaoBiao = true;
             }else{
@@ -637,6 +645,20 @@ export default {
             var vm = this
             vm.showCommonData = true;
             vm.checkItem = val;
+            console.log(vm.checkItem,'showData')
+            vm.checkItemId=vm.checkItem.rcId;
+        },
+        showRssData(val,istrue){
+            this.isRealTime=false;
+             if(istrue){
+                this.isBaoBiao = true;
+            }else{
+                this.isBaoBiao = false;
+            }
+            var vm = this
+            vm.showCommonData = true;
+            vm.checkItem = val;
+            vm.checkItemId=vm.checkItem.rssId;
         },
         showDetialList(val){
             var vm = this

@@ -11,6 +11,7 @@ export default new Vuex.Store({
         // 以下是内网配置文件
         QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
         QJFileManageSystemURL1:'http://10.252.26.240:8080/qjbim-file',
+        commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
         BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
         GMDUrl:"http://10.252.26.240:8080",
         WebGlUrl:"http://10.252.26.240", 

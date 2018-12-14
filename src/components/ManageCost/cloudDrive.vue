@@ -6,8 +6,10 @@
             </select>
             <i class="icon-sanjiao"></i>
         </div>
-        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
-            <div style="min-width: 950px;overflow-y: auto;height:760px">
+        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]" >
+            <!-- style="min-width: 950px;overflow-y: auto;height:760px" -->
+            <!-- <div > -->
+            <div style="min-width: 950px; overflow-y: auto; height: 760px;">
                 <div id="item-box-file">
                     <router-link :to="'/Drive/costover'" class=" label-item">  
                     最近文档  
@@ -36,9 +38,10 @@
                 </div>
                 <!-- <div id="project">
                 </div> -->
+                <div v-if="!showCommonList">
                     <p class="antsLine" v-if="!showQuanJing">
                         文档管理<i class="icon-sanjiao-right"></i>工程云盘<i class="icon-sanjiao-right"></i>
-                        <span class="strong" v-for="item in mayiList" :key="item.nodeId+'antLine'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                        <span v-show="spanShow" class="strong" v-for="item in mayiList" :key="item.nodeId+'antLine'" @click="IntoDir(item)" v-html="item.nodeName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
                     </p>
                     <p class="select-header clearfix">
                         <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
@@ -53,16 +56,16 @@
                         -->
                         <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*')">新建点位</span>
                         <ul class="operation" style="margin-right: 10px;">
-                            <li class="item-upload" v-if="!showQuanJing&&systemDrawFile"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
+                            <li class="item-upload" v-if="!showQuanJing&&systemDrawFile&&clickBlank"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
                         </ul>
                         <ul class="operation">
-                            <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder"  @click="copyfile(true)">剪切</li>
+                            <li class="item"  v-if="(checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow "  @click="copyfile(true)">剪切</li>
                             <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder" @click="downloadFile" >下载</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li>
-                            <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="rename">更名</li>
+                            <li class="item"  v-if="(((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="rename">更名</li>
                             <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
-                            <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
+                            <li class="item"  v-if="(checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
                             <li class="item"  v-if="checkedRound.checked || checkedFile_Folder.file || checkedFile_Folder.folder" @click="shareURL">分享</li>
                             <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
                         </ul>
@@ -70,7 +73,13 @@
                     <!--全景图代码-->
                     <div id="planeFigureDiv" v-if="showQuanJing">
                         <div  id="planeDIV">
-                            <img v-show="QJ.imageBackground.filePath" :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
+                            <img v-show="QJ.imageBackground.filePath!=undefined" :src="QJFileManageSystemURL+QJ.imageBackground.filePath" id="planeFigure">
+                            <div v-show="!QJ.imageBackground.filePath" id="planeFigure1">
+                                <img  src='../../assets/nodata.png' >
+                                 <!-- <img  src='../../assets/nopic.jpg' > -->
+                                <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的文件夹</p>
+                            </div>
+                            <!-- <span></span> -->
                             <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" 
                             @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xAxial,item.yAxial,item.fileId,item.fileName)"
                             :data-left="item.xAxial" :data-top="item.yAxial"  :id="index+'round'"
@@ -122,10 +131,10 @@
                                     <th style="width:55px;"></th>
                                     <th style="min-width:428px;">文件名</th>
                                     <th style="width:70px;"></th>
-                                    <th style="width:70px;">更新渠道</th>
-                                    <th style="width:50px;">类型</th>
                                     <th style="width:40px;">版本</th>
                                     <th style="width:70px;">大小</th>
+                                    <th style="width:50px;">类型</th>
+                                    <th style="width:70px;">更新渠道</th>
                                     <th style="min-width:60px;">上传人</th>
                                     <th style="min-width:150px;">更新时间</th>
                                 </tr>
@@ -144,10 +153,10 @@
                                         <i class="icon-goujian icon-download" @click="downLoad(index)"></i>
                                         <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileId,item.fileName)"></i>
                                     </td>
-                                    <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
-                                    <td v-text="splitType(item.icon)"></td>
                                     <td v-text="item.version"></td>
-                                    <td>{{item.fileSize|fileSizeChange()}}M</td>
+                                    <td>{{item.fileSize|fileSizeChange()}}</td>
+                                    <td v-text="splitType(item.icon)"></td>
+                                    <td  v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></td>
                                     <td v-text="item.uploadUser"></td>
                                     <td v-text="initData(item.updateTime)"></td>
                                 </tr>
@@ -172,9 +181,10 @@
                         </table>
                     </div>
                     </div>
+                </div>
             </div>
         </div>
-        <div :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+        <div v-if="!showCommonList" :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
             <div id="center-selection">
                 <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
                     <i class="icon-right"></i>
@@ -245,7 +255,7 @@
                         </li>
                          <li class="detial-item clearfix">
                             <span class="detial-text-name">文件大小</span>
-                            <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}M</span>
+                            <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}</span>
                         </li>
                         <li v-show="!showBtn" class="detial-item clearfix">
                             <span class="detial-text-name">图号</span>
@@ -302,7 +312,7 @@
                         <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
                             <p class="clearfix">
                                 <!-- @click="showDetialList(item)" -->
-                                <i class="icon-goujian icon-detial" ></i>
+                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
                                 <i class="icon-goujian icon-location" @click="goToLocation"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
@@ -364,6 +374,7 @@
                     <p class="head" v-if="checkedItem.dirId || checkedRound">
                         <i class="icon-goujian icon-search" @click="view()"></i>
                         <i class="icon-goujian icon-download" @click="downLoad()"></i>
+                        <i class="icon-goujian icon-deleteVersion" @click="deleteVersion()"></i>
                         <select v-model="posType" class="inp-search">
                             <option value="">所有版本</option>
                             <option value="1">本周更新</option>
@@ -383,14 +394,14 @@
                                     <!-- <p class="version-des1">{{updateDrawingNumber+'('+updateDrawingName+')'}}</p> -->
                                 </div>
                             </div>
-                            <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFromExplorer == 1?'浏览器':'手机端')+'更新'}}</p>
+                            <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFrom == 1?'浏览器':'手机端')+'更新'}}</p>
                         </li>
                     </ul>
                  </div>
             </div>
         </div>
         <!--下面是报表清单的编码-->
-        <common-list v-on:back="backToH" :mId="checkItem.rssId" rType="7" :bId='checkItem.rssId'  :title="'构件量清单'" v-if="showCommonList"></common-list>
+        <common-list v-on:back="backToH" :mId="setId"   :title="'构件量清单'" v-if="showCommonList"></common-list>
       <div id="edit">
         <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.nodeId" :title="uploadtitle" :accept="acceptType"
         :fgid="QJfgid" :isqj="isqj" :ugid='selectUgId'
@@ -469,7 +480,7 @@
         </el-dialog>
 
         <el-dialog title="添加清单" :visible="editBySelfShow" @close="customCancle">
-            <div class="project1 project">
+            <div class="project1 project2">
                 <div class="projectTitle">
                 <div class="projectTitleLeft">
                     <p style="text-align:left">清单名称关键字：</p>
@@ -643,7 +654,7 @@
                 </ul>
             </div>
             <div slot="footer" class="dialog-footer">
-               <button class="editBtnS" @click="labelListConfirm">网页预览</button>
+               <button class="editBtnS" @click="labelListConfirm(biaoqianInfo.pkId)">网页预览</button>
                     <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
             </div>
         </el-dialog>
@@ -736,7 +747,7 @@
             </div>
         </el-dialog>
     </div>
-    <form style="visibility:hidden" action="http://bdms.arctron.cn/h2-bim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
+    <form style="visibility:hidden" action="http://10.252.26.240:8080/h2-bim-project/manifest/manifest/qrcodeSingle" ref="manifestQrCodeSingleForm"  method="post" target="_blank">
         <input type="text" name="manifestId" :value="biaoqianInfo.pkId">
         <input type="text" name="mName" :value="biaoqianInfo.mName">
         <input type="text" name="mGSource" :value="biaoqianInfo.mGSource_">
@@ -874,7 +885,7 @@
                 cursor: pointer;
             }
     }
-    .project{
+    .project2{
             margin: 0 20px;
             .searchresult{
                 font-size: 12px;
@@ -1554,7 +1565,7 @@
             bottom: 0;
             right: 25px;
             width: 100%;
-            height: 800px;
+            // height: 800px;
             #planeDIV{
                 display:block;
                 position:absolute;
@@ -1562,6 +1573,15 @@
                 #planeFigure{
                     min-width: 700px;
                     min-height: 500px;
+                }
+                #planeFigure1{
+                    position: relative;
+                    min-width:400px;
+                    height: 115px;
+                    left:150%;
+                    top:100px;
+                    // margin-left:30%;
+                    // margin-top:20%;
                 }
             }
             .round{
@@ -2043,6 +2063,9 @@
               transition: all ease .5s;
           }
     }
+    .qindanWidth{
+        width:100% !important;
+    }
     .el-main{
         padding: 0;
     }
@@ -2375,7 +2398,7 @@
         }
         .detial-item{
             font-size: 12px;
-            line-height: 12px;
+            line-height: 15px;
             margin-top: 16px;
             text-align: left;
             .detial-text-name{
@@ -2499,6 +2522,13 @@
                         background: url('./images/search1.png')no-repeat 0 0;
                     }
                   }
+                .icon-deleteVersion{
+                    background: url('./images/delete.png')no-repeat 0 0;
+                    margin-left: 10px;
+                    &:hover{
+                        background: url('./images/delete1.png')no-repeat 0 0;
+                    }
+                }
                .inp-search{
                     width: 96px;
                     border-radius: 2px;
@@ -2635,7 +2665,9 @@ export default {
     data() {
          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
+            spanShow:true,
             showCommonList:false,
+            setId:'',
             activeIndex: '1',
             tabShow: 1,
             listStyle: 'table', //列表展示方式
@@ -2657,6 +2689,7 @@ export default {
             checkedItem: {}, //选中的file
             GouJianItem: {}, //选中file的构件
             versionItem: {}, //选中file的版本信息
+            versionIndex:'',
             show: {
                 basicAttributes: false,
                 BindingArtifacts: false
@@ -2672,7 +2705,7 @@ export default {
             },
             selectUgId: '', //选中的群组id
             ugList: [], //群组列表
-            showQuanJing: true, //控制全景和非全景的显隐
+            showQuanJing: false, //控制全景和非全景的显隐
             systemDrawFile:true,
             showBtn:true,
             checkFileDir: {}, //选中的文件夹信息
@@ -2714,7 +2747,8 @@ export default {
                 file: false,
                 folder: false,
                 fileCheckedNum: 0, //选中的文件数量，多个文件不可同时更新，更名
-                folderCheckedNum: 0 //选中 的文件夹数量
+                folderCheckedNum: 0, //选中 的文件夹数量
+                isDrawingShow:true
             },
             hasFileToPaste: {
                 is: false,
@@ -2775,6 +2809,8 @@ export default {
             updataShow:false,//更新图纸
             updateFileName:'',//文件名
             updateFileList:'',//文件列表
+            imgSrc:"",
+            clickBlank:true
         }
     },
     created(){
@@ -2789,7 +2825,7 @@ export default {
         this.GMDUrl = this.$store.state.GMDUrl;
         vm.checkFilePaste()
         vm.getIntoCloudD()
-        // vm.getDirectory()
+       
         vm.createDrawingDirectory()
         vm.getHolders()
         // this.intoDir()
@@ -2803,23 +2839,43 @@ export default {
     filters:{
         //保留两位小数点
          fileSizeChange(val){
-             var x=(val/1048576);
-              var f = parseFloat(x); 
-                if (isNaN(f)) { 
-                    return false; 
-                } 
-                var f = Math.floor(x*100)/100; 
-                var s = f.toString(); 
-                var rs = s.indexOf('.'); 
-                if (rs < 0) { 
-                    rs = s.length; 
-                    s += '.'; 
-                } 
-                while (s.length <= rs + 2) { 
-                    s += '0'; 
-                } 
-                return s; 
-      },
+             if(val/1024<100){
+                 var y=(val/1024);
+                 let f = parseFloat(y); 
+                    if (isNaN(f)) { 
+                        return false; 
+                    } 
+                    var f = Math.floor(y*100)/100; 
+                    var s = f.toString(); 
+                    var rs = s.indexOf('.'); 
+                    if (rs < 0) { 
+                        rs = s.length; 
+                        s += '.'; 
+                    } 
+                    while (s.length <= rs + 2) { 
+                        s += '0'; 
+                    }
+
+                 return s+'K'
+             }else{
+                var x=(val/1048576);
+                let f = parseFloat(x); 
+                    if (isNaN(f)) { 
+                        return false; 
+                    } 
+                    var f = Math.floor(x*100)/100; 
+                    var s = f.toString(); 
+                    var rs = s.indexOf('.'); 
+                    if (rs < 0) { 
+                        rs = s.length; 
+                        s += '.'; 
+                    } 
+                    while (s.length <= rs + 2) { 
+                        s += '0'; 
+                    } 
+                    return s+'M'; 
+                }
+        },
     },
     watch:{
         'show.basicAttributes':function(val){
@@ -2874,8 +2930,8 @@ export default {
               case "CurrentSelectedEnt":
                   CurrentSelectPara=e.data.parameter[0];
                   CurrentSelectedEntList=e.data.parameter;
-                  console.log(CurrentSelectPara,'CurrentSelectPara');
-                  console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
+                //   console.log(CurrentSelectPara,'CurrentSelectPara');
+                //   console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
                 break;
               case "ViewpointSubmited":
                         break;
@@ -2887,6 +2943,13 @@ export default {
         },
        initAll(){
           var vm = this
+            // vm.checkedFile_Folder.file=false;
+            // vm.checkedFile_Folder.folder=false;
+            // vm.checkedFile_Folder.fileCheckedNum=0;
+            // vm.checkedFile_Folder.folderCheckedNum=0;
+            // vm.checkedFile_Folder.folderCheckedNum=0;
+            // vm.checkedFile_Folder.isDrawingShow=false;
+            // vm.checkedRound.checked=false;
           if(!vm.checkAll){
                 vm.checkAll = true
                 if(vm.fileList.length>0){
@@ -3104,7 +3167,31 @@ export default {
       initTreeFolder(){
         var vm = this
         vm.firstTime = 0
+        vm.fileList=[];
+        vm.folderList=[];
+        vm.checkFileDir={};
+        vm.QJ.imageBackground={};
+        vm.clickBlank=false;
+        vm.showQuanJing=false;
+        vm.checkedFile_Folder.file=false;
+        vm.checkedFile_Folder.folder=false;
+        vm.checkedFile_Folder.fileCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.isDrawingShow=false;
+        vm.checkedRound.checked=false;
+        $('#cloudDirveFileTree .el-tree-node').removeClass('is-current_fistload')
+        // vm.mayiList = []
+        // vm.checkFileDir={}
+        // if(vm.showQuanJing){
+        //     vm.searchFileGroupInfo()
+        // }else{
+        //     vm.getInfo()
+        // }
+   
         vm.getFileTree()
+        vm.spanShow=false;
+
       },
       addFile(){
           var vm = this
@@ -3146,47 +3233,92 @@ export default {
                         type:'success',
                         message:'目录添加成功'
                     })
-                    vm.getFileTree()
+                    // if(vm.showQuanJing){
+                    //     vm.searchFileGroupInfo()
+                    // }else{
+                    //     vm.getInfo()
+                    // }
                     vm.fileName.show = false
-                }else if(response.data.cd == -1){
+                    vm.getFileTree();
+                }else if(response.data.cd == 10002){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }else if(response.data.cd==-1){
                     vm.$message({
                         type:'error',
                         message:response.data.msg
                     })
                 }
+                // console.log(vm.checkFileDir.nodeId,'vm.checkFileDir.nodeId');
+               
                 vm.fileName.newFileName = ''
             }).catch((err)=>{
                 console.log(err)
             })
-        }else{
-             axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
-                headers:{
-                    'token':vm.token
-                },
-                data:{
-                    dirName: vm.fileName.newFileName,
-                    projId: vm.projId,
-                },
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    vm.$message({
-                        type:'success',
-                        message:'目录修改成功'
-                    })
-                    vm.getFileTree()
-                    vm.fileName.show = false
-                }else if(response.data.cd == -1){
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-                vm.fileName.newFileName = ''
-            }).catch((err)=>{
-                console.log(err)
-            })
+            
+        }else {
+            // if(vm.fileName.newFileName){
+            //     vm.FileTree_original.forEach((item)=>{
+            //         if(vm.fileName.newFileName==item.nodeName){
+            //             this.$message({
+            //                 type:'info',
+            //                 message:"当前群组或其他群组根目录下文件夹名称已存在"
+            //             })
+            //            return false;
+            //         } 
+            //     })
+            // }
+            // for(let i=0;i<this.FileTree_original.length;i++){
+            //      if(vm.fileName.newFileName==this.FileTree_original[i].nodeName){
+            //             this.$message({
+            //                 type:'info',
+            //                 message:"当前群组或其他群组根目录下文件夹名称已存在"
+            //             })
+            //            break;
+            //         }
+            // }
+            if(vm.fileName.newFileName==vm.checkFileDir.nodeName){
+                 this.$message({
+                            type:'info',
+                            message:"当前群组或其他群组根目录下文件夹名称已存在"
+                        })
+            }else
+            {
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/rename',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:{
+                        dirName: vm.fileName.newFileName,
+                        projId: vm.projId,
+                    },
+                }).then((response)=>{
+                    if(Math.ceil(response.data.cd) == 0){
+                        vm.$message({
+                            type:'success',
+                            message:'目录修改成功'
+                        })
+                        vm.getFileTree()
+                        vm.fileName.show = false
+                        // setTimeout(()=>{
+                        //     console.log(vm.checkFileDir.nodeId,'vm.checkFileDir.nodeId');
+                        //     vm.$refs.fileTree_cloudDrive.setCurrentKey(6744)
+                        // },1000);
+                    }else if(response.data.cd == 10002){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                    vm.fileName.newFileName = ''
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
         }
       },
       renameFile(){
@@ -3349,43 +3481,51 @@ export default {
         var vm = this
         vm.fullscreenLoading = true
         if(vm.hasFileToPaste.obj.shear){//剪切
-             axios({
-                method:'POST',
-                url:vm.BDMSUrl+'project2/doc/'+vm.hasFileToPaste.obj.dirId+'/pasteFileGroup/'+vm.checkFileDir.nodeId+'/'+vm.hasFileToPaste.obj.projId,
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    selectFiles: vm.hasFileToPaste.obj.fgIds,
-                    ugId:vm.selectUgId,
-                    oldUgId:vm.hasFileToPaste.obj.oldUgId, //ugid是群组ID
-                    selectFolders: vm.hasFileToPaste.obj.fcIds,
-                },
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    sessionStorage.removeItem('fileObject')
-                    if(vm.showQuanJing){
-                        vm.searchFileGroupInfo()
-                    }else{
-                        vm.getInfo()
-                    }
-                    vm.getFileTree()
-                    vm.checkFilePaste()
-                }else{
-                     vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
+            if(vm.hasFileToPaste.obj.dirId==vm.checkFileDir.nodeId){
+                this.$message({
+                    type:'error',
+                    message:'不可在同一目录剪切'
+                })
                 vm.fullscreenLoading = false
-            }).catch((err)=>{
-                console.log(err)
-            })
+            }else{
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'project2/doc/'+vm.hasFileToPaste.obj.dirId+'/pasteFileGroup/'+vm.checkFileDir.nodeId+'/'+vm.hasFileToPaste.obj.projId,
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        selectFiles: vm.hasFileToPaste.obj.fgIds,
+                        ugId:vm.selectUgId,
+                        oldUgId:vm.hasFileToPaste.obj.oldUgId, //ugid是群组ID
+                        selectFolders: vm.hasFileToPaste.obj.fcIds,
+                    },
+                }).then((response)=>{
+                    if(Math.ceil(response.data.cd) == 0){
+                        sessionStorage.removeItem('fileObject')
+                        if(vm.showQuanJing){
+                            vm.searchFileGroupInfo()
+                        }else{
+                            vm.getInfo()
+                        }
+                        vm.getFileTree()
+                        vm.checkFilePaste()
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                    vm.fullscreenLoading = false
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }
         }else{//复制
             var oldDirId = vm.hasFileToPaste.obj.dirId
-            if(vm.hasFileToPaste.obj.from != ''){
-                oldDirId = ''
-            }
+            // if(vm.hasFileToPaste.obj.from != ''){
+            //     oldDirId = ''
+            // }
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/pasteTransferStation',
@@ -3928,6 +4068,7 @@ export default {
       },
       checkRound(index){
           var vm = this
+          vm.checkedFile_Folder.isDrawingShow=true;
           vm.checkedRound.checked = false
            vm.checkedRound.ID = ''
            vm.checkedRound.filepath = ''
@@ -3947,7 +4088,7 @@ export default {
                     vm.checkedRound.fileId = item.fileId
 
                     vm.PointFigure.oldname = item.fgName
-
+                    
                     //设置右侧基本属性的显示
                     vm.show.basicAttributes =true
                     vm.show.BindingArtifacts =true
@@ -3979,8 +4120,18 @@ export default {
         //         message:'这个文件夹没有子文件!'
         //     })
         //   }
+        vm.clickBlank=true;
+        vm.checkedFile_Folder.file=false;
+        vm.checkedFile_Folder.folder=false;
+        vm.checkedFile_Folder.fileCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.isDrawingShow=false;
+        vm.checkedRound.checked=false;
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
+          vm.spanShow=true;
+         
           if(vm.checkFileDir.isDrawing==1){
               this.showBtn=false;
           }else{
@@ -4005,14 +4156,14 @@ export default {
           if(vm.expandedKeys.indexOf(data.nodeId) == -1){
             vm.expandedKeys.push(data.nodeId)
           }
-          console.log(vm.expandedKeys)
+        //   console.log(vm.expandedKeys)
       },
       nodeClickClose(data,node,self){
           var vm = this
           if(vm.expandedKeys.indexOf(data.nodeId) != -1){
             vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.nodeId),1)
           }
-          console.log(vm.expandedKeys)
+        //   console.log(vm.expandedKeys)
       },
       parseMStatus(mStatus){
             // 施工现场
@@ -4143,9 +4294,9 @@ export default {
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
         // fileName.split('.')[1] == 'GMD'
-        console.log(fileName.substr(fileName.length-3));
+        
         if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
-            window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath)+'#/showcompany');
+            window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
         }else{
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
@@ -4183,8 +4334,75 @@ export default {
             return false
         }
         vm.latestFile(fileId,"下载了文件"+fileName);
-        console.log(filePath);
+        
         window.open(vm.QJFileManageSystemURL + filePath +'');
+    },
+    deleteVersion(){
+        var vm=this;
+        var fgId = ''
+        var dirId = ''
+        if(vm.versionItem == ''){
+             vm.$message({
+                type:'info',
+                message:'请勾选要下载的文件的版本'
+            })
+            return false
+        }
+         if(vm.showQuanJing && vm.checkedRound){
+            fgId =vm.checkedRound.ID
+         }
+         if(!vm.showQuanJing && vm.checkedItem){
+             if(!vm.checkedItem.fgId){
+                 vm.versionItem = {}
+                 return false
+             }
+             dirId= vm.checkedItem.dirId
+             fgId = vm.checkedItem.fgId
+         }
+        
+        axios({
+            method:'get',
+            url:this.BDMSUrl+'/project2/doc/delFileVersion',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                fileId:vm.versionItem[vm.versionIndex].fileId,
+                projId:vm.projId,
+                dirId:dirId,
+                deleteType:1,
+                fgId:fgId
+            }
+        }).then((response)=>{
+            if(response.data.cd==0){
+                vm.getVersion();
+                vm.getInfoFolder();
+                vm.getInfo();
+                this.$message({
+                    type:'success',
+                    message:'删除版本成功'
+                })
+                // vm.searchFileGroupInfo()
+            }else
+            if(response.data.cd==10002){
+                 vm.getVersion();
+                vm.getInfoFolder();
+                vm.getInfo();
+                // vm.searchFileGroupInfo();
+                // vm.getVersion();
+                // vm.getInfoFolder();
+                // this.$message({
+                //     type:'error',
+                //     message:response.data.msg
+                // })
+            }else if(response.data.cd==-1){
+                this.$message({
+                    type:'error',
+                    message:'删除版本异常'
+                })
+            }
+        })
+
     },
     downLoadWithURL(url,fileId,fileName){
          var vm = this
@@ -4291,14 +4509,18 @@ export default {
         },100)
     },
     checkItem(val,file,isMultiSelect){
+        
         var vm = this
-        vm.show.basicAttributes =true
-        vm.show.BindingArtifacts =true
-        vm.checkedFile_Folder.fileCheckedNum = 0
-        vm.checkedFile_Folder.folderCheckedNum = 0
-        vm.checkedFile_Folder.file = false
-        vm.checkedFile_Folder.folder = false
+        // vm.show.basicAttributes =true
+        // vm.show.BindingArtifacts =true
+        // vm.checkedFile_Folder.fileCheckedNum = 0
+        // vm.checkedFile_Folder.folderCheckedNum = 0
+        // vm.checkedFile_Folder.file = false
+        // vm.checkedFile_Folder.folder = false
+        // vm.checkedFile_Folder.isDrawingShow = vm.showBtn
+        // vm.fileSearchInfo = ''
         var fileCheckList = []
+        vm.checkedFile_Folder.isDrawingShow=true;
         vm.checkAll = false
         if(isMultiSelect){//多选
             if(file){
@@ -4365,6 +4587,17 @@ export default {
     },
     IntoDir(val){
         var vm = this
+        //清除按钮数据
+         vm.show.basicAttributes =true
+        vm.show.BindingArtifacts =true
+        vm.checkedFile_Folder.fileCheckedNum = 0
+        vm.checkedFile_Folder.folderCheckedNum = 0
+        vm.checkedFile_Folder.file = false
+        vm.checkedFile_Folder.folder = false
+        vm.checkedFile_Folder.isDrawingShow = vm.showBtn
+        vm.fileSearchInfo = ''
+        console.log(val,'qqqqqq0000');
+
         vm.$refs.fileTree_cloudDrive.setCurrentKey(val.nodeId)
         vm.checkFileDir = val
         if(vm.expandedKeys.indexOf(val.nodeId) == -1){
@@ -4377,6 +4610,7 @@ export default {
     getVersion(){
          var vm = this
          var fgId = ''
+         console.log(vm.checkedItem,'vm.checkedItem');
          if(vm.showQuanJing && vm.checkedRound){
             fgId =vm.checkedRound.ID
          }
@@ -4411,6 +4645,7 @@ export default {
     },
     selectVersion(val){
         var vm = this
+        this.versionIndex=val;
          vm.versionItem.forEach((item)=>{
             vm.$set(item,'checked',false)
         })
@@ -4442,7 +4677,7 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
-                console.log(vm.GouJianItem);
+                
             }
         }).catch((err)=>{
             console.log(err)
@@ -4498,7 +4733,7 @@ export default {
                         vm.$set(item,'nodeName',item.name)
                     })
                     this.getDrawingList();
-                     console.log(vm.DirectoryList,'directory')
+                    
                     // console.log(vm.DirectoryList);
                 }else{
                     vm.message({
@@ -4574,16 +4809,19 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.FileTree_original = response.data.rt;
+                
                 // var list=[{'nodeParId':0,'nodeName':'设计图纸','nodeId':1}]
                 // vm.$set(list[0],'children',vm.DirectoryList)
                 // vm.FileTree_original.push(list[0])
                 // console.log(vm.FileTree_original,'原始数据')
                 vm.FileTree = data.transformTozTreeFormat(setting,vm.FileTree_original)
-                console.log(vm.FileTree,'最终');
+               
                 if(name){
                     for(var k=0;k<vm.FileTree.length;k++){
                         if(vm.FileTree[k].nodeName.replace('_','') == name){
-                            vm.handleNodeClick(vm.FileTree[k])
+                            vm.handleNodeClick(vm.FileTree[k]);
+                           
+                            // vm.$refs.fileTree_cloudDrive.setCurrentKey(vm.FileTree[k].nodeId);
                             setTimeout(()=>{
                                 var n = k+1
                                 $('#cloudDirveFileTree .el-tree-node:nth-child('+n+')').addClass('is-current_fistload')
@@ -4591,9 +4829,12 @@ export default {
                             break
                         }
                     }
+                //     console.log(vm.checkFileDir.nodeId,'11111111111')
+                // vm.$refs.fileTree_cloudDrive.setCurrentKey(vm.checkFileDir.nodeId)
                 }else{
-                    vm.checkFileDir = vm.FileTree[0]
-                    vm.searchFileGroupInfo()
+                    // vm.IntoDir(vm.checkFileDir);
+                    // vm.checkFileDir = vm.FileTree[0]
+                    // vm.searchFileGroupInfo()
                 }
             }
 
@@ -4603,7 +4844,19 @@ export default {
     },
 
     searchFileGroupInfo(val){
+        
         var vm = this
+         vm.QJ.point = []
+        vm.QJ.imageBackground = {}
+        vm.checkedFile_Folder.file=false;
+        vm.checkedFile_Folder.folder=false;
+        vm.checkedFile_Folder.fileCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.folderCheckedNum=0;
+        vm.checkedFile_Folder.isDrawingShow=false;
+        vm.checkedRound.checked=false;
+        vm.fileSearchInfo = ''
+
         axios({
             method:'POST',
             url:vm.BDMSUrl+'project2/doc/searchFileGroupInfo',
@@ -4624,11 +4877,15 @@ export default {
                      if(item.xAxial == -1 && item.yAxial == -1){
                          vm.QJ.imageBackground = item
                          vm.hasImg = true
+                         if(vm.QJ.imageBackground){
+                            vm.imgSrc=vm.QJFileManageSystemURL+QJ.imageBackground.filePath
+                         }
                      }else{
                         vm.$set(item,'checked',false)
                          vm.QJ.point.push(item)
                      }
                  })
+                 
                  if(vm.hasImg){
                     setTimeout(function(){
                         vm.pointLocationBindClick()
@@ -4674,6 +4931,7 @@ export default {
                     })
                 }else{
                     vm.fileList = ''
+
                 }
                 vm.getInfoFolder()
             }
@@ -4685,6 +4943,10 @@ export default {
              * 获取单个文件夹
              * **/
             var vm = this
+            // vm.folderList.forEach((item)=>{
+            //     item.checked=false;
+            // })
+            // vm.folderList=[];
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/searchFolderInfo',//查询单个文件 ，下面要查询单个文件夹
@@ -4819,9 +5081,18 @@ export default {
                 }
             })
         },
+        backToH(){
+            this.showCommonList=false;
+            // vm.checkFilePaste()
+            // vm.getIntoCloudD()
+            // vm.createDrawingDirectory()
+            // vm.getHolders()
+        },
         //清单列表
-        showDetialList(){
-            this.showCommonList=true;   
+        showDetialList(item){
+            console.log(item,'item0000')
+            this.setId=item.main.pkId
+            this.showCommonList=true;
         },
         //清单二维码
         viewListQrcode(item){
@@ -4890,12 +5161,17 @@ export default {
             return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
         },
         //网页预览
-        labelListConfirm(){
-            this.$refs.manifestQrCodeSingleForm.submit();
+        labelListConfirm(val){
+            // this.$refs.manifestQrCodeSingleForm.submit();
+            var vm = this;
+            window.open('/#/Cost/getMainLabelInformation/'+val)
         },
         //打印当前标签页
         printLabelList(){
-            alert('已向打印机发送请求！');
+            this.$message({
+                type:"info",
+                message:'已向打印机发送请求！'
+            })
         },  
         biaoqianCLose(){
             this.isbiaoqianshow = false;
@@ -4986,6 +5262,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.customData = response.data.rt.rows;
+                    
                     this.customPageDetial.total = response.data.rt.total;
                     var type_c = '';
                     var relaType_c ='';
