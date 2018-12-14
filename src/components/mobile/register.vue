@@ -10,6 +10,7 @@
     <div>
       <input class="inputText" readonly placeholder="请输入手机号" v-model="mobile"/>
     </div>
+    <div class="lineDiv"></div>
     <div class="labelDivR">邮箱</div>
     <div>
       <input class="inputText" placeholder="请输入邮箱" v-model="email"/>
@@ -239,7 +240,7 @@
   .pNameDivR {
     text-align: left;
     margin-left: 1rem;
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: #fc3439;
   }
 
@@ -253,6 +254,7 @@
     height: 2rem;
     padding-left: 1rem;
     border: 0;
+    font-size: 1.2rem;
   }
 
   .lineDiv {

@@ -46,13 +46,13 @@
     data() {
       return {
         baseUrl: '',
-        mobile: '18321185409',
-        oldMobile: '18321185409',
-        email: '1208155441@qq.com',
+        mobile: '',
+        oldMobile: '',
+        email: '',
         code: '',
         codeTime: '发送',
         total: 60,
-        btnStyle: 'border: 0;width: 4rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;',
+        btnStyle: 'border: 0;font-size: 1rem;width: 4rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;',
         projId: 0,
         projName: '',
         applyMessage: ''
@@ -113,7 +113,7 @@
           }).then((response) => {
             if (response.data.result) {
               this.codeTime = this.total + 's后重新发送';
-              this.btnStyle = "border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #EAEAEA;";
+              this.btnStyle = "border: 0;font-size: 1rem;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #EAEAEA;";
               let clock = window.setInterval(() => {
                 this.total--;
                 this.codeTime = this.total + 's后重新发送';
@@ -121,7 +121,7 @@
                   window.clearInterval(clock)
                   this.codeTime = '重新发送';
                   this.total = 60;
-                  this.btnStyle = "border: 0;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;";
+                  this.btnStyle = "border: 0;font-size: 1rem;width: 6rem;height: 2rem;background-color: #FFFFFF;color: #fc3439;cursor: pointer;";
                 }
               }, 1000)
             } else {
@@ -248,6 +248,7 @@
     height: 2rem;
     padding-left: 1rem;
     border: 0;
+    font-size: 1.2rem;
   }
 
   .cardDiv {

@@ -161,6 +161,7 @@
     padding: 0.5rem;
     padding-left: 1rem;
     border: 1px #c9c9c9 solid;
+    font-size: 1.2rem;
   }
 
   .nameLengthDiv {
