@@ -478,6 +478,7 @@ export default {
         }
     },
     filters:{
+        //
 
     },
     created(){
@@ -566,8 +567,21 @@ export default {
                 message.projId = this.projId;
                 console.log(JSON.stringify(message));
                 this.ws.send(JSON.stringify(message));
+                this.chatRecordList.push({
+                    // userInfo:
+
+                })
                 this.sendText="";
             },
+            //返回头像方法
+            returnUserInfo(val){
+                this.userInfoList.forEach((item,index)=>{
+                    if(item.userId==val){
+                        return item
+                    }
+                })
+            },
+
             //将网页信息显示在网页上
             setMessageInnerHTML(innerHTML){
                 document.getElementById('message').innerHTML += innerHTML + '<br/>';
