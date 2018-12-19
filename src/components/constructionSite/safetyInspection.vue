@@ -3560,7 +3560,7 @@ export default {
             })
            
 
-
+            console.log(listData,'listData');
              var vm=this;
             axios({
                 method:'post',

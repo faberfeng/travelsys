@@ -9,7 +9,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]" >
             <!-- style="min-width: 950px;overflow-y: auto;height:760px" -->
             <!-- <div > -->
-            <div style="min-width: 950px; overflow-y: auto; height: 760px;">
+            <div :style="{'min-width: 950px; overflow-y: auto; height: 760px;':!showCommonList}">
                 <div id="item-box-file">
                     <router-link :to="'/Drive/costover'" class=" label-item">  
                     最近文档  

@@ -128,20 +128,100 @@
                         </div>
                     </div>
                     <div class="messageDiv">
+                        <!-- 会议设置 -->
+                        <div class="setChatWindow" v-if="meetSetShow">
+                            <div class="head">
+                                <span class="head_txt">会议设置</span>
+                                <span class="el-icon-close" @click="closeMeetSet"></span>
+                            </div>
+                            <ul>
+                                <li class="body">
+                                    <span class="body_txt">会议1</span>
+                                    <span class="body_edit"></span>
+                                </li>
+                                <li class="body">
+                                    <span class="body_txt1">设置置顶</span>
+                                    <span class="body_setTop"> </span>
+                                    <el-switch v-model="isMeetTopValue" active-color="#cccccc"  inactive-color="#1aad19" class="meetTop"></el-switch>
+                                </li>
+                                <li class="body"><span class="body_txt1">清除聊天记录</span></li>
+                                <li class="body"><span class="body_txt1">退出会议</span></li>
+                            </ul>
+                            <!-- <span class="el-icon-close"></span> -->
+                        </div>
+                        <!-- 对话设置 -->
+                        <div class="setChatWindow" v-if="oneByoneSetShow">
+                            <div class="head">
+                                <span class="head_txt">对话设置</span>
+                                <span class="el-icon-close" @click="closeOneByoneSet"></span>
+                            </div>
+                            <ul>
+                                <li class="body">
+                                    <span class="body_txt1">设置置顶</span>
+                                    <span class="body_setTop"> </span>
+                                    <el-switch v-model="isMeetTopValue" active-color="#cccccc"  inactive-color="#1aad19" class="meetTop"></el-switch>
+                                </li>
+                                 <li class="body"><span class="body_txt1">发起会议</span></li>
+                                <li class="body"><span class="body_txt1">清除聊天记录</span></li>
+                            </ul>
+                            <!-- <span class="el-icon-close"></span> -->
+                        </div>
+                        <div class="memberListWindow" v-show="memberListShow">
+                            <div class="head">
+                                <span class="head_txt">成员列表</span>
+                                <span class="el-icon-close" @click="closememberList"></span>
+                            </div>
+                            <ul class="member_bodyUl">
+                                <li class="member_body" v-for="(item,index) in userInfoList" :key="index" @click="selectChat(item.userId,item.realName)">
+                                    <div class="header_info">
+                                        <img :src="item.imgUuid?commomHeadPictureFile+item.imgUuid:require('../../assets/people.png')" class="header_img">
+                                    </div>
+                                    <div class="header_name">
+                                        <span class="real_name" v-text="item.realName"></span>
+                                        <span class="real_name1" v-text="item.account"></span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="meetListWindow" v-show="meetListShow">
+                            <div class="head">
+                                <span class="head_txt">会议列表</span>
+                                <span class="el-icon-close" @click="closemeetList"></span>
+                            </div>
+                        </div>
                         <div class="message_header">
-                            <span class="text">远程会议</span>
-                            <span class="btn">
-                                <span class="btnFrame">发言</span>
-                                <span class="btnFrame">媒体同步</span>
-                                <span class="btnFrame">退出</span>
-                            </span>
+                            <span class="text" @click="getMember">{{selectChatUserName}}</span>
+                            <span class="moreChatBtn" @click="openMeetList"></span>
+                            <span class="oneChatBtn" @click="openMemberList"></span>
+                            <span v-show="moreBymoreShow" class="setBtn" @click="openMeetSet"></span>
+                            <span v-show="oneByoneShow" class="setBtn" @click="openOneByOneSet"></span>
                         </div>
-                        <div class="message_member">
+                        <div v-if="getMemberShow" class="member_list">
+                            <ul :class="['clearfix','memberUl']">
+                                <li class="memberLi" v-for="(item,index) in userInfoList" :key="index">
+                                    <div class="getMember_info">
+                                        <img  class="getMemberImg" :src="item.imgUuid?commomHeadPictureFile+item.imgUuid:require('../../assets/people.png')" />
+                                    </div>
+                                    <span class="getMember_txt" v-text="item.realName"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- <div class="message_member">
                             <img class="memeberInfoImg" :src="userImg?userImg:require('../../assets/people.png')" />
+                        </div> -->
+                        <div class="message_body">
+                            <p id="message"></p>
                         </div>
-                        <div class="message_body"></div>
                         <div class="message_textarea">
-                            <textarea  v-model="sendText" id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
+                            <div class="message_file">
+                                <span class="emotIcon"></span>
+                                <span class="picIcon"></span>
+                            </div>
+                            <textarea @keyup.enter="sendMes()" v-model="sendText" id="messageTextArea" placeholder="按 Enter 发送，按 Ctrl + Enter 换行"></textarea>
+                            <div class="message_btn">
+                                <button @click="sendMes()" class="sendBtn">发送</button>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -377,6 +457,24 @@ export default {
             mouseToggle3:false,
             mouseToggle4:false,
             qjpicShow:true,
+            //即时通讯功能
+            ws:'',
+            isMeetTopValue:true,//会议是否置顶
+            meetSetShow:false,//是否打开会议设置
+            oneByoneSetShow:false,//是否私聊
+            memberListShow:false,//是否打开成员列表
+            oneByoneShow:false,//是否为私聊
+            moreBymoreShow:true,//是否为群聊,初始进入项目大厅
+            meetListShow:false,
+            outsideUserList:'',//获得工程用户列表
+            userInfo:'',//查询用户
+            userIds:[],//用户ID
+            userInfoList:'',//工程用户所有信息
+            commomHeadPictureFile:'',
+            selectChatUserId:'',//选择私聊id
+            selectChatUserName:'项目大厅',//选择私聊名称
+            getMemberShow:false,//获取某个会议室内的成员
+            chatRecordList:[],
         }
     },
     filters:{
@@ -390,6 +488,8 @@ export default {
         vm.userImg=localStorage.getItem('userImg')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
+        vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
         // var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
         // vm.imgdetial.path = obj.image
         // vm.imgdetial.x = obj.x
@@ -401,8 +501,7 @@ export default {
         this.getMediaInformation1(4);
         this.getUserGroup();
         this.getMediaInformation(1);
-        
-       
+        this.getUserInfo();
         // this.initWebSocket();//现场连线
     },
     //   destroyed(){ 
@@ -411,6 +510,39 @@ export default {
       //离开路由之后断开websocket连接
 
     mounted(){
+        // console.log(this.token,'this.token');
+        this.ws = new WebSocket("ws://10.252.29.19:16800/websocket");
+        
+        // setTimeout(()=>{
+        // },200)
+        var that=this;
+             this.ws.onopen = function () {
+                var message = new Object();
+                // var message={"type":"0","token":localStorage.getItem('token'),"projId":localStorage.getItem('projId')}
+                message.token = localStorage.getItem('token');
+                message.projId = localStorage.getItem('projId');
+                message.type = "0";
+                // console.log(message,'message');
+                console.log(JSON.stringify(message),'ppp');
+                console.log('连接成功');
+                that.ws.send(JSON.stringify(message));
+                // this.setMessageInnerHTML("open");
+            }
+        this.ws.onerror = function(){
+            // that.setMessageInnerHTML("error");
+        };
+        this.ws.onmessage = function(event){
+            console.log(JSON.parse(event.data),'回来的信息');
+            that.setMessageInnerHTML(JSON.parse(event.data).value);
+        };
+        //连接关闭的回调方法
+        this.ws.onclose = function(){
+            // that.setMessageInnerHTML("close");
+        };
+        window.onbeforeunload = function(){
+            that.ws.close();
+        }
+
     //    this.getMediaInformation(4);
     // this.getMediaInformation(1);
     },
@@ -421,26 +553,119 @@ export default {
 
     },
     methods:{
-        //  initWebSocket(){ const wsuri = "ws://127.0.0.1:8080"; 
-        //         this.websock = new WebSocket(wsuri); 
-        //         this.websock.onmessage = this.websocketonmessage;  
-        //         this.websock.onopen = this.websocketonopen;
-        //         this.websock = this.websocket;
-        //         this.websock.onclose = this.websocketclose; 
-        //         },
-        //         //连接建立之后执行send方法发送数据
-        //     websocketonopen(){  let actions = {"test":"12345"};  
-        //     this.websocketsend(JSON.stringify(actions));  },
-        //     //连接建立失败重连  
-        //     websocket(){  this.initWebSocket();  }, 
-        //     //数据接收
-        //     websocketonmessage(e){  const redata = JSON.parse(e.data);}, 
-        //     //数据发送 
-        //     //关闭
-        //     websocketsend(Data){ this.websock.send(Data);   },  
-        //     websocketclose(e){           
-        //             console.log('断开连接',e);       
-        //             },
+        //即时通讯功能
+
+            //发送短信
+            sendMes(){
+                var message = new Object();
+                //私聊
+                message.value = this.sendText;
+                message.token = this.token;
+                message.type = "1";
+                message.to = this.selectChatUserId;
+                message.projId = this.projId;
+                console.log(JSON.stringify(message));
+                this.ws.send(JSON.stringify(message));
+                this.sendText="";
+            },
+            //将网页信息显示在网页上
+            setMessageInnerHTML(innerHTML){
+                document.getElementById('message').innerHTML += innerHTML + '<br/>';
+            },
+            //关闭会议设置
+            closeMeetSet(){
+                this.meetSetShow=false;
+            },
+            //打开会议设置
+            openMeetSet(){
+                this.meetSetShow=true;
+            },
+            //关闭对话设置
+            closeOneByoneSet(){
+                this.oneByoneSetShow=false;
+            },
+            //打开对话设置
+            openOneByOneSet(){
+                this.oneByoneSetShow=true;
+            },
+            //关闭成员列表
+            closememberList(){
+                 this.memberListShow=false;
+            },
+            //打开成员列表
+            openMemberList(){
+                this.memberListShow=true;
+            },
+            //关闭会议列表
+            closemeetList(){
+                this.meetListShow=false;
+            },
+            //打开会议列表
+            openMeetList(){
+                this.meetListShow=true;
+            },
+            getMember(){
+                this.getMemberShow=!this.getMemberShow;
+            },
+            //获得工程用户列表
+             getUserInfo(){//获得工程用户列表
+                var vm = this
+                vm.userIds=[]
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'project2/Config/projectUserList',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId,
+                        queryParam:vm.userInfo
+                    }
+                }).then((response)=>{
+                    if(response.data.rt != null){
+                        vm.outsideUserList = response.data.rt;
+                        console.log(vm.outsideUserList,'vm.outsideUserList')
+                        vm.outsideUserList.forEach((item)=>{
+                            vm.userIds.push(item.userId)
+                        })
+                        if(vm.userIds){
+                            vm.getUserInfoByUserId()
+                        }
+                        
+                        // vm.outsideUserList.forEach((ele)=>{
+                        //     vm.$set(ele,'checked',false)
+                        // })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            //根据用户ID获取用户信息
+            getUserInfoByUserId(){
+                var vm=this
+                axios({
+                    method:'post',
+                    url:vm.BDMSUrl+'/lc/getUserInfoByUserId',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:vm.userIds
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.userInfoList=response.data.rt;
+                        console.log(this.userInfoList,'this.userInfoList');
+                    }else if(response.data.cd==-1){
+
+                    }
+                })
+            },
+            //私聊选择用户
+            selectChat(valId,name){
+                this.selectChatUserId=valId;
+                this.selectChatUserName=name;
+                this.memberListShow=false;
+                this.oneByoneShow=true;
+            },
 
         fullModule(){
             var elem=document.getElementById("mm");
@@ -1231,7 +1456,51 @@ export default {
     li{
         list-style: none;
     }
+    /***********设置滚动条************/
+    /* 设置滚动条的样式 */
+    .member_bodyUl::-webkit-scrollbar {
+        width:7px !important;
+    }
+    /* 滚动槽 */
+    .member_bodyUl::-webkit-scrollbar-track {
+        box-shadow: inset006pxrgba(0,0,0,0.5);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+        border-radius:10px;
+    }
+    /* 滚动条滑块 */
+    .member_bodyUl::-webkit-scrollbar-thumb {
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow: inset006pxrgba(0,0,0,0.5);
+        -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+    }
+    .member_bodyUl::-webkit-scrollbar-thumb:window-inactive {
+        background:rgba(255,0,0,0.4);
+    }
+    /*********************/
     #fieldConnection{
+        // /***********设置滚动条************/
+        // /* 设置滚动条的样式 */
+        // ::-webkit-scrollbar {
+        //     width:7px;
+        // }
+        // /* 滚动槽 */
+        // ::-webkit-scrollbar-track {
+        //     box-shadow: inset006pxrgba(0,0,0,0.5);
+        //     -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+        //     border-radius:10px;
+        // }
+        // /* 滚动条滑块 */
+        // ::-webkit-scrollbar-thumb {
+        //     border-radius:10px;
+        //     background:rgba(0,0,0,0.1);
+        //     box-shadow: inset006pxrgba(0,0,0,0.5);
+        //     -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+        // }
+        // ::-webkit-scrollbar-thumb:window-inactive {
+        //     background:rgba(255,0,0,0.4);
+        // }
+        // /*********************/
          .topHeader{
             // box-sizing: border-box;
             // position: fixed;
@@ -1416,35 +1685,308 @@ export default {
                 float: right;
                 margin: 8px;
                 height: 100%;
-                border:1px solid #999;
-                .message_header{
-                    height: 40px;
-                    background: #fafafa;
-                    border-bottom: 1px solid #999;
-                    .text{
-                        float: left;
-                        font-size:14px;
-                        line-height: 40px;
-                        color:#323232;
-                        margin-left:10px;
-                    }
-                    .btn{
-                        float: right;
-                        margin-top:8px;
-                        margin-right:8px;
-                        .btnFrame{
-                            font-size: 14px;
-                            line-height: 22px;
-                            border:1px solid #999;
-                            color:#a7a7a7;
-                            height: 22px;
-                            padding:2px;
-                            border-radius: 2px;
-                            // display: inline-block;
-                            margin-right:2px;
+                border:1px solid #ebebeb;
+                position: relative;
+                .setChatWindow{
+                    height: 240px;
+                    width: 240px;
+                    background: #fff;
+                    position: absolute;
+                    right: 0px;
+                    top:0px;
+                    border:1px solid #ccc;
+                    box-shadow: -2px 2px 2px #ccc;
+                    z-index:3;
+                    .head{
+                        height: 48px;
+                        border-bottom:1px solid #ededed; 
+                        position: relative;
+                        .head_txt{
+                            position: absolute;
+                            font-size: 16px;
+                            color:#333333;
+                            line-height: 48px;
+                            left:12px;
+                        }
+                        .el-icon-close{
+                            right: 14px;
+                            top:12px;
+                            position: absolute;
                             cursor: pointer;
                         }
                     }
+                    .body{
+                        height: 48px;
+                        border-bottom:1px solid #ededed;
+                        position: relative;
+                        width: 96%;
+                        margin:0 auto;
+                        .body_txt{
+                            color: #333;
+                            font-size:14px;
+                            position: absolute;
+                            left:12px;
+                            line-height: 48px;
+                        }
+                        .body_txt1{
+                            color: #666;
+                            font-size:14px;
+                            position: absolute;
+                            left:12px;
+                            line-height: 48px;
+                            cursor: pointer;
+                        }
+                        .meetTop{
+                            width: 40px;
+                            margin-top:14px;
+                            margin-left:100px;
+                        }
+                        .body_edit{
+                            background: url('./images/overviewedit.png') no-repeat 0 0;
+                            width: 19px;
+                            height: 16px;
+                            display: inline-block;
+                            // position: absolute;
+                            // top:15px;
+                            margin-left:1px;
+                            margin-top:15px;
+                            cursor: pointer;
+                            &:hover{
+                                background:url('./images/overviewedit.png') no-repeat 0 0;
+                            }
+                        }
+
+                    }
+                    // position: relative;
+                    
+                }
+                .memberListWindow{
+                    height: 100%;
+                    width: 240px;
+                    background: #fff;
+                    position: absolute;
+                    right: 0px;
+                    top:0px;
+                    border:1px solid #ccc;
+                    box-shadow: -2px 2px 2px #ccc;
+                    z-index:3;
+                    // overflow-y: auto;
+                    .head{
+                        height: 40px;
+                        border-bottom:1px solid #ededed; 
+                        position: relative;
+                        .head_txt{
+                            position: absolute;
+                            font-size: 16px;
+                            color:#333333;
+                            line-height: 40px;
+                            left:12px;
+                        }
+                        .el-icon-close{
+                            right: 14px;
+                            top:12px;
+                            position: absolute;
+                            cursor: pointer;
+                        }
+                    }
+                    .member_bodyUl{
+                        height:500px;
+                        overflow-y: auto;
+                          
+                        .member_body{
+                            height:50px;
+                            position: relative;
+                            width: 100%;
+                            &:hover{
+                                background: #f0f0f0;
+                            }
+                            .header_info{
+                                height: 40px;
+                                width: 40px;
+                                display: inline-block;
+                                position: absolute;
+                                left: 12px;
+                                top:5px;
+                                .header_img{
+                                    height: 38px;
+                                    width: 38px;
+                                    border-radius: 38px;
+                                }
+                            }
+                            .header_name{
+                                max-width: 120px;
+                                max-height: 40px;
+                                position: absolute;
+                                left:62px;
+                                top:5px;
+                                .real_name{
+                                    display: block;
+                                    text-align: left;
+                                    font-size:14px;
+                                    line-height: 20px;
+                                    height: 20px;
+                                    color:#333333;
+                                }
+                                .real_name1{
+                                    display: block;
+                                    text-align: left;
+                                    text-align: left;
+                                    font-size:14px;
+                                    line-height: 20px;
+                                    height: 20px;
+                                    color:#cccccc;
+                                }
+
+                            }
+                        }
+                        // .member_body :hover{
+                        //     background: red;
+                        // }
+                    }
+                    
+                }
+                .meetListWindow{
+                     height: 100%;
+                    width: 240px;
+                    background: #fff;
+                    position: absolute;
+                    right: 0px;
+                    top:0px;
+                    border:1px solid #ccc;
+                    box-shadow: -2px 2px 2px #ccc;
+                    z-index:3;
+                    // overflow-y: auto;
+                    .head{
+                        height: 40px;
+                        border-bottom:1px solid #ededed; 
+                        position: relative;
+                        .head_txt{
+                            position: absolute;
+                            font-size: 16px;
+                            color:#333333;
+                            line-height: 40px;
+                            left:12px;
+                        }
+                        .el-icon-close{
+                            right: 14px;
+                            top:12px;
+                            position: absolute;
+                            cursor: pointer;
+                        }
+                    }
+
+                }
+                .message_header{
+                    height: 40px;
+                    background: #f5f5f5;
+                    border-bottom: 1px solid #e6e6e6;
+                    position: relative;
+                    .text{
+                        position: absolute;
+                        // float: left;
+                        font-size:14px;
+                        // line-height: 40px;
+                        color:#323232;
+                        left:15px;
+                        bottom: 10px;
+                        cursor: pointer;
+                        
+                    }
+                    .moreChatBtn{
+                        background: url('./images/morePerson1.png') no-repeat 0 0;
+                        width: 25px;
+                        height: 25px;
+                        display: inline-block;
+                        position: absolute;
+                        // top:15px;
+                        right:88px;
+                        bottom: 7px;
+                        // margin-right: -8px;
+                        // margin-top: 2px;
+                        cursor: pointer;
+                        &:hover{
+                            background:url('./images/morePerson.png') no-repeat 0 0;
+                        }
+                    }
+                    .oneChatBtn{
+                        background: url('./images/person.png') no-repeat 0 0;
+                        width: 25px;
+                        height: 25px;
+                        display: inline-block;
+                        position: absolute;
+                        // top:15px;
+                        right: 50px;
+                         bottom: 7px;
+                        // margin-right: -8px;
+                        // margin-top: 2px;
+                        cursor: pointer;
+                        &:hover{
+                            background:url('./images/person1.png') no-repeat 0 0;
+                        }
+                    }
+                    .setBtn{
+                        background: url('./images/setChat.png') no-repeat 0 0;
+                        width: 25px;
+                        height: 25px;
+                        display: inline-block;
+                        position: absolute;
+                        // top:15px;
+                        right: 15px;
+                         bottom: 7px;
+                        // margin-right: -8px;
+                        // margin-top: 2px;
+                        cursor: pointer;
+                        &:hover{
+                            background:url('./images/setChat1.png') no-repeat 0 0;
+                        }
+                    }
+                }
+                .member_list{
+                    height: 262px;
+                    border-bottom:1px solid #ebebeb;
+                    position: absolute;
+                    top:40px;
+                    overflow-y: auto;
+                    background: #fff;
+                    transition: 0.5s all;
+                    .clearfix{
+                        clear: both;
+                        overflow: hidden;
+                        content: '';
+                    }
+                    .memberUl{
+                        width: 100%;
+                        height: 100%;
+                        .memberLi{
+                            float: left;
+                            width: 60px;
+                            height: 60px;
+                            // position: relative;
+                            .getMember_info{
+                                width: 30px;
+                                height: 30px;
+                                margin-top:10px;
+                                // position: absolute;
+                                .getMemberImg{
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 30px;
+                                   margin-top:5px;
+                                   margin-left:16px;
+                                }
+                            }
+                            .getMember_txt{
+                                display: block;
+                                margin-top:10px;
+                                color: #999;
+                                font-size: 12px;
+
+                            }
+                        }
+
+                    }
+                    
+
                 }
                 .message_member{
                     height: 40px;
@@ -1458,22 +2000,81 @@ export default {
                 }
                 .message_body{
                     height:70%;
+                    background: #f5f5f5;
+                    overflow-y: auto;
                 }
                 .message_textarea{
-                    border-top:1px solid #999;
+                    border-top:1px solid #e6e6e6;
+                    .message_file{
+                        height: 36px;
+                        position: relative;
+                        .emotIcon{
+                            background: url('./images/emotIcon.png') no-repeat 0 0;
+                            width: 16px;
+                            height: 16px;
+                            display: inline-block;
+                            position: absolute;
+                            top:14px;
+                            left: 14px;
+                            // margin-right: -8px;
+                            // margin-top: 2px;
+                            cursor: pointer;
+                            &:hover{
+                                background:url('./images/emotIcon1.png') no-repeat 0 0;
+                            }
+                        }
+                        .picIcon{
+                            background: url('./images/picIcon.png') no-repeat 0 0;
+                            width: 16px;
+                            height: 16px;
+                            display: inline-block;
+                            position: absolute;
+                            top:14px;
+                            left: 44px;
+                            // margin-right: -8px;
+                            // margin-top: 2px;
+                            cursor: pointer;
+                            &:hover{
+                                background:url('./images/picIcon1.png') no-repeat 0 0;
+                            }
+                        }
+                    }
                     #messageTextArea{
                             width: 97%;
                             margin: 6px;
-                            height: 110px;
+                            height: 80px;
+                            // height: 100%;
                             border: 0;
+                            padding: 5px;
                     }
                     // input{
                     //     display: none;
                     // }
-                    textarea {
-                    resize: none;
-                    text-decoration: none;
-                    font-size: 12px;
+                        textarea {
+                        resize: none;
+                        text-decoration: none;
+                        font-size: 12px;
+                        }
+                    .message_btn{
+                        height: 36px;
+                        position: relative;
+                        .sendBtn{
+                            position: absolute;
+                            right:5px;
+                            background: #fc3439;
+                            margin-right: 20px;
+                            color: #fff;
+                            font-size: 14px;
+                            font-weight: normal;
+                            width: 60px;
+                            height: 24px;
+                            border: none;
+                            padding: 0;
+                            cursor: pointer;
+                            border-radius: 2px;
+
+
+                        }
                     }
                 }
             }
@@ -1639,6 +2240,21 @@ export default {
     overflow-y:auto;
                                    
         #ugGroupTree{
+            .el-switch.is-checked .el-switch__core:after {
+                left: 100%;
+                margin-left: -17px;
+            }
+            .el-switch__core:after {
+                content: "";
+                position: absolute;
+                top: 1px;
+                left: 1px;
+                border-radius: 100%;
+                transition: all .3s;
+                width: 16px;
+                height: 16px;
+                background-color: #fff;
+            }
         /*
         修改eleUI树形组件
         */
