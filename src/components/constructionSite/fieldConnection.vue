@@ -161,11 +161,12 @@
                                     <span class="body_setTop"> </span>
                                     <el-switch v-model="isMeetTopValue" active-color="#cccccc"  inactive-color="#1aad19" class="meetTop"></el-switch>
                                 </li>
-                                 <li class="body"><span class="body_txt1">发起会议</span></li>
+                                 <li class="body"><span class="body_txt1" @click="creatMeet()">发起会议</span></li>
                                 <li class="body"><span class="body_txt1">清除聊天记录</span></li>
                             </ul>
                             <!-- <span class="el-icon-close"></span> -->
                         </div>
+                        <!-- 成员列表 -->
                         <div class="memberListWindow" v-show="memberListShow">
                             <div class="head">
                                 <span class="head_txt">成员列表</span>
@@ -183,22 +184,44 @@
                                 </li>
                             </ul>
                         </div>
+                        <!-- 会议列表 -->
                         <div class="meetListWindow" v-show="meetListShow">
                             <div class="head">
                                 <span class="head_txt">会议列表</span>
                                 <span class="el-icon-close" @click="closemeetList"></span>
                             </div>
+                            <ul class="meet_bodyUl" >
+                                <li class="meet_body" v-for="(item,index) in meetListGroup" :key="index" @click="selectGroupChat(item.id,item.name,item.groupid)">
+                                    <div class="header_info">
+                                        <img :src="require('../../assets/people.png')"/>
+                                    </div>
+                                    <div class="header_name">
+                                        {{item.name}}
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                         <div class="message_header">
-                            <span class="text" @click="getMember">{{selectChatUserName}}</span>
-                            <span class="moreChatBtn" @click="openMeetList"></span>
-                            <span class="oneChatBtn" @click="openMemberList"></span>
+                            <!-- v-show="judgeChatMethod=='2'" -->
+                            <div class="text_left">
+                                <span class="text">{{selectChatUserName}}</span>
+                                <i @click="getMember" v-show="judgeChatMethod=='2'" class="icon-sanjiao" ></i>
+                            </div>
+                            <span class="moreChatBtn" @click="openMeetList"></span><el-badge is-dot class="item1"></el-badge>
+                            <span class="oneChatBtn" @click="openMemberList"></span><el-badge is-dot class="item2"></el-badge>
+                            
                             <span v-show="moreBymoreShow" class="setBtn" @click="openMeetSet"></span>
                             <span v-show="oneByoneShow" class="setBtn" @click="openOneByOneSet"></span>
                         </div>
                         <div v-if="getMemberShow" class="member_list">
                             <ul :class="['clearfix','memberUl']">
-                                <li class="memberLi" v-for="(item,index) in userInfoList" :key="index">
+                                <li class="memberLi">
+                                    <div class="getMember_info" @click="addMoreUserToMeeting" style="cursor:pointer">
+                                        <img  class="getMemberImg" src="./images/addUserToMeet.png" />
+                                    </div>
+                                    <span class="getMember_txt">添加</span>
+                                </li>
+                                <li class="memberLi" v-for="(item,index) in getUsersByMeetIdList" :key="index">
                                     <div class="getMember_info">
                                         <img  class="getMemberImg" :src="item.imgUuid?commomHeadPictureFile+item.imgUuid:require('../../assets/people.png')" />
                                     </div>
@@ -210,7 +233,35 @@
                             <img class="memeberInfoImg" :src="userImg?userImg:require('../../assets/people.png')" />
                         </div> -->
                         <div class="message_body">
-                            <p id="message"></p>
+                            <!-- <p id="message"></p> -->
+                            <!-- <ul class="chatMessageUl"> -->
+                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatRecordList" :key="index">
+                                    <img height="36" width="36px" :class="[{'imgLeft':item.isOneSelf==2},{'imgRight':item.isOneSelf==1}]" :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
+                                    <div :class="['text',{'otherLeftText':item.isOneSelf==2},{'selfRightText':item.isOneSelf==1}]" >
+                                        <div :class="[{'userName':item.isOneSelf==1},{'userNameLeft':item.isOneSelf==2}]" v-text="item.userInfo.realName"></div>
+                                            {{item.sendText}}
+                                    </div>
+                                    <div :class="[{'chat_border_right':item.isOneSelf==1},{'chat_border_left':item.isOneSelf==2}]"></div>
+                                    <!-- <div v-show="item.isOneSelf==2" class="chatMessageLeft">
+                                        <div class="leftImg">
+                                            <img :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
+                                        </div>
+                                        <div class=leftTxt>
+                                            <div class="leftTxtFrame">{{item.sendText}}</div>
+                                        </div>
+                                    </div>
+                                    <div v-show="item.isOneSelf==1" class="chatMessageRight">
+                                        <div class=rightTxt>
+                                            <div class="rightTxtFrame">{{item.sendText}}</div>
+                                        </div>
+                                        <div class="rightImg">
+                                            <img :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
+                                        </div>
+                                       
+                                      
+                                    </div> -->
+                                </div>
+                            <!-- </ul> -->
                         </div>
                         <div class="message_textarea">
                             <div class="message_file">
@@ -281,7 +332,6 @@
                         <button class="editBtnC" @click="addMediaCancle1">取消</button>
                     </div>
                 </el-dialog>
-
                 <el-dialog title="文件路径选择" :visible.sync="addResourceDialog" @close="addResourceCancle">
                     <div class="body1">
                         <div class="head">
@@ -305,7 +355,6 @@
                         <button class="editBtnC" @click="addResourceCancle">取消</button>
                     </div>
                 </el-dialog>
-
                 <el-dialog  title="媒体路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
                     <div class="mediaUrl">
                         <div class="urlWord">目标URL</div>
@@ -316,7 +365,6 @@
                         <button class="editBtnC" @click="addResourceCancle1">取消</button>
                     </div>
                 </el-dialog>
-
                 <el-dialog title="文件路径选择" :visible.sync="updateResourceDialog" @close="updateResourceCancle">
                     <div class="body1">
                         <div class="head">
@@ -350,7 +398,56 @@
                         <button class="editBtnC" @click="updateResourceCancle1">取消</button>
                     </div>
                 </el-dialog>
+                <!--添加用户弹窗-->
+                <el-dialog
+                    title="添加会议成员"
+                    :visible.sync="centerDialogVisible"
+                    :before-close="userClose"
+                    width="550px"
+                    center>
+                    <div class="clearfix">
+                        <div class="diolog-main">
+                            <span class="title-right">
+                                <input type="text" value="" v-model="userInfo"  placeholder="输入姓名" @keyup.enter="getUserInfo" class="title-right-icon" >
+                                <span  class="el-icon-search" @click="getUserInfo"></span>
+                            </span>
+                            <ul style="max-height:320px;overflow-y: auto;">
+                                <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.userName,item.account,item.userPositions,key)">
+                                    <p>
+                                        <span class="check-name" v-text="item.userName+'-'"></span>
+                                        <span class="check-title" v-text="item.account"></span>
+                                    </p>
+                                    <p>
+                                        <span class="check-title" v-text="val.posName" v-for="(val,index) in item.userPositions" :key="index+'position'" ></span>
+                                    </p>
+                                    <span :class="['icon','icon-selectUser',item.checked?'active':'']"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="diolog-main">
+                            <div style="margin:20px 15px 20px 20px;">
+                                <span>已选择群组成员</span>
+                                <ul style="max-height:270px;overflow-y: auto;">
+                                <li class="userList-item" v-for='(item,index) in userDetialAdd' :key="index">
+                                    <p>
+                                        <span class="check-name" v-text="item.name+'-'+item.count"></span>
+                                        <span class="check-title" v-text="item.name"></span>
+                                    </p>
+                                    <p>
+                                        <span class="check-title" v-for="(val,key) in item.userPositions" :key="key+'pos'" v-text="val.posName+' '"></span>
+                                    </p>
+                                    <span class="icon icon-cancleUser" @click="removeUserAdd(item.id)"></span>
+                                </li>
+                            </ul>
+                            </div>
+                            <span class="saveBTN" @click="addMeetChat(null,null)">保存</span>
+                        </div>
+                    </div>
+                </el-dialog>
             </div>
+            <!-- <div id="addUserEdit">
+                 
+            </div> -->
     </div>
 </template>
 <script>
@@ -472,9 +569,27 @@ export default {
             userInfoList:'',//工程用户所有信息
             commomHeadPictureFile:'',
             selectChatUserId:'',//选择私聊id
+            getOneByOneChatRecordList:'',//从后台获取私聊记录
+            getMoreChatRecordList:'',//从后台获取群聊记录
             selectChatUserName:'项目大厅',//选择私聊名称
             getMemberShow:false,//获取某个会议室内的成员
             chatRecordList:[],
+            centerDialogVisible:false,
+            userDetialAdd:[],
+            userListAdd:[],
+            userQunzuList:[],
+            messageUrl:'http://10.252.26.241:8079',
+            meetListGroup:'',//会议列表组
+            ugList:[],
+            ugListGroup:'',
+            addUserIdGroup:'',
+            meetChatName:'',
+            judgeChatMethod:"2",
+            selectMeetingId:'',//选择会议ID
+            selectGroupid:'',//选择会议群组id
+            getUserByGroupidList:'',//根据群组id获得用户
+            getUsersByMeetIdList:[],//根据会议id获取用户
+
         }
     },
     filters:{
@@ -503,7 +618,10 @@ export default {
         this.getUserGroup();
         this.getMediaInformation(1);
         this.getUserInfo();
-        // this.initWebSocket();//现场连线
+        
+        // this.getQunList();
+        
+                // this.initWebSocket();//现场连线
     },
     //   destroyed(){ 
     //       this.websock.close()
@@ -512,10 +630,11 @@ export default {
 
     mounted(){
         // console.log(this.token,'this.token');
-        this.ws = new WebSocket("ws://10.252.29.19:16800/websocket");
+        this.ws = new WebSocket("ws://10.252.26.241:16800/websocket");
         
         // setTimeout(()=>{
         // },200)
+        var vm=this;
         var that=this;
              this.ws.onopen = function () {
                 var message = new Object();
@@ -534,7 +653,15 @@ export default {
         };
         this.ws.onmessage = function(event){
             console.log(JSON.parse(event.data),'回来的信息');
-            that.setMessageInnerHTML(JSON.parse(event.data).value);
+            that.chatRecordList.push({
+                userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
+                userId:JSON.parse(event.data).to,
+                sendText:JSON.parse(event.data).value,
+                time:JSON.parse(event.data).time,
+                isOneSelf:2,//1代表是当前用户，2代表是其他用户
+            })
+            console.log(that.chatRecordList,'this.chatRecordList');
+            // that.setMessageInnerHTML(JSON.parse(event.data).value);
         };
         //连接关闭的回调方法
         this.ws.onclose = function(){
@@ -548,6 +675,17 @@ export default {
     // this.getMediaInformation(1);
     },
     watch:{
+        // this.ws.onmessage = function(event){
+        //     console.log(JSON.parse(event.data),'回来的信息');
+        //     that.chatRecordList.push({
+        //         userInfo:vm.returnUserInfo(JSON.parse(event.data).to),
+        //         sendText:JSON.parse(event.data).value,
+        //         time:JSON.parse(event.data).time,
+        //         isOneSelf:2,//1代表是当前用户，2代表是其他用户
+        //     })
+        //     console.log(this.chatRecordList,'this.chatRecordList');
+        //     that.setMessageInnerHTML(JSON.parse(event.data).value);
+        // };
         
     },
     beforeUpdate(){
@@ -558,30 +696,244 @@ export default {
 
             //发送短信
             sendMes(){
+                var vm=this;
                 var message = new Object();
                 //私聊
-                message.value = this.sendText;
-                message.token = this.token;
-                message.type = "1";
-                message.to = this.selectChatUserId;
-                message.projId = this.projId;
-                console.log(JSON.stringify(message));
-                this.ws.send(JSON.stringify(message));
-                this.chatRecordList.push({
-                    // userInfo:
+                if(this.judgeChatMethod=="2"){
+                    message.value = this.sendText;
+                    message.token = this.token;
+                    message.projId = this.projId;
+                    message.type=this.judgeChatMethod;
+                    message.meetingId=this.selectMeetingId;
+                    message.from= vm.userId;
+                    message.to=null;
+                    message=JSON.stringify(message);
+                     if(message.token!=''&&message.meetingId!=''){
+                        console.log(message,'message群聊');
+                        this.ws.send(message);
+                        this.chatRecordList.push({
+                            userInfo:vm.returnUserInfo(vm.userId),
+                            userId:vm.userId,
+                            sendText:vm.sendText,
+                            time:new Date().getTime(),
+                            isOneSelf:1,//1代表是当前用户，2代表是其他用户
+                        })
+                    }
 
-                })
+                }else if(this.judgeChatMethod=="1"){
+                    message.value = this.sendText;
+                    message.token = this.token;
+                    message.type = "1";
+                    message.from= vm.userId;
+                    message.to = this.selectChatUserId;
+                    message.time=new Date().getTime();
+                    message.projId = this.projId;
+                    message=JSON.stringify(message);
+                    console.log(JSON.stringify(message),'00000');
+                    if(message.token!=''&&message.to!=''){
+                        this.ws.send(message);
+                        this.chatRecordList.push({
+                            userInfo:vm.returnUserInfo(vm.userId),
+                            userId:vm.userId,
+                            sendText:vm.sendText,
+                            time:new Date().getTime(),
+                            isOneSelf:1,//1代表是当前用户，2代表是其他用户
+                        })
+                    }
+
+                }
+                // console.log(vm.userId,'vm.userId');
+                // console.log(vm.returnUserInfo(vm.userId),'vm.returnUserInfo(vm.userId)');
+                console.log(this.chatRecordList,'this.chatRecordList000');
                 this.sendText="";
+                message='';
             },
             //返回头像方法
             returnUserInfo(val){
+                var str='';
                 this.userInfoList.forEach((item,index)=>{
                     if(item.userId==val){
-                        return item
+                        // console.log(item,'item000')
+                        str=item
+                    }
+                })
+                return str;
+            },
+            //从后台获取私聊聊天记录
+            getOneByOneChatRecord(){
+                var vm=this;
+                vm.chatRecordList=[];
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/singleHistory',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        userId:vm.userId,//当前用户
+                        toId:vm.selectChatUserId,//选择与谁对话用户
+                        pageSize:10,//页数
+                        pageNum:1,//数量
+                        times:new Date().getTime(),//获取时间
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getOneByOneChatRecordList=response.data.rt;
+                        this.getOneByOneChatRecordList.forEach((item)=>{
+                            vm.chatRecordList.push({
+                                userInfo:vm.returnUserInfo(item.fromid),
+                                userId:item.toid,
+                                sendText:item.content,
+                                time:item.date,
+                                isOneSelf:this.currentUserId(item.fromid)//1代表是当前用户，2代表是其他用户
+                            })
+                        })
+                        console.log(vm.chatRecordList,'后台获取群聊聊天记录成功');
+                    }else{
+
                     }
                 })
             },
+            //判断是否为当前用户
+            currentUserId(val){
+                if(val==this.userId){
+                    return 1;
+                }else{
+                    return 2;
+                }
+            },
+            //从后台获取群聊聊天记录
+            getMoreChatRecord(){
+                var vm=this;
+                vm.chatRecordList=[];
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/groupHistory',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        groupId:this.selectMeetingId,//那个群聊id
+                        pageSize:20,//页数
+                        pageNum:1,//数量
+                        times:new Date().getTime(),//获取时间
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getMoreChatRecordList=response.data.rt;
+                        this.getMoreChatRecordList.forEach((item)=>{
+                            vm.chatRecordList.push({
+                                userInfo:vm.returnUserInfo(item.fromid),
+                                userId:item.toid,
+                                sendText:item.content,
+                                time:item.date,
+                                isOneSelf:this.currentUserId(item.fromid)//1代表是当前用户，2代表是其他用户
+                            })
+                        })
+                        console.log('后台获取群聊记录成功')
+                    }else{
 
+                    }
+                })
+            },
+            //修改会议
+            updateMeeting(){
+                axios({
+                    method:'get',
+                    url:vm.message+'/message/updateMeeting',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        meetingId:'',//会议Id
+                        name:'',//修改名称
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.$message({
+                            type:"success",
+                            message:'修改会议名称成功'
+                        })
+                    }else if(response.data.cd==-1){
+
+                    }
+                })
+            },
+            //根据会议id获取当前联系人
+            getUsersByMeetId(){
+                var vm=this;
+                vm.getUsersByMeetIdList=[];
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/getUsers',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        meetingId:this.selectMeetingId,//会议id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        var meetIdUserList=response.data.rt;
+                        if(meetIdUserList.length==0){
+                            if(vm.selectGroupid){
+                                this.getUserByGroupid();
+                            }
+                        }else{
+                            meetIdUserList.forEach((item)=>{
+                                this.getUsersByMeetIdList.push(this.returnUserInfo(item.userid))
+                            })
+                        }
+                        console.log(this.getUsersByMeetIdList,'this.getUsersByMeetIdList');
+                        
+                        console.log('获取联系人成功')
+                    }else{
+
+                    }
+                })
+            },
+            //给会议添加联系人
+            addUserToMeeting(){
+                var vm=this;
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/addUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        meetingId:"",//会议id
+                        userId:"",//给会议添加用户ID
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        console.log('给会议添加联系人成功')
+                    }else{
+
+                    }
+                })
+            },
+            //给会议删除联系人
+            deleteUserToMeeting(){
+                 var vm=this;
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/deleteUser',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        meetingId:"",//会议id
+                        userId:"",//给会议添加用户ID
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        console.log('给会议删除联系人成功')
+                    }else{
+
+                    }
+                })
+            },
             //将网页信息显示在网页上
             setMessageInnerHTML(innerHTML){
                 document.getElementById('message').innerHTML += innerHTML + '<br/>';
@@ -597,6 +949,10 @@ export default {
             //关闭对话设置
             closeOneByoneSet(){
                 this.oneByoneSetShow=false;
+            },
+            //创建会议
+            creatMeet(){
+                this.centerDialogVisible=true;
             },
             //打开对话设置
             openOneByOneSet(){
@@ -618,8 +974,184 @@ export default {
             openMeetList(){
                 this.meetListShow=true;
             },
+            //
+
+            //获取会议列表
+            getMeetList(){
+                var vm=this;
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/getMeetings',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projectId:vm.projId,
+                        userId:vm.userId,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        vm.meetListGroup=response.data.rt;
+                        this.getQunList();
+                        vm.meetListGroup.forEach((item)=>{
+                            if(item.name=="默认群组"){
+                                this.selectMeetingId=item.id;
+                                this.selectGroupid=item.groupid;
+                            }
+                        })
+                        this.getMoreChatRecord();
+                        console.log('成功')
+                    }else if(response.data.cd==-1){
+
+                    }
+                })
+            },
+            //创建会议群组更新
+             getCreatMeetList(){
+                var vm=this;
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/getMeetings',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projectId:vm.projId,
+                        userId:vm.userId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        vm.meetListGroup=response.data.rt;
+                        this.getQunList();
+                        this.selectMeetingId=vm.meetListGroup[vm.meetListGroup.length-1].id;
+                        this.selectGroupid=vm.meetListGroup[vm.meetListGroup.length-1].groupid;
+                        this.selectChatUserName=vm.meetListGroup[vm.meetListGroup.length-1].name;
+                        this.judgeChatMethod="2";
+                        this.getMoreChatRecord();
+                    }else if(response.data.cd==-1){
+
+                    }
+                })
+            },
+            //一个群组是否含有另一个群组
+            isContained(a,b){
+                    if(!(a instanceof Array) || !(b instanceof Array)) return false;
+                    if(a.length < b.length) return false;
+                    var aStr = a.toString();
+                    for(var i = 0, len = b.length; i < len; i++){
+                    if(aStr.indexOf(b[i]) == -1) return false;
+                    }
+                    return true;
+            },
+
+            //添加会议
+            addMeetChat(val,name){
+                var vm=this;
+                if(name){
+                    vm.meetChatName=name;
+                }
+                if(vm.userDetialAdd){
+                    vm.addUserIdGroup='&userId='+vm.userId;
+                    vm.userDetialAdd.forEach((item)=>{
+                            vm.addUserIdGroup+='&userId='+item.id;
+                            vm.meetChatName+=item.name+'、';
+                    })
+                }
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/addMeeting?projectId='+vm.projId+vm.addUserIdGroup,
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        // projectId:vm.projId,
+                        // userId:vm.addUserIdGroup,//添加用户id到一个会议
+                        groupId:val,//开始进入群组列表
+                        name:vm.meetChatName,//添加用户名称
+                        createUser:vm.userId,
+                        imageUrl:'',
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        vm.addUserIdGroup='';
+                        vm.meetChatName='';
+                        vm.getCreatMeetList();
+                        this.centerDialogVisible=false;
+                        this.oneByoneSetShow=false;
+                        this.$message({
+                            type:'success',
+                            message:'创建新群组成功'
+                        })
+                    }else if(response.data.cd==-1){
+
+                    }
+                })
+            },
+            //删除会议
+            deleteMeetChat(){
+                axios({
+                    method:'get',
+                    url:vm.messageUrl+'/message/deleteMeeting',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        meetingId:''
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+
+                    }
+                })
+            },
+             getQunList(){//获得工程群组列表
+                var vm = this;
+                axios({
+                    method:'POST',
+                    url:vm.BDMSUrl+'config/userGroup/list',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId,
+                        data :''
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        // vm.subCompanyName = response.data.rt.projCompany
+                        var str=response.data.rt.ugList;
+                        str.forEach((item,index)=>{
+                            if(item.ugName=="质量验收"){
+                                str.splice(index,1);
+                            }
+                            if(item.ugName=="安全验收"){
+                                str.splice(index,1);
+                            }
+                            if(item.ugStatus==0){
+                                vm.ugList.splice(index,1);
+                                vm.ugList.push(item);
+                            }
+                        })
+                        vm.ugListGroup=str;
+                        console.log(vm.ugListGroup,'str0000000');
+                        if(this.isContained(vm.meetListGroup,vm.ugListGroup)==false){
+                            this.initCreatDefaultMeet();
+                        }
+                    }
+                })
+             },
+             initCreatDefaultMeet(){
+                 var vm=this;
+                 vm.ugListGroup.forEach((item)=>{
+                     this.addMeetChat(item.ugId,item.ugName);
+                 })
+             },
             getMember(){
                 this.getMemberShow=!this.getMemberShow;
+                this.getUsersByMeetId();
+            },
+            addMoreUserToMeeting(){
+
             },
             //获得工程用户列表
              getUserInfo(){//获得工程用户列表
@@ -645,6 +1177,7 @@ export default {
                         if(vm.userIds){
                             vm.getUserInfoByUserId()
                         }
+                        this.getMeetList();
                         
                         // vm.outsideUserList.forEach((ele)=>{
                         //     vm.$set(ele,'checked',false)
@@ -653,6 +1186,64 @@ export default {
                 }).catch((err)=>{
                     console.log(err)
                 })
+            },
+            //用户关闭
+            userClose(){
+                var vm = this
+                vm.centerDialogVisible = false
+                vm.userListAdd = []
+                vm.userDetialAdd = []
+                vm.outsideUserList.forEach((ele,index)=>{
+                    vm.$set(ele,'checked',false)
+                })
+
+            },
+            //移除会议人员
+            removeUserAdd(val){
+                var vm = this
+                if(vm.userListAdd.indexOf(val) != -1){
+                    var index = vm.userListAdd.indexOf(val)
+                    vm.userListAdd.splice(index,1)
+                    vm.userDetialAdd.splice(index,1)
+                    vm.outsideUserList.forEach((ele,index)=>{
+                        if(ele.userId == val){
+                            vm.$set(ele,'checked',false)
+                        }
+                    })
+                }
+            },
+            //增加会议人员
+            addUser(val,name,count,tag,key){
+                var vm = this
+                for(var k= 0;k<vm.userQunzuList.length;k++){
+                    if(vm.userQunzuList[k].userId == val){
+                        vm.$message({
+                            type:'warning',
+                            message: '用户 "'+vm.userQunzuList[k].userName+'" 已在群组中!'
+                        })
+                        return false
+                    }
+                }
+                if(vm.userListAdd.indexOf(val) == -1){
+                    vm.userListAdd.push(val)
+                    vm.userDetialAdd.push({
+                        id:val,
+                        name:name,
+                        count:count,
+                        userPositions:tag
+                    })
+                    vm.outsideUserList.forEach((ele,index)=>{
+                        if(key == index){
+                            vm.$set(ele,'checked',true)
+                        }
+                    })
+                   
+                    console.log(vm.userDetialAdd,'vm.userDetialAdd');
+                }
+            },
+            //保存
+            saveUserQR(){
+
             },
             //根据用户ID获取用户信息
             getUserInfoByUserId(){
@@ -679,7 +1270,45 @@ export default {
                 this.selectChatUserName=name;
                 this.memberListShow=false;
                 this.oneByoneShow=true;
+                this.judgeChatMethod="1";//代表为私聊
+                this.getMemberShow=false;
+                this.getOneByOneChatRecord();
             },
+            //群聊选择群组
+            selectGroupChat(id,name,groupId){
+                this.selectChatUserName=name;
+                this.selectMeetingId=id;
+                this.judgeChatMethod="2";//代表为群聊
+                this.meetListShow=false;
+                this.getMemberShow=false;
+                this.selectGroupid=groupId;
+                this.getMoreChatRecord();
+            },
+            //根据群组id获取用户数量
+            getUserByGroupid(){
+                var vm=this;
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'project2/Config/userGroupUserList',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        ugId:this.selectGroupid,
+                        projId:vm.projId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        vm.getUserByGroupidList=response.data.rt;
+                        vm.getUserByGroupidList.forEach((item)=>{
+                            this.getUsersByMeetIdList.push(this.returnUserInfo(item.userId))
+                        })
+                    }else{
+
+                    }
+                })
+            },
+            //
 
         fullModule(){
             var elem=document.getElementById("mm");
@@ -1470,25 +2099,42 @@ export default {
     li{
         list-style: none;
     }
+    .clearfix{
+        clear: both;
+        overflow: hidden;
+        content: '';
+    }
+    .icon{
+       display: block;
+        position: absolute;
+        top: 3px;
+        right: 30px;
+        width: 17px;
+        height: 17px;
+        background-size: 100% 100%; 
+        cursor: pointer;    
+    }
     /***********设置滚动条************/
     /* 设置滚动条的样式 */
-    .member_bodyUl::-webkit-scrollbar {
+    
+    .message_body::-webkit-scrollbar,.member_bodyUl::-webkit-scrollbar,.meet_bodyUl::-webkit-scrollbar {
         width:7px !important;
+        height:50px;
     }
     /* 滚动槽 */
-    .member_bodyUl::-webkit-scrollbar-track {
+    .message_body::-webkit-scrollbar-track,.member_bodyUl::-webkit-scrollbar-track,.meet_bodyUl::-webkit-scrollbar-track {
         box-shadow: inset006pxrgba(0,0,0,0.5);
         -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
         border-radius:10px;
     }
     /* 滚动条滑块 */
-    .member_bodyUl::-webkit-scrollbar-thumb {
+    .message_body::-webkit-scrollbar-thumb,.member_bodyUl::-webkit-scrollbar-thumb,.meet_bodyUl::-webkit-scrollbar-thumb {
         border-radius:10px;
         background:rgba(0,0,0,0.1);
         box-shadow: inset006pxrgba(0,0,0,0.5);
         -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
     }
-    .member_bodyUl::-webkit-scrollbar-thumb:window-inactive {
+    .message_body::-webkit-scrollbar-thumb:window-inactive,.member_bodyUl::-webkit-scrollbar-thumb:window-inactive,.meet_bodyUl::-webkit-scrollbar-thumb:window-inactive {
         background:rgba(255,0,0,0.4);
     }
     /*********************/
@@ -1888,6 +2534,48 @@ export default {
                             cursor: pointer;
                         }
                     }
+                    .meet_bodyUl{
+                        height:500px;
+                        overflow-y: auto;
+                        .meet_body{
+                            height:50px;
+                            position: relative;
+                            width: 100%;
+                            &:hover{
+                                background: #f0f0f0;
+                            }
+                            .header_info{
+                                height: 40px;
+                                width: 40px;
+                                display: inline-block;
+                                position: absolute;
+                                left: 12px;
+                                top:5px;
+                                img{
+                                    height: 38px;
+                                    width: 38px;
+                                    border-radius: 38px;
+                                }
+
+                            }
+                            .header_name{
+                                max-width: 120px;
+                                max-height: 50px;
+                                line-height: 50px;
+                                color: #333333;
+                                font-size: 14px;
+                                margin-left:70px;
+                                text-align: left;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis
+                                // position: absolute;
+                                // left:62px;
+                                // top:5px;
+                            }
+                        }
+
+                    }
 
                 }
                 .message_header{
@@ -1895,17 +2583,53 @@ export default {
                     background: #f5f5f5;
                     border-bottom: 1px solid #e6e6e6;
                     position: relative;
-                    .text{
-                        position: absolute;
-                        // float: left;
-                        font-size:14px;
-                        // line-height: 40px;
-                        color:#323232;
-                        left:15px;
-                        bottom: 10px;
-                        cursor: pointer;
-                        
+                    .text_left{
+                        position: relative;
+                        width:120px;
+                        height: 40px;
+                         .text1{
+                                position: absolute;
+                                // float: left;
+                                font-size:14px;
+                                width:80px;
+                                text-align: left;
+                                // line-height: 40px;
+                                color:#323232;
+                                left:15px;
+                                top:10px;
+                                // bottom: 10px;
+                            }
+                            .text{
+                                position: absolute;
+                                // float: left;
+                                font-size:14px;
+                                width:80px;
+                                text-align: left;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
+                                // line-height: 40px;
+                                color:#323232;
+                                left:15px;
+                                top:10px;
+                                // bottom: 10px;
+                                cursor: pointer;
+                            }
+                            .icon-sanjiao{
+                                display: block;
+                                position: absolute;
+                                width: 12px;
+                                height: 7px;
+                                background-image:url('../Settings/images/sanjiao.png');
+                                background-size: 100% 100%;
+                                content: '';
+                                top:15px;
+                                right:10px;
+                                cursor: pointer;
+                            }
+
                     }
+                   
                     .moreChatBtn{
                         background: url('./images/morePerson1.png') no-repeat 0 0;
                         width: 25px;
@@ -1922,6 +2646,13 @@ export default {
                             background:url('./images/morePerson.png') no-repeat 0 0;
                         }
                     }
+                    .item1{
+                        position: absolute;
+                        top:6px;
+                        right:85px;
+                        // margin-top:-71px;
+                        // margin-right: -172px;
+                    }
                     .oneChatBtn{
                         background: url('./images/person.png') no-repeat 0 0;
                         width: 25px;
@@ -1937,6 +2668,11 @@ export default {
                         &:hover{
                             background:url('./images/person1.png') no-repeat 0 0;
                         }
+                    }
+                    .item2{
+                        position: absolute;
+                        top:6px;
+                        right:48px;
                     }
                     .setBtn{
                         background: url('./images/setChat.png') no-repeat 0 0;
@@ -1963,6 +2699,8 @@ export default {
                     overflow-y: auto;
                     background: #fff;
                     transition: 0.5s all;
+                    z-index:5;
+                    width: 100%;
                     .clearfix{
                         clear: both;
                         overflow: hidden;
@@ -2013,9 +2751,185 @@ export default {
                     }
                 }
                 .message_body{
-                    height:70%;
+                    // height:70%;
                     background: #f5f5f5;
                     overflow-y: auto;
+                    height: calc(80% - 75px);
+                    position: relative;
+                    // .chatMessageUl{
+                        .otherLeft{
+                            text-align: left;
+                        }
+                        .selfRight{
+                            text-align: right;
+                        }
+                        .chatMessageLi{
+                            // height: 70px;
+                            position: relative;
+                            padding:8px;
+                            .imgLeft{
+                                float: left;
+                                margin: 5px 15px 0 10px;
+                            }
+                            .imgRight{
+                                float: right;
+                                margin: 5px 15px 0 10px;
+                            }
+                            img{
+                                border:0;
+                                border-radius: 36px;
+                                // float: right;
+                            }
+                            .text{
+                                    display: inline-block;
+                                    position: relative;
+                                    max-width: calc(86% - 55px);
+                                    min-height: 14px;
+                                    line-height: 21px;
+                                    font-size: 14px;
+                                    text-align: left;
+                                    word-break: break-all;
+                                    // background-color: #f5f5f5;
+                                    border-radius: 4px;
+                                    padding: 10px;
+                                    margin-bottom: 10px;
+                                    margin-top:20px;
+                                    .userName{
+                                        position: absolute;
+                                        right:0px;
+                                        top:-22px;
+                                        text-align: left;
+                                        font-size:12px;
+                                        color:#999999;
+                                    }
+                                    .userNameLeft{
+                                        position: absolute;
+                                        left:0px;
+                                        top:-22px;
+                                        text-align: left;
+                                        font-size:12px;
+                                        color:#999999;
+                                    }
+
+                            }
+                            .otherLeftText{
+                                background: #fff;
+                                border: 1px solid #fff;
+                                color: #333;
+                            }
+                            .selfRightText{
+                                background: #cee1f5;
+                                border: 1px solid #cee1f5;
+                                color: #333;
+                            }
+                            .chat_border_right{
+                                    position: absolute;
+                                    border-width: 6px 0 6px 6px;
+                                    border-style: solid;
+                                    border-color: transparent #cee1f5;
+                                    right: 63px;
+                                    top: 37px;
+                            }
+                            .chat_border_left{
+                                position: absolute;
+                                border-width: 6px 0 6px 6px;
+                                border-style: solid;
+                                border-color: transparent #fff;
+                                left: 63px;
+                                top: 37px;
+                                transform: rotate(180deg)
+                            }
+                            // .rightSpan{
+                            //         display: block;
+                            //         width: 0;
+                            //         height: 0;
+                            //         border-width: 5px 0 5px 5px;
+                            //         border-style: solid;
+                            //         border-color: transparent #0F90F6;
+                            //         position: absolute;
+                            //         right: 42px;
+                            //         top: 12px;
+                            // }
+
+                            // .chatMessageLeft{
+                            //     position: absolute;
+                            //     left: 15px;
+                            //     top:12px;
+                            //     .leftImg{
+                            //         width: 36px;
+                            //         height: 36px;
+                            //         display: inline-block;
+                            //         img{
+                            //             width: 36px;
+                            //             height: 36px;
+                            //             border-radius: 36px;
+                            //         }
+                            //     }
+                            //     .leftTxt{
+                            //         display: inline-block;
+                            //         margin-left:10px;
+                            //     }
+                            // }
+                            // .chatMessageRight{
+                            //     // position: absolute;
+                            //     // position: relative;
+                            //     // right: 15px;
+                            //     // top:12px;
+                            //     // float: right;
+                            //     width: 100%;
+                            //     .rightImg{
+                            //         width: 36px;
+                            //         height: 36px;
+                            //         float: right;
+                            //         // display: inline-block;
+                            //         // position: absolute;
+                            //         // top:10px;
+                            //         // right:0px;
+                            //         // float: right;
+                            //         img{
+                            //             width: 36px;
+                            //             height: 36px;
+                            //             border-radius: 36px;
+                            //         }
+                            //     }
+                            //     .rightTxt{
+                            //         display: inline-block;
+                            //         // margin-right:10px;
+                            //         // width: 80%;
+                            //         // height: 100%;
+                            //         // position: absolute;
+                            //         // position: relative;
+                            //         // right: -10px;
+                            //         // top:30px;
+
+                            //         // max-width: calc(100%-40px);
+                            //         // float: left;
+                            //         //  position: absolute;
+                            //         //  top:5px;
+                            //         //  right: 56px;
+                            //          .rightTxtFrame{
+                            //                 display: inline-block;
+                            //                 position: absolute;
+                            //                 right: 0px;
+                            //                 max-width: 80%;
+                            //                 // max-width: calc(100%-40px);
+                            //                 min-height: 14px;
+                            //                 line-height: 21px;
+                            //                 font-size: 14px;
+                            //                 text-align: left;
+                            //                 word-break: break-all;
+                            //                 border-radius: 4px;
+                            //                 padding: 10px;
+                            //                 background: #cee1f5;
+                            //                 border: 1px solid #cee1f5;
+                            //                 color: #333;
+                            //                 margin-bottom: 10px;
+                            //          }
+                            //     }
+                            // }
+                        }
+
+                    // }
                 }
                 .message_textarea{
                     border-top:1px solid #e6e6e6;
@@ -2239,6 +3153,244 @@ export default {
                 }
 
             }
+             //对话窗
+            .el-dialog {
+                position: relative;
+                margin: 0 auto 50px;
+                background: #fff;
+                border-radius: 2px;
+                box-shadow: 0 1px 3px rgba(0,0,0,.3);
+                box-sizing: border-box;
+                
+                .el-dialog__header{
+                    display: block;
+                    padding: 26px 0 16px;
+                    border-bottom: 1px solid #cccccc;
+                    .el-dialog__title{
+                        font-size: 18px;
+                        color: #fc3439;
+                        font-weight: bold;
+                        line-height: 18px;
+                    }
+                    .el-dialog__headerbtn{
+                        top: 8px;
+                        right: 8px;
+                    }
+                }
+                .el-dialog__body{
+                    margin-top:0px !important;
+                    .diolog-main{
+                        float: left;
+                        width: 50%;
+                        height: 395px;
+                        border-top: 1px solid #e6e6e6;
+                        &:first-of-type{
+                            border-right: 1px solid #e6e6e6;
+                            border-top: 1px solid #e6e6e6;
+                            padding-left: 20px;
+                        }
+                        .title-right{
+                            display: block;
+                            margin: 10px 10px 0 0;
+                            height: 28px;
+                            position: relative;
+                            .title-right-icon{
+                                display: block;
+                                width: 100%;
+                                height: 100%;
+                                border-radius: 2px;
+                                border: 1px solid #e6e6e6;
+                                position: relative;
+                                background: #fafafa;
+                                padding-left:10px;
+                                padding-right:40px;
+                                margin-right: 5px;
+                            }
+                            .el-icon-search{
+                                    position: absolute;
+                                    right: 10px;
+                                    top: 8px;
+                                    cursor: pointer;
+                            }
+                        }
+                        .userList-item{
+                            margin-top: 14px;
+                            position: relative;
+                            p{
+                                height: 20px;
+                            }
+                            .check-name{
+                                display: inline-block;
+                                font-size: 14px;
+                                line-height: 14px;
+                                color: #333333;
+                            }
+                            .check-title{
+                                display: inline-block;
+                                font-size: 12px;
+                                line-height: 14px;
+                                color: #999999;
+                            }
+                            .icon-selectUser{
+                                width: 14px;
+                                height: 14px;
+                                top: 14px;
+                                right: 14px;
+                                background-image:url('../Settings/images/a-1.png'); 
+                                &:hover{
+                                    background-image:url('../Settings/images/a-2.png'); 
+                                }
+                            }
+                            .icon-cancleUser{
+                                width: 14px;
+                                height: 14px;
+                                top: 14px;
+                                right: 14px;
+                                background-image:url('../Settings/images/b-1.png'); 
+                            }
+                            &:hover .icon-cancleUser{
+                                background-image:url('../Settings/images/b-2.png'); 
+                            }
+                            .icon-selectUser.active{
+                                background-image:url('../Settings/images/a-2.png'); 
+                            }
+                        }
+                        .saveBTN{
+                            position: absolute;
+                            bottom: 20px;
+                            right: 15px;
+                            width: 96px;
+                            height: 28px;
+                            line-height: 28px;
+                            border-radius: 2px;
+                            background: #fc3439;
+                            font-size: 14px;
+                            color: #ffffff;
+                            text-align: center;
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
+        }
+        #addUserEdit{
+            //对话窗
+            // .el-dialog {
+            //     position: relative;
+            //     margin: 0 auto 50px;
+            //     background: #fff;
+            //     border-radius: 2px;
+            //     box-shadow: 0 1px 3px rgba(0,0,0,.3);
+            //     box-sizing: border-box;
+                
+            //     .el-dialog__header{
+            //         display: block;
+            //         padding: 26px 0 16px;
+            //         border-bottom: 1px solid #cccccc;
+            //         .el-dialog__title{
+            //             font-size: 18px;
+            //             color: #fc3439;
+            //             font-weight: bold;
+            //             line-height: 18px;
+            //         }
+            //         .el-dialog__headerbtn{
+            //             top: 8px;
+            //             right: 8px;
+            //         }
+            //     }
+            //     .el-dialog__body{
+            //         margin-top:0px !important;
+            //         .diolog-main{
+            //             float: left;
+            //             width: 50%;
+            //             height: 395px;
+            //             &:first-of-type{
+            //                 border-right: 1px solid #e6e6e6;
+            //                 padding-left: 20px;
+            //             }
+            //             .title-right{
+            //                 display: block;
+            //                 margin: 10px 10px 0 0;
+            //                 height: 28px;
+            //                 position: relative;
+            //                 .title-right-icon{
+            //                     display: block;
+            //                     width: 100%;
+            //                     height: 100%;
+            //                     border-radius: 2px;
+            //                     border: 1px solid #e6e6e6;
+            //                     position: relative;
+            //                     background: #fafafa;
+            //                     padding-left:10px;
+            //                     padding-right:40px;
+            //                     margin-right: 5px;
+            //                 }
+            //                 .el-icon-search{
+            //                         position: absolute;
+            //                         right: 10px;
+            //                         top: 8px;
+            //                         cursor: pointer;
+            //                 }
+            //             }
+            //             .userList-item{
+            //                 margin-top: 14px;
+            //                 position: relative;
+            //                 p{
+            //                     height: 20px;
+            //                 }
+            //                 .check-name{
+            //                     display: inline-block;
+            //                     font-size: 14px;
+            //                     line-height: 14px;
+            //                     color: #333333;
+            //                 }
+            //                 .check-title{
+            //                     display: inline-block;
+            //                     font-size: 12px;
+            //                     line-height: 14px;
+            //                     color: #999999;
+            //                 }
+            //                 .icon-selectUser{
+            //                     width: 14px;
+            //                     height: 14px;
+            //                     top: 14px;
+            //                     right: 14px;
+            //                     background-image:url('../Settings/images/a-1.png'); 
+            //                     &:hover{
+            //                         background-image:url('../Settings/images/a-2.png'); 
+            //                     }
+            //                 }
+            //                 .icon-cancleUser{
+            //                     width: 14px;
+            //                     height: 14px;
+            //                     top: 14px;
+            //                     right: 14px;
+            //                     background-image:url('../Settings/images/b-1.png'); 
+            //                 }
+            //                 &:hover .icon-cancleUser{
+            //                     background-image:url('../Settings/images/b-2.png'); 
+            //                 }
+            //                 .icon-selectUser.active{
+            //                     background-image:url('../Settings/images/a-2.png'); 
+            //                 }
+            //             }
+            //             .saveBTN{
+            //                 position: absolute;
+            //                 bottom: 20px;
+            //                 right: 15px;
+            //                 width: 96px;
+            //                 height: 28px;
+            //                 line-height: 28px;
+            //                 border-radius: 2px;
+            //                 background: #fc3439;
+            //                 font-size: 14px;
+            //                 color: #ffffff;
+            //                 text-align: center;
+            //                 cursor: pointer;
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 
