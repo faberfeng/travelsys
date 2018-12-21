@@ -3523,6 +3523,7 @@ export default {
                 return ''
             }else{
                 return document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value
+                console.log(document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value,'返回的值');
             }
         },
         deleteDocumentMethod(){
@@ -3621,6 +3622,7 @@ export default {
                     }
                 )
             })
+            console.log(listData,'listData导入');
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/batchImport',

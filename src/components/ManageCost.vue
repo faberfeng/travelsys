@@ -14,16 +14,18 @@
                 <div class="content">
                     <el-row class="navigation1">
                         <el-col :span="24">
-                            <el-tabs  v-model="navigationPath" @tab-click="handleClick">
-                                <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
-                                </el-tab-pane>
+                            <el-tabs   v-model="navigationPath" @tab-click="handleClick" >
+                                <!-- <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage"></el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress"></el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase"></el-tab-pane>
                                 <el-tab-pane label="安全管理" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
-                                <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings"></el-tab-pane>
+                                <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings"></el-tab-pane> -->
+                                <el-tab-pane v-for="(item,index) in menusInfoData" :key="index" :label="item.title" :name="item.name" v-if="item.status==1&&item.isIf"   ></el-tab-pane>
+                               
+                                <!-- <el-tab-pane label="配置中心00"  v-if="auth.configurationCenter" name="settings"></el-tab-pane> -->
                             </el-tabs>
                         </el-col>
                     </el-row>
@@ -167,6 +169,7 @@ export default {
             rotate:'',
             QJFileManageSystemURL:'',
             commomHeadPictureFile:'',
+            menusInfoData:[],//自定义菜单
         }
     },
     created(){
@@ -176,8 +179,8 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL;
-        // vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
-        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
+        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.iframeUrl=vm.$store.state.iframeWebGlUrl+'?new='+Math.random();
         vm.navigationPath = sessionStorage.getItem('navigationPath');
@@ -191,6 +194,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
+        this.getMenusInfoPage();
        
         // this.getInitdata();
     },
@@ -262,7 +266,43 @@ export default {
                 break;
 		    }
         },
-
+        //获取自定义菜单信息
+        getMenusInfoPage(){
+            axios({
+                method:'GET',
+                url:this.BDMSUrl+'config2/component/getCustomMenu',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    this.menusInfoData = response.data.rt;
+                    this.menusInfoData.forEach((item)=>{
+                        this.$set(item,'isIf',true)
+                    })
+                    this.menusInfoData.unshift(
+                        {title:'工程首页',name:'projectPage',isIf:'auth.homePage',status:1},
+                        {title:'进度计划',name:'plan',isIf:'auth.progress',status:1},
+                        {title:'设计管理',name:'designManager',isIf:'auth.design',status:1},
+                        {title:'成本管理',name:'costManage',isIf:'auth.costManagement',status:1},
+                        {title:'物资采购',name:'materialPurchase',isIf:'auth.materialPurchasing',status:1},
+                        {title:'安全管理',name:'construction',isIf:'auth.constructionSite',status:1},
+                        {title:'文档管理',name:'documentManager',isIf:'auth.docManagement',status:1},
+                        {title:'配置中心',name:'settings',isIf:'auth.configurationCenter',status:1},
+                    )
+                    console.log(this.menusInfoData,'首页出现')
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
         changeFrameHeight(){
             var ifm= document.getElementById("webIframe"); 
             ifm.height=document.documentElement.clientHeight;
@@ -594,6 +634,11 @@ export default {
                 console.log(err)
             })
         },
+        handMenus(val){
+            console.log('触发000')
+            window.open(val,'_blank')
+
+        },
         handleClick(tab,event){
             this.settingsCenter = true;
             if(tab.label === '工程首页'){
@@ -651,6 +696,21 @@ export default {
                 this.navigationPath = tab.name;
                 this.settingsCenter = false;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
+            }
+            else {
+                // this.navigationPath=sessionStorage.getItem('navigationPath');
+                // this.settingsCenter = false;
+                this.menusInfoData.forEach((item)=>{
+                    if(item.title===tab.label){
+                        this.navigationPath=tab.name;
+                        // this.$router.push({
+                        //     path:item.url
+                        // })
+                        // sessionStorage.setItem('navigationPath',this.navigationPath);
+                        window.open(item.url,'_blank');
+                        window.location.reload(true);
+                    }
+                })
             }
         },
         selectIndex(index,indexPath){

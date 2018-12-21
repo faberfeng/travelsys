@@ -3148,8 +3148,8 @@ export default {
             vm.hasAuthDelUser = true
         }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile
-        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile
+        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
         vm.GMDUrl=vm.$store.state.GMDUrl
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;

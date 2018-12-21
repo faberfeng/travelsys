@@ -37,7 +37,12 @@
                 </li>
             </ul>
         </div>
-        
+        <div class="summary">
+            <h5 class="accountTitle"><img class="imgicon" src="./images/editMenus.png"/>自定义菜单<span class="add" @click="addMenus"><i class="el-icon-plus"></i> 新增</span></h5>
+            <ul class="accountList uniqueList" >
+                <li class="pre" v-for=" (item,index) in menusInfoData" :key="index"><span>{{item.title}}</span> <label>{{item.url}}</label><img class="imgedit" @click="editMenus(index)" src="../../assets/edit.png"/><img v-if="item.status==1" @click="editStatus(index,0)" title="停用" class="imgdelete" src="./images/stop.png"/><img v-if="item.status==0" title="启用" @click="editStatus(index,1)" class="imgdelete" src="./images/start.png"/><img @click="delMenus(index)" class="imgdelete" src="../../assets/delete.png"/></li>
+            </ul>
+        </div>
         <div class="summary">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-state.png"/>工程概况<span class="add" @click="add"><i class="el-icon-plus"></i> 新增</span></h5>
             <ul class="accountList uniqueList" >
@@ -99,6 +104,28 @@
                     <button class="editBtnC" @click="editCancle">取消</button>
                 </div>
             </el-dialog>
+            <!-- 自定义菜单 -->
+             <el-dialog title="新增自定义菜单信息" :visible.sync="addMenusDialog" @close="addMenusCancle">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="menusTitle"/></div>
+                    <div class="editBodytwo"><label class="editInpText">URL地址 :</label><input class="inp" placeholder="Https://" v-model="menusUrl"/></div>
+                </div>
+                <p class="err" v-show="showErr">请输入完整信息</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addMenusMakeSure">确定</button>
+                    <button class="editBtnC" @click="addMenusCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="自定义菜单信息编辑" :visible.sync="editMenusDialog" @close="editMenusCancle">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">标题 :</label><input class="inp" placeholder="请输入" v-model="menusTitle"/></div>
+                    <div class="editBodytwo"><label class="editInpText">URL地址 :</label><input class="inp" placeholder="请输入" v-model="menusUrl"/></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editMenusMakeSure">确定</button>
+                    <button class="editBtnC" @click="editMenusCancle">取消</button>
+                </div>
+            </el-dialog>
             <el-dialog title="图片上传" :visible.sync="upImg" @close="upImgCancle">
                 <div class="editBody">
                     <div class="editBodytwo imageBody"><label class=" imageBodyText">上传图片 :</label>
@@ -124,6 +151,24 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog  :visible.sync="deleteMenusDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">删除提醒</p>
+                <p class="deleteDialogText">您要删除当前所选记录吗?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="deleteMenusMakeSure">删除</button>
+                    <button class="cancelBtn" @click="deleteMenusDialog=false">取消</button>
+                </div>
+            </el-dialog>
+             <el-dialog  :visible.sync="changeStatusMenusDialog" width="398px">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <p class="deleteDialogWarning">更改提醒</p>
+                <p class="deleteDialogText" >您是否要{{statusText}}该菜单吗?</p>
+                <div slot="footer" class="dialog-footer">
+                    <button class="deleteBtn" @click="changeStatusMenusMakeSure">确认</button>
+                    <button class="cancelBtn" @click="changeStatusMenusDialog=false">取消</button>
                 </div>
             </el-dialog>
             <el-dialog  :visible.sync="deleteImageVisiable" width="398px">
@@ -152,12 +197,24 @@ export default {
             addDialog:false,
             editDialog:false,
             deleteDialog:false,
+            //自定义菜单信息
+            addMenusDialog:false,
+            editMenusDialog:false,
+            deleteMenusDialog:false,
+            menusIndex:'',
+            statusIndex:'',
+            statusNum:'',
+            changeStatusMenusDialog:false,
+            statusText:'',
             NotdeleteDialog:false,
             showErr:false,
             upImg:false,
             isAsdefault:false,
             projectUnity:'',
             projectName:'',
+            menusTitle:'',//自定义菜单名称
+            menusUrl:'',//自定义菜单地址
+            menusStatus:'',//自定义菜单状态
             BDMSUrl:'',
             retractImg:shouqiImg,
             retractText:'收起',
@@ -168,6 +225,7 @@ export default {
             token:'',
             projId:'',
             sumaryData:[],//工程概况信息列表
+            menusInfoData:[],//自定义菜单信息
             //unity=>viewKey viewVal=>viewVal
             index:'',
             projectConfig:{},
@@ -193,12 +251,13 @@ export default {
     created(){
        // var vm = this;
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
-        this.BDMSUrl = this.$store.state.BDMSUrl+'project2/'
+        this.BDMSUrl = this.$store.state.BDMSUrl+'project2/';
         this.BDMSUrlQRCode=this.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
         this.projectName = localStorage.getItem('projectName');
+        this.getMenusInfo();//获取自定义菜单信息
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
@@ -222,6 +281,18 @@ export default {
         fullSreenCancle(){
             var vm=this;
             vm.fullSreenShow=false;
+        },
+        //增加自定义菜单
+        addMenus(){
+            
+            if(this.menusInfoData.length>=3){
+                this.$message({
+                    type:'info',
+                    message:'最多可扩展3个自定义菜单'
+                })
+            }else{
+                this.addMenusDialog = true;
+            }
         },
         add(){
             this.addDialog = true;
@@ -259,6 +330,69 @@ export default {
                 });
             }
         },
+        //增加自定义菜单确认
+        addMenusMakeSure(){
+            if(this.menusTitle ==''|| this.menusUrl ==''){
+                alert('请输入标题或URL地址');
+            }else{
+                axios({
+                    method:'get',
+                    url:this.BDMSUrlQRCode+'config2/component/addCustomMenu',
+                    headers:{
+                        'token':this.token,
+                        "Content-Type": "application/json"
+                    },
+                    params:{
+                        projectId:localStorage.getItem('projId'),
+                        url:this.menusUrl,
+                        title:this.menusTitle
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==='0'){
+                        this.getMenusInfo();
+                        this.menusUrl='';
+                        this.menusTitle='';
+                        this.addMenusDialog = false;
+                        // window.location.reload(true);
+                    }else if(response.data.cd  == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                });
+            }
+        },
+        //删除自定义菜单
+        delMenus(index){
+            this.menusIndex = index;
+            this.deleteMenusDialog =true;
+        },
+        deleteMenusMakeSure(){
+            axios({
+                method:'post',
+                url:this.BDMSUrlQRCode+"config2/component/deleteCustomMenu",
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.menusInfoData[this.menusIndex].id
+                }
+            }).then((response)=>{
+                if(response.data.cd === '0'){
+                    this.getMenusInfo();
+                    this.deleteMenusDialog = false;
+                    // window.location.reload(true);
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
         del(index){
             this.index = index;
             this.deleteDialog = true;
@@ -285,6 +419,91 @@ export default {
                     })
                 }
             })
+        },
+        editMenus(index){
+            this.editMenusDialog=true;
+            this.menusIndex =index;
+            this.menusTitle = this.menusInfoData[index].title;
+            this.menusUrl =this.menusInfoData[index].url;
+            this.menusStatus =this.menusInfoData[index].status;
+        },
+        editMenusMakeSure(){
+            if(this.menusTitle ==''|| this.menusUrl ==''){
+                alert('请输入标题或URL地址');
+            }else{
+                axios({
+                    method:'get',
+                    url:this.BDMSUrlQRCode+'config2/component/editCustomMenu',
+                    headers:{
+                        'token':this.token,
+                        "Content-Type": "application/json"
+                    },
+                    params:{
+                        projectId:localStorage.getItem('projId'),
+                        id:this.menusInfoData[this.menusIndex].id,
+                        url:this.menusUrl,
+                        title:this.menusTitle,
+                        status:this.menusStatus,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==='0'){
+                        this.getMenusInfo();
+                        this.menusUrl='';
+                        this.menusTitle='';
+                        this.menusStatus='';
+                        this.editMenusDialog = false;
+                        // window.location.reload(true);
+                    }else if(response.data.cd  == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                });
+            }
+        },
+
+        editStatus(index,statusNum){
+            this.statusIndex=index;
+            this.statusNum=statusNum;
+            if(statusNum==0){
+                this.statusText='停用'
+            }else if(statusNum==1){
+                this.statusText='启用'
+            }
+            this.changeStatusMenusDialog=true;
+            
+        },
+        changeStatusMenusMakeSure(){
+             axios({
+                    method:'get',
+                    url:this.BDMSUrlQRCode+'config2/component/editCustomMenu',
+                    headers:{
+                        'token':this.token,
+                        "Content-Type": "application/json"
+                    },
+                    params:{
+                        projectId:localStorage.getItem('projId'),
+                        id:this.menusInfoData[this.statusIndex].id,
+                        url:this.menusInfoData[this.statusIndex].url,
+                        title:this.menusInfoData[this.statusIndex].title,
+                        status:this.statusNum,
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==='0'){
+                        this.getMenusInfo();
+                        // window.location.reload(true);
+                        this.changeStatusMenusDialog=false;
+                    }else if(response.data.cd  == '-1'){
+                        alert(response.data.msg)
+                    }else{
+                        this.$router.push({
+                            path:'/login'
+                        })
+                    }
+                });
+
         },
         edit(index){
             this.editDialog = true;
@@ -394,6 +613,31 @@ export default {
             })
 
         },
+        //获取自定义菜单信息
+        getMenusInfo(){
+            axios({
+                method:'GET',
+                url:this.BDMSUrlQRCode+'config2/component/getCustomMenu',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    this.menusInfoData = response.data.rt;
+                    
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }else{
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }
+            })
+        },
+
         //获取工程初始信息
         getProjectInitalConfig(){
             axios({
@@ -576,6 +820,14 @@ export default {
             this.projectUnity = '';
             this.projectName ='';
         },
+        //自定义弹窗关闭
+        addMenusCancle(){
+            this.addMenusDialog = false;
+        },
+        editMenusCancle(){
+            this.editMenusDialog = false;
+        },
+
     }
 }
 </script>

@@ -173,7 +173,7 @@
                                 <span class="el-icon-close" @click="closememberList"></span>
                             </div>
                             <ul class="member_bodyUl">
-                                <li class="member_body" v-for="(item,index) in userInfoList" :key="index" @click="selectChat(item.userId,item.realName)">
+                                <li class="member_body" v-for="(item,index) in memberUserInfoList" :key="index" @click="selectChat(item.userId,item.realName)">
                                     <div class="header_info">
                                         <img :src="item.imgUuid?commomHeadPictureFile+item.imgUuid:require('../../assets/people.png')" class="header_img">
                                     </div>
@@ -181,6 +181,7 @@
                                         <span class="real_name" v-text="item.realName"></span>
                                         <span class="real_name1" v-text="item.account"></span>
                                     </div>
+                                    <el-badge v-show="item.noReadNum" :value="item.noReadNum" class="item_badgeMember"></el-badge>
                                 </li>
                             </ul>
                         </div>
@@ -197,6 +198,7 @@
                                     </div>
                                     <div class="header_name">
                                         {{item.name}}
+                                        <el-badge v-show="item.noReadNum" :value="item.noReadNum" class="item_badge"></el-badge>
                                     </div>
                                 </li>
                             </ul>
@@ -229,39 +231,26 @@
                                 </li>
                             </ul>
                         </div>
-                        <!-- <div class="message_member">
-                            <img class="memeberInfoImg" :src="userImg?userImg:require('../../assets/people.png')" />
-                        </div> -->
+
                         <div class="message_body">
-                            <!-- <p id="message"></p> -->
-                            <!-- <ul class="chatMessageUl"> -->
-                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatRecordList" :key="index">
+                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatRecordList" :key="index" v-show="item.type=='2'" >
                                     <img height="36" width="36px" :class="[{'imgLeft':item.isOneSelf==2},{'imgRight':item.isOneSelf==1}]" :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
                                     <div :class="['text',{'otherLeftText':item.isOneSelf==2},{'selfRightText':item.isOneSelf==1}]" >
-                                        <div :class="[{'userName':item.isOneSelf==1},{'userNameLeft':item.isOneSelf==2}]" v-text="item.userInfo.realName"></div>
+                                        <div :class="[{'userName':item.isOneSelf==1},{'userNameLeft':item.isOneSelf==2}]"  v-text="item.userInfo.realName"></div>
                                             {{item.sendText}}
                                     </div>
                                     <div :class="[{'chat_border_right':item.isOneSelf==1},{'chat_border_left':item.isOneSelf==2}]"></div>
-                                    <!-- <div v-show="item.isOneSelf==2" class="chatMessageLeft">
-                                        <div class="leftImg">
-                                            <img :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
-                                        </div>
-                                        <div class=leftTxt>
-                                            <div class="leftTxtFrame">{{item.sendText}}</div>
-                                        </div>
-                                    </div>
-                                    <div v-show="item.isOneSelf==1" class="chatMessageRight">
-                                        <div class=rightTxt>
-                                            <div class="rightTxtFrame">{{item.sendText}}</div>
-                                        </div>
-                                        <div class="rightImg">
-                                            <img :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
-                                        </div>
-                                       
-                                      
-                                    </div> -->
                                 </div>
-                            <!-- </ul> -->
+
+                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatMemberRecordList" :key="index" v-show="item.type=='1'" >
+                                    <img height="36" width="36px" :class="[{'imgLeft':item.isOneSelf==2},{'imgRight':item.isOneSelf==1}]" :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
+                                    <div :class="['text',{'otherLeftText':item.isOneSelf==2},{'selfRightText':item.isOneSelf==1}]" >
+                                        <div :class="[{'userName':item.isOneSelf==1},{'userNameLeft':item.isOneSelf==2}]"  v-text="item.userInfo.realName"></div>
+                                            {{item.sendText}}
+                                    </div>
+                                    <div :class="[{'chat_border_right':item.isOneSelf==1},{'chat_border_left':item.isOneSelf==2}]"></div>
+                                </div>
+                            
                         </div>
                         <div class="message_textarea">
                             <div class="message_file">
@@ -566,20 +555,22 @@ export default {
             outsideUserList:'',//获得工程用户列表
             userInfo:'',//查询用户
             userIds:[],//用户ID
-            userInfoList:'',//工程用户所有信息
+            userInfoList:[],//工程用户所有信息
+            memberUserInfoList:[],//私聊成员
             commomHeadPictureFile:'',
             selectChatUserId:'',//选择私聊id
             getOneByOneChatRecordList:'',//从后台获取私聊记录
             getMoreChatRecordList:'',//从后台获取群聊记录
             selectChatUserName:'项目大厅',//选择私聊名称
             getMemberShow:false,//获取某个会议室内的成员
-            chatRecordList:[],
+            chatRecordList:[],//群聊
+            chatMemberRecordList:[],//私聊
             centerDialogVisible:false,
             userDetialAdd:[],
             userListAdd:[],
             userQunzuList:[],
             messageUrl:'http://10.252.26.241:8079',
-            meetListGroup:'',//会议列表组
+            meetListGroup:[],//会议列表组
             ugList:[],
             ugListGroup:'',
             addUserIdGroup:'',
@@ -589,6 +580,7 @@ export default {
             selectGroupid:'',//选择会议群组id
             getUserByGroupidList:'',//根据群组id获得用户
             getUsersByMeetIdList:[],//根据会议id获取用户
+            position: {scrollTop: 0, scrollLeft: 0}
 
         }
     },
@@ -604,8 +596,8 @@ export default {
         vm.userImg=localStorage.getItem('userImg')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
-        vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
+        vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
+        // vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
         // var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
         // vm.imgdetial.path = obj.image
         // vm.imgdetial.x = obj.x
@@ -630,6 +622,7 @@ export default {
 
     mounted(){
         // console.log(this.token,'this.token');
+        this.scrollToBottom();
         this.ws = new WebSocket("ws://10.252.26.241:16800/websocket");
         
         // setTimeout(()=>{
@@ -653,13 +646,47 @@ export default {
         };
         this.ws.onmessage = function(event){
             console.log(JSON.parse(event.data),'回来的信息');
-            that.chatRecordList.push({
-                userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
-                userId:JSON.parse(event.data).to,
-                sendText:JSON.parse(event.data).value,
-                time:JSON.parse(event.data).time,
-                isOneSelf:2,//1代表是当前用户，2代表是其他用户
-            })
+            var getBackData=JSON.parse(event.data);
+            
+           
+            if(getBackData.type=="2"){
+                alert('11111');
+                 that.chatRecordList.push({
+                    userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
+                    userId:JSON.parse(event.data).to,
+                    sendText:JSON.parse(event.data).value,
+                    time:JSON.parse(event.data).time,
+                    isOneSelf:2,//1代表是当前用户，2代表是其他用户
+                })
+                that.meetListGroup.forEach((item)=>{
+                    if(item.id==getBackData.meetingId){
+                        item.noReadNum++
+                    }
+                })
+            }else if(getBackData.type=="1"){
+                alert('00000');
+                that.memberUserInfoList.forEach((item)=>{
+                    if(item.userId==getBackData.from){
+                        item.noReadNum++
+                    }
+                })
+                console.log(that.memberUserInfoList,'that.memberUserInfoList');
+            }
+            // that.memberUserInfoList.push({
+            //     account:item.account,
+            //     realName:item.realName,
+            //     userId:item.userId,
+            //     imgUuid:item.imgUuid,
+            //     isRead:true,//是否已读
+            //     noReadNum:null,//未读数量
+            // })
+            if(event.data){
+                // this.$message({
+                //     type:'info',
+                //     message:'有新消息未读'
+                // })
+                alert('有新消息未读')
+            }
             console.log(that.chatRecordList,'this.chatRecordList');
             // that.setMessageInnerHTML(JSON.parse(event.data).value);
         };
@@ -673,6 +700,9 @@ export default {
 
     //    this.getMediaInformation(4);
     // this.getMediaInformation(1);
+    },
+    updated:function(){
+        this.scrollToBottom();
     },
     watch:{
         // this.ws.onmessage = function(event){
@@ -693,6 +723,16 @@ export default {
     },
     methods:{
         //即时通讯功能
+            onScroll(e,position){
+                this.position = position;
+                console.log(this.position,'this.position');
+                        },
+            scrollToBottom: function () {
+                this.$nextTick(() => {
+                    var container = this.$el.querySelector(".message_body");
+                    container.scrollTop = container.scrollHeight;
+                })
+            },
 
             //发送短信
             sendMes(){
@@ -707,6 +747,7 @@ export default {
                     message.meetingId=this.selectMeetingId;
                     message.from= vm.userId;
                     message.to=null;
+                    message.time=new Date().getTime();
                     message=JSON.stringify(message);
                      if(message.token!=''&&message.meetingId!=''){
                         console.log(message,'message群聊');
@@ -717,6 +758,7 @@ export default {
                             sendText:vm.sendText,
                             time:new Date().getTime(),
                             isOneSelf:1,//1代表是当前用户，2代表是其他用户
+                            type:this.judgeChatMethod
                         })
                     }
 
@@ -728,23 +770,25 @@ export default {
                     message.to = this.selectChatUserId;
                     message.time=new Date().getTime();
                     message.projId = this.projId;
+                    message.meetingId=null;
                     message=JSON.stringify(message);
                     console.log(JSON.stringify(message),'00000');
                     if(message.token!=''&&message.to!=''){
                         this.ws.send(message);
-                        this.chatRecordList.push({
+                        this.chatMemberRecordList.push({
                             userInfo:vm.returnUserInfo(vm.userId),
                             userId:vm.userId,
                             sendText:vm.sendText,
                             time:new Date().getTime(),
                             isOneSelf:1,//1代表是当前用户，2代表是其他用户
+                            type:this.judgeChatMethod
                         })
                     }
 
                 }
                 // console.log(vm.userId,'vm.userId');
                 // console.log(vm.returnUserInfo(vm.userId),'vm.returnUserInfo(vm.userId)');
-                console.log(this.chatRecordList,'this.chatRecordList000');
+                // console.log(this.chatRecordList,'this.chatRecordList000');
                 this.sendText="";
                 message='';
             },
@@ -762,7 +806,7 @@ export default {
             //从后台获取私聊聊天记录
             getOneByOneChatRecord(){
                 var vm=this;
-                vm.chatRecordList=[];
+                vm.chatMemberRecordList=[];
                 axios({
                     method:'get',
                     url:vm.messageUrl+'/message/singleHistory',
@@ -779,16 +823,18 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.getOneByOneChatRecordList=response.data.rt;
+
                         this.getOneByOneChatRecordList.forEach((item)=>{
-                            vm.chatRecordList.push({
+                            vm.chatMemberRecordList.unshift({
                                 userInfo:vm.returnUserInfo(item.fromid),
                                 userId:item.toid,
                                 sendText:item.content,
                                 time:item.date,
-                                isOneSelf:this.currentUserId(item.fromid)//1代表是当前用户，2代表是其他用户
+                                isOneSelf:this.currentUserId(item.fromid),//1代表是当前用户，2代表是其他用户
+                                type:"1"
                             })
                         })
-                        console.log(vm.chatRecordList,'后台获取群聊聊天记录成功');
+                        console.log(vm.chatMemberRecordList,'后台获取群聊聊天记录成功');
                     }else{
 
                     }
@@ -822,12 +868,13 @@ export default {
                     if(response.data.cd==0){
                         this.getMoreChatRecordList=response.data.rt;
                         this.getMoreChatRecordList.forEach((item)=>{
-                            vm.chatRecordList.push({
+                            vm.chatRecordList.unshift({
                                 userInfo:vm.returnUserInfo(item.fromid),
                                 userId:item.toid,
                                 sendText:item.content,
                                 time:item.date,
-                                isOneSelf:this.currentUserId(item.fromid)//1代表是当前用户，2代表是其他用户
+                                isOneSelf:this.currentUserId(item.fromid),//1代表是当前用户，2代表是其他用户
+                                type:"2"
                             })
                         })
                         console.log('后台获取群聊记录成功')
@@ -965,6 +1012,20 @@ export default {
             //打开成员列表
             openMemberList(){
                 this.memberListShow=true;
+                // this.userInfoList.forEach((item)=>{
+                //     if(item.userId==this.userId){
+                //         return false
+                //     }else{
+                //         this.memberUserInfoList.push({
+                //             account:item.account,
+                //             realName:item.realName,
+                //             userId:item.userId,
+                //             imgUuid:item.imgUuid,
+                //             isRead:true,//是否已读
+                //             noReadNum:null,//未读数量
+                //         })
+                //     }
+                // })
             },
             //关闭会议列表
             closemeetList(){
@@ -998,6 +1059,7 @@ export default {
                                 this.selectMeetingId=item.id;
                                 this.selectGroupid=item.groupid;
                             }
+                            this.$set(item,'noReadNum',0);
                         })
                         this.getMoreChatRecord();
                         console.log('成功')
@@ -1022,6 +1084,9 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         vm.meetListGroup=response.data.rt;
+                        vm.meetListGroup.forEach((item)=>{
+                            this.$set(item,'noReadNum',0);
+                        })
                         this.getQunList();
                         this.selectMeetingId=vm.meetListGroup[vm.meetListGroup.length-1].id;
                         this.selectGroupid=vm.meetListGroup[vm.meetListGroup.length-1].groupid;
@@ -1248,6 +1313,7 @@ export default {
             //根据用户ID获取用户信息
             getUserInfoByUserId(){
                 var vm=this
+                this.memberUserInfoList=[];
                 axios({
                     method:'post',
                     url:vm.BDMSUrl+'/lc/getUserInfoByUserId',
@@ -1258,6 +1324,20 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.userInfoList=response.data.rt;
+                        this.userInfoList.forEach((item)=>{
+                            if(item.userId==this.userId){
+                                return false
+                            }else{
+                                this.memberUserInfoList.push({
+                                    account:item.account,
+                                    realName:item.realName,
+                                    userId:item.userId,
+                                    imgUuid:item.imgUuid,
+                                    isRead:true,//是否已读
+                                    noReadNum:0,//未读数量
+                                })
+                            }
+                        })
                         console.log(this.userInfoList,'this.userInfoList');
                     }else if(response.data.cd==-1){
 
@@ -2496,7 +2576,11 @@ export default {
                                     height: 20px;
                                     color:#cccccc;
                                 }
-
+                            }
+                            .item_badgeMember{
+                                    position: absolute;
+                                    top:14px;
+                                    right:30px;
                             }
                         }
                         // .member_body :hover{
@@ -2568,7 +2652,13 @@ export default {
                                 text-align: left;
                                 overflow: hidden;
                                 white-space: nowrap;
-                                text-overflow: ellipsis
+                                text-overflow: ellipsis;
+                                .item_badge{
+                                    position: absolute;
+                                    right:10px;
+                                    top:5px;
+
+                                }
                                 // position: absolute;
                                 // left:62px;
                                 // top:5px;
