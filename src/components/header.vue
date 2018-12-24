@@ -34,8 +34,8 @@ export default Vue.component('common-header', {
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
-        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        // vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
+        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
     },
     computed:{
         userImg(){

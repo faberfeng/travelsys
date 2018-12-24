@@ -196,7 +196,7 @@
                                     <div class="header_info">
                                         <img :src="require('../../assets/people.png')"/>
                                     </div>
-                                    <div class="header_name">
+                                    <div class="header_name" :title="item.name">
                                         {{item.name}}
                                         <el-badge v-show="item.noReadNum" :value="item.noReadNum" class="item_badge"></el-badge>
                                     </div>
@@ -233,6 +233,7 @@
                         </div>
 
                         <div class="message_body">
+                                <!-- 群聊 -->
                                 <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatRecordList" :key="index" v-show="item.type=='2'" >
                                     <img height="36" width="36px" :class="[{'imgLeft':item.isOneSelf==2},{'imgRight':item.isOneSelf==1}]" :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
                                     <div :class="['text',{'otherLeftText':item.isOneSelf==2},{'selfRightText':item.isOneSelf==1}]" >
@@ -241,8 +242,8 @@
                                     </div>
                                     <div :class="[{'chat_border_right':item.isOneSelf==1},{'chat_border_left':item.isOneSelf==2}]"></div>
                                 </div>
-
-                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatMemberRecordList" :key="index" v-show="item.type=='1'" >
+                                <!-- 私聊 -->
+                                <div  :class="['chatMessageLi',{'otherLeft':item.isOneSelf==2},{'selfRight':item.isOneSelf==1}]" v-for="(item,index) in chatMemberRecordList" :key="index"  v-show="item.type=='1'" >
                                     <img height="36" width="36px" :class="[{'imgLeft':item.isOneSelf==2},{'imgRight':item.isOneSelf==1}]" :src="item.userInfo.imgUuid?commomHeadPictureFile+item.userInfo.imgUuid:require('../../assets/people.png')"/>
                                     <div :class="['text',{'otherLeftText':item.isOneSelf==2},{'selfRightText':item.isOneSelf==1}]" >
                                         <div :class="[{'userName':item.isOneSelf==1},{'userNameLeft':item.isOneSelf==2}]"  v-text="item.userInfo.realName"></div>
@@ -486,6 +487,7 @@ export default {
             token:'',
             projId:'',
             userImg:'',
+            userName:'',
             userId:'',
             BDMSUrl:'',
             QJFileManageSystemURL:'',
@@ -570,6 +572,7 @@ export default {
             userListAdd:[],
             userQunzuList:[],
             messageUrl:'http://10.252.26.241:8079',
+            // messageUrl:'http://10.252.29.32:8079',
             meetListGroup:[],//会议列表组
             ugList:[],
             ugListGroup:'',
@@ -594,10 +597,11 @@ export default {
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid')
         vm.userImg=localStorage.getItem('userImg')
+        vm.userName=localStorage.getItem('userName')
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-        vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
-        // vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
+        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
+        vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
         // var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
         // vm.imgdetial.path = obj.image
         // vm.imgdetial.x = obj.x
@@ -619,11 +623,12 @@ export default {
     //       this.websock.close()
     //   }, 
       //离开路由之后断开websocket连接
-
+    // mounted
     mounted(){
         // console.log(this.token,'this.token');
         this.scrollToBottom();
         this.ws = new WebSocket("ws://10.252.26.241:16800/websocket");
+        // this.ws = new WebSocket("ws://10.252.29.32:16800/websocket");
         
         // setTimeout(()=>{
         // },200)
@@ -650,45 +655,68 @@ export default {
             
            
             if(getBackData.type=="2"){
-                alert('11111');
-                 that.chatRecordList.push({
-                    userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
-                    userId:JSON.parse(event.data).to,
-                    sendText:JSON.parse(event.data).value,
-                    time:JSON.parse(event.data).time,
-                    isOneSelf:2,//1代表是当前用户，2代表是其他用户
-                })
-                that.meetListGroup.forEach((item)=>{
-                    if(item.id==getBackData.meetingId){
-                        item.noReadNum++
-                    }
-                })
+                // alert('11111');
+                console.log(that.selectMeetingId,'this.selectMeetingId');
+                if(getBackData.meetingId==that.selectMeetingId){
+                    that.chatRecordList.push({
+                        userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
+                        userId:JSON.parse(event.data).to,
+                        sendText:JSON.parse(event.data).value,
+                        time:JSON.parse(event.data).time,
+                        isOneSelf:2,//1代表是当前用户，2代表是其他用户
+                        type:"2",
+                        userFrom:JSON.parse(event.data).from,
+                        meetingId:JSON.parse(event.data).meetingId
+                    })
+                }
+                console.log(that.chatRecordList,'that.chatRecordList')
+                if(getBackData.meetingId==that.selectMeetingId){
+                    that.meetListGroup.forEach((item)=>{
+                        item.noReadNum=0;
+                    })
+                }else{
+                    that.meetListGroup.forEach((item)=>{
+                        if(item.id==getBackData.meetingId){
+                            item.noReadNum++
+                        }
+                    })
+                }
             }else if(getBackData.type=="1"){
-                alert('00000');
-                that.memberUserInfoList.forEach((item)=>{
-                    if(item.userId==getBackData.from){
-                        item.noReadNum++
-                    }
-                })
-                console.log(that.memberUserInfoList,'that.memberUserInfoList');
+                console.log(that.selectChatUserId,'that.selectChatUserId')
+                if(JSON.parse(event.data).meetingId==null&&that.selectChatUserId==getBackData.from){
+                    that.chatMemberRecordList.push({
+                        userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
+                        userId:JSON.parse(event.data).to,
+                        sendText:JSON.parse(event.data).value,
+                        time:JSON.parse(event.data).time,
+                        isOneSelf:2,//1代表是当前用户，2代表是其他用户
+                        type:"1",
+                        userFrom:JSON.parse(event.data).from,
+                        meetingId:JSON.parse(event.data).meetingId,
+                    })
+                }
+                // alert('00000');
+                if(that.selectChatUserId==getBackData.from){
+                    that.memberUserInfoList.forEach((item)=>{
+                        item.noReadNum=0;
+                    })
+                }else{
+                    that.memberUserInfoList.forEach((item)=>{
+                        if(item.userId==getBackData.from){
+                            item.noReadNum++
+                        }
+                    })
+                }
+                
+                console.log(that.chatMemberRecordList,'that.chatMemberRecordList');
             }
-            // that.memberUserInfoList.push({
-            //     account:item.account,
-            //     realName:item.realName,
-            //     userId:item.userId,
-            //     imgUuid:item.imgUuid,
-            //     isRead:true,//是否已读
-            //     noReadNum:null,//未读数量
-            // })
             if(event.data){
                 // this.$message({
                 //     type:'info',
                 //     message:'有新消息未读'
                 // })
-                alert('有新消息未读')
+                // alert('有新消息未读')
             }
-            console.log(that.chatRecordList,'this.chatRecordList');
-            // that.setMessageInnerHTML(JSON.parse(event.data).value);
         };
         //连接关闭的回调方法
         this.ws.onclose = function(){
@@ -758,7 +786,9 @@ export default {
                             sendText:vm.sendText,
                             time:new Date().getTime(),
                             isOneSelf:1,//1代表是当前用户，2代表是其他用户
-                            type:this.judgeChatMethod
+                            type:this.judgeChatMethod,
+                            userFrom:message.to,
+                            meetingId:message.meetingId
                         })
                     }
 
@@ -781,7 +811,9 @@ export default {
                             sendText:vm.sendText,
                             time:new Date().getTime(),
                             isOneSelf:1,//1代表是当前用户，2代表是其他用户
-                            type:this.judgeChatMethod
+                            type:this.judgeChatMethod,
+                            userFrom:message.to,
+                            meetingId:message.meetingId
                         })
                     }
 
@@ -807,6 +839,7 @@ export default {
             getOneByOneChatRecord(){
                 var vm=this;
                 vm.chatMemberRecordList=[];
+                vm.chatRecordList=[];
                 axios({
                     method:'get',
                     url:vm.messageUrl+'/message/singleHistory',
@@ -816,14 +849,14 @@ export default {
                     params:{
                         userId:vm.userId,//当前用户
                         toId:vm.selectChatUserId,//选择与谁对话用户
-                        pageSize:10,//页数
+                        pageSize:20,//页数
                         pageNum:1,//数量
                         times:new Date().getTime(),//获取时间
                     }
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.getOneByOneChatRecordList=response.data.rt;
-
+                        
                         this.getOneByOneChatRecordList.forEach((item)=>{
                             vm.chatMemberRecordList.unshift({
                                 userInfo:vm.returnUserInfo(item.fromid),
@@ -831,10 +864,13 @@ export default {
                                 sendText:item.content,
                                 time:item.date,
                                 isOneSelf:this.currentUserId(item.fromid),//1代表是当前用户，2代表是其他用户
-                                type:"1"
+                                type:"1",
+                                userFrom:item.fromid,
+                                meetingId:item.meetingid
+
                             })
                         })
-                        console.log(vm.chatMemberRecordList,'后台获取群聊聊天记录成功');
+                        console.log(vm.chatMemberRecordList,'后台获取私聊聊天记录成功');
                     }else{
 
                     }
@@ -852,6 +888,7 @@ export default {
             getMoreChatRecord(){
                 var vm=this;
                 vm.chatRecordList=[];
+                vm.chatMemberRecordList=[];
                 axios({
                     method:'get',
                     url:vm.messageUrl+'/message/groupHistory',
@@ -874,7 +911,10 @@ export default {
                                 sendText:item.content,
                                 time:item.date,
                                 isOneSelf:this.currentUserId(item.fromid),//1代表是当前用户，2代表是其他用户
-                                type:"2"
+                                type:"2",
+                                userFrom:item.fromid,
+                                meetingId:item.meetingid
+                                
                             })
                         })
                         console.log('后台获取群聊记录成功')
@@ -924,7 +964,7 @@ export default {
                         var meetIdUserList=response.data.rt;
                         if(meetIdUserList.length==0){
                             if(vm.selectGroupid){
-                                this.getUserByGroupid();
+                                this.getUserByGroupid(null);
                             }
                         }else{
                             meetIdUserList.forEach((item)=>{
@@ -992,6 +1032,7 @@ export default {
             //打开会议设置
             openMeetSet(){
                 this.meetSetShow=true;
+                this.getMemberShow=false;
             },
             //关闭对话设置
             closeOneByoneSet(){
@@ -1004,6 +1045,7 @@ export default {
             //打开对话设置
             openOneByOneSet(){
                 this.oneByoneSetShow=true;
+                this.getMemberShow=false;
             },
             //关闭成员列表
             closememberList(){
@@ -1012,6 +1054,7 @@ export default {
             //打开成员列表
             openMemberList(){
                 this.memberListShow=true;
+                this.getMemberShow=false;
                 // this.userInfoList.forEach((item)=>{
                 //     if(item.userId==this.userId){
                 //         return false
@@ -1034,6 +1077,7 @@ export default {
             //打开会议列表
             openMeetList(){
                 this.meetListShow=true;
+                this.getMemberShow=false;
             },
             //
 
@@ -1053,13 +1097,18 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         vm.meetListGroup=response.data.rt;
-                        this.getQunList();
+                        // this.getQunList();
+                        this.getUserGroupInit();
                         vm.meetListGroup.forEach((item)=>{
                             if(item.name=="默认群组"){
                                 this.selectMeetingId=item.id;
                                 this.selectGroupid=item.groupid;
                             }
+                            // this.getUserByGroupid(item.groupid);
+                            // this.$set(item,'userIdList',this.getUserByGroupidList);
+                            // if(item.)
                             this.$set(item,'noReadNum',0);
+                            console.log(vm.meetListGroup,'vm.meetListGroupmm');
                         })
                         this.getMoreChatRecord();
                         console.log('成功')
@@ -1087,7 +1136,8 @@ export default {
                         vm.meetListGroup.forEach((item)=>{
                             this.$set(item,'noReadNum',0);
                         })
-                        this.getQunList();
+                        // this.getQunList();
+                        this.getUserGroupInit();
                         this.selectMeetingId=vm.meetListGroup[vm.meetListGroup.length-1].id;
                         this.selectGroupid=vm.meetListGroup[vm.meetListGroup.length-1].groupid;
                         this.selectChatUserName=vm.meetListGroup[vm.meetListGroup.length-1].name;
@@ -1117,6 +1167,7 @@ export default {
                 }
                 if(vm.userDetialAdd){
                     vm.addUserIdGroup='&userId='+vm.userId;
+                    vm.meetChatName=vm.userName;
                     vm.userDetialAdd.forEach((item)=>{
                             vm.addUserIdGroup+='&userId='+item.id;
                             vm.meetChatName+=item.name+'、';
@@ -1143,10 +1194,10 @@ export default {
                         vm.getCreatMeetList();
                         this.centerDialogVisible=false;
                         this.oneByoneSetShow=false;
-                        this.$message({
-                            type:'success',
-                            message:'创建新群组成功'
-                        })
+                        // this.$message({
+                        //     type:'success',
+                        //     message:'创建新群组成功'
+                        // })
                     }else if(response.data.cd==-1){
 
                     }
@@ -1167,6 +1218,29 @@ export default {
                     if(response.data.cd==0){
 
                     }
+                })
+            },
+            getUserGroupInit(){
+                var vm=this;
+                axios({
+                    method:'get',
+                    url:vm.BDMSUrl+'lc/getUserGroup',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projectId:vm.projId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == '0'){
+                        var str=response.data.rt;
+                        vm.ugListGroup=str;
+                        console.log(vm.ugListGroup,'str0000000');
+                        if(this.isContained(vm.meetListGroup,vm.ugListGroup)==false){
+                            this.initCreatDefaultMeet();
+                        }
+                    }
+                    
                 })
             },
              getQunList(){//获得工程群组列表
@@ -1213,6 +1287,10 @@ export default {
              },
             getMember(){
                 this.getMemberShow=!this.getMemberShow;
+                this.memberListShow=false;
+                this.meetListShow=false;
+                this.oneByoneSetShow=false;
+                this.meetSetShow=false;
                 this.getUsersByMeetId();
             },
             addMoreUserToMeeting(){
@@ -1235,7 +1313,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.rt != null){
                         vm.outsideUserList = response.data.rt;
-                        console.log(vm.outsideUserList,'vm.outsideUserList')
+                        // console.log(vm.outsideUserList,'vm.outsideUserList')
                         vm.outsideUserList.forEach((item)=>{
                             vm.userIds.push(item.userId)
                         })
@@ -1338,7 +1416,7 @@ export default {
                                 })
                             }
                         })
-                        console.log(this.userInfoList,'this.userInfoList');
+                        // console.log(this.userInfoList,'this.userInfoList');
                     }else if(response.data.cd==-1){
 
                     }
@@ -1352,6 +1430,11 @@ export default {
                 this.oneByoneShow=true;
                 this.judgeChatMethod="1";//代表为私聊
                 this.getMemberShow=false;
+                this.memberUserInfoList.forEach((item)=>{
+                    if(item.userId==valId){
+                        item.noReadNum=0;
+                    }
+                })
                 this.getOneByOneChatRecord();
             },
             //群聊选择群组
@@ -1362,11 +1445,20 @@ export default {
                 this.meetListShow=false;
                 this.getMemberShow=false;
                 this.selectGroupid=groupId;
+                this.meetListGroup.forEach((item)=>{
+                    if(item.id==id){
+                        item.noReadNum=0;
+                    }
+
+                })
                 this.getMoreChatRecord();
             },
             //根据群组id获取用户数量
-            getUserByGroupid(){
+            getUserByGroupid(val){
                 var vm=this;
+                if(val){
+                    this.selectGroupid=val;
+                }
                 axios({
                     method:'get',
                     url:this.BDMSUrl+'project2/Config/userGroupUserList',

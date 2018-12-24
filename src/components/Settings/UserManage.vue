@@ -803,8 +803,8 @@ export default {
       var projAuth = localStorage.getItem('projAuth')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL
-      vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile
-    //   vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+    //   vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile
+      vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')

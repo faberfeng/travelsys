@@ -134,6 +134,7 @@ export default {
                 design:false,
                 costManagement:false,
                 materialPurchasing:false,
+                liveConnection:false,
                 safetyManagement:false,
                 constructionSite:false,
                 docManagement:false,
@@ -179,8 +180,8 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL;
-        vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
-        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        // vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
+        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.iframeUrl=vm.$store.state.iframeWebGlUrl+'?new='+Math.random();
         vm.navigationPath = sessionStorage.getItem('navigationPath');
@@ -289,6 +290,7 @@ export default {
                         {title:'设计管理',name:'designManager',isIf:'auth.design',status:1},
                         {title:'成本管理',name:'costManage',isIf:'auth.costManagement',status:1},
                         {title:'物资采购',name:'materialPurchase',isIf:'auth.materialPurchasing',status:1},
+                        // {title:'现场连线',name:'liveConnection',isIf:'auth.liveConnection',status:1},
                         {title:'安全管理',name:'construction',isIf:'auth.constructionSite',status:1},
                         {title:'文档管理',name:'documentManager',isIf:'auth.docManagement',status:1},
                         {title:'配置中心',name:'settings',isIf:'auth.configurationCenter',status:1},

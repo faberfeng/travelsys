@@ -2,7 +2,8 @@
     <div id="projectNavigation">
         <headerCommon :username="userName"></headerCommon>
         <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
-        <div v-show="noprojectShow" class="noproject">
+        <!-- v-show="noprojectShow" -->
+        <div  class="noproject" v-show="noprojectShow">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
                 <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
@@ -13,6 +14,7 @@
                 <div></div>
             </div>
         </div>
+        <!-- v-show="!noprojectShow" -->
         <div v-show="!noprojectShow">
             <ul id="CTypeList">
                 <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
@@ -55,6 +57,7 @@ export default {
             url:'',
             pathInit:'',
             companyList:[],
+            companyLists:[],
             userName:'',
             userId:'',
             token:'',
@@ -134,43 +137,85 @@ export default {
                 // if(typeof(response.data.rt.companyList) == 'undefined' && response.data.rt.companyList.length == 0){
                     
                 // }
-                console.log(response.data.rt.length)
-                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
-                    vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
-                    vm.initCompany()
+                //  if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
+                //     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
+                //     vm.initCompany()
                     
-                }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
-                    vm.companyList = response.data.rt.companyList;
-                    // this.noprojectShow=false;
-                }else if(typeof(response.data.rt.countQ1) != 'undefined'){
+                // }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
+                    
+                // }else
+                if(typeof(response.data.rt) != 'undefined'){
+                    this.companyLists=response.data.rt;
                     var obj = []
                     var index = 0
-                    if(response.data.rt.countQ3 !=0){
+                    if(response.data.rt.东北 !=0){
                         obj.push({
-                            'name':'Q3',
-                            'id':3,
+                            'name':'东北',
+                            'id':'东北',
+                            'length':response.data.rt.东北.length
                         })
-                        vm.active='Q3'
-                        index = 3
+                        vm.active='东北'
+                        index = '东北'
                     }
-                    if(response.data.rt.countQ2 !=0){
+                    if(response.data.rt.华东 !=0){
                         obj.push({
-                            'name':'Q2',
-                            'id':2,
+                            'name':'华东',
+                            'id':'华东',
+                            'length':response.data.rt.华东.length
                         })
-                        vm.active='Q2'
-                        index = 2
+                        vm.active='华东'
+                        index = '华东'
                     }
-                    if(response.data.rt.countQ1 !=0){
+                    if(response.data.rt.华北 !=0){
                         obj.push({
-                            'name':'Q1',
-                            'id':1,
+                            'name':'华北',
+                            'id':'华北',
+                            'length':response.data.rt.华北.length
                         })
-                        vm.active='Q1'
-                        index = 1
+                        vm.active='华北'
+                        // vm.companyList=response.data.rt.华北;
+                        index = '华北'
+                    }
+                    if(response.data.rt.华南 !=0){
+                        obj.push({
+                            'name':'华南',
+                            'id':'华南',
+                            'length':response.data.rt.华南.length
+                        })
+                        vm.active='华南'
+                        index = '华南'
+                    }
+                    if(response.data.rt.西北 !=0){
+                        obj.push({
+                            'name':'西北',
+                            'id':'西北',
+                            'length':response.data.rt.西北.length
+                        })
+                        vm.active='西北'
+                        index = '西北'
+                    }
+                    if(response.data.rt.西南 !=0){
+                        obj.push({
+                            'name':'西南',
+                            'id':'西南',
+                            'length':response.data.rt.西南.length
+                        })
+                        vm.active='西南'
+                        index = '西南'
                     }
                     vm.companyType = obj.reverse()
+                    if(vm.companyType.length==0){
+                        this.noprojectShow=true;
+                    }
                     vm.selectType(index)
+                    console.log(vm.companyType,'vm.companyType');
+                    if(vm.companyType.length==1){
+                        if(vm.companyType[0].length==1){
+                            vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+this.companyLists[vm.companyType[0].name][0].companyId;
+                            vm.initCompany()
+                        }
+                    }
+                    
                     // this.noprojectShow=false;
                 }else if(response.data.rt.length==undefined){
                         this.noprojectShow=true;
@@ -183,30 +228,32 @@ export default {
         },
         selectType(index){
              var vm = this
-             vm.active = 'Q'+index
-            axios({
-                method:'GET',
-                url:vm.BDMSUrl+'project2/listCompany',
-                params:{
-                    type:index
-                },
-                headers:{
-                    'accept':'application/json;charset=UTF-8',
-                    'token':vm.token
-                },
-            }).then((response)=>{
-                if(response.data.msg == "您没有登录或登录超时，请重新登录"){
-                     vm.$router.push({
-                        path:'/login'
-                    })
-                }
-                vm.companyList = response.data.rt;
+             vm.active =index
+             vm.companyList=vm.companyLists[index];
+            // axios({
+            //     method:'GET',
+            //     url:vm.BDMSUrl+'project2/listCompany',
+            //     params:{
+            //         type:index
+            //     },
+            //     headers:{
+            //         'accept':'application/json;charset=UTF-8',
+            //         'token':vm.token
+            //     },
+            // }).then((response)=>{
+            //     if(response.data.msg == "您没有登录或登录超时，请重新登录"){
+            //          vm.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            //     vm.companyList = response.data.rt;
                 
-            }).catch(function(error){
-                vm.$router.push({
-                  path:'/login'
-                })
-            })
+            // }).catch(function(error){
+            //     vm.$router.push({
+            //       path:'/login'
+            //     })
+            // })
+
         },
         //企业唯一或不唯一
         initCompany(){
@@ -321,7 +368,7 @@ export default {
         position: relative;
         cursor: pointer;
     }
-    .active-Q1 .Q_title_left,.active-Q2 .Q_title_left,.active-Q3 .Q_title_left{
+    .active-华北 .Q_title_left,.active-东北 .Q_title_left,.active-华东 .Q_title_left,.active-华北 .Q_title_left,.active-华南 .Q_title_left,.active-西北 .Q_title_left,.active-西南 .Q_title_left{
         background: #fc3439;
         border: none;
         width: 72px;
@@ -338,34 +385,60 @@ export default {
         background-position:0 0;
         content: '';
     }
-    .company-item-leftQ1 .Q_title_left::after{
+    .company-item-left华北 .Q_title_left::after{
         background-image:url('../assets/2.png');
     }
-    .company-item-leftQ2 .Q_title_left::after{
+    .company-item-left东北 .Q_title_left::after{
         background-image:url('../assets/1.png');
     }
-    .company-item-leftQ3 .Q_title_left::after{
+    .company-item-left华东 .Q_title_left::after{
         background-image:url('../assets/3.png');
     }
-    .active-Q1 .Q_title_left::after{
+    .company-item-left华南 .Q_title_left::after{
+        background-image:url('../assets/4.png');
+    }
+    .company-item-left西北 .Q_title_left::after{
+        background-image:url('../assets/5.png');
+    }
+    .company-item-left西南 .Q_title_left::after{
+        background-image:url('../assets/6.png');
+    }
+
+    .active-华北 .Q_title_left::after{
        background-image:url('../assets/2-1.png');
            top: 24px;
         left: 24px;
     }
-    .active-Q2 .Q_title_left::after{
+    .active-东北 .Q_title_left::after{
        background-image:url('../assets/1-1.png');
            top: 24px;
         left: 24px;
     }
-    .active-Q3 .Q_title_left::after{
+    .active-华东 .Q_title_left::after{
        background-image:url('../assets/3-1.png');
            top: 24px;
         left: 24px;
     }
-    .active-Q1,.active-Q2,.active-Q3{
+    .active-华南 .Q_title_left::after{
+       background-image:url('../assets/4-1.png');
+           top: 24px;
+        left: 24px;
+    }
+    .active-西北 .Q_title_left::after{
+       background-image:url('../assets/5-1.png');
+           top: 24px;
+        left: 24px;
+    }
+    .active-西南 .Q_title_left::after{
+       background-image:url('../assets/6-1.png');
+           top: 24px;
+        left: 24px;
+    }
+
+    .active-华北,.active-东北,.active-华东,.active-华南,.active-西北,.active-西南{
         position: relative;
     }
-    .active-Q1::after,.active-Q2::after,.active-Q3::after{
+    .active-华北::after,.active-东北::after,.active-华东::after,.active-华南::after,.active-西北::after,.active-西南::after{
         display: block;
         position: absolute;
         width: 12px;
