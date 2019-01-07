@@ -2,7 +2,7 @@
     <div  id="designVersion">
         <div id="item-box-file">
            
-            <router-link :to="'/Design/management'" class=" label-item">  
+            <!-- <router-link :to="'/Design/management'" class=" label-item">  
                 设计协调  
             </router-link>
              <router-link :to="'/Design/drawingReview'" class="label-item">  
@@ -13,6 +13,8 @@
             </router-link>
             <router-link :to="'/Design/designversion'"  class="label-item label-item-active">  
                 设计版本  
+            </router-link> -->
+             <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
             </router-link>
               <div class="header">
                 <span class="singelOne">单体</span>
@@ -78,7 +80,9 @@ export default {
             projId:'',
             BDMSUrl:'',
             selectValue:'',
-            holderId:''
+            holderId:'',
+            routerList:'',
+            moduleList:'',
         }
     },
     created(){
@@ -86,13 +90,58 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         vm.getDesignVersion()
+        vm.loadingTitle()
     },
     mounted(){
         var vm = this
         const table1 = new tableResizable('table-resizable');
     },
     methods:{
+         loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'004','00404','/Design/designversion','00402','/Design/drawingReview','00403','/Design/attributeManager','00401','/Design/management');
+          console.log(vn.routerList,'vn.routerList')
+
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         //进入设计版本页面
         getDesignVersion(){
             axios({

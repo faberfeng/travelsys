@@ -2,7 +2,7 @@
     <div id="resourcePlan">
         <div :class="['topHeader']">
             <div id="item-box-file">
-                <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
+                <!-- <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
                 个人日历  
                 </router-link>
                 <router-link :to="'/SchedulePlan/resourcePlan'" class="label-item label-item-active">  
@@ -13,6 +13,8 @@
                 </router-link>
                 <router-link :to="'/SchedulePlan/calendarConfig'" class="label-item">  
                 更多配置  
+                </router-link> -->
+                <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                 </router-link>
             </div>
             <div class="resourcePlanBody">
@@ -197,6 +199,8 @@ export default{
     data(){
         return {
             // webGlShow:this.$route.params.id,
+            routerList:'',
+            moduleList:'',
             dataShow:true,//空数据显示
             dataShow1:true,
             title:'',//显示当前时间
@@ -352,9 +356,11 @@ export default{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         // this.webGlShow=localStorage.getItem('webGlShow');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        this.loadingTitle()
         this.getcurTime();
         this.getResouceTypeByParams();
         this.getLineDataOfMonth();    
@@ -369,6 +375,48 @@ export default{
         // this.load();
     },
     methods:{
+         loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00502','/SchedulePlan/resourcePlan','00501','/SchedulePlan/personalCalendar','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig');
+          console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         //更换时间
         lastMonth(){
             var title = this.nowTime 

@@ -3,7 +3,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;">
                 <div id="item-box-file">
-                    <router-link :to="'/Design/management'" class="label-item">  
+                    <!-- <router-link :to="'/Design/management'" class="label-item">  
                      设计协调  
                     </router-link>
                     <router-link :to="'/Design/drawingReview'" class="label-item-active label-item">  
@@ -14,6 +14,8 @@
                     </router-link>
                     <router-link :to="'/Design/designversion'"  class="label-item">  
                         设计版本  
+                    </router-link> -->
+                     <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                 </div>
                 
@@ -86,10 +88,11 @@
                         <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
                     </p>
                     <p class="clearfix" v-else>
-                        <i class="icon-goujian icon-delete"  title="删除" @click="deleteFile()"></i>
-                        <i class="icon-goujian icon-edit"  title="编辑" @click="editMap()"></i>
+                        <i class="icon-goujian icon-delete" v-show="isOneShow"  title="删除" @click="deleteFile()"></i>
+                        <i class="icon-goujian icon-edit" v-show="isOneShow" title="编辑" @click="editMap()"></i>
                         <i class="icon-goujian icon-update"  title="更新" @click="updateFile()"></i>
                     </p>
+                    <!-- :default-expanded-keys="expandedKeys" -->
                     <el-tree
                         :data="FileTree"
                         node-key="code" 
@@ -97,17 +100,27 @@
                         :props="defaultProps"
                         :default-expanded-keys="expandedKeys"
                         :expand-on-click-node="false"
-                        :default-checked-keys="checkedKeys"
+                        
                         @node-expand="nodeClick"
                         @node-collapse="nodeClickClose"
                         :highlight-current="true"
-                        @node-click="handleNodeClick"
+                        @current-change="handleNodeClick"
+                        :show-checkbox="true"
                         :check-strictly="true"
-                        id="cloudDirveFileTree"
+                         :draggable="true"
+                        :allow-drag="allowDrag"
+                        :allow-drop="allowDrop"
+                        @node-drop="handleDrop"
+                        @check="checkChange"
                         
+                        id="cloudDirveFileTree"
                     >
+                   
+                    <!-- :allow-drop="allowDrop" -->
+                    <!-- :show-checkbox="true" -->
                     <span :class="['custom-tree-node','elselect','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'']" slot-scope="{ node, data }" v-text="node.label"></span>
                     </el-tree>
+                    
                 </div>
             </div>
             <div v-show="screenLeft.item == 2" id="box-right">
@@ -297,6 +310,7 @@ export default {
     name:'drwaingReview',
     data(){
         return{
+            checkValue:'',
             drawingShow:false,
             showComment:true,//是否折叠评论
             isClick:'',
@@ -353,6 +367,7 @@ export default {
             drawingLoading:false,
             showAction:true,
             IsFolderAction:true,
+            isOneShow:false,
             defaultSubProjId:'',
             token:'',
             projId:'',
@@ -369,12 +384,15 @@ export default {
             checkedKeys:[],
             checkFileDir:{},
             directoryId:'',
+            directoryCode:'',
             drawingsUploadShow:false,
             fileList:[], //即将上传的文件集合
             drawingList:'',
             FileTree_original:[],
             FileTree:[],
             DirectoryList:[],
+            buildIdList:[],
+            buildId:'',//单体iD
             drawingVersionList:'',
             drawingZxVersionId:'',
             pageNo:'',
@@ -456,10 +474,20 @@ export default {
             letterList:[' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N'],
             drawingNumber:'',
             drawingName:'',
-            getHoldersList:'',//空间楼层列表
+            getHoldersList:[],//空间楼层列表
             holderId:'',//容器ID
             fileGroupId:'',//文件夹ID
             paraList:{},
+            deleteDrawingIds:[],
+            drawingLists:[],
+            checkChangeValue:'',
+            targetBuildId:'',//单体ID
+            targetProfessionCode:'',//专业编码
+            draggDrawingIds:[],//图纸id
+            nextDrawingId:'',//迁移后后面的一个图纸ID，没有则不传
+            previousDrawingId:'',//迁移后前面面的一个图纸ID，没有则不传
+            routerList:'',
+            moduleList:'',
         }
     },
     filters: {
@@ -499,11 +527,13 @@ export default {
         vm.projId = localStorage.getItem('projId')
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.getDirectory()
         // this.getAllUser()
         this.getAllUser()
         this.createDrawingDirectory()
-        this.getHolders()
+        this.loadingTitle()
+        // this.getHolders()
         this.$nextTick(() => {
             this.$refs.fileTree_drawingReview.setCurrentKey(110000); // treeBox 元素的ref   value 绑定的node-key
         });
@@ -512,7 +542,7 @@ export default {
     },
     mounted(){
         console.log('fjjjk')
-         console.log(this.$refs.pic.$el.style,'fjjj');
+        //  console.log(this.$refs.pic.$el.style,'fjjj');
         //  this.$refs.pic.$el.style.display="none";
     },
     watch:{
@@ -540,13 +570,55 @@ export default {
     //    }
     },
     methods:{
+        loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'004','00402','/Design/drawingReview','00403','/Design/attributeManager','00401','/Design/management','00404','/Design/designversion');
+          console.log(vn.routerList,'vn.routerList')
+
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         drawFinish(e){
             // console.log(e);
             this.addAnnotation(e[e.length - 1]);
         },
         loadPic(){
              this.$refs.pic.Max_Select = 1;
-             console.log(this.$refs.pic.$el.style,'fjjj');
             //  this.$refs.pic.$el.style
         },
         picView_status_changed(a,b){
@@ -607,6 +679,7 @@ export default {
         //获取单体分区楼层三个级别的容器信息
         getHolders(){
             var vm=this;
+            this.getHoldersList=[];
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getHolders',
                 method:'get',
@@ -622,7 +695,8 @@ export default {
                     this.getHoldersList.unshift({ 
                         "holderId": null,
                         "holderName": "无",
-                        "holderType": ""
+                        "holderType": "",
+                        "parentHolderId":null
                     })
                      this.getHoldersList.forEach((item)=>{
                          if(item.holderType==7){
@@ -643,6 +717,37 @@ export default {
                     })
                 } 
             })
+        },
+        //
+        getHolderByBuildId(){
+            var vm=this;
+            this.getHoldersList=[];
+             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getHolderByBuildId',
+                method:'POST',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    buildId:vm.buildId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getHoldersList=response.data.rt;
+                    this.getHoldersList.unshift({ 
+                        "holderId": null,
+                        "holderName": "无",
+                        "holderType": "",
+                        "parentHolderId":null
+                    })
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+
         },
         //创建/同步图纸目录
         createDrawingDirectory(){
@@ -1254,6 +1359,54 @@ export default {
             
             }
         },
+        //获取单体目录
+        getBuildId(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'/dc/drawingReview/getBuildId',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // var list=[{'code':0,'name':'图纸','directory':0}]
+                    
+                        var buildIdLists=response.data.rt;
+                        vm.DirectoryList.forEach((item)=>{
+                            vm.buildIdList=[];
+                            buildIdLists.forEach((item1)=>{
+                                vm.buildIdList.push({
+                                    buildId:item1.id,
+                                    name:item1.name,
+                                    buildCode:item.code,
+                                    code:item1.id+item.code,
+                                    disabled:true,
+                                    isBuild:true
+                                })
+                                
+                        })
+                        vm.buildIdList.unshift({
+                                    buildCode:item.code,
+                                    buildId:null,
+                                    name:'总体',
+                                    code:0+item.code,
+                                    disabled:true,
+                                    isBuild:true
+                                })
+                        vm.$set(item,'children',vm.buildIdList)
+                    })
+                    
+                    vm.getDrawingList();
+                    // vm.FileTree=vm.DirectoryList;
+                    // console.log(vm.DirectoryList,'vm.DirectoryList');
+                    
+                }
+            })
+        },
         //获取目录
         getDirectory(){
             var vm=this
@@ -1271,9 +1424,13 @@ export default {
                     vm.DirectoryList=response.data.rt;
                     vm.DirectoryList.forEach((item)=>{
                         vm.$set(item,'directory',0)
+                        vm.$set(item,'disabled',true)
+                        vm.$set(item,'isDirectory',true)
                     })
-                    console.log(vm.DirectoryList,'directory')
-                    this.getDrawingList();
+                    
+                    vm.getBuildId()
+
+                    // this.getDrawingList();
                     // console.log(vm.DirectoryList);
                     // vm.showAction = true
                 }else{
@@ -1315,62 +1472,138 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                      vm.drawingList=response.data.rt;
+                     console.log(vm.drawingList,'vm.drawingList');
                     if(vm.drawingList != null){
                         vm.drawingList.forEach((item,index) => {
                             vm.$set(item,'isLeaf',true)
                             vm.$set(item,'name',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
                             vm.$set(item,'code',item.id)
+                            
                         });
                     }  
-                    var list=[{'code':0,'name':'图纸','directory':0}]
+                    var list=[{'code':0,'name':'图纸','directory':0,disabled: true,isTop:true}]
                      this.DirectoryList.forEach((item)=>{
-                         let a=[];
-                        this.drawingList.forEach((item1)=>{
-                            if(item.code==item1.directory){
-                                a.push(item1)
-                                vm.$set(item,'children',a)
-                            }
-                        })
+                        
+                         item.children.forEach((val)=>{
+                              var a=[];
+                             this.drawingList.forEach((item1)=>{
+                                 if(val.buildId==item1.buildId&&val.buildCode==item1.directory){
+                                    a.push(item1) 
+                                 }
+                                 vm.$set(val,'children',a)
+
+                             })
+
+                         })
                     })
                     vm.$set(list[0],'children',this.DirectoryList);
-                    console.log(list,'最新目录');
-                    console.log(this.DirectoryList,'目录列表');
+                    console.log(vm.DirectoryList,'新的directory');
                     vm.FileTree = data.transformTozTreeFormat(setting,list);
-                    console.log(vm.FileTree);
-                    // console.log(vm.FileTree,'树形图列表');
-                    if(this.drawingId){
-                        vm.drawingList.forEach((item)=>{
-                        if(item.id==vm.checkFileDir.id){
-                            this.drawingList=item.id;
-                            }
-                        });
-                    }else{
+                    console.log(vm.FileTree,'vm.FileTree000');
+                    // console.log(document.getElementsByClassName('custom-tree-node'),'rrrrrr');
+                    // if(this.drawingId){
+                    //     vm.drawingList.forEach((item)=>{
+                    //     if(item.id==vm.checkFileDir.id){
+                    //         this.drawingId=item.id;
+                    //         }
+                    //     });
+                    // }else{
+                    // }
                         let strId='';
                         let strLen='';
                         console.log(vm.FileTree,'vm.FileTree');
                         console.log(vm.directoryId,'vm.directoryId');
                         vm.FileTree[0].children.forEach((item)=>{
-                            if(item.code==vm.directoryId){
-                                strLen=item.children.length;
-                                strId=item.children[strLen-1].id;
-                                this.drawingName=item.children[strLen-1].drawingName;
-                                this.drawingNumber=item.children[strLen-1].drawingNumber;
-                            }
+                            item.children.forEach((item1)=>{
+                                if(item1.buildCode==vm.directoryId&&item1.buildId==vm.buildId){
+                                    strLen=item1.children.length;
+                                    strId=item1.children[strLen-1].id;
+                                    this.drawingName=item1.children[strLen-1].drawingName;
+                                    this.drawingNumber=item1.children[strLen-1].drawingNumber;
+                                }
+
+                            })
+                            // if(item.code==vm.directoryId){
+                            //     strLen=item.children.length;
+                            //     strId=item.children[strLen-1].id;
+                            //     this.drawingName=item.children[strLen-1].drawingName;
+                            //     this.drawingNumber=item.children[strLen-1].drawingNumber;
+                            // }
                         });
                         this.drawingId=strId;
                     }                   
                      console.log(this.drawingId,'初始加载');
                      if(this.drawingId){
                         this.getDrawingVersionList();
-                        // this.queryAnnotation();
-                        // this.getDrawingRotateInfo();
                         this.getMaxVersionPath();
-                        
                     }
-                    this.expandedKeys.push(this.directoryId);
+                    this.expandedKeys.push(this.directoryCode);
                     console.log(this.expandedKeys);
+                
+            })
+        },
+        handleDrop(draggingNode, dropNode, dropType, ev){
+            var vm=this;
+            this.draggDrawingIds=[];
+            console.log(draggingNode,'拖转的');
+            this.draggDrawingIds.push(draggingNode.data.id);
+             console.log(dropNode,'放置的');
+             console.log(dropType,'类型');
+             if(dropType=="inner"&&dropNode.data.isBuild==true){
+                 this.targetBuildId=dropNode.data.buildId;
+                this.targetProfessionCode=dropNode.data.buildCode;
+                this.nextDrawingId=null;
+                this.previousDrawingId=null;
+             }else{
+                this.targetBuildId=dropNode.data.buildId;
+                this.targetProfessionCode=dropNode.data.directory;
+                this.nextDrawingId=null;
+                this.previousDrawingId=dropNode.data.id;
+             }
+             
+             this.drawingTransfer();
+        },
+        //图纸目录拖动迁移
+        drawingTransfer(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:vm.BDMSUrl+'dc/drawingReview/drawingTransfer',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    targetBuildId:vm.targetBuildId,//单体ID
+                    projectId:vm.projId,
+                    professionCode:vm.targetProfessionCode,//专业编码
+                    nextDrawingId:vm.nextDrawingId,//迁移后后面的一个图纸ID，没有则不传
+                    previousDrawingId:vm.previousDrawingId,//迁移后前面的一个图纸ID，没有则不传
+                },
+                data:vm.draggDrawingIds,//图纸id
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getDirectory();
+                    console.log('迁移成功');
                 }
             })
+        },
+        //判断节点是否能被迁移
+        allowDrag(draggingNode){
+            return draggingNode.isLeaf
+        },
+        allowDrop(draggingNode, dropNode, type){
+            // console.log(dropNode,'dropNode');
+            // dropNode.data.isTop||dropNode.data.isDirectory||dropNode.data.isBuildId
+            // console.log(type,'type');
+            if(dropNode.data.isLeaf){
+                return type !== 'inner';
+            }else if(dropNode.data.isTop||dropNode.data.isDirectory){
+                return false
+            }else if(dropNode.data.isBuild){
+                return type === 'inner'
+            }else{
+                return true
+            }
         },
         //去除后缀名
         deleteLastName(str){
@@ -1398,78 +1631,46 @@ export default {
                     vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
                     
                     vm.getDrawingRotateInfo();
-                    // vm.paraList={angle:this.rotate,type:vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3),source:vm.drawingFileUrl};
-                    // console.log(vm.paraList,'this.paraList');
                     this.drawingLoading=false;
-
-                    // if(this.versionPath.substr(this.versionPath.length-3)=='pdf'||this.versionPath.substr(this.versionPath.length-3)=='PDF')
-                    //     {   this.pdfShow=true;
-                    //         this.imgShow=false;
-                    //         this.drawingFileUrl1=this.drawingFileUrl;
-                    //         var source=this.drawingFileUrl;
-                           
-                    //         // console.log(source);
-                    //         // this.getDrawingRotateInfo();
-                    //         // document.getElementById('abs').previousSibling.style.transform = 'rotate('+this.rotate +'deg)';
-                    //         // this.init(source);
-                    //         //删除之前节点abs
-                    //     }else{
-                    //         this.imgShow=true;
-                    //         this.pdfShow=false;
-                    //         //绘制文件是png和jpg格式的图片
-                    //         var c = document.getElementById("imgCanvas");//此为之前创建的一个图片框架
-                           
-                    //         var width=c.width;
-                    //         var height=c.height;
-                    //         var ctx_img = c.getContext("2d");
-                    //         ctx_img.clearRect(0,0,width,height);
-                    //         var img = new Image();
-                    //         img.onload =function() {
-                    //             ctx_img.drawImage(img,0, 0);
-                    //             }
-                    //         img.src = this.drawingFileUrl;
-                    //         var source=this.drawingFileUrl;
-                    //         // this.init(source);
-                    //     }
-                    //     // this.loadeds();
-                        
-                        
-                    // console.log(this.versionPath);
                 }
                 this.loading=false;
             })
         },
+        handleCheckChange(data){
+            console.log(data,'obj0000');
+
+        },
         handleNodeClick(obj){
-             this.drawingLoading=true;
+            var vm=this;
+            this.drawingLoading=true;
             // this.annotationlist='';
             this.allList='';
             this.rotate=0;
-            //清除批注遗留的canvas；
-            if(document.getElementById('abs')){
-                let absInp=document.getElementById('absInp');
-                document.getElementById('abs').drawElements=[];
-                document.getElementById('abs').reflash();
-                // alert('234')
-            }
-            var vm=this;
-            vm.checkedKeys=[];
-             vm.checkedKeys.push(obj.code)
-            //  console.log(vm.checkedKeys)
+            vm.deleteDrawingIds=[];
+            // vm.checkedKeys=[];
+            //  vm.checkedKeys.push(obj.code)
+            //  console.log(vm.checkedKeys,'vm.checkedKeys');
             vm.showAction = true
             if(!obj.isLeaf){
                 vm.IsFolderAction = true
+                vm.isOneShow=false;
             }else{
                 vm.IsFolderAction = false
+                vm.isOneShow=true;
             }
+            // console.log(this.$refs.fileTree_drawingReview.getCheckedKeys().concat(this.$refs.fileTree_drawingReview.getHalfCheckedKeys()),'00000');
 
             vm.checkFileDir=obj//选中的文件夹
+            console.log(vm.checkFileDir,'vm.checkFileDir');
             // console.log(vm.checkFileDir);
-            vm.directoryId=obj.code
+            vm.directoryCode=obj.code
+            vm.directoryId=obj.buildCode
+            vm.buildId=obj.buildId
             vm.drawingId=obj.id
             vm.drawingName=obj.drawingName
             vm.drawingNumber=obj.drawingNumber
-             
-            // console.log(vm.directoryId,'vm.directoryId')
+            vm.deleteDrawingIds.push(vm.drawingId);
+            console.log(vm.deleteDrawingIds,'vm.deleteDrawingIds');
             // console.log( vm.drawingId,' vm.drawingId')
             if(vm.checkFileDir.id){
                 //清除原来的canvas和inuput
@@ -1482,19 +1683,36 @@ export default {
             
             
         },
+        checkChange(checkedNodes,checkedKeys,halfCheckedNodes,halfCheckedKeys){
+            var vm=this;
+            this.checkChangeValue=this.$refs.fileTree_drawingReview.getCheckedNodes();
+            if(this.checkChangeValue){
+                vm.IsFolderAction=false;
+            }
+            console.log(this.$refs.fileTree_drawingReview.getCheckedNodes(),'aaaaaaaaaaaa');
+            // console.log(checkedKeys,'checkedKeys');
+            // console.log(halfCheckedNodes,'halfCheckedNodes');
+            // console.log(halfCheckedKeys,'halfCheckedKeys');
+        },
+        changeCheck(data){
+            console.log(data,'data');
+        },
         nodeClick(data,node,self){
             var vm = this
             if(vm.expandedKeys.indexOf(data.code) == -1){
                 vm.expandedKeys.push(data.code)
             }
             console.log(vm.expandedKeys);
+            // console.log(data.code,'3333');
+            // vm.directoryId=data.code;
+
         },
         nodeClickClose(data,node,self){
             var vm = this
             if(vm.expandedKeys.indexOf(data.code) != -1){
                  vm.expandedKeys.splice(vm.expandedKeys.indexOf(data.code),1)
             }
-            // console.log(vm.expandedKeys);
+            console.log(vm.expandedKeys);
         },
         //导出批注
         exportAnnotation(){
@@ -1541,15 +1759,25 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
+                var drawingIds='';
+                var str=this.$refs.fileTree_drawingReview.getCheckedNodes();
+                console.log(str,'str0000');
+                str.forEach((item)=>{
+                    vm.drawingLists.push(item.id)
+                })
+                if(vm.drawingLists.length!=0){
+                    drawingIds=vm.drawingLists
+                }else{
+                    drawingIds=vm.deleteDrawingIds
+                }
+                console.log(drawingIds,'drawingIds');
                 axios({
-                    method:'get',
-                    url:vm.BDMSUrl+'/dc/drawingReview/deleteDrawing',
+                    method:'post',
+                    url:vm.BDMSUrl+'dc/drawingReview/deleteDrawing',
                     headers:{
                         'token':vm.token
                     },
-                    params:{
-                        drawingId:vm.checkFileDir.id
-                    }
+                    data:drawingIds
                 }).then((response)=>{
                     if(response.data.cd == 0){
                         vm.$message({
@@ -1561,6 +1789,9 @@ export default {
                         this.drawingFileUrl='';
                         this.checkFileDir=[];
                         this.versionPath='';
+                        this.drawingNumber='';
+                        this.drawingName='';
+
                         this.rotate=0;
                         // //清除批注遗留的canvas；
                         // if(document.getElementById('abs')){
@@ -1598,12 +1829,20 @@ export default {
         },
         editMap(){
              var vm = this
-            vm.editDrawing.renameshow = true
             vm.editDrawing.dId = vm.checkFileDir.id
             vm.editDrawing.dcode = vm.checkFileDir.drawingNumber
             vm.editDrawing.dname = vm.checkFileDir.drawingName
             vm.editDrawing.dscale = vm.checkFileDir.ratio
             vm.holderId=vm.checkFileDir.holderId
+            vm.buildId=vm.checkFileDir.buildId
+            if(vm.buildId){
+                     vm.editDrawing.renameshow = true
+                    vm.getHolderByBuildId();
+            }else{
+                    vm.editDrawing.renameshow = true
+                    vm.getHolders()
+            }
+
         },
         updateFile(){
             var vm = this
@@ -1615,13 +1854,19 @@ export default {
         },
         uploadFile(){
             var vm = this
-            if(vm.checkFileDir.code==0){
+            if(vm.checkFileDir.directory==0){
                 vm.$message({
                     type:'error',
                     message:'系统文件，不能操作'
                 })
-            }else if(vm.checkFileDir.code){
-                vm.drawingsUploadShow = true
+            }else if(vm.checkFileDir.buildCode){
+                if(vm.buildId){
+                     vm.drawingsUploadShow = true;
+                    vm.getHolderByBuildId();
+                }else{
+                    vm.drawingsUploadShow = true;
+                    vm.getHolders()
+                }
             }
             
         },
@@ -1850,7 +2095,8 @@ export default {
                 }
             }
             vm.fileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId
+
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId+(vm.buildId==null?'':'&buildId='+vm.buildId);
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -1876,7 +2122,7 @@ export default {
                             vm.holderId=''
                             vm.getDirectory()
                             // this.getMaxVersionPath();
-                            vm.getDrawingList()
+                            // vm.getDrawingList()
                         }
                         if(response.data.cd != 0){
                             vm.$message({
@@ -1935,6 +2181,9 @@ export default {
         }
         .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
                 background-color: #dfdfdf;
+        }
+        .el-checkbox__input.is-disabled .el-checkbox__inner{
+            display: none;
         }
         // .el-tree--highlight-current .el-tree-node.is-current .elselect{
         //         background-color: #000;

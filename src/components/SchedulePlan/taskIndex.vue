@@ -1,5 +1,10 @@
 <template>
   <div id="taskIndex">
+    <!-- 打印标签提交表单 -->
+    <form id="taskIndedxPrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+            <input type="hidden" name="p" ref="taskIndedxLabelContent">
+    </form>
+    <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
     <div id="GroupSelect">
       <select v-model="selectUgId"  class="inp-search">
         <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
@@ -9,7 +14,7 @@
     <div :class="[{'box-left-active':!screenLeft.show},'box-left-container',{'goujian':showCommonList},{'gantt_left':!hiddenGanttList}]">
       <div style="min-width: 950px;overflow-y: auto;">
         <div id="item-box-file">
-          <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">
+          <!-- <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">
             个人日历
           </router-link>
           <router-link :to="'/SchedulePlan/resourcePlan'" class="label-item">
@@ -20,6 +25,8 @@
           </router-link>
           <router-link :to="'/SchedulePlan/calendarConfig'" class="label-item">
             更多配置
+          </router-link> -->
+          <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
           </router-link>
           <div v-if="!showCommonList" class="item-search">
                 <span class="title-right">
@@ -374,8 +381,8 @@
       </div>
       <div class="el-dialog__footer">
         <div slot="footer" class="dialog-footer">
-          <button class="editBtnS" @click="labelListConfirm">网页预览</button>
-          <button class="editBtnC">打印当前页标签</button>
+          <button class="editBtnS" @click="labelListConfirm(labelPkId)">网页预览</button>
+          <button class="editBtnC" @click="printCurrentLabel">打印当前页标签</button>
         </div>
       </div>
     </div>
@@ -774,7 +781,7 @@
                             <input class="upInput" type="file" ref="file" @change="fileChanged($event)"
                                    multiple="multiple">
                         </span>
-            <span class="upImgText">{{imageName}}</span>
+            <span class="upImgText" style="width:200px !important">{{imageName}}</span>
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -1139,10 +1146,13 @@
     data() {
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+        routerList:'',
+        moduleList:'',
         loading:false,
         showCommonList: false,//显示清单
         checkList: '',
         labelListShow: false,//二维码显示
+        labelPkId:'',
         ListHeaderShow: false,//列表头
         tvValue: 0,//silder初始值
         radio: 1,
@@ -1612,13 +1622,17 @@
     },
     created() {
       var vm = this
-      this.projId = localStorage.getItem('projId');
+      vm.projId = localStorage.getItem('projId');
       vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
-      this.token = localStorage.getItem('token');
+      vm.token = localStorage.getItem('token');
+      vm.projName=localStorage.getItem('projName');
       vm.userId = localStorage.getItem('userid');
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
-      this.getTaskIndex();
+      vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+      vm.loadingTitle();
+      vm.getTaskIndex();
+     
       // this.getTaskList();
     },
     mounted() {
@@ -1729,6 +1743,48 @@
 
                 
             }
+      },
+      loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00503','/SchedulePlan/taskIndex','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00504','/SchedulePlan/calendarConfig');
+          console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+      getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+          var vm=this;
+          //   console.log(vm.moduleList,'获取的东西');
+          var secondList=[];
+          itemList.forEach((item)=>{
+              if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                  secondList.push(item)
+                  if(item.moduleCode==Code1){
+                      vm.$set(item,'isShow',true);
+                      vm.$set(item,'routerLink',routerLink1);
+                  }
+                  if(item.moduleCode==Code2){
+                      vm.$set(item,'isShow',false);
+                      vm.$set(item,'routerLink',routerLink2);
+                  }
+                  if(item.moduleCode==Code3){
+                      vm.$set(item,'isShow',false);
+                      vm.$set(item,'routerLink',routerLink3);
+                  }
+                  if(item.moduleCode==Code4){
+                      vm.$set(item,'isShow',false);
+                          vm.$set(item,'routerLink',routerLink4);
+                  }
+              }
+          })
+          secondList=secondList.sort(vm.compare('sequenceNo'))
+          return secondList
+      },
+        //排序函数
+      compare(property) {
+          return function(a, b) {
+              var value1 = a[property];
+              var value2 = b[property];
+              return value1 - value2;
+          }
       },
       // 补零
       addZero(num, size) {
@@ -2718,8 +2774,36 @@
         //   this.getTaskUserGroupList();
       },
       //网页预览
-      labelListConfirm(){
-        window.open('/#/Cost/getManifestDetailInfoForPage/'+1944+'/'+0)
+      labelListConfirm(val){
+        var vm = this;
+            window.open('/#/Cost/getMainLabelInformation/'+val)
+        // window.open('/#/Cost/getManifestDetailInfoForPage/'+1944+'/'+0)
+      },
+      printCurrentLabel(){
+         var vm = this
+        var datas = '['
+        var tabelTitle = vm.projName + '构件标签'
+        var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
+        vm.relaList1.forEach((item,i)=>{
+            var valueList = '["' + (item.main.mOriginalId ? item.main.mOriginalId : "") + '","'
+                + (item.main.mName ? item.main.mName : "") + '","' + (item.main.mGSource ? vm.parseMGSource(item.main.mGSource) : "") + '","'
+                + (item.main.mBSource ? vm.parseMBSource(item.main.mBSource) : "") + '","' + (item.main.creator ? item.main.creator : "") + '","' +
+                (item.main.createTime ? vm.timeChanges(item.main.createTime) : "") + '","' + (item.main.mVersion ? item.main.mVersion : "") + '","'
+                + (item.details.length ? item.details.length : "") + '"]'
+            var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.main.pkId, 7) +
+                '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+            datas += data
+            if (i < vm.relaList1.length - 1) datas += ','
+        })
+        datas += ']'
+        console.log(datas,'data1111');
+        vm.$refs.taskIndedxLabelContent.value = datas
+        $('#taskIndedxPrint-qrcode').submit()
+        vm.$message({
+                type:'success',
+                message:'已向打印机发送请求'
+            })
       },
       addTaskMakeSure() {
         
@@ -2806,8 +2890,8 @@
           })
         }
       },
-      timeChange(val) {
-        if (val) {
+      timeChanges(val) {
+        if (val==null) {
           return;
         } else {
           return moment(val).format("YYYY-MM-DD");
@@ -3625,10 +3709,12 @@
       //显示二维码
       qrcode(val) {
         this.labelListShow = true;
+        this.labelPkId=val;
         this.relaList.forEach((item) => {
           if (item.main.pkId == val) {
             this.relaList1 = [];
             this.relaList1.push(item);
+            console.log(this.relaList1,'relaList1');
           }
         })
       },
@@ -4095,6 +4181,9 @@
 
   #taskIndex {
     height: 100%;
+    #print-qrcode{
+          display: none;
+      }
     .dialog {
       top: 15vh;
       left: 50%;
@@ -4986,17 +5075,23 @@
     #box-right1 {
       
       .addResourceType {
+        height: 30px;
+        border-bottom: 1px solid #e6e6e6;
+        position: relative;
         .action {
+          position: absolute;
           color: #78a0f8;
-          margin-left: -153px;
+          left: 30px;
+          top:10px;
           cursor: pointer;
           font-size: 12px;
           line-height: 12px;
-          margin-top: 10px;
-          margin-bottom: 10px;
+          width:calc(100%-24px)
+          // margin-top: 10px;
+          // margin-bottom: 10px;
+          //  margin-left: -153px;
         }
-        height: 30px;
-        border-bottom: 1px solid #e6e6e6;
+        
        
         // margin-left:10px;
       }

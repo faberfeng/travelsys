@@ -10,8 +10,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 <div id="item-box-file">
-                    
-                    <router-link :to="'/Design/management'" class="label-item-active label-item">  
+                    <!-- <router-link :to="'/Design/management'" class="label-item-active label-item">  
                      设计协调  
                     </router-link>
                     <router-link :to="'/Design/drawingReview'" class="label-item">  
@@ -22,6 +21,8 @@
                     </router-link>
                     <router-link :to="'/Design/designversion'"  class="label-item">  
                         设计版本  
+                    </router-link> -->
+                    <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                 </div>
                 <div id="containerMessage">
@@ -3127,6 +3128,8 @@ export default {
         entType:'',
         hasAuthDelUser:false,
         isComment:false,
+        routerList:'',
+        moduleList:'',
       }
   },
   created(){
@@ -3137,6 +3140,7 @@ export default {
         vm.userId = localStorage.getItem('userid')
         vm.entId = localStorage.getItem('entId')
         vm.projAuth = localStorage.getItem('projAuth')
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         console.log(vm.projAuth.indexOf("00400205"),'vm.projAuth');
         vm.entType = localStorage.getItem('entType')
         // vm.WebGlUrl=vm.$store.state.WebGlUrl
@@ -3148,11 +3152,12 @@ export default {
             vm.hasAuthDelUser = true
         }
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
-        // vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile
-        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile
+        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
         vm.GMDUrl=vm.$store.state.GMDUrl
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
+        vm.loadingTitle();
         var timer = setInterval(function(){
             if(vm.defaultSubProjId != null){
                 vm.getIntoDesignPage()//进入设计协调获取信息
@@ -3239,6 +3244,49 @@ export default {
                 break;
             
 		    }
+        },
+         loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'004','00401','/Design/management','00402','/Design/drawingReview','00403','/Design/attributeManager','00404','/Design/designversion');
+          console.log(vn.routerList,'vn.routerList')
+
+      },
+      //二级标题生成函数
+      getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+          var vm=this;
+        //   console.log(vm.moduleList,'获取的东西');
+          var secondList=[];
+          itemList.forEach((item)=>{
+              if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                  secondList.push(item)
+                  if(item.moduleCode==Code1){
+                      vm.$set(item,'isShow',true);
+                      vm.$set(item,'routerLink',routerLink1);
+                  }
+                  if(item.moduleCode==Code2){
+                      vm.$set(item,'isShow',false);
+                       vm.$set(item,'routerLink',routerLink2);
+                  }
+                  if(item.moduleCode==Code3){
+                      vm.$set(item,'isShow',false);
+                       vm.$set(item,'routerLink',routerLink3);
+                  }
+                  if(item.moduleCode==Code4){
+                      vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink4);
+                  }
+              }
+          })
+          secondList=secondList.sort(vm.compare('sequenceNo'))
+        return secondList
+      },
+      //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
         },
         getPropertyInfo(){
             var vm=this;

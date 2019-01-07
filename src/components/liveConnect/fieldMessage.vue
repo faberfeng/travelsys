@@ -1,5 +1,11 @@
 <template>
     <div id="fieldMessage">
+         <!-- 打印标签提交表单 -->
+        <form id="fieldMessagePrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+                <input type="hidden" name="p" ref="fieldMessageLabelContent">
+        </form>
+        <!-- 防止刷新 -->
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
         <div id="GroupSelect">
             <select v-model="allSelectUgId" class="inp-search">
                 <option :value="item.ugId" v-for="(item,index) in  allUgList" :key="index" v-text="item.ugName"></option>
@@ -8,22 +14,20 @@
         </div>
         <div class="topHeader" v-if="!showCommonList">
             <div id="item-box-file">
-                 <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
-                安全监测  
-                </router-link>
-                <router-link :to="'/constructionSite/fieldConnection'" class="label-item">  
-                现场连线  
-                </router-link>
-                <router-link :to="'/constructionSite/fieldMessage'" class="label-item label-item-active">  
-                现场发文  
-                </router-link>
-                <router-link :to="'/constructionSite/qualityChecking'" class="label-item">  
-                质量检查
-                </router-link>
-                <router-link :to="'/constructionSite/safetyChecking'" class="label-item">  
-                安全检查  
-                </router-link>
-               
+                    <!-- <router-link :to="'/liveConnect/fieldConnection'" class="label-item">  
+                    现场连线  
+                    </router-link>
+                    <router-link :to="'/liveConnect/fieldMessage'" class="label-item label-item-active">  
+                    现场发文  
+                    </router-link>
+                    <router-link :to="'/liveConnect/qualityChecking'" class="label-item">  
+                    质量检查
+                    </router-link>
+                    <router-link :to="'/liveConnect/qualityAcceptance'" class="label-item">  
+                    质量验收  
+                    </router-link> -->
+                    <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
+                    </router-link>
             </div>
             <div class="box-left" v-show="endFileMessage">
                 <div :class="['box_left_text',{'box_left_text_show':!showLeftContent}]">
@@ -316,12 +320,12 @@
                 </ul>
                 </div>
             </div>
-            <!-- <div class="el-dialog__footer">
+            <div class="el-dialog__footer">
                 <div slot="footer" class="dialog-footer">
-                <button class="editBtnS">网页预览</button>
-                <button class="editBtnC">打印当前页标签</button>
+                    <button class="editBtnS" @click="labelListConfirm(labelPkId)">网页预览</button>
+                    <button class="editBtnC" @click="printCurrentLabel">打印当前页标签</button>
                 </div>
-            </div> -->
+            </div>
         </div>
         <div id="edit">
             <el-dialog title="选择关联清单" :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
@@ -478,6 +482,8 @@ export default {
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
+            routerList:'',
+            moduleList:'',
             dataShow:true,//空数据
             contactIndexList:'',
             sendmessageUser:'',//发件人
@@ -514,6 +520,7 @@ export default {
             title:'',
             rightContactList:'',
             labelListShow:false,
+            labelPkId:'',
             showCommonList:false,
             checkList:'',
             addAssociationListDialog:false,
@@ -600,7 +607,8 @@ export default {
             QJFileManageSystemURL:'',
             base64Str:'',
             elementFilter:'',
-            uploadViewPointList:[]
+            uploadViewPointList:[],
+            projName:'',
         }
     },
     created(){
@@ -609,8 +617,11 @@ export default {
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
+        vm.projName = localStorage.getItem('projName');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.loadingTitle()
         this.getContactIndex();
         this.validateAuth();
     },
@@ -643,6 +654,55 @@ export default {
       },
     },
     methods:{
+        loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'016','01602','/liveConnect/fieldMessage','01601','/liveConnect/fieldConnection','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance');
+          console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
+        timeChanges(val){
+            if (val == null) {
+                return;
+                } else {
+                return moment(val).format("YYYY-MM-DD HH:mm");
+                }
+            },
         //进入现场发文页面
         getContactIndex(){
             axios({
@@ -831,6 +891,36 @@ export default {
             var len = ('' + num).length;
             return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
         },
+        labelListConfirm(val){
+            var vm = this;
+            window.open('/#/Cost/getMainLabelInformation/'+val)
+        },
+        printCurrentLabel(){
+         var vm = this
+            var datas = '['
+            var tabelTitle = vm.projName + '构件标签'
+            var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
+            vm.relaList.forEach((item,i)=>{
+                var valueList = '["' + (item.pkId ? item.pkId : "") + '","'
+                    + (item.mName ? item.mName : "") + '","' + (item.mGSource ? vm.parseMGSource(item.mGSource) : "") + '","'
+                    + (item.mBSource ? vm.parseMBSource(item.mBSource) : "") + '","' + (item.creator ? item.creator : "") + '","' +
+                    (item.createTime ? vm.timeChanges(item.createTime) : "") + '","' + (item.mVersion ? item.mVersion : "") + '","'
+                    + (item.details.length ? item.details.length : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                if (i < vm.relaList.length - 1) datas += ','
+            })
+            datas += ']'
+            console.log(datas,'data1111');
+            vm.$refs.fieldMessageLabelContent.value = datas
+            $('#fieldMessagePrint-qrcode').submit()
+            vm.$message({
+                    type:'success',
+                    message:'已向打印机发送请求'
+                })
+      },
         //清单类型
         parseType(val) {
             switch (val) {
@@ -1365,13 +1455,15 @@ export default {
             this.checkList = item;
         },
         qrcode(val) {
-        this.labelListShow = true;
-        this.relaList.forEach((item) => {
-          if (item.pkId == val) {
-            this.relaList = [];
-            this.relaList.push(item);
-          }
-        })
+            this.labelListShow = true;
+            this.labelPkId=val;
+            this.relaList.forEach((item) => {
+                if (item.pkId == val) {
+                    this.relaList = [];
+                    this.relaList.push(item);
+                }
+            })
+            console.log(this.relaList,'this.relaList');
         },
         //关联清单列单的定位
       location() {

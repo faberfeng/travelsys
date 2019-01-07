@@ -137,14 +137,11 @@ export default {
                 // if(typeof(response.data.rt.companyList) == 'undefined' && response.data.rt.companyList.length == 0){
                     
                 // }
-                //  if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
-                //     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
-                //     vm.initCompany()
+                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
+                    vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
+                    vm.initCompany()
                     
-                // }else if(typeof(response.data.rt.companyList) != 'undefined' && response.data.rt.companyList.length != 0){//多个企业
-                    
-                // }else
-                if(typeof(response.data.rt) != 'undefined'){
+                }else if(typeof(response.data.rt) != 'undefined'){
                     this.companyLists=response.data.rt;
                     var obj = []
                     var index = 0

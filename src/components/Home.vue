@@ -16,7 +16,7 @@
                     <el-row class="navigation1">
                         <el-col :span="24" >
                             <el-tabs  v-model="navigationPath" @tab-click="handleClick">
-                                <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
+                                <!-- <el-tab-pane label="工程首页" name="projectPage" v-if="auth.homePage">
                                 </el-tab-pane>
                                 <el-tab-pane label="进度计划" name="plan" v-if="auth.progress"></el-tab-pane>
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
@@ -25,7 +25,7 @@
                                 <el-tab-pane label="安全管理" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings">
-                                </el-tab-pane>
+                                </el-tab-pane> -->
                             </el-tabs>
                         </el-col>
                     </el-row>
@@ -62,7 +62,7 @@ export default {
                  projectImg:'', 
                  userImg:''
             },          
-            navigationPath:'projectPage',
+            // navigationPath:'projectPage',
             activeIndex:'1',
             settingActive:'/setting/initalsettings',
             winHeight:'',
@@ -130,12 +130,12 @@ export default {
         vm.WebGlUrl=vm.$store.state.WebGlUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.iframeUrl=vm.$store.state.iframeWebGlUrl
-        vm.navigationPath = sessionStorage.getItem('navigationPath');
+        // vm.navigationPath = sessionStorage.getItem('navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
-        if(!vm.navigationPath){
-            vm.navigationPath='projectPage';
-        }
+        // if(!vm.navigationPath){
+        //     vm.navigationPath='projectPage';
+        // }
         if(!vm.settingActive){
             vm.settingActive='/setting/initalsettings';
         };

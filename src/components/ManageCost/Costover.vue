@@ -1,9 +1,13 @@
 <template>
 <div>
+        <form id="costOverPrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+            <input type="hidden" name="p" ref="costOverLabelContent">
+        </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="item-box-file">
-                    <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
+                    <!-- <router-link :to="'/Drive/costover'" class="label-item-active label-item">  
                     最近文档  
                     </router-link>
                     <router-link :to="'/Drive/cloudDrive'" class="label-item">  
@@ -14,6 +18,8 @@
                     </router-link>
                     <router-link :to="'/Drive/PersonalTransit'" class="label-item">  
                         个人中转  
+                    </router-link> -->
+                    <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                     <div class="item-search">
                         <span class="title-right">
@@ -286,6 +292,9 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    #costOverPrint-qrcode{
+        display: none;
     }
     #edit .el-dialog__body{
         margin-top:20px;
@@ -1138,6 +1147,7 @@
 import axios from 'axios'
 import '../Settings/js/jquery-1.4.4.min.js'
 import './js/date.js'
+import moment from 'moment'
 import commonList from '../planCost/qingDan.vue'
 export default {
   name:'Costover',
@@ -1146,6 +1156,8 @@ export default {
     },
   data(){
       return {
+        routerList:'',
+        moduleList:'',
         activeIndex:'1',
          tabShow:1,
          listStyle:'table',//列表展示方式
@@ -1190,6 +1202,9 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.projName=localStorage.getItem('projName');
+         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.loadingTitle()
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.WebGlUrl = this.$store.state.GMDUrl;
         vm.getInfo()
@@ -1277,6 +1292,49 @@ export default {
                 vm.fileCheckedNum = 0
           }
       },
+        loadingTitle(){
+            var vn=this;
+            vn.routerList='';
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'002','00201','/Drive/costover','00202','/Drive/cloudDrive','00203','/Drive/Share','00204','/Drive/PersonalTransit');
+            console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
       parseMStatus(mStatus){
             // 施工现场
             var constructionSite = mStatus.substring(0, 1);
@@ -1395,10 +1453,30 @@ export default {
         window.open('/#/Cost/getMainLabelInformation/'+val)
     },
     printLabelList(){
-        this.$message({
-                type:"info",
-                message:'已向打印机发送请求！'
-        })
+         var vm = this
+            var datas = '['
+            var tabelTitle = vm.projName + '构件标签'
+            var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
+            var item=vm.biaoqianInfo;
+                var valueList = '["' + (item.pkId ? item.pkId : "") + '","'
+                    + (item.mName ? item.mName : "") + '","' + (item.mGSource ? vm.parseMGSource(item.mGSource) : "") + '","'
+                    + (item.mBSource ? vm.parseMBSource(item.mBSource) : "") + '","' + (item.creator ? item.creator : "") + '","' +
+                    (item.createTime ? vm.timeChanges(item.createTime) : "") + '","' + (item.mVersion ? item.mVersion : "") + '","'
+                    + (item.manifestDetailCount ? item.manifestDetailCount : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                // if (i < vm.biaoqianInfo.length - 1) datas += ','
+            
+            datas += ']'
+            console.log(datas,'data1111');
+            vm.$refs.costOverLabelContent.value = datas
+            $('#costOverPrint-qrcode').submit()
+            this.$message({
+                    type:"info",
+                    message:'已向打印机发送请求！'
+            })
     },
     //删除构件清单
     deleteList(item){
@@ -1464,6 +1542,14 @@ export default {
             }
         })
     },
+    timeChanges(val){
+             if (val==null) {
+                return;
+            } else {
+                return moment(val).format("YYYY-MM-DD");
+            }
+
+        },
     parseMBSource(mBSource) {
             switch (mBSource) {
                 case 1:

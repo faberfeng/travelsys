@@ -2,7 +2,7 @@
     <div id="productionCenter">
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container']">
             <div class="purchaseNav">
-                <router-link :to="'/'" class="navItem navactive">  
+                <!-- <router-link :to="'/'" class="navItem navactive">  
                     产品管理  
                 </router-link>
                 <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
@@ -16,6 +16,8 @@
                 </router-link>
                 <router-link :to="'/metarialpurchase/checked'" class="navItem">  
                     检查验收  
+                </router-link> -->
+                <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['navItem',{'navactive':item.isShow}]">        
                 </router-link>
             </div>
             <div class="pbody">
@@ -415,6 +417,8 @@ export default {
     name:'ProductionCenter',
     data(){
         return{
+            routerList:'',
+            moduleList:'',
             BDMSUrl:'',
             projId:'',
             token:'',
@@ -494,6 +498,8 @@ export default {
         this.BDMSUrl = this.$store.state.BDMSUrl;
         this.projId = localStorage.getItem('projId');
         this.token = localStorage.getItem('token');
+        this.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.loadingTitle()
         this.getProductBrand();
         this.loadProductParam();
         this.initProLib(0,0);
@@ -547,6 +553,52 @@ export default {
         },
     },
     methods:{
+        loadingTitle(){
+            var vn=this;
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'011','01101','/metarialpurchase/productioncenter','01104','/metarialpurchase/fahuoManage','01103','/metarialpurchase/dinghuoManage','01105','/metarialpurchase/checked','01102','/metarialpurchase/wuliaopurchase');
+            console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4,Code5,routerLink5){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                    if(item.moduleCode==Code5){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink5);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         clickRow(item){
             this.detailTableInfo = item;
         },

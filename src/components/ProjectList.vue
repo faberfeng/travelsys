@@ -415,6 +415,7 @@ export default {
   },
   created(){
     this.titleName = localStorage.getItem('projectName');
+    localStorage.removeItem("navigationPath")
   },
   methods:{
       changeStyle(){

@@ -3,7 +3,7 @@
         <!-- <div style="width:900px;height:500px"></div> -->
         <div class="topHeader">
             <div id="item-box-file">
-                <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
+                <!-- <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">  
                 个人日历  
                 </router-link>
                 <router-link :to="'/SchedulePlan/resourcePlan'" class="label-item">  
@@ -14,6 +14,8 @@
                 </router-link>
                 <router-link :to="'/SchedulePlan/calendarConfig'" class="label-item label-item-active">  
                 更多配置  
+                </router-link> -->
+                <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                 </router-link>
             </div>
             <div class="content">
@@ -1460,6 +1462,8 @@ export default{
                 },
                 timestamp:Date.now()
             },
+            routerList:'',
+            moduleList:'',
             token:'',
             projId:'',
             BDMSUrl:'',
@@ -2293,6 +2297,8 @@ export default{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.loadingTitle();
         this.getCalendarIndex();//进入季度计划更多设置页面
         // this.getCalendarTemplateInfo();
         // this.checkedItem();
@@ -2315,6 +2321,48 @@ export default{
             },
         getSTime(val){
            console.log(val);
+        },
+        loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00504','/SchedulePlan/calendarConfig','00503','/SchedulePlan/taskIndex','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan');
+          console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+            //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
         },
         //日历
         

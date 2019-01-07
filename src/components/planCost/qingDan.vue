@@ -1,13 +1,15 @@
 <template>
 <div id="CommenList" v-loading.fullscreen.lock="fullscreenLoading">
-        <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
-            <input type="hidden" name="p" ref="labelContent">
+        <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" name="print-qrcode"  target="printLabel">
+         <!-- target="printLabel" -->
+            <input type="hidden" name="p" ref="labelContent" id="labelContent" value="">
         </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
                 
                 <div id="containerMessage">
-                    <div class="project" v-loading="loading">
+                    <div class="qindanProject" v-loading="loading">
                         <p class="antsLine">
                             成本管理<i class="icon-sanjiao-right"></i><span style="cursor:pointer"  @click="back()" v-text="title"></span><i class="icon-sanjiao-right"></i>
                             <span class="strong">清单详情</span>
@@ -1434,7 +1436,7 @@
                 .backBtn{
                      background: url('./images/back.png') no-repeat 0 0;
                 }
-                .project{
+                .qindanProject{
                     .antsLine{
                         padding: 10px 10px 15px 0px;
                         font-size: 12px;
@@ -3907,11 +3909,28 @@ export default Vue.component('common-list',{
                 if (i < vm.S_Label_quantitiesList.length - 1) datas += ','
             })
             datas += ']'
+            console.log(datas,'data000');
             vm.$refs.labelContent.value = datas
-            $('#print-qrcode').on('submit', function(event){
-                event.preventDefault() //阻止form表单默认提交
-            })
             $('#print-qrcode').submit()
+            // $('#print-qrcode').submit(function () {
+            //     if(data=== "" || data == null || data == undefined){
+            //         return false
+            //     }else{
+            //         return true
+            //     }
+            // })
+            // $('#print-qrcode').on('submit', function(event){
+            //     console.log('阻止表达')
+            //     console.log(event,'event')
+            //      if(/*验证通过*/1){
+            //          $('#print-qrcode').submit()
+
+            //     }else{
+            //         event.preventDefault();
+            //     }
+            // })
+            
+            
             vm.$message({
                 type:'success',
                 message:'已向打印机发送请求'

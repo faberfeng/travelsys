@@ -3,7 +3,7 @@
         <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]">
             <div style="min-width: 950px;overflow-y: auto;">
                 <div id="item-box-file">
-                    <router-link :to="'/Drive/costover'" class=" label-item">  
+                    <!-- <router-link :to="'/Drive/costover'" class=" label-item">  
                     最近文档  
                     </router-link>
                     <router-link :to="'/Drive/cloudDrive'" class=" label-item">  
@@ -14,6 +14,8 @@
                     </router-link>
                     <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
                     个人中转  
+                    </router-link> -->
+                    <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                     <div class="item-search">
                         <span class="title-right">
@@ -1646,6 +1648,8 @@ export default {
     },
   data(){
       return {
+        routerList:'',
+        moduleList:'',
         showCommonList:false,
         isbiaoqianshow:false,
         biaoqianInfo:'',
@@ -1736,6 +1740,8 @@ export default {
         vm.shareUrl=vm.$store.state.shareUrl;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.WebGlUrl = this.$store.state.GMDUrl;
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        this.loadingTitle();
         vm.getIntoShareList()
     },
     mounted(){
@@ -1796,6 +1802,48 @@ export default {
       }
   },
   methods:{
+       loadingTitle(){
+            var vn=this;
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'002','00203','/Drive/Share','00202','/Drive/cloudDrive','00201','/Drive/costover','00204','/Drive/PersonalTransit');
+            console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
        initAll(val){
           var vm = this
          if(!vm.checkAll){

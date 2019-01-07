@@ -224,7 +224,7 @@ const router = new Router({
         }
       ]
     },
-    //施工现场路由配置
+    //安全管理路由配置
     {
       path:'/constructionSite',
       name:'constructionSite',
@@ -233,30 +233,66 @@ const router = new Router({
       },
       component:resolve=>require(['@/components/ManageCost'],resolve),
       children:[
+        // {
+        //   path:'/constructionSite/fieldConnection',
+        //   name:'fieldConnection',
+        //   component:resolve=>require(['@/components/constructionSite/fieldConnection'],resolve)
+        // },
+        // {
+        //   path:'/constructionSite/fieldMessage',
+        //   name:'fieldMessage',
+        //   component:resolve=>require(['@/components/constructionSite/fieldMessage'],resolve)
+        // },
         {
-          path:'/constructionSite/fieldConnection',
-          name:'fieldConnection',
-          component:resolve=>require(['@/components/constructionSite/fieldConnection'],resolve)
+          path:'/constructionSite/safetyCheckings',
+          name:'safetyCheckings',
+          component:resolve=>require(['@/components/constructionSite/safetyCheckings'],resolve)
         },
         {
-          path:'/constructionSite/fieldMessage',
-          name:'fieldMessage',
-          component:resolve=>require(['@/components/constructionSite/fieldMessage'],resolve)
-        },
-        {
-          path:'/constructionSite/qualityChecking',
-          name:'qualityChecking',
-          component:resolve=>require(['@/components/constructionSite/qualityChecking'],resolve)
-        },
-        {
-          path:'/constructionSite/safetyChecking',
-          name:'safetyChecking',
-          component:resolve=>require(['@/components/constructionSite/safetyChecking'],resolve)
+          path:'/constructionSite/safetyRuning',
+          name:'safetyRuning',
+          component:resolve=>require(['@/components/constructionSite/safetyRuning'],resolve)
         },
         {
           path:'/constructionSite/safetyInspection',
           name:'safetyInspection',
           component:resolve=>require(['@/components/constructionSite/safetyInspection'],resolve)
+        },
+        {
+          path:'/constructionSite/remoteVideo',
+          name:'remoteVideo',
+          component:resolve=>require(['@/components/constructionSite/remoteVideo'],resolve)
+        }
+      ]
+    },
+    //现场连线路由配置
+    {
+      path:'/liveConnect',
+      name:'liveConnect',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+          path:'/liveConnect/fieldConnection',
+          name:'fieldConnection',
+          component:resolve=>require(['@/components/liveConnect/fieldConnection'],resolve)
+        },
+        {
+          path:'/liveConnect/fieldMessage',
+          name:'fieldMessage',
+          component:resolve=>require(['@/components/liveConnect/fieldMessage'],resolve)
+        },
+        {
+          path:'/liveConnect/qualityChecking',
+          name:'qualityChecking',
+          component:resolve=>require(['@/components/liveConnect/qualityChecking'],resolve)
+        },
+        {
+          path:'/liveConnect/qualityAcceptance',
+          name:'qualityAcceptance',
+          component:resolve=>require(['@/components/liveConnect/qualityAcceptance'],resolve)
         }
       ]
     },

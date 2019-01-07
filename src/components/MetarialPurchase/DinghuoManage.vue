@@ -3,7 +3,7 @@
     <div id="dinghuo">
         <div class="topHeader">
             <div class="purchaseNav">
-                <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
+                <!-- <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
                     产品管理  
                 </router-link>
                 <router-link :to="'/metarialpurchase/wuliaopurchase'" class="navItem">  
@@ -17,6 +17,8 @@
                 </router-link>
                 <router-link :to="'/metarialpurchase/checked'" class="navItem">  
                     检查验收  
+                </router-link> -->
+                <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['navItem',{'navactive':item.isShow}]">        
                 </router-link>
             </div>
             <div class="elselect" v-if="!showCommonList">
@@ -561,6 +563,8 @@ export default {
     name:'DinghuoManage',
     data(){
         return{
+            routerList:'',
+            moduleList:'',
             activeName:'0',
             BDMSUrl:'',
             token:'',
@@ -672,9 +676,57 @@ export default {
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl;
         this.projectName = localStorage.getItem('projectName');
+         this.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.loadingTitle()
         this.getUserGroup();
     },
     methods:{
+         loadingTitle(){
+            var vn=this;
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'011','01103','/metarialpurchase/dinghuoManage','01105','/metarialpurchase/checked','01101','/metarialpurchase/productioncenter','01102','/metarialpurchase/wuliaopurchase','01104','/metarialpurchase/fahuoManage');
+            console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4,Code5,routerLink5){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                     if(item.moduleCode==Code5){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink5);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         //添加清单
         addNewQingDan(){            
             this.reSearchResult(false);

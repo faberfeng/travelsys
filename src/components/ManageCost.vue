@@ -20,18 +20,19 @@
                                 <el-tab-pane label="设计管理" name="designManager" v-if="auth.design"></el-tab-pane>
                                 <el-tab-pane label="成本管理" v-if="auth.costManagement" name="costManage"></el-tab-pane>
                                 <el-tab-pane label="物资采购" v-if="auth.materialPurchasing" name="materialPurchase"></el-tab-pane>
+                                <el-tab-pane label="现场连线" v-if="auth.liveConnection" name="liveConnection"></el-tab-pane>
                                 <el-tab-pane label="安全管理" v-if="auth.constructionSite" name="construction"></el-tab-pane>
                                 <el-tab-pane label="文档管理" v-if="auth.docManagement" name="documentManager"></el-tab-pane>
                                 <el-tab-pane label="配置中心"  v-if="auth.configurationCenter" name="settings"></el-tab-pane> -->
-                                <el-tab-pane v-for="(item,index) in menusInfoData" :key="index" :label="item.title" :name="item.name" v-if="item.status==1&&item.isIf"   ></el-tab-pane>
-                               
+
+                            <el-tab-pane v-for="(item,index) in getMenusLists" :key="index" :label="item.webName?item.webName:item.moduleName" :name="item.moduleCode" v-if="item.enableWeb==1"   ></el-tab-pane>
                                 <!-- <el-tab-pane label="配置中心00"  v-if="auth.configurationCenter" name="settings"></el-tab-pane> -->
                             </el-tabs>
                         </el-col>
                     </el-row>
                     <div  class="settingsLeft" v-if="!settingsCenter" ref="settingsL">
                         <h5>工程配置中心</h5>
-                        <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
+                        <!-- <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
                             <el-submenu index="/setting/initalsettings">
                                 <template slot="title">
                                     <span>工程场地与项目初始化</span>
@@ -76,6 +77,16 @@
                                     <el-menu-item index="/setting/projectloggermanage">工程日志管理</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
+                        </el-menu> -->
+                        <el-menu :default-active="settingActive"  router :unique-opened="true"  >
+                            <el-submenu v-for="(item,index1) in ellist" :key="index1"  @select="selectIndex" :index="item.isShowUrl">
+                                <template slot="title">
+                                    <span v-text="item.webName?item.webName:item.moduleName"></span>
+                                </template>
+                                <el-menu-item-group v-for="(val,index2) in item.routerLink" :key="index2">
+                                    <el-menu-item :index="val.title" v-text="val.linkUrl">工程初始配置信息</el-menu-item>
+                                </el-menu-item-group>
+                            </el-submenu>
                         </el-menu>
                     </div>
                     <div :class="[{'settingsCenter':settingsCenter},{'settingsRight':!settingsCenter}]">
@@ -98,9 +109,8 @@ export default {
     data(){
         // window.location.reload();
          window.addEventListener("message", (evt)=>{
-                        this.callback(evt)},true
-                     );
-       
+                       this.callback(evt)},true
+        );
         return{
             url:'http://10.252.26.240:8080/genDist/',
             BDMSUrl:'',
@@ -112,7 +122,7 @@ export default {
                 projectName:'',
                 projectImg:'',
             },          
-            navigationPath:'projectPage',
+            navigationPath:'007',
             activeIndex:'1',
             settingActive:'/setting/initalsettings',
             winHeight:'',
@@ -129,18 +139,18 @@ export default {
                  * 资产管理（010）、配置中心（001）
                  * *********/
             auth:{
-                homePage:false,
-                progress:false,
-                design:false,
-                costManagement:false,
-                materialPurchasing:false,
-                liveConnection:false,
-                safetyManagement:false,
-                constructionSite:false,
-                docManagement:false,
-                spaceManagement:false,
-                assetManagement:false,
-                configurationCenter:false
+                    homePage:false,
+                    progress:false,
+                    design:false,
+                    costManagement:false,
+                    materialPurchasing:false,
+                    liveConnection:false,
+                    safetyManagement:false,
+                    constructionSite:false,
+                    docManagement:false,
+                    spaceManagement:false,
+                    assetManagement:false,
+                    configurationCenter:false,
             },
             webGlShow:false,
             InitdataList:'',
@@ -171,23 +181,33 @@ export default {
             QJFileManageSystemURL:'',
             commomHeadPictureFile:'',
             menusInfoData:[],//自定义菜单
+            getMenusLists:[],//自定义菜单
+            strJson:[],
+            authId:'',
+            moduleLists:'',
+            ellist:'',
+
+
         }
     },
     created(){
         var vm = this
+        
         vm.projId = localStorage.getItem('projId');//获取工程编号
         vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL;
-        // vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
-        vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
+        vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
+        // vm.commomHeadPictureFile=vm.QJFileManageSystemURL;
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.iframeUrl=vm.$store.state.iframeWebGlUrl+'?new='+Math.random();
+
         vm.navigationPath = sessionStorage.getItem('navigationPath');
+        console.log(vm.navigationPath,'vm.navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
-            vm.navigationPath='projectPage';
+            vm.navigationPath='007';
         }
         if(!vm.settingActive){
             vm.settingActive='/setting/initalsettings';
@@ -195,8 +215,7 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
-        this.getMenusInfoPage();
-       
+        console.log(new Date().getTime(),'time');
         // this.getInitdata();
     },
     mounted(){
@@ -207,6 +226,15 @@ export default {
         }else{
            this.cHeight = document.body.clientHeight;
         }
+    },
+    updated(){
+        var vm=this;
+        // window.removeEventListener("message", (evt)=>{
+        //         this.callback(evt)}
+        // );
+        // console.log('updated')
+        // vm.getUserInfo();
+                  
     },
     computed:{
         path(){
@@ -222,29 +250,36 @@ export default {
             
             
              setTimeout(()=>{
-                    app = this.$refs.iframe1.contentWindow;
-                    
-                    // console.log(app,'app000')
-                    app.postMessage({command:"Init",parameter:null},"*");
+                 app = this.$refs.iframe1.contentWindow;
+                app.postMessage({command:"Init",parameter:null},"*");
                     // window.removeEventListener("message", (evt)=>{
                     //     this.callback(evt)},true);
-            },100)
-           
+            },1000)
+            
+
+          
         },
 
         callback(e){
             // console.log(e,'eee');
             // console.log(app,'app');
+            // var str=[];
             switch(e.data.command){
-               
 			case "EngineReady":
 				{
                     let Horder='';
                     let para='';
+                    
 					 Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
                      para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-                    console.log(para,'para000')
-                    app.postMessage({command:"EnterProject",parameter:para},"*");
+                    // console.log(para,'para000')
+                    // this.strJson.push({para:para})
+                    this.strJson=para;
+                    app.postMessage({command:"EnterProject",parameter:this.strJson},"*");
+                    console.log(this.strJson,'加载中');
+
+                    
+                    // console.log(para,'para0000')
                     // para='';
                     // this.WebGlId='';
                     // this.WebGlType='';
@@ -269,6 +304,7 @@ export default {
         },
         //获取自定义菜单信息
         getMenusInfoPage(){
+            var vm=this;
             axios({
                 method:'GET',
                 url:this.BDMSUrl+'config2/component/getCustomMenu',
@@ -280,22 +316,29 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
-                    this.menusInfoData = response.data.rt;
-                    this.menusInfoData.forEach((item)=>{
-                        this.$set(item,'isIf',true)
+                    var menusInfoDatas = response.data.rt;
+                    menusInfoDatas.forEach((item)=>{
+                        this.menusInfoData.push({
+                            webName: item.title,
+                            moduleName: item.title,
+                            grade: 1,
+                            due: 0,
+                            enableApp: 0,
+                            enableWeb: 1,
+                            parentModuleId: 0,
+                            moduleId: null,
+                            id: item.id,
+                            projectId: item.projectId,
+                            status: 1,
+                            title: item.title,
+                            url: item.url,
+                            moduleCode:"000"
+                        })
                     })
-                    this.menusInfoData.unshift(
-                        {title:'工程首页',name:'projectPage',isIf:'auth.homePage',status:1},
-                        {title:'进度计划',name:'plan',isIf:'auth.progress',status:1},
-                        {title:'设计管理',name:'designManager',isIf:'auth.design',status:1},
-                        {title:'成本管理',name:'costManage',isIf:'auth.costManagement',status:1},
-                        {title:'物资采购',name:'materialPurchase',isIf:'auth.materialPurchasing',status:1},
-                        // {title:'现场连线',name:'liveConnection',isIf:'auth.liveConnection',status:1},
-                        {title:'安全管理',name:'construction',isIf:'auth.constructionSite',status:1},
-                        {title:'文档管理',name:'documentManager',isIf:'auth.docManagement',status:1},
-                        {title:'配置中心',name:'settings',isIf:'auth.configurationCenter',status:1},
-                    )
-                    console.log(this.menusInfoData,'首页出现')
+                    // console.log(this.menusInfoData,'this.menusInfoData');
+                    this.getMenusLists=this.getMenusLists.concat(this.menusInfoData);
+                   
+                   
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -498,8 +541,20 @@ export default {
                 console.log(err)
             }) 
         },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
+        firstEnter(){
+
+        },
         getUserInfo(){
             var vm = this
+            this.getMenusLists=[];
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'project2/getOnlineInfo',
@@ -511,10 +566,11 @@ export default {
                     'token':vm.token,
                 },
             }).then((response)=>{
+                
                 vm.header.userName = response.data.rt.onlineInfo.userName
                 vm.header.userId = response.data.rt.onlineInfo.userId
                 vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
-                 localStorage.setItem('userImg',vm.header.userImg)
+                localStorage.setItem('userImg',vm.header.userImg)
                 localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
                 localStorage.setItem('userName',vm.header.userName)
                 /*********
@@ -541,101 +597,246 @@ export default {
                  localStorage.setItem('entId',response.data.rt.onlineInfo.entId)
                 // localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
                 localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
-                for(var i=0;i<response.data.rt.onlineInfo.projAuth[id].length;i++){
-                    var arr = response.data.rt.onlineInfo.projAuth[id][i].substr(0,3)
-                    switch(arr){
-                        case "007":
-                            vm.auth.homePage = true
-                        break;
-                        case "005":
-                            vm.auth.progress = true
-                        break;
-                        case "004":
-                            vm.auth.design = true
-                        break;
-                        case "012":
-                            vm.auth.costManagement = true
-                        break;
-                        case "011":
-                            vm.auth.materialPurchasing = true
-                        break;
-                        case "013":
-                            vm.auth.safetyManagement = true
-                        break;
-                        case "006":
-                            vm.auth.constructionSite = true
-                        break;
-                        case "002":
-                            vm.auth.docManagement = true
-                        break;
-                        case "009":
-                            vm.auth.spaceManagement = true
-                        break;
-                        case "010":
-                            vm.auth.assetManagement = true
-                        break;
-                        case "001":
-                            vm.auth.configurationCenter = true
-                        break;
+                localStorage.setItem('moduleList',JSON.stringify(response.data.rt.onlineInfo.moduleList))
+                this.moduleLists=response.data.rt.onlineInfo.moduleList;
+                console.log(this.moduleLists,'this.moduleLists');
+                var str=[]
+                this.moduleLists.forEach((item)=>{
+                    if(item.parentModuleId==0&&(item.due==0||item.due>new Date().getTime())){
+                        str.push(item);
                     }
-                }
+                })
+                str=str.sort(this.compare('sequenceNo'));
+                this.getMenusLists=str;
+                console.log(this.getMenusLists,'this.getMenusLists');
+                vm.getMenusInfoPage();
+                // vm.testIndex();
+                
                 //遍历判断
-                if(vm.$route.query.firstView == 'Y'){
-                    if(vm.auth.homePage){
+                // if(vm.$route.query.firstView == 'Y'){
+                // }
+                    if(vm.navigationPath==="007"){
                         // vm.$router.push({
                         //     path:'/SchedulePlan/personalCalendar'//进度计划；
                         // })
-                        // this.$router.push({
-                        //     path:'/home/projHome/'+this.projId
-                        // });
-                    }else if(vm.auth.progress){
-                        vm.$router.push({
-                            path:'/SchedulePlan/personalCalendar'//进度计划；
+                        this.$router.push({
+                            path:'/home/projHome/'+this.projId
+                        });
+                    }else if(vm.navigationPath==='005'){
+                        // vm.$router.push({
+                        //     path:'/SchedulePlan/personalCalendar'//进度计划；
+                        // })
+                         this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig')
                         })
-                    }else if(vm.auth.design){
-                        vm.$router.push({
-                            // path:'/Design/management'//设计管理
-                            path:'/Design/management'
+                    }else if(vm.navigationPath==='004'){
+                        // vm.$router.push({
+                        //     // path:'/Design/management'//设计管理
+                        //     path:'/Design/management'
                             
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'004','00401','/Design/management','00402','/Design/drawingReview','00403','/Design/attributeManager','00404','/Design/designversion')
                         })
-                    }else if(vm.auth.costManagement){
-                        vm.$router.push({
-                            path:'/Cost/management'//成本管理
+                    }else if(vm.navigationPath==='012'){
+                        // vm.$router.push({
+                        //     path:'/Cost/management'//成本管理
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'012','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory')
                         })
-                    }else if(vm.auth.materialPurchasing){
-                        vm.$router.push({
-                            path:'/Drive/costover'//物资采购
+                    }else if(vm.navigationPath==='016'){
+                        // vm.$router.push({
+                        //     path:'/liveConnect/fieldConnection'//现场连线
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'016','01602','/liveConnect/fieldMessage','01601','/liveConnect/fieldConnection','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance')
                         })
-                    }else if(vm.auth.safetyManagement){
-                        vm.$router.push({
-                            path:'/Drive/costover'//安全管理
+                    }else if(vm.navigationPath==='011'){
+                        // vm.$router.push({
+                        //     path:'/metarialpurchase/productioncenter'//物资采购
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'011','01101','/metarialpurchase/productioncenter','01104','/metarialpurchase/fahuoManage','01103','/metarialpurchase/dinghuoManage','01105','/metarialpurchase/checked','01102','/metarialpurchase/wuliaopurchase')
                         })
-                    }else if(vm.auth.constructionSite){
-                        vm.$router.push({
-                            path:'/constructionSite/safetyInspection'//施工现场
+                    }else if(vm.navigationPath==='006'){
+                        // vm.$router.push({
+                        //     path:'/constructionSite/safetyInspection'//安全管理
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'006','00604','/constructionSite/safetyInspection','00601','/constructionSite/safetyCheckings','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo')
                         })
-                    }else if(vm.auth.docManagement){
-                        vm.$router.push({
-                            path:'/Drive/costover'//文档管理
+                    }else if(vm.navigationPath==='002'){
+                        // vm.$router.push({
+                        //     path:'/Drive/costover'//文档管理
+                        // })
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'002','00201','/Drive/costover','00202','/Drive/cloudDrive','00203','/Drive/Share','00204','/Drive/PersonalTransit')
                         })
-                    }else if(vm.auth.spaceManagement){
-                        vm.$router.push({
-                            path:'/Drive/costover'//空间管理
-                        })
-                    }else if(vm.auth.assetManagement){
-                        vm.$router.push({
-                            path:'/Drive/costover'//资产管理
-                        })
-                    }else if(vm.auth.configurationCenter){
+                    }else if(vm.navigationPath==='009'){
+                        // vm.$router.push({
+                        //     path:'/Drive/costover'//空间管理
+                        // })
+                    }else if(vm.navigationPath==='010'){
+                        // vm.$router.push({
+                        //     path:'/Drive/costover'//资产管理
+                        // })
+                    }else if(vm.navigationPath==='001'){
                         vm.$router.push({
                             path:'/setting/initalsettings'//配置中心
                         })
                     }
-                }
+                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00104')
+                    console.log(this.ellist,'ellist0000');
             }).catch((err)=>{
                 console.log(err)
             })
         },
+        getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShowUrl','/setting/initalsettings');
+                        let routerLink1=[];
+                        routerLink1.push(
+                            {
+                                title:'/setting/initalsettings',
+                                linkUrl:'工程初始配置信息'
+                            },
+                            {
+                                title:'/setting/groundsettings',
+                                linkUrl:'场地与单体初始化'
+                            },
+                            {
+                                title:'/setting/pageinital',
+                                linkUrl:'分区与楼层初始化'
+                            }
+                        )
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShowUrl','/setting/datatransform');
+                        let routerLink2=[];
+                        routerLink2.push(
+                            {
+                                title:'/setting/datatransform',
+                                linkUrl:'数据传递标准概览'
+                            },
+                            {
+                                title:'/setting/professional',
+                                linkUrl:'专业工种分类编码'
+                            },
+                            {
+                                title:'/setting/worktool',
+                                linkUrl:'作业工具分类编码'
+                            },
+                            {
+                                title:'/setting/constructordesignmapped',
+                                linkUrl:'设计构件分类映射'
+                            },
+                            {
+                                title:'/setting/constructordesigncode',
+                                linkUrl:'设计构件分类编码'
+                            },
+                            {
+                                title:'/setting/projectsubmit',
+                                linkUrl:'工程招标分类编码'
+                            },
+                            {
+                                title:'/setting/materialpurchase',
+                                linkUrl:'物资采购分类编码'
+                            },
+                            {
+                                title:'/setting/buildingproperty',
+                                linkUrl:'构件属性语意编码'
+                            }
+                        )
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShowUrl','/setting/jobmanage');
+                        let routerLink3=[];
+                        routerLink3.push(
+                            {
+                                title:'/setting/jobmanage',
+                                linkUrl:'岗位管理'
+                            },
+                            {
+                                title:'/setting/groupmanage',
+                                linkUrl:'群组管理'
+                            },
+                            {
+                                title:'/setting/usermanage',
+                                linkUrl:'用户管理'
+                            }
+                        )
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShowUrl','/setting/projectstationmanage');
+                        let routerLink4=[];
+                        routerLink4.push(
+                            {
+                                title:'/setting/projectstationmanage',
+                                linkUrl:'工程动态管理'
+                            },
+                            {
+                                title:'/setting/projectloggermanage',
+                                linkUrl:'工程日志管理'
+                            }
+                        )
+                        vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+         //第一次加载二级标题生成函数
+        firstGetSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList[0].routerLink;
+        },
+        // testIndex(){  
+        //     var vm=this;
+        //     var a=vm.firstGetSecondGradeList(vm.moduleLists,'016','01602','/liveConnect/fieldMessage','01601','/liveConnect/fieldConnection','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance')
+        // },
+        //排序函数
+        // compare(property) {
+        //     return function(a, b) {
+        //         var value1 = a[property];
+        //         var value2 = b[property];
+        //         return value1 - value2;
+        //     }
+        // },
         handMenus(val){
             console.log('触发000')
             window.open(val,'_blank')
@@ -643,55 +844,87 @@ export default {
         },
         handleClick(tab,event){
             this.settingsCenter = true;
-            if(tab.label === '工程首页'){
+            //  * 工程首页 （007）、进度计划（005）、设计管理（004）、
+            //      * 成本管理（012）、物资采购（011）、安全管理（013）、
+            //      * 施工现场（006）、文档管理（002）、空间管理（009）、
+            //      * 资产管理（010）、配置中心（001）
+            console.log(tab,event);
+            if(tab.name === '007'){
                 this.$router.push({
                     path:'/home/projHome/'+this.projId
                 });
                 this.navigationPath = tab.name;
                 // this.webGlShow=true;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
-            }else if(tab.label === '进度计划'){
+            }else if(tab.name === '005'){
+                // this.$router.push({
+                //     path:'/SchedulePlan/personalCalendar'
+                // });
                 this.$router.push({
-                    path:'/SchedulePlan/personalCalendar'
-                });
+                    path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig')
+                })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath);
-            }else if(tab.label === '设计管理'){
-                this.$router.push({
-                    // path:'/Design/management'
-                    path:'/Design/management'
-                });
-                this.navigationPath = tab.name;
-                sessionStorage.setItem('navigationPath',this.navigationPath)
-            }else if(tab.label === '成本管理'){
-                this.$router.push({
-                    path:'/Cost/management'
+            }else if(tab.name === '004'){
+                // this.$router.push({
+                //     path:'/Design/management'
+                // });
+                 this.$router.push({
+                    path:this.firstGetSecondGradeList(this.moduleLists,'004','00401','/Design/management','00402','/Design/drawingReview','00403','/Design/attributeManager','00404','/Design/designversion')
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
-            }else if(tab.label === '物资采购'){
+            }else if(tab.name === '012'){
+                // this.$router.push({
+                //     path:'/Cost/management'
+                // })
+                this.$router.push({
+                    path:this.firstGetSecondGradeList(this.moduleLists,'012','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory')
+                })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '011'){
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+                // this.$router.push({
+                //     path:'/metarialpurchase/productioncenter'//物资采购
+                // })
                 this.$router.push({
-                    path:'/metarialpurchase/productioncenter'//物资采购
+                    path:this.firstGetSecondGradeList(this.moduleLists,'011','01101','/metarialpurchase/productioncenter','01104','/metarialpurchase/fahuoManage','01103','/metarialpurchase/dinghuoManage','01105','/metarialpurchase/checked','01102','/metarialpurchase/wuliaopurchase')
                 })
-            }else if(tab.label === '安全管理'){
+            }else if(tab.name ==='016'){
+                // this.$router.push({
+                //     path:'/liveConnect/fieldConnection'
+                // })
                 this.$router.push({
-                    path:'/constructionSite/safetyInspection'
+                    path:this.firstGetSecondGradeList(this.moduleLists,'016','01602','/liveConnect/fieldMessage','01601','/liveConnect/fieldConnection','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance')
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
 
-            }else if(tab.label === '文档管理'){
+            }
+            else if(tab.name === '006'){
+                // this.$router.push({
+                //     path:'/constructionSite/safetyInspection'
+                // })
                 this.$router.push({
-                    path:'/Drive/costover'
-                });
+                    path:this.firstGetSecondGradeList(this.moduleLists,'006','00604','/constructionSite/safetyInspection','00601','/constructionSite/safetyCheckings','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo')
+                })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
-            }else if(tab.label === '设施维保'){
+            }else if(tab.name === '002'){
+                // this.$router.push({
+                //     path:'/Drive/costover'
+                // });
+                this.$router.push({
+                    path:this.firstGetSecondGradeList(this.moduleLists,'002','00201','/Drive/costover','00202','/Drive/cloudDrive','00203','/Drive/Share','00204','/Drive/PersonalTransit')
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '015'){
                 this.navigationPath = tab.name;
                 // sessionStorage.setItem('navigationPath',this.navigationPath)
-            }else if(tab.label === '配置中心'){
+            }else if(tab.name === '001'){
                 this.$router.push({
                     path:this.settingActive
                 })
@@ -703,12 +936,8 @@ export default {
                 // this.navigationPath=sessionStorage.getItem('navigationPath');
                 // this.settingsCenter = false;
                 this.menusInfoData.forEach((item)=>{
-                    if(item.title===tab.label){
+                    if(tab.name==='000'){
                         this.navigationPath=tab.name;
-                        // this.$router.push({
-                        //     path:item.url
-                        // })
-                        // sessionStorage.setItem('navigationPath',this.navigationPath);
                         window.open(item.url,'_blank');
                         window.location.reload(true);
                     }

@@ -41,12 +41,15 @@
                     <el-table-column label="备注" prop="Remark" ></el-table-column>
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
+                            <!-- scope.row.IsDefault==false -->
                             <div class="iconDiv1 iconDiv"  @click="listTableEdit(scope)" ><img  class="iconImg editIcon"  src="../../assets/edit.png"/></div>
-                            <div class="iconDiv2 iconDiv" v-if="scope.row.IsDefault==false" v-show="scope.row.BottomHeight != '最小值'"  @click="deleteFloorRow(scope, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
+                            <div class="iconDiv2 iconDiv"  v-show="scope.row.BottomHeight != '最小值'"  @click="deleteFloorRow(scope, florData)" ><img class="iconImg"  src="../../assets/delete.png"/></div>
                         </template>
                     </el-table-column>
                 </el-table>
             </div>
+            <div style="margin-top:10px;color:#606266;;font-size:14px;text-align:left;">注:优先加载的楼层数量不建议超过3个,设置优先加载多个楼层时，多个楼层必须连续</div>
+            <!-- <div class="pageTableText" style="margin-top:5px;margin-left:17px;color:#606266;;font-size:14px;text-align:left;"></div> -->
         </div>
         <div class="flor" style="margin-bottom:30px;display:none">
             <h5 class="title" id="sourceB"><img class="imgicon"  src="../../assets/sourceBag.png"/> 分区资源包<span @click="addSource" class="add"><i class="el-icon-plus"></i>新增</span></h5>
@@ -106,7 +109,7 @@
                     <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
                     <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入标高(单位mm)" v-model="FloorValue"/></div>
                 </div>
-                <el-checkbox v-model="setAsAuto">设置为默认楼层</el-checkbox>
+                <el-checkbox v-model="setAsAuto">设置为优先加载</el-checkbox>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeAddFloorList">确定</button>
                     <button class="editBtnC" @click="cancleAddFloorList">取消</button>
@@ -118,7 +121,7 @@
                     <div class="editBodyone"><label class="editInpText">楼层名称 :</label><input class="inp" placeholder="请输入" v-model="FloorName"/></div>
                     <div class="editBodytwo"><label class="editInpText">楼层标高 :</label><input class="inp" placeholder="请输入"  :disabled="disableShowEdit" v-model="FloorValue"/></div>
                 </div>
-                <el-checkbox v-model="setAsDefault" :disabled="isDisabled">设置为默认楼层</el-checkbox>
+                <el-checkbox v-model="setAsDefault" :disabled="isDisabled">设置为优先加载</el-checkbox>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeEditFloorList">确定</button>
                     <button class="editBtnC" @click="cancleEditFloorList">取消</button>
@@ -256,8 +259,10 @@ export default {
         partitionListValue:'',//建筑分区值
         value: '',
         florData:[],
+        checkData:[],
         addFloorList:false,
         editFloorList:false,
+        isDeleteFloorShow:true,
         deleteFloorDialog:false,
         setAsAuto:false,
         setAsDefault:false,
@@ -337,8 +342,29 @@ export default {
                             return false;
                         }
                     })
+                     if(this.FloorValue>this.checkData[0]&&this.FloorValue<this.checkData[this.checkData.length-1]){
+                        this.setAsAuto=true;
+                        // this.$message({
+                        //     type:'info',
+                        //     message:'',
+                        // })
+                    }
+                    if(this.setAsAuto){
+                        var str=this.florData[this.florData.length-1].BottomHeight;
+                        if(this.FloorValue>str){
+                             this.florData.forEach((item)=>{
+                                 if(item.BottomHeight==str){
+                                     if(item.IsDefault==false){
+                                         this.setAsAuto=false;
+                                     }
+                                 }
+                             })
+                        }
+                    }
+                    
                     if(flag){
                         alert('楼层名称或标高值已存在!')
+                        
                     } else{
                         axios({
                             method:'post',
@@ -386,22 +412,96 @@ export default {
         },
         //编辑竖向楼层
         listTableEdit(scope){
-            if(scope.row.IsDefault){
-                this.isDisabled = true;
-            }else{
-                this.isDisabled = false;
-            }
-            if(scope.row.BottomHeight == '最小值'){
-                this.disableShowEdit = true;
-            }else{
-                this.disableShowEdit = false;
-            }
-
+            // if(scope.row.IsDefault){
+            //     this.isDisabled = true;
+            // }else{
+            //     this.isDisabled = false;
+            // }
             this.floorIndex = scope.$index;
-            this.setAsDefault = this.florData[this.floorIndex].IsDefault;
-            this.FloorName = this.florData[this.floorIndex].Name;
-            this.FloorValue = this.florData[this.floorIndex].BottomHeight;
-            this.editFloorList = true;
+            console.log(this.floorIndex,'this.floorIndex');
+            if(this.floorIndex==0&&this.florData[this.floorIndex+1].IsDefault){
+                 if(scope.row.BottomHeight == '最小值'){
+                    this.disableShowEdit = true;
+                }else{
+                    this.disableShowEdit = false;
+                }
+                this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                this.FloorName = this.florData[this.floorIndex].Name;
+                this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                this.editFloorList = true;
+                this.isDisabled = false;
+                // this.isDeleteFloorShow=false;
+            }else if(this.floorIndex==0&&this.florData[this.floorIndex+1].IsDefault==false){
+                if(scope.row.BottomHeight == '最小值'){
+                    this.disableShowEdit = true;
+                }else{
+                    this.disableShowEdit = false;
+                }
+                this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                this.FloorName = this.florData[this.floorIndex].Name;
+                this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                this.editFloorList = true;
+                this.isDisabled = true;
+                // this.isDeleteFloorShow=false;
+            }else if(((this.florData.length-1)==this.floorIndex)&&this.florData[this.floorIndex-1].IsDefault==true){
+                if(scope.row.BottomHeight == '最小值'){
+                    this.disableShowEdit = true;
+                }else{
+                    this.disableShowEdit = false;
+                }
+                this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                this.FloorName = this.florData[this.floorIndex].Name;
+                this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                this.editFloorList = true;
+                this.isDisabled = false;
+            }else if(((this.florData.length-1)==this.floorIndex)&&this.florData[this.floorIndex-1].IsDefault==false){
+                if(scope.row.BottomHeight == '最小值'){
+                    this.disableShowEdit = true;
+                }else{
+                    this.disableShowEdit = false;
+                }
+                this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                this.FloorName = this.florData[this.floorIndex].Name;
+                this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                this.editFloorList = true;
+                this.isDisabled = true;
+            } else if(this.florData[this.floorIndex-1].IsDefault||this.florData[this.floorIndex+1].IsDefault){
+                if(this.florData[this.floorIndex-1].IsDefault==true&&this.florData[this.floorIndex+1].IsDefault==true){
+                    this.isDisabled = true;
+                }else{
+                    this.isDisabled = false;
+                }
+                if(scope.row.BottomHeight == '最小值'){
+                    this.disableShowEdit = true;
+                }else{
+                    this.disableShowEdit = false;
+                }
+                // console.log(this.floorIndex,'this.floorIndex');
+                this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                this.FloorName = this.florData[this.floorIndex].Name;
+                this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                this.editFloorList = true;
+                // this.isDeleteFloorShow=false;
+            }else if(this.florData[this.floorIndex-1].IsDefault==false&&this.florData[this.floorIndex+1].IsDefault==false){
+                    if(scope.row.BottomHeight == '最小值'){
+                        this.disableShowEdit = true;
+                    }else{
+                        this.disableShowEdit = false;
+                    }
+                    
+                    this.setAsDefault = this.florData[this.floorIndex].IsDefault;
+                    this.FloorName = this.florData[this.floorIndex].Name;
+                    this.FloorValue = this.florData[this.floorIndex].BottomHeight;
+                    this.editFloorList = true;
+                    this.isDisabled = true;
+                    // this.isDeleteFloorShow=true;
+            }
+            else{
+                this.$message({
+                    type:'info',
+                    message:'请选择顺序楼层进行优先加载'
+                })
+            }
         },
         makeEditFloorList(){
             var reg = new RegExp("^[0-9]*$");
@@ -462,7 +562,23 @@ export default {
         //删除竖向楼层
         deleteFloorRow(scope){
             this.floorIndex = scope.$index;
-            this.deleteFloorDialog = true;
+            if(((this.florData.length-1)==this.floorIndex)&&this.florData[this.floorIndex-1].IsDefault==false&&this.florData[this.floorIndex].IsDefault==true){
+                this.$message({
+                    type:'info',
+                    message:'最少优先加载1个楼层,当前不可删除'
+                })
+            }else if(((this.florData.length-1)==this.floorIndex)&&this.florData[this.floorIndex-1].IsDefault==false&&this.florData[this.floorIndex].IsDefault==false){
+                    this.deleteFloorDialog = true;
+            }
+           else if(this.florData[this.floorIndex-1].IsDefault==false&&this.florData[this.floorIndex+1].IsDefault==false&&this.florData[this.floorIndex].IsDefault==true){
+                this.$message({
+                    type:'info',
+                    message:'最少优先加载1个楼层,当前不可删除'
+                })
+            }else{
+                this.deleteFloorDialog = true;
+            }
+            
         },
         deleteMakeSure(){
             axios({
@@ -576,11 +692,20 @@ export default {
                 if(response.data.cd == '0'){
                     if(response.data.rt != null){
                         this.florData = response.data.rt.rows;
+                        // var checkData=[];
+                        var colId="BottomHeight";
+                        var asc = function(x,y)
+                        {
+                            return (x[colId] > y[colId]) ? 1 : -1
+                        }
+                        this.florData.sort(asc);
+
                         this.florData.forEach((item,index,arr)=>{
                             if(item.IsDefault){
                                 item = Object.assign(item,{
-                                    Remark:'默认楼层'
+                                    Remark:'优先加载'
                                 })
+                                this.checkData.push(item.BottomHeight)
                             };
                             if(item.BottomHeight == -2147483648){
                                 item = Object.assign(item,{
@@ -592,6 +717,14 @@ export default {
                                 index:index
                             })
                         });
+                        console.log(this.florData,'this.florData1');
+                        console.log(this.checkData,'checkData');
+                        
+                        // this.florData.forEach((item)=>{
+                        //     if(item.IsDefault==true){
+                        //         checkData.push(item.)
+                        //     }
+                        // })
                     }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);

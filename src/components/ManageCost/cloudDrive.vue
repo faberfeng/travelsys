@@ -1,5 +1,9 @@
 <template>
     <div id="cloudDrive">
+         <form id="cloudDrivePrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+            <input type="hidden" name="p" ref="cloudDriveLabelContent">
+        </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
         <div id="GroupSelect">
             <select v-model="selectUgId" class="inp-search" @change="InitselectUgId">
                 <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
@@ -11,7 +15,7 @@
             <!-- <div > -->
             <div :style="{'min-width: 950px; overflow-y: auto; height: 760px;':!showCommonList}">
                 <div id="item-box-file">
-                    <router-link :to="'/Drive/costover'" class=" label-item">  
+                    <!-- <router-link :to="'/Drive/costover'" class=" label-item">  
                     最近文档  
                     </router-link>
                     <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
@@ -22,6 +26,8 @@
                     </router-link>
                     <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
                         个人中转  
+                    </router-link> -->
+                     <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                     <div class="item-search" v-if="!showQuanJing">
                         <span class="title-right">
@@ -2654,6 +2660,7 @@ import './js/date.js'
 import data from '../Settings/js/date.js'
 import upload from '../uploadFile.vue'
 import commonList from  '../planCost/qingDan.vue'
+import moment from 'moment'
 var app
 var CurrentSelectPara='';
 var CurrentSelectedEntList='';
@@ -2665,6 +2672,8 @@ export default {
     data() {
          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
+            routerList:'',
+            moduleList:'',
             spanShow:true,
             showCommonList:false,
             setId:'',
@@ -2810,7 +2819,8 @@ export default {
             updateFileName:'',//文件名
             updateFileList:'',//文件列表
             imgSrc:"",
-            clickBlank:true
+            clickBlank:true,
+            fgIdListById:[]
         }
     },
     created(){
@@ -2818,8 +2828,11 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
+        vm.projName = localStorage.getItem('projName');
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.loadingTitle()
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.shareUrl=vm.$store.state.shareUrl;
         this.GMDUrl = this.$store.state.GMDUrl;
@@ -2939,6 +2952,48 @@ export default {
               break;
               case "UsingColorStatus":{
               }
+            }
+        },
+        loadingTitle(){
+            var vn=this;
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'002','00202','/Drive/cloudDrive','00201','/Drive/costover','00203','/Drive/Share','00204','/Drive/PersonalTransit');
+            console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
             }
         },
        initAll(){
@@ -3114,7 +3169,7 @@ export default {
                 }
             }
             vm.drawingFileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId)
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);
@@ -3137,6 +3192,7 @@ export default {
                         if(response.data.cd=='0'){
                             vm.drawingsUploadShow = false
                             vm.drawingFileList = []
+                            vm.getHolderId=''
                             if(vm.showQuanJing){
                                 vm.searchFileGroupInfo(vm.checkFileDir.nodeId)
                             }else{
@@ -3929,6 +3985,7 @@ export default {
       getDrawingIdByFgId(){
           var vm=this;
            var fgId = ''
+           var fgIdList = []
          if(vm.showQuanJing && vm.checkedRound){
             fgId =vm.checkedRound.ID
          }
@@ -3937,7 +3994,20 @@ export default {
                  vm.versionItem = {}
                  return false
              }
-             fgId = vm.checkedItem.fgId
+            //  for(var i=0;i<vm.fileList.length;i++){
+            //         if(vm.fileList[i].checked){
+            //             if (vm.fileList[i].isAutoCreated == 1) {
+            //                 vm.$message({
+            //                     type:'error',
+            //                     message:'系统文件，不能操作！'
+            //                 })
+            //                 return false
+            //             }
+            //             fgIdList.push(vm.fileList[i].fgId)
+            //         }
+            //     }
+            //     console.log(fgIdList,'fgIdList000');
+            //  fgId = vm.checkedItem.fgId
          }
           axios({
               method:'post',
@@ -3945,9 +4015,8 @@ export default {
               headers:{
                   'token':this.token
               },
-              params:{
-                  fileGroupId:fgId
-              }
+              data:vm.fgIdListById
+              
           }).then((response)=>{
               if(response.data.cd=='0'){
                   this.drawingFgid=response.data.rt;
@@ -3957,21 +4026,21 @@ export default {
       },
       deletePoint(){//删除点位
         var vm = this
+       
         if(vm.showBtn==false){
             vm.$confirm('此操作将永久删除该图纸, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
+                    //  vm.getDrawingIdByFgId();
                     axios({
-                        method:'get',
+                        method:'post',
                         url:vm.BDMSUrl+'/dc/drawingReview/deleteDrawing',
                         headers:{
                             'token':vm.token
                         },
-                        params:{
-                            drawingId:vm.drawingFgid
-                        }
+                        data:vm.drawingFgid
                     }).then((response)=>{
                         if(response.data.cd == 0){
                             if(vm.showQuanJing){
@@ -4120,6 +4189,7 @@ export default {
         //         message:'这个文件夹没有子文件!'
         //     })
         //   }
+        console.log(obj,'vm.checkFileDir');
         vm.clickBlank=true;
         vm.checkedFile_Folder.file=false;
         vm.checkedFile_Folder.folder=false;
@@ -4131,6 +4201,7 @@ export default {
           vm.fileSearchInfo = ''
           vm.checkFileDir = obj//选中的文件夹
           vm.spanShow=true;
+          
          
           if(vm.checkFileDir.isDrawing==1){
               this.showBtn=false;
@@ -4520,9 +4591,11 @@ export default {
         // vm.checkedFile_Folder.isDrawingShow = vm.showBtn
         // vm.fileSearchInfo = ''
         var fileCheckList = []
+        this.fgIdListById =[]
         vm.checkedFile_Folder.isDrawingShow=true;
         vm.checkAll = false
         if(isMultiSelect){//多选
+            console.log('111111');
             if(file){
                 vm.fileList[val].checked =  vm.fileList[val].checked?false:true
             }else{
@@ -4533,15 +4606,19 @@ export default {
                     vm.checkedFile_Folder.file = true
                     vm.checkedFile_Folder.fileCheckedNum++
                     fileCheckList.push(vm.fileList[i])
+                    this.fgIdListById.push(vm.fileList[i].fgId)
                 }
             }
+
             for(var j=0;j<vm.folderList.length;j++){
                 if(vm.folderList[j].checked){
                     vm.checkedFile_Folder.folder = true
                     vm.checkedFile_Folder.folderCheckedNum++
                 }
             }
+            vm.getDrawingIdByFgId()
             if(file){
+                console.log(this.fgIdListById,'fgIdList000');
                 vm.PointFigure.oldname = vm.fileList[val].fgName
                 vm.PointFigure.fgID = vm.fileList[val].fgId
                 vm.checkedItem = {}
@@ -4550,7 +4627,6 @@ export default {
                     // console.log(vm.checkedItem,'123445');
                     vm.getGouJianInfo()
                     vm.getVersion()
-                    vm.getDrawingIdByFgId()
                 }
             }else{
                 vm.checkedItem = {}
@@ -4567,10 +4643,11 @@ export default {
                     vm.fileList[i].checked = false
                 }
                 vm.fileList[val].checked = true
-
+                
                 vm.PointFigure.oldname = vm.fileList[val].fgName
                 vm.PointFigure.fgID = vm.fileList[val].fgId
                 vm.checkedItem = vm.fileList[val]
+                this.fgIdListById.push(vm.fileList[val].fgId)
                 vm.getGouJianInfo()
                 vm.getVersion()
                 vm.getDrawingIdByFgId()
@@ -4713,36 +4790,36 @@ export default {
         })
     },
     // 获取目录
-     getDirectory(){
-            var vm=this
-            axios({
-                url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
-                method:'get',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projectId:vm.projId
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    vm.DirectoryList=response.data.rt;
-                    vm.DirectoryList.forEach((item)=>{
-                        vm.$set(item,'nodeParId',1)
-                        vm.$set(item,'nodeId',item.code)
-                        vm.$set(item,'nodeName',item.name)
-                    })
-                    this.getDrawingList();
+    //  getDirectory(){
+    //         var vm=this
+    //         axios({
+    //             url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
+    //             method:'get',
+    //             headers:{
+    //                 'token':vm.token
+    //             },
+    //             params:{
+    //                 projectId:vm.projId
+    //             }
+    //         }).then((response)=>{
+    //             if(response.data.cd=='0'){
+    //                 vm.DirectoryList=response.data.rt;
+    //                 vm.DirectoryList.forEach((item)=>{
+    //                     vm.$set(item,'nodeParId',1)
+    //                     vm.$set(item,'nodeId',item.code)
+    //                     vm.$set(item,'nodeName',item.name)
+    //                 })
+    //                 this.getDrawingList();
                     
-                    // console.log(vm.DirectoryList);
-                }else{
-                    vm.message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                } 
-            })
-    },
+    //                 // console.log(vm.DirectoryList);
+    //             }else{
+    //                 vm.message({
+    //                     type:'error',
+    //                     message:response.data.msg
+    //                 })
+    //             } 
+    //         })
+    // },
         //获取图纸列表
         getDrawingList(){
             // this.getDirectory()
@@ -5109,11 +5186,13 @@ export default {
                 if(response.data.cd == 0){
                     this.isbiaoqianshow = true;
                     this.biaoqianInfo = response.data.rt;
+                    
                     Object.assign(this.biaoqianInfo,{
                         mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
                         mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
 
                     })
+                    console.log(this.biaoqianInfo,'this.biaoqianInfo');
                 }else{
                     alert(response.data.msg);
                 }
@@ -5156,6 +5235,14 @@ export default {
                     return "";
             }
         },
+        timeChanges(val){
+             if (val==null) {
+                return;
+            } else {
+                return moment(val).format("YYYY-MM-DD");
+            }
+
+        },
         addZero(num,size){
             var len = ('' + num).length;
             return (new Array(size > len ? size - len + 1 || 0 : 0).join(0) + num);
@@ -5168,6 +5255,26 @@ export default {
         },
         //打印当前标签页
         printLabelList(){
+            var vm = this
+            var datas = '['
+            var tabelTitle = vm.projName + '构件标签'
+            var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
+            var item=vm.biaoqianInfo;
+                var valueList = '["' + (item.pkId ? item.pkId : "") + '","'
+                    + (item.mName ? item.mName : "") + '","' + (item.mGSource ? vm.parseMGSource(item.mGSource) : "") + '","'
+                    + (item.mBSource ? vm.parseMBSource(item.mBSource) : "") + '","' + (item.creator ? item.creator : "") + '","' +
+                    (item.createTime ? vm.timeChanges(item.createTime) : "") + '","' + (item.mVersion ? item.mVersion : "") + '","'
+                    + (item.manifestDetailCount ? item.manifestDetailCount : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                // if (i < vm.biaoqianInfo.length - 1) datas += ','
+            
+            datas += ']'
+            console.log(datas,'data1111');
+            vm.$refs.cloudDriveLabelContent.value = datas
+            $('#cloudDrivePrint-qrcode').submit()
             this.$message({
                 type:"info",
                 message:'已向打印机发送请求！'

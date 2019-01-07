@@ -33,7 +33,7 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="item.userImg?(QJFileManageSystemURL+item.userImg):require('../../assets/people.png')">
+                            <img :src="item.userImg?(commomHeadPictureFile+item.userImg):require('../../assets/people.png')">
                         </div> 
                         <div class="projectListText">
                             <p class="title">
@@ -81,6 +81,7 @@ export default {
             tabShow:1,
             token:'',
             QJFileManageSystemURL:'',
+            commomHeadPictureFile:'',
             BDMSUrl:'',
             notbeenUse:true,
             projId:'',
@@ -103,6 +104,7 @@ export default {
         var vm = this
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
+        vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
         vm.token = localStorage.getItem('token'); //获取token
         vm.projId = localStorage.getItem('projId');//获取工程id
         vm.getProjectInfo();//工程首页信息

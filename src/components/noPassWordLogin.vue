@@ -75,7 +75,7 @@ export default {
                     this.$router.push({
                         path: '/showcompany'
                     })
-                    sessionStorage.setItem('navigationPath','projectPage');
+                    // sessionStorage.setItem('navigationPath','projectPage');
                 } else if (this.projectData.cd === '10003') {
                     // alert(this.projectData.msg) //密码不正确
                 } else if (this.projectData.cd === '10000') {

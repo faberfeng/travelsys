@@ -1,7 +1,7 @@
 <template>
     <div  id="costOverView">
         <div id="item-box-file">
-            <router-link :to="'/Cost/management'" class="label-item label-item-active">  
+            <!-- <router-link :to="'/Cost/management'" class="label-item label-item-active">  
                 成本概览  
             </router-link>
             <router-link :to="'/Cost/goujianList'"  class="label-item">  
@@ -12,13 +12,9 @@
             </router-link>
              <router-link :to="'/Cost/inventory'" class=" label-item">  
                 物料量清单  
-            </router-link>
-            <!-- <router-link :to="''"  class="label-item">  
-                成本审批  
-            </router-link>
-            <router-link :to="''"  class="label-item">  
-                成本分析  
             </router-link> -->
+            <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
+            </router-link>
         </div>
         <div class="tableBox" v-loading="loading">
             <table class="UserList" border="1" width="100%" >
@@ -85,6 +81,8 @@ export default {
                 dischargeTotal:0
             },
             loading:false,
+            routerList:'',
+            moduleList:'',
         }
     },
     created(){
@@ -92,9 +90,53 @@ export default {
         vm.token = localStorage.getItem('token');
         vm.projId = localStorage.getItem('projId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.loadingTitle();
         vm.getCostOverView();
     },
     methods:{
+        loadingTitle(){
+            var vn=this;
+            vn.routerList=vn.getSecondGradeList(vn.moduleList,'012','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory');
+            // console.log(vn.routerList,'vn.routerList')
+        },
+        //二级标题生成函数
+        getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+            var vm=this;
+            //   console.log(vm.moduleList,'获取的东西');
+            var secondList=[];
+            itemList.forEach((item)=>{
+                if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                    secondList.push(item)
+                    if(item.moduleCode==Code1){
+                        vm.$set(item,'isShow',true);
+                        vm.$set(item,'routerLink',routerLink1);
+                    }
+                    if(item.moduleCode==Code2){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink2);
+                    }
+                    if(item.moduleCode==Code3){
+                        vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink3);
+                    }
+                    if(item.moduleCode==Code4){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink4);
+                    }
+                }
+            })
+            secondList=secondList.sort(vm.compare('sequenceNo'))
+            return secondList
+        },
+        //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
         //进入设计版本页面
         getCostOverView(){
             var vm = this

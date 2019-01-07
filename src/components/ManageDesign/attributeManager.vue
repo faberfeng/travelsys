@@ -2,8 +2,8 @@
 <div id="attributeManager" v-loading.fullscreen.lock="fullscreenLoading">
         <div :class="[{'box-left-avtive':!screenLeft.show,'box-left-avtive_pre':!SHOWMain},'box-left-container']">
             <div style="min-width: 950px;overflow-y: auto;">
-                <div id="item-box-file">
-                     <router-link :to="'/Design/management'" class=" label-item">  
+                <div id="item-box-file" >
+                     <!-- <router-link :to="'/Design/management'" class=" label-item">  
                      设计协调  
                     </router-link>
                      <router-link :to="'/Design/drawingReview'" class="label-item">  
@@ -14,6 +14,8 @@
                     </router-link>
                     <router-link :to="'/Design/designversion'"  class="label-item">  
                         设计版本  
+                    </router-link> -->
+                    <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                     </router-link>
                 </div>
                 <div id="containerMessage" v-show="SHOWMain">
@@ -1824,7 +1826,9 @@ export default {
   },
   data(){
       return {
-         screenLeft:{
+        routerList:'',
+        moduleList:'',
+        screenLeft:{
              show:true,
              item:1,
          },
@@ -2008,13 +2012,15 @@ export default {
         vm.entId = localStorage.getItem('entId')
         vm.projAuth = localStorage.getItem('projAuth')
         vm.entType = localStorage.getItem('entType')
-       
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.getIntoDesignPage();
         //获取第三行参数
         this.getParams();
         this.getModelSelection(this.globalCode,this.globalBUildinInfo);
+        // this.getSecondGradeList();
+        this.loadingTitle();
     },
     watch:{
         value_monomer:function(val){
@@ -2154,7 +2160,51 @@ export default {
             }
         }
     },
+
   methods:{
+      loadingTitle(){
+          var vn=this;
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'004','00403','/Design/attributeManager','00401','/Design/management','00402','/Design/drawingReview','00404','/Design/designversion');
+          console.log(vn.routerList,'vn.routerList')
+
+      },
+      //二级标题生成函数
+      getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+          var vm=this;
+        //   console.log(vm.moduleList,'获取的东西');
+          var secondList=[];
+          itemList.forEach((item)=>{
+              if(item.grade==2&&item.moduleCode.substr(0,3)==oneGradeCode&&item.enableWeb==1&&(item.due==0||item.due>new Date().getTime())){
+                  secondList.push(item)
+                  if(item.moduleCode==Code1){
+                      vm.$set(item,'isShow',true);
+                      vm.$set(item,'routerLink',routerLink1);
+                  }
+                  if(item.moduleCode==Code2){
+                      vm.$set(item,'isShow',false);
+                       vm.$set(item,'routerLink',routerLink2);
+                  }
+                  if(item.moduleCode==Code3){
+                      vm.$set(item,'isShow',false);
+                       vm.$set(item,'routerLink',routerLink3);
+                  }
+                  if(item.moduleCode==Code4){
+                      vm.$set(item,'isShow',false);
+                        vm.$set(item,'routerLink',routerLink4);
+                  }
+              }
+          })
+          secondList=secondList.sort(vm.compare('sequenceNo'))
+        return secondList
+      },
+      //排序函数
+        compare(property) {
+            return function(a, b) {
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        },
        nameChange(isInit){
             var vm = this 
             for(var i=0;i<vm.options_name.length;i++){

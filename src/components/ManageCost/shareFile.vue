@@ -164,15 +164,21 @@ export default {
             backshow:false,
             WebGlUrl:'',
             GMDUrl:'',
+            shareUrl:'',
+            appShareUrl:'',
         }
     },
     created(){
         var vm=this;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.shareUrl=vm.$store.state.shareUrl;
+        vm.appShareUrl=vm.$store.state.appShareUrl;
         this.GMDUrl = this.$store.state.GMDUrl;
         // this.intoDir();
         console.log(this.$route.query.shareName,'this.$route.query.shareName')
+        console.log(this.$route.path,'this.$route.path');
+        this.judgeUserAgent();
         this.showShareFilesOrFolder();
     },
     watch:{
@@ -182,6 +188,10 @@ export default {
       },
     },
     methods:{
+        judgeUserAgent(){
+            var shareNum=this.$route.path.replace(new RegExp("/cloud/share/"), "")
+            window.location.href = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? this.appShareUrl+'/cloudShare.html?shareNo='+shareNum : this.shareUrl+'/cloud/share/'+shareNum;
+        },
         showShareFilesOrFolder(){
             this.backshow=false;
             this.fileList=[];

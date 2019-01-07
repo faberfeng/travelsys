@@ -3,6 +3,7 @@
         <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
             <input type="hidden" name="p" ref="labelContent">
         </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
         <div :class="[{'box-left-avtive':!screenLeft.show,},'box-left-container']">
             <div style="min-width: 950px;height:785px;overflow-y: auto;">
                 
@@ -1935,12 +1936,13 @@ export default Vue.component('common-list',{
         var datas = '['
         var tabelTitle = vm.projName + '构件标签'
         var keyList = '["可追踪ID","构件名称","所在单体","所在区域","所在楼层","构件分类","构件注释","构件标记"]'
+        console.log(vm.S_Label_quantitiesList,'vm.S_Label_quantitiesList');
         vm.S_Label_quantitiesList.forEach((item,i)=>{
             var valueList = '["' + (item.dTraceId ? item.dTraceId : "") + '","'
-                + (item.dName ? item.dName : "") + '","' + (item.dBuild ? item.dBuild : "") + '","'
-                + (item.dDistrict ? item.dDistrict : "") + '","' + (item.dStorey ? item.dStorey : "") + '","' +
-                (item.classifyName ? item.classifyName : "") + '","' + (item.componentComments ? item.componentComments : "") + '","'
-                + (item.componentTag ? item.componentTag : "") + '"]'
+                + (item.name ? item.name : "") + '","' + (item.build ? item.build : "") + '","'
+                + (item.disctrict ? item.disctrict : "") + '","' + (item.storey ? item.storey : "") + '","' +
+                (item.classifyName ? item.classifyName : "") + '","' + (item.comment ? item.comment : "") + '","'
+                + (item.tag ? item.tag : "") + '"]'
             var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
                 'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
                 '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
@@ -1949,9 +1951,10 @@ export default Vue.component('common-list',{
         })
         datas += ']'
         vm.$refs.labelContent.value = datas
-        $('#print-qrcode').on('submit', function(event){
-            event.preventDefault() //阻止form表单默认提交
-        })
+        console.log(datas,'datas000');
+        // $('#print-qrcode').on('submit', function(event){
+        //     event.preventDefault() //阻止form表单默认提交
+        // })
         $('#print-qrcode').submit()
         vm.$message({
             type:'success',
@@ -2005,6 +2008,7 @@ export default Vue.component('common-list',{
       },
       labelListCancle(){
         var vm = this
+         vm.S_Label_quantitiesList = []
         vm.labelListShow = false
          vm.singleLable = false
       },
@@ -2056,6 +2060,9 @@ export default Vue.component('common-list',{
       },
       showLabel(){
           var vm = this
+          
+        // vm.S_Label_quantitiesList = []
+          vm.findManifestDetailList(1);
           vm.labelListShow = true
       },
       showLabelHeader(){
@@ -2299,6 +2306,7 @@ export default Vue.component('common-list',{
     // },
     findManifestDetailList(isDialog=0){
         var vm = this
+        // vm.S_Label_quantitiesList = [];
         //   showType:'separate',// 1. sepatate ,逐个显示 2. combine，合并显示
         /**
         * @augments isDialog 判断是否是弹框
