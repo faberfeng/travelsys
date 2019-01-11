@@ -1,6 +1,6 @@
 <template>
     <div id="cloudDrive">
-         <form id="cloudDrivePrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+         <form id="cloudDrivePrint-qrcode" style="display:none" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
             <input type="hidden" name="p" ref="cloudDriveLabelContent">
         </form>
         <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 

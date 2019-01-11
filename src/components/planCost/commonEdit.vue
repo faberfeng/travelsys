@@ -1419,6 +1419,7 @@ export default Vue.component('common-edit',{
         vm.UPID = vm.$store.state.UPID
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.data_right=[];
+        console.log(vm.rcId,'vm.rcId');
         if(vm.rcId && vm.rcId != 0){
             vm.getReportData()
             vm.getIntoDesignPage(true)
@@ -1488,17 +1489,29 @@ export default Vue.component('common-edit',{
                 }
             })
             vm.data_right = arr
+            // console.log(vm.data_right,'vm.data_right');
+            console.log(vm.privateVariables.new,'成功了吗');
+
             vm.privateVariables.new.forEach(item=>{
+
+                // vm.data_right.forEach((val)=>{
+                //     if(item.checked==val.isPrivate&&item.code==val.fieldCode){
+                //         item.checked=false;
+                //     }
+                // })
                 if(item.checked){
                     vm.data_right.push({
                         fieldCode: item.code,
                         fieldName: item.name,
                         fieldType: item.type,
                         checked:false,
-                        isPrivate:false,
+                        isPrivate:true,
                         tableType: -1
                     })
                 }
+                // else{
+                //     arr.push(item)
+                // }
             })
             let {new:obj} = vm.privateVariables
             vm.privateVariables.old = obj
@@ -1513,6 +1526,14 @@ export default Vue.component('common-edit',{
         showPrivateVariables(){
             var  vm = this
             vm.privateVariables.show = true
+            vm.data_right.forEach((item)=>{
+                for(var i=0;i<vm.privateVariables.new.length;i++){
+                    if(item.fieldCode == vm.privateVariables.new[i].code){
+                        vm.$set(vm.privateVariables.new[i],'checked',true)
+                        break
+                    }
+                }
+            })
         },
         getPV(){
             var vm = this
@@ -1841,22 +1862,51 @@ export default Vue.component('common-edit',{
                         vm.data_right = [];
                         if(response.data.rt.fieldList != null && response.data.rt.fieldList.length>0){
                             response.data.rt.fieldList.forEach(ele=>{
+                                vm.data_right.push({
+                                    fieldCode: ele.fieldCode,
+                                    fieldName: ele.fieldAlias,
+                                    fieldType: ele.fieldType,
+                                    checked:false,
+                                    tableType: -1
+                                })
+                                // if(ele.fieldCode.indexOf("43-")!=-1){
+                                vm.data_right.forEach((val)=>{
+                                    if(val.fieldCode.indexOf("43-")!=-1){
+                                        vm.$set(val,"isPrivate",true)
+                                    }
+                                })
+                                // console.log(vm.data_right,'出来的数据');
                                 for(var i=0;i<vm.data_left.length;i++){
                                     if(ele.fieldCode == vm.data_left[i].fieldCode){
                                         vm.$set(vm.data_left[i],'checked',true)
                                         vm.data_left[i].fieldName = ele.fieldAlias
+                                        // vm.data_left.remove({
+                                        //     fieldCode: ele.fieldCode,
+                                        //     fieldName: ele.fieldAlias,
+                                        //     fieldType: ele.fieldType,
+                                        //     checked:false,
+                                        //     tableType: -1});
                                         break
                                     }
                                 }
-                                for(var i=0;i<vm.privateVariables.new.length;i++){
-                                    if(ele.fieldCode == vm.privateVariables.new[i].code){
-                                        vm.$set(vm.privateVariables.new[i],'checked',true)
-                                        break
-                                    }
-                                }
+                                    var arr=[];
+                                    vm.data_left.forEach((element,index) => {
+                                        if(!element.checked){
+                                                arr.push(element)
+                                            }
+                                        })
+                                    vm.data_left=arr;
+                            
+                                // for(var i=0;i<vm.privateVariables.new.length;i++){
+                                //     if(ele.fieldCode == vm.privateVariables.new[i].code){
+                                //         vm.$set(vm.privateVariables.new[i],'checked',true)
+                                //         break
+                                //     }
+                                // }
                             })
-                            vm.addField()
-                            vm.basicConfirm()
+                            
+                            // vm.addField()
+                            // vm.basicConfirm()
                         }
                         //过滤条件
                         var length = response.data.rt.filterList.length;
@@ -2357,7 +2407,8 @@ export default Vue.component('common-edit',{
                     fieldName:vm.data_right[i].fieldName,
                     fieldType:vm.data_right[i].fieldType,
                     tableType:vm.data_right[i].tableType,
-                    checked: true
+                    checked: true,
+                    isPrivate:vm.data_right[i].isPrivate
                 }
                 vm.data_right.splice(i-1,0,obj)
                 vm.data_right.splice(i+1,1)
@@ -2367,6 +2418,7 @@ export default Vue.component('common-edit',{
         },
         shiftDown(){
             var vm = this
+            console.log(vm.data_right);
             for(var i=0;i<vm.data_right.length;i++){
               if(vm.data_right[i].checked){
                 if(i == vm.data_right.length-1)return false
@@ -2375,7 +2427,8 @@ export default Vue.component('common-edit',{
                     fieldName:vm.data_right[i].fieldName,
                     fieldType:vm.data_right[i].fieldType,
                     tableType:vm.data_right[i].tableType,
-                    checked: true
+                    checked: true,
+                    isPrivate:vm.data_right[i].isPrivate
                 }
                 vm.data_right.splice(i+2,0,obj)
                 vm.data_right.splice(i,1)

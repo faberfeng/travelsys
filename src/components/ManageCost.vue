@@ -204,7 +204,7 @@ export default {
         vm.iframeUrl=vm.$store.state.iframeWebGlUrl+'?new='+Math.random();
 
         vm.navigationPath = sessionStorage.getItem('navigationPath');
-        console.log(vm.navigationPath,'vm.navigationPath');
+        // console.log(vm.navigationPath,'vm.navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
         if(!vm.navigationPath){
             vm.navigationPath='007';
@@ -215,17 +215,18 @@ export default {
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
         vm.getPJDetial(vm.projId);
-        console.log(new Date().getTime(),'time');
+        
+        // console.log(new Date().getTime(),'time');
         // this.getInitdata();
     },
     mounted(){
-        
         var height = ''
         if(document.documentElement.clientHeight){
             this.cHeight = document.documentElement.clientHeight;
         }else{
            this.cHeight = document.body.clientHeight;
         }
+        // this.CreateIframe(this.iframeUrl);
     },
     updated(){
         var vm=this;
@@ -236,40 +237,34 @@ export default {
         // vm.getUserInfo();
                   
     },
+    destoryed(){
+        // this.IframeClose();
+    },
     computed:{
         path(){
             return this.$store.state.path;
         },
     },
+    
     methods:{
         webGlbtn(){
             var vm=this;
-            
             this.webGlShow=!this.webGlShow;
-            
-            
-            
              setTimeout(()=>{
                  app = this.$refs.iframe1.contentWindow;
+                // app = document.getElementById("webIframe").contentWindow;
                 app.postMessage({command:"Init",parameter:null},"*");
                     // window.removeEventListener("message", (evt)=>{
                     //     this.callback(evt)},true);
             },1000)
-            
-
-          
         },
 
         callback(e){
-            // console.log(e,'eee');
-            // console.log(app,'app');
-            // var str=[];
             switch(e.data.command){
 			case "EngineReady":
 				{
                     let Horder='';
                     let para='';
-                    
 					 Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
                      para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
                     // console.log(para,'para000')
@@ -294,13 +289,36 @@ export default {
 			case "ViewpointSubmited":
                 break;
             case "GetDrawingList":
-             this.GetDrawingBackList='',
+                this.GetDrawingBackList='',
                 this.drawList=[];
-            this.GetDrawingBackList=e.data.parameter;
-            // console.log(this.GetDrawingBackList,'图纸')
-            this.getDrawingList();
+                this.GetDrawingBackList=e.data.parameter;
+                // console.log(this.GetDrawingBackList,'图纸')
+                this.getDrawingList();
                 break;
 		    }
+        },
+        //动态加载iframe
+        CreateIframe(url){
+            var parent=document.getElementById("webgl");
+            var iframe=document.createElement("iframe");
+            iframe.setAttribute("allowfullscreen",true);
+            iframe.setAttribute("ref","iframe1");
+            iframe.setAttribute("id","webIframe");
+            iframe.setAttribute("name","ifd");
+            iframe.setAttribute("height",800);
+            iframe.setAttribute("frameborder",0);
+            iframe.setAttribute("border",0);
+            iframe.setAttribute("marginwidth",0);
+            iframe.setAttribute("marginheight",0);
+            iframe.setAttribute("width","100%");
+            iframe.setAttribute("src",url);
+            parent.appendChild(iframe);
+        },
+        //删除iframe
+        IframeClose(){
+            let parent=document.getElementById("webgl");
+            let child=document.getElementById("webIframe");
+            parent.removeChild(child);
         },
         //获取自定义菜单信息
         getMenusInfoPage(){
@@ -416,7 +434,7 @@ export default {
                     this.drawingWebGlList.forEach((item)=>{
                         this.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
-                                console.log(item.drawingId,'234');
+                               
                                 this.getDrawingRotateInfo(item.drawingId);
                                   this.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
@@ -599,7 +617,7 @@ export default {
                 localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
                 localStorage.setItem('moduleList',JSON.stringify(response.data.rt.onlineInfo.moduleList))
                 this.moduleLists=response.data.rt.onlineInfo.moduleList;
-                console.log(this.moduleLists,'this.moduleLists');
+                
                 var str=[]
                 this.moduleLists.forEach((item)=>{
                     if(item.parentModuleId==0&&(item.due==0||item.due>new Date().getTime())){
@@ -608,7 +626,7 @@ export default {
                 })
                 str=str.sort(this.compare('sequenceNo'));
                 this.getMenusLists=str;
-                console.log(this.getMenusLists,'this.getMenusLists');
+                // console.log(this.getMenusLists,'this.getMenusLists');
                 vm.getMenusInfoPage();
                 // vm.testIndex();
                 
@@ -687,7 +705,7 @@ export default {
                         })
                     }
                     this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00104')
-                    console.log(this.ellist,'ellist0000');
+                    // console.log(this.ellist,'ellist0000');
             }).catch((err)=>{
                 console.log(err)
             })
@@ -838,7 +856,7 @@ export default {
         //     }
         // },
         handMenus(val){
-            console.log('触发000')
+            // console.log('触发000')
             window.open(val,'_blank')
 
         },
@@ -848,7 +866,7 @@ export default {
             //      * 成本管理（012）、物资采购（011）、安全管理（013）、
             //      * 施工现场（006）、文档管理（002）、空间管理（009）、
             //      * 资产管理（010）、配置中心（001）
-            console.log(tab,event);
+            // console.log(tab,event);
             if(tab.name === '007'){
                 this.$router.push({
                     path:'/home/projHome/'+this.projId
@@ -884,14 +902,16 @@ export default {
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.name === '011'){
-                this.navigationPath = tab.name;
-                sessionStorage.setItem('navigationPath',this.navigationPath)
                 // this.$router.push({
                 //     path:'/metarialpurchase/productioncenter'//物资采购
                 // })
+                console.log('pppp');
+                console.log(this.moduleLists,'pppp1')
                 this.$router.push({
-                    path:this.firstGetSecondGradeList(this.moduleLists,'011','01101','/metarialpurchase/productioncenter','01104','/metarialpurchase/fahuoManage','01103','/metarialpurchase/dinghuoManage','01105','/metarialpurchase/checked','01102','/metarialpurchase/wuliaopurchase')
+                    path:this.firstGetSecondGradeList(this.moduleLists,'011','01101','/metarialpurchase/productioncenter','01102','/metarialpurchase/wuliaopurchase','01103','/metarialpurchase/dinghuoManage','01104','/metarialpurchase/fahuoManage','01105','/metarialpurchase/checked')
                 })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.name ==='016'){
                 // this.$router.push({
                 //     path:'/liveConnect/fieldConnection'
@@ -945,8 +965,8 @@ export default {
             }
         },
         selectIndex(index,indexPath){
-            console.log(index,'index');
-            console.log(indexPath,'indexPath');
+            // console.log(index,'index');
+            // console.log(indexPath,'indexPath');
             this.settingActive = index;
             sessionStorage.setItem('settingActive',this.settingActive);
         }

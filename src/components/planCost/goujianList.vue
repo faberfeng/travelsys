@@ -671,10 +671,12 @@ export default {
             }
             vm.getRealTimeList()
         },
-        editReportFromData(){
+        editReportFromData(data){
             var vm = this
+            console.log(data,'jjjj')
             vm.backToH()
             vm.showCommonEdit = true
+            vm.checkItem.rcId=data;
         },
         editReport(val){
             var vm = this;

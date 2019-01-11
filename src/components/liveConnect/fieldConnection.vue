@@ -27,11 +27,13 @@
                             </div>
                             <div class="video_body">
                                 <!-- <iframe id="mm" style="width: 100%;height:calc(100%);border:0;" src="https://site.altizure.cn/s/ryLw2SAxX"></iframe> -->
-                                 <model-obj ref="modelObj" id="mm" ></model-obj>
-                                 <!-- static/Tile_8.obj -->
-                                    <!-- <iframe style="width: 100%;height:100%"  src="../../../webGL/index.html"></iframe> -->
-                                
-                                <!-- src="https://site.altizure.cn/s/ryLw2SAxX" -->
+                                    <div v-show="gmdUrl" id="gmdFile" height="310px">
+                                        <iframe ref="gmdIframe" id="gmdId" :src="gmdUrl" frameborder="0" marginwidth="0" marginheight="0"  width="100%" height="310"></iframe>
+                                    </div>
+                                    <div id="objAndMtlFile"></div>
+                                    <div id="objAndMtlFile1"></div>
+                                    
+                                    <!-- <model-obj v-show="objUrl" ref="modelObj" id="objId" :src="objUrl"    ></model-obj> -->
                             </div>
                             <div class="video_bottom">
                                 <span class="fullSet" @click="getMedia(1)"></span>
@@ -52,7 +54,7 @@
                             </div>
                             <div class="video_body">
                                 <img v-show="this.mediaUrlList==[]" width="100%" height="310px" src="../../assets/nosource.png" >
-                                <video v-show="this.mediaUrlList!=[]" id="videoPlay" width="100%" height="88%" controls="controls" ref="video" allowfullscreen="true" src="../../assets/nosource.png"></video>
+                                <video v-show="this.mediaUrlList!=[]" id="videoPlay" width="100%" height="88%" controls="controls" ref="video"  allowfullscreen="true" :src="videoUrl?videoUrl:require('../../assets/nosource.png')"></video>
                                 <source type="video/mp4">
                                 your browser does not support the video tag.
                             </div>
@@ -107,7 +109,6 @@
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
                             <div class="video_body">
-                                
                                 <img  v-show="lineLiveImgShow" width="100%" height="310px" src="../../assets/nosource.png" >
                                 <videoPlayer :playsinline="true" id="lineLive" class="vjs-custom-skin videoPlayer" :options="playerOptions"></videoPlayer>
                                 <!-- <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe> -->
@@ -309,14 +310,20 @@
                             <thead>
                                 <tr>
                                     <td>序号</td>
+                                    <td>代号</td>
+                                    <td>类型</td>
                                     <td>文件路径/URL路径</td>
+                                    <td>备注</td>
                                     <td>操作</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr :class="{'select':index==isActive}" v-for="(item,index) in mediaUrlList1" :key="index" @click="checkItem(index)">
                                     <td>{{index+1}}</td>
+                                    <td>{{item.cameraId}}</td>
+                                    <td>{{item.cameraType}}</td>
                                     <td>{{item.displayPath}}</td>
+                                    <td>{{item.cameraRemark}}</td>
                                     <td>
                                         <button class="editBtn actionBtn" @click="editMediaUrl1(item.fileGroupId)"></button>
                                         <button class="deleteBtn actionBtn" @click="deleteMediaUrl1(item.id)"></button>
@@ -355,6 +362,18 @@
                 </el-dialog>
                 <el-dialog  title="媒体路径选择" :visible.sync="addResourceDialog1" @close="addResourceCancle1">
                     <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-352px !important">摄像机名称ID</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraID"/></div>
+                    </div>
+                    <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-365px !important">摄像机类型</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraType"/></div>
+                    </div>
+                    <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-404px !important">备注</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraRemark"/></div>
+                    </div>
+                    <div class="mediaUrl">
                         <div class="urlWord">目标URL</div>
                         <div class="urlInp"><input class="urlInp_inner" v-model="mediaUrl"/></div>
                     </div>
@@ -387,6 +406,18 @@
                     </div>
                 </el-dialog>
                 <el-dialog title="媒体路径选择" :visible.sync="updateResourceDialog1" @close="updateResourceCancle1">
+                    <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-352px !important">摄像机名称ID</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraID"/></div>
+                    </div>
+                    <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-365px !important">摄像机类型</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraType"/></div>
+                    </div>
+                    <div class="mediaUrl">
+                        <div class="urlWord" style="margin-left:-404px !important">备注</div>
+                        <div class="urlInp"><input class="urlInp_inner" v-model="cameraRemark"/></div>
+                    </div>
                     <div class="mediaUrl">
                         <div class="urlWord">目标URL</div>
                         <div class="urlInp"><input class="urlInp_inner" v-model="mediaUrl"/></div>
@@ -455,12 +486,19 @@
 <script>
 // import { ModelThree } from 'vue-3d-model'
 var THREE = require('three');
+var TrackballControls = require('three-trackballcontrols');
 import axios from 'axios'
 import data from '../Settings/js/date.js'
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
 import { ModelObj } from 'vue-3d-model'
 import 'videojs-flash'
+import './js/CSS3DRenderer.js'
+import './js/DDSLoader.js'
+import './js/MTLLoader.js'
+import './js/OBJLoader.js'
+// import * as THREE from 'three'
+// import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader'
 // var source= '';
 var camera, scene, renderer;
 var isUserInteracting = false,
@@ -469,6 +507,14 @@ var isUserInteracting = false,
     lat = 0, onMouseDownLat = 0,
     phi = 0, theta = 0;
     var distance = 500;
+
+var camera1, scene1, renderer1,controls;
+var mouseX = 0,
+    mouseY = 0;
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+var windowHalfX1 = "";
+var windowHalfY1 = "";
 export default {
     name:'fieldConnection',
     components: {
@@ -478,6 +524,7 @@ export default {
         return{
             routerList:'',
             moduleList:'',
+            videoUrl:'',
             playerOptions: {  
                 // width:'inherit',
                 margin:'0 auto',
@@ -489,9 +536,11 @@ export default {
                 techOrder: ['flash'],  
                 autoplay: true,  
                 controls: true,
-                 muted: false,
+                muted: false,
                 language: 'en',
                 playbackRates: [0.7, 1.0, 1.5, 2.0],
+                fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
                 // poster: "./images/baoc.png",
             },  
             lineLiveImgShow:true,
@@ -554,6 +603,10 @@ export default {
             messageText:'',
             websock: null,
             // mouseToggle:false,
+            gmdUrl:'',
+            objUrl:'',
+            mtlPathUrl:'',
+            mtlPathPath:'',
             mouseToggle1:false,
             mouseToggle2:false,
             mouseToggle3:false,
@@ -611,6 +664,14 @@ export default {
             moreChatNumShow:false,
             oneChatNum:0,
             moreChatNum:0,
+            GMDUrl:'',
+            mediaUrlLists:'',
+            currentMediaUrlLists:'',
+            cameraDefaults:'',
+            cameraID:'',
+            cameraRemark:'',
+            cameraType:'',
+            // carmerID:'',
 
 
         }
@@ -629,6 +690,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
+        this.GMDUrl = this.$store.state.GMDUrl;
         // vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
@@ -798,7 +860,6 @@ export default {
         loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'016','01601','/liveConnect/fieldConnection','01602','/liveConnect/fieldMessage','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance');
-          console.log(vn.routerList,'vn.routerList')
         },
         //二级标题生成函数
         getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
@@ -1004,7 +1065,7 @@ export default {
                                 
                             })
                         })
-                        console.log('后台获取群聊记录成功')
+                       
                     }else{
 
                     }
@@ -1064,9 +1125,8 @@ export default {
                             })
                         }
                         this.userQunzuList=this.getUsersByMeetIdList;
-                        console.log(this.getUsersByMeetIdList,'this.getUsersByMeetIdList');
+                        // console.log(this.getUsersByMeetIdList,'this.getUsersByMeetIdList');
                         
-                        console.log('获取联系人成功')
                     }else{
 
                     }
@@ -1532,7 +1592,7 @@ export default {
                     if(response.data.cd == '0'){
                         var str=response.data.rt;
                         vm.ugListGroup=str;
-                        console.log(vm.ugListGroup,'str0000000');
+                        // console.log(vm.ugListGroup,'str0000000');
                         if(this.isContained(vm.meetListGroup,vm.ugListGroup)==false){
                             this.initCreatDefaultMeet();
                         }
@@ -1846,8 +1906,17 @@ export default {
             //
 
         fullModule(){
-            var elem=document.getElementById("mm");
-	        this.requestFullscreen(elem);
+            if(this.currentMediaUrlLists.zipVersion){
+                var elem=document.getElementById("objAndMtlFile");
+                this.requestFullscreen(elem);
+            }else if(this.judgeType(this.currentMediaUrlLists.displayPath,'obj','OBJ')){
+                var elem=document.getElementById("objAndMtlFile");
+                this.requestFullscreen(elem);
+            }else if(this.judgeType(this.currentMediaUrlLists.displayPath,'gmd','GMD')){
+                var elem=document.getElementById("gmdId");
+                this.requestFullscreen(elem);
+            }
+           
         },
         changeActive(val){
             if(val==1){
@@ -1967,7 +2036,7 @@ export default {
                     this.fileTreeList_original=response.data.rt;
                     console.log(this.fileTreeList_original);
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
-                    console.log(this.fileTreeList)
+                    // console.log(this.fileTreeList)
                 }
             })
 
@@ -1979,6 +2048,7 @@ export default {
         getMedia(type){
             this.addMediaDialog=true;
             this.mediaUrlList=[];
+            this.type=type;
             this.getMediaInformation(type);
             // this.getMediaInformation1(type);
             // this.getMediaLiveInformation(type);
@@ -2003,22 +2073,46 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.mediaUrlList=response.data.rt;
-                    if(type==1){
-                        this.mediaUrlLists=response.data.rt;
-                        this.modelPageTotal=this.mediaUrlLists.length;
-                        this.$refs.modelObj.src=this.mediaUrlLists[0].path;
-                    }
-                    if(type==2){
-                        this.videoPageTotal=this.mediaUrlList.length;
-                        this.$refs.video.src=this.mediaUrlList[0].path;
-                    }
+                    
+                    
+                        if(type==1){
+                            this.mediaUrlLists=response.data.rt;
+                            this.modelPageTotal=this.mediaUrlLists.length;
+                            this.currentMediaUrlLists=this.mediaUrlLists[0]
+                            if(this.addMediaDialog==false){
+                                if(this.mediaUrlLists[0].zipVersion){
+                                    this.initObjAndMtl(this.mediaUrlLists[0].mtlPath,this.mediaUrlLists[0].objPath)
+                                }else if(this.judgeType(this.mediaUrlLists[0].displayPath,'obj','OBJ')){
+                                    this.initObjAndMtl(null,this.mediaUrlLists[0].path)
+                                }else if(this.judgeType(this.mediaUrlLists[0].displayPath,'gmd','GMD')){
+                                    this.gmdUrl=this.initGMD(this.mediaUrlLists[0].path)
+                                }
+                            }
+                        }
+                        if(type==2){
+                            this.videoPageTotal=this.mediaUrlList.length;
+                            this.videoUrl=this.mediaUrlList[0].path;
+                        }
+                    
+                    
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
                 }
                 
             })
+        },
+        judgeType(fileName,type1,type2){
+            return fileName.substr(fileName.length-3)==type1||fileName.substr(fileName.length-3)==type2
+        },
+        initGMD(Url){
+            var vm=this;
+            if(Url==null){
+                return;
+            }else{
+                return vm.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(Url)
+            }
         },
         //获取直播
         getMediaInformation1(type){
@@ -2034,7 +2128,7 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.mediaUrlList1=response.data.rt;
                     this.lineLiveImgShow=false;
                     this.livePageTotal=this.mediaUrlList1.length;
@@ -2043,14 +2137,29 @@ export default {
                     // this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
-
                 }
-                
             })
         },
         //改变模型
         handlemodelCurrentChange(val){
-            this.$refs.modelObj.src=this.mediaUrlLists[val-1].path;
+            this.currentMediaUrlLists=this.mediaUrlLists[val-1]
+            this.gmdUrl='';
+            this.objUrl='';
+            this.mtlPathPath='';
+            this.mtlPathUrl='';
+            if(document.getElementById("objAndMtl")){
+                var parent=document.getElementById("objAndMtlFile");
+                var child=document.getElementById("objAndMtl");
+                parent.removeChild(child);
+            }
+            if(this.mediaUrlLists[val-1].zipVersion){
+                this.initObjAndMtl(this.mediaUrlLists[val-1].mtlPath,this.mediaUrlLists[val-1].objPath)
+            }else if(this.judgeType(this.mediaUrlLists[val-1].displayPath,'obj','OBJ')){
+                this.initObjAndMtl(null,this.mediaUrlLists[val-1].path)
+                this.objUrl=this.mediaUrlLists[val-1].path;
+            }else if(this.judgeType(this.mediaUrlLists[val-1].displayPath,'gmd','GMD')){
+                this.gmdUrl=this.initGMD(this.mediaUrlLists[val-1].path)
+            }
         },
         //改变视频
         handleVideoCurrentChange(val){
@@ -2211,29 +2320,50 @@ export default {
             })
         },
         addResourceMakeSure1(){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'lc/add',
-                headers:{
-                    'token':this.token,
-                },
-                params:{
-                    projectId:this.projId,
-                    mediaType:this.type,
-                    path:this.mediaUrl,
-                    ugId:'',
-                    fgId:'',
-                    name:''
-                }
-            }).then(response=>{
-                if(response.data.cd=='0'){
-                    // this.getMediaInformation(this.type);
-                    this.getMediaInformation1(this.type);
-                    this.addResourceDialog1=false;
-                }else if(response.data.cd=='-1'){
-                    alert(response.data.msg);
-                }
-            })
+            if(this.cameraID==""){
+                this.$message({
+                    type:'info',
+                    message:'请输入摄像机名称ID'
+                })
+            }
+            else if(this.mediaUrl==""){
+                this.$message({
+                    type:'info',
+                    message:'请输入目标Url'
+                })
+            }else{
+                 axios({
+                    method:'get',
+                    url:this.BDMSUrl+'lc/add',
+                    headers:{
+                        'token':this.token,
+                    },
+                    params:{
+                        projectId:this.projId,
+                        mediaType:this.type,
+                        path:this.mediaUrl,
+                        ugId:'',
+                        fgId:'',
+                        name:'',
+                        cameraId:this.cameraID,
+                        cameraType:this.cameraType,
+                        cameraRemark:this.cameraRemark
+                    }
+                }).then(response=>{
+                    if(response.data.cd=='0'){
+                        // this.getMediaInformation(this.type);
+                        this.getMediaInformation1(this.type);
+                        this.addResourceDialog1=false;
+                        this.cameraID="";
+                        this.mediaUrl="";
+                        this.cameraRemark="";
+                        this.cameraType="";
+                    }else if(response.data.cd=='-1'){
+                        alert(response.data.msg);
+                    }
+                })
+            }
+           
         },
         //编辑媒体文件
         editMediaUrl(num){
@@ -2256,6 +2386,9 @@ export default {
                     this.updateId=item.id;
                     this.getFgId=item.fileGroupId;
                     this.mediaUrl=item.path;
+                    this.cameraID=item.cameraId;
+                    this.cameraType=item.cameraType;
+                    this.cameraRemark=item.cameraRemark;
                 }
             }) 
         },
@@ -2326,27 +2459,48 @@ export default {
 
         },
         updateResourceMakeSure1(){
-             axios({
-                method:'get',
-                url:this.BDMSUrl+'lc/update',
-                headers:{
-                    'token':this.token,
-                },
-                params:{
-                    projectId:this.projId,
-                    mediaType:this.type,
-                    path:this.mediaUrl,
-                    id:this.updateId
-                }
-            }).then(response=>{
-                if(response.data.cd=='0'){
-                    // this.getMediaInformation(this.type);
-                    this.getMediaInformation1(this.type);
-                    this.updateResourceDialog1=false;
-                }else if(response.data.cd=='-1'){
-                    alert(response.data.msg);
-                }
-            })
+            if(this.cameraID==""){
+                this.$message({
+                    type:'info',
+                    message:'请输入摄像机名称ID'
+                })
+
+            }else if(this.mediaUrl==""){
+                this.$message({
+                    type:'info',
+                    message:'请输入目标Url'
+                })
+            }else{
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'lc/update',
+                    headers:{
+                        'token':this.token,
+                    },
+                    params:{
+                        projectId:this.projId,
+                        mediaType:this.type,
+                        path:this.mediaUrl,
+                        id:this.updateId,
+                        cameraId:this.cameraID,
+                        cameraType:this.cameraType,
+                        cameraRemark:this.cameraRemark
+                    }
+                    }).then(response=>{
+                        if(response.data.cd=='0'){
+                            // this.getMediaInformation(this.type);
+                            this.getMediaInformation1(this.type);
+                            this.updateResourceDialog1=false;
+                            this.mediaUrl="";
+                            this.cameraID="";
+                            this.cameraType="";
+                            this.cameraRemark="";
+                        }else if(response.data.cd=='-1'){
+                            alert(response.data.msg);
+                        }
+                })
+            }
+             
 
         },
         updateResourceCancle(){
@@ -2392,7 +2546,7 @@ export default {
                     projectId:this.projId
                 }
             }).then(response=>{
-                if(response.data.rt){
+                if(response.data.rt.length!=0){
                     this.PanoramaPathList=response.data.rt;
                     this.picturePageTotal=this.PanoramaPathList.length;
                     this.$refs.picture.src=this.QJFileManageSystemURL+this.PanoramaPathList[0];
@@ -2403,6 +2557,147 @@ export default {
                         alert(response.data.msg)
                     }
             })
+        },
+        //加载obj文件和mtl材质
+        initObjAndMtl(mtlUrl,objUrl){
+            var parentContainer,container, stats;
+            var vm=this;
+            // var camera1, scene1, renderer1;
+            // var mouseX = 0,
+            //     mouseY = 0;
+            // var windowHalfX = window.innerWidth / 2;
+            // var windowHalfY = window.innerHeight / 2;
+            //
+            parentContainer=document.getElementById('objAndMtlFile')
+            container = document.createElement( 'div' );
+            container.id="objAndMtl"
+            parentContainer.appendChild( container );
+            //camera1
+            this.cameraDefaults = {
+                posCamera : new THREE.Vector3(0.0, 300.0, 300.0),
+                posCameraTarget : new THREE.Vector3(0, 0, 0),
+                near : 1,
+                far : 100000,
+                fov : 45
+            };
+
+            this.aspectRatio = $("#objAndMtlFile").width()/$("#objAndMtlFile").height();
+
+            camera1 = new THREE.PerspectiveCamera(this.cameraDefaults.fov,
+				this.aspectRatio, this.cameraDefaults.near,
+				this.cameraDefaults.far);
+            // camera1 = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+            // camera1.position.z = 3;
+            camera1.lookAt(new THREE.Vector3(0,0,0));
+            camera1.position.set(this.cameraDefaults.posCamera.x,this.cameraDefaults.posCamera.y,this.cameraDefaults.posCamera.z);
+             camera1.up.x = 0;//相机以哪个方向为上方
+            camera1.up.y = 0;
+            camera1.up.z = 1;
+
+            
+            // scene1
+            scene1 = new THREE.Scene();
+            var ambient = new THREE.AmbientLight(0x444444);
+            scene1.add(ambient);
+            var directionalLight = new THREE.DirectionalLight(0xffeedd);
+            directionalLight.position.set(0, 0, 1).normalize();
+            scene1.add(directionalLight);
+            // var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+            // scene.add( ambientLight );
+            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            camera1.add( pointLight );
+
+            // var object = new THREE.CSS3DObject( container );
+            // object.position.x = Math.random() * 200 - 100;
+            // object.position.y = Math.random() * 200 - 100;
+            // object.position.z = Math.random() * 200 - 100;
+            // object.rotation.x = Math.random();
+            // object.rotation.y = Math.random();
+            // object.rotation.z = Math.random();
+            // object.scale.x = Math.random() + 0.5;
+            // object.scale.y = Math.random() + 0.5;
+            // scene1.add( object );
+
+            // model
+            var onProgress = function(xhr) {
+                if (xhr.lengthComputable) {
+                    var percentComplete = xhr.loaded / xhr.total * 100;
+                    var counter1 = document.getElementById("objAndMtlFile1");
+                    counter1.innerText = Math.round(percentComplete, 2) + '% downloaded';
+                    console.log(Math.round(percentComplete, 2),'百分比')
+                    if(Math.round(percentComplete, 2)==100){
+                        counter1.innerText='';
+                    }
+                }
+            };
+
+            var onError = function(xhr) {};
+
+            THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+            if(mtlUrl){
+                var mtlLoader = new THREE.MTLLoader();
+                var mtlName=mtlUrl.substring(mtlUrl.lastIndexOf('/')+1,mtlUrl.length)
+                var objName=objUrl.substring(objUrl.lastIndexOf('/')+1,objUrl.length)
+                
+                mtlLoader.setResourcePath(mtlUrl.substring(0,mtlUrl.lastIndexOf('/')+1))
+            
+                mtlLoader.setCrossOrigin("anonymous")
+                // mtlLoader.setPath(mtlUrl.substring(0,mtlUrl.lastIndexOf('/')+1))
+                mtlLoader.load(mtlUrl, (materials)=> {
+
+                    var objLoader = new THREE.OBJLoader();
+                    
+                    objLoader.setMaterials(materials);
+                    objLoader.load(objUrl, (object)=> {
+                        object.position.y = 200;
+                        scene1.add(object);
+                    }, onProgress, onError);
+                });
+            }else{
+                var objLoader = new THREE.OBJLoader();
+                    // objLoader.setMaterials(materials);
+                    objLoader.load(objUrl, (object)=> {
+                        object.position.y = 200;
+                        scene1.add(object);
+                    }, onProgress, onError);
+            }
+
+            // var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+            // var material = new THREE.MeshBasicMaterial( { color: 0x455010 } );
+            // var mesh = new THREE.Mesh( geometry, material );
+            // scene1.add( mesh );
+
+            //
+            renderer1 = new THREE.WebGLRenderer();
+            renderer1.setPixelRatio(window.devicePixelRatio);
+            renderer1.setSize($("#objAndMtlFile").width(), $("#objAndMtlFile").height());
+            container.appendChild(renderer1.domElement);
+            controls = new TrackballControls(camera1,renderer1.domElement);
+            window.addEventListener( 'resize', this.onWindowResize1, false );
+            this.animateObj();
+            
+        },
+        onDocumentMouseMove1( event ) {
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
+		},
+         onWindowResize1() {
+                var container=document.getElementById("objAndMtl")
+				// windowHalfX1 = container.innerWidth / 2;
+				// windowHalfY1 = container.innerHeight / 2;
+				camera1.aspect = $("#objAndMtlFile").width() / $("#objAndMtlFile").height();
+				camera1.updateProjectionMatrix();
+				renderer1.setSize( $("#objAndMtlFile").width(), $("#objAndMtlFile").height() );
+		},
+        animateObj() {
+            var vm=this;
+            requestAnimationFrame(vm.animateObj);
+            controls.update();
+            vm.renderObj();
+        },
+        renderObj() {
+            
+            renderer1.render(scene1, camera1);
         },
 
         //全景图片渲染
@@ -2431,18 +2726,15 @@ export default {
                 container.innerHTML = ''
                 container.appendChild( renderer.domElement );
                 renderer.setClearColor(0xFFFFFF, 1.0);
-                container.addEventListener( 'mousedown', vm.onDocumentMouseDown, false );
-                container.addEventListener( 'mousemove', vm.onDocumentMouseMove, false );
-                container.addEventListener( 'mouseup', vm.onDocumentMouseUp, false );
-                container.addEventListener( 'wheel', vm.onDocumentMouseWheel, false );
                 // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				// document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				// document.addEventListener( 'touchmove', onDocumentTouchMove, false );
                 // document.addEventListener( 'mousewheel', mousewheel, false );
                 // document.addEventListener('mousewheel', vm.mousewheel, false);
-                
-                
-
+                container.addEventListener( 'mousedown', vm.onDocumentMouseDown, false );
+                container.addEventListener( 'mousemove', vm.onDocumentMouseMove, false );
+                container.addEventListener( 'mouseup', vm.onDocumentMouseUp, false );
+                container.addEventListener( 'wheel', vm.onDocumentMouseWheel, false );
                 container.addEventListener( 'dragover', function ( event ) {
 
                     event.preventDefault();
@@ -2485,8 +2777,9 @@ export default {
             },
 
             onWindowResize() {
+                console.log($("#planeDIV").height());
 
-                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.aspect = $("#planeDIV").width() / $("#planeDIV").height();
                 camera.updateProjectionMatrix();
                 renderer.setSize($("#planeDIV").width(),$("#planeDIV").height());
 
@@ -2777,6 +3070,21 @@ export default {
                             width: 100%;
                             height: 100%;
                             //  height: calc(100% - 20px);
+                            #objAndMtlFile{
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                            }
+                            #objAndMtlFile1{
+                                position: absolute;
+                                font-size:16px;
+                                // height: 20px;
+                                top:20px;
+                                // margin:0 auto;
+                                left:40%;
+                                // width: 200px;
+                                color:#fff;
+                            }
                             #planeDIV{
                                 position:absolute;
                                 width:100%;
@@ -3671,7 +3979,7 @@ export default {
 
                 .urlWord{
                     margin-left: -368px;
-                    margin-bottom: 25px;
+                    margin-top: 5px;
                 }
                 .urlInp{
                     .urlInp_inner{

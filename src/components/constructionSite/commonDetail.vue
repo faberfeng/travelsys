@@ -443,6 +443,9 @@ export default Vue.component('commonDetail',{
     },
     name:'commonDetail',
     data(){
+        window.addEventListener("message", (evt)=>{
+                this.callback(evt)},true
+        );
         return{
             broken:0,
             alert:'',
@@ -535,6 +538,8 @@ export default Vue.component('commonDetail',{
             isAlert:'',
             isBroken:'',
             pageNum:1,
+            measureName:'',
+            measureId:'',
             optionSpotChangeLine:{
                         chart: {
                             type: 'spline',
@@ -812,6 +817,48 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+        callback(e){
+            console.log(e.data,'e.data.command');
+            switch(e.data.command){
+                // console.log()
+                case "CurrentSelectedLabel":
+                    {
+                        if(e.data.parameter.type=="Measure"){
+                            // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
+                            // console.log(e.data.parameter.value.Tag.split(";").length,'加油000');
+                            if(e.data.parameter.value.Tag.split(";").length==1){
+                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //测点曲线名称
+                                this.getPointDatasList1.forEach((item)=>{
+                                    if(this.measureName==item.pointName){
+                                       this.$message({
+                                            type:'info',
+                                            message:'当前不支持测点曲线'
+                                        })
+                                    }
+                                })
+                                
+                            }else{
+                                console.log(this.getPointDatasList1,'getPointDatasList1');
+                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //判断测点曲线
+                                this.getPointDatasList1.forEach((item)=>{
+                                    if(this.measureName==item.pointName){
+                                        this.measureId=item.pointId;
+                                        this.getCurve(this.measureId,this.measureName);
+                                    }
+                                })
+                                
+                            }
+                            // console.log(this.measureName,'this.measureName');
+                            
+
+                            // var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
+                            // console.log(e.data.parameter.value.CameraUrl);
+                            
+                        }
+                    }
+                break;
+            }
+        },
         getUserInfo(){
                 var vm = this
                 axios({

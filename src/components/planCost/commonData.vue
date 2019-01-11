@@ -641,7 +641,8 @@ export default Vue.component('common-list',{
         },
         editReport(){
             var vm = this
-            vm.$emit('toedit')
+            console.log('0000')
+            vm.$emit('toedit',vm.rcId)
         },
         exportToExcel(val){
             var vm = this
