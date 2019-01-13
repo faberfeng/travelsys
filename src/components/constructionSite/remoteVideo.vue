@@ -25,19 +25,15 @@
                         <div class="openSetDiv">
                             <span class="openSet" @click="openSet()"></span>
                         </div>
-                        <ul class="bottom" >
+                        <ul id="bottomUl" >
+                            <span :class="['el-icon-arrow-left','leftIcon']" style="font-size: 30px;" @click="leftSlide"></span>
                             <li v-for="(item,index) in mediaUrlList" class="bottomLi" :key="index">
                                 <img style="cursor:pointer;" src="./images/play1.png"  @click="changeVideo(item.path,item.cameraId)">
                                 <span style="display:block;color:#ccc;font-size:14px;">{{item.cameraId}}</span>
                             </li>
+                            <span :class="['el-icon-arrow-right','rightIcon']" style="font-size: 30px;" @click="rightSlide"></span>
                         </ul>
-                        <!-- item.path,item.cameraId -->
-                        <!-- <el-carousel :interval="5000" :loop="false" :autoplay="false" @change="getNextVideo(index)"  id="bottom" type="card" height="120px">
-                            <el-carousel-item v-for="(item,index) in mediaUrlList"   :key="index" >
-                                <img style="cursor:pointer;" src="./images/play1.png"  @click="changeVideo(item.path,item.cameraId)">
-                                <span style="display:block;color:#ccc;font-size:14px;">{{item.cameraId}}</span>
-                            </el-carousel-item>
-                        </el-carousel> -->
+
 
                 </div>
         </div>
@@ -305,6 +301,12 @@ export default {
         openSet(){
             this.addResourceDialog=true;
         },
+        leftSlide(){
+            document.getElementById("bottomUl").offsetLeft="100px"
+        },
+        rightSlide(){
+            document.getElementById("bottomUl").offsetRight="100px"
+        },
         loadingTitle(){
             var vn=this;
             vn.routerList=vn.getSecondGradeList(vn.moduleList,'006','00603','/constructionSite/remoteVideo','00602','/constructionSite/safetyRuning','00601','/constructionSite/safetyCheckings','00604','/constructionSite/safetyInspection');
@@ -447,13 +449,26 @@ export default {
                     cursor: pointer;
                 }
             }
-            .bottom{
+            #bottomUl{
                     height: 140px;
                     width:100%;
                     background: #fff;
                     overflow: hidden;
                     position: relative;
                     z-index:10000000000;
+                    .leftIcon{
+                        position: absolute;
+                        left:2px;
+                        top:34%;
+                        cursor: pointer;
+    
+                    }
+                    .rightIcon{
+                        position: absolute;
+                        right:2px;
+                        top:34%;
+                        cursor: pointer;
+                    }
                     .bottomLi{
                         display: inline-block;
                         margin:6px;

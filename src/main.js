@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import VueAMap from 'vue-amap';
 import App from './App'
 import router from './router'
 import store from '@/utils/store.js';
@@ -13,6 +14,18 @@ import FullCalendar from 'vue-full-calendar'
 // import htmlToPdf from '@/components/utils/htmlToPdf.js'  
 // Vue.use(htmlToPdf) 
 import '../node_modules/fullcalendar/dist/fullcalendar.css';
+
+// import { lazyAMapApiLoaderInstance } from 'vue-amap';
+Vue.use(VueAMap);
+// console.log(Vue);
+// console.log(VueAMap);
+VueAMap.initAMapApiLoader({
+  key: 'eb4e26a19ca36911be75f2f062bee6aa',
+  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor','MapType'],
+  // 默认高德 sdk 版本为 1.4.4
+  v: '1.4.4'
+});
+
 Vue.use(vuescroll)
 Vue.use(FullCalendar)
 //Vue.use(ZkTable)

@@ -137,11 +137,15 @@ export default {
                 // if(typeof(response.data.rt.companyList) == 'undefined' && response.data.rt.companyList.length == 0){
                     
                 // }
-                 if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
+                if(response.data.cd=="10007"){
+                    this.noprojectShow=true;
+                }
+                else if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                     
-                }else if(typeof(response.data.rt) != 'undefined'){
+                }
+                else if(typeof(response.data.rt) != 'undefined'){
                     this.companyLists=response.data.rt;
                     var obj = []
                     var index = 0
@@ -202,7 +206,7 @@ export default {
                     }
                     vm.companyType = obj.reverse()
                     if(vm.companyType.length==0){
-                        this.noprojectShow=true;
+                        // this.noprojectShow=true;
                     }
                     vm.selectType(index)
                     console.log(vm.companyType,'vm.companyType');
@@ -214,9 +218,11 @@ export default {
                     }
                     
                     // this.noprojectShow=false;
-                }else if(response.data.rt.length==undefined){
-                        this.noprojectShow=true;
                 }
+                // else if(response.data.cd=="10007"){
+                //         this.noprojectShow=true;
+                //         console.log('是否成功')
+                // }
             }).catch(function(error){
                 // vm.$router.push({
                 //   path:'/login'

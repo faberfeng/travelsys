@@ -33,6 +33,7 @@
     "v-scroll": "^0.2.2",
     "vue": "^2.5.2",
     "vue-3d-model": "^1.0.2",
+    "vue-amap": "^0.5.8",
     "vue-full-calendar": "^4.0.0-1",
     "vue-pdf": "^3.3.1",
     "vue-router": "^3.0.1",

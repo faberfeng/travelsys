@@ -1,7 +1,7 @@
 <template>
 <div class="wrapper">
     <headerCommon :username="userName" :proname="titleName"></headerCommon>
-    <div v-show="!noprojectShow" class="noproject">
+      <div v-show="!noprojectShow" class="noproject">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
                 <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
@@ -15,7 +15,9 @@
     <div v-show="noprojectShow">
       <div class="header-bar">
         <span class="bar-title">工程导航</span>
+        
         <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
+        <span class="bar-button" @click="changeMapStyle">地图</span>
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
@@ -42,7 +44,7 @@
             </div>
         </div>
       </div>
-      <div class="item-proj-box" v-else>
+      <div class="item-proj-box" v-show="!show1"  v-else >
         <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
           <span class="proj-state-box">
             <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
@@ -84,6 +86,13 @@
               </div>
           </div>
         </div>
+      </div>
+      <div v-show="show1" class="amap-page-container">
+        <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
+        <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="mapCenter" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
+            <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :events="marker.events"></el-amap-marker>
+            <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible" :content="window.content"></el-amap-info-window>
+        </el-amap>
       </div>
     </div>
 </div>
@@ -191,6 +200,30 @@
 .item-proj-box0{
   padding-bottom:20px;
 }
+.amap-page-container{
+  margin-top:40px;
+   position:relative;  
+  .amap-demo {
+      margin:0 auto;
+      height: 600px;
+      width: 98%;         
+               
+      .prompt{
+        background: white;
+        width: 200px;
+        height: 100px;
+        text-align: center;
+      }
+    }
+  
+    .search-box {
+      position: absolute;
+      top: 25px;
+      left: 100px;
+    }
+  
+}
+ 
 .item-proj-box{
   width:100%;
   padding: 0px 20px;
@@ -381,12 +414,16 @@ p>.body-left-line:first-of-type{
 <script>
 import axios from 'axios'
 import headerCommon from './header.vue'
+import { AMapManager } from 'vue-amap';
+// let amapManager = new VueAMap.AMapManager();
 export default {
   name: 'ProjectList',
    data(){
+     let self=this;
       return {
         noprojectShow:true,
         show0:true,
+        show1:false,
         token:'',
         listData:[],
         title:'我们的公司',
@@ -396,6 +433,61 @@ export default {
         BDMSUrl:'',
         titleName:'',
         applyIndexUrl:'',
+
+        //高德地图变量
+        amapManager:'',
+        zoom: 12,
+        mapCenter: [121.59996, 31.197646],
+        events: {
+          init: (o) => {
+            console.log(o.getCenter())
+            console.log(this.$refs.map.$$getInstance())
+            o.getCity(result => {
+              console.log(result)
+            })
+          },
+          'moveend': () => {
+          },
+          'zoomchange': () => {
+          },
+          'click': (e) => {
+            alert('map clicked');
+          }
+        },
+        plugin: ['ToolBar', {
+          pName: 'MapType',
+          defaultType: 0,
+          events: {
+            init(o) {
+              console.log(o);
+            }
+          }
+        },
+        // {
+        //   pName: 'Geolocation',
+        //     events: {
+        //       init(o) {
+        //         // o 是高德地图定位插件实例
+        //         o.getCurrentPosition((status, result) => {
+        //           if (result && result.position) {
+        //             self.lng = result.position.lng;
+        //             self.lat = result.position.lat;
+        //             self.center = [self.lng, self.lat];
+        //             self.loaded = true;
+        //             self.$nextTick();
+        //           }
+        //         });
+        //       }
+        //     }
+        // }
+        ],
+        markers: [],
+        windows: [],
+        window: '',
+        searchOption: {
+            city: '上海',
+            citylimit: true
+        },
       }
   },
   components: {
@@ -412,16 +504,73 @@ export default {
       }
       vm.viewFlag()
       vm.getUserInfo()
+      let markers = [];
+      let windows = [];
+
+      let num = 10;
+      let self = this;
+
+      for (let i = 0 ; i < num ; i ++) {
+        markers.push({
+          position: [121.59996, 31.197646 + i * 0.001],
+          events: {
+            click() {
+              self.windows.forEach(window => {
+                window.visible = false;
+              });
+
+              self.window = self.windows[i];
+              self.$nextTick(() => {
+                self.window.visible = true;
+              });
+            }
+          }
+        });
+        windows.push({
+          position: [121.59996, 31.197646 + i * 0.001],
+          content: `<div class="prompt">${ i }</div>`,
+          visible: false
+        });
+      }
+
+      this.markers = markers;
+      this.windows = windows;
+      
+    
   },
   created(){
     this.titleName = localStorage.getItem('projectName');
     localStorage.removeItem("navigationPath")
   },
   methods:{
+      onSearchResult(pois) {
+          let latSum = 0;
+          let lngSum = 0;
+          if (pois.length > 0) {
+            pois.forEach(poi => {
+              let {lng, lat} = poi;
+              lngSum += lng;
+              latSum += lat;
+              // this.markers.push([poi.lng, poi.lat]);
+            });
+            let center = {
+              lng: lngSum / pois.length,
+              lat: latSum / pois.length
+            };
+            this.mapCenter = [center.lng, center.lat];
+          }
+      },
       changeStyle(){
         var vm = this
-        vm.show0 = vm.show0?false:true
+        vm.show0 = vm.show0?false:true;
+        vm.show1=false;
          vm.styleTitle = vm.show0?'条形风格':'牌型风格'
+      },
+      changeMapStyle(){
+        var vm=this;
+        vm.show0=false;
+        vm.show1=true;
+        console.log('成功')
       },
       getUserInfo(){
           var vm = this
