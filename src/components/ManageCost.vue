@@ -211,6 +211,7 @@ export default {
         }
         if(!vm.settingActive){
             vm.settingActive='/setting/initalsettings';
+            // vm.settingsCenter=false;
         };
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
@@ -620,7 +621,7 @@ export default {
                 
                 var str=[]
                 this.moduleLists.forEach((item)=>{
-                    if(item.parentModuleId==0&&(item.due==0||item.due>new Date().getTime())){
+                    if(item.grade==1&&item.parentModuleId==0&&(item.due==0||item.due>new Date().getTime())){
                         str.push(item);
                     }
                 })
@@ -700,7 +701,9 @@ export default {
                         //     path:'/Drive/costover'//资产管理
                         // })
                     }else if(vm.navigationPath==='001'){
+
                         vm.$router.push({
+                            // path:this.firstGetSecondGradeList(this.moduleLists,'001','00101','/setting/initalsettings','00102','/setting/datatransform','00103','/setting/jobmanage','00104','/setting/projectstationmanage'),
                             path:'/setting/initalsettings'//配置中心
                         })
                     }
@@ -946,6 +949,7 @@ export default {
                 // sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.name === '001'){
                 this.$router.push({
+                    // path:this.firstGetSecondGradeList(this.moduleLists,'001','00101','/setting/initalsettings','00102','/setting/datatransform','00103','/setting/jobmanage','00104','/setting/projectstationmanage'),
                     path:this.settingActive
                 })
                 this.navigationPath = tab.name;

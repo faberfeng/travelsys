@@ -1,5 +1,11 @@
 <template>
     <div id="safetyChecking">
+        <!-- 打印标签提交表单 -->
+        <form id="taskIndedxPrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
+                <input type="hidden" name="p" ref="taskIndedxLabelContent">
+        </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe>
+
             <div class="topHeader">
                 <div id="item-box-file">
                     <!-- <router-link :to="'/constructionSite/safetyInspection'" class="label-item">  
@@ -235,12 +241,12 @@
                             </el-pagination> -->
                         </div>
                     </div>
-                    <!-- <div class="el-dialog__footer">
+                    <div class="el-dialog__footer">
                         <div slot="footer" class="dialog-footer">
-                            <button class="editBtnS">网页预览</button> 
-                            <button class="editBtnC">打印当前页标签</button>
+                            <button class="editBtnS" @click="pageAllView">网页预览</button> 
+                            <button class="editBtnC" @click="printAllCurrentLabel">打印当前页标签</button>
                         </div>
-                    </div> -->
+                    </div>
             </div>
             <div v-if="labelListSingleShow"  id="edit" class="dialog">
                     <div class="el-dialog__header">
@@ -253,7 +259,7 @@
                         <div class="editBody">
                             <ul>
                                 <li v-for="(item,index) in checkPointsForPageSingleList" :key="index" class="item-label clearfix">
-                                    <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-CP-' + addZero(item.id, 7)" alt="">
+                                    <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-CP-' + addZero(item.checkPoint.id, 7)" alt="">
                                     <div class="right">
                                         <p class="item-list clearfix">
                                             <span class="text-left">点位名称：</span>
@@ -298,12 +304,12 @@
                             </el-pagination> -->
                         </div>
                     </div>
-                    <!-- <div class="el-dialog__footer">
+                    <div class="el-dialog__footer">
                         <div slot="footer" class="dialog-footer">
-                            <button class="editBtnS">网页预览</button> 
-                            <button class="editBtnC">打印当前页标签</button>
+                            <button class="editBtnS" @click="pageView">网页预览</button> 
+                            <button class="editBtnC" @click="printCurrentLabel">打印当前页标签</button>
                         </div>
-                    </div> -->
+                    </div>
             </div>
             <div id="mask" v-if="labelListShow||labelListSingleShow" ></div>
             <div id="edit">
@@ -476,7 +482,7 @@ export default {
             itemId:-1,
             page:1,//默认
             rows:8, //默认
-            showSafetyCheck:false,
+            showSafetyCheck:true,
             defaultProps:{
                 children: 'children',
                 label: 'itemName'
@@ -565,6 +571,7 @@ export default {
             rwriteShowId:'',
             QJFileManageSystemURL:'',
             BDMSUrl:'',
+            UPID:'',
         }
     },
     created(){
@@ -575,6 +582,8 @@ export default {
         vm.userId  = localStorage.getItem('userid');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.projName = localStorage.getItem('projName');
+        vm.UPID = vm.$store.state.UPID
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
         vm.getSecurityCheck();
@@ -677,6 +686,70 @@ export default {
 
     },
     methods:{
+        //打印当前标签
+        printCurrentLabel(){
+            var vm = this
+            console.log(this.checkPointsForPageSingleList,'checkPointsForPageSingleList');
+            var datas = '['
+            var tabelTitle = vm.projName + '安全标签'
+            var keyList = '["点位名称","安全类别","检查项目","检查频率","负责群组","负责人员","检查群组","检查人员"]'
+            // console.log(vm.relaList1,'清单9d')
+            this.checkPointsForPageSingleList.forEach((item,i)=>{
+                var valueList = '["' + (item.checkPoint.name ? item.checkPoint.name : "") + '","'
+                    + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","' + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","'
+                    + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","' + (vm.checkItemDataList.respDeptName ? vm.checkItemDataList.respDeptName : "") + '","' +
+                    (vm.checkItemDataList.respUserName ? vm.checkItemDataList.respUserName : "") + '","' + (vm.checkItemDataList.checkDeptName ? vm.checkItemDataList.checkDeptName : "") + '","'
+                    + (vm.checkItemDataList.checkUserName ? vm.checkItemDataList.checkUserName : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.checkPoint.id, 7) +
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                if (i < vm.checkPointsForPageSingleList.length - 1) datas += ','
+            })
+            datas += ']'
+            console.log(datas,'data1111');
+            vm.$refs.taskIndedxLabelContent.value = datas
+            $('#taskIndedxPrint-qrcode').submit()
+            vm.$message({
+                    type:'success',
+                    message:'已向打印机发送请求'
+                })
+        },
+        //打印所有标签
+        printAllCurrentLabel(){
+            var vm = this
+            console.log(this.checkPointsForPageList,'checkPointsForPageList');
+            var datas = '['
+            var tabelTitle = vm.projName + '安全标签'
+            var keyList = '["点位名称","安全类别","检查项目","检查频率","负责群组","负责人员","检查群组","检查人员"]'
+            // console.log(vm.relaList1,'清单9d')
+            this.checkPointsForPageList.forEach((item,i)=>{
+                var valueList = '["' + (item.name ? item.name : "") + '","'
+                    + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","' + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","'
+                    + (vm.checkItemDataList.item.itemName ? vm.checkItemDataList.item.itemName : "") + '","' + (vm.checkItemDataList.respDeptName ? vm.checkItemDataList.respDeptName : "") + '","' +
+                    (vm.checkItemDataList.respUserName ? vm.checkItemDataList.respUserName : "") + '","' + (vm.checkItemDataList.checkDeptName ? vm.checkItemDataList.checkDeptName : "") + '","'
+                    + (vm.checkItemDataList.checkUserName ? vm.checkItemDataList.checkUserName : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.id, 7) +
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                if (i < vm.checkPointsForPageList.length - 1) datas += ','
+            })
+            datas += ']'
+            console.log(datas,'data1111');
+            vm.$refs.taskIndedxLabelContent.value = datas
+            $('#taskIndedxPrint-qrcode').submit()
+            vm.$message({
+                    type:'success',
+                    message:'已向打印机发送请求'
+                })
+        },
+        pageView(){
+
+        },
+        pageAllView(){
+
+        },
         loadingTitle(){
             var vn=this;
             vn.routerList=vn.getSecondGradeList(vn.moduleList,'006','00602','/constructionSite/safetyRuning','00601','/constructionSite/safetyCheckings','00604','/constructionSite/safetyInspection','00603','/constructionSite/remoteVideo');
@@ -735,7 +808,7 @@ export default {
             if(response.data.cd=='0'){
                 this.entType=response.data.rt.entType;
                 this.ugId=response.data.rt.ugId;
-                this.validateAuth();
+                // this.validateAuth();
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
             }

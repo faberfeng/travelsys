@@ -9,32 +9,33 @@ export default new Vuex.Store({
         path:'',
         UPID:'BB1408IN16014',
         // 以下是内网配置文件
-        QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
-        QJFileManageSystemURL1:'http://10.252.26.240:8080/qjbim-file',
-        commomHeadPictureFile:'http://10.252.26.240:8080/arctron-usercenter',
-        // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
-        BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
-        GMDUrl:"http://10.252.26.240:8080",
-        WebGlUrl:"http://10.252.26.240", 
-        BIMServerPort:'8080',
-        shareUrl:'http://10.252.26.240:8080/bdms/#',
-        appShareUrl:'http://10.252.26.240:8080/bdms/',
-        iframeWebGlUrl:'http://10.252.26.240:8080/genDist/',
-        // iframeWebGlUrl:'http://10.252.29.17/index.html', 
-        applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
-        
+        // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'http://10.252.26.240:8080/qjbim-file',
+        // commomHeadPictureFile:'http://10.252.26.240:8080/arctron-usercenter',
+        // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',//仅供文件上传使用
+        // GMDUrl:"http://10.252.26.240:8080",
+        // WebGlUrl:"http://10.252.26.240", 
+        // BIMServerPort:'8080',
+        // shareUrl:'http://10.252.26.240:8080/bdms/#',
+        // appShareUrl:'http://10.252.26.240:8080/bdms/',
+        // iframeWebGlUrl:'http://10.252.26.240:8080/genDist/',
+        // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://10.252.26.241:8079',
+        // webSocketUrl:"ws://10.252.26.241:16800/websocket",
         //无锡市政院
         // QJFileManageSystemURL:'http://58.214.36.222:8080/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'http://58.214.36.222:8080/qjbim-file',
         // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
-        // // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
         // BDMSUrl:'http://58.214.36.222:8080/h2-bim-project/',//仅供文件上传使用
         // GMDUrl:"http://58.214.36.222:8080",
         // WebGlUrl:"http://58.214.36.222", 
+        // appShareUrl:'http://58.214.36.222:8080/bdms/',
         // BIMServerPort:'8080',
         // shareUrl:'http://58.214.36.222:8080/bdms/#',
         // iframeWebGlUrl:'http://58.214.36.222:8080/genDist/',
         // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
         //以下是外网配置文件
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
@@ -42,22 +43,27 @@ export default new Vuex.Store({
         // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
         // BDMSUrl:'https://bdms.arctron.cn/h2-bim-project/',//仅供文件上传使用
         // WebGlUrl:"https://bdms.arctron.cn",
+        // appShareUrl:'https://bdms.arctron.cn/bdms/',
         // GMDUrl:"https://bdms.arctron.cn",
         // shareUrl:"https://bdms.arctron.cn/#",
         // iframeWebGlUrl:'https://bdms.arctron.cn/genDist/',
         // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
         //外网测试配置文件
-        // BIMServerPort:'443',
-        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
-        // commomHeadPictureFileUserCenter:'https://bdms.arctron.cn/arctron-usercenter',
-        // commomHeadPictureFile:'https://file.arctron.cn/qjbim-file/',
-        // BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
-        // WebGlUrl:"https://bim.arctron.cn",
-        // GMDUrl:"https://bim.arctron.cn",
-        // shareUrl:"https://bim.arctron.cn/#",
-        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
-        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        BIMServerPort:'443',
+        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        commomHeadPictureFileUserCenter:'https://bdms.arctron.cn/arctron-usercenter',
+        BDMSUrl:'https://bim.arctron.cn/h2-bim-project/',//仅供文件上传使用
+        WebGlUrl:"https://bim.arctron.cn",
+        GMDUrl:"https://bim.arctron.cn",
+        shareUrl:"https://bim.arctron.cn/#",
+        appShareUrl:'http://bim.arctron.cn/bdms/',
+        iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        messageUrl:'http://42.159.153.210:8079',
+        webSocketUrl:"ws://42.159.153.210:16800/websocket",
         //以下是即时通讯网址
 
         // 以下是内网测试配置文件

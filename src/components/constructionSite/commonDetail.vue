@@ -128,7 +128,7 @@
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
                                     <button title="定位" class="location actionBtn"></button>
-                                    <button title="曲线" @click="getCurve(item.pointId,item.pointName)" class="curve actionBtn"></button>
+                                    <button title="曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -443,9 +443,9 @@ export default Vue.component('commonDetail',{
     },
     name:'commonDetail',
     data(){
-        window.addEventListener("message", (evt)=>{
-                this.callback(evt)},true
-        );
+        // window.addEventListener("message", (evt)=>{
+        //         this.callback(evt)},true
+        // );
         return{
             broken:0,
             alert:'',
@@ -817,48 +817,42 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
-        callback(e){
-            console.log(e.data,'e.data.command');
-            switch(e.data.command){
-                // console.log()
-                case "CurrentSelectedLabel":
-                    {
-                        if(e.data.parameter.type=="Measure"){
-                            // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
-                            // console.log(e.data.parameter.value.Tag.split(";").length,'加油000');
-                            if(e.data.parameter.value.Tag.split(";").length==1){
-                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //测点曲线名称
-                                this.getPointDatasList1.forEach((item)=>{
-                                    if(this.measureName==item.pointName){
-                                       this.$message({
-                                            type:'info',
-                                            message:'当前不支持测点曲线'
-                                        })
-                                    }
-                                })
+        // callback(e){
+        //     console.log(e.data,'e.data.command');
+        //     switch(e.data.command){
+        //         // console.log()
+        //         case "CurrentSelectedLabel":
+        //             {
+        //                 if(e.data.parameter.type=="Measure"){
+        //                     // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
+        //                     // console.log(e.data.parameter.value.Tag.split(";").length,'加油000');
+        //                     if(e.data.parameter.value.Tag.split(";").length==1){
+        //                         this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //测点曲线名称
+        //                         this.getPointDatasList1.forEach((item)=>{
+        //                             if(this.measureName==item.pointName){
+        //                                this.$message({
+        //                                     type:'info',
+        //                                     message:'当前不支持测点曲线'
+        //                                 })
+        //                             }
+        //                         })
                                 
-                            }else{
-                                console.log(this.getPointDatasList1,'getPointDatasList1');
-                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //判断测点曲线
-                                this.getPointDatasList1.forEach((item)=>{
-                                    if(this.measureName==item.pointName){
-                                        this.measureId=item.pointId;
-                                        this.getCurve(this.measureId,this.measureName);
-                                    }
-                                })
+        //                     }else{
+        //                         console.log(this.getPointDatasList1,'getPointDatasList1');
+        //                         this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //判断测点曲线
+        //                         this.getPointDatasList1.forEach((item)=>{
+        //                             if(this.measureName==item.pointName){
+        //                                 this.measureId=item.pointId;
+        //                                 this.getCurve(this.measureId,this.measureName);
+        //                             }
+        //                         })
                                 
-                            }
-                            // console.log(this.measureName,'this.measureName');
-                            
-
-                            // var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
-                            // console.log(e.data.parameter.value.CameraUrl);
-                            
-                        }
-                    }
-                break;
-            }
-        },
+        //                     }
+        //                 }
+        //             }
+        //         break;
+        //     }
+        // },
         getUserInfo(){
                 var vm = this
                 axios({
@@ -1636,7 +1630,7 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
                     this.getPointDatasListLength=response.data.rt.length;
-                    this.itemSubmitCount=this.getPointDatasListLength;
+                    // this.itemSubmitCount=this.getPointDatasListLength;
                     if(this.getPointDatasListLength<11){
                         for(var i=0;i<this.getPointDatasListLength;i++){
                             this.getPointDatasList1.push(this.getPointDatasList[i])
@@ -1656,7 +1650,10 @@ export default Vue.component('commonDetail',{
             })
         },
         //点击获得曲线
-        getCurve(pointId,name){
+        getCurve(pointId,name,type){
+            if(type){
+                this.itemMonitorType=type
+            }
             this.pointId=pointId;
             this.pointName=name;
             if(this.itemMonitorType==1){

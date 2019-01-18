@@ -1581,6 +1581,7 @@
         ge:"",
         rowJson:'',
         screenLeftShow:false,
+        UPID:'',
         showBimDataList:'',//着色数量
         loadGanttList:{
             tasks: [
@@ -1629,6 +1630,7 @@
       vm.userId = localStorage.getItem('userid');
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+      vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
       vm.getTaskIndex();
@@ -2782,10 +2784,11 @@
       printCurrentLabel(){
          var vm = this
         var datas = '['
-        var tabelTitle = vm.projName + '构件标签'
+        var tabelTitle = vm.projName + '清单标签'
         var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
+        // console.log(vm.relaList1,'清单9d')
         vm.relaList1.forEach((item,i)=>{
-            var valueList = '["' + (item.main.mOriginalId ? item.main.mOriginalId : "") + '","'
+            var valueList = '["' + (item.main.pkId ? item.main.pkId : "") + '","'
                 + (item.main.mName ? item.main.mName : "") + '","' + (item.main.mGSource ? vm.parseMGSource(item.main.mGSource) : "") + '","'
                 + (item.main.mBSource ? vm.parseMBSource(item.main.mBSource) : "") + '","' + (item.main.creator ? item.main.creator : "") + '","' +
                 (item.main.createTime ? vm.timeChanges(item.main.createTime) : "") + '","' + (item.main.mVersion ? item.main.mVersion : "") + '","'

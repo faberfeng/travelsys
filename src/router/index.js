@@ -68,6 +68,7 @@ const router = new Router({
       name:'hasApply',
       component:resolve=>require(['@/components/mobile/hasApply'],resolve),
     },
+    
     {
       path: '/',
       redirect:'/login',
@@ -81,6 +82,12 @@ const router = new Router({
       path:'/noPassWordlogin',
       name:'noPassWordlogin',
       component:resolve=>require(['@/components/noPassWordLogin'],resolve),
+    },
+    //服务无法启动
+    {
+        path:'/noWebServerPage',
+        name:'noWebServerPage',
+        component:resolve=>require(['@/components/noWebServerPage'],resolve),
     },
     {
       path:'/showcompany',

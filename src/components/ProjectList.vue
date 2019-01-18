@@ -15,7 +15,6 @@
     <div v-show="noprojectShow">
       <div class="header-bar">
         <span class="bar-title">工程导航</span>
-        
         <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
         <span class="bar-button" @click="changeMapStyle">地图</span>
       </div>
@@ -90,8 +89,10 @@
       <div v-show="show1" class="amap-page-container">
         <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="mapCenter" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
-            <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :events="marker.events"></el-amap-marker>
-            <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible" :content="window.content"></el-amap-info-window>
+            <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :events="marker.events" :draggable="true" :title="marker.projName"  ></el-amap-marker>
+            <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible" :template="window.content"  ></el-amap-info-window>
+            <el-amap-text style="color:white;background:#ccc;font-size:16px;" v-for="text in markers" :key="text.projId" :text="text.projName" :offset="text.offset" :position="text.position" :events="text.events" ></el-amap-text>
+            <!-- <el-amap-info-window  v-for="(item,index) in windows" :key="index" :position="item.position" :visible="item.visible1"  :template="item.template1"></el-amap-info-window> -->
         </el-amap>
       </div>
     </div>
@@ -201,12 +202,12 @@
   padding-bottom:20px;
 }
 .amap-page-container{
-  margin-top:40px;
+  // margin-top:40px;
    position:relative;  
   .amap-demo {
       margin:0 auto;
-      height: 600px;
-      width: 98%;         
+      height: 650px;
+      width: 100%;         
                
       .prompt{
         background: white;
@@ -414,18 +415,24 @@ p>.body-left-line:first-of-type{
 <script>
 import axios from 'axios'
 import headerCommon from './header.vue'
-import { AMapManager } from 'vue-amap';
-// let amapManager = new VueAMap.AMapManager();
+import {AMapManager} from "vue-amap"
+let amapManager=new AMapManager();
 export default {
   name: 'ProjectList',
+ 
    data(){
+      
      let self=this;
       return {
+        // projIds:[],
+        getPositionList:'',
+        getSiteStr:[],
         noprojectShow:true,
         show0:true,
         show1:false,
         token:'',
         listData:[],
+        listDataList:[],
         title:'我们的公司',
         userName:'',
         userId:'',
@@ -433,11 +440,14 @@ export default {
         BDMSUrl:'',
         titleName:'',
         applyIndexUrl:'',
+        shareUrl:'',
 
         //高德地图变量
-        amapManager:'',
+        // amapManager:'',
+        amapManager,
         zoom: 12,
-        mapCenter: [121.59996, 31.197646],
+        mapCenter: [121.47519, 31.228833],
+        searchMapCenter:[0, 0],
         events: {
           init: (o) => {
             console.log(o.getCenter())
@@ -451,7 +461,7 @@ export default {
           'zoomchange': () => {
           },
           'click': (e) => {
-            alert('map clicked');
+            console.log(e,'出来');
           }
         },
         plugin: ['ToolBar', {
@@ -484,6 +494,7 @@ export default {
         markers: [],
         windows: [],
         window: '',
+        window1: '',
         searchOption: {
             city: '上海',
             citylimit: true
@@ -497,46 +508,15 @@ export default {
       var vm = this
       vm.token  = localStorage.getItem('token')
       vm.BDMSUrl = vm.$store.state.BDMSUrl
-       vm.applyIndexUrl = vm.$store.state.applyIndexUrl
+      vm.applyIndexUrl = vm.$store.state.applyIndexUrl
+      vm.shareUrl = vm.$store.state.shareUrl
       var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
       if(defaultSubProjId != 'undefined'){
           localStorage.removeItem('defaultSubProjId')
       }
       vm.viewFlag()
       vm.getUserInfo()
-      let markers = [];
-      let windows = [];
-
-      let num = 10;
-      let self = this;
-
-      for (let i = 0 ; i < num ; i ++) {
-        markers.push({
-          position: [121.59996, 31.197646 + i * 0.001],
-          events: {
-            click() {
-              self.windows.forEach(window => {
-                window.visible = false;
-              });
-
-              self.window = self.windows[i];
-              self.$nextTick(() => {
-                self.window.visible = true;
-              });
-            }
-          }
-        });
-        windows.push({
-          position: [121.59996, 31.197646 + i * 0.001],
-          content: `<div class="prompt">${ i }</div>`,
-          visible: false
-        });
-      }
-
-      this.markers = markers;
-      this.windows = windows;
       
-    
   },
   created(){
     this.titleName = localStorage.getItem('projectName');
@@ -544,10 +524,12 @@ export default {
   },
   methods:{
       onSearchResult(pois) {
+        console.log(pois,'pois');
           let latSum = 0;
           let lngSum = 0;
           if (pois.length > 0) {
             pois.forEach(poi => {
+              
               let {lng, lat} = poi;
               lngSum += lng;
               latSum += lat;
@@ -559,6 +541,7 @@ export default {
             };
             this.mapCenter = [center.lng, center.lat];
           }
+          console.log(this.mapCenter,'this.mapCenter');
       },
       changeStyle(){
         var vm = this
@@ -612,13 +595,311 @@ export default {
             }).then((response)=>{
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
+                  vm.getSiteStr = response.data.rt;
+                  var projIds=[];
+                  vm.listData.forEach((num)=>{
+                    projIds.push(num.projId)
+                  })
+                  vm.getPosition(projIds)
+                  // var vm=this;
+                  console.log(projIds,'projIds');
+               
                 }
                 if(response.data.rt==null){
                    this.noprojectShow=false;
                 }
+
             }).catch((err)=>{
                 console.log(err)
             })
+        },
+        //回调函数
+        pushMethod(siteList,siteLists){
+            var vm=this;
+            if(siteList.length==siteLists.length){
+                  siteLists.forEach((items)=>{
+                      // console.log(items.site,'items.site');
+                      // console.log(items.siteData[0],'items.siteData0');
+                      // console.log(items.siteData[1],'items.siteData1');
+                      vm.addPosition(items.projId,items.siteData[0],items.siteData[1]);
+                      // vm.addPosition();
+                    })
+            }
+        },
+        //两个数组相比找不不同的元素
+        getArrDifference(arr1, arr2) {
+                return arr1.concat(arr2).filter(function(v, i, arr) {
+                    return arr.indexOf(v) === arr.lastIndexOf(v);
+                });
+          },
+        // 添加工程地图位置
+        addPosition(projectId,geoX,geoY){
+          var vm=this;
+          axios({
+            method:'GET',
+            url:vm.BDMSUrl+'/projectMap/addPosition',
+            headers:{
+              'token':vm.token
+            },
+            params:{
+              projectId:projectId,
+              geoX:geoX,
+              geoY:geoY
+            }
+          }).then((response)=>{
+            if(response.data.cd=='0'){
+              vm.toProjectList();
+              // vm.getPosition(projectId);
+            }else{
+              
+            }
+          })
+        },
+        // 根据id去除一个json数据的重复项
+        filterObj(objcArray){
+            for (var i = 0; i < objcArray.length; i++) {
+                for (var j =i+1; j <objcArray.length; ) {
+                    if (objcArray[i].projectId == objcArray[j].projectId ) { //通过id属性进行匹配；
+                       objcArray.splice(j, 1); //去除重复的对象；
+                    }else {
+                       j++;
+                    }
+                }
+           }
+           return objcArray;
+        },
+        // 获取工程地图位置
+        getPosition(projId){
+          var vm=this;
+          axios({
+            method:'POST',
+            url:vm.BDMSUrl+'/projectMap/getPosition',
+            headers:{
+              'token':vm.token
+            },
+            data:projId
+          }).then((response)=>{
+            if(response.data.cd=='0'){
+              this.getPositionList=response.data.rt;
+
+              this.getPositionList=this.filterObj(this.getPositionList);
+              var getPositionProjId=[]
+              this.getPositionList.forEach((item)=>{
+                  getPositionProjId.push(item.projectId)
+              })
+              console.log(getPositionProjId,'getPositionProjId');
+              console.log(this.getPositionList,'this.getPositionList');
+              // Array.prototype.remove = function(val) { 
+              //     var index = this.indexOf(val); 
+              //     if (index > -1) { 
+              //     this.splice(index, 1); 
+              //     } 
+              // };
+              // vm.getSiteStr=vm.listData;
+              var getSiteString=[]
+              var differentData=[];
+              // vm.getSiteStr.splice(0,vm.getPositionList.length);
+              vm.listData.forEach((item)=>{
+                vm.getPositionList.forEach((val)=>{
+                  if(item.projId==val.projectId){
+                    console.log(item,'item000');
+                    getSiteString.push(item);
+                      // vm.getSiteStr.remove(item)
+                  }
+                })
+              })
+              differentData=this.getArrDifference(vm.listData,getSiteString);
+              console.log(differentData,'differentData');
+              if(differentData.length!=0){
+                var num=1/10000000;
+                
+                   {
+                      var placeSearch = new AMap.PlaceSearch({
+                        // city 指定搜索所在城市，支持传入格式有：城市名、citycode和adcode
+                        city: '021'
+                      })
+                      var siteList=[];
+                      differentData.forEach((item)=>{
+                        if(item.overviewList){
+                            siteList.push({
+                              'projId':item.projId,
+                              'site':vm.getSite(item.overviewList)
+                            })
+                        }else{
+                          siteList.push({
+                              'projId':item.projId,
+                              'site':'上海市人民广场'
+                            })
+                        }
+                      })
+                      var siteLists=[];
+                      siteList.forEach((item)=>{
+                            placeSearch.search(item.site, function (status, result) {
+                              // 查询成功时，result即对应匹配的POI信息
+                              // console.log(result)
+                              var siteData=[0, 0];
+                              var pois = result.poiList.pois;
+                              let latSum = 0;
+                              let lngSum = 0;
+                              if (pois.length > 0) {
+                                pois.forEach(poi => {
+                                  let {lng, lat} = poi.location;
+                                  lngSum += lng;
+                                  latSum += lat;
+                                  // this.markers.push([poi.lng, poi.lat]);
+                                });
+                                let center = {
+                                  lng: lngSum / pois.length,
+                                  lat: latSum / pois.length
+                                };
+                                siteData = [center.lng+num, center.lat+num];
+                                siteLists.push({
+                                  'projId':item.projId,
+                                  'site':item.site,
+                                  'siteData':siteData
+                                })
+                                num=num+num;
+                                vm.pushMethod(siteList,siteLists);
+                                // console.log(siteLists.length,'获取到地址信息');
+                              }
+                          })
+                      })
+                    }
+
+              }else if(vm.getPositionList.length==vm.listData.length){
+                  vm.listDataList=[];
+                  vm.listData.forEach((val)=>{
+                    vm.getPositionList.forEach((val1)=>{
+                      if(val.projId==val1.projectId){
+                        vm.listDataList.push({
+                          'baseInformation':val,
+                          'siteData':val1
+                        })
+                      }
+                    })
+                  })
+                  console.log(vm.listDataList,'地点返回信息');
+                  let markers = [];
+                  let windows = [];
+
+                  // let num = 10;
+                  let self = this;
+                  console.log(this.listDataList,'这是什么值')
+
+                  for (let i = 0 ; i < this.listDataList.length ; i ++) {
+                    markers.push({
+                      projId:this.listDataList[i].baseInformation.projId,
+                      projName:this.listDataList[i].baseInformation.projName,
+                      position: [this.listDataList[i].siteData.geoX,this.listDataList[i].siteData.geoY],
+                      offset: [0, -45],
+                      events: {
+                        click() {
+                          self.windows.forEach(window => {
+                            window.visible = false;
+                            window.visible1 = true;
+                            
+                          });
+                          self.window = self.windows[i];
+                          // self.window = self.windows[i];
+                          self.$nextTick(() => {
+                            self.window.visible = true;
+                            self.window.visible1 = false;
+              
+                          });
+                        },
+                        dragend: (e) => {
+                          console.log('---event---: dragend')
+                          console.log([e.lnglat.lng, e.lnglat.lat]);
+                          console.log(e,'拖动的标记1');
+                          this.updatePosition(this.listDataList[i].baseInformation.projId,e.lnglat.lng,e.lnglat.lat);
+                        }
+                      }
+                    });
+                    // self.window = self.windows[i];
+                    windows.push({
+                      position: [this.listDataList[i].siteData.geoX,this.listDataList[i].siteData.geoY],
+                      // content: `<div class="prompt">${ this.listDataList[i].baseInformation.projCode }</div><button @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired},${this.listDataList[i].baseInformation.projName})">进入工程</button>`,
+                      // content: `<div class="prompt">${ this.listDataList[i].baseInformation.projCode }</div><button @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired},${this.listDataList[i].baseInformation.projName})">进入工程</button>`,
+                      content:`<div style="width:370px;height:195px;background:white;padding:8px;"><div style="font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;border-bottom:1px solid #ccc;">${ this.listDataList[i].baseInformation.projName }</div><p style="font-size:14px;color:#666666;padding-top:10px;"><span style="width:100px;">工程账号：${ this.listDataList[i].baseInformation.projCode }</span></br><span style="width:100px;">工程管理员：${ this.listDataList[i].baseInformation.projManager}</span><br><span style="width:100px;">使用情况：${ this.listDataList[i].baseInformation.expired==false?'使用中':'已到期'}</span></p><button style="display:block;border:1px solid #ccc;width:93px;height:26px;background:white;margin-top:10px;cursor:pointer;color:#999999;"   @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired})">进入工程</button></div>`,
+                      visible: false,
+                      visible1: true,
+                      template1:`<div style="width:200px;font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;>${ this.listDataList[i].baseInformation.projName }</div>`
+                    });
+                  }
+
+                  this.markers = markers;
+                  this.windows = windows;
+                  console.log(this.markers,'this.markers');
+                  console.log(this.windows,'this.windows');
+              }
+              
+            }else{
+              
+            }
+          })
+
+        },
+    
+        // 更新工程地图位置
+        updatePosition(projId,geoX,geoY){
+          var vm=this;
+          axios({
+            method:'get',
+            url:vm.BDMSUrl+'/projectMap/updatePosition',
+            headers:{
+              'token':vm.token
+            },
+           params:{
+             projectId:projId,
+             geoX:geoX,
+             geoY:geoY
+           }
+          }).then((response)=>{
+            if(response.data.cd=='0'){
+              // this.getPositionList=response.data.rt;
+              vm.toProjectList();
+            }else{
+              
+            }
+          })
+        },
+        getSiteDataList(placeSearch,site){ 
+            placeSearch.search(site, function (status, result) {
+                      // 查询成功时，result即对应匹配的POI信息
+                      console.log(result)
+                       var siteData=[0, 0];
+                      var pois = result.poiList.pois;
+                      let latSum = 0;
+                      let lngSum = 0;
+                      if (pois.length > 0) {
+                        pois.forEach(poi => {
+                          let {lng, lat} = poi.location;
+                          lngSum += lng;
+                          latSum += lat;
+                          // this.markers.push([poi.lng, poi.lat]);
+                        });
+                        let center = {
+                          lng: lngSum / pois.length,
+                          lat: latSum / pois.length
+                        };
+                        console.log(center.lng, center.lat,'center.lng, center.lat')
+                        siteData = [center.lng, center.lat];
+                        return siteData
+                      }
+                  })    
+        },
+        getSite(str){
+          let num='上海市人民广场';
+          str.forEach((val)=>{
+              if(val.viewKey.indexOf("地址")>0){
+                  num=val.viewVal;
+
+                  // return false;
+                  // break;
+              }
+              return false
+          })
+          return num;
         },
         selectProject(id,expired,name){
           if(expired){
@@ -630,10 +911,36 @@ export default {
             var vm = this;
             localStorage.setItem('projId',id)
             localStorage.setItem('projName',name)
+            console.log(vm.$router,'路由111')
             vm.$router.push({
               path:`/home/projHome/${id}`,
               query: { firstView: 'Y' }
             })
+          }
+        },
+        selectProjectMap(id,expired){
+          console.log(id,expired);
+          if(expired){
+               this.$message({
+                message: '项目已过期！',
+                type: 'warning'
+              });
+          }
+          else{
+            var vm = this;
+            console.log('Jin')
+            console.log(id,'id000')
+            // window.location.herf=this.shareUrl+`/home/projHome/${id}`
+            localStorage.removeItem("projId");
+            window.open(this.shareUrl+'#/home/projHome/'+id,"_self");
+            localStorage.setItem('projId',id)
+            // console.log(id,'有id吗？')
+            // localStorage.setItem('projName',name)
+            // console.log(vm.$router,'vm.$router');
+            // vm.$router.push({
+            //   path:`/home/projHome/${id}`,
+            //   query: { firstView: 'Y' }
+            // })
           }
         }
   }
@@ -642,6 +949,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .prompt{
+      background: red;
+      width: 100px;
+      height: 30px;
+      text-align: center;
+    }
     a{
         text-decoration: none;
         display: inline-block;

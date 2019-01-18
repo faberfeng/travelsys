@@ -108,9 +108,11 @@
                                 <span class="vt" >实时直播</span>
                                 <span class="fullScreen" @click="fullLive"></span>
                             </div>
-                            <div class="video_body">
+                            <div class="video_body" v-loading="loading" element-loading-text="拼命加载中"
+                                element-loading-spinner="el-icon-loading"
+                                element-loading-background="rgba(0, 0, 0, 0.8)" >
                                 <img  v-show="lineLiveImgShow" width="100%" height="310px" src="../../assets/nosource.png" >
-                                <videoPlayer :playsinline="true" id="lineLive" class="vjs-custom-skin videoPlayer" :options="playerOptions"></videoPlayer>
+                                <videoPlayer  :playsinline="true" id="lineLive" class="vjs-custom-skin videoPlayer" :options="playerOptions"></videoPlayer>
                                 <!-- <iframe id="lineLive" ref="lineLive" style="width: 100%;height: calc(100% - 40px);border:0;pointer-events:none" allowfullscreen="true" allowtransparency="true" :src="livePathUrl"></iframe> -->
                             </div>
                             <div class="video_bottom">
@@ -644,9 +646,10 @@ export default {
             userDetialAdd:[],
             userListAdd:[],
             userQunzuList:[],
-            messageUrl:'http://10.252.26.241:8079',
-            // messageUrl:'http://10.252.29.32:8079',
+            // messageUrl:'http://10.252.26.241:8079',
             // messageUrl:'http://42.159.153.210:8079',
+            messageUrl:'',
+            webSocketUrl:'',
             meetListGroup:[],//会议列表组
             ugList:[],
             ugListGroup:'',
@@ -671,6 +674,7 @@ export default {
             cameraID:'',
             cameraRemark:'',
             cameraType:'',
+            loading:false,
             // carmerID:'',
 
 
@@ -691,6 +695,8 @@ export default {
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.commomHeadPictureFile = vm.$store.state.commomHeadPictureFile;
         this.GMDUrl = this.$store.state.GMDUrl;
+        this.messageUrl=this.$store.state.messageUrl;
+        this.webSocketUrl=this.$store.state.webSocketUrl;
         // vm.commomHeadPictureFile = vm.QJFileManageSystemURL;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
@@ -718,9 +724,9 @@ export default {
     mounted(){
         // console.log(this.token,'this.token');
         this.scrollToBottom();
-        this.ws = new WebSocket("ws://10.252.26.241:16800/websocket");
+        // this.ws = new WebSocket("ws://10.252.26.241:16800/websocket");
         // this.ws = new WebSocket("ws://42.159.153.210:16800/websocket");
-        
+        this.ws = new WebSocket(this.webSocketUrl);
         // setTimeout(()=>{
         // },200)
         var vm=this;
@@ -2133,7 +2139,16 @@ export default {
                     this.lineLiveImgShow=false;
                     this.livePageTotal=this.mediaUrlList1.length;
                     console.log(this.playerOptions)
+                    this.loading=true;
                     this.playerOptions.sources[0].src=this.mediaUrlList1[0].path;
+                    setTimeout(()=>{
+                        this.loading=false;
+                    },4000)
+                    // if(document.getElementsByClassName('vjs-big-play-button')[0].disabled==false){
+                    //     this.loading=false;
+                    // }
+                    // console.log(document.getElementsByClassName('vjs-big-play-button')[0].disabled==false,'按钮');
+                    
                     // this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
@@ -2174,7 +2189,11 @@ export default {
         },
         //改变全景直播
         handleLiveCurrentChange(val){
+            this.loading=true;
             this.playerOptions.sources[0].src=this.mediaUrlList1[val-1].path;
+            setTimeout(()=>{
+                this.loading=false;
+            },3000)
         },
         checkItem(num){
             this.isActive=num;
@@ -3875,11 +3894,15 @@ export default {
                             td{
                                 padding-left:10px;
                                 height: 40px;
-                                text-align: center;
+                                text-align: left;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
                                 font-size: 12px;
                                 color: #666666;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                width: 250px;
                             }
                         }
                     }
@@ -3897,11 +3920,15 @@ export default {
                             td{
                                 padding-left:10px;
                                 height: 40px;
-                                text-align: center;
+                                text-align: left;
                                 font-size: 12px;
                                 box-sizing: border-box;
                                 border-right: 1px solid #e6e6e6;
                                 color: #666666;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                width: 250px;
                                  .actionBtn{
                                         display: inline-block;
                                         width: 16px;

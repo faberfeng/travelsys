@@ -1480,42 +1480,59 @@ export default Vue.component('common-edit',{
             var vm = this 
             vm.getGenieClass(3,inheirt)
         },
+        
         basicConfirm(){
             var vm = this
-            var arr = []
-            vm.data_right.forEach((item,key)=>{
-                if(!item.isPrivate){
-                    arr.push(item)
-                }
-            })
-            vm.data_right = arr
-            // console.log(vm.data_right,'vm.data_right');
-            console.log(vm.privateVariables.new,'成功了吗');
-
+            //删除一个数组的方法/重点
+            Array.prototype.remove = function(val) { 
+                var index = this.indexOf(val); 
+                if (index > -1) { 
+                this.splice(index, 1); 
+                } 
+            };
+            // var arr = []
+            // vm.data_right.forEach((item,key)=>{
+            //     if(!item.isPrivate){
+            //         arr.push(item)
+            //     }
+            // })
+            // vm.data_right = arr
+            // console.log(vm.privateVariables.new,'sss')
             vm.privateVariables.new.forEach(item=>{
+                vm.data_right.forEach((val)=>{
+                    if(item.checked&&item.code!=val.fieldCode){
+                        vm.data_right.push({
+                            fieldCode: item.code,
+                            fieldName: item.name,
+                            fieldType: item.type,
+                            checked:false,
+                            tableType: -1,
+                            isPrivate:true
+                        })
+                    }else if(item.checked==false&&item.code==val.fieldCode){
+                        vm.data_right.remove(val);
 
-                // vm.data_right.forEach((val)=>{
-                //     if(item.checked==val.isPrivate&&item.code==val.fieldCode){
-                //         item.checked=false;
-                //     }
-                // })
-                if(item.checked){
-                    vm.data_right.push({
-                        fieldCode: item.code,
-                        fieldName: item.name,
-                        fieldType: item.type,
-                        checked:false,
-                        isPrivate:true,
-                        tableType: -1
-                    })
-                }
-                // else{
-                //     arr.push(item)
-                // }
+                    }
+                })
             })
+
+            // vm.data_right=Array.from(new Set(vm.data_right));
+            var res=vm.data_right.map(function(i){return JSON.stringify(i);})
+            var result=this.unique(res);
+            vm.data_right=result.map(function(i){return JSON.parse(i);})
+            
             let {new:obj} = vm.privateVariables
             vm.privateVariables.old = obj
             vm.privateVariables.show = false
+        },
+        unique(arr) {
+            var ret = [];
+            for (var i = 0, j = arr.length; i < j; i++) {
+                if (ret.indexOf(arr[i]) === -1) {
+                    ret.push(arr[i]);
+                }
+            }
+            return ret;
         },
         basicCancle(){
             var vm = this
@@ -1526,14 +1543,14 @@ export default Vue.component('common-edit',{
         showPrivateVariables(){
             var  vm = this
             vm.privateVariables.show = true
-            vm.data_right.forEach((item)=>{
-                for(var i=0;i<vm.privateVariables.new.length;i++){
-                    if(item.fieldCode == vm.privateVariables.new[i].code){
-                        vm.$set(vm.privateVariables.new[i],'checked',true)
-                        break
-                    }
-                }
-            })
+            // vm.data_right.forEach((item)=>{
+            //     for(var i=0;i<vm.privateVariables.new.length;i++){
+            //         if(item.fieldCode == vm.privateVariables.new[i].code){
+            //             vm.$set(vm.privateVariables.new[i],'checked',true)
+            //             break
+            //         }
+            //     }
+            // })
         },
         getPV(){
             var vm = this
@@ -1897,12 +1914,12 @@ export default Vue.component('common-edit',{
                                         })
                                     vm.data_left=arr;
                             
-                                // for(var i=0;i<vm.privateVariables.new.length;i++){
-                                //     if(ele.fieldCode == vm.privateVariables.new[i].code){
-                                //         vm.$set(vm.privateVariables.new[i],'checked',true)
-                                //         break
-                                //     }
-                                // }
+                                for(var i=0;i<vm.privateVariables.new.length;i++){
+                                    if(ele.fieldCode == vm.privateVariables.new[i].code){
+                                        vm.$set(vm.privateVariables.new[i],'checked',true)
+                                        break
+                                    }
+                                }
                             })
                             
                             // vm.addField()
@@ -2474,9 +2491,9 @@ export default Vue.component('common-edit',{
         isNumber(input) {
             var regInt = new RegExp("^[0-9]*$");
             if(!/^[0-9]*$/.test(input) && !/^(-?\d+)(\.\d+)?$/.test(input)){  
-               return false;
+               return true;
             }  
-            return true;
+            return false;
         },
         isDate(input) {
             var result = input.match(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0?[13578])(-)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(0?2)(-)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(-)(0?2)(-)(29)$)|(^([3579][26]00)(-)(0?2)(-)(29)$)|(^([1][89][0][48])(-)(0?2)(-)(29)$)|(^([2-9][0-9][0][48])(-)(0?2)(-)(29)$)|(^([1][89][2468][048])(-)(0?2)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(0?2)(-)(29)$)|(^([1][89][13579][26])(-)(0?2)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(0?2)(-)(29)$))/);

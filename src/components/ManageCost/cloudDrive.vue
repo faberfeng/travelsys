@@ -3530,8 +3530,63 @@ export default {
         if(!vm.showQuanJing&&vm.checkFileDir.isDrawing==null&&vm.checkFileDir.t31Code==null){
             vm.updateImg('文件上传',false,0,'')//非点位类型是0
         }else if(vm.checkFileDir.isDrawing==1){
-            vm.drawingsUploadShow=true;
+             if(vm.checkFileDir.buildId){
+                     vm.drawingsUploadShow=true;
+                    vm.getHolderByBuildId();
+                }else{
+                    vm.drawingsUploadShow = true;
+                    // vm.getHolders()
+                    this.getHoldersList=[];
+                    this.getHoldersList.push({ 
+                        "holderId": null,
+                        "holderName": "无",
+                        "holderType": "",
+                        "parentHolderId":null
+                    })
+                }
         }
+      },
+      getHolderByBuildId(){
+            var vm=this;
+            this.getHoldersList=[];
+                axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getHolderByBuildId',
+                method:'POST',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    buildId:vm.checkFileDir.buildId
+                },
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getHoldersList=response.data.rt;
+                    console.log(this.getHoldersList,'this.getHoldersList');
+                    this.getHoldersList.unshift({ 
+                        "holderId": null,
+                        "holderName": "&nbsp&nbsp无",
+                        "holderType": "",
+                        "parentHolderId":null
+                    })
+                    this.getHoldersList.forEach((item)=>{
+                        //  if(item.holderType==7){
+                        //      item.holderName='&nbsp&nbsp'+item.holderName
+                        //  }
+                            if(item.holderType==8){
+                                item.holderName='&nbsp&nbsp'+item.holderName
+                            }
+                            if(item.holderType==9){
+                                item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                            }
+                        })
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
+            })
+
       },
       paste(){
         var vm = this
@@ -3579,9 +3634,9 @@ export default {
             }
         }else{//复制
             var oldDirId = vm.hasFileToPaste.obj.dirId
-            // if(vm.hasFileToPaste.obj.from != ''){
-            //     oldDirId = ''
-            // }
+            if(vm.hasFileToPaste.obj.from != ''){
+                oldDirId = ''
+            }
             axios({
                 method:'POST',
                 url:vm.BDMSUrl+'project2/doc/pasteTransferStation',
@@ -5257,7 +5312,7 @@ export default {
         printLabelList(){
             var vm = this
             var datas = '['
-            var tabelTitle = vm.projName + '构件标签'
+            var tabelTitle = vm.projName + '清单标签'
             var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
             var item=vm.biaoqianInfo;
                 var valueList = '["' + (item.pkId ? item.pkId : "") + '","'

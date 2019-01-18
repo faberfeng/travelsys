@@ -19,22 +19,28 @@
                 </div>
                 <div class="videoBody">
                         <div class="head">{{cameraNameId}}</div>
-                        <div class="body">
+                        <div class="body"  v-loading="loading2"
+                            element-loading-text="拼命加载中"
+                            element-loading-spinner="el-icon-loading"
+                            element-loading-background="rgba(0, 0, 0, 0.8)">
+                            <img  v-show="lineLiveImgShow" width="100%" height="600px" src="../../assets/nosource.png" >
                             <videoPlayer :playsinline="true" id="lineLive" class="vjs-custom-skin videoPlayer" :options="playerOptions"></videoPlayer>
                         </div>
                         <div class="openSetDiv">
                             <span class="openSet" @click="openSet()"></span>
                         </div>
-                        <ul id="bottomUl" >
-                            <span :class="['el-icon-arrow-left','leftIcon']" style="font-size: 30px;" @click="leftSlide"></span>
-                            <li v-for="(item,index) in mediaUrlList" class="bottomLi" :key="index">
-                                <img style="cursor:pointer;" src="./images/play1.png"  @click="changeVideo(item.path,item.cameraId)">
-                                <span style="display:block;color:#ccc;font-size:14px;">{{item.cameraId}}</span>
-                            </li>
-                            <span :class="['el-icon-arrow-right','rightIcon']" style="font-size: 30px;" @click="rightSlide"></span>
-                        </ul>
-
-
+                        <div id="bottomDiv">
+                            <span v-show="leftShow" :class="['el-icon-arrow-left','leftIcon']" style="font-size: 30px;" @click="leftSlide"></span>
+                            <div id="bottomDivUl">
+                                <ul id="bottomUl" >
+                                    <li v-for="(item,index) in mediaUrlList" class="bottomLi" :key="index">
+                                        <img style="cursor:pointer;" src="./images/play1.png"  @click="changeVideo(item.path,item.cameraId)">
+                                        <span style="display:block;color:#ccc;font-size:14px;">{{item.cameraId}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <span v-show="rightShow" :class="['el-icon-arrow-right','rightIcon']" style="font-size: 30px;" @click="rightSlide"></span>
+                        </div>
                 </div>
         </div>
         <div id="edit">
@@ -107,6 +113,8 @@ export default {
                        this.callback(evt)},true
         );
         return{
+            leftShow:true,
+            rightShow:false,
             routerList:'',
             moduleList:'',
             mediaUrlList:'',
@@ -117,8 +125,8 @@ export default {
             cameraType:'',
             cameraRemark:'',
             mediaUrl:'',
-
-
+            loading2:false,
+            lineLiveImgShow:true,
 
             // playerOptions:{
             //     margin:'0 auto',
@@ -184,6 +192,9 @@ export default {
         this.loadingTitle();
         this.getMediaInformation(4);
     },
+    mounted(){
+        this.initUl();
+    },
     methods:{
         callback(e){
             console.log(e.data,'e.data.command');
@@ -196,10 +207,14 @@ export default {
                             var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
                             console.log(e.data.parameter.value.CameraUrl);
                             if(e.data.parameter.value.CameraUrl){
+                                this.loading2=true;
                                 this.playerOptions.sources[0].src=e.data.parameter.value.CameraUrl;
                                 this.cameraNameId=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //摄影机id
                                 document.body.scrollTop = 850;
                                 document.documentElement.scrollTop = 850;
+                                setTimeout(()=>{
+                                            this.loading2=false;
+                                },3000);
                                 this.$message({
                                     type:'info',
                                     message:'正在加载摄像机头...'
@@ -231,9 +246,13 @@ export default {
 
         },
         changeVideo(path,name){
+            this.loading2=true;
             this.playerOptions.sources[0].src=path;
             this.cameraNameId=name;
             console.log(path,'index',name,'name');
+            setTimeout(()=>{
+                        this.loading2=false;
+            },3000);
 
         },
         getNextVideo(index){
@@ -301,11 +320,49 @@ export default {
         openSet(){
             this.addResourceDialog=true;
         },
+        initUl(){
+           
+        },
         leftSlide(){
-            document.getElementById("bottomUl").offsetLeft="100px"
+            this.rightShow=true;
+            console.log('左边')
+            var bottomUl=document.getElementById("bottomUl");
+            var bottomLi=bottomUl.getElementsByTagName("li")
+            // bottomUl.style.width = bottomLi[0].offsetWidth*bottomLi.length+'px';//ul的宽度等于每个li的宽度乘以所有li的长度
+            bottomUl.style.left = bottomUl.offsetLeft-bottomLi[0].offsetWidth-6+'px';
+            var bottomDivUl=document.getElementById('bottomDivUl').offsetWidth;
+            console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
+            console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
+            if(bottomUl.offsetLeft==0){
+                // bottomUl.style.left=0+'px'
+                this.leftShow=false;
+            }else{
+                 this.leftShow=true;
+            }
+            if(bottomUl.offsetLeft*3<-bottomDivUl){
+                this.leftShow=false;
+            }else{
+                this.leftShow=true;
+            }
+            // document.getElementById("bottomUl").style.left="188px"
         },
         rightSlide(){
-            document.getElementById("bottomUl").offsetRight="100px"
+            this.leftShow=true;
+            var bottomUl=document.getElementById("bottomUl");
+            var bottomLi=bottomUl.getElementsByTagName("li")
+            // bottomUl.style.width = bottomLi[0].offsetWidth*bottomLi.length+'px';//ul的宽度等于每个li的宽度乘以所有li的长度
+            bottomUl.style.left = bottomUl.offsetLeft+bottomLi[0].offsetWidth+5+'px';
+            console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
+            console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
+            if(bottomUl.offsetLeft>=0){
+                // bottomUl.style.left=0+'px'
+                this.rightShow=false;
+            }else{
+                this.rightShow=true;
+            }
+            
+            console.log('右边')
+            // bottomUl.style.left = bottomUl.offsetLeft+bottomLi[0].offsetWidth+'px';
         },
         loadingTitle(){
             var vn=this;
@@ -362,10 +419,22 @@ export default {
                     mediaType:type
                 }
             }).then(response=>{
-                if(response.data.rt.length!=0){
+                if(response.data.rt.length==0){
+                    this.leftShow=false;
+                    this.leftShow=false;
+
+                }
+                else if(response.data.rt.length!=0){
                     this.mediaUrlList=response.data.rt;
+                    this.loading2=true;
+                    this.lineLiveImgShow=false;
+                    this.leftShow=true;
+                    this.leftShow=true;
                     this.playerOptions.sources[0].src=this.mediaUrlList[0].path;
                     this.cameraNameId=this.mediaUrlList[0].cameraId;
+                    setTimeout(()=>{
+                        this.loading2=false;
+                    },4000);
                     // this.$refs.lineLive.src=this.mediaUrlList1[0].path;
                 }else if(response.data.cd==-1){
                     alert(response.data.msg)
@@ -449,48 +518,77 @@ export default {
                     cursor: pointer;
                 }
             }
-            #bottomUl{
-                    height: 140px;
-                    width:100%;
-                    background: #fff;
-                    overflow: hidden;
-                    position: relative;
-                    z-index:10000000000;
-                    .leftIcon{
+            #bottomDiv{
+                width: 100%;
+				height: 140px;
+				margin: 10px auto;
+				position: relative;
+                .leftIcon{
                         position: absolute;
                         left:2px;
                         top:34%;
                         cursor: pointer;
-    
+                        width: 20px;
+                        // height: 140px;
                     }
-                    .rightIcon{
-                        position: absolute;
-                        right:2px;
-                        top:34%;
-                        cursor: pointer;
+                // .leftIcon:hover{
+                //     background:#ccc;
+                // }
+                .rightIcon{
+                    position: absolute;
+                    right:2px;
+                    top:34%;
+                    cursor: pointer;
+                    width: 20px;
+                    // height: 140px;
+                }
+                // .rightIcon:hover{
+                //      background:#ccc;
+                // }
+                #bottomDivUl{
+                    position:relative;
+                    width: 90%;
+                    height: 140px;
+                    margin:auto;
+                    overflow: hidden;
+                    #bottomUl{
+                        // height: 140px;
+                        // width:100%;
+                        // background: #fff;
+                        // overflow: hidden;
+                        // position: relative;
+                        // z-index:10000000000;
+                        position:absolute;
+                        left: 0;
+                        top: 0;
+                        width: 2000px;
+                        .bottomLi{
+                            // display: inline-block;
+                            // height: 130px;
+                            margin:6px;
+                            transition: all 0.6s;
+                            float: left;
+                            // position:relative;
+                            text-align:center
+                        }
+                        .bottomLi:hover{
+                            transform: scale(1.1);
+                        }
                     }
-                    .bottomLi{
-                        display: inline-block;
-                        margin:6px;
-                        transition: all 0.6s
-                        // img{
-                        //     transition: all 0.6s
-                        // }
-                        // img:hover{
-                        //     transform: scale(1.1);
-                        // }
-                        // position: absolute;
-                    }
-                    .bottomLi:hover{
-                        transform: scale(1.1);
-                    }
-
+                }
             }
+            
             
             .body{
                 margin-top:10px;
                  height: 600px;
                 border:1px solid #ccc;
+                position: relative;
+                img{
+                    position: absolute;
+                    top:0px;
+                    left:0px;
+                }
                 #lineLive{
                     position: relative;
                     width: 100%;

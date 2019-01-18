@@ -140,7 +140,8 @@ export default {
                 if(response.data.cd=="10007"){
                     this.noprojectShow=true;
                 }
-                else if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
+                else 
+                if(typeof(response.data.rt.companyId) != 'undefined'){ //唯一企业
                     vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+response.data.rt.companyId
                     vm.initCompany()
                     

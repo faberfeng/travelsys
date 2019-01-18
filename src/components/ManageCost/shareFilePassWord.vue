@@ -43,19 +43,28 @@ export default{
             user:'',
             shareNo:'',
             userImg:'',
-            passwordValue:''
-            }
+            passwordValue:'',
+            appShareUrl:'',
+            shareUrl:'',
+        }
     },
     created(){
         var vm=this;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.QJFileManageSystemURL1 = vm.$store.state.QJFileManageSystemURL1;
+         vm.appShareUrl=vm.$store.state.appShareUrl;
+         vm.shareUrl=vm.$store.state.shareUrl;
+        vm.judgeUserAgent();
     },
     mounted(){
         this.searchShareFile();
     },
     methods:{
+         judgeUserAgent(){
+            var shareNum=this.$route.path.replace(new RegExp("/cloud/sharePassword/"), "")
+            window.location.href = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? this.appShareUrl+'/privateShare.html?shareNo='+shareNum : this.shareUrl+'/cloud/sharePassword/'+shareNum;
+        },
         //去空格
         trim(str){
             return str.replace(/\s/g,"")

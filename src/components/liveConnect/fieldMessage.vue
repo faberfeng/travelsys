@@ -898,7 +898,7 @@ export default {
         printCurrentLabel(){
          var vm = this
             var datas = '['
-            var tabelTitle = vm.projName + '构件标签'
+            var tabelTitle = vm.projName + '清单标签'
             var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
             vm.relaList.forEach((item,i)=>{
                 var valueList = '["' + (item.pkId ? item.pkId : "") + '","'

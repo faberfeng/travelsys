@@ -708,6 +708,9 @@ export default {
     },
     name:'safetyInspection',
     data(){
+        window.addEventListener("message", (evt)=>{
+                this.callback(evt)},true
+        );
         return{
             loadings:false,
             typeSpotShow:false,
@@ -1015,6 +1018,9 @@ export default {
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
             monitorPointInfo:[],//所有图纸监测点信息
+            measureType:'',//虚拟场景测点type
+            measureId:'',//虚拟场景测点id
+            measureName:'',//虚拟场景测点名称
             monitorWord:'',//监测文字 
             currentPage1:1,//改变页面数 
             positionList:'',//岗位列表    
@@ -1291,6 +1297,77 @@ export default {
         }
     },
     methods:{
+         callback(e){
+            console.log(e.data,'e.data.command');
+            switch(e.data.command){
+                // console.log()
+                case "CurrentSelectedLabel":
+                    {
+                        var vm=this;
+                        if(e.data.parameter.type=="Measure"){
+                            // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
+                            // console.log(e.data.parameter.value.Tag.split(";").length,'加油000');
+                            if(e.data.parameter.value.Tag.split(";").length==1){
+                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //测点曲线名称
+                                this.monitorPointInfo.forEach((item)=>{
+                                    if(this.measureName==item.pointName){
+                                       this.$message({
+                                            type:'info',
+                                            message:'当前不支持测点曲线'
+                                        })
+                                    }
+                                })
+                                
+                            }else{
+                                console.log(this.monitorPointInfo,'getPointDatasList1');
+
+                                this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //判断测点曲线
+                                console.log(this.measureName,'this.measureName');
+
+                                this.monitorPointInfo.forEach((item)=>{
+                                    if(this.measureName==item.pointName){
+                                        this.queryPointInfoByPointName(this.measureName);
+                                        // this.measureId=item.id;
+                                        // this.measureType=item.type;
+                                        // console.log(this.measureId,this.measureType);
+                                        // this.commonDetailShow=true;
+                                         
+                                    }
+                                })
+                                
+                            }
+                        }
+                    }
+                break;
+            }
+        },
+        queryPointInfoByPointName(val){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'/detectionInfo/queryPointInfoByPointName',
+                params:{
+                    pointName:val
+                },
+                headers:{
+                    'token':vm.token
+                }
+            }).then((response)=>{
+                if(response.data.cd=="0"){
+                    var item=response.data.rt.monitorItem;
+                    var val=response.data.rt.monitorPoint;
+                    this.detail(item.keyword,item.id,item.type,item.name,item.baseMapId,0);
+                    setTimeout(()=>{
+                        if(this.$refs.commonDetailRef){
+                            // console.log(vm.$refs.commonDetailRef,'this.$refs.commonDetailRef');
+                            this.$refs.commonDetailRef.getCurve(val.id,val.name,item.type);
+                     }
+
+                    },200); 
+                }
+            })
+
+        },
         loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'006','00604','/constructionSite/safetyInspection','00601','/constructionSite/safetyCheckings','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo');

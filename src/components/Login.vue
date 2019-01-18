@@ -83,11 +83,16 @@ export default {
             axios({
                 method:'get',
                 url: this.BDMSUrl +'user2/validateInstance',
-                headers:{
-                    'token':this.token
-                },
+                // headers:{
+                //     'token':this.token
+                // },
             }).then((response) => {
-               
+                // console.log('0000');
+                if(response.data.cd!=0){
+                    this.$router.push({
+                        path:'/noWebServerPage'
+                    })
+                }
             })
         },
         BeforeLogin(){

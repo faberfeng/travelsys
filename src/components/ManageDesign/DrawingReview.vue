@@ -88,9 +88,9 @@
                         <!-- <i class="icon-goujian icon-upload"  title="上传图纸" ></i> -->
                     </p>
                     <p class="clearfix" v-else>
-                        <i class="icon-goujian icon-delete" v-show="isOneShow"  title="删除" @click="deleteFile()"></i>
+                        <i class="icon-goujian icon-delete" v-show="isOneShow||isTwoShow"  title="删除" @click="deleteFile()"></i>
                         <i class="icon-goujian icon-edit" v-show="isOneShow" title="编辑" @click="editMap()"></i>
-                        <i class="icon-goujian icon-update"  title="更新" @click="updateFile()"></i>
+                        <i class="icon-goujian icon-update" v-show="isOneShow"  title="更新" @click="updateFile()"></i>
                     </p>
                     <!-- :default-expanded-keys="expandedKeys" -->
                     <el-tree
@@ -368,6 +368,7 @@ export default {
             showAction:true,
             IsFolderAction:true,
             isOneShow:false,
+            isTwoShow:false,
             defaultSubProjId:'',
             token:'',
             projId:'',
@@ -734,12 +735,24 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getHoldersList=response.data.rt;
+                    console.log(this.getHoldersList,'this.getHoldersList');
                     this.getHoldersList.unshift({ 
                         "holderId": null,
-                        "holderName": "无",
+                        "holderName": "&nbsp&nbsp无",
                         "holderType": "",
                         "parentHolderId":null
                     })
+                    this.getHoldersList.forEach((item)=>{
+                        //  if(item.holderType==7){
+                        //      item.holderName='&nbsp&nbsp'+item.holderName
+                        //  }
+                         if(item.holderType==8){
+                             item.holderName='&nbsp&nbsp'+item.holderName
+                         }
+                         if(item.holderType==9){
+                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                         }
+                     })
                 }else{
                     this.$message({
                         type:'error',
@@ -1686,8 +1699,12 @@ export default {
         checkChange(checkedNodes,checkedKeys,halfCheckedNodes,halfCheckedKeys){
             var vm=this;
             this.checkChangeValue=this.$refs.fileTree_drawingReview.getCheckedNodes();
-            if(this.checkChangeValue){
+            if(this.checkChangeValue.length!=0){
                 vm.IsFolderAction=false;
+                vm.isTwoShow=true;
+            }else{
+                vm.isTwoShow=false;
+                vm.IsFolderAction=true;
             }
             console.log(this.$refs.fileTree_drawingReview.getCheckedNodes(),'aaaaaaaaaaaa');
             // console.log(checkedKeys,'checkedKeys');
@@ -1770,6 +1787,7 @@ export default {
                 }else{
                     drawingIds=vm.deleteDrawingIds
                 }
+               drawingIds=Array.from(new Set(drawingIds));
                 console.log(drawingIds,'drawingIds');
                 axios({
                     method:'post',
@@ -1791,6 +1809,10 @@ export default {
                         this.versionPath='';
                         this.drawingNumber='';
                         this.drawingName='';
+                        this.IsFolderAction=true;
+                        this.isOneShow=false;
+                        this.isTwoShow=false;
+                        
 
                         this.rotate=0;
                         // //清除批注遗留的canvas；
@@ -1865,7 +1887,14 @@ export default {
                     vm.getHolderByBuildId();
                 }else{
                     vm.drawingsUploadShow = true;
-                    vm.getHolders()
+                    // vm.getHolders()
+                    this.getHoldersList=[];
+                    this.getHoldersList.push({ 
+                        "holderId": null,
+                        "holderName": "无",
+                        "holderType": "",
+                        "parentHolderId":null
+                    })
                 }
             }
             
