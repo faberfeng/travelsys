@@ -15,8 +15,9 @@
     <div v-show="noprojectShow">
       <div class="header-bar">
         <span class="bar-title">工程导航</span>
-        <span class="bar-button" @click="changeStyle" v-text="styleTitle"></span>
-        <span class="bar-button" @click="changeMapStyle">地图</span>
+        <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
+        <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
+        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
@@ -43,7 +44,7 @@
             </div>
         </div>
       </div>
-      <div class="item-proj-box" v-show="!show1"  v-else >
+      <div class="item-proj-box" v-if="show2" >
         <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
           <span class="proj-state-box">
             <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
@@ -86,7 +87,7 @@
           </div>
         </div>
       </div>
-      <div v-show="show1" class="amap-page-container">
+      <div v-if="show1" class="amap-page-container">
         <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="mapCenter" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
             <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :events="marker.events" :draggable="true" :title="marker.projName"  ></el-amap-marker>
@@ -430,6 +431,10 @@ export default {
         noprojectShow:true,
         show0:true,
         show1:false,
+        show2:false,
+        barShow:true,
+        brandShow:false,
+        mapShow:true,
         token:'',
         listData:[],
         listDataList:[],
@@ -549,11 +554,37 @@ export default {
         vm.show1=false;
          vm.styleTitle = vm.show0?'条形风格':'牌型风格'
       },
+      changeBarStyle(){
+        var vm=this;
+        this.barShow=false;
+        this.brandShow=true;
+        this.mapShow=true;
+        
+        this.show0=false;
+        this.show1=false;
+        this.show2=true;
+      },
+
       changeMapStyle(){
         var vm=this;
-        vm.show0=false;
-        vm.show1=true;
-        console.log('成功')
+        // vm.show0=false;
+        // vm.show1=true;
+        // console.log('成功')
+        this.barShow=true;
+        this.brandShow=true;
+        this.mapShow=false;
+        this.show2=false;
+        this.show0=false;
+        this.show1=true;
+      },
+      changeBrandStyle(){
+        var vm=this;
+        this.barShow=true;
+        this.brandShow=false;
+        this.mapShow=true;
+        this.show1=false;
+        this.show0=true;
+        this.show2=false;
       },
       getUserInfo(){
           var vm = this

@@ -20,6 +20,32 @@ const router = new Router({
       name:'gantt',
       component:resolve=>require(['@/components/SchedulePlan/gantt'],resolve),
     },
+    //二维码扫描
+    //开始进入当前页面
+    {
+      path:'/qr/:id',
+      name: '/qr',
+      component:resolve=>require(['@/components/mobileQindan/qrCommonPage'],resolve)
+
+    },
+    //通用清单详情
+    {
+      path:'/mobileQindan/mobileQingdanDetail',
+      name:'mobileQingdanDetail',
+      component:resolve=>require(['@/components/mobileQindan/mobileQingdanDetail'],resolve),
+    },
+    //通用构件详情
+    {
+      path:'/mobileQindan/mobileGouJianDetail',
+      name:'mobileGouJianDetail',
+      component:resolve=>require(['@/components/mobileQindan/mobileGouJianDetail'],resolve),
+    },
+    //清单选择
+    {
+      path:'/mobileQindan/qingdanChioce',
+      name:'qingdanChioce',
+      component:resolve=>require(['@/components/mobileQindan/qingdanChioce'],resolve),
+    },
     //文档管理公有分享路由
     {
       path:'/cloud/share/:id',

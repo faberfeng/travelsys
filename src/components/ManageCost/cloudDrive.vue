@@ -1571,7 +1571,7 @@
             bottom: 0;
             right: 25px;
             width: 100%;
-            // height: 800px;
+            height: 700px;
             #planeDIV{
                 display:block;
                 position:absolute;
@@ -2718,7 +2718,7 @@ export default {
             systemDrawFile:true,
             showBtn:true,
             checkFileDir: {}, //选中的文件夹信息
-            QJ: {
+            QJ:{
                 imageBackground: {},
                 point: []
             },
@@ -5002,16 +5002,21 @@ export default {
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                  vm.hasImg = false
-                 vm.QJ.imageBackground = {}
+                //  vm.QJ.imageBackground = {}
                  vm.QJ.point = []
                  vm.showQuanJing = true
                  response.data.rt.rows.forEach((item)=>{
                      if(item.xAxial == -1 && item.yAxial == -1){
+                         console.log(response.data.rt.rows,'response.data.rt.rows');
                          vm.QJ.imageBackground = item
+                         console.log(vm.QJ.imageBackground,'vm.QJ.imageBackground');
                          vm.hasImg = true
                          if(vm.QJ.imageBackground){
-                            vm.imgSrc=vm.QJFileManageSystemURL+QJ.imageBackground.filePath
+                            vm.imgSrc=vm.QJFileManageSystemURL+vm.QJ.imageBackground.filePath
                          }
+                        //  this.showQuanJing=true;
+                            console.log(vm.imgSrc,'vm.imgSrc');
+                         
                      }else{
                         vm.$set(item,'checked',false)
                          vm.QJ.point.push(item)

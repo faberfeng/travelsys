@@ -54,7 +54,7 @@
                             </div>
                             <div class="video_body">
                                 <img v-show="this.mediaUrlList==[]" width="100%" height="310px" src="../../assets/nosource.png" >
-                                <video v-show="this.mediaUrlList!=[]" id="videoPlay" width="100%" height="88%" controls="controls" ref="video"  allowfullscreen="true" :src="videoUrl?videoUrl:require('../../assets/nosource.png')"></video>
+                                <video  autoplay="autoplay" loop="loop" v-show="this.mediaUrlList!=[]" id="videoPlay" width="100%" height="88%" controls="controls" ref="video"  allowfullscreen="true" :src="videoUrl?videoUrl:require('../../assets/nosource.png')"></video>
                                 <source type="video/mp4">
                                 your browser does not support the video tag.
                             </div>
@@ -284,16 +284,16 @@
                         <table class="planTabel" border="1" width="100%">
                             <thead>
                                 <tr>
-                                    <td>序号</td>
-                                    <td>文件路径/URL路径</td>
-                                    <td>操作</td>
+                                    <td width="10%">序号</td>
+                                    <td width="60%">文件路径/URL路径</td>
+                                    <td width="20%">操作</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr :class="{'select':index==isActive}" v-for="(item,index) in mediaUrlList" :key="index" @click="checkItem(index)">
-                                    <td>{{index+1}}</td>
-                                    <td>{{item.displayPath}}</td>
-                                    <td>
+                                    <td width="10%">{{index+1}}</td>
+                                    <td width="60%" v-text="spliced(item.displayPath)"></td>
+                                    <td width="20%">
                                         <button class="editBtn actionBtn" @click="editMediaUrl(item.fileGroupId)"></button>
                                         <button class="deleteBtn actionBtn" @click="deleteMediaUrl(item.id)"></button>
                                     </td>
@@ -327,7 +327,7 @@
                                     <td>{{item.displayPath}}</td>
                                     <td>{{item.cameraRemark}}</td>
                                     <td>
-                                        <button class="editBtn actionBtn" @click="editMediaUrl1(item.fileGroupId)"></button>
+                                        <button class="editBtn actionBtn" @click="editMediaUrl1(item.id)"></button>
                                         <button class="deleteBtn actionBtn" @click="deleteMediaUrl1(item.id)"></button>
                                     </td>
                                 </tr>
@@ -532,8 +532,12 @@ export default {
                 margin:'0 auto',
                 height: '300',  
                 sources: [{  
+                    // type: "video/rtmp",
+                    // type: "video/rtsp",
+                    // type: "video/hls",
                     type: "rtmp/mp4",  
-                    src: "" 
+                    // type:"video/mp4",
+                    src:"" 
                 }],  
                 techOrder: ['flash'],  
                 autoplay: true,  
@@ -863,6 +867,10 @@ export default {
 
     },
     methods:{
+        spliced(val){
+            return val.slice(0,30);
+
+        },
         loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'016','01601','/liveConnect/fieldConnection','01602','/liveConnect/fieldMessage','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance');
@@ -2068,6 +2076,10 @@ export default {
         //获取修改媒体
         getMediaInformation(type){
             this.type=type;
+            this.mediaUrlList=[];
+            this.videoUrl='';
+            this.videoPageTotal=0;
+
             axios({
                 method:'get',
                 url:this.BDMSUrl+'lc/get',
@@ -2080,9 +2092,6 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.rt.length!=0){
-                    this.mediaUrlList=response.data.rt;
-                    
-                    
                         if(type==1){
                             this.mediaUrlLists=response.data.rt;
                             this.modelPageTotal=this.mediaUrlLists.length;
@@ -2098,8 +2107,18 @@ export default {
                             }
                         }
                         if(type==2){
+                            // this.mediaUrlList=[];
+                            // this.videoUrl='';
+                            // this.videoPageTotal=0;
+                            this.mediaUrlList=response.data.rt;
                             this.videoPageTotal=this.mediaUrlList.length;
                             this.videoUrl=this.mediaUrlList[0].path;
+                        }
+                        if(type==3){
+                            // this.mediaUrlList=[];
+                            // this.videoUrl='';
+                            // this.picturePageTotal=0;
+                            this.mediaUrlList=response.data.rt;
                         }
                     
                     
@@ -2123,6 +2142,8 @@ export default {
         //获取直播
         getMediaInformation1(type){
             this.type=type;
+            this.mediaUrlList1=[];
+             this.livePageTotal1="";
             axios({
                 method:'get',
                 url:this.BDMSUrl+'lc/get',
@@ -2400,8 +2421,9 @@ export default {
         },
         editMediaUrl1(num){
             this.updateResourceDialog1=true;
+            console.log(num,'num0000');
             this.mediaUrlList1.forEach((item)=>{
-                if(item.fileGroupId==num){
+                if(item.id==num){
                     this.updateId=item.id;
                     this.getFgId=item.fileGroupId;
                     this.mediaUrl=item.path;
@@ -3891,6 +3913,7 @@ export default {
                     thead{
                         background:#f2f2f2;
                         tr{
+                            // width: 250px;
                             td{
                                 padding-left:10px;
                                 height: 40px;
@@ -3902,7 +3925,7 @@ export default {
                                 overflow: hidden;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
-                                width: 250px;
+                                // width: 250px;
                             }
                         }
                     }
@@ -3915,8 +3938,10 @@ export default {
                             }
                         }
                         tr{
+                            width: 250px;
                             background:#fff;
                             cursor: pointer;
+                            // position: relative;
                             td{
                                 padding-left:10px;
                                 height: 40px;
@@ -3929,6 +3954,7 @@ export default {
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
                                 width: 250px;
+
                                  .actionBtn{
                                         display: inline-block;
                                         width: 16px;
@@ -3936,6 +3962,8 @@ export default {
                                         border: none;
                                         cursor: pointer;
                                         margin-right: 16px;
+                                        // position: absolute;
+                                        // right:0px;
                                     }
                                     .deleteBtn{
                                         background: url('../../assets/delete.png') no-repeat;

@@ -15,6 +15,7 @@ import FullCalendar from 'vue-full-calendar'
 // Vue.use(htmlToPdf) 
 import '../node_modules/fullcalendar/dist/fullcalendar.css';
 
+// require('videojs-contrib-hls/dist/videojs-contrib-hls');
 // import { lazyAMapApiLoaderInstance } from 'vue-amap';
 Vue.use(VueAMap);
 // console.log(Vue);
