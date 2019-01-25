@@ -107,7 +107,7 @@ export default {
         vm.commomHeadPictureFile=vm.$store.state.commomHeadPictureFile;
         vm.token = localStorage.getItem('token'); //获取token
         vm.projId = localStorage.getItem('projId');//获取工程id
-        vm.getProjectInfo();//工程首页信息
+        // vm.getProjectInfo();//工程首页信息
         vm.getBasicSituation();//获取工程概况信息;
         vm.getProjectImageList()//获取工程图片列表
         vm.getProjectStationInfo()//获取用户动态信息列表

@@ -22,6 +22,7 @@ export default new Vuex.Store({
         applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
         messageUrl:'http://10.252.26.241:8079',
         webSocketUrl:"ws://10.252.26.241:16800/websocket",
+        qrShareUrl:"http://10.252.26.240:8080/bdms/#/qr",
         //无锡市政院
         // QJFileManageSystemURL:'http://58.214.36.222:8080/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'http://58.214.36.222:8080/qjbim-file',

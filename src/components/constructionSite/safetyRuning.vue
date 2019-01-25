@@ -572,6 +572,9 @@ export default {
             QJFileManageSystemURL:'',
             BDMSUrl:'',
             UPID:'',
+            returnLabelUrl:'',
+            qrShareUrl:'',
+
         }
     },
     created(){
@@ -585,6 +588,7 @@ export default {
         vm.projName = localStorage.getItem('projName');
         vm.UPID = vm.$store.state.UPID
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        vm.qrShareUrl=vm.$store.state.qrShareUrl;
         this.loadingTitle()
         vm.getSecurityCheck();
         vm.loadzTreeData();
@@ -701,7 +705,7 @@ export default {
                     (vm.checkItemDataList.respUserName ? vm.checkItemDataList.respUserName : "") + '","' + (vm.checkItemDataList.checkDeptName ? vm.checkItemDataList.checkDeptName : "") + '","'
                     + (vm.checkItemDataList.checkUserName ? vm.checkItemDataList.checkUserName : "") + '"]'
                 var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
-                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.checkPoint.id, 7) +
+                    vm.changeUrl(vm.qrShareUrl+'/QR-CP-' + vm.addZero(item.checkPoint.id, 7)) +
                     '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
                 datas += data
                 if (i < vm.checkPointsForPageSingleList.length - 1) datas += ','
@@ -715,6 +719,7 @@ export default {
                     message:'已向打印机发送请求'
                 })
         },
+
         //打印所有标签
         printAllCurrentLabel(){
             var vm = this
@@ -730,7 +735,7 @@ export default {
                     (vm.checkItemDataList.respUserName ? vm.checkItemDataList.respUserName : "") + '","' + (vm.checkItemDataList.checkDeptName ? vm.checkItemDataList.checkDeptName : "") + '","'
                     + (vm.checkItemDataList.checkUserName ? vm.checkItemDataList.checkUserName : "") + '"]'
                 var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
-                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.id, 7) +
+                    vm.changeUrl(vm.qrShareUrl+'/QR-CP-' + vm.addZero(item.id, 7)) +
                     '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
                 datas += data
                 if (i < vm.checkPointsForPageList.length - 1) datas += ','
@@ -743,6 +748,21 @@ export default {
                     type:'success',
                     message:'已向打印机发送请求'
                 })
+        },
+        changeUrl(val){
+                var vm=this;
+                $.ajax({
+                url:'http://bimqr.cn/Public/GetShortUrl',
+                type:'GET',
+                data:{
+                    sourceUrl:encodeURIComponent(val)
+                },
+                async:false, //同步
+                success:function(response){
+                    vm.returnLabelUrl=response.obj.short_url;
+                }
+                })
+                return vm.returnLabelUrl;
         },
         pageView(){
 

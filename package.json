@@ -44,6 +44,7 @@
     "vue2-highcharts": "^1.2.4",
     "vuedraggable": "^2.16.0",
     "vuex": "^3.0.1",
+    "wc-messagebox": "^1.10.1",
     "websocket": "^1.0.26"
   },
   "devDependencies": {

@@ -609,6 +609,7 @@ export default {
             elementFilter:'',
             uploadViewPointList:[],
             projName:'',
+            qrShareUrl:'',
         }
     },
     created(){
@@ -620,6 +621,7 @@ export default {
         vm.projName = localStorage.getItem('projName');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+        vm.qrShareUrl=vm.$store.state.qrShareUrl;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
         this.getContactIndex();
@@ -907,7 +909,7 @@ export default {
                     (item.createTime ? vm.timeChanges(item.createTime) : "") + '","' + (item.mVersion ? item.mVersion : "") + '","'
                     + (item.details.length ? item.details.length : "") + '"]'
                 var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
-                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                    vm.changeUrl(vm.qrShareUrl + '/QR-QD-' + vm.addZero(item.pkId, 7)) +
                     '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
                 datas += data
                 if (i < vm.relaList.length - 1) datas += ','
@@ -920,6 +922,21 @@ export default {
                     type:'success',
                     message:'已向打印机发送请求'
                 })
+      },
+      changeUrl(val){
+        var vm=this;
+        $.ajax({
+          url:'http://bimqr.cn/Public/GetShortUrl',
+          type:'GET',
+          data:{
+            sourceUrl:encodeURIComponent(val)
+          },
+           async:false, //同步
+          success:function(response){
+            vm.returnLabelUrl=response.obj.short_url;
+          }
+        })
+        return vm.returnLabelUrl;
       },
         //清单类型
         parseType(val) {

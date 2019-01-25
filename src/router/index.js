@@ -46,6 +46,12 @@ const router = new Router({
       name:'qingdanChioce',
       component:resolve=>require(['@/components/mobileQindan/qingdanChioce'],resolve),
     },
+    //安全点位
+    {
+      path:'/mobileQindan/pointPosition',
+      name:'pointPosition',
+      component:resolve=>require(['@/components/mobileQindan/pointPosition'],resolve),
+    },
     //文档管理公有分享路由
     {
       path:'/cloud/share/:id',

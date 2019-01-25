@@ -1146,6 +1146,7 @@
     data() {
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+        returnLabelUrl:'',
         routerList:'',
         moduleList:'',
         loading:false,
@@ -1159,6 +1160,7 @@
         token: '',
         projId: '',
         BDMSUrl: '',
+        qrShareUrl:'',
         selectUgId: '',//所选择群组id
         taskNameStr: '',
         ugList: '',//群组列表
@@ -1630,10 +1632,12 @@
       vm.userId = localStorage.getItem('userid');
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+      vm.qrShareUrl=vm.$store.state.qrShareUrl;
       vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
       vm.getTaskIndex();
+      // vm.changeUrl();
      
       // this.getTaskList();
     },
@@ -2794,7 +2798,7 @@
                 (item.main.createTime ? vm.timeChanges(item.main.createTime) : "") + '","' + (item.main.mVersion ? item.main.mVersion : "") + '","'
                 + (item.details.length ? item.details.length : "") + '"]'
             var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
-                'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.main.pkId, 7) +
+                 vm.changeUrl(vm.qrShareUrl+'/QR-QD-' + vm.addZero(item.main.pkId, 7))+
                 '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
             datas += data
             if (i < vm.relaList1.length - 1) datas += ','
@@ -2807,6 +2811,23 @@
                 type:'success',
                 message:'已向打印机发送请求'
             })
+      },
+
+
+      changeUrl(val){
+        var vm=this;
+        $.ajax({
+          url:'http://bimqr.cn/Public/GetShortUrl',
+          type:'GET',
+          data:{
+            sourceUrl:encodeURIComponent(val)
+          },
+           async:false, //同步
+          success:function(response){
+            vm.returnLabelUrl=response.obj.short_url;
+          }
+        })
+        return vm.returnLabelUrl;
       },
       addTaskMakeSure() {
         

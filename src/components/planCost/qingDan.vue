@@ -926,7 +926,7 @@
                  <div class="editBody">
                     <ul>
                         <li v-for="(item,index) in S_Label_quantitiesList" :key="index" class="item-label clearfix">
-                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.pkId, 7)" alt="">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-MX-' + addZero(item.pkId, 7)" alt="">
                             <div class="right">
                                 <p class="item-list clearfix">
                                     <span class="text-left">可追踪ID：</span>
@@ -1011,7 +1011,7 @@
                  <div class="editBody">
                     <ul>
                         <li v-for="(item,index) in label_ComponentList" :key="index" class="item-label clearfix">
-                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.pkId, 7)" alt="">
+                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-MX-' + addZero(item.pkId, 7)" alt="">
                             <div class="right">
                                 <p class="item-list clearfix">
                                     <span class="text-left">可追踪ID：</span>
@@ -2373,6 +2373,7 @@ export default Vue.component('common-list',{
             defaultSubProjId:'',
             QJFileManageSystemURL:'',
             BDMSUrl:'',
+            qrShareUrl:'',
             show:{
                 basicAttributes:true,
                 generalDesignInfo:true,
@@ -2848,6 +2849,7 @@ export default Vue.component('common-list',{
             upImg:false,
             imageName:'未选择任何图片',
             filesList:[],
+            returnLabelUrl:"",
         }
     },
     created(){
@@ -2864,6 +2866,7 @@ export default Vue.component('common-list',{
             vm.BDMSUrl = vm.$store.state.BDMSUrl
             vm.WebGlUrl=vm.$store.state.WebGlUrl
             vm.BIMServerPort=vm.$store.state.BIMServerPort;
+            vm.qrShareUrl=vm.$store.state.qrShareUrl;
             vm.projName = localStorage.getItem('projName')
             vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
             vm.UPID = vm.$store.state.UPID
@@ -3903,7 +3906,7 @@ export default Vue.component('common-list',{
                     (item.classifyName ? item.classifyName : "") + '","' + (item.componentComments ? item.componentComments : "") + '","'
                     + (item.componentTag ? item.componentTag : "") + '"]'
                 var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
-                    'qr.qjbim.com/appcenter/qr/' + vm.UPID + '/QR-MX-' + vm.addZero(item.pkId, 7) +
+                    vm.changeUrl(vm.qrShareUrl+'/QR-MX-' + vm.addZero(item.pkId, 7)) +
                     '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
                 datas += data
                 if (i < vm.S_Label_quantitiesList.length - 1) datas += ','
@@ -3936,6 +3939,21 @@ export default Vue.component('common-list',{
                 message:'已向打印机发送请求'
             })
         },
+        changeUrl(val){
+            var vm=this;
+            $.ajax({
+            url:'http://bimqr.cn/Public/GetShortUrl',
+            type:'GET',
+            data:{
+                sourceUrl:encodeURIComponent(val)
+            },
+            async:false, //同步
+            success:function(response){
+                vm.returnLabelUrl=response.obj.short_url;
+            }
+            })
+            return vm.returnLabelUrl;
+      },
         changeBottomExpend(){
             var vm = this
             vm.bottomExpend.isExpend = !vm.bottomExpend.isExpend

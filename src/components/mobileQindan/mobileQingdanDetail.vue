@@ -1,10 +1,11 @@
 <template>
     <div id="qingdanMain" style="width: 100%;overflow-x: hidden">
-        <h3 class="componentDetail"><span class="leftBack"></span>清单详情</h3>
+        <h3 class="componentDetail">清单详情</h3>
+        <!-- <span class="leftCancle" @click="backCancle()"></span> -->
         <div>
-            <div class="information">
+            <div class="information" >
                 <span class="text">清单基本信息</span>
-                <span id="click1" class="upImg" @click="toggle($event)"></span>
+                <span id="click1" class="upImg" @click="toggle($event)" ></span>
             </div>
             <div class="list">
                 <p class="listLi"><span class="listP">清单编号</span><span class="listSpan">{{manifestMainInfo.pkId}}</span></p>
@@ -59,14 +60,24 @@
             </div>
         </div>
         <!-- 关联清单 -->
-        <div v-if="showDocumentList">
+        <div v-if="showDocumentList&&tokenId">
             <div class="information"><span class="text">关联文档</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
-                <p class="listLi"  v-for="(document,index) in documentList" :key="index"><span class="listP">{{document.fileName}}</span><span class="listSpan">预览</span></p>
+                <div class="listDocumentLi"  v-for="(document,index) in documentList" :key="index">
+                    <div class="listAll" @click="viewFile(document.filePath)">
+                        <div class="listL">
+                            <img :src="require('./image/icon/'+document.fileExtension.toUpperCase()+'.png')"> 
+                        </div>
+                        <div class="listR">
+                            <span class="listRTop">{{document.fileName}}</span>
+                            <span class="listRBottom">{{document.uploadUser}}    {{document.uploadFromExplorer|explorerFrom()}}    {{document.updateTime|timeChange()}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- 报表快照 -->
-        <div v-if="showReportsnapshotInfo">
+        <div v-if="showReportsnapshotInfo&&tokenId">
             <div class="information"><span class="text">报表快照</span><span id="click3" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">报表ID</span><span class="listSpan">{{reportsnapshotInfo.id}}</span></p>
@@ -77,7 +88,7 @@
             </div>
         </div>
         <!-- 工程算量 -->
-        <div v-if="showWorkAmountInfo">
+        <div v-if="showWorkAmountInfo&&tokenId">
             <div class="information"><span class="text">工程算量</span><span id="click4" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">出量构件数</span><span class="listSpan">{{workAmountInfo.componentNum}}</span></p>
@@ -88,7 +99,7 @@
             </div>
         </div>
         <!-- 产品选型 -->
-        <div v-if="showReportProductInfo">
+        <div v-if="showReportProductInfo&&tokenId">
             <div class="information"><span class="text">产品选型</span><span id="click5" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">选型构件数</span><span class="listSpan">{{reportProductInfo.componentCount}}</span></p>
@@ -99,7 +110,7 @@
             </div>
         </div>
         <!-- 物资采购 -->
-        <div v-if="showOrderInfo">
+        <div v-if="showOrderInfo&&tokenId">
             <div class="information"><span class="text">物资采购</span><span id="click6" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">订单编号</span><span class="listSpan">{{orderInfo.orderCode}}</span></p>
@@ -113,8 +124,18 @@
                 <p class="listLi" style="border-bottom:none;"><span class="listP">最后操作时间</span><span class="listSpan">{{orderDetailInfo.updateDateTime}}</span></p>
             </div>
         </div>
+        <!-- <div v-if="haveToken">
+            <div class="information"><span class="text">可用操作</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
+            <div class="list">
+                <div class="changeBtn">
+                    <span class="pre blue"  @click="sureSend()" >
+                        确认发货
+                    </span>
+                </div>
+            </div>  
+        </div> -->
         <!-- 任务进度 -->
-        <div v-if="showTaskScheduleInfo">
+        <div v-if="showTaskScheduleInfo&&tokenId">
             <div class="information"><span class="text">任务进度</span><span id="click7" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">任务名称</span><span class="listSpan">{{taskScheduleInfo.taskName}}</span></p>
@@ -131,6 +152,7 @@
 </template>
 <script>
 import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'mobileQindan',
     data(){
@@ -145,6 +167,8 @@ export default {
                 taskScheduleInfo:{},//任务进度
                 orderInfo:{},
                 orderDetailInfo:{},
+                projectId:'',
+                orderId:'',
                 page:1,
                 showDocumentList:false,
                 showReportsnapshotInfo:false,
@@ -153,25 +177,74 @@ export default {
                 showTaskScheduleInfo:false,
                 showOrderInfo:false,
                 mid:'',
-                haveToken:false,
+                haveToken:'',
+                tokenId:'',
                 // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',
-                
                 // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file',
-                
-
         }
     },
     created(){
+        var vm=this;
         this.BDMSUrl=this.$store.state.BDMSUrl;
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         this.mid=this.$route.query.mid;
-        this.haveToken=this.$route.query.haveToken;
+        this.haveToken=this.$route.query.haveToken=="false"?false:true;
+        this.tokenId=this.$route.query.tokenId;
+        console.log(this.tokenId,'this.tokenId');
+        console.log(vm.haveToken,'this.haveToken');
         this.initData();
-
-
-
     },
+    filters:{
+        sureSend(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'mobile/deliveryOrderComponent.json',
+                params:{
+                    id: this.orderId,
+                    projectId:this.projectId
+                }
+
+            }).then((response)=>{
+                var obj=response.data;
+            })
+
+        },
+        timeChange(val){
+            if(val==null){
+                return ''
+            }else{
+                return moment(val).format('YYYY-MM-DD')
+            }
+        },
+        explorerFrom(val){
+            if(val==1){
+                return '来自PC上传'
+            }else if(val==2){
+                return '来自Android上传'
+            }
+        },
+    },
+
     methods:{
+        viewFile(val){
+            window.open(val);
+        },
+        backCancle(){
+            window.opener = null; 
+            window.open('', '_self'); 
+            window.close()
+            //  this.$router.back(-1);
+            //  var userAgent = navigator.userAgent;
+            // if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") !=-1) {
+            //     window.location.href="about:blank";
+            // }else if(userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1){
+            //     window.opener=null;window.open('about:blank','_self','').close();
+            // }else {
+            //     window.opener = null;
+            //     window.open("", "_self");
+            //     window.close();
+            // }
+        },
         toggle(event){
             var ev=window.event|| event;
             var target=ev.srcElement || ev.target;
@@ -196,6 +269,8 @@ export default {
             }).then((response)=>{
                 if(response.data.responseInfo.responseCode==1){
                     var obj=response.data;
+                   
+                    // console.log(typeof(this.haveToken));
                     if(obj.manifestMainInfo!=null && obj.manifestMainInfo!=undefined) {
                         this.manifestMainInfo = obj.manifestMainInfo;
                         this.manifestMainInfo.createTime=this.convertTimestampToString(this.manifestMainInfo.createTime);
@@ -212,36 +287,51 @@ export default {
                     }
                     if(obj.documentList!=null && obj.documentList!=undefined) {
                         this.documentList = obj.documentList;
-                        this.showDocumentList=true;
+                        if(this.haveToken==true){
+                            this.showDocumentList=true;
+                        }
                     }
                     if(obj.reportsnapshotInfo!=null && obj.reportsnapshotInfo!=undefined) {
                         this.reportsnapshotInfo = obj.reportsnapshotInfo;
-                        this.showReportsnapshotInfo.createTime=this.convertTimestampToString(this.showReportsnapshotInfo.createTime);
-                        this.showReportsnapshotInfo=true;
+                        this.reportsnapshotInfo.createTime=this.convertTimestampToString(this.reportsnapshotInfo.createTime);
+                        if(this.haveToken==true){
+                            this.showReportsnapshotInfo=true;
+                        }
                     }
                     if(obj.workAmountInfo!=null && obj.workAmountInfo!=undefined) {
                         this.workAmountInfo = obj.workAmountInfo;
                         this.workAmountInfo.createTime=this.convertTimestampToString(this.workAmountInfo.createTime);
-                        this.showWorkAmountInfo=true;
+                        if(this.haveToken==true){
+                            this.showWorkAmountInfo=true;
+                        }
+                        
                     }
                     if(obj.reportProductInfo!=null && obj.reportProductInfo!=undefined) {
                         this.reportProductInfo = obj.reportProductInfo;
                         this.reportProductInfo.createTime=this.convertTimestampToString(this.reportProductInfo.createTime);
-                        this.showReportProductInfo=true;
+                        if(this.haveToken==true){
+                            this.showReportProductInfo=true;
+                        }
                     }
                     if(obj.taskScheduleInfo!=null && obj.taskScheduleInfo!=undefined) {
                         this.taskScheduleInfo = obj.taskScheduleInfo;
-                        this.showTaskScheduleInfo=true;
                         this.taskScheduleInfo.taskStart=this.convertTimestampToString(this.taskScheduleInfo.taskStart);
                         this.taskScheduleInfo.taskEnd=this.convertTimestampToString(this.taskScheduleInfo.taskEnd);
+                        if(this.haveToken==true){
+                            this.showTaskScheduleInfo=true;
+                        }
                     }
                     if(obj.orderInfo!=null && obj.orderInfo!=undefined) {
                         this.orderInfo = obj.orderInfo;
-                        this.showOrderInfo=true;
+                        if(this.haveToken==true){
+                            this.showOrderInfo=true;
+                        }
                     }
                     if(obj.orderDetailInfo!=null && obj.orderDetailInfo!=undefined) {
                         this.orderDetailInfo = obj.orderDetailInfo;
                         this.orderDetailInfo.updateDateTime=this.convertTimestampToString(this.orderDetailInfo.updateDateTime);
+                        this.projectId=this.orderDetailInfo.projectId;
+                        this.orderId=this.orderDetailInfo.id;
                     }
                     if(this.page==1){
                         $("#turnPagePre").removeClass("usable").addClass("notusable");
@@ -456,6 +546,19 @@ html{font-size:16px}
         line-height: 2.5rem;
         font-weight:normal;
         position: relative;
+        .leftCancle{
+            position: absolute;
+            background:url('./image/leftCancle.png');
+            // background-repeat:no-repeat;
+            background-size:2rem 2rem;
+            background-repeat:no-repeat;
+            // background-size:1rem 0.6rem;
+            width:1rem;
+            height:2rem;
+            display:inline-block;
+            top:0.1rem;
+            left:0.6rem;
+        }
         // .leftBack{
         //     //  float:left;
         //     position: absolute;
@@ -478,10 +581,11 @@ html{font-size:16px}
         box-sizing:border-box;
         border-bottom:1px solid #ccc;
         .text{
-            color:black;
-            font-weight:normal;
+            color:#333;
+            // font-weight:normal;
             font-family:"Microsoft YaHei";
             float: left;
+            font-weight: 800;
         }
         .downImg{
             width:1rem;height:1rem;
@@ -489,7 +593,7 @@ html{font-size:16px}
             float:right;
             background:url('./image/shouq.png');
             background-repeat:no-repeat;
-            background-size:1rem 0.6rem;
+            background-size:1rem 1rem;
             margin-top:0.6rem;
         }
         .upImg{
@@ -498,7 +602,7 @@ html{font-size:16px}
             float:right;
             background:url('./image/xial.png');
             background-repeat:no-repeat;
-            background-size:1rem 0.6rem;
+            background-size:1rem 1rem;
             margin-top:0.6rem;
            
         }
@@ -507,6 +611,21 @@ html{font-size:16px}
     // .information:after{content:'';clear:both;display:table;}
     .list{
         margin:0 0 0 1rem;background-color:#fff;font-size:0.8rem;
+        .changeBtn{
+            .pre{
+                width: 4rem;
+                height:1.8rem;
+                line-height:1.8rem;
+                margin-top:0.2rem;
+                border:1px solid #ccc;
+                display: inline-block;
+                // float:left;
+                text-align: center;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-right:1rem;
+            }
+        }
         .turnPage{
             width: 100%;height:2rem;
             .pre{
@@ -529,22 +648,60 @@ html{font-size:16px}
             // color:#333;
         }
         .turnPage .notusable{
-            color:#999; 
+            color:#666; 
         }
         .turnPage:after{content: '';clear:both;display:table;}
+        .listDocumentLi{
+            .listAll{
+                height: 4rem;
+                padding:0.5rem;
+                background:#f7f7f7;
+                margin:0.2rem;
+                .listL{
+                    float: left;
+                    img{
+                        height: 2.5rem;
+                        width: 2.5rem;
+                    }
+                }
+                .listR{
+                    float: right;
+                    width: 80%;
+                    // text-overflow:ellipsis;
+                    // overflow: hidden;
+                    // white-space: nowrap;
+                    text-align: left;
+                    .listRTop{
+                        word-break: break-all;
+                        color:#333333;
+                        height: 2rem;
+                        font-weight: 600;
+                    }
+                    .listRBottom{
+                        display: block;
+                        word-break: break-all;
+                        color:#989898;
+                        height: 2rem;
+                        font-size:0.7rem;
+                        margin-top:0.4rem;
+                    }
+                }
+            }
+        }
         .listLi{
             width:100%;margin:0;padding:0;border-bottom:1px solid #ccc;height: 2.2rem;line-height: 2.2rem;
             .listP{
                 display:inline-block;
-                color:black;
+                color:#333;
                 margin:0;
                 // text-align: left;
                 float: left;
+                font-weight: 400;
             }
             .listSpan{
                 display:inline-block;
                 width:68%;
-                color:#999;
+                color:#666;
                 text-align:right;
                 margin:0 0.5rem 0 0;
                 float:right;

@@ -14,6 +14,12 @@ import FullCalendar from 'vue-full-calendar'
 // import htmlToPdf from '@/components/utils/htmlToPdf.js'  
 // Vue.use(htmlToPdf) 
 import '../node_modules/fullcalendar/dist/fullcalendar.css';
+// import {Alert, Confirm, Toast} from 'wc-messagebox'
+// import 'wc-messagebox/style.css'
+ 
+// Vue.use(Alert, options)
+// Vue.use(Confirm, options)
+// Vue.use(Toast, options)
 
 // require('videojs-contrib-hls/dist/videojs-contrib-hls');
 // import { lazyAMapApiLoaderInstance } from 'vue-amap';

@@ -44,10 +44,37 @@
                 <p class="listLi" style="border-bottom:none;"><span class="listP">更新时间</span><span class="listSpan">{{elementInfo.updateTime}}</span></p>
             </div>
         </div>
+        <div v-if="showSummaryInfo&&operateStatus!=2">
+            <div class="information"><span class="text">可用操作</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
+            <div class="list" >
+                <div class="changeBtn">
+                    <span v-show="operateStatus==0"  class="pre blue"  @click="startSure()" >
+                        开工确认
+                    </span>
+                    <span v-show="operateStatus==1" class="pre yellow"  @click="completeSure()" >
+                        完工确认
+                    </span>
+                    <!-- <span class="pre red"  @click="changeStatus(3)" >
+                        确认发货
+                    </span> -->
+                </div>
+            </div>  
+        </div>
         <div v-if="showDocumentList">
             <div class="information"><span class="text">关联文档</span><span id="click3" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
-                <p class="listLi"  v-for="(document,index) in documentList" :key="index"><span class="listP">{{document.fileName}}</span><span class="listSpan">预览</span></p>
+                <div class="listDocumentLi"  v-for="(document,index) in documentList" :key="index">
+                    <div class="listAll" @click="viewFile(document.filePath)">
+                        <div class="listL">
+                            <img :src="require('./image/icon/'+document.fileExtension.toUpperCase()+'.png')"> 
+                        </div>
+                        <div class="listR">
+                            <span class="listRTop">{{document.fileName}}</span>
+                            <span class="listRBottom">{{document.uploadUser}}    {{document.uploadFromExplorer|explorerFrom()}}    {{document.updateTime|timeChange()}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- <p class="listLi"  v-for="(document,index) in documentList" :key="index"><span class="listP">{{document.fileName}}</span><span class="listSpan">预览</span></p> -->
             </div>
         </div>
         <div v-if="showProductLibrary">
@@ -90,6 +117,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import axios from 'axios'
 export default {
     data(){
@@ -100,24 +128,56 @@ export default {
             elementInfo:{},//设计信息
             productLibrary:{},//产品选型
             summaryInfo:{},//进度核实
+            componentFinishCheck:'',
+            operateStatus:'',
             showDocumentList:false,
             showProductLibrary:false,
             showSummaryInfo:false,
             showPurchasingInfo:false,
             mid:'',
             mdid:'',
+            haveToken:false,
+            tokenId:'',
+            traceId:'',
             // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',
             // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file',
         }
     },
     created(){
+        var vm=this;
         this.BDMSUrl=this.$store.state.BDMSUrl;
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         this.mid=this.$route.query.mid;
         this.mdid=this.$route.query.mdid;
+        this.traceId=this.$route.query.traceId;
+        vm.tokenId=this.$route.query.tokenId;
+        // this.haveToken=this.$route.query.haveToken;
+        this.haveToken=this.$route.query.haveToken=="false"?false:true;
+        
+        
         console.log(this.mdid,'this.mdid');
         console.log(this.mid,'this.mid');
+        console.log(this.tokenId,'this.tokenId')
+        console.log(vm.traceId,'this.traceId');
         this.initData();
+        // this.test();
+    },
+    filters:{
+         timeChange(val){
+            if(val==null){
+                return ''
+            }else{
+                return moment(val).format('YYYY-MM-DD')
+            }
+        },
+        explorerFrom(val){
+            if(val==1){
+                return '来自PC上传'
+            }else if(val==2){
+                return '来自Android上传'
+            }
+        },
+
     },
     methods:{
         toggle(event){
@@ -133,20 +193,113 @@ export default {
         },
         backCancle(){
             this.$router.back(-1);
+            // var userAgent = navigator.userAgent;
+            // if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") !=-1) {
+            //     window.location.href="about:blank";
+            // }else if(userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1){
+            //     window.opener=null;window.open('about:blank','_self','').close();
+            // }else {
+            //     window.opener = null;
+            //     window.open("about:blank", "_self");
+            //     window.close();
+            // }
         },
-        initData(){
-            var vm=this;
+        
+        //开工确认
+        startSure(){
             axios({
                 method:'get',
-                url:vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json',
+                url:this.BDMSUrl+'mobile/openWorkConfirm.json',
+                headers:{
+                    'tokenId':this.tokenId
+                },
+                params:{
+                    id:this.mdid
+                }
+            }).then((response)=>{
+                var obj=response.data
+                console.log(obj,'返回的值。。。')
+                if(obj.responseInfo.responseCode == 1){
+                    this.initData();
+                    alert(obj.info)
+                }else if(obj.responseInfo.responseCode==101){
+                    alert(obj.responseInfo.responseMessage)
+                }else{
+                    alert(obj.responseInfo.responseMessage)
+                }
+            })
+        },
+        //完工确认
+        completeSure(){
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'mobile/finishWorkConfirm.json',
+                headers:{
+                    'tokenId':this.tokenId
+                },
+                params:{
+                    id:this.mdid
+                }
+            }).then((response)=>{
+                var obj=response.data
+                if(obj.responseInfo.responseCode == 1){
+                    this.initData();
+                    alert(obj.info)
+                }else if(obj.responseInfo.responseCode==101){
+                    alert(obj.responseInfo.responseMessage)
+                }else{
+                    alert(obj.responseInfo.responseMessage)
+                }
+            })
+
+        },
+        // test(){
+        //     var vm=this;
+        //     axios({
+        //         method:'get',
+        //         url:vm.BDMSUrl+'/mobile/selectManifestMain',
+        //         params:{
+        //             mid:this.mid,
+        //             mdid:this.mdid
+        //             // mdid:1899025,
+        //             // mid:2157
+        //         }         
+        //         }).then((response)=>{
+        //             var obj=response.data;
+        //         })
+        // },
+        initData(){
+            var vm=this;
+            var getUrl;
+            var apptype;
+            if(this.tokenId){
+                getUrl=vm.BDMSUrl+'mobile/ScanCommonManifestDetailResp.json'
+                apptype=2
+            }else{
+                getUrl=vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json'
+                apptype='';
+            }
+            axios({
+                method:'get',
+                url:getUrl,
+                // url:vm.BDMSUrl+'mobile/ScanCommonManifestDetailResp.json',
+                // url:vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json',
+                headers:{
+                    'tokenId':this.tokenId
+                },
                 params:{
                     bFrom:3,
                     mid:this.mid,
-                    mdid:this.mdid
+                    mdid:this.mdid,
+                    traceId:decodeURIComponent(this.traceId),
+                    appType:apptype
+                    // mdid:1899025,
+                    // mid:2157
                 }
             }).then((response)=>{
                 if(response.data.responseInfo.responseCode==1){
                     var obj=response.data;
+                    // this.haveToken=this.$route.query.haveToken=="false"?false:true;
                     if(obj.manifestDetailInfo!=null && obj.manifestDetailInfo!=undefined) {
                         this.manifestDetailInfo = obj.manifestDetailInfo;
                         this.manifestDetailInfo.updateTime=this.convertTimestampToString(this.manifestDetailInfo.updateTime);
@@ -172,6 +325,8 @@ export default {
                         this.summaryInfo = obj.summaryInfo;
                         this.summaryInfo.openWorkTime=this.convertTimestampToString(this.summaryInfo.openWorkTime);
                         this.summaryInfo.finishWorkTime=this.convertTimestampToString(this.summaryInfo.finishWorkTime);
+                        this.componentFinishCheck=this.summaryInfo.componentFinishCheck;
+                        this.operateStatus=this.summaryInfo.operateStatus
                         this.showSummaryInfo=true;
                     }
                 }
@@ -335,6 +490,9 @@ html{font-size:16px}
         .leftCancle{
             position: absolute;
             background:url('./image/leftCancle.png');
+            // background-repeat:no-repeat;
+            // background-size:1rem 1rem;
+            background-size:2rem 2rem;
             background-repeat:no-repeat;
             // background-size:1rem 0.6rem;
             width:1rem;
@@ -358,10 +516,11 @@ html{font-size:16px}
         box-sizing:border-box;
         border-bottom:1px solid #ccc;
         .text{
-            color:black;
-            font-weight:normal;
+            color:#333;
+            // font-weight:normal;
             font-family:"Microsoft YaHei";
             float: left;
+            font-weight: 800;
         }
         .downImg{
             width:1rem;height:1rem;
@@ -369,7 +528,7 @@ html{font-size:16px}
             float:right;
             background:url('./image/shouq.png');
             background-repeat:no-repeat;
-            background-size:1rem 0.6rem;
+            background-size:1rem 1rem;
             margin-top:0.6rem;
         }
         .upImg{
@@ -378,7 +537,7 @@ html{font-size:16px}
             float:right;
             background:url('./image/xial.png');
             background-repeat:no-repeat;
-            background-size:1rem 0.6rem;
+            background-size:1rem 1rem;
             margin-top:0.6rem;
            
         }
@@ -387,6 +546,21 @@ html{font-size:16px}
     // .information:after{content:'';clear:both;display:table;}
     .list{
         margin:0 0 0 1rem;background-color:#fff;font-size:0.8rem;
+        .changeBtn{
+            .pre{
+                width: 4rem;
+                height:1.8rem;
+                line-height:1.8rem;
+                margin-top:0.2rem;
+                border:1px solid #ccc;
+                display: inline-block;
+                // float:left;
+                text-align: center;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-right:1rem;
+            }
+        }
         .turnPage{
             width: 100%;height:2rem;
             .pre{
@@ -409,22 +583,60 @@ html{font-size:16px}
             // color:#333;
         }
         .turnPage .notusable{
-            color:#999; 
+            color:#666; 
         }
         .turnPage:after{content: '';clear:both;display:table;}
+        .listDocumentLi{
+            .listAll{
+                height: 4rem;
+                padding:0.5rem;
+                background:#f7f7f7;
+                margin:0.2rem;
+                .listL{
+                    float: left;
+                    img{
+                        height: 2.5rem;
+                        width: 2.5rem;
+                    }
+                }
+                .listR{
+                    float: right;
+                    width: 80%;
+                    // text-overflow:ellipsis;
+                    // overflow: hidden;
+                    // white-space: nowrap;
+                    text-align: left;
+                    .listRTop{
+                        word-break: break-all;
+                        color:#333333;
+                        height: 2rem;
+                        font-weight: 600;
+                    }
+                    .listRBottom{
+                        display: block;
+                        word-break: break-all;
+                        color:#989898;
+                        height: 2rem;
+                        font-size:0.7rem;
+                        margin-top:0.4rem;
+                    }
+                }
+            }
+        }
         .listLi{
             width:100%;margin:0;padding:0;border-bottom:1px solid #ccc;height: 2.2rem;line-height: 2.2rem;
             .listP{
                 display:inline-block;
-                color:black;
+                color:#333;
                 margin:0;
+                font-weight: 400;
                 // text-align: left;
                 float: left;
             }
             .listSpan{
                 display:inline-block;
                 width:68%;
-                color:#999;
+                color:#666;
                 text-align:right;
                 margin:0 0.5rem 0 0;
                 float:right;

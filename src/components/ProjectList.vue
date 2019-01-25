@@ -17,7 +17,7 @@
         <span class="bar-title">工程导航</span>
         <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
         <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
-        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
+        <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span>
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">

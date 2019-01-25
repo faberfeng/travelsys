@@ -1,6 +1,7 @@
 <template>
 <div id="main" style="width: 100%;overflow-x: hidden">
     <h3 class="componentDetail">所在清单选择</h3>
+    <!-- <span class="leftCancle" @click="backCancle()"></span> -->
     <div class="box" v-for="(main,index) in manifestMainList" :key="index">
         <table cellpadding="0" cellspacing="0" width="100%">
             <tr>
@@ -35,6 +36,8 @@ export default {
     data(){
         return{
             manifestMainList:[],
+            tokenId:'',
+            traceId:'',
             // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',
             // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file',
         }
@@ -44,6 +47,8 @@ export default {
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         this.mid=this.$route.query.mid;
         this.haveToken=this.$route.query.haveToken;
+        this.tokenId=this.$route.query.tokenId;
+        // this.haveToken=this.$route.query.haveToken=="false"?false:true;
         this.initData();
     },
     methods:{
@@ -54,11 +59,13 @@ export default {
                 url:vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json',
                 params:{
                     bFrom:1,
-                    mdid:this.mid,
+                    mdid:this.mid
+                    // mdid:1899025
                 }
             }).then((response)=>{
                 if(response.data){
                     var obj=response.data;
+                    this.traceId=obj.traceId;
                     if(obj.manifestMainList!=null && obj.manifestMainList!=undefined){
                         obj.manifestMainList.forEach((item)=>{
                             item.mStatus=vm.parseMStatus(item.mStatus);
@@ -74,11 +81,29 @@ export default {
                 path:'/mobileQindan/mobileGouJianDetail',
                 query:{
                     mid:mid,
-                    mdid:this.mid
+                    mdid:this.mid,
+                    haveToken:this.haveToken,
+                    tokenId:this.tokenId,
+                    traceId:encodeURIComponent(this.traceId)
                 }
             })
             //  window.location.href=this.BDMSUrl+"/mobile/selectManifestMain?mid="+mid+"&mdid="+2238;
              console.log(mid);
+        },
+        backCancle(){
+            window.opener = null; 
+            window.open('', '_self'); 
+            window.close()
+        //    var userAgent = navigator.userAgent;
+        //     if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") !=-1) {
+        //         window.location.href="about:blank";
+        //     }else if(userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1){
+        //         window.opener=null;window.open('about:blank','_self','').close();
+        //     }else {
+        //         window.opener = null;
+        //         window.open("about:blank", "_self");
+        //         window.close();
+        //     }
         },
          parseMStatus:function(mStatus){
                 // 施工现场
@@ -201,7 +226,21 @@ export default {
         font-size:1rem;
         font-family:"Microsoft YaHei";
         height:2.5rem;
-        line-height:2.5rem
+        line-height:2.5rem;
+        .leftCancle{
+            position: absolute;
+            background:url('./image/leftCancle.png');
+            // background-repeat:no-repeat;
+            // background-size:1rem 1rem;
+            background-size:2rem 2rem;
+            background-repeat:no-repeat;
+            // background-size:1rem 0.6rem;
+            width:1rem;
+            height:2rem;
+            display:inline-block;
+            top:0.1rem;
+            left:0.6rem;
+        }
     }
     .box{
         width:100%;
@@ -209,8 +248,8 @@ export default {
         box-sizing:border-box;
         border-bottom:1px solid #ccc;
         display:table;
-       td:nth-of-type(odd){width:6rem;white-space: nowrap }
-        td{padding:0.2rem;font-size: 1rem;}
+        td:nth-of-type(odd){width:6rem;white-space: nowrap }
+        td{padding:0.2rem;font-size: 0.8rem;}
         .button{display:table-cell;vertical-align:middle;text-align:center;width:20%;}
         button{padding:0.5rem;border:none;background-color:#0486d1;color:#fff;border-radius: 4px;}
     }
