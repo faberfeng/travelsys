@@ -27,7 +27,7 @@
                 <li class="pre" id="preQRCode">
                     <span>加入工程二维码</span>
                     <div class="QRCode">
-                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/10/5'" style="width:175px;height:175px;"/>
+                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/10/5'" style="width:155px;height:155px;"/>
                     </div>
                     <div class="QRCode1">
                          <div class="fulscreen" @click="fullSreen()"><img class="fulscreenImg" src="./images/fullSreen1.png">全屏</div>
@@ -75,7 +75,7 @@
             <el-dialog width="400px" :visible.sync="fullSreenShow" @close="fullSreenCancle()">
                 <div class="qrcodeBody">
                     <div>
-                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/15/9'" style="width:235px;height:235px;border-radius:4px;"/>
+                        <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/18/9'" style="width:235px;height:235px;border-radius:4px;"/>
                     </div>
                     <div style="font-size:18px;color:#333333;margin-top:10px;">打开手机浏览器扫码申请加入</div>
                     <div style="font-size:16px;color:#999999;margin-top:10px;">{{projectName}}</div>
@@ -271,7 +271,7 @@ export default {
         //下载二维码
         downQRCode(){
             var vm=this;
-            window.open(vm.BDMSUrlQRCode+'QRCode2/ApplyQr/'+vm.projId+'/27/15');
+            window.open(vm.BDMSUrlQRCode+'QRCode2/ApplyQr/'+vm.projId+'/32/15');
         },
         //全屏
         fullSreen(){

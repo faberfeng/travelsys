@@ -1862,7 +1862,14 @@ export default {
                     vm.getHolderByBuildId();
             }else{
                     vm.editDrawing.renameshow = true
-                    vm.getHolders()
+                    // vm.getHolders()
+                    this.getHoldersList=[];
+                    this.getHoldersList.push({ 
+                        "holderId": null,
+                        "holderName": "无",
+                        "holderType": "",
+                        "parentHolderId":null
+                    })
             }
 
         },

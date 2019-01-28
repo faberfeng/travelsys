@@ -37,6 +37,7 @@ export default new Vuex.Store({
         // applyIndexUrl:'https://bdms.arctron.cn/arctron-usercenter/apply/applyIndex',
         // messageUrl:'http://42.159.153.210:8079',
         // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"http://58.214.36.222:8080/bdms/#/qr",
         //以下是外网配置文件
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，

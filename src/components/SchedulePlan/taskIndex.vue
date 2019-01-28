@@ -2072,35 +2072,74 @@
       },
       //点击zk-tree获取id
       rowClick(row, rowIndex,$event) {
-        var userAgent = navigator.userAgent;//取得浏览器的userAgent字符串
-        //判断是什么浏览器
-        if (userAgent.indexOf("Firefox") > -1) {
-          console.log('ff')
-        } 
-        //判断是否chorme浏览器
-        if (userAgent.indexOf("Chrome") > -1){
-           console.log('chrome')
-        }
+        // var userAgent = navigator.userAgent;//取得浏览器的userAgent字符串
+        // //判断是什么浏览器
+        // if (userAgent.indexOf("Firefox") > -1) {
+        //   if(row.target._prevClass=="zk-table__cell-inner"){
+        //     row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        //   if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
+        //     row.target.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        //   if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+        //     row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        //   console.log('是火狐浏览器')
+        // } 
+        // //判断是否chorme浏览器
+        // if (userAgent.indexOf("Chrome") > -1){
+        //     if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+        //       row.path[4].childNodes.forEach((item)=>{
+        //           item.style.backgroundColor='white'
+        //         })
+        //       row.path[3].style.backgroundColor='#0081c2'
+        //     }
+        //     if(row.path[0]._prevClass=="zk-table__cell-inner"){
+        //         row.path[3].childNodes.forEach((item)=>{
+        //           item.style.backgroundColor='white'
+        //           })
+        //         row.path[2].style.backgroundColor='#0081c2'
+        //     }
+        //     if(row.path[0]._prevClass=="zk-table__body-cell zk-table--border-cell"){
+        //         row.path[2].childNodes.forEach((item)=>{
+        //               item.style.backgroundColor='white'
+        //             })
+        //           row.path[1].style.backgroundColor='#0081c2'
+        //     }
+        //    console.log('是谷歌浏览器')
+        // }
         console.log(row);
-       
-        if(row.path[0]._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
-          row.path[4].childNodes.forEach((item)=>{
+        {
+          if(row.target._prevClass=="zk-table__cell-inner"){
+            row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
             })
-          row.path[3].style.backgroundColor='#0081c2'
+            row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+          }
+          if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
+            row.target.parentElement.parentElement.childNodes.forEach((item)=>{
+              item.style.backgroundColor='white'
+            })
+            row.target.parentElement.style.backgroundColor='#0081c2'
+          }
+          if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+            row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+              item.style.backgroundColor='white'
+            })
+            row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+          }
         }
-         if(row.path[0]._prevClass=="zk-table__cell-inner"){
-            row.path[3].childNodes.forEach((item)=>{
-               item.style.backgroundColor='white'
-              })
-            row.path[2].style.backgroundColor='#0081c2'
-        }
-        if(row.path[0]._prevClass=="zk-table__body-cell zk-table--border-cell"){
-            row.path[2].childNodes.forEach((item)=>{
-                  item.style.backgroundColor='white'
-                })
-              row.path[1].style.backgroundColor='#0081c2'
-        }
+       
+        
 
         //如何是火狐浏览器，兼容图表选中问题
         

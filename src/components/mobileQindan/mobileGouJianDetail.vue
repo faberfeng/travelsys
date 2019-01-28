@@ -66,7 +66,7 @@
                 <div class="listDocumentLi"  v-for="(document,index) in documentList" :key="index">
                     <div class="listAll" @click="viewFile(document.filePath)">
                         <div class="listL">
-                            <img :src="require('./image/icon/'+document.fileExtension.toUpperCase()+'.png')"> 
+                            <img :src="require('./image/icon/'+fileIconChange(document.fileExtension.toUpperCase())+'.png')"> 
                         </div>
                         <div class="listR">
                             <span class="listRTop">{{document.fileName}}</span>
@@ -139,6 +139,7 @@ export default {
             haveToken:false,
             tokenId:'',
             traceId:'',
+            bFromValue:'',
             // BDMSUrl:'http://10.252.26.240:8080/h2-bim-project/',
             // QJFileManageSystemURL:'http://10.252.26.240:8080/qjbim-file',
         }
@@ -151,6 +152,7 @@ export default {
         this.mdid=this.$route.query.mdid;
         this.traceId=this.$route.query.traceId;
         vm.tokenId=this.$route.query.tokenId;
+        vm.bFromValue=this.$route.query.bFrom;
         // this.haveToken=this.$route.query.haveToken;
         this.haveToken=this.$route.query.haveToken=="false"?false:true;
         
@@ -190,6 +192,16 @@ export default {
                 $(target).addClass("downImg").removeClass("upImg");
             }
             node.toggle();
+        },
+        fileIconChange(val){
+            var vm = this
+            // console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
         },
         backCancle(){
             this.$router.back(-1);
@@ -272,12 +284,46 @@ export default {
             var vm=this;
             var getUrl;
             var apptype;
+            var paramList;
             if(this.tokenId){
                 getUrl=vm.BDMSUrl+'mobile/ScanCommonManifestDetailResp.json'
-                apptype=2
+                apptype=2;
+                if(this.bFromValue==1){
+                    paramList={
+                        bFrom:this.bFromValue,
+                        mdid:this.mdid,
+                        // traceId:decodeURIComponent(this.traceId),
+                        // appType:apptype
+                    }
+                }else if(this.bFromValue==3){
+                    paramList={
+                        bFrom:this.bFromValue,
+                        mid:this.mid,
+                        mdid:this.mdid,
+                        traceId:decodeURIComponent(this.traceId),
+                        appType:apptype
+                    }
+                }
+
             }else{
                 getUrl=vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json'
                 apptype='';
+                if(this.bFromValue==1){
+                    paramList={
+                        bFrom:this.bFromValue,
+                        mdid:this.mdid,
+                        // traceId:decodeURIComponent(this.traceId),
+                        // appType:apptype
+                    }
+                }else if(this.bFromValue==3){
+                    paramList={
+                        bFrom:this.bFromValue,
+                        mid:this.mid,
+                        mdid:this.mdid,
+                        traceId:decodeURIComponent(this.traceId),
+                        appType:apptype
+                    }
+                }
             }
             axios({
                 method:'get',
@@ -287,15 +333,14 @@ export default {
                 headers:{
                     'tokenId':this.tokenId
                 },
-                params:{
-                    bFrom:3,
-                    mid:this.mid,
-                    mdid:this.mdid,
-                    traceId:decodeURIComponent(this.traceId),
-                    appType:apptype
-                    // mdid:1899025,
-                    // mid:2157
-                }
+                params:paramList
+                // {
+                //     bFrom:this.bFromValue,
+                //     mid:this.mid,
+                //     mdid:this.mdid,
+                //     traceId:decodeURIComponent(this.traceId),
+                //     appType:apptype
+                // }
             }).then((response)=>{
                 if(response.data.responseInfo.responseCode==1){
                     var obj=response.data;

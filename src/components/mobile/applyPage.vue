@@ -57,7 +57,8 @@
     created() {
       this.baseUrl = this.$store.state.BDMSUrl;;
       let url = window.location.href;
-      let strs = url.split("/");
+      let urls = url.split("?");
+      let strs = urls[0].split("/");
       let projId = strs[strs.length - 1];
       this.projId = projId;
       this.getProjectinfo(projId);

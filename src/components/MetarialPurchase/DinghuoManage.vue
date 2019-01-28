@@ -1,6 +1,11 @@
 
 <template>
     <div id="dinghuo">
+        <form id="print-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" name="print-qrcode"  target="printLabel">
+         <!-- target="printLabel" -->
+            <input type="hidden" name="p" ref="labelContent" id="labelContent" value="">
+        </form>
+        <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe>
         <div class="topHeader">
             <div class="purchaseNav">
                 <!-- <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
@@ -659,6 +664,8 @@ export default {
             selectionHint:false,
             isVerify:true,
             dataProfiling:{},
+            qrShareUrl:'',
+            returnLabelUrl:'',
         }
     },
     watch:{
@@ -675,6 +682,7 @@ export default {
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         this.BDMSUrl = this.$store.state.BDMSUrl;
+        this.qrShareUrl=this.$store.state.qrShareUrl;
         this.projectName = localStorage.getItem('projectName');
          this.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
@@ -1691,6 +1699,7 @@ export default {
                             mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
                             mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
                         })
+                        console.log(this.biaoqianInfo,'this.biaoqianInfo');
                     }
                 }else{
                     alert(response.data.msg);
@@ -1707,7 +1716,46 @@ export default {
         },
         //打印当前标签页
         printLabelList(){
-            alert('已向打印机发送请求！');
+            var vm = this
+            var datas = '['
+            var tabelTitle = vm.projectName + '项目物资清单标签'
+            var keyList = '["清单ID","订单名称","生成方式","业务来源","创建用户","创建时间","明细数量"]'
+            // console.log(vm.relaList1,'清单9d')
+            // vm.biaoqianInfo.forEach((item,i)=>{})
+                var valueList = '["' + (vm.biaoqianInfo.pkId ? vm.biaoqianInfo.pkId : "") + '","'
+                    + (vm.selectObject.orderTitle ? vm.selectObject.orderTitle : "") + '","' + (vm.biaoqianInfo.mGSource_ ? vm.biaoqianInfo.mGSource_ : "") + '","'
+                    + (vm.biaoqianInfo.mBSource_ ? vm.biaoqianInfo.mBSource_ : "") + '","' + (vm.biaoqianInfo.creator ? vm.biaoqianInfo.creator : "") + '","' +
+                    (vm.biaoqianInfo.createTime ? new Date(vm.biaoqianInfo.createTime).toLocaleString() : "") + '","' 
+                    + (vm.biaoqianInfo.manifestDetailCount ? vm.biaoqianInfo.manifestDetailCount : "") + '"]'
+                var data = '{"Title":"' + tabelTitle + '","LabelType":"general","Code":"' +
+                    vm.changeUrl(vm.qrShareUrl+'/QR-QD-' + vm.addZero(vm.biaoqianInfo.pkId, 7))+
+                    '","KeyList":' + keyList + ',"ValueList":' + valueList + '}'
+                datas += data
+                // if (i < vm.biaoqianInfo.length - 1) datas += ','
+            
+            datas += ']'
+            console.log(datas,'data000');
+            vm.$refs.labelContent.value = datas
+            $('#print-qrcode').submit()
+           vm.$message({
+                type:'success',
+                message:'已向打印机发送请求'
+            })
+        },
+        changeUrl(val){
+            var vm=this;
+            $.ajax({
+            url:'http://bimqr.cn/Public/GetShortUrl',
+            type:'GET',
+            data:{
+                sourceUrl:encodeURIComponent(val)
+            },
+            async:false, //同步
+            success:function(response){
+                vm.returnLabelUrl=response.obj.short_url;
+            }
+            })
+            return vm.returnLabelUrl;
         },
         biaoqianCLose(){
             this.isbiaoqianshow = false;
@@ -1816,6 +1864,9 @@ export default {
 </script>
 <style lang="less">
 #dinghuo{
+     #print-qrcode{
+            display: none;
+    }
     ::-webkit-scrollbar{width:0px}//隐藏滚动条
     .content-hidden {
         display: none;               

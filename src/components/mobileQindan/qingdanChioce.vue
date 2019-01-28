@@ -57,9 +57,14 @@ export default {
             axios({
                 method:'get',
                 url:vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json',
+                // headers:{
+                // },
                 params:{
                     bFrom:1,
-                    mdid:this.mid
+                    mdid:this.mid,
+                    // traceId:'',
+                    // mid:'',
+                    // appType:'',
                     // mdid:1899025
                 }
             }).then((response)=>{
@@ -71,6 +76,19 @@ export default {
                             item.mStatus=vm.parseMStatus(item.mStatus);
                         })
                         vm.manifestMainList=obj.manifestMainList
+                    }
+                    if(obj.elementInfo){
+                        this.$router.push({
+                            path:'/mobileQindan/mobileGouJianDetail',
+                            query:{
+                                // mid:mid,
+                                mdid:this.mid,
+                                haveToken:this.haveToken,
+                                tokenId:this.tokenId,
+                                traceId:encodeURIComponent(this.traceId),
+                                bFrom:1
+                            }
+                        })
                     }
                     console.log(vm.manifestMainList,'vm.manifestMainList');
                 }
@@ -84,7 +102,8 @@ export default {
                     mdid:this.mid,
                     haveToken:this.haveToken,
                     tokenId:this.tokenId,
-                    traceId:encodeURIComponent(this.traceId)
+                    traceId:encodeURIComponent(this.traceId),
+                    bFrom:3
                 }
             })
             //  window.location.href=this.BDMSUrl+"/mobile/selectManifestMain?mid="+mid+"&mdid="+2238;

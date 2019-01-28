@@ -17,7 +17,7 @@
         <span class="bar-title">工程导航</span>
         <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
         <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
-        <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span>
+        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
@@ -90,9 +90,10 @@
       <div v-if="show1" class="amap-page-container">
         <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="mapCenter" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
-            <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :events="marker.events" :draggable="true" :title="marker.projName"  ></el-amap-marker>
+            <el-amap-marker v-for="(marker,index1) in markers" :vid="index1"  :key="index1" :position="marker.position" :events="marker.events" :template="marker.template" :offset="marker.offset" :draggable="true" :title="marker.projName"  ></el-amap-marker>
+            <el-amap-marker v-for="(marker) in markers" :vid="marker.projId" :key="marker.projId" :position="marker.position" :events="marker.events" :draggable="true" :title="marker.projName"  ></el-amap-marker>
             <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible" :template="window.content"  ></el-amap-info-window>
-            <el-amap-text style="color:white;background:#ccc;font-size:16px;" v-for="text in markers" :key="text.projId" :text="text.projName" :offset="text.offset" :position="text.position" :events="text.events" ></el-amap-text>
+            <!-- <el-amap-text style="color:white;background:#797979;font-size:16px;" v-for="text in markers" :key="text.projId" :text="text.projName" :offset="text.offset" :position="text.position" :events="text.events" ></el-amap-text> -->
             <!-- <el-amap-info-window  v-for="(item,index) in windows" :key="index" :position="item.position" :visible="item.visible1"  :template="item.template1"></el-amap-info-window> -->
         </el-amap>
       </div>
@@ -455,10 +456,10 @@ export default {
         searchMapCenter:[0, 0],
         events: {
           init: (o) => {
-            console.log(o.getCenter())
-            console.log(this.$refs.map.$$getInstance())
+            // console.log(o.getCenter())
+            // console.log(this.$refs.map.$$getInstance())
             o.getCity(result => {
-              console.log(result)
+              // console.log(result)
             })
           },
           'moveend': () => {
@@ -466,7 +467,7 @@ export default {
           'zoomchange': () => {
           },
           'click': (e) => {
-            console.log(e,'出来');
+            // console.log(e,'出来');
           }
         },
         plugin: ['ToolBar', {
@@ -529,7 +530,7 @@ export default {
   },
   methods:{
       onSearchResult(pois) {
-        console.log(pois,'pois');
+        // console.log(pois,'pois');
           let latSum = 0;
           let lngSum = 0;
           if (pois.length > 0) {
@@ -546,7 +547,7 @@ export default {
             };
             this.mapCenter = [center.lng, center.lat];
           }
-          console.log(this.mapCenter,'this.mapCenter');
+          // console.log(this.mapCenter,'this.mapCenter');
       },
       changeStyle(){
         var vm = this
@@ -576,6 +577,7 @@ export default {
         this.show2=false;
         this.show0=false;
         this.show1=true;
+        // console.log(document.getElementsByClassName('amap-overlay-text-container'),'样式试试');
       },
       changeBrandStyle(){
         var vm=this;
@@ -626,6 +628,43 @@ export default {
             }).then((response)=>{
                 if(response.data.rt != 0){
                   vm.listData = response.data.rt;
+                  vm.listData.forEach((item)=>{
+                    if(item.overviewList){
+                      if(item.overviewList.length==1){
+                        item.overviewList[0].viewKey=item.overviewList[0].viewKey+':';
+                           Object.assign(item,{
+                                site1:item.overviewList[0],
+                                site2:{'viewKey':'','viewVal':''},
+                                site3:{'viewKey':'','viewVal':''},
+                            })
+                      }else if(item.overviewList.length==2){
+                        item.overviewList[0].viewKey=item.overviewList[0].viewKey+':';
+                        item.overviewList[1].viewKey=item.overviewList[1].viewKey+':';
+                         Object.assign(item,{
+                                site1:item.overviewList[0],
+                                site2:item.overviewList[1],
+                                site3:{'viewKey':'','viewVal':''},
+                            })
+                      }else if(item.overviewList.length>=3){
+                        item.overviewList[0].viewKey=item.overviewList[0].viewKey+':';
+                        item.overviewList[1].viewKey=item.overviewList[1].viewKey+':';
+                        item.overviewList[2].viewKey=item.overviewList[2].viewKey+':';
+                         Object.assign(item,{
+                                site1:item.overviewList[0],
+                                site2:item.overviewList[1],
+                                site3:item.overviewList[2]
+                            })
+                      }
+                    }else{
+                          Object.assign(item,{
+                                    site1:{'viewKey':'','viewVal':''},
+                                    site2:{'viewKey':'','viewVal':''},
+                                    site3:{'viewKey':'','viewVal':''},
+                                })
+                    }
+                    
+                  });
+                  // console.log(vm.listData,'vm.listData00000');
                   vm.getSiteStr = response.data.rt;
                   var projIds=[];
                   vm.listData.forEach((num)=>{
@@ -633,7 +672,7 @@ export default {
                   })
                   vm.getPosition(projIds)
                   // var vm=this;
-                  console.log(projIds,'projIds');
+                  // console.log(projIds,'projIds');
                
                 }
                 if(response.data.rt==null){
@@ -718,8 +757,8 @@ export default {
               this.getPositionList.forEach((item)=>{
                   getPositionProjId.push(item.projectId)
               })
-              console.log(getPositionProjId,'getPositionProjId');
-              console.log(this.getPositionList,'this.getPositionList');
+              // console.log(getPositionProjId,'getPositionProjId');
+              // console.log(this.getPositionList,'this.getPositionList');
               // Array.prototype.remove = function(val) { 
               //     var index = this.indexOf(val); 
               //     if (index > -1) { 
@@ -733,14 +772,14 @@ export default {
               vm.listData.forEach((item)=>{
                 vm.getPositionList.forEach((val)=>{
                   if(item.projId==val.projectId){
-                    console.log(item,'item000');
+                    // console.log(item,'item000');
                     getSiteString.push(item);
                       // vm.getSiteStr.remove(item)
                   }
                 })
               })
               differentData=this.getArrDifference(vm.listData,getSiteString);
-              console.log(differentData,'differentData');
+              // console.log(differentData,'differentData');
               if(differentData.length!=0){
                 var num=1/10000000;
                 
@@ -809,20 +848,21 @@ export default {
                       }
                     })
                   })
-                  console.log(vm.listDataList,'地点返回信息');
+                  // console.log(vm.listDataList,'地点返回信息');
                   let markers = [];
                   let windows = [];
 
                   // let num = 10;
                   let self = this;
-                  console.log(this.listDataList,'这是什么值')
+                  // console.log(this.listDataList,'这是什么值')
 
                   for (let i = 0 ; i < this.listDataList.length ; i ++) {
                     markers.push({
                       projId:this.listDataList[i].baseInformation.projId,
                       projName:this.listDataList[i].baseInformation.projName,
                       position: [this.listDataList[i].siteData.geoX,this.listDataList[i].siteData.geoY],
-                      offset: [0, -45],
+                      template:`<div style="width:140px;height:28px;border:1px solid #797979;font-size:14px;border-radius:2px;line-height:28px;color:white;background:#797979;padding:2px 6px;text-overflow:ellipsis;overflow:hidden;white-space:nowarp">${this.listDataList[i].baseInformation.projName}</div>`,
+                      offset: [-70, -68],
                       events: {
                         click() {
                           self.windows.forEach(window => {
@@ -839,9 +879,9 @@ export default {
                           });
                         },
                         dragend: (e) => {
-                          console.log('---event---: dragend')
-                          console.log([e.lnglat.lng, e.lnglat.lat]);
-                          console.log(e,'拖动的标记1');
+                          // console.log('---event---: dragend')
+                          // console.log([e.lnglat.lng, e.lnglat.lat]);
+                          // console.log(e,'拖动的标记1');
                           this.updatePosition(this.listDataList[i].baseInformation.projId,e.lnglat.lng,e.lnglat.lat);
                         }
                       }
@@ -851,17 +891,21 @@ export default {
                       position: [this.listDataList[i].siteData.geoX,this.listDataList[i].siteData.geoY],
                       // content: `<div class="prompt">${ this.listDataList[i].baseInformation.projCode }</div><button @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired},${this.listDataList[i].baseInformation.projName})">进入工程</button>`,
                       // content: `<div class="prompt">${ this.listDataList[i].baseInformation.projCode }</div><button @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired},${this.listDataList[i].baseInformation.projName})">进入工程</button>`,
-                      content:`<div style="width:370px;height:195px;background:white;padding:8px;"><div style="font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;border-bottom:1px solid #ccc;">${ this.listDataList[i].baseInformation.projName }</div><p style="font-size:14px;color:#666666;padding-top:10px;"><span style="width:100px;">工程账号：${ this.listDataList[i].baseInformation.projCode }</span></br><span style="width:100px;">工程管理员：${ this.listDataList[i].baseInformation.projManager}</span><br><span style="width:100px;">使用情况：${ this.listDataList[i].baseInformation.expired==false?'使用中':'已到期'}</span></p><button style="display:block;border:1px solid #ccc;width:93px;height:26px;background:white;margin-top:10px;cursor:pointer;color:#999999;"   @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired})">进入工程</button></div>`,
+                      // <span style="width:100px;>${this.listDataList[i].baseInformation.overviewList[0].viewKey}：${this.listDataList[i].baseInformation.overviewList[0].viewVal}</span>
+                      // <div v-for="(item,index) in ${this.listDataList[i].baseInformation.overviewList}" ><span v-text="item.viewKey"></span><span v-text="item.viewVal"></span></div>
+
+                      // <span style="width:100px;">${ this.listDataList[i].baseInformation.site1.viewKey}：${ this.listDataList[i].baseInformation.site1.viewVal}</span><br>
+                      content:`<div style="width:370px;height:195px;background:white;padding:8px;"><div style="font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;border-bottom:1px solid #ccc;">${ this.listDataList[i].baseInformation.projName }</div><p style="font-size:14px;color:#666666;padding-top:10px;"><span style="width:100px;">工程账号：${ this.listDataList[i].baseInformation.projCode }</span></br><span style="width:100px;">工程管理员：${ this.listDataList[i].baseInformation.projManager}</span><br><span style="width:100px;">${ this.listDataList[i].baseInformation.site1.viewKey} ${ this.listDataList[i].baseInformation.site1.viewVal}</span><br><span style="width:100px;">${ this.listDataList[i].baseInformation.site2.viewKey}${ this.listDataList[i].baseInformation.site2.viewVal}</span><br><span style="width:100px;">${ this.listDataList[i].baseInformation.site3.viewKey} ${ this.listDataList[i].baseInformation.site3.viewVal}</span><br><span style="width:100px;">使用情况：${ this.listDataList[i].baseInformation.expired==false?'使用中':'已到期'}</span></p><button style="display:block;border:1px solid #ccc;width:93px;height:26px;background:white;margin-top:10px;cursor:pointer;color:#999999;"   @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired})">进入工程</button></div>`,
                       visible: false,
                       visible1: true,
-                      template1:`<div style="width:200px;font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;>${ this.listDataList[i].baseInformation.projName }</div>`
+                      template1:`<div style="width:370px;height:195px;background:white;padding:8px;"><div style="font-size:18px;color:black;font-weight:bold;height:30px;line-height:30px;border-bottom:1px solid #ccc;">${ this.listDataList[i].baseInformation.projName }</div><p style="font-size:14px;color:#666666;padding-top:10px;"><span style="width:100px;">工程账号：${ this.listDataList[i].baseInformation.projCode }</span></br><span style="width:100px;">工程管理员：${ this.listDataList[i].baseInformation.projManager}</span><br><span style="width:100px;">使用情况：${ this.listDataList[i].baseInformation.expired==false?'使用中':'已到期'}</span><span></span></p><button style="display:block;border:1px solid #ccc;width:93px;height:26px;background:white;margin-top:10px;cursor:pointer;color:#999999;"   @click="selectProjectMap(${this.listDataList[i].baseInformation.projId},${this.listDataList[i].baseInformation.expired})">进入工程</button></div>`
                     });
                   }
 
                   this.markers = markers;
                   this.windows = windows;
-                  console.log(this.markers,'this.markers');
-                  console.log(this.windows,'this.windows');
+                  // console.log(this.markers,'this.markers');
+                  // console.log(this.windows,'this.windows');
               }
               
             }else{
@@ -913,7 +957,7 @@ export default {
                           lng: lngSum / pois.length,
                           lat: latSum / pois.length
                         };
-                        console.log(center.lng, center.lat,'center.lng, center.lat')
+                        // console.log(center.lng, center.lat,'center.lng, center.lat')
                         siteData = [center.lng, center.lat];
                         return siteData
                       }
@@ -942,7 +986,7 @@ export default {
             var vm = this;
             localStorage.setItem('projId',id)
             localStorage.setItem('projName',name)
-            console.log(vm.$router,'路由111')
+            // console.log(vm.$router,'路由111')
             vm.$router.push({
               path:`/home/projHome/${id}`,
               query: { firstView: 'Y' }
@@ -950,7 +994,7 @@ export default {
           }
         },
         selectProjectMap(id,expired){
-          console.log(id,expired);
+          // console.log(id,expired);
           if(expired){
                this.$message({
                 message: '项目已过期！',
@@ -959,8 +1003,8 @@ export default {
           }
           else{
             var vm = this;
-            console.log('Jin')
-            console.log(id,'id000')
+            // console.log('Jin')
+            // console.log(id,'id000')
             // window.location.herf=this.shareUrl+`/home/projHome/${id}`
             localStorage.removeItem("projId");
             window.open(this.shareUrl+'#/home/projHome/'+id,"_self");

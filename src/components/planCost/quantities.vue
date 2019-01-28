@@ -517,7 +517,7 @@
                         <span class="upImgText">{{duliProject.fileName}}</span> 
                         <span class="updataImageSpan">
                             <button @click="selectfile" class="upImgBtn">浏览</button>
-                            <input class="upInput"  type="file"  @change="fileChanged" ref="file" multiple="multiple">
+                            <input class="upInput"  type="file"  @change="fileChanged" id="fileInfoId" ref="file" multiple="multiple">
                         </span>
                     </div>
                     <div class="worklist">
@@ -573,7 +573,7 @@
                         <span class="upImgText">{{viewProjectDetail.fileName}}</span>
                         <span class="updataImageSpan">
                             <button @click="selectimportfile" class="upImgBtn">选择文件</button>
-                            <input class="upInput"  type="file"  @change="selectfileChanged" ref="fileimport" multiple="multiple">
+                            <input class="upInput"  type="file"  @change="selectfileChanged" id="fileInfo" ref="fileimport" multiple="multiple">
                         </span> 
                     </div>
                     <div class="worklist">
@@ -1615,6 +1615,7 @@ export default {
                     }
                 })
             }
+            document.getElementById('fileInfoId').value="";
         },
         //独立工程量清单 识别数据
         verifiedData(){
@@ -1676,6 +1677,7 @@ export default {
                     }
                 })
             }
+            document.getElementById('fileInfoId').value="";
         },
         //取消导入
         importExcelCancel(){
@@ -1985,6 +1987,7 @@ export default {
                     }
                 })
             }
+            document.getElementById('fileInfo').value="";
         },
         //校验导入单价
         importPriceSure(){
@@ -2037,9 +2040,11 @@ export default {
                     alert(response.data.msg);
                 }
             })
+            document.getElementById('fileInfo').value="";
         },
         datadistinguishCancel(){
             this.viewProjectDetail.datadistinguishShow = false;
+            document.getElementById('fileInfo').value="";
         },
         importPriceCancel(){
             this.viewProjectDetail.sheetName ='';

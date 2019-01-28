@@ -66,7 +66,7 @@
                 <div class="listDocumentLi"  v-for="(document,index) in documentList" :key="index">
                     <div class="listAll" @click="viewFile(document.filePath)">
                         <div class="listL">
-                            <img :src="require('./image/icon/'+document.fileExtension.toUpperCase()+'.png')"> 
+                            <img :src="require('./image/icon/'+fileIconChange(document.fileExtension.toUpperCase())+'.png')"> 
                         </div>
                         <div class="listR">
                             <span class="listRTop">{{document.fileName}}</span>
@@ -226,6 +226,16 @@ export default {
     },
 
     methods:{
+        fileIconChange(val){
+            var vm = this
+            // console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
+        },
         viewFile(val){
             window.open(val);
         },
@@ -267,9 +277,9 @@ export default {
                     id:this.mid,
                 }
             }).then((response)=>{
-                if(response.data.responseInfo.responseCode==1){
+                // response.data.responseInfo.responseCode==1
+                if(response.data.responseInfo){
                     var obj=response.data;
-                   
                     // console.log(typeof(this.haveToken));
                     if(obj.manifestMainInfo!=null && obj.manifestMainInfo!=undefined) {
                         this.manifestMainInfo = obj.manifestMainInfo;
@@ -372,7 +382,7 @@ export default {
                 method:'get',
                 url:this.BDMSUrl+'/mobile/QjPageManifestDetailInfo.json',
                 params:{
-                    id:2094,
+                    id:this.mid,
                     qocIndex:this.page
                 }
             }).then((response)=>{
