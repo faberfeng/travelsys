@@ -89,8 +89,8 @@
                                 <p  class="clearfix" style="margin: 7px 0 10px;text-align:left;">
                                     <span  class="title-list" v-text="'明细总数：'+pageDetial.total"></span>
                                     <span class="item-btn clearfix">
-                                        <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
-                                        <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label>
+                                        <!-- <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
+                                        <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label> -->
                                         <label class="item-btn-icon icon-2" @click="showLabel()">全部标签</label>
                                         <label class="item-btn-icon icon-3" @click="showLabelHeader()">显示列</label>
                                     </span>
@@ -198,8 +198,8 @@
                                     <span  class="title-list" v-text="'未完工：'+pageDetial.total"></span>
                                     <span  class="title-list" v-text="'完工比例：'+pageDetial.total"></span>
                                     <span class="item-btn clearfix">
-                                        <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
-                                        <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label>
+                                        <!-- <label class="item-btn-icon icon-0" @click="changeShowType(true)">逐个显示</label>
+                                        <label class="item-btn-icon icon-1" @click="changeShowType(false)">合并显示</label> -->
                                         <label class="item-btn-icon icon-3" @click="showLabelHeader1()">显示列</label>
                                     </span>
                                 </p>
@@ -305,10 +305,10 @@
                                     <span  class="title-list" v-text="'总产值：'+pageDetial.total"></span>
                                     <span  class="title-list" v-text="'已完成：'+pageDetial.total"></span>
                                     <span class="item-btn clearfix">
-                                        <label class="item-btn-icon icon-1" >全选</label>
+                                        <!-- <label class="item-btn-icon icon-1" >全选</label>
                                         <label class="item-btn-icon icon-1" >全不选</label>
                                         <label class="item-btn-icon icon-1" >批量编辑</label>
-                                        <label class="item-btn-icon icon-1" >完成编辑</label>
+                                        <label class="item-btn-icon icon-1" >完成编辑</label> -->
                                         <label class="item-btn-icon icon-2" @click="showLabel()">全部标签</label>
                                         <label class="item-btn-icon icon-3" @click="showLabelHeader2()">显示列</label>
                                     </span>
@@ -1694,7 +1694,7 @@ export default Vue.component('common-list',{
             {
                 name:'开工确认',
                 show:true,
-                prop:'openWorkUser',
+                prop:'openWorkUser_value',
             },
             {
                 name:'完工时间',
@@ -1704,7 +1704,7 @@ export default Vue.component('common-list',{
              {
                 name:'完工确认',
                 show:true,
-                prop:'finishWorkUser',
+                prop:'finishWorkUser_value',
             }
         ],
         //明细产值
@@ -2374,6 +2374,7 @@ export default Vue.component('common-list',{
                 if(response.data.rt != null){
                     vm.pageLabelList.total = response.data.rt.total
                     vm.pageDetial.total = response.data.rt.total
+
                     if(isDialog == 1){
                         if(response.data.rt.rows != null){
                             vm.S_Label_quantitiesList = response.data.rt.rows
@@ -2386,6 +2387,8 @@ export default Vue.component('common-list',{
                             vm.S_quantitiesList.forEach((element,index) => {
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                                vm.$set(element,'openWorkUser_value',element.openWorkTime==null?'否':'是')//开工确认状态
+                                vm.$set(element,'finishWorkUser_value',element.finishWorkTime==null?'否':'是')//完工确认状态
                             });
                         }else{
                             vm.S_quantitiesList = [];
@@ -2397,6 +2400,8 @@ export default Vue.component('common-list',{
                             vm.S_quantitiesList.forEach((element,index) => {
                                 vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                                vm.$set(element,'openWorkUser_value',element.openWorkTime==null?'否':'是')//开工确认状态
+                                vm.$set(element,'finishWorkUser_value',element.finishWorkTime==null?'否':'是')//完工确认状态
                             });
                         }else{
                             vm.S_Label_quantitiesList = []

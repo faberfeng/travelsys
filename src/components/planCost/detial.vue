@@ -99,8 +99,8 @@
                         <i class="icon-right"></i>
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                        <span class="item-property " @click="screenLeft.show = true;screenLeft.item = 1">构<br>件</span>
-                        <span class="item-version " @click="screenLeft.show = true;screenLeft.item = 2">选<br>型</span>
+                        <span class="item-property" @click="screenLeft.show = true;screenLeft.item = 1">构<br>件</span>
+                        <span class="item-version" @click="screenLeft.show = true;screenLeft.item = 2">选<br>型</span>
                     </div>
             </div>
             <div v-show="screenLeft.show" v-if="screenLeft.item == 1" class="screenRight_1">
@@ -598,117 +598,117 @@
             width: 85%;
             position: relative;
             transition:  all ease .5s;
-             #center-selection{
-                // position: fixed;
-                // top: 115px;
-                // right: 225px;
-                // width: 25px;
-                // z-index: 100;
-                // transition: all ease .5s;
-                // background: #ffffff;
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                width: 25px;
-                border-right: 1px solid #cccccc;
-                .SH_right{
-                    // width: 25px;
-                    // height: 50px;
-                    width: 100%;
-                    height: 48px;
-                    border-left: 1px solid #cccccc;
-                    border-bottom: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    .icon-right{
-                        display: block;
-                        position: absolute;
-                        top: 19px;
-                        left: 6px;
-                        width: 14px;
-                        height: 14px;
-                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
-                        transition: all ease .5s;
-                        transform: rotateZ(0deg);
-                    }
-                }
-                .item-property{//目录
-                    display: block;
-                    width: 25px;
-                    height: 75px;
-                    background: #fafafa;
-                    padding-top:15px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom: -7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fff;
-                        border-top: 1px solid #cccccc;
-                        border-bottom: 1px solid #cccccc;
-                        -webkit-transform: skewY(30deg);
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }   
-                .item-version{//属性
-                    display: block;
-                    width: 25px;
-                    height: 55px;
-                    background: #fafafa;
-                    padding-top:12px;
-                    font-size: 12px;
-                    color: #666666; 
-                    text-align: center;
-                    border-left: 1px solid #cccccc;
-                    position: relative;
-                    cursor: pointer;
-                    &::after{
-                        display: block;
-                        position: absolute;
-                        bottom:-7px;
-                        width: 24px;
-                        height: 13px;
-                        background: #fafafa;
-                        border-bottom: 1px solid #cccccc;
-                        transform: skewY(30deg);
-                        content: '';
-                    }
-                }
-                .active-version{//中间 属性 高显
-                    .item-version{//属性
-                        background: #fff;
-                        color: #fc3439;
-                        z-index: 15;
-                        &::after{
-                            background: #fff;
-                        }
-                    }
-                    .item-property::after{//目录
-                        background: #fff;
-                    }
-                }
-                .active{//上边 目录 高显
-                    .item-property{
-                        background: #fff;
-                        color: #fc3439;
-                        &::after{
-                            background: #fafafa;
-                        }
-                    }
-                    .item-version{
-                        z-index: 15;
-                    }
-                }
-            }
+            //  #center-selection{
+            //     // position: fixed;
+            //     // top: 115px;
+            //     // right: 225px;
+            //     // width: 25px;
+            //     // z-index: 100;
+            //     // transition: all ease .5s;
+            //     // background: #ffffff;
+            //     position: absolute;
+            //     top: 0;
+            //     bottom: 0;
+            //     left: 0;
+            //     width: 25px;
+            //     border-right: 1px solid #cccccc;
+            //     .SH_right{
+            //         // width: 25px;
+            //         // height: 50px;
+            //         width: 100%;
+            //         height: 48px;
+            //         border-left: 1px solid #cccccc;
+            //         border-bottom: 1px solid #cccccc;
+            //         position: relative;
+            //         cursor: pointer;
+            //         .icon-right{
+            //             display: block;
+            //             position: absolute;
+            //             top: 19px;
+            //             left: 6px;
+            //             width: 14px;
+            //             height: 14px;
+            //             background: url('../ManageCost/images/right.png')no-repeat 0 0;
+            //             transition: all ease .5s;
+            //             transform: rotateZ(0deg);
+            //         }
+            //     }
+            //     .item-property{//目录
+            //         display: block;
+            //         width: 25px;
+            //         height: 75px;
+            //         background: #fafafa;
+            //         padding-top:15px;
+            //         font-size: 12px;
+            //         color: #666666; 
+            //         text-align: center;
+            //         border-left: 1px solid #cccccc;
+            //         position: relative;
+            //         cursor: pointer;
+            //         &::after{
+            //             display: block;
+            //             position: absolute;
+            //             bottom: -7px;
+            //             width: 24px;
+            //             height: 13px;
+            //             background: #fff;
+            //             border-top: 1px solid #cccccc;
+            //             border-bottom: 1px solid #cccccc;
+            //             -webkit-transform: skewY(30deg);
+            //             transform: skewY(30deg);
+            //             content: '';
+            //         }
+            //     }   
+            //     .item-version{//属性
+            //         display: block;
+            //         width: 25px;
+            //         height: 55px;
+            //         background: #fafafa;
+            //         padding-top:12px;
+            //         font-size: 12px;
+            //         color: #666666; 
+            //         text-align: center;
+            //         border-left: 1px solid #cccccc;
+            //         position: relative;
+            //         cursor: pointer;
+            //         &::after{
+            //             display: block;
+            //             position: absolute;
+            //             bottom:-7px;
+            //             width: 24px;
+            //             height: 13px;
+            //             background: #fafafa;
+            //             border-bottom: 1px solid #cccccc;
+            //             transform: skewY(30deg);
+            //             content: '';
+            //         }
+            //     }
+            //     .active-version{//中间 属性 高显
+            //         .item-version{//属性
+            //             background: #fff;
+            //             color: #fc3439;
+            //             z-index: 15;
+            //             &::after{
+            //                 background: #fff;
+            //             }
+            //         }
+            //         .item-property::after{//目录
+            //             background: #fff;
+            //         }
+            //     }
+            //     .active{//上边 目录 高显
+            //         .item-property{
+            //             background: #fff;
+            //             color: #fc3439;
+            //             &::after{
+            //                 background: #fafafa;
+            //             }
+            //         }
+            //         .item-version{
+            //             z-index: 15;
+            //         }
+            //     }
+            // }
             #containerMessage{
                 // padding-left:30px; 
                 padding-bottom: 65px;
@@ -1255,6 +1255,117 @@
                         text-overflow: ellipsis;
                         white-space: nowrap;
                         display: inline-block;
+                    }
+                }
+            }
+             #center-selection{
+                // position: fixed;
+                // top: 115px;
+                // right: 225px;
+                // width: 25px;
+                // z-index: 100;
+                // transition: all ease .5s;
+                // background: #ffffff;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 25px;
+                border-right: 1px solid #cccccc;
+                .SH_right{
+                    // width: 25px;
+                    // height: 50px;
+                    width: 100%;
+                    height: 48px;
+                    border-left: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    .icon-right{
+                        display: block;
+                        position: absolute;
+                        top: 19px;
+                        left: 6px;
+                        width: 14px;
+                        height: 14px;
+                        background: url('../ManageCost/images/right.png')no-repeat 0 0;
+                        transition: all ease .5s;
+                        transform: rotateZ(0deg);
+                    }
+                }
+                .item-property{//目录
+                    display: block;
+                    width: 25px;
+                    height: 75px;
+                    background: #fafafa;
+                    padding-top:15px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom: -7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fff;
+                        border-top: 1px solid #cccccc;
+                        border-bottom: 1px solid #cccccc;
+                        -webkit-transform: skewY(30deg);
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }   
+                .item-version{//属性
+                    display: block;
+                    width: 25px;
+                    height: 55px;
+                    background: #fafafa;
+                    padding-top:12px;
+                    font-size: 12px;
+                    color: #666666; 
+                    text-align: center;
+                    border-left: 1px solid #cccccc;
+                    position: relative;
+                    cursor: pointer;
+                    &::after{
+                        display: block;
+                        position: absolute;
+                        bottom:-7px;
+                        width: 24px;
+                        height: 13px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #cccccc;
+                        transform: skewY(30deg);
+                        content: '';
+                    }
+                }
+                .active-version{//中间 属性 高显
+                    .item-version{//属性
+                        background: #fff;
+                        color: #fc3439;
+                        z-index: 15;
+                        &::after{
+                            background: #fff;
+                        }
+                    }
+                    .item-property::after{//目录
+                        background: #fff;
+                    }
+                }
+                .active{//上边 目录 高显
+                    .item-property{
+                        background: #fff;
+                        color: #fc3439;
+                        &::after{
+                            background: #fafafa;
+                        }
+                    }
+                    .item-version{
+                        z-index: 15;
                     }
                 }
             }

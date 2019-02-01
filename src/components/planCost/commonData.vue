@@ -28,9 +28,9 @@
                     <th rowspan="1" :colspan="4+detailsHead.length-totalTitleNum" v-text="rcStyle.titleName" :style="[{'height':rcStyle.titleBorderHeight+'px'+'!important'}]" :class="[rcStyle.titleUseBorder==1?'userBorder':'']"></th>
                 </tr>
                 <tr  class="userList-thead" :style="{'backgroundColor':rcStyle.tableTitleBgColor,'fontSize':rcStyle.tableFontSize+'px',}">
-                    <!-- <th style="width:100px;" v-if="groupHead.monomer.length>0"></th>
+                    <th style="width:100px;" v-if="groupHead.monomer.length>0"></th>
                     <th style="width:100px;" v-if="groupHead.partition.length>0"></th>
-                    <th style="width:100px;" v-if="groupHead.floor.length>0"></th> -->
+                    <th style="width:100px;" v-if="groupHead.floor.length>0"></th>
                     <th v-for="(item,index) in detailsHead" :key="index+'_table'" v-text="item" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}"></th>
                     <th :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="displayTyle == 0">数量</th>
                     <th :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}">操作</th>
@@ -38,14 +38,14 @@
             </thead>
             <tbody :style="{'textAlign':rcStyle.tableAlign}">
                 <tr v-for="(val,index) in DatatableList" :key="index" :style="{'fontSize':rcStyle.tableFontSize+'px'}">
-                    <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
+                    <td colspan="1"  :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.monomer" :key="'monomer'+key">{{item.infoList[0]}}</td>
                     <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.partition" :key="'partition'+key">{{item.infoList[0]}}</td>
                     <td colspan="1" :style="{'backgroundColor':rcStyle.tableGroupBgColor,'height':rcStyle.tableRowHeight+'px'+'!important'}" v-if="index == 0" :rowspan="item.length" v-for="(item,key) in groupHead.floor" :key="'floor'+key">{{item.infoList[0]}}</td>
                     <td style="border-right:none;border-left: none;font-weight: bold;" v-for="(val_2,index_2) in val.level" :key="'kongge'+index_2" v-text="index_2==0?'小计':''"></td>
                     <td v-for="(val_1,index_1) in val.list" :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" :key="index_1" v-text="val_1" v-if="!(index_1 == val.list.length-1)"></td>
                     <td v-if="displayTyle == 0">{{JSON.parse(val.list[val.list.length-1]).length}}</td>
                     <!-- !(index_1 == val.list.length-1 && displayTyle == 0) -->
-                    <!-- <td v-for="(val_1,index_1) in val.list" :key="index_1" v-text="val_1"></td> -->
+                    <!-- <td v-for="(val_1,index_1) in val.list" :key="val_1" v-text="val_1"></td> -->
                     <td :style="{'height':rcStyle.tableRowHeight+'px'+'!important'}" >
                         <button  class="locationBtn actionBtn" title="定位" @click.stop="openLocation(val.list[val.list.length-1])"></button>
                     </td>
@@ -930,6 +930,7 @@ export default Vue.component('common-list',{
                                             element.length = ROW_GROUP_length
                                         if(element.groupLevel == 1){//单体
                                             vm.groupHead.monomer.push(element)
+                                            console.log(vm.groupHead,'vm.groupHead');
                                         }else if(element.groupLevel == 2){//分区
                                             vm.groupHead.partition.push(element)
                                         }else if(element.groupLevel == 3){//楼层

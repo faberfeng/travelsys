@@ -17,7 +17,7 @@
         <span class="bar-title">工程导航</span>
         <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
         <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
-        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
+        <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span>
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
@@ -577,6 +577,11 @@ export default {
         this.show2=false;
         this.show0=false;
         this.show1=true;
+        var projIds=[];
+        vm.listData.forEach((num)=>{
+          projIds.push(num.projId)
+        })
+        vm.getPosition(projIds)
         // console.log(document.getElementsByClassName('amap-overlay-text-container'),'样式试试');
       },
       changeBrandStyle(){
@@ -666,11 +671,11 @@ export default {
                   });
                   // console.log(vm.listData,'vm.listData00000');
                   vm.getSiteStr = response.data.rt;
-                  var projIds=[];
-                  vm.listData.forEach((num)=>{
-                    projIds.push(num.projId)
-                  })
-                  vm.getPosition(projIds)
+                  // var projIds=[];
+                  // vm.listData.forEach((num)=>{
+                  //   projIds.push(num.projId)
+                  // })
+                  // vm.getPosition(projIds)
                   // var vm=this;
                   // console.log(projIds,'projIds');
                
@@ -719,6 +724,11 @@ export default {
           }).then((response)=>{
             if(response.data.cd=='0'){
               vm.toProjectList();
+              var projIds=[];
+              vm.listData.forEach((num)=>{
+                projIds.push(num.projId)
+              })
+              vm.getPosition(projIds)
               // vm.getPosition(projectId);
             }else{
               
@@ -778,8 +788,9 @@ export default {
                   }
                 })
               })
+              console.log(getSiteString,'getSiteString00');
               differentData=this.getArrDifference(vm.listData,getSiteString);
-              // console.log(differentData,'differentData');
+              console.log(differentData,'differentData');
               if(differentData.length!=0){
                 var num=1/10000000;
                 
@@ -848,6 +859,14 @@ export default {
                       }
                     })
                   })
+                  // LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                  //   LatLngBounds bounds = null;
+                  //   for (int i = 0; i < size; i++){
+
+                  //   builder.include(LatLng);//把你所有的坐标点放进去
+                  //   }
+                  //   bounds = builder.build();
+                  //   new AMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,40));
                   // console.log(vm.listDataList,'地点返回信息');
                   let markers = [];
                   let windows = [];
@@ -861,7 +880,7 @@ export default {
                       projId:this.listDataList[i].baseInformation.projId,
                       projName:this.listDataList[i].baseInformation.projName,
                       position: [this.listDataList[i].siteData.geoX,this.listDataList[i].siteData.geoY],
-                      template:`<div style="width:140px;height:28px;border:1px solid #797979;font-size:14px;border-radius:2px;line-height:28px;color:white;background:#797979;padding:2px 6px;text-overflow:ellipsis;overflow:hidden;white-space:nowarp">${this.listDataList[i].baseInformation.projName}</div>`,
+                      template:`<div style="width:140px;height:28px;border:1px solid #797979;font-size:14px;border-radius:2px;line-height:28px;color:white;background:#797979;padding:0px 6px;text-overflow:ellipsis;overflow:hidden;white-space:nowarp">${this.listDataList[i].baseInformation.projName}</div>`,
                       offset: [-70, -68],
                       events: {
                         click() {
@@ -933,6 +952,12 @@ export default {
             if(response.data.cd=='0'){
               // this.getPositionList=response.data.rt;
               vm.toProjectList();
+              var projIds=[];
+              vm.listData.forEach((num)=>{
+                projIds.push(num.projId)
+              })
+              vm.getPosition(projIds)
+
             }else{
               
             }

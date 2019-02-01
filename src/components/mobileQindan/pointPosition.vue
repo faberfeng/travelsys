@@ -8,16 +8,17 @@
                 </div>
                 <div class="list">
                     <p class="listLi"><span class="listP">项目名称</span><span class="listSpan">{{securityCheckItem.itemName}}</span></p>
-                    <p class="listLi"><span class="listP">点位名称</span><span class="listSpan">{{checkPoint.name}}</span></p>
+                    <p class="listLi"><span class="listP">点位名称</span><span class="listSpan">{{currentPoint.name}}</span></p>
                     <p class="listLi"><span class="listP">检查频率</span><span class="listSpan">{{securityCheckItem.checkFrequency|checkFrequency}}</span></p>
                     <p class="listLi"><span class="listP">负责单位</span><span class="listSpan">{{securityCheckItem.respDeptName}}</span></p>
                     <p class="listLi"><span class="listP">负责人</span><span class="listSpan">{{securityCheckItem.respUserName}}</span></p>
                     <p class="listLi"><span class="listP">检查单位</span><span class="listSpan">{{securityCheckItem.checkDeptName}}</span></p>
-                    <p class="listLi"><span class="listP">当前状态</span><span class="listSpan">{{checkPoint.currCheckStatus|currentStatus}}</span></p>
-                    <p class="listLi" style="border-bottom:none;"><span class="listP">上次检查</span><span class="listSpan">{{checkPoint.expectCheckStatus|currentStatus}}</span></p>
+                    <p class="listLi"><span class="listP">当前状态</span><span class="listSpan">{{currentPoint.currCheckStatus|currentStatus}}</span></p>
+                    <p class="listLi" style="border-bottom:none;"><span class="listP">上次检查</span><span class="listSpan">{{currentPoint.expectCheckStatus|currentStatus}}</span></p>
                 </div>
+                <div class="list_bottom"></div>
             </div>
-            <div v-if="haveToken">
+            <div v-if="tokenId">
                 <div class="information" >
                     <span class="text">检查操作</span>
                     <span id="click1" class="upImg" @click="toggle($event)" ></span>
@@ -35,6 +36,7 @@
                         </span>
                     </div>
                 </div>
+                <div class="list_bottom"></div>
 
             </div>
             <div>
@@ -54,6 +56,7 @@
                     <p class="listLi"><span class="listP">检查人</span><span class="listSpan">{{checkPoint.checkUserName}}</span></p>
                     <p class="listLi"><span class="listP">检查时间</span><span class="listSpan">{{checkPoint.checkTime|timeChange}}</span></p>
                 </div>
+                <div class="list_bottom"></div>
             </div>
 
     </div>
@@ -67,6 +70,7 @@ export default {
         return{
             BDMSUrl:"",
             checkPoint:'',
+            currentPoint:'',
             securityCheckItem:'',
             mid:'',
             tokenId:'',
@@ -169,7 +173,11 @@ export default {
             }).then((response)=>{
                 if(response.data){
                     var obj=response.data;
-                    if(obj.responseInfo.responseCode==102){
+                    if(obj.responseInfo.responseCode==1){
+                        this.checkPoint=obj.checkPointRecord[0];
+                        console.log(this.checkPoint,'this.checkPoint00');
+                    }
+                    else if(obj.responseInfo.responseCode==102){
                         alert(obj.responseInfo.responseMessage)
                     }
                     console.log(obj,'记录');
@@ -178,24 +186,29 @@ export default {
         },
         changeStatus(status){
             var vm=this;
-            axios({
-                method:'get',
-                url:vm.BDMSUrl+'/mobile/updateSecurityStatus.json',
-                headers:{
-                    'tokenId':this.tokenId
-                },
-                params:{
-                    cpId:vm.mid,
-                    status:status,
-                    projId:vm.checkPoint.projId
-                }
-            }).then((response)=>{
-                if(response.data){
-                    
-                }
-            })
+            var re=confirm('是否执行当前操作');
+            if(re==true){
+                axios({
+                    method:'get',
+                    url:vm.BDMSUrl+'/mobile/updateSecurityStatus.json',
+                    headers:{
+                        'tokenId':this.tokenId
+                    },
+                    params:{
+                        cpId:vm.mid,
+                        status:status,
+                        projId:vm.currentPoint.projId,
+                        appType:1
+                    }
+                }).then((response)=>{
+                    if(response.data.responseInfo.responseCode==1){
+                        alert(response.data.responseInfo.responseMessage);
+                        this.initData()  
+                    }
+                })
+            }else{
 
-
+            }
         },
         initData(){
             var vm=this;
@@ -209,6 +222,7 @@ export default {
                 var obj=response.data;
                 if(response.data.responseInfo.responseCode==1){
                     this.checkPoint=obj.checkPoint[0];
+                    this.currentPoint=obj.checkPoint[0];
                     this.securityCheckItem=obj.securityCheckItem
                 }
                 console.log(obj,'obj00000');
@@ -277,7 +291,7 @@ export default {
         font-size: 0.8rem;
         padding:0 1rem;
         box-sizing:border-box;
-        border-bottom:1px solid #ccc;
+        border-bottom:1px solid #f5f5f5;
         .text{
             color:#333;
             // font-weight:normal;
@@ -312,9 +326,10 @@ export default {
         .changeBtn{
              .pre{
                 width: 4rem;
-                height:1.8rem;
-                line-height:1.8rem;
-                margin-top:0.2rem;
+                height:2rem;
+                line-height:2rem;
+                margin-top:0.4rem;
+                margin-bottom:0.4rem;
                 border:1px solid #ccc;
                 display: inline-block;
                 // float:left;
@@ -398,7 +413,7 @@ export default {
         //     }
         // }
         .listLi{
-            width:100%;margin:0;padding:0;border-bottom:1px solid #ccc;height: 2.2rem;line-height: 2.2rem;
+            width:100%;margin:0;padding:0;border-bottom:1px solid #f5f5f5;height: 2.2rem;line-height: 2.2rem;
             .listP{
                 display:inline-block;
                 color:#333;
@@ -419,6 +434,11 @@ export default {
                 overflow:hidden
             }
         }
+    }
+    .list_bottom{
+        width: 100%;
+        height: 1.2rem;
+        background: #f5f5f5;
     }
 
 }

@@ -1,6 +1,12 @@
 
 <template>
     <div id="fahuo">
+        <!-- <div id="GroupSelect" v-if="!showCommonList">
+             <select v-model="selectUser" placeholder="请选择" @change="groupChange" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in userGroup" :key="index" v-text="item.ugName"></option>
+            </select>
+            <i class="icon-sanjiao"></i>
+        </div> -->
         <div class="topHeader">
             <div class="purchaseNav">
                 <!-- <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
@@ -853,6 +859,41 @@ export default {
 <style lang="less">
 #fahuo{
     ::-webkit-scrollbar{width:0px}
+    #GroupSelect {
+            display: inline-block;
+            float: right;
+            margin-top:-40px;
+            margin-right:10px;
+            width: 168px;
+            height: 30px;
+            .inp-search {
+                width: 168px;
+                border-radius: 15px;
+                height: 30px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #fafafa;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                float: left;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .icon-sanjiao {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 19px;
+                right: 18px;
+            }
+    }
     .topHeader{
         box-sizing: border-box;
         float: left;

@@ -6,6 +6,12 @@
             <input type="hidden" name="p" ref="labelContent" id="labelContent" value="">
         </form>
         <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe>
+        <div id="GroupSelect" v-if="!showCommonList">
+             <select v-model="selectUser" placeholder="请选择" @change="groupChange" class="inp-search">
+                <option :value="item.ugId" v-for="(item,index) in userGroup" :key="index" v-text="item.ugName"></option>
+            </select>
+            <i class="icon-sanjiao"></i>
+        </div>
         <div class="topHeader">
             <div class="purchaseNav">
                 <!-- <router-link :to="'/metarialpurchase/productioncenter'" class="navItem">  
@@ -26,7 +32,7 @@
                 <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['navItem',{'navactive':item.isShow}]">        
                 </router-link>
             </div>
-            <div class="elselect" v-if="!showCommonList">
+            <!-- <div class="elselect" v-if="!showCommonList">
                 <el-select v-model="selectUser" placeholder="请选择" @change="groupChange">
                     <el-option
                     v-for="(item,index) in userGroup"
@@ -36,7 +42,7 @@
                     </el-option>
                 </el-select>
                 <label class="elselecttitle">群组:</label>
-            </div>
+            </div> -->
             <div class="pbody" v-if="!showCommonList">
                 <div class="pbodyleft">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -176,7 +182,7 @@
                                         <td v-text="item.count"></td>
                                         <td v-text="item.amount"></td>
                                         <td v-text="item.updateDateTime_"></td>
-                                        <td v-text="item.updateUserName"></td>
+                                        <td v-text="item.userName"></td>
                                         <td>
                                             <span class="biaoqianIcon" :title="'标签'" @click="tips(item)"></span>
                                             <span class="editdetail" :title="'明细'" @click="showDetialList(item,index)"></span>
@@ -1356,29 +1362,36 @@ export default {
             }
         },
         addListSure(){
-            this.addNewListShow = false;
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/order/add',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projId:this.projId,
-                    orderTitle:this.newListName,
-                    orderUgId:this.selectUser,
-                    supplyUgId:this.suppyModel
+            if(this.newListName==''){
+                this.$message({
+                    type:'info',
+                    message:'订单名称不能为空'
+                })
+            }else{
+                this.addNewListShow = false;
+                axios({
+                    method:'post',
+                    url:this.BDMSUrl+'project2/order/add',
+                    headers:{
+                        token:this.token
+                    },
+                    params:{
+                        projId:this.projId,
+                        orderTitle:this.newListName,
+                        orderUgId:this.selectUser,
+                        supplyUgId:this.suppyModel
 
-                }
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.getNoPlanList(this.selectUser);
-                    this.newListName = '';
-                    this.suppyModel = '';
-                }else{
-                    alert(response.data.msg);
-                }
-            })
+                    }
+                }).then(response=>{
+                    if(response.data.cd == 0){
+                        this.getNoPlanList(this.selectUser);
+                        this.newListName = '';
+                        this.suppyModel = '';
+                    }else{
+                        alert(response.data.msg);
+                    }
+                })
+            }
         },
         listClose(){
             this.addNewListShow = false;
@@ -1403,6 +1416,7 @@ export default {
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.getNoPlanList(this.selectUser);
+                        this.showDetail=true;
                     }else{
                         alert(response.data.msg);
                     }
@@ -1646,7 +1660,18 @@ export default {
         },
         //确认编辑
         editfukuanSure(){
-            if(this.editfukuan.amount != '' && this.editfukuan.price != '' && this.editfukuan.computerunit != ''){
+            var reg = /^[0-9]+.?[0-9]*$/;
+            if(!reg.test(this.editfukuan.amount)){
+                    this.$message({
+                        type:'info',
+                        message:'数量必须为数字'
+                    })
+            }else if(!reg.test(this.editfukuan.price)){
+                this.$message({
+                        type:'info',
+                        message:'单价必须为数字'
+                    })
+            } else if(this.editfukuan.amount != '' && this.editfukuan.price != '' && this.editfukuan.computerunit != ''){
                 let totalPrice = this.editfukuan.amount*this.editfukuan.price;
                 axios({
                     method:'post',
@@ -1863,6 +1888,16 @@ export default {
 }
 </script>
 <style lang="less">
+select.inp-search {  
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
+            /*很关键：将默认的select选择框样式清除*/  
+            appearance:none;  
+            -moz-appearance:none;  
+            -webkit-appearance:none;  
+            /*在选择框的最右侧中间显示小箭头图片*/  
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/  
+            padding-right: 14px;  
+        }
 #dinghuo{
      #print-qrcode{
             display: none;
@@ -1870,6 +1905,41 @@ export default {
     ::-webkit-scrollbar{width:0px}//隐藏滚动条
     .content-hidden {
         display: none;               
+    }
+    #GroupSelect {
+            display: inline-block;
+            float: right;
+            margin-top:-40px;
+            margin-right:10px;
+            width: 168px;
+            height: 30px;
+            .inp-search {
+                width: 168px;
+                border-radius: 15px;
+                height: 30px;
+                border: 1px solid #cccccc;
+                position: relative;
+                background: #fafafa;
+                padding-left: 10px;
+                padding-right: 20px;
+                box-sizing: border-box;
+                margin-right: 15px;
+                float: left;
+                color: #333333;
+                font-size: 14px;
+                outline: none;
+            }
+            .icon-sanjiao {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 19px;
+                right: 18px;
+            }
     }
     .topHeader{
         box-sizing: border-box;

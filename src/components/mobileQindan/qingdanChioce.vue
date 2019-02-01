@@ -24,7 +24,7 @@
                 <td>业务状态:</td><td>{{main.mStatus}}</td>
             </tr>
         </table>
-        <div class="button"><button @click="selectmain(main.pkId)">点击查看构件详情</button></div>
+        <div class="button"><button @click="selectmain(main.pkId)">点击<br/>查看构件详情</button></div>
     </div>
 </div>
     
@@ -82,10 +82,10 @@ export default {
                             path:'/mobileQindan/mobileGouJianDetail',
                             query:{
                                 // mid:mid,
-                                mdid:this.mid,
-                                haveToken:this.haveToken,
-                                tokenId:this.tokenId,
-                                traceId:encodeURIComponent(this.traceId),
+                                mdid:vm.mid,
+                                haveToken:vm.haveToken,
+                                tokenId:vm.tokenId,
+                                traceId:encodeURIComponent(vm.traceId),
                                 bFrom:1
                             }
                         })

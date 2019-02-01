@@ -188,6 +188,7 @@
                     <h3 class="header-attribute" style="margin-top: 0px;">
                         <i class="trrangle"></i>
                         产品资料
+                        <i v-show="detailTableInfo" style="margin-left:10px;" class="el-icon-plus" @click="addWordFile"></i>
                         <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                     </h3>
                     <!-- <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
@@ -196,6 +197,16 @@
                             <span class="detial-text-value" :title="detailTableInfo.productId">{{detailTableInfo.productId}}</span>
                         </li>
                     </ul> -->
+                    <ul class="uploadFileUl" :class="[{'show':show.basicAttributes}]">
+                        <li class="uploadFileLi" v-for="(item,index) in getAssetProductLibFilesList" :key="index">
+                        <span class="uploadFileText">{{item[0]}}</span>
+                        <span class="icon">
+                            <i class="icon-goujian icon-search" @click="searchsPic(item[1])"></i>
+                            <i class="icon-goujian icon-download" @click="downLoadPic(item[2])"></i>
+                            <i class="icon-goujian icon-delete" @click="deleteFile(item[3])"></i>
+                        </span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -207,6 +218,15 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="deleteBtn" @click="deleteMakeSure">删除</button>
                     <button class="cancelBtn" @click="deleteDialog=false">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog :visible.sync="deleteFileDialog" width="398px" @close="deleteFileClose">
+                <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
+                <!-- <p class="deleteDialogWarning"></p> -->
+                <p class="deleteDialogText">你要删除该任务关联文件？</p>
+                <div slot="footer" class="dialog-footer">
+                <button class="deleteBtn" @click="deleteFileMakeSure">删除</button>
+                <button class="cancelBtn" @click="deleteFileClose">取消</button>
                 </div>
             </el-dialog>
         </div>
@@ -303,6 +323,21 @@
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="importSure">上传</button>
                     <button class="editBtnC" @click="importClose">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="上传文件" :visible.sync="importWordShow" :before-close="importWordClose">
+                <div class="editBody">
+                    <div class="editBodytwo imageBody"><label class=" imageBodyText">上传文件 :</label>
+                        <span class="updataImageSpan">
+                            <button @click="selectWordFile" class="upImgBtn">选择文件</button>
+                            <input class="upInput"  type="file"  @change="fileWordChanged" ref="fileWord" id="fileWordId" multiple="multiple">
+                        </span>
+                        <span class="upImgText">{{fileWordName}}</span> 
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="importWordSure">上传</button>
+                    <button class="editBtnC" @click="importWordClose">取消</button>
                 </div>
             </el-dialog>
             <el-dialog title="Excel方式导入" :visible.sync="importTypeShow" :before-close="importTypeClose">
@@ -452,8 +487,11 @@ export default {
             editProductionShow:false,
             editOneDay:{},
             importTextShow:false,
+            importWordShow:false,
             fileName:'未选择任何文件',
+            fileWordName:'未选择任何文件',
             fileList:[],
+            fileWordList:[],
             importTypeShow:false,
             setColumn:false,
             codeTypeData:[],
@@ -488,10 +526,14 @@ export default {
                 tezhengMiaosu:true,
             },
             showProperty:true,
-            detailTableInfo:{},
+            detailTableInfo:'',
+            getAssetProductLibFilesList:{},
             isConfirm:false,
             initGenieClassData: [],
             productTypeId:'',
+            deleteFileDialog:false,
+            QJFileManageSystemURL:'',
+            fileId:"",
         }
     },
     created(){
@@ -499,6 +541,7 @@ export default {
         this.projId = localStorage.getItem('projId');
         this.token = localStorage.getItem('token');
         this.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
         this.loadingTitle()
         this.getProductBrand();
         this.loadProductParam();
@@ -601,6 +644,7 @@ export default {
         },
         clickRow(item){
             this.detailTableInfo = item;
+            this.getAssetProductLibFiles();
         },
         //节点切换
         handleNodeClick(data){
@@ -997,9 +1041,16 @@ export default {
         selectFile(){
             this.$refs.file.click();
         },
+        selectWordFile(){
+            this.$refs.fileWord.click();
+        },
         fileChanged(){
             this.fileList = this.$refs.file.files[0];
             this.fileName = this.fileList.name;
+        },
+        fileWordChanged(){
+            this.fileWordList = this.$refs.fileWord.files[0];
+            this.fileWordName = this.fileWordList.name;
         },
         //确认导入
         importSure(){
@@ -1049,9 +1100,117 @@ export default {
                 }
             }
         },
+        //确定上传文件
+        importWordSure(){
+            let formData = new FormData();
+            formData.append('filedata',this.fileWordList);
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'project2/asset/uploadFile',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    projId:this.projId,
+                    type:21,
+                    pkId:this.detailTableInfo.productId,
+                    flag:this.detailTableInfo.flag,
+                },
+                data:formData
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.importWordShow=false;
+                    this.getAssetProductLibFiles();
+                }
+            })
+            this.fileWordName='未选择任何文件';
+            document.getElementById('fileWordId').value="";
+
+        },
+        //查看图片
+      searchsPic(filePath) {
+        window.open(this.QJFileManageSystemURL + filePath + "/preview");
+      },
+      //下载图片
+      downLoadPic(filePath) {
+        var vm = this
+        window.open(vm.QJFileManageSystemURL + filePath + '');
+      },
+      deleteFile(fileId){
+           this.deleteFileDialog = true;
+            this.fileId = fileId;
+      },
+      deleteFileClose(){
+        this.deleteFileDialog = false;
+      },
+      deleteFileMakeSure(){
+          var vm=this;
+          axios({
+              method:'get',
+              url:vm.BDMSUrl+'project2/asset/deleteFile',
+              headers:{
+                  'token':vm.token
+              },
+              params:{
+                  projectId:vm.projId,
+                  fileId:this.fileId
+              }
+          }).then((response)=>{
+              if(response.data.cd=='0'){
+                this.getAssetProductLibFiles();
+                  this.deleteFileDialog = false;
+                  this.$message({
+                      type:'success',
+                      message:'文件删除成功'
+                  })
+              }else{
+                  this.$message({
+                      type:'error',
+                      message:response.data.msg
+                  })
+
+              }
+          })
+      },
+
+
+        //获取资料产品文件
+        getAssetProductLibFiles(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:vm.BDMSUrl+'project2/asset/assetProductLibFiles',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    productId:this.detailTableInfo.productId,
+                    flag:this.detailTableInfo.flag,
+                    projId:this.projId,
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getAssetProductLibFilesList=response.data.rt;
+                    console.log(this.getAssetProductLibFilesList,'this.getAssetProductLibFilesList');
+                }else{
+
+                }
+            })
+
+        },
         //取消导入
         importClose(){
             this.importTextShow = false;
+        },
+        //取消文档导入
+        importWordClose(){
+            this.importWordShow = false;
+            this.fileWordName='';
+            document.getElementById('fileWordId').value="";
+        },
+        //
+        addWordFile(){
+            this.importWordShow = true;
         },
         importTypeClose(){
             this.importTypeShow = false;
@@ -1857,6 +2016,74 @@ export default {
             }
             .header-attribute:last-of-type{
                 margin-top: 30px;
+            }
+             .uploadFileUl{
+                display: none;
+                >li:last-of-type{
+                    padding-bottom: 7px;
+                }
+                width: 100%;
+                overflow-y: auto;
+                padding: 5px;
+                .uploadFileLi{
+                    height: 32px;
+                    font-size:12px;
+                    line-height: 30px;
+                    color:#999999;
+                    text-align: left;
+                    position: relative;
+                    &:hover{
+                        background: #fafafa;
+                        .icon-goujian{
+                            display: inline-block;
+                        }
+                        }
+                    .uploadFileText{
+                        max-width: 130px;
+                        float: left;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow-x: hidden;
+                    }
+                    .icon{
+                        display: inline-block;
+                        height:16px;
+                        position:absolute;
+                        right:0px;
+                        top:10px;
+                        .icon-goujian{
+                            float:left;
+                            width: 16px;
+                            height: 16px;
+                            cursor: pointer;
+                        }
+                        .icon-download{
+                                background: url('../SchedulePlan/images/download.png')no-repeat 0 0;
+
+                                &:hover{
+                                    background: url('../SchedulePlan/images/download1.png')no-repeat 0 0;
+                                }
+                            }
+                            .icon-search{
+                                background: url('../SchedulePlan/images/search.png')no-repeat 0 0;
+                                &:hover{
+                                    background: url('../SchedulePlan/images/search1.png')no-repeat 0 0;
+                                }
+                            }
+                            .icon-delete{
+                                float: right;
+                                background: url('../SchedulePlan/images/delete.png')no-repeat 0 0;
+
+                                &:hover{
+                                    background: url('../SchedulePlan/images/delete1.png')no-repeat 0 0;
+                                }
+                            }
+                            i{
+                                margin-left:3px;
+                            }
+                    }
+                }
+
             }
             .Att{
                 >li:last-of-type{

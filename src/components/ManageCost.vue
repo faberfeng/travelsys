@@ -231,14 +231,19 @@ export default {
     },
     updated(){
         var vm=this;
-        // window.removeEventListener("message", (evt)=>{
-        //         this.callback(evt)}
-        // );
+        window.removeEventListener("message", (evt)=>{
+                this.callback(evt)}
+        );
         // console.log('updated')
         // vm.getUserInfo();
                   
     },
     destoryed(){
+        var vm=this;
+        window.removeEventListener("message", (evt)=>{
+                this.callback(evt)}
+        );
+        console.log('是否销毁');
         // this.IframeClose();
     },
     computed:{

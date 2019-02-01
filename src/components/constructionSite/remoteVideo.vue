@@ -127,7 +127,7 @@ export default {
             mediaUrl:'',
             loading2:false,
             lineLiveImgShow:true,
-
+            isRemoteVideo:true,
             // playerOptions:{
             //     margin:'0 auto',
             //     height: '300',  
@@ -179,6 +179,7 @@ export default {
             projId:'',
             userId:'',
             projName:'',
+            currentUrl:'',
         }
     },
     created(){
@@ -191,6 +192,9 @@ export default {
         vm.projName = localStorage.getItem('projName');
         this.loadingTitle();
         this.getMediaInformation(4);
+        this.currentUrl=window.location.href.substring(window.location.href.lastIndexOf('/')+1);
+        
+        // console.log(window.location.href.substring(window.location.href.lastIndexOf('/')+1),'href地址');
     },
     mounted(){
         this.initUl();
@@ -198,37 +202,46 @@ export default {
     methods:{
         callback(e){
             console.log(e.data,'e.data.command');
-            switch(e.data.command){
-                // console.log()
-                case "CurrentSelectedLabel":
-                    {
-                        if(e.data.parameter.type=="Camera"){
-                            // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
-                            var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
-                            console.log(e.data.parameter.value.CameraUrl);
-                            if(e.data.parameter.value.CameraUrl){
-                                this.loading2=true;
-                                this.playerOptions.sources[0].src=e.data.parameter.value.CameraUrl;
-                                this.cameraNameId=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //摄影机id
-                                document.body.scrollTop = 850;
-                                document.documentElement.scrollTop = 850;
-                                setTimeout(()=>{
-                                            this.loading2=false;
-                                },3000);
-                                this.$message({
-                                    type:'info',
-                                    message:'正在加载摄像机头...'
-                                })
-                            }else{
-                                this.$message({
-                                    type:'info',
-                                    message:'机位监控没有视频流'
-                                })
+            console.log(this.isRemoteVideo,'this.isRemoteVideo');
+            
+                switch(e.data.command){
+                    // console.log()
+                    case "CurrentSelectedLabel":
+                        {
+                            console.log(this.currentUrl,'this.currentUrl');
+                            if(this.currentUrl=="remoteVideo"){
+                                if(e.data.parameter.type=="Camera"){
+                                    // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
+                                    var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
+                                    console.log(e.data.parameter.value.CameraUrl);
+                                    if(e.data.parameter.value.CameraUrl){
+                                        this.loading2=true;
+                                        this.playerOptions.sources[0].src=e.data.parameter.value.CameraUrl;
+                                        this.cameraNameId=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //摄影机id
+                                        document.body.scrollTop = 850;
+                                        document.documentElement.scrollTop = 850;
+                                        setTimeout(()=>{
+                                                    this.loading2=false;
+                                        },3000);
+                                        this.$message({
+                                            type:'info',
+                                            message:'正在加载摄像机头...'
+                                        })
+                                    }else{
+                                        this.$message({
+                                            type:'info',
+                                            message:'机位监控没有视频流'
+                                        })
+                                    }
+                                }
                             }
+                            this.currentUrl='';
                         }
-                    }
-                break;
-            }
+                    break;
+                    
+                }
+                
+            
         },
         checkItem(){
 

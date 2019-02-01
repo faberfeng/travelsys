@@ -2132,7 +2132,7 @@ export default {
             }
             vm.fileList.forEach((item,index)=>{
 
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId+(vm.buildId==null?'':'&buildId='+vm.buildId);
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId+(vm.buildId==null?'':'&buildId='+vm.buildId);
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);

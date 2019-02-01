@@ -35,6 +35,7 @@
                 <p class="listLi"><span class="listP">业务状态</span><span class="listSpan">{{manifestMainInfo.mStatus}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">变更版本</span><span class="listSpan">{{manifestMainInfo.mVersion}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <div>
             <div class="information"><span class="text">明细基本信息({{page}}/{{pageInfo.totalCount}})</span><span id="click8" class="upImg" @click="toggle($event)"></span></div>
@@ -58,6 +59,7 @@
                 <p class="listLi" style="border-bottom:none;"><span class="listP">单位数量</span><span class="listSpan">{{manifestDetailInfo.dUnit}}</span></p>
                 
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- 关联清单 -->
         <div v-if="showDocumentList&&tokenId">
@@ -75,6 +77,7 @@
                     </div>
                 </div>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- 报表快照 -->
         <div v-if="showReportsnapshotInfo&&tokenId">
@@ -86,6 +89,7 @@
                 <p class="listLi"><span class="listP">创建人</span><span class="listSpan">{{reportsnapshotInfo.createUser}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">创建日期</span><span class="listSpan">{{reportsnapshotInfo.createTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- 工程算量 -->
         <div v-if="showWorkAmountInfo&&tokenId">
@@ -97,6 +101,7 @@
                 <p class="listLi"><span class="listP">创建人</span><span class="listSpan">{{workAmountInfo.createUser}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">创建日期</span><span class="listSpan">{{workAmountInfo.createTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- 产品选型 -->
         <div v-if="showReportProductInfo&&tokenId">
@@ -108,6 +113,7 @@
                 <p class="listLi"><span class="listP">创建人</span><span class="listSpan">{{reportProductInfo.createUser}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">创建日期</span><span class="listSpan">{{reportProductInfo.createTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- 物资采购 -->
         <div v-if="showOrderInfo&&tokenId">
@@ -123,6 +129,7 @@
                 <p class="listLi"><span class="listP">最后操作用户</span><span class="listSpan">{{orderDetailInfo.updateUserName}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">最后操作时间</span><span class="listSpan">{{orderDetailInfo.updateDateTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
         <!-- <div v-if="haveToken">
             <div class="information"><span class="text">可用操作</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
@@ -147,6 +154,7 @@
                 <p class="listLi"><span class="listP">责任群组</span><span class="listSpan">{{taskScheduleInfo.taskUserGroupName}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">责任人</span><span class="listSpan">{{taskScheduleInfo.dutyUserName}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
     </div>    
 </template>
@@ -270,9 +278,9 @@ export default {
             axios({
                 url:this.BDMSUrl+'/mobile/QjScanCommonManifestResp.json',
                 method:'GET',
-                // headers:{
-
-                // },
+                headers:{
+                    'tokenId':this.tokenId
+                },
                 params:{
                     id:this.mid,
                 }
@@ -297,45 +305,40 @@ export default {
                     }
                     if(obj.documentList!=null && obj.documentList!=undefined) {
                         this.documentList = obj.documentList;
-                        if(this.haveToken==true){
                             this.showDocumentList=true;
-                        }
+                        
                     }
                     if(obj.reportsnapshotInfo!=null && obj.reportsnapshotInfo!=undefined) {
                         this.reportsnapshotInfo = obj.reportsnapshotInfo;
                         this.reportsnapshotInfo.createTime=this.convertTimestampToString(this.reportsnapshotInfo.createTime);
-                        if(this.haveToken==true){
                             this.showReportsnapshotInfo=true;
-                        }
+                        
                     }
                     if(obj.workAmountInfo!=null && obj.workAmountInfo!=undefined) {
                         this.workAmountInfo = obj.workAmountInfo;
                         this.workAmountInfo.createTime=this.convertTimestampToString(this.workAmountInfo.createTime);
-                        if(this.haveToken==true){
                             this.showWorkAmountInfo=true;
-                        }
                         
                     }
                     if(obj.reportProductInfo!=null && obj.reportProductInfo!=undefined) {
                         this.reportProductInfo = obj.reportProductInfo;
                         this.reportProductInfo.createTime=this.convertTimestampToString(this.reportProductInfo.createTime);
-                        if(this.haveToken==true){
                             this.showReportProductInfo=true;
-                        }
+                        
                     }
                     if(obj.taskScheduleInfo!=null && obj.taskScheduleInfo!=undefined) {
                         this.taskScheduleInfo = obj.taskScheduleInfo;
                         this.taskScheduleInfo.taskStart=this.convertTimestampToString(this.taskScheduleInfo.taskStart);
                         this.taskScheduleInfo.taskEnd=this.convertTimestampToString(this.taskScheduleInfo.taskEnd);
-                        if(this.haveToken==true){
+                       
                             this.showTaskScheduleInfo=true;
-                        }
+                        
                     }
                     if(obj.orderInfo!=null && obj.orderInfo!=undefined) {
                         this.orderInfo = obj.orderInfo;
-                        if(this.haveToken==true){
+                        
                             this.showOrderInfo=true;
-                        }
+                        
                     }
                     if(obj.orderDetailInfo!=null && obj.orderDetailInfo!=undefined) {
                         this.orderDetailInfo = obj.orderDetailInfo;
@@ -360,8 +363,13 @@ export default {
 
         },
         convertTimestampToString(time){
-                var date = new Date(time*1000);
+            if(time==""){
+                return ""
+            }else{
+                 var date = new Date(time*1000);
                 return date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+            }
+               
         },
         changeMX(op){
             //1:上一条 2:下一条
@@ -589,7 +597,7 @@ html{font-size:16px}
         font-size: 0.8rem;
         padding:0 1rem;
         box-sizing:border-box;
-        border-bottom:1px solid #ccc;
+        border-bottom:1px solid #f5f5f5;
         .text{
             color:#333;
             // font-weight:normal;
@@ -624,9 +632,10 @@ html{font-size:16px}
         .changeBtn{
             .pre{
                 width: 4rem;
-                height:1.8rem;
-                line-height:1.8rem;
-                margin-top:0.2rem;
+                height:2rem;
+                line-height:2rem;
+                margin-top:0.4rem;
+                margin-bottom:0.4rem;
                 border:1px solid #ccc;
                 display: inline-block;
                 // float:left;
@@ -699,7 +708,7 @@ html{font-size:16px}
             }
         }
         .listLi{
-            width:100%;margin:0;padding:0;border-bottom:1px solid #ccc;height: 2.2rem;line-height: 2.2rem;
+            width:100%;margin:0;padding:0;border-bottom:1px solid #f5f5f5;height: 2.2rem;line-height: 2.2rem;
             .listP{
                 display:inline-block;
                 color:#333;
@@ -720,6 +729,11 @@ html{font-size:16px}
                 overflow:hidden
             }
         }
+    }
+    .list_bottom{
+        width: 100%;
+        height: 1.2rem;
+        background: #f5f5f5;
     }
 
 }

@@ -3172,7 +3172,7 @@ export default {
                 }
             }
             vm.drawingFileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+item.drawingName+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId)
+                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId)
                 returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
                 formData.append('token',vm.token);

@@ -8,12 +8,10 @@
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
             <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
         </div>
-
         <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
             <input ref="number_input_input"  type = "text" style="position:absolute;left:2px;height:30px;top:2px;width:120px"/>
             <button @click="create_Multiple_points" style="right:2px;height:30px;top:2px;width:60px;position:absolute" >确定</button>
         </div>
-        
     </div>
 </template>
 
@@ -312,7 +310,6 @@ export default {
             this.$refs.pdfDocument.$el.style.position = ""; //  防抖
 
             this.init(this.$refs.picView,this.para.source,this.para.type,1,0);
-            
             
         },
         setNumber_inputPostion(position_){

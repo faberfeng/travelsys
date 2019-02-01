@@ -26,6 +26,8 @@
     -->
                 </p>
             </div>
+            <div class="list_bottom"></div>
+
         </div>
         <div>
             <div class="information"><span class="text">设计信息</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
@@ -43,15 +45,16 @@
                 <p class="listLi"><span class="listP">更新用户</span><span class="listSpan">{{elementInfo.editor}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">更新时间</span><span class="listSpan">{{elementInfo.updateTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
-        <div v-if="showSummaryInfo&&operateStatus!=2">
+        <div v-if="showSummaryInfo&&operateStatus!=2&&tokenId">
             <div class="information"><span class="text">可用操作</span><span id="click2" class="upImg" @click="toggle($event)"></span></div>
             <div class="list" >
                 <div class="changeBtn">
                     <span v-show="operateStatus==0"  class="pre blue"  @click="startSure()" >
                         开工确认
                     </span>
-                    <span v-show="operateStatus==1" class="pre yellow"  @click="completeSure()" >
+                    <span v-show="operateStatus==1" class="pre yellow"  @click="completeSure()">
                         完工确认
                     </span>
                     <!-- <span class="pre red"  @click="changeStatus(3)" >
@@ -59,8 +62,9 @@
                     </span> -->
                 </div>
             </div>  
+            <div class="list_bottom"></div>
         </div>
-        <div v-if="showDocumentList">
+        <div v-if="showDocumentList&&tokenId">
             <div class="information"><span class="text">关联文档</span><span id="click3" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <div class="listDocumentLi"  v-for="(document,index) in documentList" :key="index">
@@ -76,8 +80,9 @@
                 </div>
                 <!-- <p class="listLi"  v-for="(document,index) in documentList" :key="index"><span class="listP">{{document.fileName}}</span><span class="listSpan">预览</span></p> -->
             </div>
+            <div class="list_bottom"></div>
         </div>
-        <div v-if="showProductLibrary">
+        <div v-if="showProductLibrary&&tokenId">
             <div class="information"><span class="text">选型信息</span><span id="click4" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">产品ID</span><span class="listSpan">{{productLibrary.productId}}</span></p>
@@ -88,21 +93,23 @@
                 <p class="listLi"><span class="listP">供货商</span><span class="listSpan">{{productLibrary.supplier}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">标记</span><span class="listSpan">{{productLibrary.productTag}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
-        <div v-if="showPurchasingInfo">
+        <div v-if="showPurchasingInfo&&tokenId">
             <div class="information"><span class="text">物资采购</span><span id="click5" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">订单编号</span><span class="listSpan">{{purchasingInfo.orderCode}}</span></p>
                 <p class="listLi"><span class="listP">订单名称</span><span class="listSpan">{{purchasingInfo.orderTitle}}</span></p>
-                <p class="listLi"><span class="listP">订货群组</span><span class="listSpan">{{purchasingInfo.orderUgName}}</span></p>
-                <p class="listLi"><span class="listP">供货群组</span><span class="listSpan">{{purchasingInfo.supply}}</span></p>
+                <p class="listLi"><span class="listP">订货群组</span><span class="listSpan">{{purchasingInfo.orderOrderUgName}}</span></p>
+                <p class="listLi"><span class="listP">供货群组</span><span class="listSpan">{{purchasingInfo.orderSupply}}</span></p>
                 <p class="listLi"><span class="listP">前续环节</span><span class="listSpan">{{purchasingInfo.forewordStep}}</span></p>
                 <p class="listLi"><span class="listP">当前环节</span><span class="listSpan">{{purchasingInfo.currentStep}}</span></p>
-                <p class="listLi"><span class="listP">最后操作用户</span><span class="listSpan">{{purchasingInfo.updateUserName}}</span></p>
-                <p class="listLi" style="border-bottom:none;"><span class="listP">最后操作时间</span><span class="listSpan">{{purchasingInfo.updateDateTime}}</span></p>
+                <p class="listLi"><span class="listP">最后操作用户</span><span class="listSpan">{{purchasingInfo.updateUser}}</span></p>
+                <p class="listLi" style="border-bottom:none;"><span class="listP">最后操作时间</span><span class="listSpan">{{purchasingInfo.updateTime}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
-        <div v-if="showSummaryInfo">
+        <div v-if="showSummaryInfo&&tokenId">
             <div class="information"><span class="text">进度核实</span><span id="click6" class="upImg" @click="toggle($event)"></span></div>
             <div class="list">
                 <p class="listLi"><span class="listP">任务名称</span><span class="listSpan">{{summaryInfo.taskName}}</span></p>
@@ -112,6 +119,7 @@
                 <p class="listLi"><span class="listP">完工时间</span><span class="listSpan">{{summaryInfo.finishWorkTime}}</span></p>
                 <p class="listLi" style="border-bottom:none;"><span class="listP">完工确认</span><span class="listSpan">{{summaryInfo.finishWorkUserName}}</span></p>
             </div>
+            <div class="list_bottom"></div>
         </div>
     </div> 
 </template>
@@ -219,51 +227,60 @@ export default {
         
         //开工确认
         startSure(){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'mobile/openWorkConfirm.json',
-                headers:{
-                    'tokenId':this.tokenId
-                },
-                params:{
-                    id:this.mdid
-                }
-            }).then((response)=>{
-                var obj=response.data
-                console.log(obj,'返回的值。。。')
-                if(obj.responseInfo.responseCode == 1){
-                    this.initData();
-                    alert(obj.info)
-                }else if(obj.responseInfo.responseCode==101){
-                    alert(obj.responseInfo.responseMessage)
-                }else{
-                    alert(obj.responseInfo.responseMessage)
-                }
-            })
+            var r=confirm("是否确认开工");
+            if(r==true){
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'mobile/openWorkConfirm.json',
+                    headers:{
+                        'tokenId':this.tokenId
+                    },
+                    params:{
+                        id:this.mdid
+                    }
+                }).then((response)=>{
+                    var obj=response.data
+                    console.log(obj,'返回的值。。。')
+                    if(obj.responseInfo.responseCode == 1){
+                        this.initData();
+                        alert(obj.info)
+                    }else if(obj.responseInfo.responseCode==101){
+                        alert(obj.responseInfo.responseMessage)
+                    }else{
+                        alert(obj.responseInfo.responseMessage)
+                    }
+                })
+            }else{
+
+            }
         },
         //完工确认
         completeSure(){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'mobile/finishWorkConfirm.json',
-                headers:{
-                    'tokenId':this.tokenId
-                },
-                params:{
-                    id:this.mdid
-                }
-            }).then((response)=>{
-                var obj=response.data
-                if(obj.responseInfo.responseCode == 1){
-                    this.initData();
-                    alert(obj.info)
-                }else if(obj.responseInfo.responseCode==101){
-                    alert(obj.responseInfo.responseMessage)
-                }else{
-                    alert(obj.responseInfo.responseMessage)
-                }
-            })
+            var r=confirm("是否确认完工");
+            if(r==true){
+                axios({
+                    method:'get',
+                    url:this.BDMSUrl+'mobile/finishWorkConfirm.json',
+                    headers:{
+                        'tokenId':this.tokenId
+                    },
+                    params:{
+                        id:this.mdid
+                    }
+                }).then((response)=>{
+                    var obj=response.data
+                    if(obj.responseInfo.responseCode == 1){
+                        this.initData();
+                        alert(obj.info)
+                    }else if(obj.responseInfo.responseCode==101){
+                        alert(obj.responseInfo.responseMessage)
+                    }else{
+                        alert(obj.responseInfo.responseMessage)
+                    }
+                })
+            }else{
 
+            }
         },
         // test(){
         //     var vm=this;
@@ -293,7 +310,7 @@ export default {
                         bFrom:this.bFromValue,
                         mdid:this.mdid,
                         // traceId:decodeURIComponent(this.traceId),
-                        // appType:apptype
+                        appType:apptype
                     }
                 }else if(this.bFromValue==3){
                     paramList={
@@ -304,8 +321,8 @@ export default {
                         appType:apptype
                     }
                 }
-
-            }else{
+            }else
+            {
                 getUrl=vm.BDMSUrl+'/mobile/QjScanCommonManifestDetailResp.json'
                 apptype='';
                 if(this.bFromValue==1){
@@ -352,7 +369,7 @@ export default {
                     }
                     if(obj.purchasingInfo!=null && obj.purchasingInfo!=undefined) {
                         this.purchasingInfo = obj.purchasingInfo;
-                        this.purchasingInfo.updateDateTime=this.convertTimestampToString(this.purchasingInfo.updateDateTime);
+                        this.purchasingInfo.updateTime=this.convertTimestampToString(this.purchasingInfo.updateTime);
                         this.showPurchasingInfo=true;
                     }
                     if(obj.documentList!=null && obj.documentList!=undefined) {
@@ -379,8 +396,12 @@ export default {
 
         },
         convertTimestampToString(time){
-                var date = new Date(time*1000);
+            if(time==""){
+                return ""
+            }else{
+                 var date = new Date(time*1000);
                 return date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+            }
         },
         parseMStatus:function(mStatus){
                 // 施工现场
@@ -559,7 +580,7 @@ html{font-size:16px}
         font-size: 0.8rem;
         padding:0 1rem;
         box-sizing:border-box;
-        border-bottom:1px solid #ccc;
+        border-bottom:1px solid #f5f5f5;
         .text{
             color:#333;
             // font-weight:normal;
@@ -594,9 +615,10 @@ html{font-size:16px}
         .changeBtn{
             .pre{
                 width: 4rem;
-                height:1.8rem;
-                line-height:1.8rem;
-                margin-top:0.2rem;
+                height:2rem;
+                line-height:2rem;
+                margin-top:0.4rem;
+                margin-bottom: 0.4rem;
                 border:1px solid #ccc;
                 display: inline-block;
                 // float:left;
@@ -669,7 +691,7 @@ html{font-size:16px}
             }
         }
         .listLi{
-            width:100%;margin:0;padding:0;border-bottom:1px solid #ccc;height: 2.2rem;line-height: 2.2rem;
+            width:100%;margin:0;padding:0;border-bottom:1px solid #f5f5f5;height: 2.2rem;line-height: 2.2rem;
             .listP{
                 display:inline-block;
                 color:#333;
@@ -690,6 +712,11 @@ html{font-size:16px}
                 overflow:hidden
             }
         }
+    }
+    .list_bottom{
+        width: 100%;
+        height: 1.2rem;
+        background: #f5f5f5;
     }
 
 }

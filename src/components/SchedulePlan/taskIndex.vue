@@ -47,44 +47,46 @@
               </div>
               <div class="taskHeadRight">
                 <span class="btn-operate" @click="progressSearch()">进度查询</span>
-                <span class="btn-operate" @click="valueSearch()">产值查询</span>
+                <!-- <span class="btn-operate" @click="valueSearch()">产值查询</span> -->
                 <span class="btn-operate" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
                 <span class="btn-operate" @click="cancleSelect()">取消选择</span>
                 <!-- <span class="btn-operate" @click="showColumnConfig()">显示列</span> -->
               </div>
             </div>
-            <div class="taskBody">
-              <zk-table
-                index-text="序号"
-                :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
-                :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
-                @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
-                <template slot="action" slot-scope="scope">
-                  <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                  <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                  <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button>
-                </template>
-                <template slot="milepost" slot-scope="scope">
-                    {{scope.row.taskType==1?'是':'否'}}
-                </template>
-                <template slot="taskStart" slot-scope="scope">
-                  {{scope.row.taskStart | timeChange()}}
-                </template>
-                <template slot="taskEnd" slot-scope="scope">
-                  {{scope.row.taskEnd | timeChange()}}
-                </template>
-                <template slot="realTaskStart" slot-scope="scope">
-                  {{scope.row.realTaskStart | timeChange()}}
-                </template>
-                <template slot="realTaskEnd" slot-scope="scope">
-                  {{scope.row.realTaskEnd | timeChange()}}
-                </template>
-                <template slot="taskDuration" slot-scope="scope">
-                  {{scope.row.taskDuration + '天'}}
-                </template>
-              </zk-table>
+            <div>
+              <div style="overflow: auto;" class="taskBody">
+                <zk-table
+                  index-text="序号"
+                  :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
+                  :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
+                  :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
+                  @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
+                  <template slot="action" slot-scope="scope">
+                    <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
+                    <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
+                    <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button>
+                  </template>
+                  <template slot="milepost" slot-scope="scope">
+                      {{scope.row.taskType==1?'是':'否'}}
+                  </template>
+                  <template slot="taskStart" slot-scope="scope">
+                    {{scope.row.taskStart | timeChange()}}
+                  </template>
+                  <template slot="taskEnd" slot-scope="scope">
+                    {{scope.row.taskEnd | timeChange()}}
+                  </template>
+                  <template slot="realTaskStart" slot-scope="scope">
+                    {{scope.row.realTaskStart | timeChange()}}
+                  </template>
+                  <template slot="realTaskEnd" slot-scope="scope">
+                    {{scope.row.realTaskEnd | timeChange()}}
+                  </template>
+                  <template slot="taskDuration" slot-scope="scope">
+                    {{scope.row.taskDuration + '天'}}
+                  </template>
+                </zk-table>
+              </div>
             </div>
           </div>
           <!-- 以下是以前的gantt图 -->
@@ -4568,7 +4570,7 @@
         display: inline-block;
         width: 85%;
         position: relative;
-        transition:  all ease .5s;
+        // transition:  all ease .5s;
 
     }
     .goujian{
@@ -4579,7 +4581,7 @@
     }
     .box-left-active {
       width: 98%;
-      transition:  all ease .5s;
+      // transition:  all ease .5s;
       .icon-right{
           transform: rotateZ(180deg)!important;
           transition: all ease .5s;
@@ -4603,7 +4605,7 @@
         float: right;
         width: 15%;
         // margin-top: -763px;
-        transition: all ease .5s;
+        // transition: all ease .5s;
         background: #ffffff;
         z-index: 10;
         height: 785px;
@@ -4764,7 +4766,7 @@
     }
     .box-right-active1{
         width: 2%;
-        transition: all ease .5s;
+        // transition: all ease .5s;
       }
     #box-right{
             padding: 19px 13px 0 10px;
