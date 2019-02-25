@@ -1159,8 +1159,8 @@ export default Vue.component('commonDetail',{
             if(this.getPointDatasListLength-1>=NumB&&this.getPointDatasListLength-1<=NumE){
                 NumE=this.getPointDatasListLength-1;
             }
-            console.log(NumB,'NumBp')
-            console.log(NumE,'NumEp')
+            // console.log(NumB,'NumBp')
+            // console.log(NumE,'NumEp')
             for(var i=NumB;i<NumE+1;i++){
                 this.getPointDatasList1.push(this.getPointDatasList[i])
             }
@@ -1174,8 +1174,8 @@ export default Vue.component('commonDetail',{
             if(this.getPointDatasListLength-1>=NumB&&this.getPointDatasListLength-1<=NumE){
                 NumE=this.getPointDatasListLength-1;
             }
-            console.log(NumB,'NumBp')
-            console.log(NumE,'NumEp')
+            // console.log(NumB,'NumBp')
+            // console.log(NumE,'NumEp')
             for(var i=NumB;i<NumE+1;i++){
                 this.getPointDatasList1.push(this.getPointDatasList[i])
             }

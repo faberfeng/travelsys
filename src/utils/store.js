@@ -68,6 +68,22 @@ export default new Vuex.Store({
         // messageUrl:'http://42.159.153.210:8079',
         // webSocketUrl:"ws://42.159.153.210:16800/websocket",
         // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+
+        //外网测试配置文件（新版）
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        // BDMSUrl:'https://bim.arctron.cn/bdms/',//仅供文件上传使用
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"https://bim.arctron.cn/#",
+        // appShareUrl:'https://bim.arctron.cn/BDMSTest/',
+        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
         //以下是即时通讯网址
 
         // 以下是内网测试配置文件

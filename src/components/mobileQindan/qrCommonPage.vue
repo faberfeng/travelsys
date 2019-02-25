@@ -17,17 +17,17 @@ export default {
         }
     },
     created(){
-        console.log(this.$route.path,'this.$route.path000');
-        console.log(this.$route.name,'this.$route.name');
+        // console.log(this.$route.path,'this.$route.path000');
+        // console.log(this.$route.name,'this.$route.name');
        this.sharePath=this.$route.path.replace(new RegExp("/qr/"), "")
-       console.log(this.sharePath,'this.sharePath');
+    //    console.log(this.sharePath,'this.sharePath');
         // console.log(shareNum,'shareNum');
         if(this.sharePath.indexOf("_haveToken")>0){
             this.sharePath=this.sharePath.replace(new RegExp("_haveToken"), "")
             this.sharePath1=this.sharePath.split('=')[0];
             this.tokenId=this.sharePath.split('=')[1];
-            console.log(this.sharePath1,'this.sharePath7777');
-            console.log(this.tokenId,'this.tokenId');
+            // console.log(this.sharePath1,'this.sharePath7777');
+            // console.log(this.tokenId,'this.tokenId');
             this.haveToken=true;
             this.midType=this.sharePath1.split('-')[1];
             if(this.midType=='QD'){

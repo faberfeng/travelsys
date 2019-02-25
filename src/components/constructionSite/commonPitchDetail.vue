@@ -1504,7 +1504,7 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
-                                console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
+                                // console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
                                 var maxShift1=[];
                                 this.leftDisplayListValue1.forEach((item)=>{
                                     maxShift1.push(item.shift)
@@ -1525,7 +1525,7 @@ export default Vue.component('commonPitch-detail',{
                                 // console.log(maxVariation,'maxVariation')
                                 this.leftMaxVariation=this.getMaxValue(maxVariation)
                                 this.leftMaxHeight=this.getMaxValue(maxHeight)
-                                console.log(this.leftMaxHeight,'this.leftMaxHeight')
+                                // console.log(this.leftMaxHeight,'this.leftMaxHeight')
                             }
                            
                             
@@ -2063,8 +2063,8 @@ export default Vue.component('commonPitch-detail',{
                 // console.log(this.$refs.lineLeftChartOne.clientWidth,'000');
                 // console.log(document.getElementsByClassName('highcharts-background'))
                 if(this.$refs.lineLeftChartOne&&this.leftDisplayShow){
-                    console.log(this.$refs.lineLeftChartOne.$el.clientWidth,'offsetWidth');
-                    console.log(this.$refs.lineLeftChartOne.$el.clientHeight,'offsetWidth');
+                    // console.log(this.$refs.lineLeftChartOne.$el.clientWidth,'offsetWidth');
+                    // console.log(this.$refs.lineLeftChartOne.$el.clientHeight,'offsetWidth');
                     var heightLeft=this.$refs.lineLeftChartOne.$el.clientHeight;
                     this.$refs.canvasLeftRef.style.width=this.$refs.lineLeftChartOne.$el.clientWidth+'px';
                     this.$refs.canvasLeftRef.style.height=this.$refs.lineLeftChartOne.$el.clientHeight+'px';
@@ -2076,7 +2076,7 @@ export default Vue.component('commonPitch-detail',{
                     ctxLeft.fillStyle='red';
                     var spotHeightLeft=(heightLeft-10)/(this.leftMaxHeight+1);
                     this.getPitchSeqMarkLeftList.forEach((item)=>{
-                        console.log(spotHeightLeft*Number(item.depth),'0000');
+                        // console.log(spotHeightLeft*Number(item.depth),'0000');
                         ctxLeft.strokeRect(80,spotHeightLeft*Number(item.depth),15,15);
                         ctxLeft.strokeText(item.name,100,spotHeightLeft*Number(item.depth)+11,[100])
                     })

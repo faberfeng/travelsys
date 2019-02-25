@@ -46,13 +46,13 @@ export default {
             var str='';
              
             str=this.readCookie("BITRIX_SM_LOGIN");
-            console.log(str);
+            // console.log(str);
            if(str==null){
                  this.$router.push({
                         path: '/login'
                     })
             }
-            console.log(str);
+            // console.log(str);
             formData.append('account',str);
             formData.append('isRemember',this.isAuto);
             formData.append('password',this.login.Password);

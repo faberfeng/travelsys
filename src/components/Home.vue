@@ -324,7 +324,7 @@ export default {
                         }else{
                             this.rotate=response.data.rt.rotateInfo;    //  先改角度再改地址
                         }
-                        console.log(this.rotate,'获取角度');
+                        // console.log(this.rotate,'获取角度');
                     }
                     // console.log(vm.drawingWebGlList,'vm.drawingWebGlList');
                     //   vm.drawingWebGlList.forEach((item)=>{

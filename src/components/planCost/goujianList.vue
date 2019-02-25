@@ -661,7 +661,7 @@ export default {
             if(event != null){
                 if(event.showData){
                     
-                    console.log(event.rcid,'event.rcid0000')
+                    // console.log(event.rcid,'event.rcid0000')
                     vm.backToH()
                     if(event.rcid != null)vm.checkItemId = event.rcid
                     vm.showCommonData = true

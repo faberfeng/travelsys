@@ -29,7 +29,7 @@ const CHAT={
 			};
 			this.socket.emit('message', obj);
 		}else{
-			console.log('msg is null')
+			// console.log('msg is null')
 		}
 		
 		return false;

@@ -1747,7 +1747,7 @@ export default Vue.component('common-list',{
         openLabel(row){
             var vm = this;
             this.leftInfo = row;
-            console.log(this.leftInfo);
+            // console.log(this.leftInfo);
             this.screenLeft.show = true;
             vm.labelListShow = true;
             vm.selectRow = [];
@@ -1874,7 +1874,7 @@ export default Vue.component('common-list',{
                                 vm.$set(ele,'TotalPrice',num)
                             })
                             vm.S_quantitiesList = dataTransform.transformTozTreeFormat(setting, arr);
-                            console.log(vm.S_quantitiesList)
+                            // console.log(vm.S_quantitiesList)
                         }
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg);

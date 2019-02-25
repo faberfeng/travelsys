@@ -162,7 +162,7 @@ export default {
                         //     mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
                         //     mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
                         // })
-                        console.log(this.biaoqianInfo,'this.biaoqianInfo');
+                        // console.log(this.biaoqianInfo,'this.biaoqianInfo');
 
                     }else{
                         alert(response.data.msg);

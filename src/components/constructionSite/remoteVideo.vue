@@ -201,19 +201,19 @@ export default {
     },
     methods:{
         callback(e){
-            console.log(e.data,'e.data.command');
-            console.log(this.isRemoteVideo,'this.isRemoteVideo');
+            // console.log(e.data,'e.data.command');
+            // console.log(this.isRemoteVideo,'this.isRemoteVideo');
             
                 switch(e.data.command){
                     // console.log()
                     case "CurrentSelectedLabel":
                         {
-                            console.log(this.currentUrl,'this.currentUrl');
+                            // console.log(this.currentUrl,'this.currentUrl');
                             if(this.currentUrl=="remoteVideo"){
                                 if(e.data.parameter.type=="Camera"){
                                     // console.log(e.data.parameter.value.Tag.split(";")[0].split("=")[1],'Tag');
                                     var str=e.data.parameter.value.Tag.split(";")[0].split("=")[1];
-                                    console.log(e.data.parameter.value.CameraUrl);
+                                    // console.log(e.data.parameter.value.CameraUrl);
                                     if(e.data.parameter.value.CameraUrl){
                                         this.loading2=true;
                                         this.playerOptions.sources[0].src=e.data.parameter.value.CameraUrl;
@@ -262,15 +262,15 @@ export default {
             this.loading2=true;
             this.playerOptions.sources[0].src=path;
             this.cameraNameId=name;
-            console.log(path,'index',name,'name');
+            // console.log(path,'index',name,'name');
             setTimeout(()=>{
                         this.loading2=false;
             },3000);
 
         },
         getNextVideo(index){
-            console.log('1111');
-            console.log(index,'111111')
+            // console.log('1111');
+            // console.log(index,'111111')
             // this.playerOptions.sources[0].src=path;
             // this.cameraNameId=name;
             // console.log(path,'index1',name,'name1');
@@ -338,14 +338,14 @@ export default {
         },
         leftSlide(){
             this.rightShow=true;
-            console.log('左边')
+            // console.log('左边')
             var bottomUl=document.getElementById("bottomUl");
             var bottomLi=bottomUl.getElementsByTagName("li")
             // bottomUl.style.width = bottomLi[0].offsetWidth*bottomLi.length+'px';//ul的宽度等于每个li的宽度乘以所有li的长度
             bottomUl.style.left = bottomUl.offsetLeft-bottomLi[0].offsetWidth-6+'px';
             var bottomDivUl=document.getElementById('bottomDivUl').offsetWidth;
-            console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
-            console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
+            // console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
+            // console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
             if(bottomUl.offsetLeft==0){
                 // bottomUl.style.left=0+'px'
                 this.leftShow=false;
@@ -365,8 +365,8 @@ export default {
             var bottomLi=bottomUl.getElementsByTagName("li")
             // bottomUl.style.width = bottomLi[0].offsetWidth*bottomLi.length+'px';//ul的宽度等于每个li的宽度乘以所有li的长度
             bottomUl.style.left = bottomUl.offsetLeft+bottomLi[0].offsetWidth+5+'px';
-            console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
-            console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
+            // console.log(document.getElementById('bottomDivUl').offsetWidth,'宽度')
+            // console.log(bottomUl.offsetLeft,'bottomUl.offsetLeft');
             if(bottomUl.offsetLeft>=0){
                 // bottomUl.style.left=0+'px'
                 this.rightShow=false;
@@ -374,13 +374,13 @@ export default {
                 this.rightShow=true;
             }
             
-            console.log('右边')
+            // console.log('右边')
             // bottomUl.style.left = bottomUl.offsetLeft+bottomLi[0].offsetWidth+'px';
         },
         loadingTitle(){
             var vn=this;
             vn.routerList=vn.getSecondGradeList(vn.moduleList,'006','00603','/constructionSite/remoteVideo','00602','/constructionSite/safetyRuning','00601','/constructionSite/safetyCheckings','00604','/constructionSite/safetyInspection');
-            console.log(vn.routerList,'vn.routerList')
+            // console.log(vn.routerList,'vn.routerList')
         },
         //二级标题生成函数
         getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){

@@ -742,8 +742,8 @@ export default {
                 message.projId = localStorage.getItem('projId');
                 message.type = "0";
                 // console.log(message,'message');
-                console.log(JSON.stringify(message),'ppp');
-                console.log('连接成功');
+                // console.log(JSON.stringify(message),'ppp');
+                // console.log('连接成功');
                 that.ws.send(JSON.stringify(message));
                 // this.setMessageInnerHTML("open");
             }
@@ -751,13 +751,13 @@ export default {
             // that.setMessageInnerHTML("error");
         };
         this.ws.onmessage = function(event){
-            console.log(JSON.parse(event.data),'回来的信息');
+            // console.log(JSON.parse(event.data),'回来的信息');
             var getBackData=JSON.parse(event.data);
             
            
             if(getBackData.type=="2"){
                 // alert('11111');
-                console.log(that.selectMeetingId,'this.selectMeetingId');
+                // console.log(that.selectMeetingId,'this.selectMeetingId');
                 if(getBackData.meetingId==that.selectMeetingId){
                     that.chatRecordList.push({
                         userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
@@ -770,7 +770,7 @@ export default {
                         meetingId:JSON.parse(event.data).meetingId
                     })
                 }
-                console.log(that.chatRecordList,'that.chatRecordList')
+                // console.log(that.chatRecordList,'that.chatRecordList')
                 if(getBackData.meetingId==that.selectMeetingId){
                     that.meetListGroup.forEach((item)=>{
                         item.noReadNum=0;
@@ -783,7 +783,7 @@ export default {
                             that.moreChatNum++
                         }
                     })
-                    console.log(that.moreChatNum,'that.moreChatNum')
+                    // console.log(that.moreChatNum,'that.moreChatNum')
                     if(that.moreChatNum>0){
                         that.moreChatNumShow=true;
                     }else{
@@ -791,7 +791,7 @@ export default {
                     }
                 }
             }else if(getBackData.type=="1"){
-                console.log(that.selectChatUserId,'that.selectChatUserId')
+                // console.log(that.selectChatUserId,'that.selectChatUserId')
                 if(JSON.parse(event.data).meetingId==null&&that.selectChatUserId==getBackData.from){
                     that.chatMemberRecordList.push({
                         userInfo:vm.returnUserInfo(JSON.parse(event.data).from),
@@ -825,7 +825,7 @@ export default {
                     }
                 }
                 
-                console.log(that.chatMemberRecordList,'that.chatMemberRecordList');
+                // console.log(that.chatMemberRecordList,'that.chatMemberRecordList');
             }
             if(event.data){
                 // this.$message({
@@ -915,7 +915,7 @@ export default {
         //即时通讯功能
             onScroll(e,position){
                 this.position = position;
-                console.log(this.position,'this.position');
+                // console.log(this.position,'this.position');
                         },
             scrollToBottom: function () {
                 this.$nextTick(() => {
@@ -940,7 +940,7 @@ export default {
                     message.time=new Date().getTime();
                     message=JSON.stringify(message);
                      if(message.token!=''&&message.meetingId!=''){
-                        console.log(message,'message群聊');
+                        // console.log(message,'message群聊');
                         this.ws.send(message);
                         this.chatRecordList.push({
                             userInfo:vm.returnUserInfo(vm.userId),
@@ -964,7 +964,7 @@ export default {
                     message.projId = this.projId;
                     message.meetingId=null;
                     message=JSON.stringify(message);
-                    console.log(JSON.stringify(message),'00000');
+                    // console.log(JSON.stringify(message),'00000');
                     if(message.token!=''&&message.to!=''){
                         this.ws.send(message);
                         this.chatMemberRecordList.push({
@@ -1032,7 +1032,7 @@ export default {
 
                             })
                         })
-                        console.log(vm.chatMemberRecordList,'后台获取私聊聊天记录成功');
+                        // console.log(vm.chatMemberRecordList,'后台获取私聊聊天记录成功');
                     }else{
 
                     }
@@ -1128,7 +1128,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         var meetIdUserList=response.data.rt;
-                        console.log(meetIdUserList,'meetIdUserList');
+                        // console.log(meetIdUserList,'meetIdUserList');
                         if(meetIdUserList.length==0){
                             if(vm.selectGroupid){
                                 this.getUserByGroupid(null);
@@ -1488,7 +1488,7 @@ export default {
             },
             //会议置顶
             meetSetTop(){
-                console.log(this.isMeetTopValue,'isMeetTopValue');
+                // console.log(this.isMeetTopValue,'isMeetTopValue');
                 if(this.isMeetTopValue==true){
                     this.setTop(1)
                 }else if(this.isMeetTopValue==false){
@@ -1497,7 +1497,7 @@ export default {
             },
             //联系人置顶
             oneByoneChatSetTop(){
-                console.log(this.ischatUserTopValue,'ischatUserTopValue');
+                // console.log(this.ischatUserTopValue,'ischatUserTopValue');
                 if(this.ischatUserTopValue==true){
                     this.setTop(0)
                 }else if(this.ischatUserTopValue==false){
@@ -1802,7 +1802,7 @@ export default {
                         }
                     })
                    
-                    console.log(vm.userDetialAdd,'vm.userDetialAdd');
+                    // console.log(vm.userDetialAdd,'vm.userDetialAdd');
                 }
             },
             //保存
@@ -2048,7 +2048,7 @@ export default {
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.fileTreeList_original=response.data.rt;
-                    console.log(this.fileTreeList_original);
+                    // console.log(this.fileTreeList_original);
                     this.fileTreeList = data.transformTozTreeFormat(setting, response.data.rt);
                     // console.log(this.fileTreeList)
                 }
@@ -2159,7 +2159,7 @@ export default {
                     this.mediaUrlList1=response.data.rt;
                     this.lineLiveImgShow=false;
                     this.livePageTotal=this.mediaUrlList1.length;
-                    console.log(this.playerOptions)
+                    // console.log(this.playerOptions)
                     this.loading=true;
                     this.playerOptions.sources[0].src=this.mediaUrlList1[0].path;
                     setTimeout(()=>{
@@ -2421,7 +2421,7 @@ export default {
         },
         editMediaUrl1(num){
             this.updateResourceDialog1=true;
-            console.log(num,'num0000');
+            // console.log(num,'num0000');
             this.mediaUrlList1.forEach((item)=>{
                 if(item.id==num){
                     this.updateId=item.id;
@@ -2665,7 +2665,7 @@ export default {
                     var percentComplete = xhr.loaded / xhr.total * 100;
                     var counter1 = document.getElementById("objAndMtlFile1");
                     counter1.innerText = Math.round(percentComplete, 2) + '% downloaded';
-                    console.log(Math.round(percentComplete, 2),'百分比')
+                    // console.log(Math.round(percentComplete, 2),'百分比')
                     if(Math.round(percentComplete, 2)==100){
                         counter1.innerText='';
                     }
@@ -2818,7 +2818,7 @@ export default {
             },
 
             onWindowResize() {
-                console.log($("#planeDIV").height());
+                // console.log($("#planeDIV").height());
 
                 camera.aspect = $("#planeDIV").width() / $("#planeDIV").height();
                 camera.updateProjectionMatrix();

@@ -149,7 +149,7 @@ export default  Vue.component('commonAutoGet',{
                         // vm.uploadshow=false;
                     }
             })
-            console.log(vm.filesList,'vm.filesList');
+            // console.log(vm.filesList,'vm.filesList');
         },
         //上传
         uploadIMG(){

@@ -710,7 +710,7 @@ export default Vue.component('common-list',{
                     this.HolderPath=JSON.parse(response.data.rt)[0].holderInfo;
                     
                     this.paraList={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCodeList};
-                    console.log(this.paraList,'this.paraList');
+                    // console.log(this.paraList,'this.paraList');
                     const app = document.getElementById('webIframe').contentWindow;
                     app.postMessage({command:"LookAtEntities",parameter:this.paraList},"*");
                     document.body.scrollTop = 0;
@@ -731,12 +731,12 @@ export default Vue.component('common-list',{
                     message:'请打开顶部的虚拟场景'
                 })
             }else{
-                console.log(JSON.parse(val),'val2222');
+                // console.log(JSON.parse(val),'val2222');
                 var val=JSON.parse(val);
                 this.TraceID=String(val[0].b_TraceID);
                 this.GCCodeList=val[0].b_GCCode;
                 this.holderId.push(val[0].b_HolderID);
-                console.log(this.TraceID);
+                // console.log(this.TraceID);
                 this.getParentId();
             }
         },
@@ -783,11 +783,11 @@ export default Vue.component('common-list',{
                             projId:this.projId
                         }
                     }).then(response=>{
-                        console.log(response.data);
+                        // console.log(response.data);
                         if(response.data.cd == 0){
-                            console.log(response.data.rt);
+                            // console.log(response.data.rt);
                             vm.rcStyle = response.data.rt.rcStyle
-                            console.log(vm.rcStyle,'rcStyle');
+                            // console.log(vm.rcStyle,'rcStyle');
                             vm.dataName = response.data.rt.reportName;
                             this.displayTyle = response.data.rt.rcConfig.displayType;
                             vm.DatatableList = [];

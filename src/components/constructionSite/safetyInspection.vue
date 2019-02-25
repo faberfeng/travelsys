@@ -163,7 +163,7 @@
                             <label class="inspectTableHeadLeftTxt"></label>
                         </div>
                         <div class="inspectTableHeadRight">
-                            <!-- <div class="addData" v-show="importDataEdit" @click="batchExport()">数据导入</div> -->
+                            <div class="addData" v-show="importDataEdit" @click="batchExport()">数据导入</div>
                             <div class="addInspectContent" v-show="editInspectWordEdit" @click="addMonitorItemBtn()">新增监测内容</div>
                         </div>
                     </div>
@@ -417,28 +417,31 @@
                                 <div class="editBodytwo" v-show="val.type==1"><label class="editInpText" style="width:18% !important;">位移取值列名:</label>
                                     <select class="gatherTimeName"  :id="'distanceCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
                                 </div>
+
                                 <div class="editBodytwo" v-show="val.type==2"><label class="editInpText" style="width:18% !important;">高程取值列名:</label>
                                     <select class="gatherTimeName"  :id="'altitudeCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
                                 </div>
+
                                 <div class="editBodytwo" v-show="val.type==3"><label class="editInpText" style="width:18% !important;">管口标高取值列名:</label>
                                     <select class="gatherTimeName"  :id="'pipeHeightCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
-                                
                                 </div>
+
                                 <div class="editBodytwo" v-show="val.type==3"><label class="editInpText" style="width:18% !important;">水位深度取值列名:</label>
                                     <select class="gatherTimeName"  :id="'gaugeHeightCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
-                            
                                 </div>
+
                                 <div class="editBodytwo" v-show="val.type==5"><label class="editInpText" style="width:18% !important;">斜度位移取值列名:</label>
                                     <select class="gatherTimeName"  :id="'shiftIndexCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
-                                
                                 </div>
+
                                 <div class="editBodytwo" v-show="val.type==5"><label class="editInpText" style="width:18% !important;">斜度深度取值列名:</label>
                                     <select class="gatherTimeName"  :id="'depthIndexCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
-                            
                                 </div>
+
                                  <div class="editBodytwo" v-show="!frequencyShow&&val.type==4"><label class="editInpText" style="width:18% !important;">受力取值列名:</label>
                                     <select class="gatherTimeName"  :id="'forceIndexCol'+val.itemId"><option value=""></option><option v-for="(item) in val.sheetlist" :value="item.index+'-'+val.itemId" :key="item.index" v-text="item.name"></option></select>
                                 </div>
+                                
                                 <div class="editBodytwo" v-show="val.type==4"><label class="editInpText" style="width:18% !important;">
                                         <el-checkbox v-model="frequencyShow">按频率取值受力</el-checkbox>
                                     </label>

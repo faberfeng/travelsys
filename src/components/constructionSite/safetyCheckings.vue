@@ -376,7 +376,7 @@ export default {
         loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'006','00601','/constructionSite/safetyCheckings','00604','/constructionSite/safetyInspection','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo');
-          console.log(vn.routerList,'vn.routerList')
+        //   console.log(vn.routerList,'vn.routerList')
         },
         //二级标题生成函数
         getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
@@ -427,7 +427,7 @@ export default {
       },
       checkIcon1(val){
           var vm = this
-          console.log(val,'val1111');
+        //   console.log(val,'val1111');
           var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
           if(iconArr.indexOf(val) > -1){
               return val
@@ -519,7 +519,7 @@ export default {
         //     return ;
         // }
          vm.isComment=false;
-        console.log(event,'00000')
+        // console.log(event,'00000')
         if(reviewCount == 0&&event==null){
              vm.$message({
                 type:'warning',
@@ -587,7 +587,7 @@ export default {
                     this.validateAuth();
                     this.getCheckTypeSubDir();
                     this.getCommunicationList();
-                    console.log(this.qualityCheckList);
+                    // console.log(this.qualityCheckList);
                 }else if(response.data.cd=="-1"){
                     alert(response.data.msg)
                 }
@@ -630,7 +630,7 @@ export default {
                 if(response.data.cd=="0"){
                     this.CheckTypeSubDirList=response.data.rt;
                     // this.CheckTypeSubDirList=data.transformTozTreeFormat(setting, response.data.rt);
-                    console.log(this.CheckTypeSubDirList);
+                    // console.log(this.CheckTypeSubDirList);
                 }else if(response.data.cd=="-1"){
                     alert(response.data.msg)
                 }
@@ -719,12 +719,12 @@ export default {
             this.checkTypeId=obj.id;
             this.checkTypeValue=obj.text;
             var str;
-            console.log(obj.attributes.dirParId)
+            // console.log(obj.attributes.dirParId)
             this.CheckTypeSubDirList.forEach((item)=>{
                 if(item.id==obj.attributes.dirParId){
                     str=item.text;
                     this.checkTypeValue=str+'-'+this.checkTypeValue;
-                    console.log(this.checkTypeValue)
+                    // console.log(this.checkTypeValue)
                 }
             })
             // if(obj.attributes.dirParId)
@@ -775,7 +775,7 @@ export default {
                     vm.$set(item,'statusText',vm.checkStatus(item.dcStatus))
                 })
                }
-               console.log(vm.CommunicationList);
+            //    console.log(vm.CommunicationList);
                vm.pageTotal = response.data.rt.pager.totalSize
             }else{
                   vm.$message({
