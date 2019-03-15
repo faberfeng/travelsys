@@ -56,7 +56,7 @@ export default Vue.component('common-header', {
             var vm = this
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'project2/logout',
+                url:vm.BDMSUrl+'api/v1/certification/logout',
                 headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token

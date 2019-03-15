@@ -4,13 +4,14 @@
         <div class="account">
             <h5 class="accountTitle"><img class="imgicon" src="../../assets/project-id.png"/>工程账号 <span class="groundSpan" @click="retract"><img class="groundEdit"   :src="retractImg"/>{{retractText}}</span></h5>
             <ul class="accountList" >
-                <li class="pre"><span>工程账号</span> <label>{{projectConfig.projCode}}</label></li>
-                <li class="pre"><span>工程名称</span> <label>{{projectConfig.projName}}</label></li>
-                <li class="pre"><span>工程管理账号</span> <label>{{projectConfig.projAdminEmail}}</label></li>
-                <li class="pre"><span>工程管理员姓名</span> <label>{{projectConfig.projAdminName}}</label></li>
-                <li class="pre" v-show="isShow"><span>工程管理员电话</span> <label>{{projectConfig.projTelphone}}</label></li>
-                <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>{{projectConfig.projUserNum}}  {{projectUseCount}}个已使用</label></li>
-                <li class="pre" v-show="isShow"><span>到期日期</span> <label>{{projectConfig.projExpireTime | toLocalD}}</label></li>
+                <li class="pre"><span>工程账号</span> <label>{{projectConfig.projectId}}</label></li>
+                <li class="pre"><span>工程名称</span> <label>{{proName}}</label></li>
+                <!-- <li class="pre"><span>工程管理账号</span> <label>{{projectConfig.projAdminEmail}}</label></li> -->
+                <li class="pre" v-show="isShow"><span>工程创建者</span> <label>{{projectConfig.creater}}</label></li>
+                 <li class="pre"><span>工程状态</span> <label>{{projectConfig.strStatus}}</label></li>
+                
+                <!-- <li class="pre" v-show="isShow"><span>授权用户数量</span> <label>{{projectConfig.projUserNum}}  {{projectUseCount}}个已使用</label></li>
+                <li class="pre" v-show="isShow"><span>到期日期</span> <label>{{projectConfig.projExpireTime | toLocalD}}</label></li> -->
                 <li class="pre " id="pre" v-show="isShow">
                     <span>工程logo</span> 
                     <div class="preDiv">
@@ -18,13 +19,13 @@
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
                             <img v-if="projectImage" :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/>
                             </div>
-                        <div style="margin:0;">
+                        <!-- <div style="margin:0;">
                             <el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> 
                             <label style="margin-left:-10px;color:#999999;font-size:12px;">200*50px,jpg/png格式</label>
-                        </div>
+                        </div> -->
                     </div>
                 </li>
-                <li class="pre" id="preQRCode">
+                <!-- <li class="pre" id="preQRCode">
                     <span>加入工程二维码</span>
                     <div class="QRCode">
                         <img :src="BDMSUrlQRCode+'QRCode2/ApplyQr/'+projId+'/10/5'" style="width:155px;height:155px;"/>
@@ -33,8 +34,7 @@
                          <div class="fulscreen" @click="fullSreen()"><img class="fulscreenImg" src="./images/fullSreen1.png">全屏</div>
                         <div class="downFile" @click="downQRCode()"><img class="downFileImg" src="./images/downFile1.png">下载</div>
                     </div>
-                   
-                </li>
+                </li> -->
             </ul>
         </div>
         <div class="summary">
@@ -229,6 +229,7 @@ export default {
             //unity=>viewKey viewVal=>viewVal
             index:'',
             projectConfig:{},
+            proName:'',
             projectUseCount:'',
             projectImage:{},
             projectImageList:[],//获取工程图片列表
@@ -251,12 +252,12 @@ export default {
     created(){
        // var vm = this;
         this.QJFileManageSystemURL=this.$store.state.QJFileManageSystemURL;
-        this.BDMSUrl = this.$store.state.BDMSUrl+'project2/';
+        this.BDMSUrl = this.$store.state.BDMSUrl+'api/v1/main/main/';
         this.BDMSUrlQRCode=this.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
-        this.projectName = localStorage.getItem('projectName');
+        // this.projectName = localStorage.getItem('projectName');
         this.getMenusInfo();//获取自定义菜单信息
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
@@ -303,13 +304,14 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'saveProjectOverview',
+                    url:this.BDMSUrlQRCode+'api/v1/main/saveProjectOverview',
+                    // url:'http://10.252.26.117:8080/bdms_war_exploded/api/v1/main/saveProjectOverview',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
                     },
                     data:{
-                        id:0,
+                        // id:null,
                         projId:localStorage.getItem('projId'),
                         viewKey:this.projectUnity,
                         viewVal:this.projectName
@@ -337,7 +339,7 @@ export default {
             }else{
                 axios({
                     method:'get',
-                    url:this.BDMSUrlQRCode+'config2/component/addCustomMenu',
+                    url:this.BDMSUrlQRCode+'api/v1/main/addCustomMenu',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
@@ -372,7 +374,7 @@ export default {
         deleteMenusMakeSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrlQRCode+"config2/component/deleteCustomMenu",
+                url:this.BDMSUrlQRCode+"api/v1/main/deleteCustomMenu",
                 headers:{
                     'token':this.token
                 },
@@ -400,7 +402,7 @@ export default {
         deleteMakeSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+"delProjectOverview",
+                url:this.BDMSUrlQRCode+"api/v1/main/delProjectOverview",
                 headers:{
                     'token':this.token
                 },
@@ -433,7 +435,7 @@ export default {
             }else{
                 axios({
                     method:'get',
-                    url:this.BDMSUrlQRCode+'config2/component/editCustomMenu',
+                    url:this.BDMSUrlQRCode+'api/v1/main/editCustomMenu',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
@@ -517,7 +519,7 @@ export default {
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'saveProjectOverview',
+                    url:this.BDMSUrlQRCode+'api/v1/main/saveProjectOverview',
                     headers:{
                         'token':this.token,
                     },
@@ -617,7 +619,7 @@ export default {
         getMenusInfo(){
             axios({
                 method:'GET',
-                url:this.BDMSUrlQRCode+'config2/component/getCustomMenu',
+                url:this.BDMSUrlQRCode+'api/v1/main/getCustomMenu',
                 headers:{
                     'token':this.token
                 },
@@ -642,7 +644,7 @@ export default {
         getProjectInitalConfig(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'projectConfigIndex',
+                url:this.BDMSUrlQRCode+'api/v1/main/index',
                 headers:{
                     'token':this.token
                 },
@@ -652,18 +654,23 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.projectConfig = response.data.rt.project;
-                    this.projectLogoConfig = response.data.rt.projectConfig;
-                    this.isAsdefault = response.data.rt.projectConfig.confVal;
+                    this.$store.commit('changeProjectLogo',{
+                        // projectImg:response.data.rt.projectImage?response.data.rt.image[0].filePath:''
+                        projectImg:response.data.rt.image[0]
+                    })
+                     this.projectImage = response.data.rt.image[0];
+                     this.proName=this.projectConfig.projectName;
+                    // this.projectLogoConfig = response.data.rt.projectConfig;
+                    // this.isAsdefault = response.data.rt.projectConfig.confVal;
                     if(this.isAsdefault == 'true'){
                         this.isAsdefault = true;
                     }else{
                         this.isAsdefault = false;
                     }
-                    this.$store.commit('changeProjectLogo',{
-                        projectImg:response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
-                    })
-                    this.projectUseCount = response.data.rt.projectUserCount;
-                    this.projectImage = response.data.rt.projectImage;
+                    
+                    // this.projectUseCount = response.data.rt.projectUserCount;
+                   
+                    console.log(this.projectImage);
                 }else if(response.data.cd === '-1'){
                     alert(response.data.msg)
                 }else{

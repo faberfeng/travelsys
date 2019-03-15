@@ -1029,7 +1029,6 @@ export default {
                                 type:"1",
                                 userFrom:item.fromid,
                                 meetingId:item.meetingid
-
                             })
                         })
                         // console.log(vm.chatMemberRecordList,'后台获取私聊聊天记录成功');

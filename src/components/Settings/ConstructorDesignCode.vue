@@ -7,10 +7,10 @@
             <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button>
             <div class="worktable">
                 <zk-table 
-                index-text="序号"
-                :data="constructorData" :columns="columns" @expand-cell-click="expandClick" :tree-type="props.treeType" 
-                :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
-                :border="props.border"  empty-text="正在加载...">
+                    index-text="序号"
+                    :data="constructorData" :columns="columns" @expand-cell-click="expandClick" :tree-type="props.treeType" 
+                    :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
+                    :border="props.border"  empty-text="正在加载...">
                     <template slot="appearence" slot-scope="scope">
                        <div v-html="scope.row.color_0+scope.row.color_1+scope.row.color_2">
                        </div>
@@ -594,28 +594,28 @@ export default {
             columns: [
                 {
                     label: '编码',
-                    prop: 'number',
+                    prop: 'classifyCode',
                     width: '150px',
                 },
                 {
                     label: '标题',
-                    prop: 'title',
+                    prop: 'classifyName',
                     minWidth: '50px',
                 },
-                {
-                    label: '来源',
-                    prop: 'source_',
-                },
-                {
-                    label: '状态',
-                    prop: 'status_',
-                },
-                {
-                    label: '外观材质',
-                    type: 'template',
-                    template: 'appearence',
-                    minWidth:'150px'
-                },
+                // {
+                //     label: '来源',
+                //     prop: 'source_',
+                // },
+                // {
+                //     label: '状态',
+                //     prop: 'status_',
+                // },
+                // {
+                //     label: '外观材质',
+                //     type: 'template',
+                //     template: 'appearence',
+                //     minWidth:'150px'
+                // },
                 {
                     label: '扩展属性',
                     prop: 'properties',
@@ -826,13 +826,15 @@ export default {
             var vm = this
             axios({
                 method:'post',
-                url:vm.BDMSUrl+'project2/Config/getProjectGenieClassByProjId',
+                // url:vm.BDMSUrl+'project2/Config/getProjectGenieClassByProjId',
+                url:vm.BDMSUrl+'/projectInfo/getComponentCode',
                 headers:{
                     token:this.token
                 },
                 params:{
-                    projId:this.projId,
-                    tableName:'t31'
+                    // projId:this.projId
+                    // tableName:'t31'
+                    projectId:this.projId
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){

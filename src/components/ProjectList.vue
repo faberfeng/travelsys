@@ -1,7 +1,7 @@
 <template>
 <div class="wrapper">
     <headerCommon :username="userName" :proname="titleName"></headerCommon>
-      <div v-show="!noprojectShow" class="noproject">
+      <!-- <div v-show="!noprojectShow" class="noproject">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
                 <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
@@ -11,53 +11,53 @@
                 </div>
                 <div></div>
             </div>
-      </div>
+      </div> -->
     <div v-show="noprojectShow">
       <div class="header-bar">
         <span class="bar-title">工程导航</span>
         <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
         <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
-        <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span>
+        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
-        <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.activated,'end_color_b':item.expired},'item-proj']" @click="selectProject(item.projId,item.expired,item.projName)">
-            <div :class="[{'ongoing':item.activated,'end':item.expired},'item-head','new']">
+        <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.strStatus=='进行中','end_color_b':item.strStatus!='进行中'},'item-proj']" @click="selectProject(item.projectId,item.strStatus!='进行中',item.projName)">
+            <div :class="[{'ongoing':item.strStatus=='进行中','end':item.strStatus!='进行中'},'item-head','new']">
               <span class="item-title">工程名称</span>
-              <div :class="[item.projName.length>13?'item-name-box-s':'','item-name-box']">
-                <span class="item-name" v-text="item.projName.length>25?item.projName.substr(0,25)+'...':item.projName" :title="item.projName"></span>
+              <div :class="[item.projectName.length>13?'item-name-box-s':'','item-name-box']">
+                <span class="item-name" v-text="item.projectName.length>25?item.projectName.substr(0,25)+'...':item.projectName" :title="item.projectName"></span>
               </div>
               <img class="img"  src="../assets/003.png" alt="">
             </div>
             <div class="item_body">
               <div style="height:102px;overflow:hidden;">
                 <p style="margin-bottom:18px" class="clearfix">
-                  <span class="body-left">工程账号</span><span class="body-right" v-text="item.projCode"></span>
+                  <span class="body-left">工程账号</span><span class="body-right" v-text="item.projectId"></span>
                 </p>
                 <p style="margin-bottom:18px" class="clearfix">
-                  <span class="body-left">工程管理员</span><span class="body-right" v-text="item.projAdminName"></span>
+                  <span class="body-left">工程管理员</span><span class="body-right" v-text="item.creater"></span>
                 </p>
-                <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
+                <!-- <p style="margin-bottom:24px" class="clearfix" v-for="(val,key) in item.overviewList" :key="key">
                   <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-html="val.viewVal"></span>
-                </p>
+                </p> -->
               </div>
-              <span v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')" :class="[{'ongoing_s':item.activated,'end_s':item.expired},'new_s','text-s']"></span>
+              <span v-text="item.strStatus!='进行中'?'已到期':(item.strStatus=='进行中'?'进行中':'新项目')" :class="[{'ongoing_s':item.strStatus=='进行中','end_s':item.strStatus!='进行中'},'new_s','text-s']"></span>
             </div>
         </div>
       </div>
       <div class="item-proj-box" v-if="show2" >
-        <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.activated,'end_color':item.expired},'item-proj-line']" @click="selectProject(item.projId,item.expired,item.projName)">
+        <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.strStatus=='进行中','end_color':item.strStatus!='进行中'},'item-proj-line']" @click="selectProject(item.projectId,item.expired,item.projName)">
           <span class="proj-state-box">
-            <span class="proj-state-bg" :class="[{'ongoing_bg':item.activated,'end_bg':item.expired}]"></span>
-            <span class="proj-state-title" v-text="item.expired?'已到期':(item.activated?'进行中':'新项目')"></span>
+            <span class="proj-state-bg" :class="[{'ongoing_bg':item.strStatus=='进行中','end_bg':item.strStatus!='进行中'}]"></span>
+            <span class="proj-state-title" v-text="item.strStatus!='进行中'?'已到期':(item.strStatus=='进行中'?'进行中':'新项目')"></span>
           </span>
           <img :src="item.imgPath?item.imgPath:require('../assets/bg.png')" class="line-img" alt="">
           <div class="line-detial-box">
-              <h1 v-text="item.projName"></h1>
+              <h1 v-text="item.projectName"></h1>
               <div class="line-content-box">
                 <p  class="clearfix line-p">
-                  <span class="body-left-line" style="width:87px;">工程账号:</span><span class="body-left-line" v-text="item.projCode"></span>
+                  <span class="body-left-line" style="width:87px;">工程账号:</span><span class="body-left-line" v-text="item.projectId"></span>
                 </p>
-                <p class="clearfix line-p">
+                <!-- <p class="clearfix line-p">
                   <span class="body-left-line" style="width:87px;">工程管理员账号:</span><span class="body-left-line" v-text="item.projAdminAccount"></span>
                 </p>
                 <p class="clearfix line-p">
@@ -68,19 +68,19 @@
                 </p>
                 <p class="clearfix line-p">
                   <span class="body-left-line" style="width:87px;">授权用户数量:</span><span class="body-left-line" v-text="item.projUserNum+' '+item.projUserNum"></span>
-                </p>
+                </p> -->
               </div>
               <div class="line-content-box">
                 <table>
                   <tbody>
-                    <tr class="line-table" >
+                    <!-- <tr class="line-table" >
                       <td class="body-left-table">到期日期:</td>
-                      <td class="body-right-table" v-text="item.projExpireTime"></td>
-                    </tr>
-                    <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
+                      <td class="body-right-table" v-text="item.createDate"></td>
+                    </tr> -->
+                    <!-- <tr class="line-table" v-for="(val,key) in item.overviewList" :key="key">
                       <td class="body-left-table" v-text="val.viewKey+':'"></td>
                       <td  class="body-right-table" v-text="val.viewVal"></td>
-                    </tr>
+                    </tr> -->
                   </tbody>
                 </table>
               </div>
@@ -418,6 +418,7 @@ p>.body-left-line:first-of-type{
 import axios from 'axios'
 import headerCommon from './header.vue'
 import {AMapManager} from "vue-amap"
+import moment from 'moment'
 let amapManager=new AMapManager();
 export default {
   name: 'ProjectList',
@@ -479,23 +480,6 @@ export default {
             }
           }
         },
-        // {
-        //   pName: 'Geolocation',
-        //     events: {
-        //       init(o) {
-        //         // o 是高德地图定位插件实例
-        //         o.getCurrentPosition((status, result) => {
-        //           if (result && result.position) {
-        //             self.lng = result.position.lng;
-        //             self.lat = result.position.lat;
-        //             self.center = [self.lng, self.lat];
-        //             self.loaded = true;
-        //             self.$nextTick();
-        //           }
-        //         });
-        //       }
-        //     }
-        // }
         ],
         markers: [],
         windows: [],
@@ -505,6 +489,8 @@ export default {
             city: '上海',
             citylimit: true
         },
+        pathInit:'',
+        
       }
   },
   components: {
@@ -520,15 +506,78 @@ export default {
       if(defaultSubProjId != 'undefined'){
           localStorage.removeItem('defaultSubProjId')
       }
-      vm.viewFlag()
+      // vm.viewFlag()
       vm.getUserInfo()
-      
+      vm.initCompany()
+      console.log(this.$route.query.entId,'回来的entid');
+
   },
   created(){
-    this.titleName = localStorage.getItem('projectName');
+    var vm = this
+    vm.userName = localStorage.getItem('userName')
+    vm.userId = localStorage.getItem('userId')
+    this.titleName = localStorage.getItem('entName');
     localStorage.removeItem("navigationPath")
   },
   methods:{
+
+      getUserInfo(){
+            var vm = this
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'/user/getOnlineInfo',
+                headers:{
+                    'accept':'application/json;charset=UTF-8',
+                    'token':vm.token
+                },
+            }).then((response)=>{
+                if(response.data.cd === '-1'){
+                    this.$router.push({
+                        path:'/login'
+                    })
+                }else{
+                    vm.userName = response.data.rt.user.name;
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        },
+      //获取工程列表
+      initCompany(){
+         var vm = this
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'projectInfo/getUserProjectList',
+                 headers:{
+                    'accept':'application/json;charset=UTF-8',
+                    'token':vm.token
+                },
+                params:{
+                  entId:vm.$route.query.entId
+                }
+            }).then((response)=>{
+                if(response.data.cd == "0"){//跳转项目首页
+                    this.listData=response.data.rt;
+                    console.log(this.listData,'this.listData');
+                }else if(response.data.cd === "1"){
+                    alert(response.data.msg);
+                    setTimeout(()=>{
+                         vm.$router.push({
+                            path:'/login'
+                        })
+                    },1000)
+                   
+                }
+            }).catch(function(error){
+                vm.$router.push({
+                  path:'/login'
+                })
+            })
+
+      },
+
+
+
       onSearchResult(pois) {
         // console.log(pois,'pois');
           let latSum = 0;
@@ -593,11 +642,11 @@ export default {
         this.show0=true;
         this.show2=false;
       },
-      getUserInfo(){
-          var vm = this
-          vm.userName = localStorage.getItem('username')
-          vm.userId = localStorage.getItem('userid')
-      },
+      // getUserInfo(){
+      //     var vm = this
+      //     vm.userName = localStorage.getItem('userName')
+      //     vm.userId = localStorage.getItem('userId')
+      // },
       viewFlag(){
             var vm = this
             axios({

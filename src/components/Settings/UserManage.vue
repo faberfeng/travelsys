@@ -26,25 +26,25 @@
                         <th width="15%">用户名</th>
                         <th width="10%">工程管理员</th>
                         <th width="15%;">已被分配到的岗位</th>
-                         <th width="15%">添加时间</th>
-                        <th width="10%;">添加人</th>
+                         <!-- <th width="15%">添加时间</th>
+                        <th width="10%;">添加人</th> -->
                         <th width="10%">备注</th>
                          <th width="10%">操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(val,index) in userList" :key="index">
-                        <td v-text="val.userName"></td>
-                        <td v-text="val.account"></td>
-                        <td v-text="val.isAdmin ==2?'是':'不是'"></td>
+                        <td v-text="val.name"></td>
+                        <td v-text="val.name2"></td>
+                        <td v-text="val.isAdmin ==1?'是':'不是'"></td>
                         <td>
-                            <span v-for="(item,key) in val.userPositions" :key="key" v-text="item.posName+(key<val.userPositions.length-1?'、':'')"></span>
+                            <span v-for="(item,key) in val.posNames" :key="key" v-text="item+(key<val.posNames.length-1?'、':'')"></span>
                         </td>
-                         <td v-text="val.addTimeStr"></td>
-                        <td v-text="val.addUser"></td>
+                         <!-- <td v-text="val.addTimeStr"></td>
+                        <td v-text="val.addUser"></td> -->
                         <td v-text="val.remark"></td>
                         <td>
-                            <span class="editIcon" @click="addUser(val.id)"></span>
+                            <span class="editIcon" @click="addUser(val.name2,val.userId,val.remark)"></span>
                             <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.id)"></span>
                         </td>
                     </tr>
@@ -197,7 +197,7 @@
                 <div class="log-head clearfix">
                     <span class="log-head-title">查找用户:</span>
                     <el-radio v-model="userDetial.posType" label="1">邮箱</el-radio>
-                    <el-radio v-model="userDetial.posType" label="2">账号</el-radio>
+                    <el-radio v-model="userDetial.posType" label="2">电话</el-radio>
                 </div>
                 <div  class="JobName clearfix">
                     <input type="text" v-model="userDetial.posName" placeholder="请输入" @keyup.enter="searchUser">
@@ -211,11 +211,11 @@
                     <span class="info-user">
                         <p>
                             <span class="name">姓名:</span>
-                            <span class="detial" v-text="userDetial.info.realName"></span>
+                            <span class="detial" v-text="userDetial.info.name"></span>
                         </p>
                         <p>
-                            <span class="name">账号:</span>
-                            <span class="detial" v-text="userDetial.info.account" style="color:#666;font-weight: normal;"></span>
+                            <span class="name">电话:</span>
+                            <span class="detial" v-text="userDetial.info.tel" style="color:#666;font-weight: normal;"></span>
                         </p>
                         <p>
                             <span class="name">邮箱:</span>
@@ -746,7 +746,9 @@ export default {
             show:true,
             info:{},//具体信息
           },
-          position_default:{},//工程管理员岗位
+          position_default:{
+            //   checkFlg:false
+          },//工程管理员岗位
           position_list:[],//可选其他岗位
           pageDetial:{
               pagePerNum:20,//一页几份数据
@@ -808,8 +810,9 @@ export default {
       vm.projAuth.deleteUser = projAuth.indexOf('00100305')>=0?true:false
       vm.projId = localStorage.getItem('projId')//项目id
       vm.token  = localStorage.getItem('token')
-      vm.intoUserManager()
+    //   vm.intoUserManager()
     //   vm.getJobShuXingTu()
+    vm.getInfo()//获取用户列表
   },
   methods:{
       //
@@ -989,8 +992,9 @@ export default {
             }
 
         },
-        searchUser(){
+        searchUser(name){
             var vm = this
+            var phone=''
             if(vm.userDetial.posType == 1){
                 var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
                 if(!myreg.test(vm.userDetial.posName))
@@ -1002,66 +1006,74 @@ export default {
                     return false;
                 }
             }
+            if(vm.userDetial.posType == 2){
+                    phone=vm.userDetial.posName
+            }
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                // url:vm.BDMSUrl+'project2/Config/findUserByKeyWord',
+                url:vm.BDMSUrl+'user/getUserInfo',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    params:vm.userDetial.posName
+                    email:vm.userDetial.posName,
+                    phone:phone,
+                    nickname:name
                 }
             }).then((response)=>{
                 if(response.data.cd == 0){
                     if(response.data.rt != null){
                         vm.userDetial.info = response.data.rt
-                    }else{
-                        vm.userDetial.info = {}
-                        if(vm.userDetial.posType == 1){
-                           vm.$confirm('没有找到邮箱为['+vm.userDetial.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '无用户邮箱', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'warning'
-                            }).then(() => {
-                                axios({
-                                    method:'GET',
-                                    url:vm.BDMSUrl+'project2/Config/sendNoRegesterEmail',
-                                    headers:{
-                                        'token':vm.token
-                                    },
-                                    params:{
-                                        email:vm.userDetial.posName,
-                                        projId:vm.projId
-                                    }
-                                }).then((response)=>{
-                                    if(Math.ceil(response.data.cd) == 0){
-                                         vm.$notify({
-                                            title: '邀请已发送',
-                                            message: '邮箱为[' + vm.userDetial.posName + ']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的用户',
-                                            type: 'success'
-                                        });
-                                    }else if(response.data.cd == -1){
-                                        vm.$message({
-                                            type:'error',
-                                            message:response.data.msg
-                                        })
-                                    }
-                                }).catch((err)=>{
-                                    console.log(err)
-                                })
-                            }).catch(() => {
-                                vm.$message({
-                                    type: 'info',
-                                    message: '已取消发送邀请。'
-                                })
-                            })
-                        }else{
-                             vm.$message({
-                                type: 'warning',
-                                message: '未找到[ '+vm.userDetial.posName+' ]用户!'
-                            })
-                        }
                     }
+                    // else{
+                    //     vm.userDetial.info = {}
+                    //     if(vm.userDetial.posType == 1){
+                    //        vm.$confirm('没有找到邮箱为['+vm.userDetial.posName+']的用户记录。是否向本邮箱用户发送加入当前工程协同工作的邀请?', '无用户邮箱', {
+                    //             confirmButtonText: '确定',
+                    //             cancelButtonText: '取消',
+                    //             type: 'warning'
+                    //         }).then(() => {
+                    //             axios({
+                    //                 method:'GET',
+                    //                 url:vm.BDMSUrl+'project2/Config/sendNoRegesterEmail',
+                    //                 headers:{
+                    //                     'token':vm.token
+                    //                 },
+                    //                 params:{
+                    //                     email:vm.userDetial.posName,
+                    //                     projId:vm.projId
+                    //                 }
+                    //             }).then((response)=>{
+                    //                 if(Math.ceil(response.data.cd) == 0){
+                    //                      vm.$notify({
+                    //                         title: '邀请已发送',
+                    //                         message: '邮箱为[' + vm.userDetial.posName + ']的用户将收到您所发出的的协同工作邀请。此用户登录邮箱点击链接，补充完成信息后，即可登陆协同系统，成为当前工程的用户',
+                    //                         type: 'success'
+                    //                     });
+                    //                 }else if(response.data.cd == -1){
+                    //                     vm.$message({
+                    //                         type:'error',
+                    //                         message:response.data.msg
+                    //                     })
+                    //                 }
+                    //             }).catch((err)=>{
+                    //                 console.log(err)
+                    //             })
+                    //         }).catch(() => {
+                    //             vm.$message({
+                    //                 type: 'info',
+                    //                 message: '已取消发送邀请。'
+                    //             })
+                    //         })
+                    //     }
+                    //     else{
+                    //          vm.$message({
+                    //             type: 'warning',
+                    //             message: '未找到[ '+vm.userDetial.posName+' ]用户!'
+                    //         })
+                    //     }
+                    // }
                     
                 }
             }).catch((err)=>{
@@ -1138,21 +1150,23 @@ export default {
             console.log(this.userSearchInfo)
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'project2/Config/searchProjectUserList/'+vm.projId,
+                // url:vm.BDMSUrl+'project2/Config/searchProjectUserList/'+vm.projId,
+                url:vm.BDMSUrl+'user/getUserList',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    page: vm.pageDetial.currentPage,
-                    rows: vm.pageDetial.pagePerNum,
-                    userName: vm.userSearchInfo,
+                    // page: vm.pageDetial.currentPage,
+                    // rows: vm.pageDetial.pagePerNum,
+                    // userName: vm.userSearchInfo,
+                    projectId:vm.projId
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     vm.userSearchInfo ='';//搜索完清空
-                    vm.userList = response.data.rt.rows;
-                    vm.pageDetial.total = response.data.rt.total;
-                    vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum);
+                    vm.userList = response.data.rt;
+                    // vm.pageDetial.total = response.data.rt.total;
+                    // vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum);
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{
@@ -1168,59 +1182,116 @@ export default {
         deleteRow(index, rows) {
             rows.splice(index, 1);
         },
-        addUser(id){
+        //获取所有岗位
+        getInfoList(posId){
+            var vm=this;
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'/position/getAllPosition',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    // vm.userDetial.positions = response.data.rt.positions
+                    vm.position_list = response.data.rt
+                    vm.position_list.forEach((item)=>{
+                        // item.checkFlg=false;
+                        vm.$set(item,'checkFlg',false);
+                    })
+                    vm.position_default = vm.position_list[0]//工程管理员岗位
+                    vm.position_list = vm.position_list.slice(1)//可选其他岗位
+                    if(posId){
+                         posId.forEach((item)=>{
+                             vm.position_list.forEach((item1)=>{
+                                 if(item==item1.id){
+                                     item1.checkFlg=true;
+                                 }
+                             })
+                             if(item==vm.position_default.id){
+                                 vm.position_default.checkFlg=true;
+                             }
+                            //  vm.position_default.forEach((item2)=>{
+                            //      if(item==item2.id){
+                            //          item2.checkFlg=true;
+                            //      }
+                            //  })
+
+                        })
+
+                    }
+                   
+                    // this.position_list.forEach((item)=>{
+                    //     item.checkFlg=true;
+                    // })
+                    // vm.position_list[0].checkFlg=true;
+                }
+            })
+        },
+
+        addUser(name,id,remark){
             var vm = this
             vm.adduser = true;
             if(id){//编辑用户
+                vm.userDetial.posType = 0
                 vm.title = '编辑用户'
                  vm.userDetial.show = false
+                 vm.remarkIfo=remark
                 axios({
                     method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/editProjectUser',
+                    // url:vm.BDMSUrl+'project2/Config/editProjectUser',
+                    url:vm.BDMSUrl+'user/getUserPosition',
                     headers:{
                         'token':vm.token
                     },
                     params:{
-                        projId: vm.projId,
                         userId: id,
                     }
                 }).then((response)=>{
-                    vm.userDetial.info = response.data.rt.projectUser
-                    vm.userDetial.positions = response.data.rt.positions
-                    vm.position_default = response.data.rt.positions[0]//工程管理员岗位
-                    vm.position_list = response.data.rt.positions.slice(1)//可选其他岗位
-                    // this.position_list.forEach((item)=>{
-                    //     item.checkFlg=true;
-                    // })
-                    vm.position_list[0].checkFlg=true;
-                    vm.projUserId = response.data.rt.projUserId
-                    vm.remarkIfo=response.data.rt.remark
+                    vm.searchUser(name);
+                    // vm.userDetial.info = response.data.rt.projectUser
+                    
+                   vm.userDetial.posType = 1
+                    // vm.userDetial.positions = response.data.rt.positions
+                    // vm.position_default = response.data.rt.positions[0]//工程管理员岗位
+                    // vm.position_list = response.data.rt.positions.slice(1)//可选其他岗位
+                    // // this.position_list.forEach((item)=>{
+                    // //     item.checkFlg=true;
+                    // // })
+                    // vm.position_list[0].checkFlg=true;
+                    // vm.projUserId = response.data.rt;
+                    vm.getInfoList(response.data.rt);
+                    // vm.remarkIfo=response.data.rt.remark
                 }).catch((err)=>{
                     console.log(err)
                 })
             }else{
                   vm.title = '添加用户'
                 vm.userDetial.show = true
-                 axios({//添加用户
-                    method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/addProjectUser',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        projId: vm.projId,
-                    }
-                }).then((response)=>{
-                vm.position_default = response.data.rt.positions[0]
-                vm.position_list = response.data.rt.positions.slice(1)
-                vm.position_list[0].checkFlg=true;
-                console.log(vm.position_list,'666')
-                // this.position_list.forEach((item)=>{
-                //         item.checkFlg=true;
-                //     })
-                }).catch((err)=>{
-                    console.log(err)
-                })
+                vm.getInfoList();
+                //  axios({//添加用户
+                //     method:'GET',
+                //     url:vm.BDMSUrl+'project2/Config/addProjectUser',
+                //     headers:{
+                //         'token':vm.token
+                //     },
+                //     params:{
+                //         projId: vm.projId,
+                //     }
+                // }).then((response)=>{
+                // // vm.position_default = response.data.rt.positions[0]
+                // // vm.position_list = response.data.rt.positions.slice(1)
+                // // // vm.position_list[0].checkFlg=true;
+                // // console.log(vm.position_list,'666')
+                // // // this.position_list.forEach((item)=>{
+                // // //         item.checkFlg=true;
+                // // //     })
+                // }).catch((err)=>{
+                //     console.log(err)
+                // })
             }
         },
         //查看申请
@@ -1278,11 +1349,11 @@ export default {
         PostaddUser(){
              var vm = this
              var posIds = []
-             var isAdmin = 1
+             var isAdmin = 0
              var hasPosition = false
             if(vm.position_default.checkFlg){
                 posIds.push(vm.position_default.id+'')
-                isAdmin = 2
+                isAdmin = 1
                 hasPosition = true
             }
             for(var i=0;i<vm.position_list.length;i++){
@@ -1314,22 +1385,27 @@ export default {
             //     return false
             // }
             this.loading=true;
+            var urlList=''
+            if(vm.userDetial.show==true){
+                urlList=vm.BDMSUrl+'user/addUser' //添加用户
+            }else{
+                urlList=vm.BDMSUrl+'user/updateUser' //修改用户
+            }
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'project2/Config/saveProjectUser',
+                // url:vm.BDMSUrl+'project2/Config/saveProjectUser',
+                url:urlList,
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    projId:vm.projId,
-                },
-                data:{
+                    projectId:vm.projId,
                     isAdmin: isAdmin,
-                    posIds: posIds,
                     remark:this.remarkIfo,
-                    projUserId: vm.projUserId,
                     userId: vm.userDetial.info.userId+''
-                }
+                },
+                data: posIds,
+                    // projUserId: vm.projUserId,
             }).then((response)=>{
                  if(response.data.cd == 0){
                     vm.userClose()
@@ -1337,7 +1413,6 @@ export default {
                         type:'success',
                         message:'添加用户成功！'
                     })
-                    
                     vm.getInfo()
                  }else{
                      vm.$message({

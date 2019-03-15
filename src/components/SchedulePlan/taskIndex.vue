@@ -243,7 +243,7 @@
                 <i class="icon-goujian icon-add"></i>
                 <i class="icon-goujian icon-detial" title="清单详细" @click="showDetialList(item.main)"></i>
                 <i class="icon-goujian icon-QRcode" title="清单二维码" @click="qrcode(item.main.pkId)"></i>
-                <i class="icon-goujian icon-location" title="定位" @click="location()"></i>
+                <i class="icon-goujian icon-location" title="定位" @click="location(item.details)"></i>
                 <i class="icon-goujian icon-delete" title="删除" @click="deleteAssociationList(item.main.pkId)"></i>
               </p>
               <p class="item-detial">
@@ -2845,8 +2845,9 @@
             if (i < vm.relaList1.length - 1) datas += ','
         })
         datas += ']'
-        console.log(datas,'data1111');
+        console.log(datas,'data11110000');
         vm.$refs.taskIndedxLabelContent.value = datas
+
         $('#taskIndedxPrint-qrcode').submit()
         vm.$message({
                 type:'success',
@@ -3788,8 +3789,24 @@
         vm.labelListShow = false
       },
       //关联清单列单的定位
-      location() {
-        alert("虚拟场景面板未打开，请打开左侧虚拟场景面板。")
+      location(value) {
+        if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+              // console.log(value,'多点定位数据');
+              var para=[];
+              value.forEach((item)=>{
+                para.push({
+                  "TraceID":String(item.dTraceId),
+                  "HolderPath":JSON.parse(item.dHolderPath),
+                  "GCCode":item.dGCCode
+                })
+              })
+              console.log(para,'多点定位数据');
+            }
       },
       //将清单与任务解除关联关系
       deleteAssociationList(num) {

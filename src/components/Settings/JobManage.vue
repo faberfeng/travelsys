@@ -20,19 +20,19 @@
                     <tr  class="userList-thead">
                         <th width="18%">岗位名称</th>
                         <th width="18%">岗位类型</th>
-                        <th width="50%">授权的功能模块</th>
+                        <!-- <th width="50%">授权的功能模块</th> -->
                         <th width="14%;">操作 </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(val,index) in jobList" :key="index">
                             <td v-text="val.posName"></td>
-                            <td v-text="val.posTypeName"></td>
-                            <td v-text="val.posAuthNameList"></td>
+                            <td v-text="typePosType(val.posType)"></td>
+                            <!-- <td v-text="val.posAuthNameList"></td> -->
                             <td>
-                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位'))"
-                                 class="editIcon" @click="addUser(val.posType,val.posName,val.id)"></span>
-                                <span v-if="!(val.posType == 0 || (val.posName == '工程管理员' && val.posTypeName == '工程内岗位')) && !(val.posName == '默认岗位' && val.posTypeName == '合作方岗位')" 
+                                <span v-if="!(val.posType == 2 || (val.posName == '工程管理员' && val.posType == 1))"
+                                 class="editIcon" @click="addUser(val.posType,val.posName,val.id,val.auths)"></span>
+                                <span v-if="!(val.posType == 2 || (val.posType == '工程管理员' && val.posType == 1)) && !(val.posType == 3 && val.posType == 4)" 
                                 class="deleteIcon" @click="deleteJob(val.id)"></span>
                             </td>
                         </tr>
@@ -194,11 +194,24 @@ export default {
         var vm = this
         vm.projId = localStorage.getItem('projId')//项目id
         vm.token  = localStorage.getItem('token')
+         vm.entId = localStorage.getItem('entId')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
-        vm.intoJobManager();
+        vm.getInfoList()
+        // vm.intoJobManager();
         vm.getJobShuXingTu();
     },
     methods:{
+        typePosType(val){
+            if(val==1){
+                return '工程内岗位'
+            }else if(val==2){
+                return '合作方岗位'
+            }else if(val==3){
+                return '工程内默认岗位'
+            }else if(val==4){
+                return '合作方默认岗位'
+            }
+        },
         checkName(name){
             var vm = this
             if(name == '' || name.indexOf('默认岗位') == -1){
@@ -241,7 +254,7 @@ export default {
                     },
                     simpleData: {
                         enable: true,
-                        idKey: "authId",
+                        idKey: "id",
                         pIdKey: "parAuthId",
                         rootPId: 0
                     }
@@ -249,25 +262,28 @@ export default {
             };
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'project2/Config/positionTree',
+                url:vm.BDMSUrl+'/projectInfo/getAllAuthInfo',
                 headers:{
                     'token':vm.token
-                },
-                params:{
-                    pId:vm.jobID
                 }
+                // params:{
+                //     pId:vm.jobID
+                // }
             }).then((response)=>{
                 if(response.data.rt){
-                    var jobTree_checked = [],jobTree_opend = []
+                    var jobTree_opend = []
+
                     for(var i =0;i<response.data.rt.length;i++){
-                        if(response.data.rt[i].flag){
-                            jobTree_checked.push(response.data.rt[i].authCode)
-                        }
-                        if(response.data.rt[i].open){
-                            jobTree_opend.push(response.data.rt[i].authCode)
-                        }
+                        // jobTree_checked.push(response.data.rt[i].authCode)
+                        jobTree_opend.push(response.data.rt[i].authCode)
+                        // if(response.data.rt[i].flag){
+                            
+                        // }
+                        // if(response.data.rt[i].open){
+                           
+                        // }
                     }
-                    vm.jobTree_checked = jobTree_checked,
+                    // vm.jobTree_checked = jobTree_checked,
                     vm.jobTree_opend = jobTree_opend,
                     vm.jobTree =  data.transformTozTreeFormat(setting, response.data.rt)
                 }
@@ -292,6 +308,23 @@ export default {
                 }
             }).catch((err)=>{
                 console.log(err)
+            })
+        },
+        getInfoList(){
+            var vm=this;
+            axios({
+                method:'GET',
+                url:vm.BDMSUrl+'/position/getAllPosition',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    vm.jobList = response.data.rt;
+                }
             })
         },
         getInfo(){
@@ -326,7 +359,7 @@ export default {
         deleteRow(index, rows) {
             rows.splice(index, 1);
         },
-        addUser(type,name,val){
+        addUser(type,name,val,auth){
             console.log(type)
             var vm = this;
             vm.adduser = true;
@@ -340,13 +373,21 @@ export default {
                 if(type ==4 ){
                     vm.jobDetial.posType = ''+2;
                 }
+                var jobTree_checked = [];
+                 for(var i =0;i<auth.length;i++){
+                        jobTree_checked.push(auth[i].authCode)
+                    }
+                vm.jobTree_checked=jobTree_checked;
                 vm.getJobShuXingTu()//获取某val的权限
+               
+                console.log(vm.jobTree_checked);
             }else{
                 vm.isD = false
                 vm.jobDetial.posName = '';
                 vm.jobDetial.posType = '1';
                 vm.jobID = 0
                 vm.title = '增加岗位'
+                vm.jobTree_checked=[];
                 vm.getJobShuXingTu()//获取某val的权限
             }
         },
@@ -359,6 +400,12 @@ export default {
             //vm.$refs.tree_job.setCheckedKeys([]);
             vm.getJobShuXingTu();
         },
+        setPositionAuth(){
+            axios({
+
+            })
+        },
+
         PostaddUser(){
             var vm = this;
             //var checkCode = [];
@@ -383,46 +430,83 @@ export default {
             }else{
                 flag = false
             }
-            
-            if(flag){
-                alert('岗位不能重复添加!');
-            }else{
-                if(this.jobDetial.posName == ''){
-                    alert("请输入岗位名称！");
-                }else if(this.checkCode.length == 0 ){
-                    alert("该用户至少选择一个岗位权限！");
+                    if(flag){
+                    alert('岗位不能重复添加!');
                 }else{
-                    axios({
-                        method:'POST',
-                        url:vm.BDMSUrl+'project2/Config/savePosition?projId='+vm.projId,
-                        headers:{
-                            'token':vm.token
-                        },
-                        data:{
-                            authCodes:this.checkCode,
-                            posId: vm.jobID,
-                            posName: vm.jobDetial.posName,
-                            posType: parseInt(vm.jobDetial.posType),
-                        }
-                    }).then((response)=>{
-                        if(response.data.cd == 0){
-                            vm.adduser = false;
-                            this.jobDetial.posName = '';
-                            vm.jobDetial.posType ='1';
-                            // vm.$refs.tree_job.setCheckedKeys([]);
-                            vm.getInfo();
-                        }else if(response.data.cd == '-1'){
-                            alert(response.data.msg);
-                        }else{
-                            this.$router.push({
-                                path:'/login'
-                            })
-                        }
-                    }).catch((err)=>{
-                        console.log(err)
-                    })
+                    if(this.jobDetial.posName == ''){
+                        alert("请输入岗位名称！");
+                    }else if(this.checkCode.length == 0 ){
+                        alert("该用户至少选择一个岗位权限！");
+                    }else if(this.isD==false){
+                        axios({
+                            method:'POST',
+                            // url:vm.BDMSUrl+'project2/Config/savePosition?projId='+vm.projId,
+                            url:vm.BDMSUrl+'/position/addPosition',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                entId: vm.entId,
+                                positionName: vm.jobDetial.posName,
+                                posType: parseInt(vm.jobDetial.posType),
+                                projectId:vm.projId
+                            },
+                            data:this.checkCode
+                        }).then((response)=>{
+                            if(response.data.cd == 0){
+                                vm.adduser = false;
+                                this.jobDetial.posName = '';
+                                vm.jobDetial.posType ='1';
+                                // vm.$refs.tree_job.setCheckedKeys([]);
+                                // vm.getInfo();
+                                vm.getInfoList();
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg);
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+                    }else if(this.isD==true){
+                         axios({
+                            method:'POST',
+                            // url:vm.BDMSUrl+'project2/Config/savePosition?projId='+vm.projId,
+                            url:vm.BDMSUrl+'/position/setPositionAuth',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                positionId:vm.jobID
+                            },
+                            data:this.checkCode
+                        }).then((response)=>{
+                            if(response.data.cd == 0){
+                                vm.adduser = false;
+                                this.jobDetial.posName = '';
+                                vm.jobDetial.posType ='1';
+                                // vm.$refs.tree_job.setCheckedKeys([]);
+                                // vm.getInfo();
+                                vm.getInfoList();
+                            }else if(response.data.cd == '-1'){
+                                alert(response.data.msg);
+                            }else{
+                                this.$router.push({
+                                    path:'/login'
+                                })
+                            }
+                        }).catch((err)=>{
+                            console.log(err)
+                        })
+
+
+                    }
                 }
-            }
+
+            
+            
         },
         deleteJob(key){
             var vm = this;

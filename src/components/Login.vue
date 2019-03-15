@@ -66,7 +66,7 @@ export default {
         if(defaultSubProjId != 'undefined'){
             localStorage.removeItem('defaultSubProjId')
         }
-         this.validateInstance()
+        //  this.validateInstance()
         // if(token != 'undefined'){
         //     vm.token = token
         //     // 判断是否登陆
@@ -116,45 +116,31 @@ export default {
         Login(){
             this.login.Password = md5(this.login.Password);
             var formData = new FormData();
-            formData.append('account',this.login.Id.trim());
-            formData.append('isRemember',this.isAuto);
+            formData.append('userName',this.login.Id.trim());
+            // formData.append('isRemember',this.isAuto);
             formData.append('password',this.login.Password);
             this.loadingShow=true;
             axios({
                 method: 'Post',
-                url: this.BDMSUrl + 'project2/login',
+                // url: this.BDMSUrl + 'project2/login',
+                url: this.BDMSUrl + 'api/v1/certification/login',
                 headers: {
                     'content-type': 'application/json;charset=UTF-8',
                 },
                 data:formData
             }).then((response) => {
                 this.projectData = response.data;
-                if (this.projectData.cd === '10004') {
-                    localStorage.setItem('token', this.projectData.rt.session.onlineInfo.tokenId);
-                    // sessionStorage.setItem('token')
-                    localStorage.setItem('username', this.projectData.rt.session.onlineInfo.realName);
-                    localStorage.setItem('userid', this.projectData.rt.session.onlineInfo.userId);
-                    this.$store.commit('changeImagePath',{
-                        imagePath:this.projectData.rt.session.onlineInfo.imgUuid
-                    })
+                if(this.projectData.cd === '0'){
+                    localStorage.setItem('token', this.projectData.rt);
                     this.$router.push({
                         path: '/showcompany'
                     })
+                    // this.$router.push({
+                    //     path:'/projectlist'
+                    // })
                     this.loadingShow=false;
-                    // sessionStorage.setItem('navigationPath','projectPage');
-                    //  sessionStorage.setItem('navigationPath','工程首页');
-                    // const loading = this.$loading({
-                    //     lock: true,
-                    //     text: 'Loading',
-                    //     spinner: 'el-icon-loading',
-                    //     background: 'rgba(0, 0, 0, 0.7)'
-                    // });
-                } else if (this.projectData.cd === '10003') {
-                    this.loadingShow=false;
-                    alert(this.projectData.msg) //密码不正确
-                } else if (this.projectData.cd === '10000') {
-                    this.loadingShow=false;
-                    alert(this.projectData.msg) //账号不存在
+                }else if(this.projectData.cd === '-1'){
+                    alert(this.projectData.msg)
                 }
             })
         }

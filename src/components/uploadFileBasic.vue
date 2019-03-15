@@ -100,6 +100,7 @@ export default Vue.component('common-upload',{
                 console.log(err)
             })
         },
+        
         uploadIMG(){
             var vm = this
             vm.uploading=true;
@@ -116,29 +117,20 @@ export default Vue.component('common-upload',{
                })
                return false
            }
-        //    console.log(vm.dirid+':::'+vm.fgid+':::'+vm.des+':::'+vm.isqj)
-        //     var returnUrl = vm.BDMSUrl+"project2/doc/uploadFile?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj+"&from="+1;
-        //     // var returnUrl = "http://10.252.29.13:8060/uploading/uploadMultiplyFileInfo?dirId="+vm.dirid+"&fgId="+vm.fgid+"&fileDesc="+vm.des+"&isUploadPoint="+vm.isqj;
-        //     returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
-            // formData.append('token',vm.token);
-            // formData.append('projId',vm.projId);
-            //  formData.append('type',1);
-            formData.append('files',vm.filesList);
-            // formData.append('userId',vm.userId);
-            // formData.append('modelCode','002');
-            // formData.append('returnUrl',returnUrl);
+           
+            formData.append('file',vm.filesList);
+           
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'/doc/upload',
-                //vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
-                // url:'http://10.252.29.13:8060/uploading/uploadMultiplyFileInfo',
+                url:vm.BDMSUrl+'doc/uploadPanorama',
+           
                 headers:{
                     'token':vm.token,
                     'Content-Type': 'multipart/form-data'
                 },
                 params:{
-                    projectId:vm.projId,
+                    projId:vm.projId,
                     dirId:vm.dirid
                 },
                 data:formData,
@@ -150,8 +142,8 @@ export default Vue.component('common-upload',{
                     vm.des = ''
                     vm.imageName ='未选择任何文件'
                     vm.filesList = null
-                    fileId.push(response.data.rt[0].fileId)
-                    vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
+                    // fileId.push(response.data.rt[0].fileId)
+                    // vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
                     vm.$refs.file.value = ''
                     vm.$emit('refreshqj')
                 

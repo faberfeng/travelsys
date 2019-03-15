@@ -13,13 +13,13 @@
                      <span  class="title-right-edit-icon" @click="allowChangeName"></span>
                   </span>
               </p>
-                <p class="title-box">
+                <!-- <p class="title-box">
                   <span class="title-left">创建用户:</span>
                   <span class="info-title" v-text="ugInfo.createUser"></span>
-              </p>
+              </p> -->
                 <p class="title-box">
                   <span class="title-left">创立时间:</span>
-                  <span class="info-title">{{ugInfo.createTime | toLocalD}}</span>
+                  <span class="info-title">{{ugEdit.time | toLocalD}}</span>
               </p>
                <p class="title-box">
                   <span class="title-left">群组标签:</span>
@@ -31,8 +31,8 @@
                 <p class="title-box">
                   <span class="title-left">群组状态:</span>
                   <span class="info-title">
-                    <el-radio v-model="ugEdit.status" label="1" >启用</el-radio>
-                    <el-radio v-model="ugEdit.status" label="0" >禁用</el-radio>
+                    <el-radio v-model="ugEdit.status" label="0" >启用</el-radio>
+                    <el-radio v-model="ugEdit.status" label="2" >禁用</el-radio>
                   </span>
               </p>
                 <p class="title-box">
@@ -48,8 +48,8 @@
           <ul>
               <li class="check-item" v-for="(item,index) in userQunzuList" :key="index">
                 <el-checkbox class="hahaha"   @change="pushUserID(item.userId)" v-model="item.checked">
-                    <span class="check-name" v-text="item.userName"></span>
-                    <span class="check-title" v-text="item.account"></span>
+                    <span class="check-name" v-text="item.name"></span>
+                    <span class="check-title" v-text="item.name2"></span>
                 </el-checkbox>
               </li>
           </ul>
@@ -62,9 +62,9 @@
             <span class="icon icon-addqun" @click="addQR"></span>
         </h1>
         <ul style="max-height:600px;overflow-y:auto;">
-            <li :class="[activeugID==item.ugId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.ugId,key,item,false)">
-                <span :class="[{'title-red':item.ugStatus==0},'title-qun']" >{{item.ugName}}<label v-show="item.ugStatus==0">(已禁用)</label></span>
-                <span class="icon icon-delect-qun" @click="deleteQR(item.ugId,item.ugName)"></span>
+            <li :class="[activeugID==item.groupId?'qun-item-active':'','qun-item']" v-for="(item,key) in ugList" :key="key" @click="changeQR(item.groupId,key,item,false)">
+                <span :class="[{'title-red':item.status==2},'title-qun']" >{{item.groupName}}<label v-show="item.status==2">(已禁用)</label></span>
+                <span class="icon icon-delect-qun" @click="deleteQR(item.groupId,item.groupName)"></span>
             </li>
         </ul>
         <!--一下功能暂未用到，所以隐藏了，不可删-->
@@ -89,14 +89,14 @@
                      <span  class="el-icon-search" @click="getUserInfo"></span>
                   </span>
                   <ul style="max-height:320px;overflow-y: auto;">
-                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.userName,item.account,item.userPositions,key)">
+                      <li class="userList-item" v-for="(item,key) in outsideUserList" :key="key" @click="addUser(item.userId,item.name,item.name2,key)">
                           <p>
-                            <span class="check-name" v-text="item.userName+'-'"></span>
-                            <span class="check-title" v-text="item.account"></span>
+                            <span class="check-name" v-text="item.name+'-'"></span>
+                            <span class="check-title" v-text="item.name2"></span>
                           </p>
-                          <p>
+                          <!-- <p>
                             <span class="check-title" v-text="val.posName" v-for="(val,index) in item.userPositions" :key="index+'position'" ></span>
-                          </p>
+                          </p> -->
                           <span :class="['icon','icon-selectUser',item.checked?'active':'']"></span>
                       </li>
                   </ul>
@@ -133,7 +133,8 @@ export default {
             ugEdit:{
                 name:'',
                 tag:'',
-                status:''
+                status:'',
+                time:'',
             },
             BDMSUrl:'',
             canEditname:true,
@@ -156,6 +157,7 @@ export default {
             subCompanyName:'',
             subCompanyList:[],
             isCompany:false,
+            userList:[]
         }
     },
     watch:{
@@ -213,12 +215,16 @@ export default {
         saveUserQR(){
             var vm = this
             //userDetialAdd
+            console.log(vm.userDetialAdd);
             if(vm.userListAdd.length>0){
                 for(let i=0;i<vm.userListAdd.length;i++){
-                    let userName = vm.outsideUserList[i].userName
-                    vm.addQzUsers(vm.userListAdd[i],userName)
+                    let userName = vm.outsideUserList[i].name
+                    vm.userList.push(vm.userDetialAdd[i].id);
                 }
+                vm.addQzUsers(vm.userList)
+                console.log(vm.userList,'vm.userList')
                 setTimeout(function(){
+                    
                     vm.getQRuser(vm.activeugID)
                     vm.userClose()
                 },1000)
@@ -233,14 +239,17 @@ export default {
             var vm = this
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
+                // url:vm.BDMSUrl+'project2/Config/addUserGroupUser',
+                url:vm.BDMSUrl+'userGroup/addGroupUser',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    userId:userId,
-                    ugId:vm.activeugID,//正在查看的群组ID
-                }
+                    groupId:vm.activeugID,
+                    // userIds:vm.activeugID,//正在查看的群组ID
+                },
+                data:vm.userList
+                
             }).then((response)=>{
                 if(response.data.cd == 0){
                     vm.$notify({
@@ -278,7 +287,7 @@ export default {
                 if(vm.userQunzuList[k].userId == val){
                     vm.$message({
                         type:'warning',
-                        message: '用户 "'+vm.userQunzuList[k].userName+'" 已在群组中!'
+                        message: '用户 "'+vm.userQunzuList[k].name+'" 已在群组中!'
                     })
                     return false
                 }
@@ -508,18 +517,15 @@ export default {
             addQunzu(value){
                 var vm = this
                 axios({
-                    method:'POST',
-                    url:vm.BDMSUrl+'config/userGroup/add',
+                    method:'GET',
+                    // url:vm.BDMSUrl+'config/userGroup/add',
+                    url:vm.BDMSUrl+'userGroup/addGroup',
                     headers:{
                         'token':vm.token
                     },
-                    data:{
-                        projId:vm.projId,
-                        ugName:value,
-                        ugOrder:11,
-                        ugParId:0,
-                        ugStatus:1,
-                        ugType:0
+                    params:{
+                        projectId:vm.projId,
+                        groupName:value
                     }
                 }).then((response)=>{
                     if(response.data.cd == 0){
@@ -610,36 +616,39 @@ export default {
                 vm.EditLabel()
             },
         intoQunzu(){
-            var vm = this
-                axios({
-                    method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/groupIndex',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        projId:vm.projId
-                    }
-                }).then((response)=>{
-                    if(response.data.rt.projId == vm.projId){
-                        vm.getUserInfo()
-                        vm.getQunList()
-                    }
-                }).catch((err)=>{
-                    console.log(err)
-                })
+                var vm = this
+                // axios({
+                //     method:'GET',
+                //     url:vm.BDMSUrl+'project2/Config/groupIndex',
+                //     headers:{
+                //         'token':vm.token
+                //     },
+                //     params:{
+                //         projId:vm.projId
+                //     }
+                // }).then((response)=>{
+                //     if(response.data.rt.projId == vm.projId){
+                        
+                //     }
+                // }).catch((err)=>{
+                //     console.log(err)
+                // })
+                vm.getUserInfo()
+                vm.getQunList()
         },
         getUserInfo(){//获得工程用户列表
                 var vm = this
                 axios({
                     method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/projectUserList',
+                    // url:vm.BDMSUrl+'project2/Config/projectUserList',
+                    url:vm.BDMSUrl+'/user/getProjectUserList',
                     headers:{
                         'token':vm.token
                     },
                     params:{
-                        projId:vm.projId,
-                        queryParam:vm.userInfo
+                        // projId:vm.projId,
+                        // queryParam:vm.userInfo
+                        projectId:vm.projId
                     }
                 }).then((response)=>{
                     if(response.data.rt != null){
@@ -655,39 +664,34 @@ export default {
         getQunList(){//获得工程群组列表
                 var vm = this;
                 axios({
-                    method:'POST',
-                    url:vm.BDMSUrl+'config/userGroup/list',
+                    method:'get',
+                    url:vm.BDMSUrl+'/userGroup/getAllGroup',
                     headers:{
                         'token':vm.token
                     },
                     params:{
-                        projId:vm.projId,
-                        data :''
+                        projectId:vm.projId
                     }
                 }).then((response)=>{
                     if(response.data.cd == '0'){
-                        vm.subCompanyName = response.data.rt.projCompany
-                        var str=response.data.rt.ugList;
-                        // for(var i=0;i<str.length;i++){
-                        //     if(str[i].ugStatus==0){
-                        //         console.log(i,'i111');
-                        //         console.log(i+"="+str[i]);
-                        //         str.splice(i--,1);
-                        //         // str.push(str[i--]);
+                        // vm.subCompanyName = response.data.rt.projCompany
+                        this.ugList=response.data.rt;
+                        vm.changeQR(response.data.rt[0].groupId,null,response.data.rt[0]);
+                        vm.getQRuser(response.data.rt[0].groupId);
+                        // response.data.rt.ugList=response.data.rt;
+                        // var str=response.data.rt.ugList;
+                        // str.forEach((item,index)=>{
+                        //     if(item.groupName=="质量验收"){
+                        //         str.splice(index,1);
                         //     }
-                        // }
-                        str.forEach((item,index)=>{
-                            if(item.ugName=="质量验收"){
-                                str.splice(index,1);
-                            }
-                            if(item.ugName=="安全验收"){
-                                str.splice(index,1);
-                            }
-                            if(item.ugStatus==0){
-                                vm.ugList.splice(index,1);
-                                vm.ugList.push(item);
-                            }
-                        })
+                        //     if(item.groupName=="安全验收"){
+                        //         str.splice(index,1);
+                        //     }
+                        //     if(item.status==0){
+                        //         vm.ugList.splice(index,1);
+                        //         vm.ugList.push(item);
+                        //     }
+                        // })
                         // var map = new Map();
                         // for (var i = 0; i < str.length;i++){
                         //     var patrolId = str[i].ugStatus;
@@ -710,40 +714,40 @@ export default {
                         //     console.log(value,'ppppp');
                         //     console.log(str,'strppp');
                         // });
+                        
                         // vm.ugList=str;
                         if(response.data.rt.ugList){
-                            vm.ugList = []
-                            vm.subCompanyList = []
-                            var entDept = [],entCoop=[]
-                            for(var i=0;i<response.data.rt.ugList.length;i++){
-                                if(response.data.rt.ugList[i].ugName == '默认群组'){
-                                    vm.activeugID = response.data.rt.ugList[i].ugId;
-                                    vm.activeugIDkey = i;
-                                    vm.changeQR(response.data.rt.ugList[i].ugId,i);
-                                    vm.getQRuser(response.data.rt.ugList[i].ugId);
-                                    vm.checkedUgList = response.data.rt.ugList[i];
-                                }
-                                if(response.data.rt.ugList[i].ugType == 2){
-                                    vm.ugList.push(response.data.rt.ugList[i])
-                                    // || response.data.rt.ugList[i].ugName == '安全验收'
-                                }else if( response.data.rt.ugList[i].ugName == '质量检查' || response.data.rt.ugList[i].ugName == '安全验收'  || response.data.rt.ugList[i].ugName == '安全检查'){
-                                    vm.ugList.push(response.data.rt.ugList[i])
-                                }else if(response.data.rt.ugList[i].ugType == 4){
-                                    entDept.push(response.data.rt.ugList[i])
-                                }else if(response.data.rt.ugList[i].ugType == 5){
-                                    entCoop.push(response.data.rt.ugList[i])
-                                }else{
-                                    vm.ugList.push(response.data.rt.ugList[i])
-                                }
-                            }
+                            // vm.ugList = []
+                            // vm.subCompanyList = []
+                            // var entDept = [],entCoop=[]
+                            // for(var i=0;i<response.data.rt.ugList.length;i++){
+                            //     if(response.data.rt.ugList[i].groupName == '默认群组'){
+                            //         vm.activeugID = response.data.rt.ugList[i].groupId;
+                            //         vm.activeugIDkey = i;
+                            //         vm.changeQR(response.data.rt.ugList[i].groupId,i);
+                            //         vm.getQRuser(response.data.rt.ugList[i].groupId);
+                            //         vm.checkedUgList = response.data.rt.ugList[i];
+                            //     }
+                            //     // if(response.data.rt.ugList[i].ugType == 2){
+                            //     //     vm.ugList.push(response.data.rt.ugList[i])
+                            //     // }else if( response.data.rt.ugList[i].ugName == '质量检查' || response.data.rt.ugList[i].ugName == '安全验收'  || response.data.rt.ugList[i].ugName == '安全检查'){
+                            //     //     vm.ugList.push(response.data.rt.ugList[i])
+                            //     // }else if(response.data.rt.ugList[i].ugType == 4){
+                            //     //     entDept.push(response.data.rt.ugList[i])
+                            //     // }else if(response.data.rt.ugList[i].ugType == 5){
+                            //     //     entCoop.push(response.data.rt.ugList[i])
+                            //     // }else{
+                            //     //     vm.ugList.push(response.data.rt.ugList[i])
+                            //     // }
+                            // }
                             console.log(vm.ugList,'0000')
-                            vm.subCompanyList = entDept.concat(entCoop)
+                            // vm.subCompanyList = entDept.concat(entCoop)
                         }else if(response.data.cd == '-1'){
                             alert(response.data.msg);
                         }else{
-                            vm.$router.push({
-                                path:'/login'
-                            })
+                            // vm.$router.push({
+                            //     path:'/login'
+                            // })
                         }
                     }  
                     
@@ -878,47 +882,52 @@ export default {
         },
         changeQR(val,index,item,isCompany){//切换群组，根据群组ID获取群组信息
             var vm = this;
+             vm.getQRuser(val)
             vm.checkedUgList = item;
-            if(isCompany)vm.isCompany = isCompany
-            if(val){
-                vm.ugEdit.status = ''
-                axios({
-                    method:'POST',
-                    url:vm.BDMSUrl+'config/userGroup/findCompanyUserGroupByNodeId',
-                    headers:{
-                        'token':vm.token
-                    },
-                    params:{
-                        ugId:val,
-                    }
-                 }).then((response)=>{
-                    vm.activeugID = val
-                    vm.activeugIDkey = index
-                    vm.ugInfo = response.data.rt//工程群组
-                    //增添群组信息
-                    vm.ugEdit.name = vm.ugInfo.ugName 
-                    vm.ugEdit.tag = vm.ugInfo.ugTag
-                    vm.ugEdit.status = vm.ugInfo.ugStatus
-                    vm.ugEdit.status =  response.data.rt.ugStatus+''
-                    vm.userListDEL = []
-                    vm.getQRuser(val)
-                }).catch((err)=>{
-                    console.log(err)
-                })
-            }
+            vm.activeugID = val
+            vm.activeugIDkey = index
+            // vm.ugInfo = response.data.rt//工程群组
+            //增添群组信息
+            vm.ugEdit.name = vm.checkedUgList.groupName 
+            vm.ugEdit.tag = null
+            vm.ugEdit.status = vm.checkedUgList.status
+            vm.ugEdit.status =  vm.checkedUgList.status+''
+            // vm.ugInfo.createTime=vm.checkedUgList.createDate
+            vm.ugEdit.time=vm.checkedUgList.createDate
+            vm.userListDEL = []
+                   
+            // if(isCompany)vm.isCompany = isCompany
+            // if(val){
+            //     vm.ugEdit.status = ''
+            //     axios({
+            //         method:'POST',
+            //         url:vm.BDMSUrl+'config/userGroup/findCompanyUserGroupByNodeId',
+            //         headers:{
+            //             'token':vm.token
+            //         },
+            //         params:{
+            //             ugId:val,
+            //         }
+            //      }).then((response)=>{
+                    
+            //     }).catch((err)=>{
+            //         console.log(err)
+            //     })
+            // }
         },
         getQRuser(val){//根据群组ID获取群组用户列表
             var vm = this;
             if(val){
                 axios({
                     method:'GET',
-                    url:vm.BDMSUrl+'project2/Config/userGroupUserList',
+                    // url:vm.BDMSUrl+'project2/Config/userGroupUserList',
+                    url:vm.BDMSUrl+'userGroup/getGroupUser',
                     headers:{
                         'token':vm.token
                     },
                     params:{
-                        ugId:val,
-                        projId:vm.projId
+                        groupId:val
+                        // projId:vm.projId
                     }
                 }).then((response)=>{
                     if(response.data.cd == '0'){

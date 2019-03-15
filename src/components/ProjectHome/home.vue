@@ -146,7 +146,8 @@ export default {
             var vm = this
             axios({
                 method:'get',
-                url:vm.BDMSUrl+'project2/main/'+vm.projId+'/overview/list',
+                // url:vm.BDMSUrl+'project2/main/'+vm.projId+'/overview/list',
+                url:vm.BDMSUrl+'api/v1/main/main/'+vm.projId+'/overview/list',
                 headers:{
                     'token':this.token
                 }
@@ -167,7 +168,8 @@ export default {
             var vm = this
             axios({
                 method:'get',
-                url:vm.BDMSUrl+'project2/main/findProjectImage?projectId='+this.projId,
+                // url:vm.BDMSUrl+'project2/main/findProjectImage?projectId='+this.projId,
+                url:vm.BDMSUrl+'api/v1/main/main/findProjectImage?projectId='+this.projId,
                 headers:{
                     'token':this.token
                 }

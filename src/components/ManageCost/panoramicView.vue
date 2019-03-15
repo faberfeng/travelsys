@@ -8,15 +8,15 @@
               <span :class="['round']"   :style="{'top':imgdetial.y+'px','left':imgdetial.x+'px'}">
               </span>
           </div>
-          <p class="headTitle">历史版本</p>
-          <ul>
+          <!-- <p class="headTitle">历史版本</p> -->
+          <!-- <ul>
             <li :class="['item-version',{'active':item.checked}]" v-for="(item,index) in QJ.imageBackground" :key="index+'_version'" @click="change(index)">
               <p v-text="'版本'+(index+1)" class="title"></p>
                <p v-text="item.fileName" class="info"></p>
               <p v-text="initData(item.uploadTime)+'由'+item.uploadUserName+'上传'" class="info" style="margin-top:8px;"></p>
               <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
             </li>
-          </ul>
+          </ul> -->
       </div>
 </div>
 </template>
@@ -176,18 +176,22 @@ export default {
             path:'',
             x:'',
             y:''
-          }
+          },
+          BDMSUrl:'',
       }
     },
     created(){
       var vm = this
       vm.projId = localStorage.getItem('projId');
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL
+      vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.fgId = vm.$route.params.id
       var obj = JSON.parse(sessionStorage.getItem('qjInfo'))
       vm.imgdetial.path = obj.image
       vm.imgdetial.x = obj.x
       vm.imgdetial.y = obj.y
+      console.log(vm.imgdetial.path,'vm.imgdetial.path');
+     
       vm.getImg()
       // vm.init(source);
     },
@@ -223,29 +227,33 @@ export default {
       },
       getImg(){
         var vm = this
-         axios({
-            method:'POST',
-            url:'project2/doc/getFileGroupVersionList',
-            params:{
-                fgId:vm.fgId,
-            },
-        }).then((response)=>{
-            if(response.data.cd == 0 && response.data.rt.length>0){
-               vm.QJ.imageBackground = response.data.rt
-                vm.QJ.imageBackground.forEach((item,key) => {
-                    if(key == 0){
-                       vm.$set(item,'checked',true)
-                    }else{
-                        vm.$set(item,'checked',false)
-                    }
-                });
-                source = vm.QJFileManageSystemURL+response.data.rt[0].filePath
-                console.log(source)
-                vm.init(source);
-            }
-        }).catch((err)=>{
-            console.log(err)
-        })
+        setTimeout(()=>{
+            vm.init(vm.BDMSUrl+'/doc/download/'+vm.fgId);
+        },1000)
+         
+        //  axios({
+        //     method:'POST',
+        //     url:'project2/doc/getFileGroupVersionList',
+        //     params:{
+        //         fgId:vm.fgId,
+        //     },
+        // }).then((response)=>{
+        //     if(response.data.cd == 0 && response.data.rt.length>0){
+        //        vm.QJ.imageBackground = response.data.rt
+        //         vm.QJ.imageBackground.forEach((item,key) => {
+        //             if(key == 0){
+        //                vm.$set(item,'checked',true)
+        //             }else{
+        //                 vm.$set(item,'checked',false)
+        //             }
+        //         });
+        //         source = vm.QJFileManageSystemURL+response.data.rt[0].filePath
+        //         console.log(source)
+        //         vm.init(source);
+        //     }
+        // }).catch((err)=>{
+        //     console.log(err)
+        // })
       },
      init(source){
        var vm = this

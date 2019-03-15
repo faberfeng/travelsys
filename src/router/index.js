@@ -550,6 +550,14 @@ const router = new Router({
           },
           component:resolve=>require(['@/components/Settings/BuildingProperty'],resolve)
         },
+        {
+          path:'/setting/hierarchicalManagement',
+          name:'hierarchicalManagement',
+          meta:{
+            settingsCenter:true
+          },
+          component:resolve=>require(['@/components/Settings/hierarchicalManagement'],resolve)
+        },
       ]
     }
   ]

@@ -101,6 +101,7 @@
 import headerCommon from './header.vue'
 import axios from 'axios'
 var app
+var responseStr=require('./json/response');
 export default {
     name:'Home',
     components: {
@@ -215,8 +216,9 @@ export default {
         };
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
         vm.token  = localStorage.getItem('token')
+        vm.getUserInfo()
         vm.getPJDetial(vm.projId);
-        
+        vm.getOnlineInfo();
         // console.log(new Date().getTime(),'time');
         // this.getInitdata();
     },
@@ -329,9 +331,11 @@ export default {
         //获取自定义菜单信息
         getMenusInfoPage(){
             var vm=this;
+            this.menusInfoData=[];
             axios({
                 method:'GET',
-                url:this.BDMSUrl+'config2/component/getCustomMenu',
+                // url:this.BDMSUrl+'config2/component/getCustomMenu',
+                url:this.BDMSUrl+'api/v1/main/getCustomMenu',
                 headers:{
                     'token':this.token
                 },
@@ -524,7 +528,8 @@ export default {
              * ********/
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'project2/index?projId='+key,
+                // url:vm.BDMSUrl+'project2/index?projId='+key,
+                url:vm.BDMSUrl+'api/v1/main/index?projId='+key,
                 headers:{
                     'accept':'application/json;charset=UTF-8',
                     'token':vm.token
@@ -539,11 +544,11 @@ export default {
                     // vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:''
                     // localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId)
                     // localStorage.setItem('projectName',vm.header.projectName)
-
-                    vm.header.projectName = response.data.rt.project?response.data.rt.project.projName:'';
+                    vm.getUserInfo();
+                    vm.header.projectName = response.data.rt.project?response.data.rt.project.projectName:'';
                     localStorage.setItem('projectName',vm.header.projectName);
                     
-                    vm.header.projectImg = response.data.rt.projectImage?response.data.rt.projectImage.filePath:'';
+                    vm.header.projectImg = response.data.rt[0].image?response.data.rt[0].image.filePath:'';
                     this.$store.commit('changeProjectLogo',{
                         projectImg:vm.header.projectImg
                     })
@@ -558,8 +563,8 @@ export default {
                     }
                     localStorage.setItem('defaultSubProjId',response.data.rt.defaultSubProjId);
                     this.subProjId=response.data.rt.defaultSubProjId;
-                    vm.getUserInfo();
-                    vm.getInitdata();
+                    
+                    // vm.getInitdata();
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -576,27 +581,57 @@ export default {
         firstEnter(){
 
         },
+        
+        getOnlineInfo(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'user/getOnlineInfo',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                // vm.header.userName = response.data.rt.user.name
+                vm.header.userId = response.data.rt.user.userId
+                // vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
+                // localStorage.setItem('userImg',vm.header.userImg)
+                // localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
+                // localStorage.setItem('userName',vm.header.userName)
+                localStorage.setItem('projAuth',response.data.rt.authIds)
+                // console.log(response.data.rt.authIds,'权限文件');
+            })
+        },
+
         getUserInfo(){
             var vm = this
             this.getMenusLists=[];
-            axios({
-                method:'GET',
-                url:vm.BDMSUrl+'project2/getOnlineInfo',
-                params:{
-                    refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
-                },
-                headers:{
-                    'accept':'application/json;charset=UTF-8',
-                    'token':vm.token,
-                },
-            }).then((response)=>{
+            // axios({
+            //     method:'GET',
+            //     url:vm.BDMSUrl+'project2/getOnlineInfo',
+            //     params:{
+            //         refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+            //     },
+            //     headers:{
+            //         'accept':'application/json;charset=UTF-8',
+            //         'token':vm.token,
+            //     },
+            // })
+            // .then((response)=>{
                 
-                vm.header.userName = response.data.rt.onlineInfo.userName
-                vm.header.userId = response.data.rt.onlineInfo.userId
-                vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
-                localStorage.setItem('userImg',vm.header.userImg)
-                localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
-                localStorage.setItem('userName',vm.header.userName)
+            {
+                var response={
+                    data:responseStr
+                }
+                // var id = localStorage.getItem('projId');
+                // vm.header.userName = response.data.rt.onlineInfo.userName
+                // vm.header.userId = response.data.rt.onlineInfo.userId
+                // vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
+                // localStorage.setItem('userImg',vm.header.userImg)
+                // localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
+                // localStorage.setItem('userName',vm.header.userName)
+                // localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
                 /*********
                  *要判断导航栏功能； 
                  * 工程首页 （007）、进度计划（005）、设计管理（004）、
@@ -617,10 +652,10 @@ export default {
                         configurationCenter:false
                     }
                  * *********/
-                var id = localStorage.getItem('projId');
-                 localStorage.setItem('entId',response.data.rt.onlineInfo.entId)
+                // var id = localStorage.getItem('projId');
+                //  localStorage.setItem('entId',response.data.rt.onlineInfo.entId)
                 // localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
-                localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
+                
                 localStorage.setItem('moduleList',JSON.stringify(response.data.rt.onlineInfo.moduleList))
                 this.moduleLists=response.data.rt.onlineInfo.moduleList;
                 
@@ -714,9 +749,10 @@ export default {
                     }
                     this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00104')
                     // console.log(this.ellist,'ellist0000');
-            }).catch((err)=>{
-                console.log(err)
-            })
+            // }).catch((err)=>{
+            //     console.log(err)
+            // })
+            }
         },
         getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4){
             var vm=this;
@@ -733,13 +769,17 @@ export default {
                                 title:'/setting/initalsettings',
                                 linkUrl:'工程初始配置信息'
                             },
+                            // {
+                            //     title:'/setting/groundsettings',
+                            //     linkUrl:'场地与单体初始化'
+                            // },
+                            // {
+                            //     title:'/setting/pageinital',
+                            //     linkUrl:'层级管理初始化'
+                            // },
                             {
-                                title:'/setting/groundsettings',
-                                linkUrl:'场地与单体初始化'
-                            },
-                            {
-                                title:'/setting/pageinital',
-                                linkUrl:'分区与楼层初始化'
+                                title:'/setting/hierarchicalManagement',
+                                linkUrl:'层级管理初始化'
                             }
                         )
                         vm.$set(item,'routerLink',routerLink1);
@@ -748,38 +788,38 @@ export default {
                         vm.$set(item,'isShowUrl','/setting/datatransform');
                         let routerLink2=[];
                         routerLink2.push(
-                            {
-                                title:'/setting/datatransform',
-                                linkUrl:'数据传递标准概览'
-                            },
-                            {
-                                title:'/setting/professional',
-                                linkUrl:'专业工种分类编码'
-                            },
-                            {
-                                title:'/setting/worktool',
-                                linkUrl:'作业工具分类编码'
-                            },
-                            {
-                                title:'/setting/constructordesignmapped',
-                                linkUrl:'设计构件分类映射'
-                            },
+                            // {
+                            //     title:'/setting/datatransform',
+                            //     linkUrl:'数据传递标准概览'
+                            // },
+                            // {
+                            //     title:'/setting/professional',
+                            //     linkUrl:'专业工种分类编码'
+                            // },
+                            // {
+                            //     title:'/setting/worktool',
+                            //     linkUrl:'作业工具分类编码'
+                            // },
+                            // {
+                            //     title:'/setting/constructordesignmapped',
+                            //     linkUrl:'设计构件分类映射'
+                            // },
                             {
                                 title:'/setting/constructordesigncode',
                                 linkUrl:'设计构件分类编码'
                             },
-                            {
-                                title:'/setting/projectsubmit',
-                                linkUrl:'工程招标分类编码'
-                            },
-                            {
-                                title:'/setting/materialpurchase',
-                                linkUrl:'物资采购分类编码'
-                            },
-                            {
-                                title:'/setting/buildingproperty',
-                                linkUrl:'构件属性语意编码'
-                            }
+                            // {
+                            //     title:'/setting/projectsubmit',
+                            //     linkUrl:'工程招标分类编码'
+                            // },
+                            // {
+                            //     title:'/setting/materialpurchase',
+                            //     linkUrl:'物资采购分类编码'
+                            // },
+                            // {
+                            //     title:'/setting/buildingproperty',
+                            //     linkUrl:'构件属性语意编码'
+                            // }
                         )
                         vm.$set(item,'routerLink',routerLink2);
                     }
